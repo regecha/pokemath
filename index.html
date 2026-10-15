@@ -2055,7 +2055,7 @@ function isRandomMonCard(v){return isBattleSpecial(v)&&v.sp==='random';}
 function isItemCard(v){return isBattleSpecial(v)&&v.sp==='item';}
 function battleCost(v){return isBattleSpecial(v)?v.cost:((MON[v]&&MON[v].cost)||99);}
 function battleCardName(v){if(!isBattleSpecial(v))return MON[v]?MON[v].name:'포켓몬 카드';return v.name||'특수 카드';}
-function randomBandCard(ball){const x={master:{sp:'random',ball:'master',cost:4,band:[1,99],name:'마스터볼',desc:'내가 보유한 모든 포켓몬 중 랜덤 소환'},power:{sp:'random',ball:'power',cost:2,band:[1,99],name:'파워볼',desc:'내가 보유한 모든 포켓몬 중 랜덤 소환'},poke:{sp:'random',ball:'poke',cost:1,band:[1,99],name:'포켓볼',desc:'내가 보유한 모든 포켓몬 중 랜덤 소환'}}[ball];return x?{...x}:null;}
+function randomBandCard(ball){const x={master:{sp:'random',ball:'master',cost:4,band:[5,6],name:'마스터볼',desc:'보유 중인 5~6코스트 포켓몬 중 랜덤 소환'},power:{sp:'random',ball:'power',cost:2,band:[3,4],name:'파워볼',desc:'보유 중인 3~4코스트 포켓몬 중 랜덤 소환'},poke:{sp:'random',ball:'poke',cost:1,band:[1,2],name:'포켓볼',desc:'보유 중인 1~2코스트 포켓몬 중 랜덤 소환'}}[ball];return x?{...x}:null;}
 function stoneCard(item){const x={fire:{name:'화염의 돌',cost:3,desc:'상대 필드의 모든 포켓몬에게 피해 2'},water:{name:'물의 돌',cost:3,desc:'내 필드의 모든 포켓몬에게 방어막 +1'},thunder:{name:'전기의 돌',cost:3,desc:'내 포켓몬 하나가 한 번 더 행동'},moon:{name:'달의 돌',cost:3,desc:'상대 포켓몬 하나를 1턴 동안 기절시켜요'},sun:{name:'태양의 돌',cost:0,desc:'사용하면 이번 턴 에너지 +1'}}[item];return x?{sp:'item',item,cost:x.cost,name:x.name,desc:x.desc}:null;}
 function battleCardHTML(v,opt={}){if(!isBattleSpecial(v))return cardHTML(v,opt);const size=opt.size||'sm',cls=opt.cls||'';let visual='',kind='';
  if(v.sp==='random'){kind=v.ball;visual=`<div class="battleOrb ${v.ball}">${v.ball==='master'?'<b>M</b>':''}</div>`;}
@@ -2248,8 +2248,9 @@ const BOARD_N=5;
 function mkPlayer(name,deck,hp,av,keep,owned=[],specials=false){return{name,hp,max:hp,mana:0,maxMana:0,deck:keep?deck.slice():shuffle(deck.slice()),hand:[],board:Array(BOARD_N).fill(null),av,fat:0,owned:(owned||[]).map(Number).filter(id=>MON[id]),specials:!!specials,powerUses:2};}
 function mkUnit(id){const m=MON[id];const kw=kwOf(m).k;return{id,atk:m.atk,hp:m.hp,max:m.hp,kw,att:kw==='rush'?1:0,frozen:0,dodge:kw==='dodge'?1:0,tough:kw==='tough'?1:0,grow:0,fresh:1,shield:0};}
 function playerRoll(P){return B&&B.pvp&&P&&P.drawRng?P.drawRng():brand();}
-function ownedBand(P,band){ // 랜덤 카드는 도감에만 등록된 포켓몬이 아니라 실제 보유 컬렉션 전체에서 선택
- return [...new Set((P&&P.owned||[]).map(Number).filter(id=>MON[id]))];
+function ownedBand(P,band){ // 실제 보유 컬렉션에서 카드의 코스트 구간에 맞는 포켓몬만 선택
+ const lo=Array.isArray(band)?Number(band[0]):1,hi=Array.isArray(band)?Number(band[1]):Infinity;
+ return [...new Set((P&&P.owned||[]).map(Number).filter(id=>MON[id]&&MON[id].cost>=lo&&MON[id].cost<=hi))];
 }
 function drawSpecial(P){if(!P||!P.specials)return null;
  // 전체 확률: 기존 돌 4종 합계 20%(각 5%), 태양의 돌 10%, 랜덤 포켓몬 카드 20%, 일반 덱 카드 50%.
@@ -2263,7 +2264,7 @@ function drawSpecial(P){if(!P||!P.specials)return null;
   const tier=playerRoll(P);let ball=tier<.20?'master':tier<.50?'power':'poke';
   let c=randomBandCard(ball);
   if(!c||!ownedBand(P,c.band).length){
-   // 모든 랜덤 카드가 보유 중인 전체 포켓몬을 대상으로 해요. 카드별 소환 비용만 다릅니다.
+   // 해당 코스트 구간에 보유 포켓몬이 없으면, 소환 가능한 구간의 랜덤 카드 중에서 골라요.
    const available=['master','power','poke'].filter(b=>{const rc=randomBandCard(b);return rc&&ownedBand(P,rc.band).length>0;});
    if(!available.length)return null;
    ball=available[Math.floor(playerRoll(P)*available.length)];c=randomBandCard(ball);
@@ -2296,9 +2297,9 @@ function draw(P,quiet){if(P.hand.length>=6){if(!quiet)toast('손이 꽉 차서 �
  // 손패가 돌 카드(아이템)만으로 구성되어 있으면, 다음 드로우는 반드시 랜덤 카드 또는 포켓몬 카드로 보정해요.
  const onlyStones=P.hand.length>0&&P.hand.every(c=>isItemCard(c));
  if(onlyStones){
-  const owned=ownedBand(P);
+  const balls=['poke','power','master'].filter(ball=>{const rc=randomBandCard(ball);return rc&&ownedBand(P,rc.band).length>0;});
   let guaranteed=null;
-  if(owned.length){const balls=['poke','power','master'];guaranteed=randomBandCard(balls[Math.floor(playerRoll(P)*balls.length)]);}
+  if(balls.length){guaranteed=randomBandCard(balls[Math.floor(playerRoll(P)*balls.length)]);}
   if(guaranteed){P.hand.push(guaranteed);if(!quiet&&B)fx(heroEl(P),`${guaranteed.name}!`,'txt');return;}
   // 보유 포켓몬이 없어 랜덤 카드를 만들 수 없다면 덱에 남은 포켓몬 카드를 우선 뽑아요.
   const idx=P.deck.findIndex(id=>MON[id]);
@@ -2664,7 +2665,7 @@ async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)
   await dealUnit(me,tg.u,dmg);if(a.kw==='freeze'&&me.board[tg.u])me.board[tg.u].frozen=1;if(a.kw==='poison'&&me.board[tg.u])me.board[tg.u].atk=Math.max(0,me.board[tg.u].atk-1);
   const cd=applyType(d.atk,typeMul(d.id,a.id));if(cd>0){await wait(200);await dealUnit(fo,i,cd);}}
  cleanup();renderBattle();checkEnd();}
-function battleMenu(){if(B&&B.wildMode){M(`<h2>야생 포켓몬 전투</h2><div class=explain style="font-size:14px">기존 배틀과 같은 방식으로 카드를 내고, 수학 문제를 풀어 공격해요. 야생 포켓몬은 트레이너 체력 없이 체력이 30% 이하가 되면 포획을 시도할 수 있어요.</div><div class=mbtns><button class="btn gold" data-a=x>계속 싸우기</button><button class="btn ghost" data-a=q>전투 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),q:async()=>{if(await confirmBox('야생 포켓몬과의 전투를 포기할까요? 이번 포획 기회는 사라져요.','포기하기','계속 싸우기')){closeM();finishEndlessWild('fled','야생 포켓몬 전투를 포기했어요.');}}});return;}M(`<h2>배틀 메뉴</h2><div class=explain style="font-size:14px">${Object.values(KW).filter((v,i,a)=>a.findIndex(x=>x.n===v.n)===i).map(k=>`${I(k.ic)} <b>${k.n}</b> ${k.d}`).join('<br>')}<br><br><b>타입 상성</b>: 상성이 좋으면 피해 ×1.5(효과가 굉장했다!), 나쁘면 −1. 공격받은 포켓몬은 반격해요.<br>10번째 차례부터는 두 트레이너 모두 조금씩 지쳐요.<br><br><b>특수 카드 뽑기</b>: 일반 덱 카드 50%, 랜덤 포켓몬 카드 20%, 기본 돌 4종 합계 20%(화염의 돌·물의 돌·전기의 돌·달의 돌 각각 5%), 태양의 돌 10%예요. 태양의 돌은 비용 0으로 사용하면 이번 턴 에너지가 1 늘어요. 랜덤 카드 중 마스터볼 20%(5~6코스트·비용 4), 파워볼 30%(3~4코스트·비용 2), 포켓볼 50%(1~2코스트·비용 1) 비율로 나와요.<br><br><b>공부 기술</b>: 전투마다 2회 사용할 수 있고, 에너지를 소모하지 않아요. 사용할 때마다 남은 횟수가 1씩 줄어요. <b>달의 돌</b>은 3코스트로 상대 포켓몬 하나를 1턴 동안 기절시켜요.</div>
+function battleMenu(){if(B&&B.wildMode){M(`<h2>야생 포켓몬 전투</h2><div class=explain style="font-size:14px">기존 배틀과 같은 방식으로 카드를 내고, 수학 문제를 풀어 공격해요. 야생 포켓몬은 트레이너 체력 없이 체력이 30% 이하가 되면 포획을 시도할 수 있어요.</div><div class=mbtns><button class="btn gold" data-a=x>계속 싸우기</button><button class="btn ghost" data-a=q>전투 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),q:async()=>{if(await confirmBox('야생 포켓몬과의 전투를 포기할까요? 이번 포획 기회는 사라져요.','포기하기','계속 싸우기')){closeM();finishEndlessWild('fled','야생 포켓몬 전투를 포기했어요.');}}});return;}M(`<h2>배틀 메뉴</h2><div class=explain style="font-size:14px">${Object.values(KW).filter((v,i,a)=>a.findIndex(x=>x.n===v.n)===i).map(k=>`${I(k.ic)} <b>${k.n}</b> ${k.d}`).join('<br>')}<br><br><b>타입 상성</b>: 상성이 좋으면 피해 ×1.5(효과가 굉장했다!), 나쁘면 −1. 공격받은 포켓몬은 반격해요.<br>10번째 차례부터는 두 트레이너 모두 조금씩 지쳐요.<br><br><b>특수 카드 뽑기</b>: 일반 덱 카드 50%, 랜덤 포켓몬 카드 20%, 기본 돌 4종 합계 20%(화염의 돌·물의 돌·전기의 돌·달의 돌 각각 5%), 태양의 돌 10%예요. 태양의 돌은 비용 0으로 사용하면 이번 턴 에너지가 1 늘어요. 랜덤 카드 중 마스터볼 20%(5~6코스트 포켓몬·비용 4), 파워볼 30%(3~4코스트 포켓몬·비용 2), 포켓볼 50%(1~2코스트 포켓몬·비용 1) 비율로 나와요. 보유 포켓몬이 해당 구간에 없으면 소환 가능한 다른 볼로 바뀌어요.<br><br><b>공부 기술</b>: 전투마다 2회 사용할 수 있고, 에너지를 소모하지 않아요. 사용할 때마다 남은 횟수가 1씩 줄어요. <b>달의 돌</b>은 3코스트로 상대 포켓몬 하나를 1턴 동안 기절시켜요.</div>
  <div class=mbtns><button class="btn gold" data-a=x>계속하기</button>${B.pvp?'':`<button class="btn green" data-a=sv>${I('disk')} 저장하고 나가기</button>`}<button class="btn ghost" data-a=q>포기하기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),sv:()=>{if(B.busy||B.side!=='me'){toast('내 차례일 때 저장할 수 있어요');return;}const o=Object.assign({},B,{busy:false,sel:-1,pick:-1});delete o.rng;S.meta.bsave=JSON.stringify(o);saveLocal();closeM();B=null;$('#battle').classList.remove('on');$('#battle').innerHTML='';renderLeague();toast('배틀을 저장했어요! 지금 꺼도 다음에 이어서 할 수 있어요');},q:async()=>{if(await confirmBox('배틀을 포기할까요? 푼 문제는 기록에 남아요.','포기','계속')){closeM();if(B.pvp)pvpSend({t:'quit'});B.over=true;endBattle(false);}}});}
 async function endBattle(win){if(B&&B.wildMode){finishEndlessWild('fled','야생 포켓몬 전투를 종료했어요.');return;}if(B&&B.pvp)return pvpEnd(win);startBgm('adventure');const me=S.meta,g=B.g,gi=B.gi;const first=gi>=0&&win&&!me.gyms[gi];
  let coins=win?30+B.diff*10:10,candy=B.qc,packs=0,legend=0;
@@ -3084,7 +3085,11 @@ ${R.found&&R.found.filter(Boolean).length?`<div class=adult>지금 좌삼 쌓는
 ${R.misc&&R.misc.length?`<h2>다음 시즌에 조심할 실수</h2><div>${R.misc.map(([l,n])=>`<span class=tag>${esc(l)} (${n}번)</span>`).join('')}</div>`:''}
 <h2>선생님·보호자 한마디</h2><div class=memo>여기에 적어 주세요</div>
 <div class=foot>모든 수치는 앱에 쌓인 학습 기록(공부한 날짜·문제별 정답·풀이 시간)에서 자동으로 계산했어요. 개념 별은 같은 개념을 3번 연속 맞힐 때마다 1개, 단원 배지는 단원의 모든 개념이 별 3개 이상일 때 받아요.<br>만든 날 ${new Date(R.made).toLocaleDateString('ko-KR')} · 포켓몬 수학 · 좌삼초. 포켓몬 관련 권리는 각 권리자에게 있어요(비영리 교육용).</div>
-</div></body></html>`;}
+</div>
+<style id="sc-pokemon-narration-portraits">
+.scv-narr-content{display:flex;align-items:center;gap:14px;min-width:0}.scv-narr-content.has-mon .scv-narr-text{flex:1;min-width:0}.scv-narr-mon{flex:0 0 clamp(76px,18vw,124px);width:clamp(76px,18vw,124px);display:flex;flex-direction:column;align-items:center;justify-content:center;align-self:center;filter:drop-shadow(0 5px 10px rgba(0,0,0,.45));animation:scvMonPop .32s ease both}.scv-narr-mon img{display:block;width:100%;height:clamp(76px,18vw,124px);object-fit:contain;image-rendering:pixelated}.scv-narr-mon small{font-family:'Jua',sans-serif;font-size:12px;color:#fff4b0;text-shadow:0 2px 4px #000;text-align:center}.scv-narr-text{min-width:0;flex:1}.scv-narr-text .scv-ln:first-child{margin-top:0}@keyframes scvMonPop{from{opacity:0;transform:translateY(8px) scale(.88)}to{opacity:1;transform:translateY(0) scale(1)}}@media(max-width:420px){.scv-narr-content{gap:8px}.scv-narr-mon{flex-basis:76px;width:76px}.scv-narr-mon img{height:76px}.scv-narr-mon small{font-size:10px}}
+</style>
+</body></html>`;}
 function downloadReport(R){const html=reportHTML(R);const blob=new Blob([html],{type:'text/html;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`포켓몬수학_시즌리포트_${(R.name||'트레이너').replace(/[\\/:*?"<>|\s]/g,'')}_${R.id}.html`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);toast('시즌 리포트를 내려받았어요! 열어서 인쇄할 수도 있어요');}
 // ---- 시즌 화면 ----
 function renderSeason(){S.screen='season';const m=S.meta;ensureSeason();const se=m.season;const lv=seasonLv(se);const F=seasonFeatured(se.id);const r=seasonRange(se.id);const left=Math.max(0,dayDiff(today(),r[1]));
@@ -3555,7 +3560,7 @@ function scP(t){ // 대본의 '주인공'을 내 닉네임으로(조사까지 �
 const scE=t=>esc(scP(t));
 // ----- 포켓몬 이름 → 번호 -----
 let _scN2I=null;
-function scN2I(){if(!_scN2I){_scN2I={};MON_IDS.forEach(id=>{const m=MON[id];if(SC_KEYMONS.indexOf(m.name)>=0)_scN2I[m.name]=id;});}return _scN2I;}
+function scN2I(){if(!_scN2I){_scN2I={};MON_IDS.forEach(id=>{const m=MON[id];if(m&&m.name)_scN2I[m.name]=id;});}return _scN2I;}
 function scMonId(txt){const t=String(txt||''),m=scN2I();let best=0,bl=0;for(const k in m){if(t.indexOf(k)>=0&&k.length>bl){best=m[k];bl=k.length;}}return best;}
 const scMonName=id=>(MON[id]&&MON[id].name)||'포켓몬';
 const scRegionIds=r=>SC_REGIONS[r].wild.map(scMonId).concat([scMonId(SC_REGIONS[r].boss)]);
@@ -3614,6 +3619,8 @@ function scBackToHub(){SC.busy=false;scStopMusic();renderHub();startBgm();}
 // ----- 이야기 리더 -----
 const scPages=u=>(SC_STORY[u]&&SC_STORY[u].pages)||[];
 function scLines(text){return String(text).split('\n').map((ln,i)=>{const d=/^\(.*\)$/.test(ln.trim());return `<div class="scv-ln${d?' dir':''}" style="animation-delay:${Math.min(i*.28,1.4)}s">${scE(ln)}</div>`;}).join('');}
+function scNarrMonId(text){const raw=String(text||''),m=scN2I();let hit=null;for(const name of Object.keys(m)){const at=raw.indexOf(name);if(at>=0&&(!hit||at<hit.at||(at===hit.at&&name.length>hit.name.length)))hit={name,at,id:m[name]};}return hit?hit.id:0;}
+function scNarration(text){const id=scNarrMonId(text);return `<div class="scv-narr-content${id?' has-mon':''}">${id?`<div class="scv-narr-mon" aria-label="${esc(MON[id].name)}">${monImg(id,'front')}<small>${esc(MON[id].name)}</small></div>`:''}<div class="scv-narr-text">${scLines(text)}</div></div>`;}
 function scSpeakerArt(who){
  const w=String(who||''),art=SC_USER_ART.portraits;let key=null;
  if(w==='주인공')key='hero';else if(w==='이안')key='rival';else if(/^라온/.test(w))key='raon';else if(w==='지라치')key='jirachi';else if(/조사단원|도시 관장|연구소/.test(w))key='judge';
@@ -3641,8 +3648,8 @@ function scStageHTML(u,pos,pg,grant){
  switch(pg.k){
   case 'ttl':return `<div class="scv-cover"><div class="scv-cover-ic">${un.icon}</div><div class="scv-cover-a">${esc(pg.a)}</div><h2>${esc(pg.b)}</h2>${pg.c?`<div class="scv-cover-c">${esc(pg.c)}</div>`:''}${reg?`<p>${esc(reg.short)}</p>`:`<p>천공의 도감을 둘러싼 이야기가 시작됩니다.</p>`}</div>`;
   case 'sc':return `<div class="scv-scene"><small>${esc(pg.a)}</small><b>${esc(pg.b)}</b>${pg.c?`<span>${esc(pg.c)}</span>`:''}</div>`;
-  case 'bg':return `<div class="scv-narr scv-bgcard"><div class="lab">🏞 배경</div>${scLines(pg.t)}</div>`;
-  case 'n':return `<div class="scv-narr">${scLines(pg.t)}</div>`;
+  case 'bg':return `<div class="scv-narr scv-bgcard"><div class="lab">🏞 배경</div>${scNarration(pg.t)}</div>`;
+  case 'n':return `<div class="scv-narr">${scNarration(pg.t)}</div>`;
   case 'say':return `<div class="scv-card scv-say"><div class="sc-dialogue">${scSpeakerArt(pg.w)}<div class="sc-dialogue-body"><div class="sc-speaker">${esc(scSpeakerName(pg.w))}</div><div class="scv-lines">${scLines(pg.t)}</div></div></div></div>`;
   case 'sys':{const id=pg.m?scMonId(pg.m):0;return `<div class="scv-sys"><div class="lab">📘 천공의 도감</div><div class="scv-sys-body">${id?`<div class="scv-sys-mon">${scState().col[id]?cardHTML(id):''}</div>`:''}<div>${scLines(pg.t)}</div></div></div>`;}
   case 'fx':return `<div class="scv-fx"><b>${esc(pg.s)}</b>${pg.t?`<div>${scLines(pg.t)}</div>`:''}</div>`;
@@ -3943,6 +3950,61 @@ battleMenu=function(){if(B&&B.coopMode){M(`<h2>협동 보스전</h2><p>기존 �
 const __coopHeroEl=heroEl;heroEl=function(P){if(B&&B.coopMode&&P===B.me)return $('#heroMe');return __coopHeroEl.apply(this,arguments)};
 // 기존 야생 전투의 방어 문제·스킬 연출은 foeAttack / resolveAttack 그대로 사용합니다.
 (function installCoopCss(){if($('#coopWildStyle'))return;const st=document.createElement('style');st.id='coopWildStyle';st.textContent=`#myLane.coopLane{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;align-content:center;padding:2px 4px;min-height:0}#myLane.coopLane .slot{width:auto;min-width:0;max-height:none;aspect-ratio:1/1.18;border-radius:9px;border-width:2px}#myLane.coopLane .unit{width:100%;height:100%;overflow:visible}#myLane.coopLane .unit .sp img{max-width:70%;max-height:58%}#myLane.coopLane .unit .un{font-size:clamp(7px,1vw,11px);bottom:24%}#myLane.coopLane .unit .tdots{bottom:17%;gap:2px}#myLane.coopLane .unit .tdots i{width:6px;height:6px}#myLane.coopLane .unit .us{bottom:1%;gap:2px}#myLane.coopLane .unit .us .st{min-width:0;height:18px;font-size:11px;padding:0 3px}#myLane.coopLane .unit .kwI{top:1px;left:1px}#myLane.coopLane .coopMine{border-style:solid;border-color:#46a7ff;background:linear-gradient(180deg,#eaf7ff,#d6eaff)}#myLane.coopLane .coopFriend{border-style:solid;border-color:#bd70df;background:linear-gradient(180deg,#fbebff,#f0d9fa)}.coopTrainerHp{display:flex;gap:8px;padding:4px 8px;background:#152238;color:#fff;border-bottom:1px solid #34445d}.coopTrainer{flex:1;min-width:0;display:grid;grid-template-columns:1fr auto;gap:2px 8px;font-size:11px}.coopTrainer b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.coopTrainer i{grid-column:1/3;height:5px;border-radius:5px;background:#596579;overflow:hidden}.coopTrainer i em{display:block;height:100%;background:linear-gradient(90deg,#43d17a,#b8ef72)}.coopTrainer{opacity:1}.coopOwner{position:absolute;top:2px;right:2px;z-index:10;font-size:7px;font-weight:900;padding:1px 3px;border-radius:4px;background:#18233bdc;color:#fff;pointer-events:none}@media(max-width:560px){#myLane.coopLane{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}#myLane.coopLane .slot{aspect-ratio:1/0.88}#myLane.coopLane .unit .sp img{max-height:52%}#myLane.coopLane .unit .un{font-size:9px;bottom:24%}#myLane.coopLane .unit .us .st{height:16px;font-size:10px}}`;document.head.appendChild(st)})();
+
+// 협동 보스전 반응형 UI 보정: 포켓몬 최소 크기를 유지하면서 버튼/카드가 겹치지 않게 하고, 출전 슬롯 배경은 투명하게.
+(function installCoopLayoutFix(){
+ if(document.getElementById('coopLayoutFix'))return;
+ const st=document.createElement('style');st.id='coopLayoutFix';st.textContent=`
+ /* 협동 전투는 화면 높이에 맞춰 영역을 나누고, 카드/버튼은 축소·겹침 대신 자체 영역을 유지 */
+ #battle:has(#coopTrainerHp){overflow:hidden;box-sizing:border-box}
+ #battle:has(#coopTrainerHp) .bTop{flex:0 0 auto;min-width:0;max-width:100%;box-sizing:border-box;gap:5px;padding:4px 7px}
+ #battle:has(#coopTrainerHp) .wildTop{min-width:0;flex:1 1 auto;padding:3px 5px}
+ #battle:has(#coopTrainerHp) #coopTrainerHp{flex:0 0 auto;min-height:31px;box-sizing:border-box;padding:3px 7px}
+ #battle:has(#coopTrainerHp) .lane{flex:1 1 0;min-height:0;min-width:0;box-sizing:border-box}
+ #battle:has(#coopTrainerHp) #myLane.coopLane{display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr))!important;grid-auto-rows:minmax(0,1fr);gap:3px!important;align-content:stretch;justify-content:stretch;overflow:hidden!important;padding:2px 5px!important;flex:1 1 0;min-height:0}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .slot{box-sizing:border-box;flex:none!important;width:auto!important;min-width:0!important;max-width:none!important;min-height:0;max-height:none!important;aspect-ratio:1/1.2!important;border:0!important;border-radius:0!important;background:transparent!important;overflow:visible;padding:0}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .slot.can{background:transparent!important;outline:2px dashed #3cc47c;outline-offset:-2px}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit{inset:0;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none;min-width:0;min-height:0;padding:1px;overflow:visible}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit.ready{box-shadow:0 0 0 2px #3cc47c,0 0 10px #3cc47c88!important;border-radius:8px}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit.sel{box-shadow:0 0 0 2px #ffd23f,0 0 12px #ffd23f99!important;border-radius:8px}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit .sp{min-height:0;align-items:flex-end}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit .sp img{width:auto!important;height:auto!important;max-width:94%!important;max-height:68%!important;object-fit:contain;transform:scale(1.12)!important;transform-origin:50% 100%;}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit .un{font-size:clamp(7px,2.3vw,11px);bottom:24%;max-width:100%;background:transparent!important;text-shadow:0 1px 3px #fff,0 0 4px #fff;padding:0 1px;border-radius:0}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit .us{gap:1px;margin-top:1px}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit .us .st{height:clamp(13px,3.6vw,18px);font-size:clamp(9px,2.5vw,11px);padding:0 2px;background:rgba(255,255,255,.86)}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .coopMine,#battle:has(#coopTrainerHp) #myLane.coopLane .coopFriend{background:transparent!important;border-color:transparent!important;border-style:solid!important}
+ #battle:has(#coopTrainerHp) .mid{flex:0 0 auto;min-height:26px;padding:1px 6px}
+ #battle:has(#coopTrainerHp) .mid .msg{font-size:clamp(11px,3.2vw,15px);padding:3px 8px;max-width:88vw}
+ #battle:has(#coopTrainerHp) .bBot{flex:0 0 auto;min-width:0;flex-wrap:wrap;gap:4px;padding:4px 6px;box-sizing:border-box}
+ #battle:has(#coopTrainerHp) .bBot .hero{min-width:0;max-width:42%;padding:2px 6px 2px 2px;gap:4px}
+ #battle:has(#coopTrainerHp) .bBot .hero .hn{max-width:18vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ #battle:has(#coopTrainerHp) .bBot .mana{gap:2px;max-width:18vw}
+ #battle:has(#coopTrainerHp) #bPower{white-space:nowrap;margin-left:auto}
+ #battle:has(#coopTrainerHp) .hand{flex:0 0 auto;min-height:0;height:clamp(82px,17vh,116px);max-width:100%;overflow-x:auto;overflow-y:hidden;justify-content:flex-start;gap:4px;padding:4px 7px calc(5px + var(--sb));box-sizing:border-box;scrollbar-width:thin}
+ #battle:has(#coopTrainerHp) .hand .card{flex:0 0 auto;width:var(--hw,72px)!important;max-width:20vw}
+ @media(max-width:560px){
+  #battle:has(#coopTrainerHp) #myLane.coopLane{grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr));gap:2px!important;}
+  #battle:has(#coopTrainerHp) #myLane.coopLane .slot{aspect-ratio:1/1.05!important}
+  #battle:has(#coopTrainerHp) #myLane.coopLane .unit .sp img{max-width:96%!important;max-height:66%!important;transform:scale(1.08)!important}
+  #battle:has(#coopTrainerHp) .wildTop .wildEntry{flex:1 1 135px;min-width:0}
+  #battle:has(#coopTrainerHp) .coopTrainer{font-size:10px;gap:1px 4px}
+  #battle:has(#coopTrainerHp) .bBot .hero .av{width:30px;height:30px}
+  #battle:has(#coopTrainerHp) .bBot .hero .av img{width:26px;height:26px}
+  #battle:has(#coopTrainerHp) .bBot .hero .hhp{font-size:16px}
+  #battle:has(#coopTrainerHp) .bBot .mana i{width:9px;height:9px}
+  #battle:has(#coopTrainerHp) #bPower{font-size:11px;padding:5px 6px}
+  #battle:has(#coopTrainerHp) #bEnd{padding:5px 8px;white-space:nowrap}
+  #battle:has(#coopTrainerHp) .hand{height:clamp(78px,15vh,102px)}
+ }
+ @media(max-height:600px){
+  #battle:has(#coopTrainerHp) .hand{height:clamp(66px,15vh,88px)}
+  #battle:has(#coopTrainerHp) #coopTrainerHp{min-height:26px;padding-top:2px;padding-bottom:2px}
+  #battle:has(#coopTrainerHp) .bTop{padding-top:2px;padding-bottom:2px}
+  #battle:has(#coopTrainerHp) .mid{min-height:22px}
+ }
+ `;document.head.appendChild(st);
+})();
+
 const __coopRenderHub=renderHub;
 renderHub=function(){__coopRenderHub.apply(this,arguments);const grid=$('#view .tiles');if(grid&&!$('#bxHubTile')){const b=document.createElement('button');b.id='bxHubTile';b.className='tile main';b.style.background='linear-gradient(120deg,#f4e7ff,#ffe8e2)';b.style.borderColor='#d9b8ff';b.style.boxShadow='0 5px 0 #d9b8ff';b.innerHTML='<span class="ti" style="font-size:48px;display:flex;align-items:center;justify-content:center">🐉</span><span><span class="tn">협동 보스전</span><br><span class="td">친구와 함께 보스 포켓몬을 쓰러뜨리자!</span></span>';grid.insertBefore(b,grid.firstChild);b.onclick=()=>{sfx('tap');bxRender()}}};
 
