@@ -3765,6 +3765,111 @@ const __scStartBgmOriginal=startBgm;
 startBgm=function(mode){if(scIsScreen()){if(!S.meta.settings.bgm){scMusicStart(SC.index>=0?SC.index:0);return;}scSetWorldMusic();return;}scStopMusic();__scStartBgmOriginal(mode);};
 Object.assign(BGMAP,{scenarioMap:'town',scenarioStory:'town',scenarioDeck:'town',scenarioDex:'town',scenarioBattle:'town',scenarioEpilogue:'town'});
 
+
+// ===== 협동 보스전 v2: 방 연결 · 턴/행동 검증 · 본 게임 조각 보상 =====
+const BOSS_VER=2, BX={peer:null,conn:null,host:false,code:'',state:null,player:0,awarded:false,targetBoss:0,battleId:'',leaving:false,answerExpected:null};
+function bxClose(){BX.leaving=true;try{BX.conn&&BX.conn.close()}catch(e){}try{BX.peer&&BX.peer.destroy()}catch(e){}BX.peer=null;BX.conn=null;BX.state=null;BX.awarded=false;BX.targetBoss=0;BX.battleId='';BX.answerExpected=null;BX.leaving=false;}
+function bxSend(o){try{if(BX.conn&&BX.conn.open)BX.conn.send(o)}catch(e){}}
+function bxOwned(){ensureDeck();return (S.meta.deck||[]).map(Number).filter(id=>MON[id]);}
+function bxShardCount(){return Object.values(S.meta.shard||{}).reduce((a,b)=>a+(+b||0),0)}
+function bxRender(){
+ S.screen='boss';bxClose();const m=S.meta;ensureDeck();
+ $('#view').innerHTML=hudHTML()+`<div class="wrap"><div class="panel bx-shell"><div class="bx-head"><div class="bx-emblem">🐉</div><div><h2 style="margin:0">협동 보스전</h2><div class="mut">둘이 함께 도전하는 고난도 레이드</div></div></div>
+ <div class="bx-rules"><div>⭐ <b>4성 80% · 5성 20%</b></div><div>❤️ 보스 HP <b>15배</b> · 공격력은 기본값</div><div>⚔️ 보스 1마리면 <b>2회 공격</b> · 2마리면 각각 <b>1회 공격</b></div><div>🧩 승리 시 대표 보스의 조각 1개 — 기존 도감/조각 시스템에 반영</div><div>🧑‍🤝‍🧑 방장 → 친구 → 보스 순서 · 포켓몬 출전 슬롯 8칸</div></div>
+ <div class="bx-actions"><button class="btn red big" id="bxHost">방 만들기</button><button class="btn blue big" id="bxJoin">코드로 참가</button></div>
+ <label for="bxCode" class="mut" style="display:block;margin:10px 0 4px">친구에게 받은 4자리 방 코드</label><input class="inp codeIn" id="bxCode" maxlength="4" inputmode="numeric" placeholder="예: 4821">
+ <div id="bxStatus" style="margin-top:14px"></div><button class="btn ghost" id="bxBack" style="margin-top:14px">트레이너 방으로</button></div></div>`;
+ bindHud();$('#bxBack').onclick=()=>{bxClose();renderHub()};
+ $('#bxHost').onclick=()=>bxStart(true,String(rint(1000,9999)));
+ $('#bxJoin').onclick=()=>{const c=($('#bxCode').value||'').replace(/\D/g,'');if(c.length!==4){toast('방 코드 4자리를 입력해 주세요');return}bxStart(false,c)};
+}
+function bxStart(host,code){
+ bxClose();BX.host=host;BX.code=code;BX.player=host?0:1;const st=$('#bxStatus');if(st)st.innerHTML='<p>안전한 연결을 준비하고 있어요…</p>';
+ loadPeer().then(()=>{
+  const peer=host?new Peer('pkboss-'+BOSS_VER+'-'+code):new Peer();BX.peer=peer;
+  peer.on('error',e=>{const el=$('#bxStatus');if(el)el.innerHTML=`<p style="color:#d9393f">${e.type==='unavailable-id'?'이 방 번호는 이미 사용 중이에요. 새 방을 만들어 주세요.':e.type==='peer-unavailable'?'방을 찾을 수 없어요. 방장에게 새 코드를 받아 주세요.':'연결에 실패했어요. 인터넷 연결을 확인해 주세요.'}</p>`});
+  peer.on('open',()=>{if(host){const el=$('#bxStatus');if(el)el.innerHTML=`<div class="bx-wait"><div class="mut">친구에게 이 코드를 알려 주세요</div><div class="bx-code">${code}</div><div class="mut">친구가 참가하면 전투가 자동으로 시작됩니다.</div></div>`;
+   peer.on('connection',c=>{if(BX.conn){c.close();return}BX.conn=c;bxBind(c)});
+  }else{const c=peer.connect('pkboss-'+BOSS_VER+'-'+code,{reliable:true});BX.conn=c;bxBind(c)}});
+ }).catch(e=>{const el=$('#bxStatus');if(el)el.textContent=e.message||'연결 도구를 불러오지 못했어요.'});
+}
+function bxMakeBoss(id,two){const m=MON[id];return{id,hp:Math.max(1,Math.round(m.hp*15)),max:Math.max(1,Math.round(m.hp*15)),atk:m.atk,attacks:two?1:2,alive:true}}
+function bxNewState(friend){
+ const rar=Math.random()<.8?4:5;let pool=MON_IDS.filter(id=>MON[id]&&MON[id].rar===rar);if(!pool.length)pool=MON_IDS.filter(id=>MON[id]&&(MON[id].rar===4||MON[id].rar===5));
+ const id=pool[Math.floor(Math.random()*pool.length)]||MON_IDS[0],two=Math.random()<.1;
+ let second=id;if(two){let p2=MON_IDS.filter(x=>MON[x]&&(MON[x].rar===4||MON[x].rar===5));second=p2[Math.floor(Math.random()*p2.length)]||id;}
+ const decks=[bxOwned(),(friend.deck||[]).map(Number).filter(x=>MON[x])];
+ return{battleId:'bx'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),names:[S.meta.name||'방장',friend.name||'친구'],decks,usedDeck:[decks[0].map(()=>false),decks[1].map(()=>false)],slots:Array(8).fill(null),turn:0,round:1,cost:0,costMax:8,bosses:[bxMakeBoss(id,two),...(two?[bxMakeBoss(second,true)]:[])],two,done:false,result:'',pendingQ:null,log:[`${S.meta.name||'방장'}님과 ${friend.name||'친구'}님이 보스전에 참가했어요.`]};
+}
+function bxBind(c){
+ c.on('open',()=>{BX.player=BX.host?0:1;bxSend({t:'hello',v:BOSS_VER,name:S.meta.name||'플레이어',deck:bxOwned()});const el=$('#bxStatus');if(el&&BX.host)el.innerHTML='<p>연결됐어요! 보스 정보를 준비하고 있습니다…</p>'});
+ c.on('data',d=>{if(!d||typeof d!=='object')return;
+  if(d.t==='hello'&&BX.host){if(d.v!==BOSS_VER){bxSend({t:'error',message:'게임 버전이 달라요. 두 사람 모두 최신 파일을 열어 주세요.'});return}if(BX.state){bxSend({t:'error',message:'이미 시작된 방이에요.'});return}BX.state=bxNewState(d);BX.battleId=BX.state.battleId;bxSend({t:'state',state:BX.state});bxShow();return}
+  if(d.t==='error'){const el=$('#bxStatus');if(el)el.innerHTML=`<p style="color:#d9393f">${esc(d.message||'연결 오류')}</p>`;return}
+  if(d.t==='state'&&!BX.host){if(!d.state)return;BX.state=d.state;BX.battleId=d.state.battleId;bxAwardIfWon();bxShow();return}
+  if(d.t==='act'&&BX.host&&BX.state&&!BX.state.done){if(d.v!==BOSS_VER)return;bxApply(d.action,d.player);return}
+ });
+ c.on('close',()=>{if(BX.leaving||!BX.conn)return;const el=$('#bxStatus');if(el)el.innerHTML='<div class="bx-disconnect"><b>연결이 끊어졌어요.</b><p>이 전투는 이어지지 않았어요. 둘 다 협동 보스전 화면으로 돌아간 뒤 새 방을 만들어 주세요.</p><button class="btn blue" id="bxRetry">돌아가기</button></div>';const b=$('#bxRetry');if(b)b.onclick=()=>{bxClose();bxRender()}});
+ c.on('error',()=>{});
+}
+function bxBroadcast(){bxAwardIfWon();bxSend({t:'state',state:BX.state});bxShow()}
+function bxAwardIfWon(){const s=BX.state;if(!s||!s.done||s.result!=='win'||BX.awarded)return;const key='bx-reward-'+s.battleId;try{if(localStorage.getItem(key)){BX.awarded=true;return}}catch(e){}
+ const id=s.bosses[0]&&s.bosses[0].id;if(id&&MON[id]){const r=gainCard(id,true);S.meta.dexSeen[id]=1;autoSave();BX.awarded=true;try{localStorage.setItem(key,'1')}catch(e){}s.reward={id,result:r.k,need:r.need||SHARD_NEED[MON[id].rar]||1,count:r.n||0,name:MON[id].name};}
+}
+function bxEndCheck(){const s=BX.state;if(s.bosses.every(b=>!b.alive)){s.done=true;s.result='win';s.pendingQ=null;s.log.unshift('🎉 보스 격파!');return true}if(!s.slots.some(Boolean)){s.done=true;s.result='lose';s.pendingQ=null;s.log.unshift('💫 출전한 포켓몬이 모두 쓰러졌어요.');return true}return false}
+function bxBossPhase(s){
+ s.turn=2;s.log.unshift('보스의 반격!');
+ for(const b of s.bosses.filter(x=>x.alive))for(let n=0;n<b.attacks;n++){const alive=s.slots.map((u,i)=>u?i:-1).filter(i=>i>=0);if(!alive.length)break;const i=alive[Math.floor(Math.random()*alive.length)],u=s.slots[i],mul=typeMul(b.id,u.id),dmg=Math.max(1,Math.round(b.atk*mul));u.hp=Math.max(0,u.hp-dmg);s.log.unshift(`${MON[b.id].name}의 공격! ${MON[u.id].name} HP -${dmg}${mul>1?' (효과가 굉장했다!)':mul<1?' (효과가 별로다…)':''}`);if(u.hp<=0){s.log.unshift(`${MON[u.id].name}이(가) 쓰러졌어요.`);s.slots[i]=null}}
+ if(!bxEndCheck()){s.round++;s.turn=0;s.cost=0;s.slots.forEach(u=>{if(u)u.actedRound=0});s.log.unshift(`제${s.round}라운드 시작!`)}
+}
+function bxApply(a,player){
+ const s=BX.state;if(!s||s.done||!a||!Number.isInteger(player)||player<0||player>1)return;
+ // 클라이언트가 보낸 플레이어 번호와 실제 차례, 덱/슬롯을 호스트가 검증합니다.
+ if(a.kind==='deploy'){
+  if(s.turn!==player||s.pendingQ||s.slots.filter(Boolean).length>=8)return;
+  const ix=+a.deckIndex,slot=+a.slot;if(!Number.isInteger(ix)||ix<0||ix>=s.decks[player].length||!Number.isInteger(slot)||slot<0||slot>=8||s.slots[slot]||s.usedDeck[player][ix])return;
+  const id=+s.decks[player][ix],m=MON[id];if(!m||+a.id!==id||s.cost+m.cost>s.costMax)return;
+  s.usedDeck[player][ix]=true;s.slots[slot]={id,owner:player,hp:m.hp,max:m.hp,atk:m.atk,cost:m.cost,actedRound:0};s.cost+=m.cost;s.log.unshift(`${s.names[player]}님이 ${m.name}을(를) 출전시켰어요.`);
+ }else if(a.kind==='ask'){
+  if(s.turn!==player||s.pendingQ)return;const slot=+a.slot,u=s.slots[slot];if(!u||u.owner!==player||u.actedRound===s.round)return;
+  let q=pickQ();if(!q){const x=rint(2,12),y=rint(2,12);q={q:`${x} × ${y} = ?`,a:String(x*y),ch:[String(x*y),String(x*y+1),String(Math.max(0,x*y-1)),String(x*y+2)]};}BX.answerExpected=String(q.a);s.pendingQ={slot,player,question:q.q,choices:q.ch.map(String)};s.log.unshift(`${MON[u.id].name}이(가) 공격을 준비해요.`);
+ }else if(a.kind==='answer'){
+  const q=s.pendingQ;if(!q||q.player!==player||s.turn!==player)return;const answer=String(a.answer??'').trim();const u=s.slots[q.slot];const expected=BX.answerExpected;BX.answerExpected=null;s.pendingQ=null;if(!u||u.owner!==player)return;u.actedRound=s.round;
+  if(answer!==''&&answer===String(expected)){const bi=Number.isInteger(+a.targetBoss)&&s.bosses[+a.targetBoss]&&s.bosses[+a.targetBoss].alive?+a.targetBoss:s.bosses.findIndex(b=>b.alive);const b=s.bosses[bi];if(b){const mul=typeMul(u.id,b.id),dmg=Math.max(1,Math.round(u.atk*mul));b.hp=Math.max(0,b.hp-dmg);s.log.unshift(`정답! ${MON[u.id].name}의 공격으로 ${MON[b.id].name} HP -${dmg}${mul>1?' · 효과가 굉장했다!':mul<1?' · 효과가 별로다…':''}`);if(b.hp<=0){b.alive=false;s.log.unshift(`${MON[b.id].name} 격파!`)}}}else{s.log.unshift(`오답! ${MON[u.id].name}의 공격이 빗나갔어요.`)}
+  if(bxEndCheck()){};
+ }else if(a.kind==='end'){
+  if(s.turn!==player||s.pendingQ)return;
+  if(player===0){s.turn=1;s.cost=0;s.log.unshift(`${s.names[0]}님의 차례 종료. ${s.names[1]}님 차례!`)}else{bxBossPhase(s)}
+ }
+ if(!s.done&&s.turn===2)bxBossPhase(s);
+ bxBroadcast();
+}
+function bxShow(){
+ const s=BX.state,el=$('#bxStatus');if(!s||!el)return;
+ const won=s.done&&s.result==='win',lost=s.done&&s.result==='lose';
+ const bosses=s.bosses.map((b,i)=>{const m=MON[b.id],pct=Math.max(0,Math.min(100,b.hp/b.max*100));return `<div class="bx-boss ${b.alive?'':'bx-fainted'}"><div class="bx-boss-art">${monImg(b.id,'front')}</div><div class="bx-boss-name">${esc(m.name)} <span>★${m.rar}</span></div><div class="bx-hp"><i style="width:${pct}%"></i></div><div class="bx-hptext">HP ${Math.max(0,b.hp).toLocaleString()} / ${b.max.toLocaleString()} · 공격력 ${b.atk}</div>${!s.done&&b.alive?`<button class="btn ${BX.targetBoss===i?'gold':'ghost'} sm" data-bxtarget="${i}">${BX.targetBoss===i?'공격 대상 선택됨':'공격 대상으로 선택'}</button>`:b.alive?'':'<b class="bx-defeated">격파 완료</b>'}</div>`}).join('');
+ const slots=s.slots.map((u,i)=>u?`<div class="bx-slot ${u.owner===BX.player?'bx-mine':'bx-teammate'}"><div class="bx-slot-art">${monImg(u.id,'front')}</div><b>${esc(MON[u.id].name)}</b><small>${u.owner===0?'방장':'친구'} · 비용 ${u.cost}</small><div class="bx-hp"><i style="width:${Math.max(0,u.hp/u.max*100)}%;background:${u.hp/u.max<.3?'#ed5757':'#46c87a'}"></i></div><small>HP ${Math.max(0,u.hp)} / ${u.max}</small>${!s.done&&s.turn===BX.player&&u.owner===BX.player&&u.actedRound!==s.round&&!s.pendingQ?`<button class="btn red sm" data-bxatk="${i}">공격하기</button>`:u.actedRound===s.round?'<small class="bx-used">이번 라운드 행동 완료</small>':''}</div>`:`<div class="bx-slot bx-empty"><span>＋</span><small>빈 슬롯 ${i+1}</small></div>`).join('');
+ const own=s.decks[BX.player]||[],used=s.usedDeck[BX.player]||[];const cards=own.map((id,ix)=>({id,ix,m:MON[id]})).filter(o=>o.m&&!used[o.ix]).map(o=>`<button class="bx-card" data-bxid="${o.id}" data-bxdeck="${o.ix}" ${s.turn!==BX.player||s.cost+o.m.cost>s.costMax||s.slots.filter(Boolean).length>=8||s.pendingQ||s.done?'disabled':''}><span class="bx-card-art">${monImg(o.id,'front')}</span><b>${esc(o.m.name)}</b><span>비용 ${o.m.cost} · 공격 ${o.m.atk}</span></button>`).join('');
+ const turnText=s.done?(won?'전투 승리!': '전투 패배'):s.turn===0?`${esc(s.names[0])} 차례`:s.turn===1?`${esc(s.names[1])} 차례`:'보스 차례';
+ let question='';if(s.pendingQ&&s.pendingQ.player===BX.player&&!s.done){const q=s.pendingQ;question=`<div class="bx-question"><div class="mut">공격 수학 문제 · 정답을 선택하세요</div><div class="bx-equation bx-question-text">${q.question}</div><div class="bx-choices">${q.choices.map((v,i)=>`<button class="btn ghost bx-choice" data-bxanswer="${esc(v)}">${['①','②','③','④'][i]||'•'} ${esc(v)}</button>`).join('')}</div></div>`}else if(s.pendingQ){question=`<div class="bx-question"><b>${esc(s.names[s.pendingQ.player])}님이 공격 문제를 푸는 중…</b><p class="mut">상대가 답을 선택하면 전투가 이어집니다.</p></div>`}
+ let reward='';if(won){const rw=s.reward;reward=`<div class="bx-result win"><div style="font-size:34px">🏆</div><h2>보스 격파!</h2><p>${rw?`${esc(rw.name)} 보상 처리 완료`: '보상 확인 중…'}</p><div class="bx-reward-art">${monImg((rw&&rw.id)||s.bosses[0].id,'front')}</div><p>${rw&&rw.result==='shard'?`조각 +1 (${rw.count}/${rw.need})`:rw&&rw.result==='done'?`조각을 모아 ${esc(rw.name)} 카드 등록 완료!`:'보상은 도감의 조각/중복 카드 규칙에 따라 반영됐어요.'}</p></div>`}else if(lost)reward=`<div class="bx-result lose"><h2>이번에는 아쉽게 패배했어요</h2><p>덱을 조정하고 다시 도전해 보세요.</p></div>`;
+ const log=s.log.slice(0,5).map(t=>`<li>${esc(t)}</li>`).join('');
+ el.innerHTML=`<div class="panel bx-arena"><div class="bx-statusline"><div><span class="bx-turn-dot ${s.turn===BX.player?'active':''}"></span><b>${turnText}</b><div class="mut">라운드 ${s.round} · ${s.names.map(esc).join(' & ')}</div></div><div class="bx-cost"><small>이번 차례 코스트</small><strong>${s.cost} / ${s.costMax}</strong></div></div>${reward}<div class="bx-bosses">${bosses}</div><div class="bx-team-title"><h3>공유 출전 필드</h3><span>${s.slots.filter(Boolean).length} / 8칸</span></div><div class="bx-slots">${slots}</div>${question}<div class="bx-team-title"><h3>내 덱에서 출전</h3><span>${own.length-used.filter(Boolean).length}장 남음</span></div><div class="bx-cards">${cards||'<div class="mut">출전 가능한 카드가 없어요. 이미 출전했거나 코스트가 부족할 수 있어요.</div>'}</div><div class="bx-turn-actions"><button class="btn gold" id="bxEnd" ${s.done||s.turn!==BX.player||s.pendingQ?'disabled':''}>내 차례 끝내기 →</button>${s.done?'<button class="btn blue" id="bxAgain">다시 도전</button>':''}</div><details class="bx-log"><summary>전투 기록 보기</summary><ol>${log}</ol></details><p class="mut bx-footnote">내 차례에는 포켓몬을 여러 마리 출전시키고, 아직 공격하지 않은 내 포켓몬으로 각각 한 번 공격할 수 있어요. 코스트는 차례마다 8로 초기화됩니다. 보스 공격 후 다음 라운드가 시작돼요.</p></div>`;
+ el.querySelectorAll('[data-bxid]').forEach(b=>b.onclick=()=>{const id=+b.dataset.bxid,ix=+b.dataset.bxdeck,slot=s.slots.findIndex(x=>!x);if(slot<0){toast('공유 필드 8칸이 모두 찼어요');return}bxAction({kind:'deploy',id,deckIndex:ix,slot})});
+ el.querySelectorAll('[data-bxatk]').forEach(b=>b.onclick=()=>bxAction({kind:'ask',slot:+b.dataset.bxatk}));
+ el.querySelectorAll('[data-bxtarget]').forEach(b=>b.onclick=()=>{BX.targetBoss=+b.dataset.bxtarget;bxShow()});
+ el.querySelectorAll('[data-bxanswer]').forEach(b=>b.onclick=()=>bxAction({kind:'answer',answer:b.dataset.bxanswer,targetBoss:BX.targetBoss}));
+ const end=el.querySelector('#bxEnd');if(end)end.onclick=()=>bxAction({kind:'end'});const again=el.querySelector('#bxAgain');if(again)again.onclick=()=>{bxClose();bxRender()};
+}
+function bxAction(action){if(!BX.state||BX.state.done)return;if(BX.host)bxApply(action,BX.player);else bxSend({t:'act',v:BOSS_VER,action,player:BX.player});}
+// 보스전 전용 스타일: 모바일에서도 HP·공격 버튼이 겹치지 않게 구성
+(function bxInstallStyle(){if($('#bxStyle'))return;const st=document.createElement('style');st.id='bxStyle';st.textContent=`
+.bx-shell,.bx-arena{border:1px solid #dfd1f6;background:linear-gradient(160deg,#fff 0%,#faf7ff 52%,#fff8f2 100%);box-shadow:0 10px 30px #59408012}.bx-head{display:flex;gap:12px;align-items:center;margin-bottom:14px}.bx-emblem{width:60px;height:60px;display:grid;place-items:center;font-size:36px;border-radius:18px;background:linear-gradient(135deg,#d9c2ff,#ffe2ca);box-shadow:inset 0 0 0 2px #fff}.bx-rules{display:grid;gap:7px;background:#f6f1ff;border:1px solid #e6dcfa;border-radius:14px;padding:13px;font-size:13px;line-height:1.45}.bx-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.bx-wait{text-align:center;padding:12px;border:1px solid #e7dcfb;border-radius:16px;background:#faf7ff}.bx-code{font-size:48px;letter-spacing:9px;font-weight:900;color:#6941a5;padding:6px}.bx-statusline{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.bx-turn-dot{display:inline-block;width:9px;height:9px;background:#bbb;border-radius:50%;margin-right:7px}.bx-turn-dot.active{background:#2cbf7a;box-shadow:0 0 0 4px #2cbf7a22}.bx-cost{background:#f1e9ff;border-radius:12px;padding:8px 12px;text-align:right;min-width:92px}.bx-cost small,.bx-cost strong{display:block}.bx-cost strong{font-size:22px;color:#7040ad}.bx-bosses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.bx-boss{min-width:0;text-align:center;padding:10px 8px;border:2px solid #e5d2ff;border-radius:16px;background:linear-gradient(160deg,#fff,#f9f3ff);box-shadow:0 5px 0 #eadff8}.bx-boss-art{height:112px;display:flex;align-items:center;justify-content:center}.bx-boss-art img{max-width:100%;max-height:112px;object-fit:contain;filter:drop-shadow(0 4px 4px #37234b22)}.bx-boss-name{font-weight:900;font-size:14px;margin:3px 0 8px}.bx-boss-name span{color:#9a68bd}.bx-hp{height:10px;border-radius:99px;background:#eee5f2;overflow:hidden;margin:5px 0}.bx-hp i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#4ed18b,#22a968);transition:width .25s}.bx-hptext{font-size:11px;color:#655b70;margin-bottom:7px}.bx-fainted{opacity:.55;filter:grayscale(1)}.bx-defeated{display:block;color:#8b6a9c;font-size:12px;padding:6px}.bx-team-title{display:flex;align-items:center;justify-content:space-between;margin:18px 0 9px}.bx-team-title h3{margin:0}.bx-team-title span{font-size:12px;color:#74677f;background:#f1eafa;border-radius:99px;padding:4px 9px}.bx-slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.bx-slot{min-width:0;position:relative;text-align:center;padding:7px 4px;border:1px solid #d8c8ef;border-radius:12px;background:#fff;box-shadow:0 3px 0 #eee5f8}.bx-mine{border-color:#8dc4ff;background:#f5faff}.bx-teammate{border-color:#e4b5df;background:#fff8fe}.bx-slot-art{height:58px;display:flex;align-items:center;justify-content:center}.bx-slot-art img{max-width:100%;max-height:58px;object-fit:contain}.bx-slot b{display:block;font-size:11px;overflow-wrap:anywhere}.bx-slot small{display:block;font-size:10px;color:#71667b;margin-top:3px}.bx-slot .btn{width:100%;padding:5px 2px;font-size:11px;margin-top:5px}.bx-empty{display:flex;min-height:122px;flex-direction:column;justify-content:center;align-items:center;border:2px dashed #d8cde4;background:#fbf9fd;color:#a79ab3}.bx-empty span{font-size:26px}.bx-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.bx-card{min-width:0;border:1px solid #ddd0f1;border-radius:12px;background:#fff;padding:7px 4px;display:flex;align-items:center;flex-direction:column;gap:3px;color:#443650;font:inherit;box-shadow:0 3px 0 #eee6f7}.bx-card:disabled{opacity:.4;filter:grayscale(.5)}.bx-card-art{height:54px;display:flex;align-items:center;justify-content:center}.bx-card-art img{max-width:100%;max-height:54px;object-fit:contain}.bx-card b{font-size:11px}.bx-card span:last-child{font-size:10px;color:#796c83}.bx-turn-actions{display:flex;gap:9px;margin-top:16px}.bx-turn-actions button{flex:1}.bx-question{margin:14px 0;padding:15px;border-radius:16px;border:2px solid #b8a0f1;background:linear-gradient(135deg,#f5f1ff,#edf7ff);text-align:center}.bx-equation{font-size:32px;font-weight:900;letter-spacing:1px;margin:8px 0 12px;color:#4e3987}.bx-question form{display:flex;gap:8px;max-width:360px;margin:auto}.bx-question input{min-width:0;flex:1}.bx-question-text{font-size:20px;line-height:1.45;letter-spacing:0}.bx-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:560px;margin:auto}.bx-choice{white-space:normal;min-height:44px}.bx-result{text-align:center;margin:12px 0;padding:18px;border-radius:16px}.bx-result.win{background:linear-gradient(135deg,#fff1b8,#fff8e6);border:1px solid #f2d36e}.bx-result.lose{background:#f3eff7;border:1px solid #ddd2e9}.bx-result h2{margin:5px 0}.bx-reward-art{height:90px;display:flex;justify-content:center}.bx-reward-art img{max-height:90px;max-width:120px}.bx-log{margin-top:14px;background:#f8f5fb;border-radius:12px;padding:10px 12px;font-size:12px}.bx-log summary{cursor:pointer;font-weight:700}.bx-log ol{padding-left:22px;line-height:1.6}.bx-footnote{font-size:11px;line-height:1.5;margin:12px 0 0}.bx-used{color:#a48db6!important}.bx-disconnect{padding:14px;background:#fff3f3;border-radius:12px;color:#633;line-height:1.5}
+@media(max-width:480px){.bx-bosses{gap:6px}.bx-boss{padding:7px 5px}.bx-boss-art{height:86px}.bx-boss-art img{max-height:86px}.bx-slots{gap:5px}.bx-slot{padding:5px 2px}.bx-slot-art{height:46px}.bx-slot-art img{max-height:46px}.bx-empty{min-height:106px}.bx-cards{grid-template-columns:repeat(3,minmax(0,1fr))}.bx-card-art{height:44px}.bx-card-art img{max-height:44px}.bx-equation{font-size:28px}.bx-question-text{font-size:17px}.bx-choices{grid-template-columns:1fr}.bx-question form{flex-direction:column}.bx-question form button{width:100%}.bx-statusline{align-items:flex-start}}
+`;document.head.appendChild(st)})();
+const __bossHubOriginal=renderHub;
+renderHub=function(){__bossHubOriginal.apply(this,arguments);const grid=$('#view .tiles');if(grid&&!$('#bxHubTile')){const b=document.createElement('button');b.id='bxHubTile';b.className='tile main';b.style.background='linear-gradient(120deg,#f4e7ff,#ffe8e2)';b.style.borderColor='#d9b8ff';b.style.boxShadow='0 5px 0 #d9b8ff';b.innerHTML='<span class="ti" style="font-size:48px;display:flex;align-items:center;justify-content:center">🐉</span><span><span class="tn">협동 보스전</span><br><span class="td">친구와 함께 보스 포켓몬을 쓰러뜨리자!</span></span>';grid.insertBefore(b,grid.firstChild);b.onclick=()=>{sfx('tap');bxRender()}}};
+
 init();
 if(S.screen==='title')renderTitle();
 </script><div style="position: fixed; left: 0px; top: 0px; width: 100%; height: 100%; pointer-events: none; visibility: hidden; z-index: -5;"></div>
