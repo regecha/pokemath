@@ -2294,18 +2294,20 @@ function startBattle(gi){const me=S.meta;if(gi>=0&&!window.__sim)me.stats.gymTry
    {el:'#bEnd',h:'차례 끝',ic:'check',t:'할 일을 다 했으면 차례 끝을 눌러요. 상대 차례가 시작돼요.'}]);
   startTurn('me');})();}
 function draw(P,quiet){if(P.hand.length>=6){if(!quiet)toast('손이 꽉 차서 카드 한 장이 사라졌어요');return;}
- // 손패가 돌 카드(아이템)만으로 구성되어 있으면, 다음 드로우는 반드시 랜덤 카드 또는 포켓몬 카드로 보정해요.
- const onlyStones=P.hand.length>0&&P.hand.every(c=>isItemCard(c));
- if(onlyStones){
+ // 손에 랜덤 포켓몬 카드나 일반 포켓몬 카드가 하나도 없으면 돌 카드 대신 둘 중 하나를 우선 뽑아요.
+ const hasPokemonOrRandom=P.hand.some(c=>isRandomMonCard(c)||(!isBattleSpecial(c)&&MON[Number(c)]));
+ const forcePokemonOrRandom=!!(P.specials&&!hasPokemonOrRandom);
+ if(forcePokemonOrRandom){
   const balls=['poke','power','master'].filter(ball=>{const rc=randomBandCard(ball);return rc&&ownedBand(P,rc.band).length>0;});
   let guaranteed=null;
-  if(balls.length){guaranteed=randomBandCard(balls[Math.floor(playerRoll(P)*balls.length)]);}
+  if(balls.length)guaranteed=randomBandCard(balls[Math.floor(playerRoll(P)*balls.length)]);
   if(guaranteed){P.hand.push(guaranteed);if(!quiet&&B)fx(heroEl(P),`${guaranteed.name}!`,'txt');return;}
-  // 보유 포켓몬이 없어 랜덤 카드를 만들 수 없다면 덱에 남은 포켓몬 카드를 우선 뽑아요.
+  // 해당 구간의 보유 포켓몬이 없으면 덱의 일반 포켓몬 카드를 우선 뽑아요.
   const idx=P.deck.findIndex(id=>MON[id]);
   if(idx>=0){P.hand.push(P.deck.splice(idx,1)[0]);if(!quiet&&B)fx(heroEl(P),'포켓몬 카드!','txt');return;}
  }
- const special=drawSpecial(P);if(special){P.hand.push(special);if(!quiet&&B)fx(heroEl(P),`${special.name}!`,'txt');return;}
+ // 보정 조건이 아닐 때만 특수 카드 확률을 적용해요. 보정 중 대체 카드가 없으면 돌 카드도 건너뜁니다.
+ const special=forcePokemonOrRandom?null:drawSpecial(P);if(special){P.hand.push(special);if(!quiet&&B)fx(heroEl(P),`${special.name}!`,'txt');return;}
  if(!P.deck.length){P.fat++;P.hp-=P.fat;if(!quiet&&B)fx(heroEl(P),`-${P.fat}`,'');return;}P.hand.push(P.deck.pop());}
 const meP=()=>B.me,foeP=()=>B.foe;
 function heroEl(P){return P===B.me?$('#heroMe'):(B&&B.wildMode?$('#wildStatus'):$('#heroFoe'));}
