@@ -3961,7 +3961,7 @@ function bxBind(c){c.on('open',()=>{bxSend({t:'hello',v:COOP_BOSS_VER,name:S.met
 function bxBattleActionSync(kind,extra={}){if(!B||!B.coopMode)return;BX.lastAction=Object.assign({kind,owner:BX.player},extra);bxSync();}
 // 기존 야생 전투 UI를 그대로 유지하고, 공유 필드의 칸 수·소유자 표시만 추가
 const __coopRenderBattle=renderBattle;
-renderBattle=function(){if(!B||!B.coopMode)return __coopRenderBattle.apply(this,arguments);B.side=B.coop.turn===BX.player?'me':'foe';const r=__coopRenderBattle.apply(this,arguments);const lane=$('#myLane');if(lane){lane.classList.add('coopLane');lane.querySelectorAll('.slot').forEach((slot,i)=>{const u=B.me.board[i];if(!u)return;slot.classList.add(u.owner===BX.player?'coopMine':'coopFriend');const unit=slot.querySelector('.unit');if(unit&&u.owner!==BX.player)unit.classList.remove('ready');if(unit&&!unit.querySelector('.coopOwner')){const tag=document.createElement('span');tag.className='coopOwner';tag.textContent=u.owner===0?'방장':'친구';unit.appendChild(tag)}})}const status=$('#wildStatus');if(status)status.querySelectorAll('.wtName').forEach(n=>{n.textContent=n.textContent.replace(/^야생 · /,'보스 · ')});if(B.coop.trainerHp){let bar=$('#coopTrainerHp');if(!bar){bar=document.createElement('div');bar.id='coopTrainerHp';bar.className='coopTrainerHp';const top=$('#battle .bTop');if(top)top.insertAdjacentElement('afterend',bar)}bar.innerHTML=B.coop.names.map((name,i)=>{const hp=Math.max(0,B.coop.trainerHp[i]||0),mx=(B.coop.trainerMax||[])[i]||HERO_HP,pct=Math.max(0,Math.min(100,hp/mx*100));return `<div class=coopTrainer><b>${esc(name||('트레이너 '+(i+1)))}</b><span>♥ ${hp}/${mx}${hp<=0?' · 전투 불가':''}</span><i><em style="width:${pct}%"></em></i></div>`}).join('')}if(B.me.hp<=0){$('#battle').querySelectorAll('.hand .card').forEach(c=>{c.classList.add('cant');c.style.pointerEvents='none'});const pw=$('#bPower');if(pw)pw.disabled=true;const en=$('#bEnd');if(en&&B.coop.turn===BX.player&&!B.over){en.disabled=false;en.textContent='전투 불가 · 차례 넘기기'}}$('#battle').querySelectorAll('[data-wild-catch-slot]').forEach(b=>b.remove());const msgEl=$('#bMsg');if(msgEl&&B.coop.turn!==BX.player)msgEl.innerHTML=`${esc(B.coop.names[B.coop.turn]||'친구')}님의 차례를 기다리고 있어요.`;return r;};
+renderBattle=function(){if(!B||!B.coopMode)return __coopRenderBattle.apply(this,arguments);B.side=B.coop.turn===BX.player?'me':'foe';const r=__coopRenderBattle.apply(this,arguments);const lane=$('#myLane');if(lane){lane.classList.add('coopLane');lane.querySelectorAll('.slot').forEach((slot,i)=>{const u=B.me.board[i];if(!u)return;slot.classList.add(u.owner===BX.player?'coopMine':'coopFriend');const unit=slot.querySelector('.unit');if(unit&&u.owner!==BX.player)unit.classList.remove('ready');if(unit&&!unit.querySelector('.coopOwner')){const tag=document.createElement('span');tag.className='coopOwner';tag.textContent=u.owner===BX.player?'내 포켓몬':'친구 포켓몬';unit.appendChild(tag)}})}const status=$('#wildStatus');if(status)status.querySelectorAll('.wtName').forEach(n=>{n.textContent=n.textContent.replace(/^야생 · /,'보스 · ')});if(B.coop.trainerHp){let bar=$('#coopTrainerHp');if(!bar){bar=document.createElement('div');bar.id='coopTrainerHp';bar.className='coopTrainerHp';const top=$('#battle .bTop');if(top)top.insertAdjacentElement('afterend',bar)}bar.innerHTML=B.coop.names.map((name,i)=>{const hp=Math.max(0,B.coop.trainerHp[i]||0),mx=(B.coop.trainerMax||[])[i]||HERO_HP,pct=Math.max(0,Math.min(100,hp/mx*100));return `<div class=coopTrainer><b>${esc(name||('트레이너 '+(i+1)))}</b><span>♥ ${hp}/${mx}${hp<=0?' · 전투 불가':''}</span><i><em style="width:${pct}%"></em></i></div>`}).join('')}if(B.me.hp<=0){$('#battle').querySelectorAll('.hand .card').forEach(c=>{c.classList.add('cant');c.style.pointerEvents='none'});const pw=$('#bPower');if(pw)pw.disabled=true;const en=$('#bEnd');if(en&&B.coop.turn===BX.player&&!B.over){en.disabled=false;en.textContent='전투 불가 · 차례 넘기기'}}$('#battle').querySelectorAll('[data-wild-catch-slot]').forEach(b=>b.remove());const msgEl=$('#bMsg');if(msgEl&&B.coop.turn!==BX.player)msgEl.innerHTML=`${esc(B.coop.names[B.coop.turn]||'친구')}님의 차례를 기다리고 있어요.`;return r;};
 const __coopSummon=summon;
 summon=async function(P,hi,slot){const result=await __coopSummon.apply(this,arguments);if(B&&B.coopMode&&P===B.me&&B.me.board[slot]){B.me.board[slot].owner=BX.player;bxBattleActionSync('summon',{slot,id:B.me.board[slot].id})}return result};
 const __coopItem=playItem;
@@ -4042,6 +4042,50 @@ const __coopHeroEl=heroEl;heroEl=function(P){if(B&&B.coopMode&&P===B.me)return $
 const __coopRenderHub=renderHub;
 renderHub=function(){__coopRenderHub.apply(this,arguments);const grid=$('#view .tiles');if(grid&&!$('#bxHubTile')){const b=document.createElement('button');b.id='bxHubTile';b.className='tile main';b.style.background='linear-gradient(120deg,#f4e7ff,#ffe8e2)';b.style.borderColor='#d9b8ff';b.style.boxShadow='0 5px 0 #d9b8ff';b.innerHTML='<span class="ti" style="font-size:48px;display:flex;align-items:center;justify-content:center">🐉</span><span><span class="tn">협동 보스전</span><br><span class="td">친구와 함께 보스 포켓몬을 쓰러뜨리자!</span></span>';grid.insertBefore(b,grid.firstChild);b.onclick=()=>{sfx('tap');bxRender()}}};
 
+
+
+/* 협동 보스전 모바일 가독성 최종 보정 */
+(function installCoopMobileReadability(){
+ if(document.getElementById('coopMobileReadability'))return;
+ const st=document.createElement('style');st.id='coopMobileReadability';
+ st.textContent=`
+ #battle:has(#coopTrainerHp){height:var(--vh);max-height:var(--vh);padding-bottom:calc(var(--sb) + env(safe-area-inset-bottom, 0px));}
+ #battle:has(#coopTrainerHp) .bTop{flex-shrink:0}
+ #battle:has(#coopTrainerHp) .lane{flex:1 1 0;min-height:68px}
+ #battle:has(#coopTrainerHp) #foeLane{flex:1.05 1 0;min-height:82px}
+ #battle:has(#coopTrainerHp) #myLane{flex:1.1 1 0;min-height:94px}
+ #battle:has(#coopTrainerHp) .bBot{flex-shrink:0}
+ #battle:has(#coopTrainerHp) .hand{height:clamp(112px,16vh,148px)!important;min-height:112px!important;flex-shrink:0;overflow-x:auto;overflow-y:hidden;align-items:flex-end;padding:4px 7px calc(8px + env(safe-area-inset-bottom, 0px))!important}
+ #battle:has(#coopTrainerHp) .hand .card{width:clamp(68px,12vw,86px)!important;max-width:none!important;height:auto;aspect-ratio:63/88;flex:0 0 auto;overflow:visible}
+ #battle:has(#coopTrainerHp) .hand .card .cTop{min-height:18px;font-size:clamp(9px,2.8vw,12px);gap:2px;padding:0 1px}
+ #battle:has(#coopTrainerHp) .hand .card .cost{width:19px;height:19px;font-size:12px;flex-shrink:0}
+ #battle:has(#coopTrainerHp) .hand .card .stats .st{height:18px;min-width:18px;font-size:11px;padding:0 2px}
+ #battle:has(#coopTrainerHp) .hand .card .rar{font-size:9px}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .slot{outline:2px solid transparent;outline-offset:-2px}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .slot.coopMine{outline-color:#2798ff}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .slot.coopFriend{outline-color:#bd70df}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit .us{position:relative;z-index:4;display:flex;justify-content:center;gap:2px;margin-top:2px}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit .us .st{height:19px;min-width:24px;font-size:12px;padding:0 4px;border:1px solid rgba(255,255,255,.95);box-shadow:0 1px 2px #24304b55}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit .us .st.atk::before{content:'⚔';font-size:9px;margin-right:2px}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit .us .st.hp::before{content:'♥';font-size:9px;margin-right:2px}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit .coopOwner{top:0;right:0;font-size:clamp(8px,2.5vw,10px);padding:2px 4px;border:1px solid #fff;box-shadow:0 1px 3px #0005}
+ #battle:has(#coopTrainerHp) #myLane.coopLane .unit:has(.coopOwner) .sp{padding-top:12px}
+ @media(max-width:560px){
+  #battle:has(#coopTrainerHp) .hand{height:clamp(112px,16vh,138px)!important;min-height:112px!important}
+  #battle:has(#coopTrainerHp) .hand .card{width:clamp(68px,17vw,82px)!important}
+  #battle:has(#coopTrainerHp) #myLane.coopLane{grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr));}
+  #battle:has(#coopTrainerHp) #myLane.coopLane .unit .us .st{height:18px;font-size:11px;min-width:23px}
+  #battle:has(#coopTrainerHp) #myLane.coopLane .unit .coopOwner{font-size:9px}
+ }
+ @media(max-height:700px){
+  #battle:has(#coopTrainerHp) .lane{min-height:54px}
+  #battle:has(#coopTrainerHp) #foeLane{min-height:60px}
+  #battle:has(#coopTrainerHp) #myLane{min-height:70px}
+  #battle:has(#coopTrainerHp) .hand{height:106px!important;min-height:106px!important}
+ }
+ `;
+ document.head.appendChild(st);
+})();
 
 init();
 if(S.screen==='title')renderTitle();
