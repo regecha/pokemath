@@ -3730,7 +3730,7 @@ function scStartBattle(u,pos){
  if(pg.kind==='boss'){hpM=SC_TUNE.boss;atkB=SC_TUNE.bossAtk;}
  if(pg.kind==='final'){const f=SC_TUNE.final[(pg.phase||1)-1]||SC_TUNE.final[0];hpM=f.hp;atkB=f.atk;}
  SC.unit=u;SC.pos=pos;SC.index=SC_UNITS[u].art;S.screen='scenarioBattle';scMusicStart(SC_UNITS[u].bgm);
- const me=mkPlayer(S.meta.name,p.deck,HERO_HP,scAvatar(),false,scOwned(),true);
+ const me=mkPlayer(S.meta.name,p.deck,HERO_HP,scAvatar(),false,Object.keys(S.meta.col||{}).map(Number).filter(id=>MON[id]),true);
  const foe=mkPlayer(`${boss?'보스':'굴레'} · ${wild.name}`,[],1,id,true,[],false);
  const slot=Math.floor(BOARD_N/2),un=mkUnit(id);un.hp=Math.round(wild.hp*10*hpM);un.max=un.hp;un.atk=wild.atk+atkB;un.att=0;un.fresh=0;un.wildEncounter=1;foe.board[slot]=un;
  for(let d=0;d<3;d++)draw(me,true);
