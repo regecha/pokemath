@@ -1082,6 +1082,37 @@ html.lowfx .wildLane .unit::before{animation:none!important}
 </style>
 
 
+<style id="scenario-impact-effects">
+/* 시나리오 효과 페이지: 충격파·진동·화면 흔들림 */
+.scv-fx-impact .scv-stage{position:relative;isolation:isolate;overflow:hidden;animation:scvImpactShake .72s cubic-bezier(.36,.07,.19,.97) both}
+.scv-fx-impact .scv-stage::before,.scv-fx-impact .scv-stage::after{content:"";position:absolute;inset:-35%;pointer-events:none;z-index:4;border-radius:50%}
+.scv-fx-impact .scv-stage::before{background:radial-gradient(circle,rgba(255,255,240,.96) 0%,rgba(255,211,125,.62) 8%,rgba(255,101,35,.2) 24%,rgba(255,50,20,0) 58%);opacity:0;animation:scvImpactFlash .82s ease-out both}
+.scv-fx-impact .scv-stage::after{inset:-60%;background:repeating-conic-gradient(from 0deg,rgba(255,236,178,0) 0deg 8deg,rgba(255,222,153,.5) 8.5deg 10deg,rgba(255,236,178,0) 10.5deg 20deg);opacity:0;animation:scvImpactRays .9s ease-out both}
+.scv-fx-impact .scv-fx{position:relative;z-index:5;animation:scvImpactPop .55s cubic-bezier(.16,1,.3,1) both;box-shadow:0 0 0 1px rgba(255,200,100,.35),0 0 32px rgba(255,104,32,.55),inset 0 0 28px rgba(255,180,70,.16)}
+.scv-fx-impact .scv-fx b{text-shadow:0 0 8px #fff,0 0 22px #ff8c32,3px 4px 0 #641d12;animation:scvShake .22s ease 4}
+@keyframes scvImpactShake{0%,100%{transform:translate(0,0)}12%{transform:translate(-5px,2px) rotate(-.35deg)}24%{transform:translate(6px,-2px) rotate(.35deg)}36%{transform:translate(-4px,1px)}48%{transform:translate(4px,0)}60%{transform:translate(-2px,-1px)}72%{transform:translate(2px,1px)}84%{transform:translate(-1px,0)}}
+@keyframes scvImpactFlash{0%{opacity:0;transform:scale(.1)}13%{opacity:1}38%{opacity:.55}100%{opacity:0;transform:scale(1.15)}}
+@keyframes scvImpactRays{0%{opacity:0;transform:scale(.18) rotate(-15deg)}18%{opacity:.85}100%{opacity:0;transform:scale(1.05) rotate(18deg)}}
+@keyframes scvImpactPop{0%{transform:scale(.78);filter:brightness(2.1)}65%{transform:scale(1.035);filter:brightness(1.25)}100%{transform:scale(1);filter:brightness(1)}}
+@media(prefers-reduced-motion:reduce){.scv-fx-impact .scv-stage,.scv-fx-impact .scv-stage::before,.scv-fx-impact .scv-stage::after,.scv-fx-impact .scv-fx,.scv-fx-impact .scv-fx b{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
+<style id="scenario-six-star-effect">
+.scv-six-stars{position:relative;display:flex;justify-content:center;align-items:center;gap:clamp(7px,2.3vw,22px);padding:22px 12px 18px;margin:2px auto 12px;width:min(100%,620px);min-height:92px;border-radius:18px;isolation:isolate;background:radial-gradient(ellipse at 17% 50%,rgba(40,255,132,.13),transparent 32%),linear-gradient(90deg,rgba(8,18,40,.08),rgba(8,18,40,.25),rgba(8,18,40,.08));overflow:hidden;animation:scSixReveal .8s ease both}
+.scv-six-stars:before{content:"";position:absolute;inset:50% 5%;height:1px;background:linear-gradient(90deg,transparent,#8ca7cb88,#e3e9ffcc,#8ca7cb88,transparent);z-index:-1}
+.scv-star{position:relative;display:block;width:clamp(25px,5.4vw,48px);height:clamp(25px,5.4vw,48px);flex:0 0 auto;filter:drop-shadow(0 0 5px #a6c6ff88);animation:scStarFloat 3s ease-in-out infinite;animation-delay:calc(var(--i)*-.22s)}
+.scv-star svg{width:100%;height:100%;overflow:visible}.scv-star polygon{fill:#b8c9ef;fill-opacity:.18;stroke:#dce8ff;stroke-width:1.8;stroke-linejoin:round}
+.scv-star:first-child{width:clamp(35px,7vw,61px);height:clamp(35px,7vw,61px);filter:drop-shadow(0 0 8px #38ff91) drop-shadow(0 0 17px #00d85b);animation:scGreenStar 1.35s ease-in-out infinite}
+.scv-star:first-child polygon{fill:#58ff9b;fill-opacity:.9;stroke:#d5ffe5;stroke-width:2.2}
+.scv-star:first-child:before,.scv-star:first-child:after{content:"";position:absolute;left:50%;top:50%;width:115%;height:145%;transform:translate(-50%,-50%);border-radius:50% 50% 42% 42%;pointer-events:none;z-index:-1}
+.scv-star:first-child:before{background:radial-gradient(ellipse at 50% 56%,rgba(95,255,151,.85) 0%,rgba(24,230,95,.48) 28%,rgba(0,185,75,.18) 48%,transparent 70%);filter:blur(3px);animation:scFlamePulse .48s ease-in-out infinite alternate}
+.scv-star:first-child:after{width:80%;height:120%;top:38%;background:linear-gradient(0deg,transparent 3%,rgba(31,255,116,.75) 38%,rgba(181,255,205,.8) 55%,transparent 76%);clip-path:polygon(50% 0,63% 26%,84% 9%,78% 43%,100% 35%,78% 65%,69% 100%,48% 74%,29% 100%,25% 65%,0 48%,28% 40%,21% 16%,43% 29%);filter:blur(2px);animation:scFlameLick .38s ease-in-out infinite alternate}
+@keyframes scSixReveal{from{opacity:0;transform:scale(.86);filter:brightness(2)}to{opacity:1;transform:scale(1);filter:brightness(1)}}
+@keyframes scStarFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-4px) rotate(3deg)}}
+@keyframes scGreenStar{0%,100%{transform:scale(1) rotate(-2deg);filter:drop-shadow(0 0 6px #38ff91) drop-shadow(0 0 12px #00d85b)}50%{transform:scale(1.12) rotate(3deg);filter:drop-shadow(0 0 12px #b7ffd0) drop-shadow(0 0 24px #00ff65)}}
+@keyframes scFlamePulse{from{opacity:.65;transform:translate(-50%,-50%) scale(.85)}to{opacity:1;transform:translate(-50%,-50%) scale(1.12)}}
+@keyframes scFlameLick{from{transform:translate(-50%,-50%) scaleY(.83) rotate(-5deg);opacity:.7}to{transform:translate(-50%,-50%) scaleY(1.13) rotate(5deg);opacity:1}}
+@media(prefers-reduced-motion:reduce){.scv-six-stars,.scv-star,.scv-star:first-child:before,.scv-star:first-child:after{animation:none!important}}
+</style>
 </head>
 <body>
 <div id="bg"><div class="hill b"></div><div class="hill c"></div><div class="ballDeco"></div><i style="left:8%;top:12%;width:120px;height:40px"></i><i style="left:14%;top:9%;width:70px;height:50px"></i><i style="left:62%;top:20%;width:150px;height:44px"></i><i style="left:70%;top:16%;width:80px;height:56px"></i></div>
@@ -3622,7 +3653,8 @@ function scBackToHub(){SC.busy=false;scStopMusic();renderHub();startBgm();}
 const scPages=u=>(SC_STORY[u]&&SC_STORY[u].pages)||[];
 function scLines(text){return String(text).split('\n').map((ln,i)=>{const d=/^\(.*\)$/.test(ln.trim());return `<div class="scv-ln${d?' dir':''}" style="animation-delay:${Math.min(i*.28,1.4)}s">${scE(ln)}</div>`;}).join('');}
 function scNarrMonId(text){const raw=String(text||''),m=scN2I();let hit=null;for(const name of Object.keys(m)){const at=raw.indexOf(name);if(at>=0&&(!hit||at<hit.at||(at===hit.at&&name.length>hit.name.length)))hit={name,at,id:m[name]};}return hit?hit.id:0;}
-function scNarration(text){const id=scNarrMonId(text);return `<div class="scv-narr-content${id?' has-mon':''}">${id?`<div class="scv-narr-mon" aria-label="${esc(MON[id].name)}">${monImg(id,'front')}<small>${esc(MON[id].name)}</small></div>`:''}<div class="scv-narr-text">${scLines(text)}</div></div>`;}
+function scSixStarGraphic(){return `<div class="scv-six-stars" role="img" aria-label="여섯 개의 별 문양. 첫 번째 별이 초록빛으로 불타오른다">${Array.from({length:6},(_,i)=>`<span class="scv-star" style="--i:${i}"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,3 61,35 95,35 68,55 79,88 50,68 21,88 32,55 5,35 39,35"/></svg></span>`).join('')}</div>`;}
+function scNarration(text){const id=scNarrMonId(text);const stars=String(text||'').includes('여섯 개의 별 문양')?scSixStarGraphic():'';return `<div class="scv-narr-content${id?' has-mon':''}">${id?`<div class="scv-narr-mon" aria-label="${esc(MON[id].name)}">${monImg(id,'front')}<small>${esc(MON[id].name)}</small></div>`:''}<div class="scv-narr-text">${stars}${scLines(text)}</div></div>`;}
 function scSpeakerArt(who){
  const w=String(who||''),art=SC_USER_ART.portraits;let key=null;
  if(w==='주인공')key='hero';else if(w==='이안')key='rival';else if(/^라온/.test(w))key='raon';else if(w==='지라치')key='jirachi';else if(/조사단원|도시 관장|연구소/.test(w))key='judge';
@@ -3695,7 +3727,7 @@ function scShow(u,pos){
  autoSave();
  const nav=scNavFor(u,pos,pg),stage=scStageHTML(u,pos,pg,grant),pct=Math.round((pos+1)/pages.length*100);
  const lab=scSceneLabel(u,pos);
- $('#view').innerHTML=`<div class="sc-page scv scv-k-${pg.k}"><div class="scv-bar"><button class="btn ghost sm" id="scMapBtn">지도</button><h2>${esc(SC_UNITS[u].name)}${lab?` <span>· ${esc(lab)}</span>`:''}</h2><button class="btn ${S.meta.settings.bgm?'blue':'ghost'} sm" id="scMusicBtn">${S.meta.settings.bgm?'♪ ON':'♪ OFF'}</button></div><div class="scv-stage" id="scStage">${stage}</div><div class="scv-nav"><button class="btn ghost" id="scPrev" ${pos===0?'disabled':''}>◀ 이전</button><div class="scv-prog" title="${pct}%"><i style="width:${pct}%"></i><span>${pos+1} / ${pages.length}</span></div><button class="btn purple big" id="scNext" ${nav.dis?'disabled':''}>${nav.label}</button></div></div>`;
+ $('#view').innerHTML=`<div class="sc-page scv scv-k-${pg.k}${pg.k==='fx'?' scv-fx-impact':''}"><div class="scv-bar"><button class="btn ghost sm" id="scMapBtn">지도</button><h2>${esc(SC_UNITS[u].name)}${lab?` <span>· ${esc(lab)}</span>`:''}</h2><button class="btn ${S.meta.settings.bgm?'blue':'ghost'} sm" id="scMusicBtn">${S.meta.settings.bgm?'♪ ON':'♪ OFF'}</button></div><div class="scv-stage" id="scStage">${stage}</div><div class="scv-nav"><button class="btn ghost" id="scPrev" ${pos===0?'disabled':''}>◀ 이전</button><div class="scv-prog" title="${pct}%"><i style="width:${pct}%"></i><span>${pos+1} / ${pages.length}</span></div><button class="btn purple big" id="scNext" ${nav.dis?'disabled':''}>${nav.label}</button></div></div>`;
  $('#scMapBtn').onclick=()=>{sfx('tap');scRenderMap();};
  $('#scMusicBtn').onclick=()=>{sfx('tap');S.meta.settings.bgm=!S.meta.settings.bgm;autoSave();startBgm();scShow(u,pos);};
  $('#scPrev').onclick=()=>{if(pos>0){sfx('tap');let q=pos-1;while(q>0&&pages[q].k==='bt')q--;scShow(u,q);}};
