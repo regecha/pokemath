@@ -603,6 +603,313 @@ html.lowfx .card.r5:not(.battleSpec):not(.shardCard) { animation:none !important
   .card.r5:not(.battleSpec):not(.shardCard) { animation:none !important; }
 }
 
+
+
+/* ===== 최종 개선: 속성별 색상 + 희귀 오오라는 카드 바깥에서만 ===== */
+.card .cTop{
+  background:linear-gradient(90deg,var(--tc) 0%,var(--tc2) 100%);
+  border-radius:6px;padding:2px 4px!important;
+  color:#241f2d;text-shadow:0 1px 0 rgba(255,255,255,.25);
+}
+.card .art{
+  background:radial-gradient(circle at 50% 38%,#fff 0%,rgba(255,255,255,.84) 58%,var(--tc2) 100%)!important;
+  border-color:rgba(255,255,255,.92)!important;
+}
+.card .holo{display:none!important;visibility:hidden!important;opacity:0!important}
+.card.r3:not(.battleSpec):not(.shardCard),
+.card.r4:not(.battleSpec):not(.shardCard),
+.card.r5:not(.battleSpec):not(.shardCard){
+  border:3px solid transparent!important;
+  background:linear-gradient(160deg,var(--tc) 0%,var(--tc2) 100%) padding-box,
+    linear-gradient(135deg,#fff,#cbd4e0) border-box!important;
+  background-size:auto!important;
+  overflow:hidden!important;
+}
+/* 3성: 푸른 크리스털 오오라 — 테두리 바깥만 빛나고 카드 내부는 타입 색상 */
+.card.r3:not(.battleSpec):not(.shardCard){
+  background:linear-gradient(160deg,var(--tc) 0%,var(--tc2) 100%) padding-box,
+    linear-gradient(135deg,#e5fbff,#46c7ff,#758dff,#dcf8ff) border-box!important;
+  animation:rareBlueAura 2.2s ease-in-out infinite!important;
+}
+@keyframes rareBlueAura{
+  0%,100%{box-shadow:0 0 0 2px #effcff,0 0 0 5px rgba(70,191,255,.8),0 0 15px 5px rgba(64,171,255,.5),0 6px 14px rgba(0,0,0,.16)}
+  50%{box-shadow:0 0 0 2px #fff,0 0 0 6px rgba(133,151,255,.9),0 0 27px 10px rgba(62,216,255,.76),0 6px 14px rgba(0,0,0,.16)}
+}
+/* 4성: 타입 배경 위에 무지개 테두리, 바깥 광채만 애니메이션 */
+.card.r4:not(.battleSpec):not(.shardCard){
+  background:linear-gradient(160deg,var(--tc) 0%,var(--tc2) 100%) padding-box,
+    conic-gradient(from 0deg,#ff59b8,#ffe56c,#57f2bd,#61c9ff,#a47cff,#ff59b8) border-box!important;
+  animation:rareRainbowAura 2.5s ease-in-out infinite!important;
+}
+@keyframes rareRainbowAura{
+  0%,100%{box-shadow:0 0 0 2px rgba(255,255,255,.98),0 0 0 5px rgba(190,110,255,.84),0 0 15px 5px rgba(205,100,255,.52),0 6px 14px rgba(0,0,0,.16)}
+  50%{box-shadow:0 0 0 2px #fff,0 0 0 5px rgba(255,120,218,.92),0 0 25px 9px rgba(111,205,255,.72),0 6px 14px rgba(0,0,0,.16)}
+}
+/* 5성: 황금 테두리와 굵은 금빛 오오라 */
+.card.r5:not(.battleSpec):not(.shardCard){
+  background:linear-gradient(160deg,var(--tc) 0%,var(--tc2) 100%) padding-box,
+    conic-gradient(from 0deg,#fff8cc,#ffbd23,#fff6a8,#d58a05,#fffbd9,#ffbd23,#fff8cc) border-box!important;
+  animation:rareGoldAura 1.9s ease-in-out infinite!important;
+}
+@keyframes rareGoldAura{
+  0%,100%{box-shadow:0 0 0 2px #fff9d7,0 0 0 5px rgba(255,194,42,.96),0 0 18px 7px rgba(255,177,24,.65),0 6px 14px rgba(0,0,0,.16)}
+  50%{box-shadow:0 0 0 2px #fff,0 0 0 6px #ffe16c,0 0 30px 12px rgba(255,190,28,.9),0 6px 14px rgba(0,0,0,.16)}
+}
+/* 포켓몬 이미지 위로 어떤 광택도 올라오지 않도록 일러스트를 최상위 레이어로 */
+.card.r3:not(.battleSpec):not(.shardCard) .art,
+.card.r4:not(.battleSpec):not(.shardCard) .art,
+.card.r5:not(.battleSpec):not(.shardCard) .art{isolation:isolate!important;position:relative!important}
+.card.r3:not(.battleSpec):not(.shardCard) .art::after,
+.card.r4:not(.battleSpec):not(.shardCard) .art::after,
+.card.r5:not(.battleSpec):not(.shardCard) .art::after{content:none!important;display:none!important}
+.card.r3:not(.battleSpec):not(.shardCard) .art>img,
+.card.r4:not(.battleSpec):not(.shardCard) .art>img,
+.card.r5:not(.battleSpec):not(.shardCard) .art>img{
+  position:relative!important;z-index:2!important;opacity:1!important;visibility:visible!important;
+  mix-blend-mode:normal!important;filter:drop-shadow(0 4px 3px rgba(35,20,65,.32))!important;
+}
+/* 덱 구성에서도 코스트·속성·특성 설명을 모두 읽을 수 있는 풀 카드 */
+.card.deck{width:132px!important;padding:5px!important;border-radius:10px}
+.card.deck .cTop{font-size:12px;min-height:19px;gap:3px}
+.card.deck .cost{width:20px;height:20px;font-size:13px}
+.card.deck .art{margin:3px 0;min-height:44px}
+.card.deck .art img{width:92%;height:92%;transform:none;image-rendering:pixelated}
+.card.deck .types{display:flex;gap:2px;margin-bottom:2px}
+.card.deck .tchip{font-size:9px;line-height:13px;padding:0 4px}
+.card.deck .kw{display:block!important;font-size:9.5px;min-height:34px;line-height:1.22;padding:3px 4px;background:rgba(255,255,255,.9)}
+.card.deck .stats{margin-top:2px}
+.card.deck .st{min-width:23px;height:22px;font-size:14px;border-radius:6px}
+.card.deck .rar{font-size:10px}
+.card.deck .cnt{top:22px}
+/* 끝없는 도전 야생 포켓몬: 보스급 크기와 뒤쪽 오오라 */
+.wildLane .slot{flex:0 0 auto;overflow:visible!important}
+.wildLane.wildCount1 .slot{width:min(68vw,410px)!important;min-width:220px;max-height:calc(var(--vh)*.66)!important}
+.wildLane.wildCount2 .slot{width:min(46vw,300px)!important;min-width:140px;max-height:calc(var(--vh)*.58)!important}
+.wildLane .unit{overflow:visible!important;isolation:isolate}
+.wildLane .unit::before{
+  content:"";position:absolute;left:50%;top:6%;width:155%;height:66%;transform:translateX(-50%);
+  border:4px solid rgba(255,221,112,.8);border-radius:50%;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse,rgba(255,218,95,.35) 0%,rgba(255,141,74,.16) 40%,rgba(135,96,255,.1) 61%,transparent 74%);
+  box-shadow:0 0 24px 8px rgba(255,190,63,.5),inset 0 0 22px rgba(255,255,255,.18);
+  animation:wildBossAura 2.6s ease-in-out infinite;
+}
+@keyframes wildBossAura{0%,100%{opacity:.62;filter:brightness(.95);transform:translateX(-50%) scale(.94)}50%{opacity:1;filter:brightness(1.25);transform:translateX(-50%) scale(1.05)}}
+.wildLane .unit .sp{position:relative;z-index:1;overflow:visible!important}
+.wildLane.wildCount1 .unit .sp img{
+  width:min(88vw,390px)!important;height:auto!important;max-width:none!important;max-height:none!important;
+  object-fit:contain!important;transform:none!important;animation:none!important;image-rendering:pixelated;
+  filter:drop-shadow(0 8px 9px rgba(0,0,0,.32)) drop-shadow(0 0 15px rgba(255,229,129,.42))!important;
+  transform-origin:center bottom!important;
+}
+.wildLane.wildCount2 .unit .sp img{
+  width:min(50vw,290px)!important;height:auto!important;max-width:none!important;max-height:none!important;
+  object-fit:contain!important;transform:none!important;animation:none!important;image-rendering:pixelated;
+  filter:drop-shadow(0 7px 7px rgba(0,0,0,.32)) drop-shadow(0 0 11px rgba(255,229,129,.35))!important;
+}
+.wildLane .unit .un,.wildLane .unit .tdots,.wildLane .unit .us,.wildLane .unit .kwI{position:relative;z-index:3}
+.wildLane .unit .shadow{left:8%;right:8%;height:18px;filter:blur(3px);background:rgba(31,20,55,.3);z-index:0}
+html.lowfx .card.r3:not(.battleSpec):not(.shardCard),
+html.lowfx .card.r4:not(.battleSpec):not(.shardCard),
+html.lowfx .card.r5:not(.battleSpec):not(.shardCard),
+html.lowfx .wildLane .unit::before{animation:none!important}
+@media(prefers-reduced-motion:reduce){
+ .card.r3:not(.battleSpec):not(.shardCard),.card.r4:not(.battleSpec):not(.shardCard),.card.r5:not(.battleSpec):not(.shardCard),.wildLane .unit::before{animation:none!important}
+}
+
+</style>
+
+<style id="wild-layout-overlap-fix">
+/* 끝없는 도전: 야생 보스의 크기와 능력치 표시를 전용 영역 안에 정리 */
+#foeLane.wildLane{
+  flex:0 0 clamp(170px,31vh,285px)!important;
+  height:clamp(170px,31vh,285px)!important;
+  min-height:150px!important;
+  max-height:32vh!important;
+  overflow:visible!important;
+  align-items:center!important;
+}
+#foeLane.wildLane.wildCount1 .slot{
+  width:min(54vw,330px)!important;
+  height:min(29vh,260px)!important;
+  min-width:0!important;
+  min-height:150px!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+}
+#foeLane.wildLane.wildCount2 .slot{
+  width:min(39vw,230px)!important;
+  height:min(24vh,220px)!important;
+  min-width:0!important;
+  min-height:150px!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+}
+#foeLane.wildLane .unit{overflow:visible!important;isolation:isolate;}
+/* 야생 포켓몬 그림은 슬롯 안에 고정해 우리 필드까지 침범하지 않게 함 */
+#foeLane.wildLane .unit .sp{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  flex:none!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;
+  overflow:visible!important;z-index:1!important;pointer-events:none;
+}
+#foeLane.wildLane.wildCount1 .unit .sp img{
+  width:auto!important;height:min(28vh,250px)!important;
+  max-width:min(52vw,290px)!important;max-height:none!important;
+  object-fit:contain!important;transform:none!important;animation:none!important;
+  image-rendering:pixelated;filter:drop-shadow(0 7px 8px rgba(0,0,0,.3)) drop-shadow(0 0 12px rgba(255,224,112,.36))!important;
+}
+#foeLane.wildLane.wildCount2 .unit .sp img{
+  width:auto!important;height:min(21vh,190px)!important;
+  max-width:min(36vw,205px)!important;max-height:none!important;
+  object-fit:contain!important;transform:none!important;animation:none!important;
+  image-rendering:pixelated;filter:drop-shadow(0 6px 7px rgba(0,0,0,.3)) drop-shadow(0 0 10px rgba(255,224,112,.32))!important;
+}
+/* 이름, 타입, 공격력, 체력을 슬롯 위쪽의 읽기 쉬운 HUD로 모음 */
+#foeLane.wildLane .unit .un,
+#foeLane.wildLane .unit .tdots,
+#foeLane.wildLane .unit .us{position:absolute!important;left:50%!important;transform:translateX(-50%)!important;z-index:8!important;}
+#foeLane.wildLane .unit .un{
+  top:5px!important;max-width:calc(100% - 48px)!important;
+  background:rgba(255,255,255,.96)!important;border:2px solid rgba(255,205,91,.95);
+  border-radius:9px!important;padding:1px 7px!important;color:#302845;
+  box-shadow:0 2px 7px rgba(20,20,45,.25);font-size:clamp(11px,1.5vw,14px)!important;
+}
+#foeLane.wildLane .unit .tdots{
+  top:31px!important;display:flex!important;gap:3px!important;
+  padding:3px 6px;background:rgba(28,32,62,.78);border-radius:99px;
+  box-shadow:0 2px 6px rgba(0,0,0,.18);
+}
+#foeLane.wildLane .unit .tdots i{width:9px!important;height:9px!important;flex:none;}
+#foeLane.wildLane .unit .us{
+  top:49px!important;display:flex!important;align-items:center!important;gap:5px!important;
+  padding:3px 6px!important;background:rgba(255,255,255,.97)!important;
+  border:2px solid #e8bd56;border-radius:12px!important;
+  box-shadow:0 3px 9px rgba(20,20,45,.28)!important;white-space:nowrap;
+}
+#foeLane.wildLane .unit .us .st{min-width:36px!important;height:29px!important;font-size:19px!important;padding:0 6px!important;}
+#foeLane.wildLane.wildCount2 .unit .us .st{min-width:29px!important;height:25px!important;font-size:16px!important;padding:0 4px!important;}
+#foeLane.wildLane .unit .kwI{z-index:9!important;top:5px!important;left:5px!important;}
+#foeLane.wildLane .unit .shadow{z-index:0!important;bottom:8px!important;left:10%!important;right:10%!important;}
+@media(max-height:650px){
+  #foeLane.wildLane{flex-basis:26vh!important;height:26vh!important;min-height:135px!important;}
+  #foeLane.wildLane.wildCount1 .slot{height:min(23vh,190px)!important;min-height:130px!important;}
+  #foeLane.wildLane.wildCount2 .slot{height:min(22vh,175px)!important;min-height:130px!important;}
+  #foeLane.wildLane.wildCount1 .unit .sp img{height:min(21vh,175px)!important;}
+  #foeLane.wildLane.wildCount2 .unit .sp img{height:min(18vh,145px)!important;}
+}
+/* 바위 벽(갈색 테두리)은 안쪽, 공격 가능(초록 테두리)은 바깥쪽으로 분리 */
+.unit.taunt::before{
+  inset:6px!important;border:3px dashed #9a744e!important;border-radius:12px!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.62)!important;
+  z-index:2!important;pointer-events:none;
+}
+.unit.ready.taunt{
+  box-shadow:0 0 0 4px #35d879,0 0 0 7px rgba(53,216,121,.22),0 0 18px rgba(53,216,121,.7)!important;
+}
+.unit.ready.taunt::before{inset:7px!important;border-color:#9a744e!important;}
+</style>
+<style id="wild-right-stats-and-solid-rock">
+/* 야생 보스: 포켓몬은 왼쪽에서 크게, 이름·속성·공격력·체력은 오른쪽 패널에 배치 */
+#foeLane.wildLane{
+  flex:0 0 clamp(225px,35vh,335px)!important;
+  height:clamp(225px,35vh,335px)!important;
+  min-height:205px!important;
+  max-height:36vh!important;
+  overflow:visible!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:clamp(2px,1vw,10px)!important;
+}
+#foeLane.wildLane.wildCount1 .slot{
+  width:min(88vw,560px)!important;
+  height:min(34vh,325px)!important;
+  min-width:0!important;min-height:195px!important;max-height:none!important;
+  aspect-ratio:auto!important;flex:0 0 auto!important;
+}
+#foeLane.wildLane.wildCount2 .slot{
+  width:min(49vw,310px)!important;
+  height:min(28vh,260px)!important;
+  min-width:0!important;min-height:175px!important;max-height:none!important;
+  aspect-ratio:auto!important;flex:0 0 auto!important;
+}
+#foeLane.wildLane .unit{overflow:visible!important;isolation:isolate!important;}
+#foeLane.wildLane .unit .sp{
+  position:absolute!important;left:0!important;right:auto!important;top:0!important;bottom:0!important;
+  width:68%!important;height:100%!important;inset-block:0!important;
+  flex:none!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;
+  overflow:visible!important;z-index:1!important;pointer-events:none!important;padding:0!important;
+}
+#foeLane.wildLane.wildCount1 .unit .sp img{
+  height:min(33vh,315px)!important;width:auto!important;max-width:100%!important;max-height:none!important;
+  object-fit:contain!important;transform:none!important;animation:none!important;image-rendering:pixelated!important;
+  filter:drop-shadow(0 8px 9px rgba(0,0,0,.32)) drop-shadow(0 0 15px rgba(255,229,129,.46))!important;
+}
+#foeLane.wildLane.wildCount2 .unit .sp{width:64%!important;}
+#foeLane.wildLane.wildCount2 .unit .sp img{
+  height:min(25vh,235px)!important;width:auto!important;max-width:100%!important;max-height:none!important;
+  object-fit:contain!important;transform:none!important;animation:none!important;image-rendering:pixelated!important;
+  filter:drop-shadow(0 7px 8px rgba(0,0,0,.32)) drop-shadow(0 0 12px rgba(255,229,129,.4))!important;
+}
+/* 이름과 속성은 그림 머리 위가 아닌 오른쪽 패널 */
+#foeLane.wildLane .unit .un,
+#foeLane.wildLane .unit .tdots,
+#foeLane.wildLane .unit .us{
+  position:absolute!important;left:67%!important;right:2px!important;transform:none!important;
+  width:auto!important;max-width:none!important;z-index:8!important;margin:0!important;
+}
+#foeLane.wildLane .unit .un{
+  top:14%!important;white-space:normal!important;overflow-wrap:anywhere!important;text-align:center!important;
+  background:rgba(255,255,255,.97)!important;border:2px solid rgba(255,205,91,.98)!important;
+  border-radius:9px!important;padding:3px 4px!important;color:#302845!important;
+  box-shadow:0 2px 7px rgba(20,20,45,.25)!important;font-size:clamp(10px,1.4vw,14px)!important;line-height:1.2!important;
+}
+#foeLane.wildLane .unit .tdots{
+  top:34%!important;display:flex!important;flex-wrap:wrap!important;justify-content:center!important;align-items:center!important;
+  gap:3px!important;padding:4px 3px!important;background:rgba(28,32,62,.82)!important;border-radius:10px!important;
+  box-shadow:0 2px 6px rgba(0,0,0,.18)!important;
+}
+#foeLane.wildLane .unit .tdots i{width:10px!important;height:10px!important;flex:none!important;}
+#foeLane.wildLane .unit .us{
+  top:48%!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:center!important;
+  gap:6px!important;padding:5px!important;background:rgba(255,255,255,.97)!important;
+  border:2px solid #e8bd56!important;border-radius:12px!important;box-shadow:0 3px 9px rgba(20,20,45,.28)!important;
+  white-space:nowrap!important;
+}
+#foeLane.wildLane .unit .us .st{min-width:0!important;width:100%!important;height:30px!important;font-size:18px!important;padding:0 4px!important;}
+#foeLane.wildLane.wildCount2 .unit .un{font-size:clamp(9px,1.2vw,12px)!important;left:64%!important;right:1px!important;}
+#foeLane.wildLane.wildCount2 .unit .tdots{left:64%!important;right:1px!important;top:35%!important;}
+#foeLane.wildLane.wildCount2 .unit .tdots i{width:8px!important;height:8px!important;}
+#foeLane.wildLane.wildCount2 .unit .us{left:64%!important;right:1px!important;top:50%!important;padding:3px!important;gap:4px!important;}
+#foeLane.wildLane.wildCount2 .unit .us .st{height:25px!important;font-size:15px!important;}
+#foeLane.wildLane .unit .kwI{z-index:9!important;top:4px!important;left:4px!important;}
+#foeLane.wildLane .unit .shadow{z-index:0!important;bottom:8px!important;left:8%!important;right:35%!important;}
+/* 바위 벽은 예전처럼 실선, 공격 준비 초록 테두리는 바깥쪽 실선으로 유지 */
+.unit.taunt::before{
+  inset:6px!important;border:3px solid #9a744e!important;border-style:solid!important;border-radius:12px!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.62)!important;
+  z-index:2!important;pointer-events:none!important;
+}
+.unit.ready.taunt{
+  box-shadow:0 0 0 4px #35d879,0 0 0 7px rgba(53,216,121,.22),0 0 18px rgba(53,216,121,.7)!important;
+}
+.unit.ready.taunt::before{inset:7px!important;border:3px solid #9a744e!important;border-style:solid!important;}
+@media(max-height:650px){
+  #foeLane.wildLane{flex-basis:29vh!important;height:29vh!important;min-height:170px!important;max-height:31vh!important;}
+  #foeLane.wildLane.wildCount1 .slot{height:min(29vh,225px)!important;min-height:160px!important;}
+  #foeLane.wildLane.wildCount2 .slot{height:min(25vh,195px)!important;min-height:150px!important;}
+  #foeLane.wildLane.wildCount1 .unit .sp img{height:min(28vh,220px)!important;}
+  #foeLane.wildLane.wildCount2 .unit .sp img{height:min(23vh,180px)!important;}
+}
+@media(max-width:430px){
+  #foeLane.wildLane.wildCount1 .slot{width:94vw!important;}
+  #foeLane.wildLane.wildCount1 .unit .sp{width:66%!important;}
+  #foeLane.wildLane.wildCount1 .unit .un,
+  #foeLane.wildLane.wildCount1 .unit .tdots,
+  #foeLane.wildLane.wildCount1 .unit .us{left:66%!important;right:1px!important;}
+  #foeLane.wildLane.wildCount1 .unit .us .st{height:26px!important;font-size:16px!important;}
+  #foeLane.wildLane.wildCount2 .slot{width:49vw!important;}
+  #foeLane.wildLane.wildCount2 .unit .un{font-size:9px!important;padding:2px!important;}
+  #foeLane.wildLane.wildCount2 .unit .us .st{height:22px!important;font-size:13px!important;}
+}
 </style>
 </head>
 <body>
@@ -1522,7 +1829,7 @@ function starsHTML(n){return `<span class=stars>${'★'.repeat(n)}<i>${'★'.rep
 const MON={};const MON_IDS=[];
 PACK_RAW.forEach(r=>{const[id,name,types,from,stage,rar,cost,atk,hp,genus,flavor,ht,wt]=r;MON[id]={id,name,types,from,stage,rar,cost,atk,hp,genus,flavor,ht,wt,to:[]};MON_IDS.push(id);});
 MON_IDS.forEach(id=>{const f=MON[id].from;if(f&&MON[f])MON[f].to.push(id);});
-const TYPE_COL=['#a8a77a','#ee8130','#6390f0','#7ac74c','#f7d02c','#96d9d6','#c22e28','#a33ea1','#e2bf65','#a98ff3','#f95587','#a6b91a','#b6a136','#735797','#6f35fc','#705746','#b7b7ce','#d685ad'];
+const TYPE_COL=['#7e8794','#e6502e','#247de0','#279b52','#c99700','#24a8ba','#ba2f3a','#8e3bb1','#a66a2f','#668fe3','#d94486','#719b22','#8c7559','#5f4baa','#4c61d8','#46424e','#66798e','#da6ca8'];
 const RAR_NAME=['','일반','고급','희귀','영웅','전설'];
 // 타입 능력: 좋아하는 포켓몬도 각자 쓸모가 있도록 (운빨던전에서 얻은 생각)
 const KW={
@@ -1561,12 +1868,12 @@ function fallbackSprite(id){if(FB[id])return FB[id];const m=MON[id];const c=m?TY
 function imgFail(el){const id=+el.dataset.id;if(el.dataset.f==='1'){el.src=fallbackSprite(id);el.dataset.f='2';return;}
  if(el.dataset.k&&el.dataset.k!=='front'){el.dataset.f='1';el.src=SPR_BASE+id+'.png';return;}el.dataset.f='2';el.src=fallbackSprite(id);}
 function monImg(id,kind='front',cls=''){if((kind==='anim'||kind==='back')&&S.meta.settings.anim!=='gif')cls=(cls?cls+' ':'')+'idle';return `<img class="${cls}" style="--d:${(id%7)*.17}s" src="${spriteURL(id,kind)}" data-id="${id}" data-k="${kind}" alt="" loading="lazy" draggable="false" onerror="imgFail(this)">`;}
-function typeChips(m){return m.types.map(t=>`<span class=tchip style="background:${TYPE_COL[t]}">${TYPE_KO[t]}</span>`).join('');}
+function typeChips(m){return m.types.map(t=>{const dark=[0,4,5,8,11,12,16,17].includes(t);return `<span class=tchip style="background:${TYPE_COL[t]};color:${dark?'#201a2a':'#fff'};text-shadow:${dark?'0 1px 0 rgba(255,255,255,.22)':'0 1px 0 rgba(0,0,0,.28)'}">${TYPE_KO[t]}</span>`;}).join('');}
 function cardHTML(id,opt={}){const m=MON[id];const kw=kwOf(m);const t=m.types[0],t2=m.types[1]!=null?m.types[1]:t;
  const lg=opt.size==='lg';
  // 홀로그램 레이어를 카드 전체가 아니라 일러스트 영역의 배경에 배치해
  // 포켓몬 이미지가 항상 홀로그램보다 앞에 그려지도록 한다.
- return `<div class="card ${opt.size||''} r${m.rar} ${opt.cls||''}" data-id="${id}" style="--tc:${TYPE_COL[t]};--tc2:${shade(TYPE_COL[t2],1.45)}">
+ return `<div class="card ${opt.size||''} r${m.rar} ${opt.cls||''}" data-id="${id}" style="--tc:${TYPE_COL[t]};--tc2:${shade(TYPE_COL[t2],1.18)}">
   <div class=cTop><span class=cName>${esc(m.name)}</span><span class=cost>${m.cost}</span></div>
   <div class=art>${monImg(id,lg?'art':'front')}</div>
   <div class=types>${typeChips(m)}</div>
@@ -1733,8 +2040,8 @@ function renderDeck(keep){S.screen='deck';const me=S.meta;if(!keep)ensureDeck();
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('cards')} 내 덱 (${me.deck.length}/${DECK_N})</h2><span class=hudSp></span><button class="btn blue sm" id=dAuto>자동으로 짜기</button></div>
   <p class=mut style="font-size:13px;margin:6px 0">덱 카드를 누르면 빠지고, 아래 카드를 누르면 들어가요. 같은 카드는 2장까지. 비용이 낮은 카드가 많아야 처음부터 싸울 수 있어요.</p>
   <div class=row style="align-items:flex-end;gap:16px;margin-bottom:18px"><div><div class=mut style="font-size:12px">비용별 장수</div><div class=curve>${curve.map((n,i)=>`<div style="height:${n*8+2}px"><span>${i+1}</span></div>`).join('')}</div></div></div>
-  <div class=deckBar id=deckBar>${me.deck.map((id,i)=>cardHTML(id,{size:'sm',noHolo:1}).replace('class="card','data-di="'+i+'" class="card')).join('')}</div>
-  <h3>가진 카드</h3><div class=colGrid>${owned.map(id=>{const inD=counts[id]||0,lim=deckLim(id);return cardHTML(id,{size:'sm',cnt:me.col[id],noHolo:1,cls:inD>=lim?'locked':''});}).join('')}</div></div></div>`;
+  <div class=deckBar id=deckBar>${me.deck.map((id,i)=>cardHTML(id,{size:'deck'}).replace('class="card','data-di="'+i+'" class="card')).join('')}</div>
+  <h3>가진 카드</h3><div class=colGrid>${owned.map(id=>{const inD=counts[id]||0,lim=deckLim(id);return cardHTML(id,{size:'deck',cnt:me.col[id],cls:inD>=lim?'locked':''});}).join('')}</div></div></div>`;
  bindHud();
  $('#dAuto').onclick=()=>{sfx('tap');me.deck=autoDeck();autoSave();renderDeck();};
  $('#deckBar').querySelectorAll('.card').forEach(c=>c.onclick=()=>{sfx('tap');me.deck.splice(+c.dataset.di,1);autoSave();renderDeckKeep();});
@@ -1755,11 +2062,14 @@ const GYMS=[
  {n:'챔피언 리그',ldr:'챔피언 하늘',types:null,lv:30,av:149,c:'#ffd23f',d:'모든 타입의 최강 트레이너'}];
 let B=null;
 const HERO_HP=20;const foeHP=d=>Math.round(13+d*1.3);
-function gymDeck(g,diff){ // 상대 덱: 체육관 타입 + 난이도에 맞는 비용
+function gymDeck(g,diff){ // 관장 타입 시너지와 전투 기여도가 높은 카드로 덱을 구성
  const pool=MON_IDS.filter(id=>{const m=MON[id];if(m.rar===5&&diff<9)return false;if(g&&g.types&&!m.types.some(t=>g.types.includes(t)))return false;return m.cost<=Math.min(6,2+Math.ceil(diff/2));});
+ const bonus={double:13,taunt:8,armor:8,dodge:7,grow:7,freeze:6,quake:6,poison:5,fight:5,rush:5,heal:4,draw:4,wave:4,ember:3,tough:4};
+ const score=id=>{const m=MON[id];return m.atk*1.8+m.hp*1.05+m.rar*2.5+(bonus[kwOf(m).k]||0)+(g&&g.types?m.types.filter(t=>g.types.includes(t)).length*3:0);};
  const d=[];const want=diff<=2?{1:4,2:5,3:3}:diff<=5?{1:3,2:4,3:3,4:2}:{1:2,2:3,3:3,4:2,5:1,6:1};
- for(const c in want){const p=shuffle(pool.filter(id=>MON[id].cost===+c));for(let k=0;k<want[c];k++)if(p.length)d.push(p[k%p.length]);}
- while(d.length<DECK_N&&pool.length)d.push(rpick(pool));
+ for(const c in want){const p=pool.filter(id=>MON[id].cost===+c).sort((a,b)=>score(b)-score(a));for(let k=0;k<want[c];k++)if(p.length)d.push(p[k%p.length]);}
+ const ranked=pool.slice().sort((a,b)=>score(b)-score(a));
+ while(d.length<DECK_N&&ranked.length)d.push(ranked[(d.length*3)%ranked.length]);
  return shuffle(d.slice(0,DECK_N));}
 // 배틀 안의 운(불씨 대상 등)은 친구 대전에서 두 기기가 똑같이 나오도록 같은 씨앗 난수를 써요
 const brand=()=>B&&B.rng?B.rng():rnd();
@@ -1795,9 +2105,10 @@ function startBattle(gi){const me=S.meta;if(gi>=0&&!window.__sim)me.stats.gymTry
  const g=gi>=0?GYMS[gi]:null;const diff=g?gi+1:clamp(Math.ceil(lvOf(me.xp).lv/2),1,7);
  const wildT=rint(0,17);const wild=g?null:{n:'연습 대전',ldr:'떠돌이 트레이너',types:[wildT,rint(0,17)],c:TYPE_COL[wildT]};
  const G=g||wild;
- B={gi,g:G,diff,turn:0,round:0,side:'me',me:mkPlayer(me.name,SIM.deck||me.deck,HERO_HP,partnerId(),false,Object.keys(me.col).map(Number),true),foe:mkPlayer(G.ldr,gymDeck(G,diff),foeHP(diff)+(G.hpAdj||0),g?g.av:rpick(MON_IDS.filter(id=>MON[id].types.includes(wildT)))),
+ B={gi,g:G,diff,turn:0,round:0,side:'me',me:mkPlayer(me.name,SIM.deck||me.deck,HERO_HP,partnerId(),false,Object.keys(me.col).map(Number),true),foe:mkPlayer(G.ldr,gymDeck(G,diff),foeHP(diff)+(G.hpAdj||0)+(g?5+gi*2:0),g?g.av:rpick(MON_IDS.filter(id=>MON[id].types.includes(wildT)))),
   sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:false,over:false};
- for(let i=0;i<3;i++)draw(B.me,true);for(let i=0;i<4;i++)draw(B.foe,true);
+ if(g){const leaderStartMana=Math.min(3,1+Math.floor(gi/3));B.foe.maxMana=leaderStartMana;B.foe.mana=leaderStartMana;}
+ for(let i=0;i<3;i++)draw(B.me,true);for(let i=0;i<(g?5:4);i++)draw(B.foe,true);
  S.screen='battle';$('#view').innerHTML='';$('#battle').classList.add('on');startBgm('battle');
  renderBattle();
  if(window.__sim)return startTurn('me');
@@ -2150,8 +2461,13 @@ async function foeTurn(){const fo=B.foe,me=B.me;B.busy=true;renderBattle();
    const faceDmg=fo.board.reduce((s,x)=>s+(x&&x.att>0&&!x.frozen?x.atk:0),0);
    if(taunts.length&&u.kw!=='sneak')tg={u:taunts.sort((a,b)=>me.board[a].hp-me.board[b].hp)[0]};
    else if(faceDmg>=me.hp)tg={hero:1};
-   else{let best=null,bv=-1;me.board.forEach((x,j)=>{if(!x)return;const dm=applyType(u.atk+(u.kw==='fight'?1:0),typeMul(u.id,x.id));const back=applyType(x.atk,typeMul(x.id,u.id));const kill=dm>=x.hp,die=back>=u.hp;let v=kill?(die?MON[x.id].cost-MON[u.id].cost+.5:MON[x.id].cost+3):-1;if(v>bv){bv=v;best=j;}});
-    const smart=B.diff>=3?.8:.45;if(best!=null&&bv>0&&rnd()<smart)tg={u:best};else tg={hero:1};}
+   else{let best=null,bv=-1;me.board.forEach((x,j)=>{if(!x)return;const dm=applyType(u.atk+(u.kw==='fight'?1:0),typeMul(u.id,x.id));const back=applyType(x.atk,typeMul(x.id,u.id));const kill=dm>=x.hp,die=back>=u.hp;let v;
+      if(B.gi>=0){
+       // 관장은 처치 가능한 위협부터 제거하고, 처치가 어렵다면 위험한 상대에게 큰 피해를 줘요.
+       v=kill?100+MON[x.id].cost*4-MON[u.id].cost*1.5+(!die?18:0)+(isTaunt(x)?5:0):Math.min(dm,x.hp)*1.8+x.atk*2+MON[x.id].cost*.7+(isTaunt(x)?6:0)+(x.kw==='grow'?3:0);
+      }else v=kill?(die?MON[x.id].cost-MON[u.id].cost+.5:MON[x.id].cost+3):-1;
+      if(v>bv){bv=v;best=j;}});
+    const smart=B.gi>=0?.97:(B.diff>=3?.8:.45);if(best!=null&&bv>0&&rnd()<smart)tg={u:best};else tg={hero:1};}
    await foeAttack(i,tg);u=fo.board[i];await wait(380);}}
  if(B.over)return;B.busy=false;await wait(300);startTurn('me');}
 async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)return;a.att--;
