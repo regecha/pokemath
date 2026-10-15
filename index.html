@@ -1113,6 +1113,132 @@ html.lowfx .wildLane .unit::before{animation:none!important}
 @keyframes scFlameLick{from{transform:translate(-50%,-50%) scaleY(.83) rotate(-5deg);opacity:.7}to{transform:translate(-50%,-50%) scaleY(1.13) rotate(5deg);opacity:1}}
 @media(prefers-reduced-motion:reduce){.scv-six-stars,.scv-star,.scv-star:first-child:before,.scv-star:first-child:after{animation:none!important}}
 </style>
+
+<style id="battle-mobile-space-rebalance-v2">
+/* 보스/야생 포켓몬은 조금 작게, 아군 필드와 손패 공간은 넉넉하게 */
+#battle.on{
+  height:var(--vh)!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  padding-bottom:var(--sb)!important;
+}
+#battle .bTop{flex:0 0 auto!important;min-height:52px!important;padding:4px 8px!important;gap:6px!important}
+#battle .wildTop{padding:3px 5px!important;min-height:0!important}
+#battle .wildEntry{padding:2px 4px!important;gap:4px!important}
+#battle .wildEntry .av{width:30px!important;height:30px!important}
+#battle .wildTop .wtName{font-size:12px!important}
+#battle .wildTop .wtHp{font-size:12px!important}
+#battle .wildTop .endWildHp{height:6px!important}
+#battle .lane{min-height:0!important;overflow:visible!important}
+#foeLane.wildLane{
+  flex:0 0 clamp(120px,20vh,180px)!important;
+  height:clamp(120px,20vh,180px)!important;
+  min-height:115px!important;
+  max-height:21vh!important;
+  gap:4px!important;
+  padding:0 4px!important;
+}
+#foeLane.wildLane.wildCount1 .slot{
+  width:min(70vw,360px)!important;
+  height:min(19vh,165px)!important;
+  min-height:110px!important;
+}
+#foeLane.wildLane.wildCount2 .slot{
+  width:min(43vw,220px)!important;
+  height:min(18vh,155px)!important;
+  min-height:105px!important;
+}
+#foeLane.wildLane.wildCount1 .unit .sp{width:64%!important}
+#foeLane.wildLane.wildCount1 .unit .sp img{
+  height:min(18vh,155px)!important;max-width:100%!important;
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.25))!important;
+}
+#foeLane.wildLane.wildCount2 .unit .sp{width:62%!important}
+#foeLane.wildLane.wildCount2 .unit .sp img{
+  height:min(15vh,128px)!important;max-width:100%!important;
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.25))!important;
+}
+#foeLane.wildLane .unit .un{top:12%!important;font-size:clamp(9px,1.2vw,12px)!important;padding:2px 3px!important}
+#foeLane.wildLane .unit .tdots{top:31%!important;padding:2px 3px!important}
+#foeLane.wildLane .unit .tdots i{width:7px!important;height:7px!important}
+#foeLane.wildLane .unit .us{top:43%!important;gap:3px!important;padding:3px!important}
+#foeLane.wildLane .unit .us .st{height:23px!important;font-size:14px!important}
+#foeLane.wildLane.wildCount2 .unit .us .st{height:20px!important;font-size:12px!important}
+#battle .mid{flex:0 0 auto!important;min-height:27px!important;padding:1px 6px!important}
+#battle .mid .msg{font-size:clamp(11px,3vw,14px)!important;padding:3px 8px!important;max-width:88vw!important}
+#myLane{
+  flex:1 1 0!important;
+  min-height:clamp(150px,24vh,230px)!important;
+  max-height:none!important;
+  padding:3px 4px!important;
+  gap:clamp(2px,1vw,8px)!important;
+  align-items:stretch!important;
+}
+#myLane .slot{
+  flex:1 1 0!important;
+  width:auto!important;
+  min-width:0!important;
+  height:100%!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+}
+#myLane .unit{padding:3px 2px!important}
+#myLane .unit .sp img{max-width:82%!important;max-height:68%!important;transform:scale(1.12)!important}
+#myLane .unit .un{font-size:clamp(9px,2.5vw,12px)!important;max-width:100%!important;padding:0 3px!important}
+#myLane .unit .us{gap:2px!important;flex-wrap:nowrap!important;max-width:100%!important}
+#myLane .unit .us .st{min-width:0!important;height:20px!important;font-size:clamp(11px,3vw,14px)!important;padding:0 3px!important;flex:1 1 0!important}
+#battle .bBot{flex:0 0 auto!important;min-height:45px!important;gap:4px!important;padding:3px 6px!important;flex-wrap:nowrap!important}
+#battle .bBot .hero{gap:4px!important;padding:3px 5px!important;border-width:2px!important;min-width:0!important}
+#battle .bBot .hero .av{width:30px!important;height:30px!important;flex:none!important}
+#battle .bBot .hero .av img{width:26px!important;height:26px!important}
+#battle .bBot .hero .hn{font-size:11px!important}
+#battle .bBot .hero .hhp{font-size:15px!important}
+#battle .bBot .mana{gap:2px!important;flex-wrap:nowrap!important}
+#battle .bBot .mana i{width:9px!important;height:9px!important;border-width:1px!important}
+#battle .bBot .mana b{font-size:11px!important;margin-left:1px!important}
+#battle .bBot .btn{font-size:11px!important;padding:5px 6px!important;gap:2px!important}
+#battle .bBot .pill{font-size:11px!important;padding:3px 5px!important}
+#battle .hand{
+  flex:0 0 auto!important;
+  min-height:0!important;
+  height:clamp(104px,16vh,142px)!important;
+  max-height:17vh!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  justify-content:flex-start!important;
+  align-items:flex-end!important;
+  gap:4px!important;
+  padding:4px 6px calc(5px + var(--sb))!important;
+  -webkit-overflow-scrolling:touch;
+}
+#battle .hand .card{
+  flex:0 0 var(--hw,76px)!important;
+  width:var(--hw,76px)!important;
+  max-width:var(--hw,76px)!important;
+  height:auto!important;
+  max-height:100%!important;
+}
+#battle .hand .card .cTop{min-width:0!important;overflow:visible!important}
+#battle .hand .card .cost{flex:0 0 18px!important;width:18px!important;height:18px!important;font-size:12px!important}
+#battle .hand .card .cName{min-width:0!important;font-size:10px!important}
+#battle .hand .card .st{min-width:18px!important;height:18px!important;font-size:12px!important;padding:0 2px!important}
+@media(max-height:700px){
+  #foeLane.wildLane{flex-basis:17vh!important;height:17vh!important;min-height:100px!important;max-height:18vh!important}
+  #foeLane.wildLane.wildCount1 .slot{height:16vh!important;min-height:95px!important}
+  #foeLane.wildLane.wildCount2 .slot{height:15vh!important;min-height:90px!important}
+  #foeLane.wildLane.wildCount1 .unit .sp img{height:15vh!important}
+  #foeLane.wildLane.wildCount2 .unit .sp img{height:13vh!important}
+  #myLane{min-height:20vh!important}
+  #battle .hand{height:14vh!important;max-height:15vh!important}
+}
+@media(max-width:430px){
+  #foeLane.wildLane.wildCount1 .slot{width:72vw!important}
+  #foeLane.wildLane.wildCount2 .slot{width:43vw!important}
+  #battle .bBot .btn{font-size:10px!important;padding:5px 4px!important}
+  #battle .bBot .mana i{width:7px!important;height:7px!important}
+}
+</style>
+
 </head>
 <body>
 <div id="bg"><div class="hill b"></div><div class="hill c"></div><div class="ballDeco"></div><i style="left:8%;top:12%;width:120px;height:40px"></i><i style="left:14%;top:9%;width:70px;height:50px"></i><i style="left:62%;top:20%;width:150px;height:44px"></i><i style="left:70%;top:16%;width:80px;height:56px"></i></div>
