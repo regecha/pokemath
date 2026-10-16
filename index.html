@@ -2532,7 +2532,7 @@ function renderBattle(){if(!B||window.__sim)return;B.trainerSkillUsed=B.trainerS
    <span class=hudSp></span><span class=pill>${I('book')} ${loc.deck.length}</span><button class="btn red endBtn" id=bEnd ${my?'':'disabled'}>차례 끝</button></div>
   <div id=bInfoSlot></div><div class=hand style="--hw:min(96px,calc((100vw - ${document.documentElement.classList.contains('safe')?92:24}px) / ${Math.max(4,me.hand.length)} - 6px))">${(B.coop?B.coop.players[BC.localIndex].hand:me.hand).map((id,i)=>{const handP=B.coop?B.coop.players[BC.localIndex]:me;const can=my&&B.coop&&B.coop.active!==BC.localIndex?false:my&&battleCost(id)<=handP.mana&&(isItemCard(id)||me.board.includes(null));return battleCardHTML(id,{size:'sm',noHolo:1,cls:(can?'':'cant')+(B.pick===i?' pick':'')}).replace('class="card','data-h="'+i+'" class="card');}).join('')}</div>`;
  if(!my)msg(B.side==='foe'?(B.wildMode?`야생 ${wildNames().map(esc).join(' · ')}의 차례… 공격을 조심해요!`:`${esc(fo.name)}의 차례…${B.pvp?' (친구가 생각 중이에요)':''}`):'');
- else if(B.trainerSkillTarget)msg(B.trainerSkillTarget.type==='attack'?'💥 트레이너 공격: 피해를 줄 상대 포켓몬을 눌러요':'📣 응원: 능력치를 올릴 아군 포켓몬을 눌러요');
+ else if(B.trainerSkillTarget)msg(B.trainerSkillTarget.type==='attack'?'💥 트레이너 공격: 피해를 줄 상대 포켓몬을 눌러요':'📣 응원: 공격력과 방어막을 줄 아군 포켓몬을 눌러요');
  else if(B.itemTargetMode)msg('⚡ 전기의 돌: 한 번 더 행동할 내 포켓몬을 눌러요');
  else if(B.moonTargetMode)msg('🌙 달의 돌: 1턴 동안 기절시킬 상대 포켓몬을 눌러요');
  else if(B.pick>=0)msg(`<b>${esc(battleCardName(me.hand[B.pick]))}</b> — ${isItemCard(me.hand[B.pick])?'카드를 한 번 더 눌러 사용해요': '아래 「내보내기」 또는 빈칸을 눌러요'}`);
@@ -2861,7 +2861,7 @@ async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)
    if(S.meta.settings.defq&&dmg>=2){renderBattle();bossMarkTarget(tp);let r=null;if(remoteDef){r=await bossAskDefense(tp,a);}else{const q=pickQ();if(q)r=await battleQ(q,{who:tp.av,what:`막기! ${esc(MON[a.id].name)}의 공격을 막아요`,defense:true});}
     if(r){if(r.ok){B.qc++;B.combo++;if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;dmg=Math.max(0,dmg-2);fx(heroEl(tp),'막았다!','txt');if(B.counterActive>0){await dealUnit(fo,i,B.counterActive);fx(heroEl(tp),`반격 -${B.counterActive}`,'txt');}}else B.combo=0;}}
   bossMarkTarget(tp);await skillMove(fo,i,heroEl(tp),true,false);tp.hp-=dmg;if(dmg){impact(heroEl(tp),dmg,{hero:1,col:'#ff5a5f'});fx(heroEl(tp),'-'+dmg,dmg>=4?'big':'');}}
- else{const d=me.board[tg.u];if(!d)return;if(a.kw==='fight')dmg+=1;const k=typeMul(a.id,d.id);dmg=applyType(dmg,k);dmg=Math.max(0,dmg-(d.trainerDef||0));
+ else{const d=me.board[tg.u];if(!d)return;if(a.kw==='fight')dmg+=1;const k=typeMul(a.id,d.id);dmg=applyType(dmg,k);
   await skillMove(fo,i,unitEl(me,tg.u),true,false);if(k>=2)fx(unitEl(me,tg.u),'효과가 굉장했다!','txt');
   await dealUnit(me,tg.u,dmg);if(a.kw==='freeze'&&me.board[tg.u])me.board[tg.u].frozen=1;if(a.kw==='poison'&&me.board[tg.u])me.board[tg.u].atk=Math.max(0,me.board[tg.u].atk-1);
   const cd=applyType(d.atk,typeMul(d.id,a.id));if(cd>0){await wait(200);await dealUnit(fo,i,cd);}}
@@ -2893,7 +2893,7 @@ const TRAINER_SKILL_INFO={
  heal:{n:'체력 회복',ic:'💚',desc:'트레이너 체력을 스킬 레벨만큼 회복해요.',max:5},
  counter:{n:'반격',ic:'⚔️',desc:'이번 상대 차례에 트레이너를 공격한 포켓몬에게 반격해요. 방어 문제를 맞혀야 피해가 들어가요.',max:5},
  attack:{n:'공격',ic:'💥',desc:'상대 포켓몬 하나에게 스킬 레벨만큼 직접 피해를 줘요.',max:5},
- cheer:{n:'응원',ic:'📣',desc:'아군 포켓몬 하나의 공격력과 방어력을 스킬 레벨만큼 영구적으로 올려요.',max:5},
+ cheer:{n:'응원',ic:'📣',desc:'아군 포켓몬 하나의 공격력을 스킬 레벨만큼 영구적으로 올리고, 방어막(피해 1을 막아요)을 스킬 레벨만큼 줘요.',max:5},
  mana:{n:'마나 연구',ic:'🔮',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 매 턴 시작 시 일정 확률로 마나를 1 더 얻어요. (Lv.1 50% → Lv.5 90%)',eff:n=>n?`매 턴 ${manaChance(n)}% 확률로 마나 +1`:'아직 배우지 않았어요',max:5},
  vit:{n:'체력 증강',ic:'❤️‍🔥',passive:1,desc:'패시브 · 찍어 두면 상시 적용돼요. 트레이너의 최대 체력이 스킬 레벨만큼 늘어요. (Lv.5 +5)',eff:n=>n?`트레이너 최대 체력 +${n}`:'아직 배우지 않았어요',max:5}
 };
@@ -2917,7 +2917,7 @@ function activateTrainerSkill(k){if(!B||B.busy||B.side!=='me'||B.over)return;con
  if(k==='cheer'){B.trainerSkillTarget={type:'cheer',level:lv};renderBattle();toast('응원할 아군 포켓몬을 선택해 주세요');return;}}
 function resolveTrainerSkillTarget(side,i){if(!B||!B.trainerSkillTarget)return false;const t=B.trainerSkillTarget,u=(side==='me'?B.me:B.foe).board[i];if(!u||u.hp<=0){toast('포켓몬이 있는 칸을 선택해 주세요');return true;}if(t.type==='cheer'&&side!=='me'){toast('응원은 아군 포켓몬에게 사용해요');return true;}if(t.type==='attack'&&side!=='foe'){toast('공격은 상대 포켓몬에게 사용해요');return true;}if(t.type==='cheer'&&B.coop&&Number(u.coopOwner??0)!==B.coop.active){toast('내가 조종하는 포켓몬을 선택해 주세요');return true;}
  B.trainerSkillTarget=null;B.trainerSkillUsed=B.trainerSkillUsed||{};if(B.coop&&!BC.host){bossSubmit({type:'trainerSkill',skill:t.type,level:t.level,slot:i});return true;}B.trainerSkillUsed[t.type]=true;
- if(t.type==='cheer'){u.atk+=t.level;u.trainerDef=(u.trainerDef||0)+t.level;fx(unitEl(B.me,i),`공격 +${t.level} · 방어 +${t.level}`,'txt');renderBattle();autoSave();toast(`${MON[u.id].name}의 공격력과 방어력이 영구적으로 ${t.level} 상승했어요!`);return true;}
+ if(t.type==='cheer'){u.atk+=t.level;u.shield=(u.shield||0)+t.level;fx(unitEl(B.me,i),`공격 +${t.level} · 방어막 +${t.level}`,'txt');renderBattle();autoSave();toast(`${MON[u.id].name}의 공격력이 영구적으로 ${t.level} 오르고, 방어막 ${t.level}개를 얻었어요!`);return true;}
  B.busy=true;renderBattle();(async()=>{const name=MON[u.id].name;await dealUnit(B.foe,i,t.level);B.busy=false;renderBattle();checkEnd();toast(`${name}에게 ${t.level} 피해!`);})();return true;}
 
 function renderLeague(){S.screen='league';const me=S.meta;const L=lvOf(me.xp).lv;
@@ -2993,7 +2993,7 @@ async function bossHandleAction(d){if(!B||!B.coop||!BC.host||BC.processing||B.ov
  else if(a.type==='item'){if(!Number.isInteger(Number(a.h))||Number(a.h)<0||Number(a.h)>=P.hand.length)return;const card=P.hand[Number(a.h)];if(card&&card.item==='thunder'&&(!P.board[Number(a.target)]||Number(P.board[Number(a.target)].coopOwner??0)!==idx))return;B.busy=false;await playItem(P,Number(a.h),Number(a.target??-1),true);}
  else if(a.type==='attack'){B.busy=false;await playerAttack(Number(a.si),a.tg,!!a.ok);}
  else if(a.type==='power'){B.busy=false;await bossApplyPower(!!a.ok);}
- else if(a.type==='trainerSkill'){const sk=String(a.skill||''),lv=Math.max(1,Math.min(5,Number(a.level)||1)),slot=Number(a.slot);B.trainerSkillUsed=B.trainerSkillUsed||{};if(!['heal','counter','attack','cheer'].includes(sk)||B.trainerSkillUsed[sk])return;if(sk==='heal'){P.hp=Math.min(P.max||15,P.hp+lv);B.trainerSkillUsed.heal=true;fx(heroEl(P),`+${lv} 회복`,'txt');}else if(sk==='counter'){B.counterActive=lv;B.trainerSkillUsed.counter=true;}else if(sk==='attack'){const u=B.foe.board[slot];if(!u||u.hp<=0)return;B.trainerSkillUsed.attack=true;await dealUnit(B.foe,slot,lv);checkEnd();}else if(sk==='cheer'){const u=P.board[slot];if(!u||u.hp<=0||Number(u.coopOwner??0)!==idx)return;u.atk+=lv;u.trainerDef=(u.trainerDef||0)+lv;B.trainerSkillUsed.cheer=true;fx(unitEl(P,slot),`공격 +${lv} · 방어 +${lv}`,'txt');}B.busy=false;renderBattle();}
+ else if(a.type==='trainerSkill'){const sk=String(a.skill||''),lv=Math.max(1,Math.min(5,Number(a.level)||1)),slot=Number(a.slot);B.trainerSkillUsed=B.trainerSkillUsed||{};if(!['heal','counter','attack','cheer'].includes(sk)||B.trainerSkillUsed[sk])return;if(sk==='heal'){P.hp=Math.min(P.max||15,P.hp+lv);B.trainerSkillUsed.heal=true;fx(heroEl(P),`+${lv} 회복`,'txt');}else if(sk==='counter'){B.counterActive=lv;B.trainerSkillUsed.counter=true;}else if(sk==='attack'){const u=B.foe.board[slot];if(!u||u.hp<=0)return;B.trainerSkillUsed.attack=true;await dealUnit(B.foe,slot,lv);checkEnd();}else if(sk==='cheer'){const u=P.board[slot];if(!u||u.hp<=0||Number(u.coopOwner??0)!==idx)return;u.atk+=lv;u.shield=(u.shield||0)+lv;B.trainerSkillUsed.cheer=true;fx(unitEl(P,slot),`공격 +${lv} · 방어막 +${lv}`,'txt');}B.busy=false;renderBattle();}
  else if(a.type==='catch'){B.busy=false;B.wildState.captureModalOpen=false;tryCatchWildPokemon(Number(a.slot));}
  }catch(e){console.error('coop action',e)}finally{BC.processing=false;if(B&&B.coop){B.coop.processing=false;B.busy=false;bossRewire();renderBattle();bossBroadcast(true);}}}
 async function bossApplyPower(ok){const me=B.me;if((me.powerUses||0)<=0)return;B.qn++;B.busy=true;me.powerUses=Math.max(0,(me.powerUses||0)-1);if(ok){B.qc++;B.combo++;draw(me);fx($('.hand'),'카드 +1','txt')}else B.combo=0;B.busy=false;renderBattle();}
