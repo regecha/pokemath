@@ -4,7 +4,7 @@
 
 <meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>포켓몬 수학</title>
+<title>좌삼몬 · 수학 & 영어</title>
 <link rel="preconnect" href="https://fonts.googleapis.com/">
 <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
 <link href="./포켓몬 수학_files/css2" rel="stylesheet">
@@ -4468,6 +4468,139 @@ renderHub=function(){__scRenderHubOriginal.apply(this,arguments);const grid=$('#
 const __scStartBgmOriginal=startBgm;
 startBgm=function(mode){if(scIsScreen()){if(!S.meta.settings.bgm){scMusicStart(SC.index>=0?SC.index:0);return;}scSetWorldMusic();return;}scStopMusic();__scStartBgmOriginal(mode);};
 Object.assign(BGMAP,{scenarioMap:'town',scenarioStory:'town',scenarioDeck:'town',scenarioDex:'town',scenarioBattle:'town',scenarioEpilogue:'town'});
+
+
+// ===== 영어 모드: 오프라인 데이터 + 자동 출제 =====
+const EN_LEVELS=[
+ {n:'영어 입문',d:'기초 단어와 아주 짧은 문장'},
+ {n:'초등 기초',d:'일상 단어와 be동사·기본 어순'},
+ {n:'초등 기본',d:'일반동사·의문문·짧은 해석'},
+ {n:'초등 심화',d:'과거형·미래 표현·비교급·독해'},
+ {n:'중학교 기초',d:'시제·조동사·to부정사·동명사'},
+ {n:'중학교 심화',d:'접속사·관계대명사 기초·문맥 독해'}
+];
+const EN_WORDS=[
+[['apple','사과'],['book','책'],['cat','고양이'],['dog','개'],['sun','해'],['water','물'],['milk','우유'],['friend','친구'],['school','학교'],['happy','행복한'],['run','달리다'],['eat','먹다'],['red','빨간색'],['big','큰'],['small','작은'],['bird','새'],['fish','물고기'],['family','가족'],['house','집'],['tree','나무'],['play','놀다'],['look','보다'],['good','좋은'],['one','하나'],['two','둘'],['three','셋'],['mother','어머니'],['father','아버지'],['name','이름'],['hello','안녕'],['schoolbag','책가방'],['pencil','연필']],
+[['beautiful','아름다운'],['because','왜냐하면'],['between','~사이에'],['always','항상'],['usually','보통'],['sometimes','때때로'],['library','도서관'],['breakfast','아침 식사'],['weather','날씨'],['season','계절'],['favorite','가장 좋아하는'],['different','다른'],['together','함께'],['remember','기억하다'],['careful','조심하는'],['quiet','조용한'],['strong','강한'],['early','일찍'],['answer','대답하다'],['question','질문'],['picture','그림'],['market','시장'],['travel','여행하다'],['hungry','배고픈'],['minute','분'],['weekend','주말'],['borrow','빌리다'],['return','돌려주다'],['learn','배우다'],['choose','고르다']],
+[['arrive','도착하다'],['invite','초대하다'],['practice','연습하다'],['message','메시지'],['museum','박물관'],['delicious','맛있는'],['popular','인기 있는'],['expensive','비싼'],['possible','가능한'],['decide','결정하다'],['carefully','주의 깊게'],['different','다른'],['enough','충분한'],['perhaps','아마도'],['during','~동안'],['although','비록 ~일지라도'],['improve','향상시키다'],['healthy','건강한'],['exercise','운동'],['problem','문제'],['promise','약속하다'],['message','메시지'],['special','특별한'],['continue','계속하다'],['festival','축제'],['reason','이유'],['surprise','놀라게 하다'],['return','돌아오다'],['prepare','준비하다'],['weather','날씨']],
+[['environment','환경'],['experience','경험'],['information','정보'],['protect','보호하다'],['discover','발견하다'],['invent','발명하다'],['healthy','건강한'],['dangerous','위험한'],['carefully','주의 깊게'],['instead','대신에'],['however','그러나'],['especially','특히'],['probably','아마도'],['opinion','의견'],['future','미래'],['culture','문화'],['imagine','상상하다'],['suggest','제안하다'],['reduce','줄이다'],['increase','증가하다'],['successful','성공적인'],['necessary','필요한'],['comfortable','편안한'],['valuable','가치 있는'],['opportunity','기회'],['recycle','재활용하다'],['volunteer','자원봉사자'],['journey','여정'],['solution','해결책'],['although','비록 ~일지라도']],
+[['achievement','성취'],['environmental','환경의'],['responsibility','책임'],['independent','독립적인'],['relationship','관계'],['decision','결정'],['development','발전'],['opportunity','기회'],['communicate','의사소통하다'],['recommend','추천하다'],['consider','고려하다'],['realize','깨닫다'],['avoid','피하다'],['afford','~할 여유가 있다'],['purpose','목적'],['behavior','행동'],['advantage','장점'],['disadvantage','단점'],['ordinary','평범한'],['appropriate','적절한'],['confident','자신 있는'],['convenient','편리한'],['similar','비슷한'],['effective','효과적인'],['recognize','알아보다'],['participate','참여하다'],['explain','설명하다'],['encourage','격려하다'],['prevent','예방하다'],['research','연구']],
+[['perspective','관점'],['consequence','결과'],['significant','중요한'],['contribute','기여하다'],['determine','결정하다'],['accurate','정확한'],['efficient','효율적인'],['available','이용 가능한'],['persuade','설득하다'],['maintain','유지하다'],['require','요구하다'],['approach','접근법'],['evidence','증거'],['benefit','이익'],['challenge','도전'],['influence','영향을 미치다'],['tend','~하는 경향이 있다'],['assume','가정하다'],['specific','구체적인'],['essential','필수적인'],['establish','설립하다'],['individual','개인'],['theory','이론'],['issue','쟁점'],['achieve','성취하다'],['analyze','분석하다'],['complex','복잡한'],['occur','발생하다'],['indicate','나타내다'],['interpret','해석하다']]
+];
+const EN_GRAMMAR=[
+ [
+  {q:'I ___ a student.',a:'am',c:['am','is','are','be'],e:'I와 함께 be동사 am을 사용해요.'},
+  {q:'She ___ my friend.',a:'is',c:['am','is','are','be'],e:'She는 3인칭 단수이므로 is를 사용해요.'},
+  {q:'They ___ soccer every day.',a:'play',c:['plays','play','playing','played'],e:'They 뒤에는 동사원형 play를 사용해요.'},
+  {q:'I have ___ orange.',a:'an',c:['a','an','the','are'],e:'orange는 모음 소리로 시작하므로 an을 써요.'},
+  {q:'This is ___ book.',a:'a',c:['a','an','are','am'],e:'자음 소리로 시작하는 단수 명사 앞에는 a를 써요.'},
+  {q:'The cat is ___ the box.',a:'in',c:['in','are','does','very'],e:"in은 '~안에'라는 뜻이에요."}
+ ],[
+  {q:'He ___ to school by bus.',a:'goes',c:['go','goes','going','gone'],e:'He처럼 3인칭 단수 현재형에는 보통 -s/-es를 붙여요.'},
+  {q:'___ you like music?',a:'Do',c:['Do','Does','Are','Is'],e:'you가 주어인 일반동사 의문문은 Do로 시작해요.'},
+  {q:'There ___ two pencils on the desk.',a:'are',c:['is','are','am','be'],e:'two pencils는 복수이므로 are를 써요.'},
+  {q:'My bag is ___ than yours.',a:'heavier',c:['heavy','heaviest','heavier','more heavy'],e:'짧은 형용사의 비교급에는 보통 -er를 붙여요.'},
+  {q:'We ___ TV yesterday.',a:'watched',c:['watch','watches','watched','watching'],e:'yesterday가 있으므로 과거형 watched를 써요.'},
+  {q:'I can ___ fast.',a:'run',c:['runs','running','ran','run'],e:'조동사 can 뒤에는 동사원형이 와요.'}
+ ],[
+  {q:'Mina ___ her homework every evening.',a:'does',c:['do','does','doing','did'],e:'Mina는 3인칭 단수이므로 does를 사용해요.'},
+  {q:'What ___ you doing now?',a:'are',c:['do','does','are','is'],e:'현재진행형은 be동사 + 동사-ing 형태예요.'},
+  {q:'I was tired, ___ I went to bed early.',a:'so',c:['but','because','so','or'],e:'so는 앞의 결과를 이어 줄 때 사용해요.'},
+  {q:'You ___ wear a helmet when riding a bike.',a:'should',c:['should','would like','was','has'],e:"should는 '~하는 것이 좋다'라는 조언을 나타내요."},
+  {q:'This is the ___ movie I have ever seen.',a:'best',c:['good','better','best','well'],e:'여러 대상 중 최고를 말하므로 최상급 best를 써요.'},
+  {q:'I want ___ a doctor in the future.',a:'to be',c:['be','being','to be','been'],e:'want 뒤에는 to부정사가 올 수 있어요.'}
+ ],[
+  {q:'We ___ dinner when the phone rang.',a:'were having',c:['have','had','were having','are having'],e:'과거에 진행 중이던 일은 과거진행형으로 나타내요.'},
+  {q:'If it rains tomorrow, we ___ at home.',a:'will stay',c:['stayed','stay yesterday','will stay','staying'],e:'조건을 나타내는 if절과 함께 미래 결과를 will로 표현할 수 있어요.'},
+  {q:'This bag is ___ expensive for me to buy.',a:'too',c:['enough','too','many','such'],e:"too + 형용사는 '~하기에 너무 …한'이라는 뜻이에요."},
+  {q:'I enjoy ___ books in my free time.',a:'reading',c:['read','to reading','reading','reads'],e:'enjoy 뒤에는 동명사(-ing)가 와요.'},
+  {q:'The boy ___ lives next door is my cousin.',a:'who',c:['who','where','when','what'],e:'사람을 설명하는 관계대명사로 who를 쓸 수 있어요.'},
+  {q:'This cake was ___ by my sister.',a:'made',c:['make','making','made','makes'],e:'수동태는 be동사 + 과거분사 형태예요.'}
+ ],[
+  {q:'I have lived here ___ 2020.',a:'since',c:['for','since','during','from'],e:'since 뒤에는 시작 시점이 와요.'},
+  {q:'She is interested in ___ foreign languages.',a:'learning',c:['learn','to learn','learning','learned'],e:'전치사 in 뒤에는 명사나 동명사가 와요.'},
+  {q:'The test was ___ difficult that many students needed more time.',a:'so',c:['such','so','too much','enough'],e:'so + 형용사 + that은 너무 …해서 ~하다라는 뜻이에요.'},
+  {q:'I wish I ___ more free time.',a:'had',c:['have','will have','had','am having'],e:'현재 사실과 다른 소망은 wish 뒤에 과거형을 쓸 수 있어요.'},
+  {q:'The book ___ cover is blue belongs to me.',a:'whose',c:['who','whose','which','where'],e:'소유 관계를 나타낼 때 whose를 사용해요.'},
+  {q:'You had better ___ a doctor.',a:'see',c:['to see','seeing','saw','see'],e:'had better 뒤에는 동사원형이 와요.'}
+ ],[
+  {q:'The project must ___ by Friday.',a:'be completed',c:['complete','be completed','completed','be completing'],e:'must와 수동태를 함께 쓰면 must be + 과거분사 형태예요.'},
+  {q:'Not only the students but also the teacher ___ excited.',a:'was',c:['were','was','are','be'],e:'not only A but also B에서는 가까운 주어 B에 동사를 일치시키는 것이 일반적이에요.'},
+  {q:'Hardly had we arrived ___ it began to rain.',a:'when',c:['than','when','while','because'],e:'Hardly had A p.p. when B는 A하자마자 B했다는 표현이에요.'},
+  {q:'If I had known about the delay, I ___ earlier.',a:'would have left',c:['leave','will leave','would have left','would leave'],e:'과거 사실과 반대되는 가정은 would have + 과거분사로 나타내요.'},
+  {q:'The proposal, ___ was discussed yesterday, will be revised.',a:'which',c:['who','where','which','whose'],e:'앞의 사물을 덧붙여 설명하는 계속적 용법에는 which를 쓸 수 있어요.'},
+  {q:'Despite ___ tired, he finished the assignment.',a:'being',c:['be','was','being','to be'],e:'전치사 despite 뒤에는 명사나 동명사가 와요.'}
+ ]
+];
+const EN_TRANSLATIONS=[
+ [
+  ['I like apples.','나는 사과를 좋아한다.'],['This is my school.','이곳은 나의 학교이다.'],['My dog is very cute.','내 강아지는 매우 귀엽다.'],['We play together.','우리는 함께 논다.'],['She has a red bag.','그녀는 빨간 가방을 가지고 있다.'],['The sun is bright today.','오늘은 해가 밝다.'],['I drink water every day.','나는 매일 물을 마신다.'],['My friend can swim.','내 친구는 수영할 수 있다.']
+ ],[
+  ['I usually get up at seven.','나는 보통 7시에 일어난다.'],['We went to the park yesterday.','우리는 어제 공원에 갔다.'],['My brother is taller than me.','내 남동생은 나보다 키가 크다.'],['Please open the window.','창문을 열어 주세요.'],['I am looking for my pencil.','나는 내 연필을 찾고 있다.'],['She was happy to see her friend.','그녀는 친구를 만나서 기뻤다.'],['There are many books in the library.','도서관에는 책이 많이 있다.'],['What do you want to eat?','너는 무엇을 먹고 싶니?']
+ ],[
+  ['Although it was cold, we went outside.','날씨가 추웠지만 우리는 밖으로 나갔다.'],['He forgot to bring his notebook.','그는 공책을 가져오는 것을 잊었다.'],['I have never visited Jeju Island.','나는 제주도에 가 본 적이 없다.'],['The movie was more exciting than I expected.','그 영화는 내가 예상했던 것보다 더 흥미진진했다.'],['You should ask your teacher for help.','너는 선생님께 도움을 요청하는 것이 좋다.'],['I was reading when my sister called me.','여동생이 나에게 전화했을 때 나는 책을 읽고 있었다.'],['We need to protect the environment.','우리는 환경을 보호해야 한다.'],['Please tell me why you are late.','왜 늦었는지 나에게 말해 줘.']
+ ],[
+  ['If we leave now, we will arrive before noon.','지금 출발하면 정오 전에 도착할 것이다.'],['The museum was built more than a hundred years ago.','그 박물관은 백 년도 더 전에 지어졌다.'],['I am looking forward to meeting you again.','나는 너를 다시 만나기를 고대하고 있다.'],['The girl who won the contest is my classmate.','그 대회에서 우승한 소녀는 내 반 친구이다.'],['You can improve your skills by practicing every day.','매일 연습함으로써 실력을 향상시킬 수 있다.'],['He was too tired to continue working.','그는 너무 피곤해서 일을 계속할 수 없었다.'],['I have already finished the report.','나는 이미 보고서를 끝냈다.'],['She asked me whether I needed any help.','그녀는 나에게 도움이 필요한지 물었다.']
+ ],[
+  ['The teacher encouraged us to express our opinions.','선생님은 우리가 의견을 표현하도록 격려했다.'],['I have been studying English for three years.','나는 3년 동안 영어를 공부해 오고 있다.'],['The problem was more complicated than it first appeared.','그 문제는 처음 보였던 것보다 더 복잡했다.'],['We should consider how our choices affect others.','우리는 우리의 선택이 다른 사람들에게 어떤 영향을 주는지 고려해야 한다.'],['She succeeded in solving the puzzle by herself.','그녀는 혼자서 그 퍼즐을 푸는 데 성공했다.'],['The article explains why recycling is important.','그 기사는 재활용이 왜 중요한지 설명한다.'],['I would rather walk than wait for another bus.','나는 다른 버스를 기다리느니 차라리 걸어가겠다.'],['The book was so interesting that I read it twice.','그 책은 매우 재미있어서 나는 두 번 읽었다.']
+ ],[
+  ['Had I known the truth, I would have made a different choice.','진실을 알았더라면 나는 다른 선택을 했을 것이다.'],['The evidence suggests that the policy needs to be revised.','그 증거는 그 정책이 수정될 필요가 있음을 시사한다.'],['What matters most is how we respond to unexpected challenges.','가장 중요한 것은 예상치 못한 도전에 우리가 어떻게 대응하느냐이다.'],['The more carefully you plan, the fewer mistakes you are likely to make.','더 신중하게 계획할수록 실수를 덜 할 가능성이 있다.'],['Although the solution seems simple, it requires careful analysis.','해결책은 단순해 보이지만 신중한 분석이 필요하다.'],['People who participate in the program often develop greater confidence.','그 프로그램에 참여하는 사람들은 종종 더 큰 자신감을 기른다.'],['It is essential that every member be given an equal opportunity.','모든 구성원에게 동등한 기회가 주어지는 것이 필수적이다.'],['No sooner had the meeting started than the fire alarm rang.','회의가 시작되자마자 화재 경보가 울렸다.']
+ ]
+];
+const EN_READINGS=[
+ [
+  {p:'Tom has a small dog named Coco. Every morning, Tom walks Coco in the park. Coco likes to run after a red ball. After the walk, Tom gives Coco some water.',q:'What does Coco like to chase?',a:'a red ball',c:['a red ball','a blue bird','a big bus','a small cat'],e:'글에서 Coco는 빨간 공을 쫓아다니는 것을 좋아한다고 했어요.'},
+  {p:'Mina gets up at seven on school days. She eats breakfast with her family and walks to school with her friend Jisu. They like to read books during lunch time.',q:'Who walks to school with Mina?',a:'Jisu',c:['Her teacher','Jisu','Her brother','Her mother'],e:'Mina는 친구 Jisu와 함께 학교에 걸어가요.'}
+ ],[
+  {p:'Last Saturday, Joon and his sister visited the city library. Joon borrowed a book about space, while his sister chose a book about animals. They returned home before lunch and read their books in the garden.',q:'What kind of book did Joon borrow?',a:'A book about space',c:['A book about cooking','A book about space','A book about music','A book about sports'],e:'Joon은 우주에 관한 책을 빌렸어요.'},
+  {p:'Our class started a small garden behind the school. We planted tomatoes, beans, and flowers. Everyone takes turns watering the plants. We hope to share the vegetables with the school cafeteria in summer.',q:'Why do the students take turns watering the plants?',a:'To care for their garden',c:['To sell new books','To clean the library','To care for their garden','To play a game'],e:'학생들은 학교 정원을 돌보기 위해 번갈아 물을 줘요.'}
+ ],[
+  {p:'Sora wanted to join the school music club, but she was nervous about playing in front of others. Her friend encouraged her to practice a little every day. After a month, Sora played a song at the club meeting and received warm applause.',q:'How did Sora feel before joining the club?',a:'Nervous',c:['Angry','Bored','Nervous','Sleepy'],e:'다른 사람들 앞에서 연주하는 것이 걱정되어 긴장했어요.'},
+  {p:'Many people use reusable bottles to reduce plastic waste. A reusable bottle may cost more at first, but it can be used for a long time. Small choices like this can help protect the environment.',q:'What is the main idea of the passage?',a:'Small habits can help the environment',c:['Plastic bottles are always cheaper','Small habits can help the environment','Everyone should stop drinking water','Reusable bottles last one day'],e:'재사용 물병처럼 작은 습관이 환경 보호에 도움이 된다는 내용이에요.'}
+ ],[
+  {p:'When the town opened a new bike path, fewer people drove short distances by car. The path also connected the library, the market, and the riverside park. Local shop owners noticed that more visitors stopped in their stores on weekends.',q:'What was one result of the new bike path?',a:'More weekend visitors came to local stores',c:['The library was closed','More weekend visitors came to local stores','Cars became free','The market moved away'],e:'새 자전거 길이 생긴 뒤 주말에 가게를 찾는 방문객이 늘었어요.'},
+  {p:'Yuna kept a notebook of questions she could not answer during science class. Instead of memorizing the answers immediately, she searched for clues in her textbook and discussed difficult points with classmates. Over time, she became more confident about learning new topics.',q:'Which habit helped Yuna learn?',a:'Looking for clues and discussing questions',c:['Avoiding difficult topics','Copying every answer without thinking','Looking for clues and discussing questions','Studying only before tests'],e:'교과서에서 단서를 찾고 친구들과 어려운 점을 토론했어요.'}
+ ],[
+  {p:'A community center invited teenagers to design a campaign encouraging people to repair old items instead of throwing them away. The students interviewed local residents and discovered that many people wanted to repair things but did not know where to find reliable help. They created a shared online map of repair shops and workshops.',q:'What problem did the students identify?',a:'People did not know where to find repair help',c:['Nobody owned old items','People did not know where to find repair help','Repair shops refused every customer','The community center had no internet'],e:'많은 주민이 수리를 원했지만 믿을 만한 도움을 어디서 찾는지 몰랐어요.'},
+  {p:'Although remote work can reduce commuting time, it may also blur the boundary between work and personal life. Some workers respond by setting clear working hours and taking regular breaks. The most effective routine often depends on the person and the type of work involved.',q:'What does the passage suggest about remote-work routines?',a:'They should fit the person and the work',c:['Everyone should work all night','Breaks should be avoided','They should fit the person and the work','Commuting is always necessary'],e:'효과적인 일과는 사람과 업무의 종류에 따라 달라질 수 있어요.'}
+ ],[
+  {p:'Cities often invest in public spaces because parks and libraries can support social connections. However, building a space is not enough by itself. Residents are more likely to use it when they have a voice in planning, when it is easy to reach, and when activities reflect local needs.',q:'According to the passage, what can make a public space more useful?',a:'Including residents in planning and meeting local needs',c:['Making it difficult to reach','Limiting activities to visitors','Including residents in planning and meeting local needs','Avoiding feedback from the community'],e:'주민이 계획에 참여하고 접근성과 지역의 필요를 고려해야 활용도가 높아져요.'},
+  {p:'A researcher compared two groups learning unfamiliar words. One group reviewed the list many times in a single evening, while the other reviewed it briefly over several days. The second group remembered more words a week later. The result suggests that spacing practice over time can support long-term memory.',q:'What conclusion is best supported by the study?',a:'Spaced practice can improve long-term memory',c:['Words are impossible to remember','One long session is always best','Spaced practice can improve long-term memory','Reviewing words has no effect'],e:'며칠에 걸쳐 나누어 복습한 집단이 일주일 뒤 더 많이 기억했어요.'}
+ ]
+];
+function enRand(a){return a[Math.floor(rnd()*a.length)];}
+function enChoices(answer,opts){const out=[answer];for(const x of opts||[])if(x!==answer&&!out.includes(x)&&out.length<4)out.push(x);let guard=0;while(out.length<4&&guard++<30){const w=enRand(EN_WORDS[Math.max(0,Math.min(5,(S.meta.enLevel||1)-1))]);const x=w[1];if(x!==answer&&!out.includes(x))out.push(x);}for(let i=out.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[out[i],out[j]]=[out[j],out[i]];}return out;}
+function makeEnglishQ(){
+ const level=Math.max(1,Math.min(6,+S.meta.enLevel||1)),idx=level-1,types=['vocabulary','grammar','translation','reading'];
+ const weights=level<3?[38,28,22,12]:[30,30,22,18];let roll=rnd()*weights.reduce((a,b)=>a+b,0),type=types[0];for(let i=0;i<types.length;i++){roll-=weights[i];if(roll<0){type=types[i];break;}}
+ let q,a,ch,e='';
+ if(type==='vocabulary'){
+  const word=enRand(EN_WORDS[idx]);q=`다음 영어 단어의 뜻은 무엇인가요?<br><b style="font-size:1.18em;color:#2f5aa8">${word[0]}</b>`;a=word[1];ch=enChoices(a,EN_WORDS[idx].map(w=>w[1]));e=`${word[0]}은(는) '${word[1]}'라는 뜻이에요.`;
+ }else if(type==='grammar'){
+  const g=enRand(EN_GRAMMAR[idx]);q=`빈칸에 들어갈 알맞은 말을 고르세요.<br><b style="font-size:1.02em;color:#2f5aa8">${g.q}</b>`;a=g.a;ch=enChoices(a,g.c);e=g.e;
+ }else if(type==='translation'){
+  const t=enRand(EN_TRANSLATIONS[idx]);q=`다음 문장의 뜻으로 알맞은 것은?<br><b style="font-size:1.02em;color:#2f5aa8">${t[0]}</b>`;a=t[1];ch=enChoices(a,EN_TRANSLATIONS[idx].filter(x=>x[1]!==a).map(x=>x[1]));e=`해석: ${t[1]}`;
+ }else{
+  const r=enRand(EN_READINGS[idx]);q=`다음 글을 읽고 질문에 답하세요.<div style="font-family:'Noto Sans KR';font-size:15px;line-height:1.65;text-align:left;background:#f2f8ff;padding:10px;border-radius:12px;margin-top:8px">${r.p}</div><br><b style="font-size:.95em;color:#2f5aa8">${r.q}</b>`;a=r.a;ch=enChoices(a,r.c);e=r.e;
+ }
+ const sk='en:'+level+':'+type;let meta=SKM[sk];if(!meta){meta={id:sk,s:S.meta.gs||'1-1',u:1,n:`${EN_LEVELS[idx].n} · ${{vocabulary:'단어',grammar:'문법',translation:'문장 해석',reading:'독해'}[type]}`,es:[]};SKM[sk]=meta;}meta.s=S.meta.gs||'1-1';
+ return{q,a,ch:enChoices(a,ch.filter(x=>x!==a)),e,sk,key:sk+'|'+q+'|'+a,en:1,type};
+}
+const __pickQBeforeEnglish=pickQ;
+pickQ=function(opt={}){if(S.meta.questionMode==='english'&&!(typeof scIsScreen==='function'&&scIsScreen()))return makeEnglishQ();return __pickQBeforeEnglish(opt);};
+const __foundUpdateBeforeEnglish=foundUpdate;
+foundUpdate=function(q,ok){if(q&&q.en)return;return __foundUpdateBeforeEnglish(q,ok);};
+const __recordAnswerBeforeEnglish=recordAnswer;
+recordAnswer=function(q,ok,ms,opt={}){if(!q||!q.en)return __recordAnswerBeforeEnglish(q,ok,ms,opt);const m=S.meta;m.enStats=m.enStats||{q:0,c:0,streak:0,bestCombo:0};const z=m.enStats;if(!opt.retry){z.q++;if(ok)z.c++;}if(ok){z.streak++;z.bestCombo=Math.max(z.bestCombo,z.streak);}else z.streak=0;z.lastLevel=+m.enLevel||1;z.lastAt=today();gainXP(ok?10:opt.guess?0:3);autoSave();};
+const __qHTMLBeforeEnglish=qHTML;
+qHTML=function(q,head=''){if(!q||!q.en)return __qHTMLBeforeEnglish(q,head);const two=q.ch.length===2;return `${head}<div class=qCard><span class="qSk">영어 · ${esc(EN_LEVELS[(S.meta.enLevel||1)-1].n)} · ${{vocabulary:'단어',grammar:'문법',translation:'문장 해석',reading:'독해'}[q.type]}</span><div class=qText>${q.q}</div></div><div class="choices${two?' two':''}">${q.ch.map((c,i)=>`<button class=ch data-i="${i}">${esc(c)}</button>`).join('')}</div><div class=qAfter></div>`;};
+const __renderTitleWithScenario=renderTitle;
+function chooseEnglishMode(fromHub){const levels=EN_LEVELS.map((v,i)=>`<button class="btn ${(+S.meta.enLevel||1)===i+1?'green':'ghost'}" style="white-space:normal;justify-content:flex-start;text-align:left" data-a="lv${i+1}"><span style="font-family:'Black Han Sans';font-size:20px;min-width:28px">${i+1}</span><span><b>${v.n}</b><br><small style="font-size:12px;font-family:'Noto Sans KR'">${v.d}</small></span></button>`).join('');const actions={_close:()=>{}};EN_LEVELS.forEach((v,i)=>actions['lv'+(i+1)]=()=>{S.meta.questionMode='english';S.meta.enLevel=i+1;autoSave();closeM();if(fromHub)renderHub();else goStart();});M(`<h2>영어 모드 · 단계 선택</h2><p style="font-size:14px;line-height:1.6;margin-bottom:10px">단어·문법·문장 해석·짧은 독해가 섞여 나와요. 단계는 언제든 바꿀 수 있어요.</p><div style="display:grid;grid-template-columns:1fr;gap:7px">${levels}</div><div class="mbtns"><button class="btn ghost" data-a="cancel">취소</button></div>`,Object.assign(actions,{cancel:()=>closeM()}));}
+renderTitle=function(){__renderTitleWithScenario();const menu=$('.menuCol');if(!menu)return;const go=$('#tGo');if(go){go.innerHTML=`${I('calculator')} 수학 모드 · ${S.meta.name?'이어하기':'시작하기'}${S.meta.name?` <small style="font-size:13px">${esc(S.meta.name)} · Lv.${lvOf(S.meta.xp).lv}</small>`:''}`;go.onclick=()=>{sfx('tap');S.meta.questionMode='math';autoSave();ac();goStart();};}if(!$('#tEnglish')){const b=document.createElement('button');b.id='tEnglish';b.className='btn blue big';b.innerHTML='📘 영어 모드';menu.insertBefore(b,$('#tSave'));b.onclick=()=>{sfx('tap');ac();chooseEnglishMode(false);};}};
+const __renderHubWithEnglishScenario=renderHub;
+renderHub=function(){__renderHubWithEnglishScenario.apply(this,arguments);const wrap=$('#view .wrap');if(!wrap)return;let panel=$('#englishModePanel');if(!panel){panel=document.createElement('div');panel.id='englishModePanel';panel.className='panel';panel.style.cssText='display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px';const tiles=wrap.querySelector('.tiles');if(tiles)wrap.insertBefore(panel,tiles);}if(panel){const isEn=S.meta.questionMode==='english';panel.innerHTML=`<div style="font-size:28px">${isEn?'📘':'➗'}</div><div style="flex:1;min-width:130px"><b class="jua" style="font-size:18px">현재 모드: ${isEn?'영어 모드':'수학 모드'}</b><div class="mut" style="font-size:12px">${isEn?`${EN_LEVELS[(S.meta.enLevel||1)-1].n} · 단어·문법·해석·독해`:'기존 학년·학기 수학 문제'}</div></div><button class="btn blue sm" id="hEnglishMode">${isEn?'영어 단계 변경':'영어 모드'}</button><button class="btn ghost sm" id="hMathMode">수학 모드</button>`;$('#hEnglishMode').onclick=()=>{sfx('tap');chooseEnglishMode(true);};$('#hMathMode').onclick=()=>{sfx('tap');S.meta.questionMode='math';autoSave();renderHub();};}
+ const train=$('#tTrain');if(train){const title=train.querySelector('.tn'),desc=train.querySelector('.td');if(title)title.textContent=S.meta.questionMode==='english'?'오늘의 영어 훈련':'오늘의 훈련';if(desc&&S.meta.questionMode==='english')desc.innerHTML=`${trainN()}문제 · ${EN_LEVELS[(S.meta.enLevel||1)-1].n} · 영어 실력 키우기`;else if(desc)desc.innerHTML=`${S.meta.train.daily===today()?'오늘 훈련 완료! 한 번 더 하면 사탕을 더 받아요.':`문제 ${trainN()}개 · 오늘의 카드팩 받기`}`;}
+};
 
 init();
 if(S.screen==='title')renderTitle();
