@@ -1488,9 +1488,9 @@ function codeValid(){const c=S.meta.code&&parseCode(S.meta.code);return !!(c&&!c
 
 // ===== 상태 =====
 const SAVE_KEY=GAME.id+'-v1';
-const SAVE_VER=3; // 저장 형식이 바뀌면 올리고 upgradeMeta에 변환을 한 단계 추가해요(옛 저장도 이어서 하기)
+const SAVE_VER=4; // 저장 형식이 바뀌면 올리고 upgradeMeta에 변환을 한 단계 추가해요(옛 저장도 이어서 하기)
 function defaultMeta(){return{ver:SAVE_VER,name:'',code:'',gs:'',cls:'',focus:null,uMax:null,misc:{},starter:0,created:0,
- xp:0,lp:0,lpRetrofit:false,coins:0,candy:0,packs:0,dust:0,pity:{p4:0,p5:0},col:{},seen:{},dexSeen:{},deck:[],
+ xp:0,lp:0,lpRetrofit:false,trainerSkills:{heal:0,counter:0,attack:0,cheer:0},coins:0,candy:0,packs:0,dust:0,pity:{p4:0,p5:0},col:{},seen:{},dexSeen:{},deck:[],
  sk:{},days:{},hist:[],train:{last:'',best:0,count:0,lastRes:null,daily:''},
  badges:{},gyms:{},battles:{w:0,l:0},stats:{q:0,c:0,streak:0,bestCombo:0,bestStreak:0,guessWrong:0,guessAlert:0,careful:0,lowerStar:0,shardDone:0,crafted:0,foundDone:0,superEff:0,gymTry:0,retryOk:0,bounce:0,fast:0,better:0,perfect:0,quickTrain:0,practice:0,comeback:0,flawless:0,defOk:0,candyAll:0,evolved:0,opened:0},
  unl:{},unlNew:{},ach:{},partner:0,bond:{},stoneSeen:null,card:null,uMaxAt:'',shard:{},dust:0,season:null,seasons:[],bsave:null,thist:[],first20:null,first20t:null,found:{},endless:{best:0,total:0,runs:0,caught:0},pvp:{n:0,w:0,l:0,gg:0,foes:{},last:0},tod:{m:0,a:0,e:0},firstPlay:0,scenario:{chapter:0,unlocked:0,cleared:[],seenIntro:false},settings:{anim:'calm',sound:true,bgm:true,lowfx:false,easy:false,safe:'auto',zoom:'auto',fit:'auto',imgs:true,defq:true}};}
@@ -1508,6 +1508,8 @@ function upgradeMeta(m){
   }
   m.ver=3;
  }
+ // v3 → v4: 트레이너 스킬 레벨 저장 칸을 추가해요.
+ if((m.ver||1)<4){m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0},m.trainerSkills||{});m.ver=4;}
  m.ver=SAVE_VER;return m;}
 const S={meta:defaultMeta(),screen:'title',busy:false};
 
@@ -2513,13 +2515,13 @@ function tgtBadge(d,i){if(!B||B.side!=='me')return '';const me=B.me;let out='';
   out=(mu?`<b class=${mu.c}>${mu.t}</b>`:'')+`<b class=dmgp>-${dm}</b>`+(dm>=d.hp&&!d.tough?'<b class=ko>쓰러뜨려요!</b>':'');}
  else if(B.pick>=0&&me.hand[B.pick]!=null&&!isBattleSpecial(me.hand[B.pick])){const mu=matchup(me.hand[B.pick],d.id);if(mu)out=`<b class=${mu.c}>${mu.t}</b>`;}
  return out?`<div class=tbadge>${out}</div>`:'';}
-function renderBattle(){if(!B||window.__sim)return;const me=B.me,fo=B.foe;const my=B.side==='me'&&!B.busy&&!B.over&&(!B.coop||B.coop.active===BC.localIndex);
+function renderBattle(){if(!B||window.__sim)return;B.trainerSkillUsed=B.trainerSkillUsed||{};const me=B.me,fo=B.foe;const my=B.side==='me'&&!B.busy&&!B.over&&(!B.coop||B.coop.active===BC.localIndex);
  const valid=targetsFor(B.sel);
  const unitH=(u,P,i)=>{if(!u)return '';const friendly=P===me;const mine=friendly&&(!B.coop||Number(u.coopOwner??0)===B.coop.active);const m=MON[u.id];const ready=mine&&my&&u.att>0&&!u.frozen;
   return `<div class="unit${ready?' ready':''}${mine&&B.sel===i?' sel':''}${!friendly&&valid.units.includes(i)?' tgt':''}${isTaunt(u)?' taunt':''}${u.frozen?' frozen':''}${u.shield?' shielded':''}${mine&&B.itemTargetMode&&!u.frozen?' itemTarget':''}${!friendly&&B.moonTargetMode?' itemTarget':''}${mine&&!ready&&my?' zz':''}" data-i="${i}">
    ${B.coop?(()=>{const ow=Number(u.coopOwner??0)===1?1:0;const nm=String((B.coop.players[ow]&&B.coop.players[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?`<span class=shieldBadge>🛡️${u.shield}</span>`:''}</div><div class=shadow></div><div class=sp>${monImg(u.id,mine?'back':'anim')}</div><div class=un>${esc(m.name)}</div><div class=tdots>${m.types.map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
    <div class=us><span class="st atk">${u.atk}</span><span class="st hp"${u.hp<u.max?' style="background:#d9393f"':''}>${u.hp}</span></div></div>`;};
- const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=B.coop?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id}><div class=av>${monImg(P.av,'front')}</div><div><div class=hn>${esc(P.name)}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
+ const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=B.coop?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front')}</div><div><div class=hn>${esc(P.name)}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
   const mana=P=>`<div class=mana>${Array.from({length:6},(_,i)=>`<i class="${i<P.mana?'on':''}"${i>=P.maxMana&&i>=P.mana?' style="opacity:.3"':''}></i>`).join('')}<b>${P.mana}/${Math.max(P.maxMana,P.mana)}</b></div>`;
  $('#battle').innerHTML=`
   <div class=bTop>${B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front')}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:-12px"><b class=dmgp>-${me.board[B.sel].atk+(me.board[B.sel].kw==='quake'?1:0)}</b></div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front')}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill>${I('cards')} ${fo.hand.length}</span><span class=pill title="남은 덱">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<button class="btn ghost sm" id=bMenu>메뉴</button></div>
@@ -2531,6 +2533,7 @@ function renderBattle(){if(!B||window.__sim)return;const me=B.me,fo=B.foe;const 
    <span class=hudSp></span><span class=pill>${I('book')} ${loc.deck.length}</span><button class="btn red endBtn" id=bEnd ${my?'':'disabled'}>차례 끝</button></div>
   <div id=bInfoSlot></div><div class=hand style="--hw:min(96px,calc((100vw - ${document.documentElement.classList.contains('safe')?92:24}px) / ${Math.max(4,me.hand.length)} - 6px))">${(B.coop?B.coop.players[BC.localIndex].hand:me.hand).map((id,i)=>{const handP=B.coop?B.coop.players[BC.localIndex]:me;const can=my&&B.coop&&B.coop.active!==BC.localIndex?false:my&&battleCost(id)<=handP.mana&&(isItemCard(id)||me.board.includes(null));return battleCardHTML(id,{size:'sm',noHolo:1,cls:(can?'':'cant')+(B.pick===i?' pick':'')}).replace('class="card','data-h="'+i+'" class="card');}).join('')}</div>`;
  if(!my)msg(B.side==='foe'?(B.wildMode?`야생 ${wildNames().map(esc).join(' · ')}의 차례… 공격을 조심해요!`:`${esc(fo.name)}의 차례…${B.pvp?' (친구가 생각 중이에요)':''}`):'');
+ else if(B.trainerSkillTarget)msg(B.trainerSkillTarget.type==='attack'?'💥 트레이너 공격: 피해를 줄 상대 포켓몬을 눌러요':'📣 응원: 능력치를 올릴 아군 포켓몬을 눌러요');
  else if(B.itemTargetMode)msg('⚡ 전기의 돌: 한 번 더 행동할 내 포켓몬을 눌러요');
  else if(B.moonTargetMode)msg('🌙 달의 돌: 1턴 동안 기절시킬 상대 포켓몬을 눌러요');
  else if(B.pick>=0)msg(`<b>${esc(battleCardName(me.hand[B.pick]))}</b> — ${isItemCard(me.hand[B.pick])?'카드를 한 번 더 눌러 사용해요': '아래 「내보내기」 또는 빈칸을 눌러요'}`);
@@ -2539,8 +2542,9 @@ function renderBattle(){if(!B||window.__sim)return;const me=B.me,fo=B.foe;const 
  if(B.coop&&BC.host&&!BC.processing)bossBroadcast();bindBattle();}
 function bindBattle(){const me=B.me;
  $('#bMenu').onclick=()=>{sfx('tap');battleMenu();};
+ const hm=$('#heroMe');if(hm)hm.onclick=()=>{sfx('tap');openTrainerSkillModal();};
  $('#battle').querySelectorAll('[data-wild-catch-slot]').forEach(btn=>btn.onclick=()=>askWildCapture(Number(btn.dataset.wildCatchSlot))); 
- $('#bEnd').onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;sfx('tap');B.sel=-1;B.pick=-1;if(B.coop&&!BC.host){bossSubmit({type:'end'});return;}if(B.pvp)pvpSend({t:'end'});endTurn();};
+ $('#bEnd').onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;sfx('tap');B.sel=-1;B.pick=-1;B.trainerSkillTarget=null;if(B.coop&&!BC.host){bossSubmit({type:'end'});return;}if(B.pvp)pvpSend({t:'end'});endTurn();};
  $('#bPower').onclick=()=>{if(B&&B.coop&&!BC.host){if(B.busy||B.side!=='me'||B.coop.active!==BC.localIndex)return;const q=pickQ();(async()=>{if(!q){bossSubmit({type:'power',ok:true});return;}const r=await battleQ(q,{who:B.me.av,what:'공부 기술: 맞히면 카드 1장!'});bossSubmit({type:'power',ok:r.ok});})();return;}usePower();};
  $('#battle').querySelectorAll('.hand .card').forEach(c=>c.onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;const i=+c.dataset.h,v=(B.coop?B.coop.players[BC.localIndex].hand:me.hand)[i];
   if(B.itemTargetMode){if(i===B.itemTargetMode.hand){B.itemTargetMode=null;B.pick=-1;renderBattle();toast('전기의 돌 사용을 취소했어요');}else toast('먼저 전기의 돌을 사용할 포켓몬을 골라 주세요');return;}
@@ -2553,12 +2557,13 @@ function bindBattle(){const me=B.me;
   if(B.pick===i&&can){closeInfo();const sl=me.board.indexOf(null);if(B.coop&&!BC.host){bossSubmit({type:'summon',h:i,s:sl});return;}if(B.pvp)pvpSend({t:'sum',h:i,s:sl});summon(me,i,sl);return;}
   sfx('tap');B.pick=can?i:-1;B.sel=-1;renderBattle();if(isRandomMonCard(v)){toast(can?`${v.name}: ${v.desc}`:battleCost(v)>me.mana?`에너지가 ${battleCost(v)-me.mana} 모자라요`:'필드가 꽉 찼어요');return;}showInfo(v,{hand:i,can,why:battleCost(v)>me.mana?`에너지가 ${battleCost(v)-me.mana} 모자라요`:!hasSlot?'필드가 꽉 찼어요':''});});
  $('#myLane').querySelectorAll('.slot').forEach(s=>s.onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;const i=+s.dataset.i,u=me.board[i];
+  if(B.trainerSkillTarget){resolveTrainerSkillTarget('me',i);return;}
   if(B.moonTargetMode){toast('달의 돌은 상대 포켓몬을 선택해야 해요');return;}
   if(B.itemTargetMode){if(!u){toast('포켓몬이 있는 칸을 골라 주세요');return;}if(B.coop&&Number(u.coopOwner??0)!==B.coop.active){toast('내 포켓몬만 재행동시킬 수 있어요');return;}if(u.frozen){toast('얼어 있는 포켓몬은 재행동할 수 없어요');return;}if(B.coop&&!BC.host){bossSubmit({type:'item',h:B.itemTargetMode.hand,target:i});B.itemTargetMode=null;B.pick=-1;return;}playItem(me,B.itemTargetMode.hand,i);return;}
   if(!u){if(B.pick>=0){const selected=(B.coop?B.coop.players[BC.localIndex].hand:me.hand)[B.pick];if(isItemCard(selected)){toast('돌 아이템은 카드를 한 번 더 눌러 사용해요');return;}closeInfo();if(B.coop&&!BC.host){bossSubmit({type:'summon',h:B.pick,s:i});return;}if(B.pvp)pvpSend({t:'sum',h:B.pick,s:i});summon(me,B.pick,i);}return;}
   closeInfo();if(u.att>0&&!u.frozen&&(!B.coop||Number(u.coopOwner??0)===B.coop.active)){sfx('tap');B.sel=B.sel===i?-1:i;B.pick=-1;renderBattle();}
   else{sfx('tap');showInfo(u.id,{unit:u,why:u.frozen?'얼어서 이번 차례는 쉬어요':u.fresh?'방금 나온 포켓몬은 다음 차례부터 공격해요':'이번 차례에 이미 공격했어요'});}});
- $('#foeLane').querySelectorAll('.slot').forEach(s=>s.onclick=()=>{if(B.busy||(B.coop&&B.coop.active!==BC.localIndex))return;const i=+s.dataset.i;if(B.moonTargetMode){if(!B.foe.board[i]){toast('포켓몬이 있는 칸을 골라 주세요');return;}if(B.coop&&!BC.host){bossSubmit({type:'item',h:B.moonTargetMode.hand,target:i});B.moonTargetMode=null;B.pick=-1;return;}playItem(B.me,B.moonTargetMode.hand,i);return;}if(B.sel<0){if(B.foe.board[i]){sfx('tap');showInfo(B.foe.board[i].id,{unit:B.foe.board[i],foe:1});}return;}closeInfo();if(!targetsFor(B.sel).units.includes(i)){if(B.foe.board[i])toast('바위 벽(테두리) 포켓몬부터 공격해야 해요');return;}if(B.coop&&!BC.host){const si=B.sel;B.busy=true;const q=pickQ();(async()=>{let ok=true;if(q){const r=await battleQ(q,{who:me.board[si].id,what:`${esc(MON[B.foe.board[i].id].name)}에게 공격!`});ok=r.ok;}bossSubmit({type:'attack',si,tg:{u:i},ok});B.busy=false;})();return;}playerAttack(B.sel,{u:i});});
+ $('#foeLane').querySelectorAll('.slot').forEach(s=>s.onclick=()=>{if(B.busy||(B.coop&&B.coop.active!==BC.localIndex))return;const i=+s.dataset.i;if(B.trainerSkillTarget){resolveTrainerSkillTarget('foe',i);return;}if(B.moonTargetMode){if(!B.foe.board[i]){toast('포켓몬이 있는 칸을 골라 주세요');return;}if(B.coop&&!BC.host){bossSubmit({type:'item',h:B.moonTargetMode.hand,target:i});B.moonTargetMode=null;B.pick=-1;return;}playItem(B.me,B.moonTargetMode.hand,i);return;}if(B.sel<0){if(B.foe.board[i]){sfx('tap');showInfo(B.foe.board[i].id,{unit:B.foe.board[i],foe:1});}return;}closeInfo();if(!targetsFor(B.sel).units.includes(i)){if(B.foe.board[i])toast('바위 벽(테두리) 포켓몬부터 공격해야 해요');return;}if(B.coop&&!BC.host){const si=B.sel;B.busy=true;const q=pickQ();(async()=>{let ok=true;if(q){const r=await battleQ(q,{who:me.board[si].id,what:`${esc(MON[B.foe.board[i].id].name)}에게 공격!`});ok=r.ok;}bossSubmit({type:'attack',si,tg:{u:i},ok});B.busy=false;})();return;}playerAttack(B.sel,{u:i});});
  const hf=$('#heroFoe');if(hf)hf.onclick=()=>{if(B.busy||B.sel<0||(B.coop&&B.coop.active!==BC.localIndex))return;closeInfo();if(!targetsFor(B.sel).hero){toast('바위 벽 포켓몬이 막고 있어요');return;}if(B.coop&&!BC.host){const si=B.sel;B.busy=true;const q=pickQ();(async()=>{let ok=true;if(q){const r=await battleQ(q,{who:me.board[si].id,what:`${esc(B.foe.name)}에게 공격!`});ok=r.ok;}bossSubmit({type:'attack',si,tg:{hero:1},ok});B.busy=false;})();return;}playerAttack(B.sel,{hero:1});};if(B.coop&&!BC.host){} }
 // ---- 카드 정보 창: 효과·타입·이 판의 상성을 크게 보여 줘요(휴대폰에서도 읽기 쉽게) ----
 function typesStrong(t){return TYPE_EN.map((_,x)=>x).filter(x=>TYPE_CHART[t][x]>=2);}
@@ -2813,7 +2818,7 @@ async function battleQ(q,opt){B.qn++;if(window.__sim)return{ok:rnd()<SIM.p,ms:30
  if(!r.ok){B.retryQ=q;}return r;}
 function cleanup(){[B.me,B.foe].forEach(P=>P.board.forEach((u,i)=>{if(u&&u.hp<=0){P.board[i]=null;}}));if(B&&B.wildMode)syncWildPrimary();}
 function checkEnd(){if(!B||B.over)return false;if(B.wildMode){const live=syncWildPrimary();if(!live.length){if(B.coop){if(BC.host)bossFinish('win');return true;}B.over=true;const caught=(B.wildState.caughtIds||[]).length>0;const note=caught?'야생 포켓몬 전투가 끝났어요. 포획한 포켓몬은 도감에 등록됐어요.':'야생 포켓몬이 모두 쓰러져 포획하지 못했어요.';if(!window.__sim)setTimeout(()=>finishEndlessWild(caught?'caught':'knockout',note),650);return true;}if(B.coop&&B.coop.players.some(p=>p.hp<=0)){if(BC.host)bossFinish('lost');return true;}if(B.me.hp<=0&&!B.coop){B.over=true;if(!window.__sim)setTimeout(()=>finishEndlessWild('lost','트레이너 체력이 0이 되어 야생 전투를 마쳤어요.'),650);return true;}const weak=live.filter(i=>B.foe.board[i].hp<=B.foe.board[i].max*.3).sort((a,b)=>B.foe.board[a].hp/B.foe.board[a].max-B.foe.board[b].hp/B.foe.board[b].max);if(weak.length&&!B.capturePrompted&&!(B.wildState&&B.wildState.scenarioMode)){B.capturePrompted=true;B.wildCaptureTargetSlot=weak[0];if(!window.__sim)setTimeout(scheduleWildCapturePrompt,180);}return false;}if(B.foe.hp<=0||B.me.hp<=0){B.over=true;if(window.__sim)return true;setTimeout(()=>endBattle(B.foe.hp<=0&&B.me.hp>0||(B.foe.hp<=0&&B.me.hp>=B.foe.hp)),600);return true;}return false;}
-async function startTurn(side){if(!B||B.over)return;closeInfo();if(B.coop&&side==='foe')bossSetActive(0);B.side=side;const P=side==='me'?B.me:B.foe;B.turn++;if(side==='me')B.round++;
+async function startTurn(side){if(!B||B.over)return;closeInfo();if(B.coop&&side==='foe')bossSetActive(0);B.side=side;const P=side==='me'?B.me:B.foe;B.turn++;if(side==='me'){B.round++;B.counterActive=0;}
  P.maxMana=Math.min(6,P.maxMana+1);P.mana=P.maxMana;B.defUsed=false;
  const wildAliveCount=B.wildMode&&side==='foe'?B.foe.board.filter(u=>u&&u.hp>0).length:0;
  P.board.forEach(u=>{if(!u)return;if(B.coop&&side==='me'&&Number(u.coopOwner??0)!==B.coop.active)return;u.fresh=0;u.att=u.frozen?0:(B.wildMode&&P===B.foe?((S.meta.settings.easy||wildAliveCount>=2)?1:2):(u.kw==='double'?2:1));if(u.frozen&&side==='me'){}if(u.kw==='grow'&&u.grow<2){u.grow++;u.atk++;}});
@@ -2853,9 +2858,9 @@ async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)
   // 막기 문제: 내 트레이너가 피해 2 이상을 받을 때마다 방어 문제를 표시
   const tp=(B.coop&&tg.p!=null&&B.coop.players[tg.p])?B.coop.players[tg.p]:me;const remoteDef=!!B.coop&&tp!==B.coop.players[0];
    if(S.meta.settings.defq&&dmg>=2){renderBattle();bossMarkTarget(tp);let r=null;if(remoteDef){r=await bossAskDefense(tp,a);}else{const q=pickQ();if(q)r=await battleQ(q,{who:tp.av,what:`막기! ${esc(MON[a.id].name)}의 공격을 막아요`,defense:true});}
-    if(r){if(r.ok){B.qc++;B.combo++;if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;dmg=Math.max(0,dmg-2);fx(heroEl(tp),'막았다!','txt');}else B.combo=0;}}
+    if(r){if(r.ok){B.qc++;B.combo++;if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;dmg=Math.max(0,dmg-2);fx(heroEl(tp),'막았다!','txt');if(B.counterActive>0){await dealUnit(fo,i,B.counterActive);fx(heroEl(tp),`반격 -${B.counterActive}`,'txt');}}else B.combo=0;}}
   bossMarkTarget(tp);await skillMove(fo,i,heroEl(tp),true,false);tp.hp-=dmg;if(dmg){impact(heroEl(tp),dmg,{hero:1,col:'#ff5a5f'});fx(heroEl(tp),'-'+dmg,dmg>=4?'big':'');}}
- else{const d=me.board[tg.u];if(!d)return;if(a.kw==='fight')dmg+=1;const k=typeMul(a.id,d.id);dmg=applyType(dmg,k);
+ else{const d=me.board[tg.u];if(!d)return;if(a.kw==='fight')dmg+=1;const k=typeMul(a.id,d.id);dmg=applyType(dmg,k);dmg=Math.max(0,dmg-(d.trainerDef||0));
   await skillMove(fo,i,unitEl(me,tg.u),true,false);if(k>=2)fx(unitEl(me,tg.u),'효과가 굉장했다!','txt');
   await dealUnit(me,tg.u,dmg);if(a.kw==='freeze'&&me.board[tg.u])me.board[tg.u].frozen=1;if(a.kw==='poison'&&me.board[tg.u])me.board[tg.u].atk=Math.max(0,me.board[tg.u].atk-1);
   const cd=applyType(d.atk,typeMul(d.id,a.id));if(cd>0){await wait(200);await dealUnit(fo,i,cd);}}
@@ -2882,6 +2887,33 @@ async function endBattle(win){if(B&&B.wildMode){finishEndlessWild('fled','야생
 // ---- 리그 화면 ----
 function gymNeed(i){return GYMS[i].lv;}
 function gymOpen(i){const me=S.meta;return (i===0||me.gyms[i-1])&&lvOf(me.xp).lv>=gymNeed(i);}
+// ===== 트레이너 스킬: 레벨 포인트로 배우고 전투마다 종류별 1회 사용 =====
+const TRAINER_SKILL_INFO={
+ heal:{n:'체력 회복',ic:'💚',desc:'트레이너 체력을 스킬 레벨만큼 회복해요.',max:5},
+ counter:{n:'반격',ic:'⚔️',desc:'이번 상대 차례에 트레이너를 공격한 포켓몬에게 반격해요. 방어 문제를 맞혀야 피해가 들어가요.',max:5},
+ attack:{n:'공격',ic:'💥',desc:'상대 포켓몬 하나에게 스킬 레벨만큼 직접 피해를 줘요.',max:5},
+ cheer:{n:'응원',ic:'📣',desc:'아군 포켓몬 하나의 공격력과 방어력을 스킬 레벨만큼 영구적으로 올려요.',max:5}
+};
+function trainerSkillLevels(){const m=S.meta;m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0},m.trainerSkills||{});return m.trainerSkills;}
+function trainerSkillUpgradeCost(nextLv){return nextLv<=2?1:nextLv<=4?2:3;}
+function trainerSkillInvestedPoints(levels){return Object.values(levels).reduce((sum,n)=>{n=Math.max(0,Math.min(5,Number(n)||0));for(let i=1;i<=n;i++)sum+=trainerSkillUpgradeCost(i);return sum;},0);}
+function renderTrainerSkills(){S.screen='trainerSkills';const m=S.meta,lv=trainerSkillLevels();
+ $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">🛡️ 트레이너 스킬</h2><span class=hudSp></span><span class=pill>🔷 레벨 포인트 ${m.lp||0}</span></div><p class=mut style="font-size:13px">레벨 1~2는 각각 1포인트, 레벨 3~4는 각각 2포인트, 레벨 5는 3포인트가 필요해요. 전투에서는 스킬 종류별로 한 번씩 사용할 수 있어요.</p><div style="display:grid;gap:10px">${Object.entries(TRAINER_SKILL_INFO).map(([k,v])=>{const n=lv[k]||0,cost=n>=5?0:trainerSkillUpgradeCost(n+1);return `<div class=panel style="margin:0;border:2px solid ${n?'#b8a4f4':'var(--line)'};background:${n?'#f7f2ff':'#fff'}"><div style="display:flex;align-items:flex-start;gap:10px"><div style="font-size:30px">${v.ic}</div><div style="flex:1;min-width:0"><div class=jua style="font-size:19px">${v.n} <span class=mut style="font-size:14px">Lv.${n}/5</span></div><div class=mut style="font-size:13px;line-height:1.55">${v.desc}</div><div style="margin-top:6px;color:#7c55c7;font-size:13px">${'★'.repeat(n)}${'☆'.repeat(5-n)}</div><div class=mut style="font-size:12px;margin-top:4px">${n>=5?'최대 레벨':`다음 레벨 비용: 🔷 ${cost}개`}</div></div><button class="btn ${n>=5?'ghost':'purple'} sm" data-skill-up="${k}" ${n>=5||(m.lp||0)<cost?'disabled':''}>${n>=5?'최대 레벨':`🔷 ${cost} 투자`}</button></div></div>`;}).join('')}</div><div class=mbtns><button class="btn ghost" id=tsBack>← 돌아가기</button><button class="btn red" id=tsReset ${m.coins<100?'disabled':''}>초기화 · 🪙 100코인</button></div><p class=mut style="font-size:12px">초기화하면 모든 트레이너 스킬 레벨이 0이 되고, 투자했던 레벨 포인트를 전부 돌려받아요.</p></div></div>`;
+ bindHud();$('#tsBack').onclick=()=>renderHub();$('#view').querySelectorAll('[data-skill-up]').forEach(b=>b.onclick=()=>{const k=b.dataset.skillUp,cur=trainerSkillLevels(),cost=trainerSkillUpgradeCost((cur[k]||0)+1);if((S.meta.lp||0)<cost||cur[k]>=5)return;S.meta.lp-=cost;cur[k]++;autoSave();renderTrainerSkills();toast(`${TRAINER_SKILL_INFO[k].n} Lv.${cur[k]} 달성! (레벨 포인트 ${cost}개 사용)`);});
+ $('#tsReset').onclick=async()=>{if((S.meta.coins||0)<100){toast('코인이 100개 필요해요');return;}const yes=await confirmBox(`트레이너 스킬을 초기화할까요?<br>비용: 🪙 100코인<br>투자한 레벨 포인트는 모두 돌려받아요.`,'초기화','취소');if(!yes)return;const cur=trainerSkillLevels(),refund=trainerSkillInvestedPoints(cur);S.meta.coins-=100;S.meta.lp=(S.meta.lp||0)+refund;S.meta.trainerSkills={heal:0,counter:0,attack:0,cheer:0};autoSave();renderTrainerSkills();toast(`스킬 초기화 완료! 레벨 포인트 ${refund}개를 돌려받았어요.`);};}
+function openTrainerSkillModal(){if(!B||B.over)return;const levels=trainerSkillLevels(),used=B.trainerSkillUsed||(B.trainerSkillUsed={});const myTurn=B.side==='me'&&!B.busy&&(!B.coop||B.coop.active===BC.localIndex);const skills=Object.entries(TRAINER_SKILL_INFO).map(([k,v])=>{const n=levels[k]||0,done=!!used[k],disabled=!n||done||!myTurn||(k==='attack'&&!B.foe.board.some(u=>u&&u.hp>0))||(k==='cheer'&&!B.me.board.some(u=>u&&u.hp>0))||(k==='heal'&&B.me.hp>=15);return `<button class="btn ${disabled?'ghost':'purple'}" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;margin:7px 0;white-space:normal" data-trainer-skill="${k}" ${disabled?'disabled':''}><span style="font-size:24px">${v.ic}</span><span style="flex:1"><b>${v.n} · Lv.${n}</b><br><small>${done?'이번 전투에서 사용 완료':!n?'아직 배우지 않았어요':v.desc}</small></span><span>${done?'✓':n?'사용':''}</span></button>`;}).join('');
+ M(`<h2>🛡️ 트레이너 스킬</h2><p class=mut style="font-size:13px">배운 스킬은 종류별로 이 전투에서 한 번 사용할 수 있어요.</p>${skills}<div class=mbtns><button class="btn ghost" data-a=x>닫기</button><button class="btn ghost" data-a=manage>스킬 관리</button></div>`,{x:()=>closeM(),_close:()=>closeM(),manage:()=>{closeM();renderTrainerSkills();}});
+ $('#mbox').querySelectorAll('[data-trainer-skill]').forEach(b=>b.onclick=()=>{const k=b.dataset.trainerSkill;if(!B||B.busy||B.side!=='me'||B.over)return;closeM();activateTrainerSkill(k);});}
+function activateTrainerSkill(k){if(!B||B.busy||B.side!=='me'||B.over)return;const levels=trainerSkillLevels(),lv=levels[k]||0;B.trainerSkillUsed=B.trainerSkillUsed||{};if(!lv||B.trainerSkillUsed[k]){toast('배우지 않았거나 이번 전투에서 이미 사용한 스킬이에요');return;}
+ if(k==='heal'){if(B.coop&&!BC.host){bossSubmit({type:'trainerSkill',skill:'heal',level:lv});toast('체력 회복 스킬을 사용했어요');return;}const before=B.me.hp;B.me.hp=Math.min(15,B.me.hp+lv);if(B.me.hp===before){toast('트레이너 체력이 이미 가득 찼어요');return;}B.trainerSkillUsed.heal=true;fx(heroEl(B.me),`+${B.me.hp-before} 회복`,'txt');renderBattle();autoSave();toast(`트레이너 체력 ${B.me.hp-before} 회복!`);return;}
+ if(k==='counter'){if(B.coop&&!BC.host){bossSubmit({type:'trainerSkill',skill:'counter',level:lv});toast(`이번 상대 차례에 반격 준비! 피해 ${lv}`);return;}B.trainerSkillUsed.counter=true;B.counterActive=lv;renderBattle();toast(`이번 상대 차례에 반격 준비! 피해 ${lv}`);return;}
+ if(k==='attack'){B.trainerSkillTarget={type:'attack',level:lv};renderBattle();toast('공격할 상대 포켓몬을 선택해 주세요');return;}
+ if(k==='cheer'){B.trainerSkillTarget={type:'cheer',level:lv};renderBattle();toast('응원할 아군 포켓몬을 선택해 주세요');return;}}
+function resolveTrainerSkillTarget(side,i){if(!B||!B.trainerSkillTarget)return false;const t=B.trainerSkillTarget,u=(side==='me'?B.me:B.foe).board[i];if(!u||u.hp<=0){toast('포켓몬이 있는 칸을 선택해 주세요');return true;}if(t.type==='cheer'&&side!=='me'){toast('응원은 아군 포켓몬에게 사용해요');return true;}if(t.type==='attack'&&side!=='foe'){toast('공격은 상대 포켓몬에게 사용해요');return true;}if(t.type==='cheer'&&B.coop&&Number(u.coopOwner??0)!==B.coop.active){toast('내가 조종하는 포켓몬을 선택해 주세요');return true;}
+ B.trainerSkillTarget=null;B.trainerSkillUsed=B.trainerSkillUsed||{};if(B.coop&&!BC.host){bossSubmit({type:'trainerSkill',skill:t.type,level:t.level,slot:i});return true;}B.trainerSkillUsed[t.type]=true;
+ if(t.type==='cheer'){u.atk+=t.level;u.trainerDef=(u.trainerDef||0)+t.level;fx(unitEl(B.me,i),`공격 +${t.level} · 방어 +${t.level}`,'txt');renderBattle();autoSave();toast(`${MON[u.id].name}의 공격력과 방어력이 영구적으로 ${t.level} 상승했어요!`);return true;}
+ B.busy=true;renderBattle();(async()=>{const name=MON[u.id].name;await dealUnit(B.foe,i,t.level);B.busy=false;renderBattle();checkEnd();toast(`${name}에게 ${t.level} 피해!`);})();return true;}
+
 function renderLeague(){S.screen='league';const me=S.meta;const L=lvOf(me.xp).lv;
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('trophy')} 배틀 리그</h2><span class=hudSp></span><span class=pill>${I('medal')} 배지 ${Object.keys(me.gyms).length}/9</span><span class=pill>${me.battles.w}승 ${me.battles.l}패</span></div>
   <p class=mut style="font-size:13px;margin:6px 0 12px">체육관은 앞 체육관을 이기고 <b>트레이너 레벨</b>이 되어야 열려요. 레벨은 문제를 풀수록 올라가요!</p>
@@ -2954,6 +2986,7 @@ async function bossHandleAction(d){if(!B||!B.coop||!BC.host||BC.processing||B.ov
  else if(a.type==='item'){if(!Number.isInteger(Number(a.h))||Number(a.h)<0||Number(a.h)>=P.hand.length)return;const card=P.hand[Number(a.h)];if(card&&card.item==='thunder'&&(!P.board[Number(a.target)]||Number(P.board[Number(a.target)].coopOwner??0)!==idx))return;B.busy=false;await playItem(P,Number(a.h),Number(a.target??-1),true);}
  else if(a.type==='attack'){B.busy=false;await playerAttack(Number(a.si),a.tg,!!a.ok);}
  else if(a.type==='power'){B.busy=false;await bossApplyPower(!!a.ok);}
+ else if(a.type==='trainerSkill'){const sk=String(a.skill||''),lv=Math.max(1,Math.min(5,Number(a.level)||1)),slot=Number(a.slot);B.trainerSkillUsed=B.trainerSkillUsed||{};if(!['heal','counter','attack','cheer'].includes(sk)||B.trainerSkillUsed[sk])return;if(sk==='heal'){P.hp=Math.min(15,P.hp+lv);B.trainerSkillUsed.heal=true;fx(heroEl(P),`+${lv} 회복`,'txt');}else if(sk==='counter'){B.counterActive=lv;B.trainerSkillUsed.counter=true;}else if(sk==='attack'){const u=B.foe.board[slot];if(!u||u.hp<=0)return;B.trainerSkillUsed.attack=true;await dealUnit(B.foe,slot,lv);checkEnd();}else if(sk==='cheer'){const u=P.board[slot];if(!u||u.hp<=0||Number(u.coopOwner??0)!==idx)return;u.atk+=lv;u.trainerDef=(u.trainerDef||0)+lv;B.trainerSkillUsed.cheer=true;fx(unitEl(P,slot),`공격 +${lv} · 방어 +${lv}`,'txt');}B.busy=false;renderBattle();}
  else if(a.type==='catch'){B.busy=false;B.wildState.captureModalOpen=false;tryCatchWildPokemon(Number(a.slot));}
  }catch(e){console.error('coop action',e)}finally{BC.processing=false;if(B&&B.coop){B.coop.processing=false;B.busy=false;bossRewire();renderBattle();bossBroadcast(true);}}}
 async function bossApplyPower(ok){const me=B.me;if((me.powerUses||0)<=0)return;B.qn++;B.busy=true;me.powerUses=Math.max(0,(me.powerUses||0)-1);if(ok){B.qc++;B.combo++;draw(me);fx($('.hand'),'카드 +1','txt')}else B.combo=0;B.busy=false;renderBattle();}
@@ -3590,12 +3623,14 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
  $('#view').innerHTML=hudHTML()+`<div class=wrap>
   <div class=panel style="display:flex;gap:12px;align-items:center"><div style="width:96px;height:96px;flex:none">${monImg(partner,'anim')}</div><div style="flex:1"><div class=jua style="font-size:22px">${esc(m.name)}</div><div class=mut style="font-size:14px">${esc(lvOf(m.xp).title)} · ${josa(esc(MON[partner].name),'와과')} 함께해요</div><div style="font-size:15px;margin-top:4px">${hubLine()}</div></div><button class="btn ghost sm" id=hPartner style="align-self:flex-start">${I('heart')} 파트너<br>바꾸기</button></div>
   ${stonePanel(m)}
+  <div class=panel style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="font-size:30px">🛡️</div><div style="flex:1"><b class=jua style="font-size:19px">트레이너 스킬</b><div class=mut style="font-size:13px">레벨 포인트 ${m.lp||0}개 · 스킬을 배우고 전투에서 사용해요</div></div><button class="btn purple" id="hTrainerSkills">스킬 관리</button></div>
   <div class=tiles>
    <button class="tile main" id=tTrain>${done?'':'<i class=newTag>오늘!</i>'}<span class=ti>${I('flame','ti')}</span><span><span class=tn>오늘의 훈련</span><br><span class=td>${done?'오늘 훈련 완료! 한 번 더 하면 사탕을 더 받아요.':`문제 ${trainN()}개 · 오늘의 카드팩 받기`}${gh?`<br>어제의 나: ${gh.n}문제 중 ${gh.c}개 정답`:''}</span></span></button>
    ${tiles}</div>
   ${next?`<div class=nextFeat>${I('lock')} 다음에 열릴 기능: <b>${next.n}</b> — ${next.how}</div>`:''}
   <div class=nextFeat>${esc(semName(m.gs))}${m.uMax&&m.uMax<20?` ${m.uMax}단원까지`:''} 범위의 문제만 나와요 · <a href="#" id=hUnit style="color:inherit">배운 단원 바꾸기</a> · <a href="#" id=hCode style="color:inherit">코드 바꾸기</a></div></div>`;
  bindHud();
+ $('#hTrainerSkills').onclick=()=>{sfx('tap');renderTrainerSkills();};
  $('#tTrain').onclick=()=>{sfx('tap');startTraining();};
  $('#hCode').onclick=e=>{e.preventDefault();renderGate(true);};
  $('#hUnit').onclick=e=>{e.preventDefault();sfx('tap');askUnit(()=>renderHub(),true);};
