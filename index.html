@@ -1204,6 +1204,12 @@ html.lowfx .wildLane .unit::before{animation:none!important}
 
 @media(prefers-reduced-motion:reduce){.scv-cm,.scEmSpin,.scEmSt.on .flame{animation:none!important}}
 
+/* 보호막(파란색)은 안쪽 테두리로, 행동 가능(초록)·선택(노랑)·대상(빨강)은 바깥 테두리로 분리해서 겹치지 않게 */
+.unit.shielded{outline:none;box-shadow:inset 0 0 0 3px #61c5ff,inset 0 0 14px 2px #61c5ffaa}
+.unit.shielded.ready{box-shadow:0 0 0 3px #3cc47c,0 0 14px rgba(60,196,124,.6),inset 0 0 0 3px #61c5ff,inset 0 0 14px 2px #61c5ffaa}
+.unit.shielded.sel{box-shadow:0 0 0 4px #ffd23f,0 0 18px rgba(255,210,63,.9),inset 0 0 0 3px #61c5ff,inset 0 0 14px 2px #61c5ffaa}
+.unit.shielded.tgt{box-shadow:0 0 0 4px #ff5a5f,inset 0 0 0 3px #61c5ff,inset 0 0 14px 2px #61c5ffaa}
+
 /* ===== 협동 보스전 승리 보상 연출 ===== */
 #brw{--c1:#c08bff;--c2:#7fe3ff;position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:'Jua';color:#fff;text-align:center;animation:brwFade .4s ease both}
 #brw[data-r="5"]{--c1:#ffcf40;--c2:#fff1a0}
@@ -1214,7 +1220,7 @@ html.lowfx .wildLane .unit::before{animation:none!important}
 #brw .brwFlash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 #brw .brwFlash.go{animation:brwFlash .8s ease-out}
 @keyframes brwFlash{0%{opacity:.95}100%{opacity:0}}
-#brw .brwBody{position:relative;width:min(92vw,460px);max-height:100%;overflow-y:auto;padding:18px 12px;display:flex;flex-direction:column;align-items:center}
+#brw .brwBody{position:relative;width:min(92vw,460px);max-height:100%;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none;padding:18px 12px;display:flex;flex-direction:column;align-items:center}
 #brw .brwTitle{font-size:clamp(30px,8vw,46px);line-height:1.1;animation:brwTitle .8s cubic-bezier(.2,1.5,.4,1) both}#brw .brwTx{background:linear-gradient(90deg,#fff,var(--c2),var(--c1),#fff);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 rgba(0,0,0,.35)) drop-shadow(0 0 14px var(--c1));animation:brwShine 3s linear .8s infinite}
 @keyframes brwTitle{from{opacity:0;transform:translateY(-50px) scale(.4)}}
 @keyframes brwShine{to{background-position:-250% 0}}
@@ -1249,6 +1255,9 @@ html.lowfx .wildLane .unit::before{animation:none!important}
 #brw .brwOk{margin-top:14px;opacity:0;pointer-events:none;transition:opacity .4s}
 #brw .brwOk.show{opacity:1;pointer-events:auto}
 #brw .brwP.pp{left:var(--px);top:var(--py)}
+#brw .brwBody::-webkit-scrollbar{display:none;width:0;height:0}
+#brw .brwStage,#brw .brwSlots{contain:layout}
+@media (max-height:720px){#brw .brwStage{min-height:200px;width:min(48vw,170px);margin:8px 0 4px}#brw .brwCardWrap .card{width:min(40vw,150px)}#brw .brwTitle{font-size:clamp(26px,7vw,38px)}}
 html.lowfx #brw .brwRays,html.lowfx #brw .brwHalo.on{animation:none}
 </style>
 
