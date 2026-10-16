@@ -2199,7 +2199,7 @@ const RAR_NAME=['','일반','고급','희귀','영웅','전설'];
 // 타입 능력: 좋아하는 포켓몬도 각자 쓸모가 있도록 (운빨던전에서 얻은 생각)
 const KW={
  0:{k:'tough',n:'끈기',ic:'normal',d:'처음 쓰러질 때 체력 1로 버텨요'},
- 1:{k:'ember',n:'불씨',ic:'flame',d:'나올 때 상대 포켓몬 하나에 1 피해'},
+ 1:{k:'ember',n:'불씨',ic:'flame',d:'내 차례가 시작될 때마다 상대 포켓몬 하나에 1 피해'},
  2:{k:'wave',n:'물결',ic:'drop',d:'나올 때 내 포켓몬 모두 체력 +1'},
  3:{k:'heal',n:'광합성',ic:'leaf',d:'나올 때 내 트레이너 체력 +2'},
  4:{k:'rush',n:'번개',ic:'bolt',d:'나온 차례에 바로 공격할 수 있어요'},
@@ -2207,15 +2207,15 @@ const KW={
  6:{k:'fight',n:'격투',ic:'fist',d:'포켓몬을 공격할 때 공격 +1'},
  7:{k:'poison',n:'독',ic:'skull',d:'공격한 상대의 공격 -1'},
  8:{k:'quake',n:'땅울림',ic:'ground',d:'트레이너를 공격할 때 +1 피해'},
- 9:{k:'rush',n:'날개',ic:'wing',d:'나온 차례에 바로 공격할 수 있어요'},
+ 9:{k:'wing',n:'날개',ic:'wing',d:'공격해도 반격을 받지 않아요 · 상대가 공격해 오면 반격 피해가 2배'},
  10:{k:'draw',n:'예지',ic:'eye',d:'나올 때 카드 1장 뽑기'},
  11:{k:'grow',n:'성장',ic:'bug',d:'내 차례가 시작될 때 공격 +1 (최대 +2)'},
- 12:{k:'taunt',n:'바위 벽',ic:'rock',d:'상대는 이 포켓몬부터 공격해야 해요'},
+ 12:{k:'taunt',n:'바위 벽',ic:'rock',d:'나올 때 방어막 +1 · 상대는 이 포켓몬부터 공격해야 해요'},
  13:{k:'dodge',n:'유령',ic:'ghost',d:'처음 받는 공격을 피해요'},
  14:{k:'double',n:'용의 기세',ic:'dragon',d:'한 차례에 두 번 공격'},
  15:{k:'sneak',n:'기습',ic:'moon',d:'바위 벽을 무시하고 공격'},
  16:{k:'armor',n:'강철',ic:'steel',d:'받는 피해 -1 · 상대는 이 포켓몬부터 공격'},
- 17:{k:'heal',n:'요정의 빛',ic:'fairy',d:'나올 때 내 트레이너 체력 +2'}};
+ 17:{k:'fairy',n:'요정의 빛',ic:'fairy',d:'나올 때 상대 포켓몬 하나의 공격이 랜덤으로 -1'}};
 function kwOf(mon){let t=mon.types[0];if(t===0&&mon.types[1]!=null)t=mon.types[1];return KW[t];}
 // 그림: PokeAPI 스프라이트(인터넷). 막혀 있으면 타입 색 공 그림으로 대신해요.
 const SPR_BASE='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
@@ -2369,17 +2369,20 @@ function showCard(id){const m=MON[id],me=S.meta,own=me.col[id]||0;const kw=kwOf(
  tiltOn($('#mbox .card.lg'));}
 
 // ---- 도감 ----
-let DEXF='all',DEXR=0;
+let DEXF='all',DEXR=0,DEXRAR=0;
 function renderDex(){S.screen='dex';const me=S.meta;const own=ownCount();
  const inR=id=>DEXR<0||(id>=REGIONS[DEXR][1]&&id<=REGIONS[DEXR][2]);
- const fl=(DEXF==='all'?MON_IDS.filter(inR):DEXF==='own'?MON_IDS.filter(id=>me.col[id]):DEXF==='evo'?MON_IDS.filter(id=>me.col[id]&&MON[id].to.length):MON_IDS.filter(id=>inR(id)&&MON[id].types.includes(+DEXF)));
+ const rarBase=(DEXF==='all'?MON_IDS.filter(inR):DEXF==='own'?MON_IDS.filter(id=>me.col[id]):DEXF==='evo'?MON_IDS.filter(id=>me.col[id]&&MON[id].to.length):MON_IDS.filter(id=>inR(id)&&MON[id].types.includes(+DEXF)));
+ const fl=DEXRAR?rarBase.filter(id=>MON[id].rar===DEXRAR):rarBase;
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('book')} 도감</h2><span class=hudSp></span><span class=pill>${own} / ${MON_IDS.length}</span><span class=pill title="별가루">${I('star')} 별가루 ${me.dust||0}</span></div>
+  <div class=filters style="margin:8px 0">${[0,1,2,3,4,5].map(k=>{const tot=k?rarBase.filter(id=>MON[id].rar===k):rarBase,have=tot.filter(id=>me.col[id]).length,on=DEXRAR===k;return `<button class="fbtn${on?' on':''}" data-rar="${k}" style="${on&&k?`background:var(--r${k});border-color:var(--r${k});${k===5?'color:#5a3b00':''}`:''}">${k?'★'.repeat(k)+' '+RAR_NAME[k]:'전체 등급'} <small>${have}/${tot.length}</small></button>`;}).join('')}</div>
   <div class=filters style="margin:8px 0">${REGIONS.map((r,i)=>`<button class="fbtn${DEXR===i?' on':''}" data-r="${i}">${r[0]} <small>${MON_IDS.filter(id=>id>=r[1]&&id<=r[2]&&me.col[id]).length}/${r[2]-r[1]+1}</small></button>`).join('')}<button class="fbtn${DEXR<0?' on':''}" data-r="-1">모든 지역</button></div>
   <div class=filters style="margin:8px 0">${[['all','전체'],['own','가진 카드'],['evo','진화 가능']].map(([k,n])=>`<button class="fbtn${DEXF===k?' on':''}" data-f="${k}">${n}</button>`).join('')}${TYPE_KO.map((n,i)=>`<button class="fbtn${DEXF===String(i)?' on':''}" data-f="${i}" style="${DEXF===String(i)?`background:${TYPE_COL[i]};border-color:${TYPE_COL[i]}`:''}">${n}</button>`).join('')}</div>
   <div class=mut style="font-size:12px;margin-bottom:8px">일반·고급은 한 번에, 희귀는 조각 3개·영웅 5개·전설 8개를 모아야 내 카드가 돼요. 본 적 있는 포켓몬은 별가루로 조각을 만들 수 있어요. 카드팩에서 전설 조각이 나올 확률은 장마다 ${PACK_W[5]}%예요. 카드팩 40개 안에는 꼭 1장 나와요(지금 ${me.pity.p5}/40). 영웅 이상은 10팩 안에 꼭(지금 ${me.pity.p4}/10).</div>
   <div class=dexGrid>${fl.map(id=>{const n=me.col[id]||0,seen=me.dexSeen[id];return `<div class="dexCell ${n?'':seen?'seen':'none'}" data-id="${id}"><span class=no>${id}</span>${!n&&me.shard&&me.shard[id]?`<span class=n2 style="color:#9a6bff">${me.shard[id]}/${SHARD_NEED[MON[id].rar]}</span>`:''}${monImg(id)}<span class=nm>${n||seen?esc(MON[id].name):'???'}</span></div>`;}).join('')||'<p class=mut>아직 없어요</p>'}</div></div></div>`;
  bindHud();
  $('#view').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{sfx('tap');DEXF=b.dataset.f;renderDex();});
+ $('#view').querySelectorAll('[data-rar]').forEach(b=>b.onclick=()=>{sfx('tap');DEXRAR=+b.dataset.rar;renderDex();});
  $('#view').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{sfx('tap');DEXR=+b.dataset.r;renderDex();});
  $('#view').querySelectorAll('.dexCell').forEach(c=>c.onclick=()=>{sfx('tap');showCard(+c.dataset.id);});
  const ev=MON_IDS.find(id=>me.col[id]&&MON[id].to.length&&me.candy>=evoCost(MON[id]));
@@ -2398,6 +2401,7 @@ function ensureDeck(){const me=S.meta;const cnt={};const ok=me.deck.filter(id=>{
  if(ok.length>DECK_N)ok.length=DECK_N;
  if(ok.length<DECK_N){for(const id of autoDeck()){if(ok.length>=DECK_N)break;const n=ok.filter(x=>x===id).length;if(n<deckLim(id))ok.push(id);}}
  me.deck=ok;return deckValid(me.deck);}
+let DECKKW='';
 function renderDeck(keep){S.screen='deck';const me=S.meta;if(!keep)ensureDeck();
  const counts={};me.deck.forEach(id=>counts[id]=(counts[id]||0)+1);
  const curve=[1,2,3,4,5,6].map(c=>me.deck.filter(id=>MON[id].cost===c).length);
@@ -2406,8 +2410,9 @@ function renderDeck(keep){S.screen='deck';const me=S.meta;if(!keep)ensureDeck();
   <p class=mut style="font-size:13px;margin:6px 0">덱 카드를 누르면 빠지고, 아래 카드를 누르면 들어가요. 같은 카드는 2장까지. 비용이 낮은 카드가 많아야 처음부터 싸울 수 있어요.</p>
   <div class=row style="align-items:flex-end;gap:16px;margin-bottom:18px"><div><div class=mut style="font-size:12px">비용별 장수</div><div class=curve>${curve.map((n,i)=>`<div style="height:${n*8+2}px"><span>${i+1}</span></div>`).join('')}</div></div></div>
   <div class=deckBar id=deckBar>${me.deck.map((id,i)=>cardHTML(id,{size:'deck'}).replace('class="card','data-di="'+i+'" class="card')).join('')}</div>
-  <h3>가진 카드</h3><div class=colGrid>${owned.map(id=>{const inD=counts[id]||0,lim=deckLim(id);return cardHTML(id,{size:'deck',cnt:me.col[id],cls:inD>=lim?'locked':''});}).join('')}</div></div></div>`;
+  <h3>가진 카드</h3>${(()=>{const names=[];owned.forEach(id=>{const n=kwOf(MON[id]).n;if(!names.includes(n))names.push(n);});if(DECKKW&&!names.includes(DECKKW))DECKKW='';const cnt=n=>owned.filter(id=>kwOf(MON[id]).n===n).length;const sel=DECKKW?Object.values(KW).find(k=>k.n===DECKKW):null;return `<div class=filters style="margin:6px 0"><button class="fbtn${DECKKW?'':' on'}" data-kw="">전체 특성 <small>${owned.length}</small></button>${names.map(n=>{const k=Object.values(KW).find(v=>v.n===n);return `<button class="fbtn${DECKKW===n?' on':''}" data-kw="${esc(n)}">${I(k.ic)} ${esc(n)} <small>${cnt(n)}</small></button>`;}).join('')}</div>${sel?`<div class=mut style="font-size:13px;margin-bottom:8px">${I(sel.ic)} <b>${esc(sel.n)}</b> · ${esc(sel.d)}</div>`:''}`;})()}<div class=colGrid>${owned.filter(id=>!DECKKW||kwOf(MON[id]).n===DECKKW).map(id=>{const inD=counts[id]||0,lim=deckLim(id);return cardHTML(id,{size:'deck',cnt:me.col[id],cls:inD>=lim?'locked':''});}).join('')}</div></div></div>`;
  bindHud();
+ $('#view').querySelectorAll('[data-kw]').forEach(b=>b.onclick=()=>{sfx('tap');DECKKW=b.dataset.kw;renderDeckKeep();});
  $('#dAuto').onclick=()=>{sfx('tap');me.deck=autoDeck();autoSave();renderDeck();};
  $('#deckBar').querySelectorAll('.card').forEach(c=>c.onclick=()=>{sfx('tap');me.deck.splice(+c.dataset.di,1);autoSave();renderDeckKeep();});
  $('.colGrid').querySelectorAll('.card').forEach(c=>c.onclick=()=>{const id=+c.dataset.id;const inD=me.deck.filter(x=>x===id).length;if(me.deck.length>=DECK_N){toast('덱이 꽉 찼어요. 위에서 한 장을 빼 주세요');return;}if(inD>=deckLim(id)){toast('같은 카드는 가진 만큼, 최대 2장까지예요');return;}sfx('tap');me.deck.push(id);autoSave();renderDeckKeep();});}
@@ -2429,7 +2434,7 @@ let B=null;
 const HERO_HP=20;const foeHP=d=>Math.round(13+d*1.3);
 function gymDeck(g,diff){ // 관장 타입 시너지와 전투 기여도가 높은 카드로 덱을 구성
  const pool=MON_IDS.filter(id=>{const m=MON[id];if(m.rar===5&&diff<9)return false;if(g&&g.types&&!m.types.some(t=>g.types.includes(t)))return false;return m.cost<=Math.min(6,2+Math.ceil(diff/2));});
- const bonus={double:13,taunt:8,armor:8,dodge:7,grow:7,freeze:6,quake:6,poison:5,fight:5,rush:5,heal:4,draw:4,wave:4,ember:3,tough:4};
+ const bonus={double:13,taunt:8,armor:8,dodge:7,grow:7,freeze:6,quake:6,poison:5,fight:5,rush:5,wing:5,heal:4,fairy:4,draw:4,wave:4,ember:3,tough:4};
  const score=id=>{const m=MON[id];return m.atk*1.8+m.hp*1.05+m.rar*2.5+(bonus[kwOf(m).k]||0)+(g&&g.types?m.types.filter(t=>g.types.includes(t)).length*3:0);};
  const d=[];const want=diff<=2?{1:4,2:5,3:3}:diff<=5?{1:3,2:4,3:3,4:2}:{1:2,2:3,3:3,4:2,5:1,6:1};
  for(const c in want){const p=pool.filter(id=>MON[id].cost===+c).sort((a,b)=>score(b)-score(a));for(let k=0;k<want[c];k++)if(p.length)d.push(p[k%p.length]);}
@@ -2441,7 +2446,7 @@ const brand=()=>B&&B.rng?B.rng():rnd();
 // 필드 칸 수 (3칸 → 5칸으로 늘림)
 const BOARD_N=5;
 function mkPlayer(name,deck,hp,av,keep,owned=[],specials=false){return{name,hp,max:hp,mana:0,maxMana:0,deck:keep?deck.slice():shuffle(deck.slice()),hand:[],board:Array(BOARD_N).fill(null),av,fat:0,owned:(owned||[]).map(Number).filter(id=>MON[id]),specials:!!specials,powerUses:2};}
-function mkUnit(id){const m=MON[id];const kw=kwOf(m).k;return{id,atk:m.atk,hp:m.hp,max:m.hp,kw,att:kw==='rush'?1:0,frozen:0,dodge:kw==='dodge'?1:0,tough:kw==='tough'?1:0,grow:0,fresh:1,shield:0};}
+function mkUnit(id){const m=MON[id];const kw=kwOf(m).k;return{id,atk:m.atk,hp:m.hp,max:m.hp,kw,att:kw==='rush'?1:0,frozen:0,dodge:kw==='dodge'?1:0,tough:kw==='tough'?1:0,grow:0,fresh:1,shield:kw==='taunt'?1:0};}
 function playerRoll(P){return B&&B.pvp&&P&&P.drawRng?P.drawRng():brand();}
 function ownedBand(P,band){return (P&&P.owned||[]).filter(id=>MON[id]&&MON[id].cost>=band[0]&&MON[id].cost<=band[1]);}
 function drawSpecial(P){if(!P||!P.specials)return null;
@@ -2605,7 +2610,7 @@ async function summon(P,hi,slot){const card=P.hand[hi];let id=card;
  if(isRandomMonCard(card))fx(unitEl(P,slot),`${card.name}! ${m.name}`,'txt');
  const O=P===B.me?B.foe:B.me;renderBattle();slamFx(P,slot);await wait(380);
  // 나올 때 효과
- if(u.kw==='ember'){const t=O.board.map((x,i)=>x?i:-1).filter(i=>i>=0);if(t.length){const ti=t[Math.floor(brand()*t.length)];await dealUnit(O,ti,1,'불씨');}else{O.hp-=1;fx(heroEl(O),'-1','');}}
+ if(u.kw==='fairy'){const t=O.board.map((x,i)=>x?i:-1).filter(i=>i>=0);if(t.length){const ti=t[Math.floor(brand()*t.length)];const x=O.board[ti];x.atk=Math.max(0,x.atk-1);fx(unitEl(O,ti),'요정의 빛! 공격 -1','txt');sfx('heal');}}
  if(u.kw==='wave'){P.board.forEach((x,i)=>{if(x){x.hp++;x.max++;}});fx(unitEl(P,slot),'물결 +1','heal');sfx('heal');}
  if(u.kw==='heal'){const h=Math.min(2,P.max-P.hp);P.hp+=h;fx(heroEl(P),'+'+h,'heal');sfx('heal');}
  if(u.kw==='draw'){draw(P);fx(unitEl(P,slot),'카드 +1','txt');}
@@ -2802,7 +2807,7 @@ async function resolveAttack(A,D,si,tg,ok,cb,defReduce=0){const a=A.board[si];if
   await dealUnit(D,tg.u,dmg);
   if(a.kw==='freeze'&&D.board[tg.u])D.board[tg.u].frozen=1;
   if(a.kw==='poison'&&D.board[tg.u])D.board[tg.u].atk=Math.max(0,D.board[tg.u].atk-1);
-  if(!(B.wildMode&&D===B.foe)){let cd=d.atk;const k2=typeMul(d.id,a.id);cd=applyType(cd,k2);if(cd>0){await wait(220);await dealUnit(A,si,cd);}}
+  if(!(B.wildMode&&D===B.foe)){let cd=d.atk;const k2=typeMul(d.id,a.id);cd=a.kw==='wing'?0:applyType(cd,k2);if(d.kw==='wing')cd*=2;if(cd>0){await wait(220);await dealUnit(A,si,cd);}}
   if(note)fx(unitEl(A,si),note,'txt');}
  cleanup();renderBattle();checkEnd();}
 // 공부 기술: 에너지 2 → 문제 맞히면 카드 1장, 틀려도 설명을 보고 다시
@@ -2826,6 +2831,10 @@ async function startTurn(side){if(!B||B.over)return;closeInfo();if(B.coop&&side=
  // 얼음은 한 차례만
  P.board.forEach(u=>{if(u&&u.frozen&&(!B.coop||side==='foe'||Number(u.coopOwner??0)===B.coop.active)){u.frozen=0;u.att=0;}});
  if(!(B.wildMode&&side==='foe'))draw(P);
+ // 불씨: 내 차례가 시작될 때마다 상대 포켓몬 하나에 1 피해
+ if(!(B.wildMode&&side==='foe')){const O2=side==='me'?B.foe:B.me;const em=P.board.filter(u=>u&&u.kw==='ember').length;
+  for(let e=0;e<em&&!B.over;e++){const t=O2.board.map((x,i)=>x?i:-1).filter(i=>i>=0);if(t.length){const ti=t[Math.floor(brand()*t.length)];await dealUnit(O2,ti,1,'불씨');}else{O2.hp-=1;fx(heroEl(O2),'-1','');}}
+  if(em){cleanup();renderBattle();if(checkEnd())return;}}
  const rd=B.pvp?Math.ceil(B.turn/2):B.round;
  if(rd>=10&&!(B.wildMode&&P===B.foe)){const sd=rd-9;P.hp-=sd;renderBattle();fx(heroEl(P),`지쳤다 -${sd}`,'');if(checkEnd())return;}
  renderBattle();
@@ -2845,7 +2854,7 @@ async function foeTurn(){const fo=B.foe,me=B.me;B.busy=true;renderBattle();
    const faceDmg=fo.board.reduce((s,x)=>s+(x&&x.att>0&&!x.frozen?x.atk:0),0);
    if(taunts.length&&u.kw!=='sneak')tg={u:taunts.sort((a,b)=>me.board[a].hp-me.board[b].hp)[0]};
    else if(B.coop?bossLethal(faceDmg)>=0:faceDmg>=me.hp)tg=bossPickTrainer(faceDmg);
-   else{let best=null,bv=-1;me.board.forEach((x,j)=>{if(!x)return;const dm=applyType(u.atk+(u.kw==='fight'?1:0),typeMul(u.id,x.id));const back=applyType(x.atk,typeMul(x.id,u.id));const kill=dm>=x.hp,die=back>=u.hp;let v;
+   else{let best=null,bv=-1;me.board.forEach((x,j)=>{if(!x)return;const dm=applyType(u.atk+(u.kw==='fight'?1:0),typeMul(u.id,x.id));const back=u.kw==='wing'?0:applyType(x.atk,typeMul(x.id,u.id))*(x.kw==='wing'?2:1);const kill=dm>=x.hp,die=back>=u.hp;let v;
       if(B.gi>=0){
        // 관장은 처치 가능한 위협부터 제거하고, 처치가 어렵다면 위험한 상대에게 큰 피해를 줘요.
        v=kill?100+MON[x.id].cost*4-MON[u.id].cost*1.5+(!die?18:0)+(isTaunt(x)?5:0):Math.min(dm,x.hp)*1.8+x.atk*2+MON[x.id].cost*.7+(isTaunt(x)?6:0)+(x.kw==='grow'?3:0);
@@ -2865,7 +2874,7 @@ async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)
  else{const d=me.board[tg.u];if(!d)return;if(a.kw==='fight')dmg+=1;const k=typeMul(a.id,d.id);dmg=applyType(dmg,k);
   await skillMove(fo,i,unitEl(me,tg.u),true,false);if(k>=2)fx(unitEl(me,tg.u),'효과가 굉장했다!','txt');
   await dealUnit(me,tg.u,dmg);if(a.kw==='freeze'&&me.board[tg.u])me.board[tg.u].frozen=1;if(a.kw==='poison'&&me.board[tg.u])me.board[tg.u].atk=Math.max(0,me.board[tg.u].atk-1);
-  const cd=applyType(d.atk,typeMul(d.id,a.id));if(cd>0){await wait(200);await dealUnit(fo,i,cd);}}
+  let cd=a.kw==='wing'?0:applyType(d.atk,typeMul(d.id,a.id));if(d.kw==='wing')cd*=2;if(cd>0){await wait(200);await dealUnit(fo,i,cd);}}
  cleanup();renderBattle();checkEnd();}
 function battleMenu(){if(B&&B.wildMode){M(`<h2>야생 포켓몬 전투</h2><div class=explain style="font-size:14px">기존 배틀과 같은 방식으로 카드를 내고, 수학 문제를 풀어 공격해요. 야생 포켓몬은 트레이너 체력 없이 체력이 30% 이하가 되면 포획을 시도할 수 있어요.</div><div class=mbtns><button class="btn gold" data-a=x>계속 싸우기</button><button class="btn ghost" data-a=q>전투 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),q:async()=>{if(await confirmBox('야생 포켓몬과의 전투를 포기할까요? 이번 포획 기회는 사라져요.','포기하기','계속 싸우기')){closeM();finishEndlessWild('fled','야생 포켓몬 전투를 포기했어요.');}}});return;}M(`<h2>배틀 메뉴</h2><div class=explain style="font-size:14px">${Object.values(KW).filter((v,i,a)=>a.findIndex(x=>x.n===v.n)===i).map(k=>`${I(k.ic)} <b>${k.n}</b> ${k.d}`).join('<br>')}<br><br><b>타입 상성</b>: 상성이 좋으면 피해 ×1.5(효과가 굉장했다!), 나쁘면 −1. 공격받은 포켓몬은 반격해요.<br>10번째 차례부터는 두 트레이너 모두 조금씩 지쳐요.<br><br><b>특수 카드 뽑기</b>: 일반 덱 카드 50%, 랜덤 포켓몬 카드 20%, 기본 돌 4종 합계 20%(화염의 돌·물의 돌·전기의 돌·달의 돌 각각 5%), 태양의 돌 10%예요. 태양의 돌은 비용 0으로 사용하면 이번 턴 에너지가 1 늘어요. 랜덤 카드 중 마스터볼 20%(5~6코스트·비용 4), 파워볼 30%(3~4코스트·비용 2), 포켓볼 50%(1~2코스트·비용 1) 비율로 나와요.<br><br><b>공부 기술</b>: 전투마다 2회 사용할 수 있고, 에너지를 소모하지 않아요. 사용할 때마다 남은 횟수가 1씩 줄어요. <b>달의 돌</b>은 3코스트로 상대 포켓몬 하나를 1턴 동안 기절시켜요.</div>
  <div class=mbtns><button class="btn gold" data-a=x>계속하기</button>${B.pvp?'':`<button class="btn green" data-a=sv>${I('disk')} 저장하고 나가기</button>`}<button class="btn ghost" data-a=q>포기하기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),sv:()=>{if(B.busy||B.side!=='me'){toast('내 차례일 때 저장할 수 있어요');return;}const o=Object.assign({},B,{busy:false,sel:-1,pick:-1});delete o.rng;S.meta.bsave=JSON.stringify(o);saveLocal();closeM();B=null;$('#battle').classList.remove('on');$('#battle').innerHTML='';renderLeague();toast('배틀을 저장했어요! 지금 꺼도 다음에 이어서 할 수 있어요');},q:async()=>{if(await confirmBox('배틀을 포기할까요? 푼 문제는 기록에 남아요.','포기','계속')){closeM();if(B.pvp)pvpSend({t:'quit'});B.over=true;endBattle(false);}}});}
@@ -4350,7 +4359,9 @@ function scAfterBattle(u,pos,res){
  if(!res||['lost','fled','no-deck'].indexOf(res.outcome)>=0){scRenderBtFail(u,pos,res||{outcome:'lost'});return;}
  p.beat[u+':'+pos]=1;
  const id=scMonId(pg.who)||scMonId(pg.label);
- if(id&&(pg.kind==='wild'||pg.kind==='boss'||(pg.kind==='final'&&pg.phase===2))){p.col[id]=1;S.meta.dexSeen[id]=1;}
+ if(id&&(pg.kind==='wild'||pg.kind==='boss'||(pg.kind==='final'&&pg.phase===2))){p.col[id]=1;S.meta.dexSeen[id]=1;
+  // 일반 도감에도 추가해요. 이미 갖고 있으면 아무 일도 없이 넘어가요.
+  if(!S.meta.col[id]){addCard(id);if(S.meta.shard&&S.meta.shard[id])delete S.meta.shard[id];toast(`${scMonName(id)} 카드를 도감에 얻었어요!`);}}
  autoSave();sfx('rare');confetti(30);
  scShow(u,pos+1);
 }
