@@ -4587,7 +4587,7 @@ function makeEnglishQ(){
  return{q,a,ch:enChoices(a,ch.filter(x=>x!==a)),e,sk,key:sk+'|'+q+'|'+a,en:1,type};
 }
 const __pickQBeforeEnglish=pickQ;
-pickQ=function(opt={}){if(S.meta.questionMode==='english'&&!(typeof scIsScreen==='function'&&scIsScreen()))return makeEnglishQ();return __pickQBeforeEnglish(opt);};
+pickQ=function(opt={}){if(S.meta.questionMode==='english')return makeEnglishQ();return __pickQBeforeEnglish(opt);};
 const __foundUpdateBeforeEnglish=foundUpdate;
 foundUpdate=function(q,ok){if(q&&q.en)return;return __foundUpdateBeforeEnglish(q,ok);};
 const __recordAnswerBeforeEnglish=recordAnswer;
