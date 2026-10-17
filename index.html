@@ -1308,6 +1308,9 @@ button.rl-chip{cursor:pointer}button.rl-chip:hover{background:rgba(40,56,120,.9)
 .rl-deal{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.rl-dealc{display:flex;flex-direction:column;align-items:center;gap:3px}.rl-dealc small{font-family:'Jua',sans-serif;font-size:12px;color:#8a7d8f}
 .rl-bchips{display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:center;font-style:normal}
 .rl-bchips i{font-style:normal;font-family:'Jua',sans-serif;font-size:14px;background:rgba(10,18,46,.72);color:#fff;border-radius:999px;padding:1px 7px;cursor:help}
+.rl-plus{display:flex;align-items:center;font-family:'Black Han Sans',sans-serif;font-size:28px;color:#8a7d8f;padding:0 2px}
+.rl-slot.rnd{border-style:solid;border-color:#d7cdf0;background:#f5f0ff;color:#9a6bff;font-size:24px}
+.rl-slot[data-rm]{cursor:pointer}
 </style>
 
 
@@ -4662,7 +4665,7 @@ const RL={
  winHeal:3,                            // 전투 승리 때 기본 회복
  restHeal:8,                           // 휴식 회복량
  removeBase:75,removeStep:25,          // 상점 카드 삭제 가격
- keepPicked:false                      // true: 고른 스타팅이 덱에 그대로 들어가요 / false: 전체 도감에서 랜덤 배정(같은 타입 우선)
+ pick:3,rand:5                         // 내가 고르는 카드 수 + 완전 랜덤 카드 수
 };
 const rlMeta=()=>{const m=S.meta;if(!m.rl||typeof m.rl!=='object'||m.rl.v!==RL_VER)m.rl={v:RL_VER,runs:0,clears:0,best:0,relicSeen:{},run:null};return m.rl;};
 const RUN=()=>rlMeta().run;
@@ -4727,19 +4730,14 @@ function rlRollNormal(s){const r=rlRollRar({1:Math.max(15,58-s*5),2:30,3:12+s*4}
 function rlRandMon(w,ban){const b=new Set(ban||[]);for(let k=0;k<20;k++){const r=rlRollRar(w);const id=rpick(rlPoolByRar(r,r));if(!b.has(id))return id;}return rpick(MON_IDS);}
 function rlFoeStats(kind,id,step){const b=MON[id];let hpM,atkB;
  if(kind==='elite'){hpM=.5+step*.035;atkB=-2;}
- else if(kind==='boss'){hpM=.8;atkB=-2;}
+ else if(kind==='boss'){return{hp:b.hp*15,atk:b.atk};}
  else{hpM=.62+step*.045;atkB=step>=6?0:-1;}
  return{hp:Math.max(8,Math.round(b.hp*10*hpM)),atk:Math.max(1,b.atk+atkB)};}
 function rlStarterIds(){const set=new Set();const walk=id=>{if(!MON[id]||set.has(id))return;set.add(id);MON[id].to.forEach(walk);};Object.keys(STARTERS).forEach(k=>STARTERS[k].forEach(walk));const col=S.meta.col||{};return [...set].filter(id=>col[id]).sort((a,b)=>a-b);}
-function rlDeal(picked){
+function rlDeal(picked){ // 내가 고른 3장 + 전체 도감에서 완전 랜덤 5장
  const used=new Set(),deck=[],pairs=[];
- for(let i=0;i<5;i++){const st=picked[i];let id;
-  if(st!=null&&RL.keepPicked)id=st;
-  else{
-   const r=rlRollRar({1:50,2:33,3:12,4:5});let pool=rlPoolByRar(r,r).filter(x=>!used.has(x));
-   if(st!=null){const same=pool.filter(x=>MON[x].types.some(t=>MON[st].types.indexOf(t)>=0));if(same.length)pool=same;}
-   id=rpick(pool.length?pool:MON_IDS.filter(x=>!used.has(x)));}
-  used.add(id);deck.push(id);pairs.push([st==null?null:st,id]);}
+ picked.slice(0,RL.pick).forEach(id=>{if(MON[id]&&!used.has(id)){used.add(id);deck.push(id);pairs.push([1,id]);}});
+ while(deck.length<RL.pick+RL.rand){const id=rpick(MON_IDS.filter(x=>!used.has(x)));used.add(id);deck.push(id);pairs.push([null,id]);}
  return{deck,pairs};}
 function rlGold(n){const run=RUN();const g=Math.round(n*(rlHas('wallet')?1.25:1));run.gold+=g;return g;}
 function rlHeal(n){const run=RUN();const h=Math.max(0,Math.min(run.max-run.hp,n));run.hp+=h;return h;}
@@ -4809,19 +4807,29 @@ function rlMkNode(run,t){
 function rlRollRand(run){
  const w={normal:20,elite:7,relic:9,rest:9,shop:7,trial:12,event:36};let tot=0;for(const k in w)tot+=w[k];let r=rnd()*tot,t='event';for(const k in w){r-=w[k];if(r<=0){t=k;break;}}
  return rlMkNode(run,t);}
+// 분기점 짜임: 전투를 피해 갈 수 없도록 단계마다 나오는 종류를 정해 두었어요.
+const RL_PLAN=[
+ {fixed:['normal','normal','normal']},
+ {pick:3,from:['relic','event','trial','rest','normal']},
+ {fixed:['normal','normal','elite']},
+ {pick:3,from:['relic','shop','gym','event','rest']},
+ {fixed:['gym','elite','normal']},
+ {pick:3,from:['shop','rest','event','relic']},
+ {fixed:['elite','elite','gym']},
+ {fixed:['rest'],pick:2,from:['elite','shop','relic','event']}
+];
 function rlGenOpts(run){
  const s=run.step;
  if(s>=RL.steps)return[{t:'boss',id:run.boss,sc:rint(0,99)}];
- const cnt=3+(rlHas('map',run)?1:0);let types=[];
- if(s===RL.steps-1){types=['rest','shop','elite'];if(cnt>3)types.push('relic');}
- else{
-  const ok=t=>!(t==='elite'&&s<2)&&!(t==='gym'&&s<3)&&!(t==='shop'&&s<1)&&!(t==='rest'&&s<2);
-  const pool=Object.keys(RL_W).filter(ok);
-  if(s===0)types.push('normal');
-  if(s>=4&&!run.gymSeen&&pool.indexOf('gym')>=0)types.push('gym');
-  while(types.length<cnt){const cand=pool.filter(t=>types.indexOf(t)<0);if(!cand.length)break;let tot=cand.reduce((a,t)=>a+RL_W[t],0),r=rnd()*tot,pick=cand[0];for(const t of cand){r-=RL_W[t];if(r<=0){pick=t;break;}}types.push(pick);}
-  types=shuffle(types);}
- return types.map(t=>rlMkNode(run,t));}
+ const plan=RL_PLAN[s]||RL_PLAN[1],extra=rlHas('map',run)&&s>0?1:0;
+ let types=(plan.fixed||[]).slice();
+ if(plan.pick){const cand=shuffle(plan.from.slice());types=types.concat(cand.slice(0,plan.pick+extra));}
+ else if(extra){const c=['relic','event','shop','rest'].filter(t=>types.indexOf(t)<0);types.push(rpick(c));}
+ types=shuffle(types);
+ const nodes=types.map(t=>rlMkNode(run,t));
+ // 같은 단계의 전투 상대는 서로 다른 포켓몬으로
+ const seen=new Set();nodes.forEach(n=>{if(n.id==null||n.t==='boss')return;for(let k=0;k<30&&seen.has(n.id);k++){n.id=n.t==='elite'?rpick(rlPoolByRar(4,5)):rlRollNormal(s);}seen.add(n.id);});
+ return nodes;}
 
 // ---------- 공통 화면 도구 ----------
 let RL_BUSY=false;
@@ -4999,8 +5007,8 @@ async function rlStart(){
  rl.run={id:Date.now(),bg,boss,step:0,opts:null,cur:null,hist:[],hp:max,max,gold:0,deck:dl.deck.slice(),relics:[],used:{},fights:0,q:0,qc:0,rmCost:RL.removeBase,gymSeen:0,start:dl.pairs};
  rl.runs++;rl.lastBg=bg;sfx('rare');rlSave();rlPrologue();}
 function rlPrologue(){const run=RUN(),reg=SC_REGIONS[run.bg];rlSetBg('');
- const deal=run.start.map(p=>`<div class="rl-dealc">${p[0]!=null&&!RL.keepPicked?`<small>${esc(MON[p[0]].name)} →</small>`:'<small>&nbsp;</small>'}${cardHTML(p[1],{size:'deck'})}</div>`).join('');
- rlShell(`<div class="scv-stage"><div class="scv-card rl-scene"><span class="sc-tag">PROLOGUE · ${reg.icon} ${esc(reg.name)}</span><h3>끝없는 길의 시작</h3><p class="sc-line">${rlTxt(reg.theme+'. 이곳 {p}의 끝에는 모두가 두려워하는 존재, {m이} 기다린다는 소문이 있다.\n\n주인공은 도감 속에서 불러낸 다섯 동료와 함께 첫걸음을 내디뎠다. 한 번 쓰러지면 모험은 끝! 신중하게, 그리고 영리하게 나아가자.',{p:reg.place,m:MON[run.boss].name})}</p><h4 class="rl-h">🎲 오늘의 동료 5장</h4><div class="rl-deal">${deal}</div><div class="rl-foe" style="margin-top:12px"><div class="mut" style="font-size:13px">이 모험의 보스</div>${monImg(run.boss,'front')}<b>${esc(MON[run.boss].name)}</b></div><div class="mbtns"><button class="btn gold big" id="rlGo">첫 분기점으로 ▶</button></div></div></div>`);
+ const deal=run.start.map(p=>`<div class="rl-dealc">${p[0]!=null?'<small>⭐ 내 카드</small>':'<small>🎲 랜덤</small>'}${cardHTML(p[1],{size:'deck'})}</div>`).join('');
+ rlShell(`<div class="scv-stage"><div class="scv-card rl-scene"><span class="sc-tag">PROLOGUE · ${reg.icon} ${esc(reg.name)}</span><h3>끝없는 길의 시작</h3><p class="sc-line">${rlTxt(reg.theme+'. 이곳 {p}의 끝에는 모두가 두려워하는 존재, {m이} 기다린다는 소문이 있다.\n\n주인공은 내가 고른 동료, 그리고 우연히 만난 동료까지 여덟 장의 카드와 함께 첫걸음을 내디뎠다. 한 번 쓰러지면 모험은 끝! 신중하게, 그리고 영리하게 나아가자.',{p:reg.place,m:MON[run.boss].name})}</p><h4 class="rl-h">🎲 시작 덱 (내 카드 3장 + 랜덤 5장)</h4><div class="rl-deal">${deal}</div><div class="rl-foe" style="margin-top:12px"><div class="mut" style="font-size:13px">이 모험의 보스</div>${monImg(run.boss,'front')}<b>${esc(MON[run.boss].name)}</b></div><div class="mbtns"><button class="btn gold big" id="rlGo">첫 분기점으로 ▶</button></div></div></div>`);
  $('#rlGo').onclick=()=>{sfx('page');rlRenderMap();};}
 function rlRewardCalc(run,win){let r;
  if(win)r={xp:180+run.fights*8,coins:200+run.fights*10,candy:60+run.fights*3,dust:30+run.fights*2};
@@ -5026,25 +5034,36 @@ function rlEnd(win,why){
  $('#rlAgain').onclick=()=>{sfx('tap');rlRenderEntry();};$('#rlHome').onclick=()=>{sfx('tap');scBackToHub();};}
 
 // ---------- 모험 입구 ----------
+let RL_KW='';
 function rlRenderEntry(){
  const rl=rlMeta(),run=rl.run;S.screen='scenarioRLEntry';
- rlSetBg(run?'':'',run?run.bg:(rl.lastBg!=null?rl.lastBg:4));
+ rlSetBg('',run?run.bg:(rl.lastBg!=null?rl.lastBg:4));
  const stats=`<div class="sc-reward-list"><div class="sc-reward"><strong>${rl.runs}</strong>도전</div><div class="sc-reward"><strong>${rl.clears}</strong>클리어</div><div class="sc-reward"><strong>${Math.min(rl.best||0,RL.steps+1)} / ${RL.steps+1}</strong>최고 단계</div><div class="sc-reward"><strong>${Object.keys(rl.relicSeen).length}/${Object.keys(RL_RELICS).length}</strong>유물 도감</div></div>`;
- const rules=`<div class="rl-rules"><div>🎲 <b>덱 5장</b>으로 출발! 카드 수에는 제한이 없어요.</div><div>🗺️ 분기점을 골라 ${RL.steps}번 나아가면 <b>보스</b>가 기다려요.</div><div>⚔️ 전투 · 💀 엘리트 · 🏟️ 관장 · 🏺 유물 · ⛺ 휴식 · 🛒 상점 · 🎲 랜덤 · 🎓 수학 시련</div><div>💰 모험 중 얻은 <b>포켓몬·유물·골드</b>는 모험 안에서만 써요.</div><div>🎁 보스를 쓰러뜨리면 경험치·코인·사탕·별가루와 <b>4~5성 포켓몬 1장</b>!</div><div>💔 트레이너 체력이 0이 되면 모험이 끝나요.</div></div>`;
+ const rules=`<div class="rl-rules"><div>🃏 <b>내 카드 ${RL.pick}장 + 완전 랜덤 ${RL.rand}장</b> = ${RL.pick+RL.rand}장으로 출발! 카드 수 제한은 없어요.</div><div>🗺️ 분기점을 골라 ${RL.steps}번 나아가면 <b>보스</b>가 기다려요.</div><div>⚔️ 전투 · 💀 엘리트 · 🏟️ 관장 · 🏺 유물 · ⛺ 휴식 · 🛒 상점 · 🎲 랜덤 · 🎓 수학 시련</div><div>💰 모험 중 얻은 <b>포켓몬·유물·골드</b>는 모험 안에서만 써요. (가져간 내 카드도 사라지지 않아요!)</div><div>🎁 보스를 쓰러뜨리면 경험치·코인·사탕·별가루와 <b>4~5성 포켓몬 1장</b>!</div><div>💔 트레이너 체력이 0이 되면 모험이 끝나요.</div></div>`;
  let body;
  if(run){const reg=SC_REGIONS[run.bg];
   body=`<div class="scv-card"><span class="sc-tag">▶ 진행 중인 모험</span><h3>${reg.icon} ${esc(reg.name)}</h3><div class="sc-reward-list"><div class="sc-reward"><strong>${Math.min(run.step+1,RL.steps+1)} / ${RL.steps+1}</strong>단계</div><div class="sc-reward"><strong>${run.hp}/${run.max}</strong>체력</div><div class="sc-reward"><strong>${run.gold}</strong>골드</div><div class="sc-reward"><strong>${run.deck.length}</strong>덱 카드</div><div class="sc-reward"><strong>${run.relics.length}</strong>유물</div></div><div class="mbtns"><button class="btn gold big" id="rlResume">▶ 이어하기</button><button class="btn ghost" id="rlAbandon">포기하기</button></div></div>`;}
  else{
-  const owned=rlStarterIds();
-  const slots=Array.from({length:5},(_,i)=>{const id=RL_SEL[i];return `<div class="rl-slot${id!=null?' on':''}">${id!=null?monImg(id,'front'):'<span>?</span>'}</div>`;}).join('');
-  body=`<div class="scv-card"><span class="sc-tag">🎲 모험 준비</span><h3>스타팅 포켓몬 고르기 <small class="mut" style="font-size:.6em">${RL_SEL.length} / 5</small></h3><p class="sc-note">내가 가진 스타팅 포켓몬 중 최대 5마리를 골라요. <b>시작</b>을 누르면 덱 5장이 <b>전체 도감에서 랜덤</b>으로 배정돼요${RL.keepPicked?'(고른 포켓몬도 함께!)':' (고른 스타팅과 같은 타입이 우선 나와요)'}. 안 골라도 시작할 수 있어요.</p><div class="rl-slots">${slots}</div>${owned.length?`<div class="colGrid" id="rlStGrid">${owned.map(id=>cardHTML(id,{size:'deck',cls:RL_SEL.indexOf(id)>=0?'rl-selected':''})).join('')}</div>`:'<p class="mut" style="text-align:center;margin:12px">아직 스타팅 포켓몬이 없어요. 그대로 시작하면 덱 5장이 랜덤 배정돼요.</p>'}<div class="mbtns"><button class="btn blue sm" id="rlAutoSel">자동 선택</button><button class="btn ghost sm" id="rlClrSel">선택 해제</button><button class="btn red big" id="rlStart">🎲 모험 시작</button></div></div>`;}
+  const col=S.meta.col||{},owned=Object.keys(col).map(Number).filter(id=>MON[id]).sort((a,b)=>MON[a].cost-MON[b].cost||a-b);
+  const need=Math.min(RL.pick,owned.length);
+  RL_SEL=RL_SEL.filter(id=>col[id]).slice(0,RL.pick);
+  const names=[];owned.forEach(id=>{const n=kwOf(MON[id]).n;if(names.indexOf(n)<0)names.push(n);});if(RL_KW&&names.indexOf(RL_KW)<0)RL_KW='';
+  const cnt=n=>owned.filter(id=>kwOf(MON[id]).n===n).length;
+  const sel=RL_KW?Object.keys(KW).map(k=>KW[k]).find(k=>k.n===RL_KW):null;
+  const filters=`<div class="filters" style="margin:6px 0"><button class="fbtn${RL_KW?'':' on'}" data-kw="">전체 특성 <small>${owned.length}</small></button>${names.map(n=>{const k=Object.keys(KW).map(x=>KW[x]).find(v=>v.n===n);return `<button class="fbtn${RL_KW===n?' on':''}" data-kw="${esc(n)}">${I(k.ic)} ${esc(n)} <small>${cnt(n)}</small></button>`;}).join('')}</div>${sel?`<div class="mut" style="font-size:13px;margin-bottom:8px">${I(sel.ic)} <b>${esc(sel.n)}</b> · ${esc(sel.d)}</div>`:''}`;
+  const slots=Array.from({length:RL.pick},(_,i)=>{const id=RL_SEL[i];return `<div class="rl-slot${id!=null?' on':''}" ${id!=null?`data-rm="${id}"`:''} title="${id!=null?'누르면 빼요':''}">${id!=null?monImg(id,'front'):'<span>?</span>'}</div>`;}).join('')+`<div class="rl-plus">+</div>`+Array.from({length:RL.rand},()=>'<div class="rl-slot rnd"><span>🎲</span></div>').join('');
+  const ready=RL_SEL.length>=need;
+  body=`<div class="scv-card"><span class="sc-tag">🎲 모험 준비</span><h3>데려갈 내 포켓몬 고르기 <small class="mut" style="font-size:.6em">${RL_SEL.length} / ${need}</small></h3><p class="sc-note">내가 가진 포켓몬 중 <b>${RL.pick}장</b>을 골라요. 고른 카드는 모험에서 바로 쓸 수 있고, 시작하면 <b>완전 랜덤 ${RL.rand}장</b>이 더해져 총 ${RL.pick+RL.rand}장으로 출발해요. (같은 카드를 여러 장 가져가진 못해요)</p><div class="rl-slots">${slots}</div>${owned.length?`${filters}<div class="colGrid" id="rlStGrid">${owned.filter(id=>!RL_KW||kwOf(MON[id]).n===RL_KW).map(id=>cardHTML(id,{size:'deck',cnt:col[id],cls:RL_SEL.indexOf(id)>=0?'rl-selected':''})).join('')}</div>`:'<p class="mut" style="text-align:center;margin:12px">아직 가진 포켓몬이 없어요. 그대로 시작하면 덱 8장이 모두 랜덤이에요.</p>'}<div class="mbtns"><button class="btn blue sm" id="rlAutoSel">자동 선택</button><button class="btn ghost sm" id="rlClrSel">선택 해제</button><button class="btn red big" id="rlStart" ${ready?'':'disabled'}>🎲 모험 시작${ready?'':` (${need-RL_SEL.length}장 더 골라요)`}</button></div></div>`;}
  rlShell(`<div class="scv-card rl-intro"><span class="sc-tag">✦ 로그라이크 모험</span><h3>끝없는 길</h3>${rules}${stats}<div class="mbtns"><button class="btn purple sm" id="rlDex">📖 유물 도감</button></div></div>${body}`,{noRun:true,screen:'scenarioRLEntry'});
  $('#rlDex').onclick=()=>{sfx('tap');rlRelicDex();};
  if(run){$('#rlResume').onclick=()=>{sfx('tap');if(run.cur)rlEnter(run.cur);else rlRenderMap();};$('#rlAbandon').onclick=async()=>{sfx('tap');if(await confirmBox('진행 중인 모험을 포기할까요?<br><span class=mut style="font-size:14px">간 만큼의 작은 보상만 받아요.</span>','포기하기','취소'))rlEnd(false,'abandon');};return;}
- const g=$('#rlStGrid');if(g)g.querySelectorAll('.card').forEach(c=>c.onclick=()=>{const id=+c.dataset.id,i=RL_SEL.indexOf(id);if(i>=0)RL_SEL.splice(i,1);else if(RL_SEL.length<5)RL_SEL.push(id);else{toast('최대 5마리까지 고를 수 있어요');return;}sfx('tap');const y=$('#view').scrollTop;rlRenderEntry();$('#view').scrollTop=y;});
- $('#rlAutoSel').onclick=()=>{sfx('tap');const o=rlStarterIds();RL_SEL=shuffle(o.slice()).slice(0,5);rlRenderEntry();};
- $('#rlClrSel').onclick=()=>{sfx('tap');RL_SEL=[];rlRenderEntry();};
- $('#rlStart').onclick=()=>{sfx('tap');RL_SEL=RL_SEL.filter(id=>S.meta.col[id]);rlStart();};}
+ const keep=()=>{const y=$('#view').scrollTop;rlRenderEntry();$('#view').scrollTop=y;};
+ $('#view').querySelectorAll('[data-kw]').forEach(b=>b.onclick=()=>{sfx('tap');RL_KW=b.dataset.kw;keep();});
+ $('#view').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{sfx('tap');RL_SEL=RL_SEL.filter(x=>x!==+b.dataset.rm);keep();});
+ const g=$('#rlStGrid');if(g)g.querySelectorAll('.card').forEach(c=>c.onclick=()=>{const id=+c.dataset.id,i=RL_SEL.indexOf(id);if(i>=0)RL_SEL.splice(i,1);else if(RL_SEL.length<RL.pick)RL_SEL.push(id);else{toast(`최대 ${RL.pick}장까지 고를 수 있어요. 위 칸을 눌러 빼거나 카드를 다시 눌러요`);return;}sfx('tap');keep();});
+ $('#rlAutoSel').onclick=()=>{sfx('tap');RL_SEL=shuffle(owned.slice()).slice(0,need);keep();};
+ $('#rlClrSel').onclick=()=>{sfx('tap');RL_SEL=[];keep();};
+ $('#rlStart').onclick=()=>{if($('#rlStart').disabled){toast(`내 카드를 ${need}장 골라 주세요`);return;}sfx('tap');RL_SEL=RL_SEL.filter(id=>S.meta.col[id]);rlStart();};}
 function rlLaunch(){const m=S.meta;if(!codeValid()||!m.name||!m.starter)return scLaunch();rlMeta();RL_SEL=[];rlRenderEntry();}
 
 // ---------- 전투 효과 연결 (유물) ----------
