@@ -4721,7 +4721,7 @@ const RL={
  typeMul:1.5,                          // 속성 유물: 해당 속성 공격 피해 배수 (2로 올리면 더 쎄져요)
  winHeal:3,                            // 전투 승리 때 기본 회복
  restHeal:8,                           // 휴식 회복량
- removeBase:75,removeStep:25,          // 상점 카드 삭제 가격
+ removeBase:110,removeStep:40,          // 상점 카드 삭제 가격
  pick:3,rand:5                         // 내가 고르는 카드 수 + 완전 랜덤 카드 수
 };
 const rlMeta=()=>{const m=S.meta;if(!m.rl||typeof m.rl!=='object'||m.rl.v!==RL_VER)m.rl={v:RL_VER,runs:0,clears:0,best:0,relicSeen:{},run:null};return m.rl;};
@@ -4738,7 +4738,7 @@ const RL_NODE={
  rest:{ic:'⛺',n:'휴식',d:'체력을 회복하거나 마음에 안 드는 카드를 정리해요.',c:'#3cc47c'},
  shop:{ic:'🛒',n:'상점',d:'골드로 유물과 포켓몬을 사요.',c:'#ff6fa5'},
  rand:{ic:'🎲',n:'랜덤',d:'무슨 일이 생길지 아무도 몰라요!',c:'#8a7d8f'},
- trial:{ic:'🎓',n:'수학 시련',d:'문제 3개! 많이 맞힐수록 큰 보상을 받아요.',c:'#24a8ba'},
+ trial:{ic:'🎓',n:'시련',d:'문제 3개! 많이 맞힐수록 큰 보상을 받아요.',c:'#24a8ba'},
  event:{ic:'❓',n:'사건',d:'길 위에서 뜻밖의 일이 벌어졌어요.',c:'#8e3bb1'},
  boss:{ic:'👑',n:'보스',d:'이 층의 마지막 상대예요!',c:'#d9393f'}
 };
@@ -4750,7 +4750,7 @@ const RL_W={normal:34,elite:13,gym:11,relic:11,rest:12,shop:12,rand:16,trial:11}
 // reward: 보스를 잡았을 때 포켓몬 카드 ★ 확률(가중치, 합이 100이 아니어도 돼요)
 const RL_FLOOR={
  1:{foe:{normal:{atk:-2,hp:5,att:1},boss:{atk:-1,hp:8,att:2}},reward:{3:60,4:35,5:5}},
- 2:{foe:{normal:{atk:-1,hp:7,att:2},boss:{atk:0,hp:10,att:2}},reward:{3:40,4:40,5:20}},
+ 2:{foe:{normal:{atk:-1,hp:7,att:2},boss:{atk:0,hp:10,att:2}},reward:{3:30,4:50,5:20}},
  3:{foe:{normal:{atk:0,hp:9,att:2},boss:{atk:1,hp:12,att:2}},reward:{4:60,5:40}}
 };
 
@@ -4782,7 +4782,8 @@ const RL_TYPE_RELIC=[[0,'행운의 리본','🎀'],[1,'지옥불','🔥'],[2,'�
 RL_TYPE_RELIC.forEach(a=>rlDef('t'+a[0],a[1],a[2],`${TYPE_KO[a[0]]} 타입 포켓몬의 공격 피해 ×${RL.typeMul}`,2,{type:a[0]}));
 const RL_RAR=['','일반','희귀','전설'];
 const RL_RAR_C=['','#7e8794','#4d9cff','#ffb321'];
-const rlPrice={relic:{1:70,2:115,3:190},mon:{1:30,2:55,3:95,4:165,5:260}};
+const rlPrice={relic:{1:95,2:165,3:330},mon:{1:45,2:85,3:150,4:300,5:480}};
+const RL_HEAL_PRICE=75;
 
 function rlAtkMul(u){const run=RUN();if(!run||!u||!MON[u.id])return 1;const ty=MON[u.id].types;let n=0;run.relics.forEach(k=>{const d=RL_RELICS[k];if(d&&d.type!=null&&ty.indexOf(d.type)>=0)n++;});return (n?1+(RL.typeMul-1)*n:1)*(rlHas('prism',run)?1.2:1);}
 function rlRelicOffer(run,n,bias){
@@ -5138,16 +5139,16 @@ function rlRest(m,run){const heal=RL.restHeal+(rlHas('camp')?4:0);rlSetBg('camp'
   {l:`💤 푹 쉰다 <small>체력 +${heal}</small>`,c:'green',big:1,f:()=>{const h=rlHeal(heal);sfx('heal');rlFinish(m,`포켓몬들과 낮잠 한숨! 일어나니 몸이 깃털처럼 가볍다. ❤️ +${h}`);}},
   {l:'🗑️ 카드 1장 정리하기 <small>마음에 안 드는 카드를 덱에서 삭제</small>',c:'blue',dis:run.deck.length<=1,why:'덱에 카드가 1장뿐이에요',f:async()=>{const id=await rlPickDeckCard('정리할 카드','덱에서 영영 없애요. 카드가 줄면 좋은 카드를 더 자주 뽑아요!',run.deck,x=>`<b>${esc(MON[x].name)}</b> 카드를 덱에서 삭제할까요?`);if(id==null)return;run.deck.splice(run.deck.indexOf(id),1);rlFinish(m,`<b>${esc(MON[id].name)}</b> 카드와 작별했다. "그동안 고마웠어…" 덱이 가벼워졌다! (덱 ${run.deck.length}장)`);}}]});}
 function rlShop(m,run){
- if(!m.st){const rel=rlRelicOffer(run,3).map(d=>d.k),mons=[];while(mons.length<4)mons.push(rlRandMon({1:25,2:35,3:25,4:15},mons));m.st={rel,mons,sold:{},heal:0};rlSave();}
+ if(!m.st){const rel=rlRelicOffer(run,3).map(d=>d.k),mons=[];const leg=Object.keys(RL_RELICS).map(k=>RL_RELICS[k]).filter(d=>d.r===3&&!d.ex&&run.relics.indexOf(d.k)<0&&rel.indexOf(d.k)<0);if(leg.length){const d=rpick(leg);rel.push(d.k);rlMeta().relicSeen[d.k]=1;}while(mons.length<3)mons.push(rlRandMon({1:25,2:35,3:30,4:10},mons));while(mons.length<5)mons.push(rlRandMon({4:70,5:30},mons));m.st={rel,mons,sold:{},heal:0,v:2};rlSave();}
  const st=m.st,pr=(p)=>`<div class="pr${run.gold>=p?'':' no'}">🪙 ${p}</div>`;
- const relH=st.rel.map((k,i)=>{const d=RL_RELICS[k],p=rlCost(rlPrice.relic[d.r]),sold=st.sold['r'+i];return `<div class="rl-shopi${sold?' sold':''}">${rlRelicHTML(d,`data-buy="r${i}" ${sold?'disabled':''}`)}${sold?'<div class="pr no">품절</div>':pr(p)}</div>`;}).join('');
- const monH=st.mons.map((id,i)=>{const p=rlCost(rlPrice.mon[MON[id].rar]),sold=st.sold['m'+i];return `<div class="rl-shopi${sold?' sold':''}"><div class="rl-shopc" ${sold?'':`data-buy="m${i}"`}>${cardHTML(id,{size:'deck'})}</div>${sold?'<div class="pr no">품절</div>':pr(p)}</div>`;}).join('');
- const rmP=rlCost(run.rmCost),hlP=rlCost(45);
+ const relH=st.rel.map((k,i)=>{const d=RL_RELICS[k],p=rlCost(rlPrice.relic[d.r]),sold=st.sold['r'+i];return `<div class="rl-shopi${sold?' sold':''}">${d.r===3?'<div class="mut" style="font-size:12px;font-weight:900;color:#ffb321">✨ 고급</div>':''}${rlRelicHTML(d,`data-buy="r${i}" ${sold?'disabled':''}`)}${sold?'<div class="pr no">품절</div>':pr(p)}</div>`;}).join('');
+ const monH=st.mons.map((id,i)=>{const p=rlCost(rlPrice.mon[MON[id].rar]),sold=st.sold['m'+i];return `<div class="rl-shopi${sold?' sold':''}">${MON[id].rar>=4?'<div class="mut" style="font-size:12px;font-weight:900;color:#ffb321">✨ 고급</div>':''}<div class="rl-shopc" ${sold?'':`data-buy="m${i}"`}>${cardHTML(id,{size:'deck'})}</div>${sold?'<div class="pr no">품절</div>':pr(p)}</div>`;}).join('');
+ const rmP=rlCost(run.rmCost),hlP=rlCost(RL_HEAL_PRICE);
  rlScene(m,{tag:rlTag(m,'상점'),ic:'🛒',title:'떠돌이 상점',after:1,text:rlText(m,run),extra:`<h4 class="rl-h">🏺 유물</h4><div class="rl-shoprow">${relH}</div><h4 class="rl-h">🃏 포켓몬 카드</h4><div class="rl-shoprow">${monH}</div><h4 class="rl-h">🛠️ 서비스</h4><div class="rl-svc"><button class="btn blue" data-buy="rm">🗑️ 카드 1장 삭제 <small>🪙 ${rmP}</small></button><button class="btn green" data-buy="hl" ${st.heal?'disabled':''}>💊 회복약 (체력 +8) <small>${st.heal?'품절':'🪙 '+hlP}</small></button></div>`,btns:[{l:'상점을 떠난다 ▶',c:'gold',big:1,f:()=>{m.done=1;m.msg='';rlSave();rlAdvance();}}]});
  $('#view').querySelectorAll('[data-buy]').forEach(el=>el.onclick=()=>{if(el.disabled)return;rlBuy(m,run,el.dataset.buy);});}
 async function rlBuy(m,run,key){const st=m.st;let price,name,doit;
  if(key==='rm'){price=rlCost(run.rmCost);name='카드 삭제 서비스';if(run.deck.length<=1){toast('덱에 카드가 1장뿐이에요');return;}}
- else if(key==='hl'){price=rlCost(45);name='회복약';}
+ else if(key==='hl'){price=rlCost(RL_HEAL_PRICE);name='회복약';}
  else if(key[0]==='r'){const d=RL_RELICS[st.rel[+key.slice(1)]];price=rlCost(rlPrice.relic[d.r]);name=`${d.ic} ${d.n}`;}
  else{const id=st.mons[+key.slice(1)];price=rlCost(rlPrice.mon[MON[id].rar]);name=`${MON[id].name} 카드`;}
  if(run.gold<price){sfx('wrong');toast('골드가 모자라요');return;}
@@ -5158,8 +5159,8 @@ async function rlBuy(m,run,key){const st=m.st;let price,name,doit;
  else{st.sold[key]=1;run.deck.push(st.mons[+key.slice(1)]);sfx('rare');}
  run.gold-=price;sfx('coin');rlSave();const y0=$('#view').scrollTop;rlShop(m,run);$('#view').scrollTop=y0;}
 async function rlTrial(m,run){
- rlScene(m,{tag:rlTag(m,'수학 시련'),ic:'🎓',title:'수학 시련',after:1,text:rlText(m,run),extra:`<div class="rl-trialrw"><span>0개 🪙10</span><span>1개 🪙35</span><span>2개 🪙70 · ❤️+3</span><span>3개 🪙100 · ❤️+5 · 유물 3택1</span></div>`,btns:[{l:'🎓 도전! (문제 3개)',c:'blue',big:1,f:async()=>{if(RL_BUSY)return;RL_BUSY=true;let ok=0;
-  try{for(let i=0;i<3;i++){const r=await rlAsk(`수학 시련 ${i+1} / 3`,partnerId());run.q++;if(r.ok){run.qc++;ok++;}}}finally{RL_BUSY=false;}
+ rlScene(m,{tag:rlTag(m,'시련'),ic:'🎓',title:'시련',after:1,text:rlText(m,run),extra:`<div class="rl-trialrw"><span>0개 🪙10</span><span>1개 🪙35</span><span>2개 🪙70 · ❤️+3</span><span>3개 🪙100 · ❤️+5 · 유물 3택1</span></div>`,btns:[{l:'🎓 도전! (문제 3개)',c:'blue',big:1,f:async()=>{if(RL_BUSY)return;RL_BUSY=true;let ok=0;
+  try{for(let i=0;i<3;i++){const r=await rlAsk(`시련 ${i+1} / 3`,partnerId());run.q++;if(r.ok){run.qc++;ok++;}}}finally{RL_BUSY=false;}
   const R=[{g:10,h:0,t:'0개! 괜찮아, 석판도 처음엔 다 틀렸을 거야.'},{g:35,h:0,t:'반은 성공! 석판이 "음, 나쁘지 않네" 하며 보상을 뱉었다.'},{g:70,h:3,t:'오~ 제법인데? 길이 환하게 열렸다!'},{g:100,h:5,t:'만점!! 석판이 너무 눈부셔서 선글라스가 필요하다!'}][ok];
   const g=rlGold(R.g),h=R.h?rlHeal(R.h):0;let extra='';
   if(ok===3){const offers=rlRelicOffer(run,3,10);if(offers.length){const k=await rlRelicChoice('완벽해요! 유물을 골라요',offers);if(k){rlGetRelic(k);extra=`<br>${RL_RELICS[k].ic} <b>${esc(RL_RELICS[k].n)}</b> 획득!`;}}}
@@ -5213,6 +5214,7 @@ async function rlBattleEnd(m,kind,win,me,fled){
   run.deck.push(cid);card=`<div class="rl-gain">${cardHTML(cid,{size:'deck'})}<div class="mut" style="font-size:13px">새 동료! (모험 안에서만 쓸 수 있어요)</div></div>`;
   if(kind==='elite'&&rlHas('badge')){const offers=rlRelicOffer(run,3,10);if(offers.length){const k=await rlRelicChoice('사냥꾼의 증표! 유물을 골라요',offers);if(k){rlGetRelic(k);card+=`<p style="margin-top:8px">${RL_RELICS[k].ic} <b>${esc(RL_RELICS[k].n)}</b> 획득!</p>`;}}}
  }
+ if(kind==='gym'){const G=GYMS[m.gi],tp=G.types,pool=MON_IDS.filter(id=>MON[id].rar>=4&&(!tp||MON[id].types.some(t=>tp.indexOf(t)>=0)));const gid=rpick(pool.length?pool:rlPoolByRar(4,5));run.deck.push(gid);card=`<div class="rl-gain"><div class="mut" style="font-size:12px">🏟️ 관장 승리 보상 ${starsHTML(MON[gid].rar)}</div>${cardHTML(gid,{size:'deck'})}<div class="mut" style="font-size:13px">${tp?'관장 속성 포켓몬이 동료가 됐어요!':'챔피언 보상! 랜덤 포켓몬이 동료가 됐어요!'} (모험 안에서만 쓸 수 있어요)</div></div>`;}
  if(kind==='elite')rlLog(run,'💀',`엘리트 ${rlJ(MON[m.id].name,'을','를')} 쓰러뜨렸다`);if(kind==='gym')rlLog(run,'🏟️',`관장 ${rlJ(GYMS[m.gi].ldr,'을','를')} 이겼다`);
  const wl=rlWinLine(kind,m,run);
  sfx('win');confetti(30);
@@ -5284,7 +5286,7 @@ function rlRenderEntry(){
  const rl=rlMeta(),run=rl.run;S.screen='scenarioRLEntry';
  rlSetBg('',run?run.bg:(rl.lastBg!=null?rl.lastBg:4));
  const stats=`<div class="sc-reward-list"><div class="sc-reward"><strong>${rl.runs}</strong>도전</div><div class="sc-reward"><strong>${rl.clears}</strong>클리어</div><div class="sc-reward"><strong>${Math.min(rl.best||0,RL.floors*(RL.steps+1))} / ${RL.floors*(RL.steps+1)}</strong>최고 단계</div><div class="sc-reward"><strong>${Object.keys(rl.relicSeen).length}/${Object.keys(RL_RELICS).length}</strong>유물 도감</div></div>`;
- const rules=`<div class="rl-rules"><div>🃏 <b>내 카드 ${RL.pick}장 + 완전 랜덤 ${RL.rand}장</b> = ${RL.pick+RL.rand}장으로 출발! 카드 수 제한은 없어요.</div><div>🗺️ 분기점을 골라 ${RL.steps}번 나아가면 <b>보스</b>가 기다려요. 보스를 쓰러뜨리면 <b>포켓몬 카드</b>를 받고, <b>그만둘지 다음 층(최대 ${RL.floors}층)</b>으로 갈지 골라요. 층이 오를수록 적이 강해져요!</div><div>⚔️ 전투 · 💀 엘리트 · 🏟️ 관장 · 🏺 유물 · ⛺ 휴식 · 🛒 상점 · 🎲 랜덤 · 🎓 수학 시련</div><div>💰 모험 중 얻은 <b>포켓몬·유물·골드</b>는 모험 안에서만 써요. (가져간 내 카드도 사라지지 않아요!)</div><div>🎁 보스를 쓰러뜨리면 경험치·코인·사탕·별가루와 <b>4~5성 포켓몬 1장</b>!</div><div>💔 트레이너 체력이 0이 되면 모험이 끝나요.</div></div>`;
+ const rules=`<div class="rl-rules"><div>🃏 <b>내 카드 ${RL.pick}장 + 완전 랜덤 ${RL.rand}장</b> = ${RL.pick+RL.rand}장으로 출발! 카드 수 제한은 없어요.</div><div>🗺️ 분기점을 골라 ${RL.steps}번 나아가면 <b>보스</b>가 기다려요. 보스를 쓰러뜨리면 <b>포켓몬 카드</b>를 받고, <b>그만둘지 다음 층(최대 ${RL.floors}층)</b>으로 갈지 골라요. 층이 오를수록 적이 강해져요!</div><div>⚔️ 전투 · 💀 엘리트 · 🏟️ 관장 · 🏺 유물 · ⛺ 휴식 · 🛒 상점 · 🎲 랜덤 · 🎓 시련</div><div>💰 모험 중 얻은 <b>포켓몬·유물·골드</b>는 모험 안에서만 써요. (가져간 내 카드도 사라지지 않아요!)</div><div>🎁 보스를 쓰러뜨리면 경험치·코인·사탕·별가루와 <b>4~5성 포켓몬 1장</b>!</div><div>💔 트레이너 체력이 0이 되면 모험이 끝나요.</div></div>`;
  let body;
  if(run){const reg=SC_REGIONS[run.bg];
   body=`<div class="scv-card"><span class="sc-tag">▶ 진행 중인 모험</span><h3>${reg.icon} ${esc(reg.name)}</h3><div class="sc-reward-list"><div class="sc-reward"><strong>${run.floor||1}층 ${Math.min(run.step+1,RL.steps+1)} / ${RL.steps+1}</strong>단계</div><div class="sc-reward"><strong>${run.hp}/${run.max}</strong>체력</div><div class="sc-reward"><strong>${run.gold}</strong>골드</div><div class="sc-reward"><strong>${run.deck.length}</strong>덱 카드</div><div class="sc-reward"><strong>${run.relics.length}</strong>유물</div></div><div class="mbtns"><button class="btn gold big" id="rlResume">▶ 이어하기</button><button class="btn ghost" id="rlAbandon">포기하기</button></div></div>`;}
@@ -5318,6 +5320,9 @@ const __rlResolveAttack=resolveAttack;
 resolveAttack=async function(A,D,si,tg,ok,cb,defReduce){
  if(B&&B.rl&&A===B.me){const a=A.board[si];if(a){const mul=rlAtkMul(a);if(mul>1){const old=a.atk;a.atk=Math.ceil(old*mul);try{return await __rlResolveAttack.apply(this,arguments);}finally{if(a)a.atk=old;}}}}
  return __rlResolveAttack.apply(this,arguments);};
+function rlBoost(u){return (u&&B&&B.rl&&B.me&&B.me.board.indexOf(u)>=0)?rlAtkMul(u):1;}
+const __rlPredDmg=predDmg;
+predDmg=function(a,d){const mul=rlBoost(a);if(mul>1){const old=a.atk;a.atk=Math.ceil(old*mul);try{return __rlPredDmg.call(this,a,d);}finally{a.atk=old;}}return __rlPredDmg.apply(this,arguments);};
 const __rlSummon=summon;
 summon=async function(P,hi,slot){
  const mine=!!(B&&B.rl&&P===B.me),had=mine?P.board[slot]:null;
@@ -5339,7 +5344,8 @@ battleQ=async function(q,opt){const r=await __rlBattleQ.apply(this,arguments);
  if(B&&B.rl){const run=RUN();if(run){run.q++;if(r&&r.ok){run.qc++;if(rlHas('glasses')){run.gold+=3;if(!window.__sim)fx($('#heroMe'),'🪙 +3','txt');}}}}return r;};
 const __rlRenderBattle=renderBattle;
 renderBattle=function(){__rlRenderBattle.apply(this,arguments);
- if(B&&B.rl&&!window.__sim){const run=RUN(),mid=document.querySelector('#battle .mid');if(run&&mid&&!mid.querySelector('.rl-bchips')){const s=document.createElement('span');s.className='rl-bchips';s.innerHTML=`<i title="골드">🪙 ${run.gold}</i>${run.relics.slice(0,14).map(k=>`<i title="${esc(RL_RELICS[k].n)} — ${esc(RL_RELICS[k].d)}">${RL_RELICS[k].ic}</i>`).join('')}`;mid.appendChild(s);}}};
+ if(B&&B.rl&&!window.__sim){const run=RUN(),mid=document.querySelector('#battle .mid');if(run&&mid&&!mid.querySelector('.rl-bchips')){const s=document.createElement('span');s.className='rl-bchips';s.innerHTML=`<i title="골드">🪙 ${run.gold}</i>${run.relics.slice(0,14).map(k=>`<i title="${esc(RL_RELICS[k].n)} — ${esc(RL_RELICS[k].d)}">${RL_RELICS[k].ic}</i>`).join('')}`;mid.appendChild(s);}
+  if(run&&B.me){document.querySelectorAll('#myLane .slot').forEach(sl=>{const i=+sl.dataset.i,u=B.me.board[i];if(!u)return;const mul=rlAtkMul(u);const el=sl.querySelector('.st.atk');if(!el||mul<=1)return;const v=Math.ceil(u.atk*mul);if(v>u.atk){el.textContent=v;el.style.color='#ffe36b';el.title=`기본 공격 ${u.atk} → 유물 효과로 ${v}`;if(!el.querySelector('.rl-up')){const t=document.createElement('sup');t.className='rl-up';t.textContent='▲';t.style.cssText='font-size:9px;margin-left:1px;color:#7dffb0';el.appendChild(t);}}});}}};
 const __rlEndBattle=endBattle;
 endBattle=async function(win){
  if(B&&B.rl&&B.rl.duel){const r=B.rl,me=B.me;B.over=true;sfx(win?'win':'lose');if(win)confetti(60);$('#bq').classList.remove('on');closeInfo();B=null;$('#battle').classList.remove('on');$('#battle').innerHTML='';startBgm('adventure');rlBattleEnd(r.node,'gym',!!win&&me.hp>0,me,!!r.fled);return;}
