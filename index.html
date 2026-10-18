@@ -1374,6 +1374,26 @@ button.rl-chip{cursor:pointer}button.rl-chip:hover{background:rgba(40,56,120,.9)
 @media(max-width:600px){.sc-line,.rl-scene .sc-line{font-size:18px!important;line-height:1.95!important}.rl-scene .sc-line{padding:12px 14px}.sc-dialogue-body{padding:12px 14px!important}.sc-portrait.sc-pixelportrait{width:66px!important;height:86px!important}}
 </style>
 <style id="px-ui">.ic,img.ic.px{image-rendering:pixelated}</style>
+<style id="perf-opt">
+/* ===== 전투 최적화 ===== */
+/* 후광: 필터(brightness) 애니메이션을 빼고 투명도·크기만 움직여 매 프레임 다시 그리지 않게 해요 */
+@keyframes wildBossAura{0%,100%{opacity:.62;transform:translateX(-50%) scale(.94)}50%{opacity:1;transform:translateX(-50%) scale(1.05)}}
+.wildLane .unit::before{will-change:transform,opacity}
+/* 보이지 않는 외곽선 색 애니메이션(실제로는 아무것도 안 바뀜)은 끄고, 눈에 보이는 것만 깜빡이게 해요 */
+.unit.tgt,.slot.can{animation:none}
+.hero.tgt,.unit.itemTarget{animation-timing-function:steps(1,end)}
+/* 큰 야생 포켓몬: 후광이 이미 있으니 번지는 노란 그림자 하나를 빼요 */
+#foeLane.wildLane.wildCount1 .unit:not(.frozen) .sp img,#foeLane.wildLane.wildCount2 .unit:not(.frozen) .sp img{filter:drop-shadow(0 6px 7px rgba(0,0,0,.3))!important}
+/* 숨쉬기 애니메이션은 자기 층에서만 움직이게 */
+.unit .sp img.idle,.buddy .bimg img.idle{will-change:transform}
+/* 가벼운 화면: 전투에서 무거운 것들을 더 줄여요 */
+html.lowfx .unit:not(.frozen) .sp img{filter:none!important}
+html.lowfx .wildLane .unit::before,html.lowfx #foeLane.wildLane .unit::before{box-shadow:none!important;will-change:auto}
+html.lowfx *{backdrop-filter:none!important}
+html.lowfx .hero.tgt,html.lowfx .unit.itemTarget{animation:none!important}
+html.lowfx .unit .sp img.idle,html.lowfx .buddy .bimg img.idle{will-change:auto}
+</style>
+
 </head>
 <body>
 <div id="bg"><div class="hill b"></div><div class="hill c"></div><div class="ballDeco"></div><i style="left:8%;top:12%;width:120px;height:40px"></i><i style="left:14%;top:9%;width:70px;height:50px"></i><i style="left:62%;top:20%;width:150px;height:44px"></i><i style="left:70%;top:16%;width:80px;height:56px"></i></div>
@@ -3003,7 +3023,7 @@ const skRand=(a,b)=>a+Math.random()*(b-a);
 // 낮은 해상도 캔버스에 "칸(도트)" 단위로 찍고, 24프레임으로 뚝뚝 끊기게 움직여요. (레트로 게임 느낌 + 타격감)
 // 모든 연출은 Math.random(skRand)만 써요. 친구 대전의 씨앗 난수(brand)는 건드리지 않아요.
 const PXF=(()=>{
- const STEP=1000/24,q=Math.round;let cv=null,cx=null,S=4,cw=0,ch=0,parts=[],raf=0,last=0,frz=0;
+ const STEP=1000/24,q=Math.round;let cv=null,cx=null,S=4,cw=0,ch=0,parts=[],raf=0,last=0,frz=0;const DPAT={};
  function size(){const w=VW(),h=VH();S=Math.max(3,Math.min(6,q(Math.min(w,h)/115)));const nw=Math.ceil(w/S),nh=Math.ceil(h/S);
   if(!cv){cv=document.createElement('canvas');cv.id='pxfx';document.body.appendChild(cv);cx=cv.getContext('2d');}
   if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;}cw=nw;ch=nh;cv.style.width=nw*S+'px';cv.style.height=nh*S+'px';}
@@ -3021,7 +3041,7 @@ const PXF=(()=>{
     if(wi<0)put(x-wo,x+wo);else{put(x-wo,x-wi-1);put(x+wi+1,x+wo);}}},
   spr(rows,pal,x,y,sc){sc=sc||1;const h=rows.length,w=rows[0].length;x=q(x-w*sc/2);y=q(y-h*sc/2);
    for(let j=0;j<h;j++)for(let i=0;i<w;i++){const k=rows[j][i];if(k==='.')continue;cx.fillStyle=pal[k];cx.fillRect(x+i*sc,y+j*sc,sc,sc);}},
-  fill(c,alpha,dither){cx.save();cx.globalAlpha=alpha==null?1:alpha;if(dither){const t=document.createElement('canvas');t.width=t.height=2;const g=t.getContext('2d');g.fillStyle=c;g.fillRect(0,0,1,1);g.fillRect(1,1,1,1);cx.fillStyle=cx.createPattern(t,'repeat');}else cx.fillStyle=c;cx.fillRect(0,0,cw,ch);cx.restore();}
+  fill(c,alpha,dither){cx.save();cx.globalAlpha=alpha==null?1:alpha;if(dither){let pt=DPAT[c];if(!pt||pt.cx!==cx){const t=document.createElement('canvas');t.width=t.height=2;const g=t.getContext('2d');g.fillStyle=c;g.fillRect(0,0,1,1);g.fillRect(1,1,1,1);pt=DPAT[c]={cx,p:cx.createPattern(t,'repeat')};}cx.fillStyle=pt.p;}else cx.fillStyle=c;cx.fillRect(0,0,cw,ch);cx.restore();}
  };
  function add(delay,dur,x,y,f,o){const p=Object.assign({age:-delay,dur,x,y,f},o||{});parts.push(p);if(!raf){size();last=0;raf=requestAnimationFrame(tick);}return p;}
  function tick(ts){raf=requestAnimationFrame(tick);if(!last)last=ts;const dt=ts-last;if(dt<STEP)return;last=ts-(dt%STEP);
@@ -5600,6 +5620,19 @@ const __rlRenderHub=renderHub;
 renderHub=function(){__rlRenderHub.apply(this,arguments);const grid=$('#view .tiles');if(grid&&!$('#rlHubTile')){const rl=rlMeta(),run=rl.run;const b=document.createElement('button');b.id='rlHubTile';b.className='tile main';b.style.background='linear-gradient(120deg,#fff4d6,#ffe3c2)';b.style.borderColor='#ffcf7a';b.style.boxShadow='0 5px 0 #ffcf7a';b.innerHTML=`<span class="ti" style="font-size:48px;display:flex;align-items:center;justify-content:center">🗺️</span><span><span class=tn>로그라이크 모험</span><br><span class=td>${run?`진행 중 · ${run.floor||1}층 ${Math.min(run.step+1,RL.steps+1)}/${RL.steps+1}단계 · ❤️ ${run.hp}/${run.max}`:`분기점 · 유물 · 보스 · ${rl.clears}번 클리어`}</span></span>`;const sc=$('#scHubTile');grid.insertBefore(b,sc?sc.nextSibling:grid.firstChild);b.onclick=()=>{sfx('tap');ac();rlLaunch();};}};
 
 init();
+
+// ===== 전투 프레임 감시: 전투 중 화면이 계속 끊기면 '가벼운 화면'으로 자동 전환 (설정에서 다시 바꿀 수 있어요) =====
+(function perfWatch(){let buf=[],last=0,strikes=0,done=false;
+ function tick(t){requestAnimationFrame(tick);
+  if(done||document.hidden){last=0;return;}
+  const dt=last?t-last:0;last=t;
+  let inBattle=false;try{inBattle=S.screen==='battle'&&!!B&&!B.over&&!document.querySelector('#bq.on,#modal.on,#modal2.on');}catch(e){}
+  if(!inBattle||!dt||dt>250){if(!inBattle)buf.length=0;return;}
+  buf.push(dt);
+  if(buf.length>=120){const avg=buf.reduce((a,b)=>a+b,0)/buf.length;buf.length=0;
+   if(avg>32)strikes++;else strikes=Math.max(0,strikes-1);
+   if(strikes>=2){done=true;try{if(!S.meta.settings.lowfx){S.meta.settings.lowfx=true;applySafe();autoSave();toast('화면이 느려서 <b>가벼운 화면</b>으로 바꿨어요. (설정에서 되돌릴 수 있어요)');}}catch(e){}}}}
+ requestAnimationFrame(tick);})();
 if(S.screen==='title')renderTitle();</script><div style="position: fixed; left: 0px; top: 0px; width: 100%; height: 100%; pointer-events: none; visibility: hidden; z-index: -5;"></div>
 
 
