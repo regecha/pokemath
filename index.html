@@ -329,7 +329,7 @@ html.lowfx .card .holo{animation:none;mix-blend-mode:normal;opacity:.25}
 .hero.turnNow{border-color:#ffb400;box-shadow:0 0 0 3px rgba(255,180,0,.35)}
 .mana{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
 .mana i{width:16px;height:16px;transform:rotate(45deg);border-radius:4px;background:#cfd8ea;border:2px solid #9fb0d4}
-.mana i.on{background:linear-gradient(135deg,#7fe0ff,#3d7bff);border-color:#1f4fbf}
+.mana i.on{background:linear-gradient(135deg,#7fe0ff,#3d7bff);border-color:#1f4fbf} .mana i.bonus{background:linear-gradient(135deg,#e3b3ff,#9a4dff);border-color:#6b2fbf}
 .mana b{font-family:'Black Han Sans';font-size:16px;color:#1f4fbf;margin-left:4px}
 .lane{flex:1;display:flex;align-items:center;justify-content:center;gap:clamp(3px,1.1vw,14px);min-height:0;padding:2px 6px}
 .lane.coopLane{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;padding:2px 4px;align-content:center}.coopLane .slot{width:100%;min-width:0;aspect-ratio:1/1.2;max-height:100%;border-radius:8px}.coopLane .unit{transform:scale(.92);transform-origin:center}.coopLane .unit .un{font-size:clamp(8px,1vw,13px)}.coopLane .unit .us{font-size:clamp(9px,1vw,13px)}.coopOwner{position:absolute;top:1px;left:2px;z-index:4;font-size:9px;font-weight:900;border-radius:5px;padding:1px 4px;background:#fff;color:#334155;white-space:nowrap}.coopOwner.o0{background:#3d7bff;color:#fff}.coopOwner.o1{background:#ff8a3d;color:#fff}@media(max-width:560px){.lane.coopLane{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));}.coopLane .slot{aspect-ratio:1/1.05}.coopLane .unit .sp img{max-width:60%;max-height:60%}}
@@ -1407,6 +1407,7 @@ html.lowfx .unit .sp img.idle,html.lowfx .buddy .bimg img.idle{will-change:auto}
 .dmg.txt{--o:transparent;-webkit-text-stroke:0;color:#3a2e3f;font-size:18px;letter-spacing:0;text-shadow:none;border-radius:10px;
  box-shadow:0 3px 0 rgba(0,0,0,.18);animation:dmgTxt 1.1s cubic-bezier(.22,.7,.3,1) forwards}
 .dmg.txt.super{color:#b45a00;background:#fff3cf}
+.dmg.mana{--f:#4da6ff;--o:#0b2a6b}
 .dmg.lbl{font-size:20px;-webkit-text-stroke:4px var(--o);white-space:nowrap;letter-spacing:0}
 @keyframes dmgPop{
  0%{opacity:0;transform:translate(calc(-50% + var(--jx,0px)),-20%) scale(.3)}
@@ -1805,7 +1806,7 @@ const VW=()=>innerWidth/ZM(),VH=()=>innerHeight/ZM();
 function toast(msg){const d=document.createElement('div');d.className='tst';d.innerHTML=msg;$('#toast').appendChild(d);setTimeout(()=>d.remove(),2800);}
 function banner(b1,b2,ms=2200){const el=$('#banner');el.innerHTML=`<div class=b1>${b1}</div>${b2?`<div class=b2>${b2}</div>`:''}`;el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(banner.t);banner.t=setTimeout(()=>el.classList.remove('on'),ms);
  if(!banner.local&&BC.host&&B&&B.coop&&BC.conn&&BC.conn.open)bossSend({t:'boss-banner',b1,b2,ms});}
-function floatAt(el,text,cls=''){const r=el&&el.getBoundingClientRect?zRect(el):{left:VW()/2,top:VH()/2,width:0,height:0};const d=document.createElement('div');d.className='dmg '+cls;d.innerHTML=text;d.style.left=clamp(r.left+r.width/2,40,VW()-40)+'px';d.style.top=clamp(r.top+r.height/2,30,VH()-30)+'px';if(!/txt/.test(cls)&&!/^[-+]?\d+$/.test(String(text).replace(/<[^>]*>/g,'')))d.classList.add('lbl');d.style.setProperty('--jx',Math.round((Math.random()-.5)*36)+'px');if(/^-\d+$/.test(String(text))&&!/crit|big|txt/.test(cls)){d.style.fontSize=Math.min(60,32+Math.abs(+text)*2.4)+'px';}document.body.appendChild(d);setTimeout(()=>d.remove(),1150);}
+function floatAt(el,text,cls=''){const r=el&&el.getBoundingClientRect?zRect(el):{left:VW()/2,top:VH()/2,width:0,height:0};const d=document.createElement('div');d.className='dmg '+cls;d.innerHTML=text;const mg=String(text).replace(/<[^>]*>/g,'').length>4?105:40;d.style.left=clamp(r.left+r.width/2,mg,VW()-mg)+'px';d.style.top=clamp(r.top+r.height/2,30,VH()-30)+'px';if(/에너지/.test(String(text)))d.classList.add('mana');if(!/txt/.test(cls)&&!/^[-+]?\d+$/.test(String(text).replace(/<[^>]*>/g,'')))d.classList.add('lbl');d.style.setProperty('--jx',Math.round((Math.random()-.5)*36)+'px');if(/^-\d+$/.test(String(text))&&!/crit|big|txt/.test(cls)){d.style.fontSize=Math.min(60,32+Math.abs(+text)*2.4)+'px';}document.body.appendChild(d);setTimeout(()=>d.remove(),1150);}
 function confetti(n=46){if(S.meta.settings.lowfx)n=Math.min(n,16);const cols=['#ff6b6b','#ffcc4d','#51cf66','#339af0','#cc5de8','#ffffff'];for(let i=0;i<n;i++){const d=document.createElement('div');d.className='confetti';d.style.left=(VW()/2+(Math.random()-.5)*200)+'px';d.style.top=(VH()*.45)+'px';d.style.background=cols[i%cols.length];d.style.setProperty('--dx',((Math.random()-.5)*VW()*.9)+'px');d.style.setProperty('--dy',((Math.random()-.2)*VH()*.7)+'px');d.style.setProperty('--rr',(Math.random()*900-450)+'deg');d.style.animationDelay=(Math.random()*.15)+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),1900);}}
 function M(html,acts={},opt={}){const l2=!!opt.layer2;const md=$(l2?'#modal2':'#modal'),bx=$(l2?'#mbox2':'#mbox');bx.className='mbox panel'+(opt.wide?' wide':'');bx.innerHTML=html;md.classList.add('on');bx.scrollTop=0;
  bx.querySelectorAll('[data-a]').forEach(b=>b.onclick=e=>{e.stopPropagation();sfx('tap');const f=acts[b.dataset.a];if(f)f(b);});
@@ -1855,9 +1856,9 @@ function codeValid(){const c=S.meta.code&&parseCode(S.meta.code);return !!(c&&!c
 
 // ===== 상태 =====
 const SAVE_KEY=GAME.id+'-v1';
-const SAVE_VER=4; // 저장 형식이 바뀌면 올리고 upgradeMeta에 변환을 한 단계 추가해요(옛 저장도 이어서 하기)
+const SAVE_VER=5; // 저장 형식이 바뀌면 올리고 upgradeMeta에 변환을 한 단계 추가해요(옛 저장도 이어서 하기)
 function defaultMeta(){return{ver:SAVE_VER,name:'',code:'',gs:'',cls:'',focus:null,uMax:null,misc:{},starter:0,created:0,
- xp:0,lp:0,lpRetrofit:false,trainerSkills:{heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0},coins:0,candy:0,packs:0,dust:0,pity:{p4:0,p5:0},col:{},seen:{},dexSeen:{},deck:[],
+ xp:0,lp:0,lpRetrofit:false,lpBonus5:true,trainerSkills:{heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},coins:0,candy:0,packs:0,dust:0,pity:{p4:0,p5:0},col:{},seen:{},dexSeen:{},deck:[],
  sk:{},days:{},hist:[],train:{last:'',best:0,count:0,lastRes:null,daily:''},
  badges:{},gyms:{},battles:{w:0,l:0},stats:{q:0,c:0,streak:0,bestCombo:0,bestStreak:0,guessWrong:0,guessAlert:0,careful:0,lowerStar:0,shardDone:0,crafted:0,foundDone:0,superEff:0,gymTry:0,retryOk:0,bounce:0,fast:0,better:0,perfect:0,quickTrain:0,practice:0,comeback:0,flawless:0,defOk:0,candyAll:0,evolved:0,opened:0},
  unl:{},unlNew:{},ach:{},partner:0,bond:{},stoneSeen:null,card:null,uMaxAt:'',shard:{},dust:0,season:null,seasons:[],bsave:null,thist:[],first20:null,first20t:null,found:{},endless:{best:0,total:0,runs:0,caught:0},pvp:{n:0,w:0,l:0,gg:0,foes:{},last:0},tod:{m:0,a:0,e:0},firstPlay:0,scenario:{chapter:0,unlocked:0,cleared:[],seenIntro:false},settings:{anim:'calm',sound:true,bgm:true,lowfx:false,easy:false,safe:'auto',zoom:'auto',fit:'auto',imgs:true,defq:true}};}
@@ -1876,7 +1877,9 @@ function upgradeMeta(m){
   m.ver=3;
  }
  // v3 → v4: 트레이너 스킬 레벨 저장 칸을 추가해요.
- if((m.ver||1)<4){m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0},m.trainerSkills||{});m.ver=4;}
+ if((m.ver||1)<4){m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},m.trainerSkills||{});m.ver=4;}
+  // v4 → v5: 카드 보유량 스킬 칸 + 5레벨마다 레벨 포인트 +2를 현재 레벨 기준으로 소급 지급해요.
+  if((m.ver||1)<5){m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},m.trainerSkills||{});if(!m.lpBonus5){m.lp=(Number(m.lp)||0)+lvBonusPts(1,lvOf(Math.max(0,Number(m.xp)||0)).lv);m.lpBonus5=true;}m.ver=5;}
  m.ver=SAVE_VER;return m;}
 const S={meta:defaultMeta(),screen:'title',busy:false};
 
@@ -2272,9 +2275,9 @@ function balanceAns(q){const n=q.ch.length;if(n<2)return;let i=q.ch.indexOf(q.a)
 
 // ---- 레벨 ----
 const LV_TITLES=['새내기 트레이너','꼬마 트레이너','성실한 트레이너','숫자 탐험가','계산 레인저','개념 기사','학습 연구원','체육관 도전자','엘리트 트레이너','학습 챔피언','전설의 트레이너'];
-const lvNeed=l=>80+l*40;
+const lvNeed=l=>80+l*40; function lvBonusPts(from,to){return Math.max(0,Math.floor(to/5)-Math.floor(from/5))*2;}
 function lvOf(xp){let lv=1,x=xp;while(x>=lvNeed(lv)){x-=lvNeed(lv);lv++;}return{lv,cur:x,need:lvNeed(lv),title:LV_TITLES[Math.min(LV_TITLES.length-1,Math.floor((lv-1)/3))]};}
-function gainXP(n){const b=lvOf(S.meta.xp).lv;S.meta.xp+=n;if(typeof gainSeasonXP==='function')gainSeasonXP(n);const a=lvOf(S.meta.xp).lv;if(a>b){S.lvUp=(S.lvUp||0)+(a-b);S.meta.lp=(S.meta.lp||0)+(a-b);}}
+function gainXP(n){const b=lvOf(S.meta.xp).lv;S.meta.xp+=n;if(typeof gainSeasonXP==='function')gainSeasonXP(n);const a=lvOf(S.meta.xp).lv;if(a>b){const bp=lvBonusPts(b,a);S.lvUp=(S.lvUp||0)+(a-b);S.lvBonus=(S.lvBonus||0)+bp;S.meta.lp=(S.meta.lp||0)+(a-b)+bp;}}
 
 // ---- 기록 ----
 function dayRec(d=today()){const m=S.meta;return m.days[d]||(m.days[d]={n:0,c:0,ms:0,t:0,tt:0});}
@@ -2554,7 +2557,7 @@ async function showTrainResult(res,gh,rw){const m=S.meta;S.screen='result';sfx('
  $('#rHub').onclick=()=>{sfx('tap');renderHub();};if($('#rPack'))$('#rPack').onclick=()=>{sfx('tap');openPack();};if($('#rMore'))$('#rMore').onclick=()=>{sfx('tap');startTraining({endless:true});};
  if(S.lvUp){await wait(500);levelUpFx();}
  if(nb.length){await wait(300);banner('단원 배지!',`${nb.length}개 얻었어요`);}}
-function levelUpFx(){const L=lvOf(S.meta.xp);sfx('level');confetti(60);banner('레벨 업!',`Lv.${L.lv} ${L.title} · 레벨 포인트 +1`);S.lvUp=0;
+function levelUpFx(){const L=lvOf(S.meta.xp);const gp=Math.max(1,S.lvUp||1)+(S.lvBonus||0);sfx('level');confetti(60);banner('레벨 업!',`Lv.${L.lv} ${L.title} · 레벨 포인트 +${gp}`);S.lvUp=0;S.lvBonus=0;
  S.meta.packs+=1;toast(`${I('ball')} 레벨 업 선물: 카드팩 +1`);autoSave();}
 function starsHTML(n){return `<span class=stars>${'★'.repeat(n)}<i>${'★'.repeat(5-n)}</i></span>`;}
 
@@ -2862,7 +2865,7 @@ function startBattle(gi){const me=S.meta;if(gi>=0&&!window.__sim)me.stats.gymTry
 // 돌 카드 대신 랜덤 카드나 포켓몬 카드가 나와요.
 function anyRandomCard(P){const av=['master','power','poke'].filter(b=>{const rc=randomBandCard(b);return rc&&ownedBand(P,rc.band).length>0;});
  if(!av.length)return null;return randomBandCard(av[Math.floor(playerRoll(P)*av.length)]);}
-function draw(P,quiet){if(P.hand.length>=6){if(!quiet)toast('손이 꽉 차서 카드 한 장이 사라졌어요');return;}
+function draw(P,quiet){if(P.hand.length>=handMax(P)){if(!quiet)toast('손이 꽉 차서 카드 한 장이 사라졌어요');return;}
  let special=drawSpecial(P);
  if(special&&isItemCard(special)){
   const deckEmpty=!P.deck.length,handNoMon=!P.hand.some(c=>!isItemCard(c));
@@ -2887,14 +2890,59 @@ function tgtBadge(d,i){if(!B||B.side!=='me')return '';const me=B.me;let out='';
   out=(mu?`<b class=${mu.c}>${mu.t}</b>`:'')+`<b class=dmgp>-${dm}</b>`+(dm>=d.hp&&!d.tough?'<b class=ko>쓰러뜨려요!</b>':'');}
  else if(B.pick>=0&&me.hand[B.pick]!=null&&!isBattleSpecial(me.hand[B.pick])){const mu=matchup(me.hand[B.pick],d.id);if(mu)out=`<b class=${mu.c}>${mu.t}</b>`;}
  return out?`<div class=tbadge>${out}</div>`:'';}
-function renderBattle(){if(!B||window.__sim)return;B.trainerSkillUsed=B.trainerSkillUsed||{};const me=B.me,fo=B.foe;const my=B.side==='me'&&!B.busy&&!B.over&&(!B.coop||B.coop.active===BC.localIndex);
+
+// ===== 전투 화면 프레임 최적화 =====
+// ① #battle 을 통째로 갈아엎지 않고 바뀐 부분만 고쳐요 → 포켓몬 그림이 다시 로드되지 않고, 숨쉬기·반짝임 애니메이션이 끊기지 않아요.
+(function(){
+ const desc=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');if(!desc||!desc.set)return;
+ const ON=['onclick','onpointerdown','onpointerup','ontouchstart','ontouchend','onmousedown','oncontextmenu'];
+ const same=(a,b)=>{if(a.nodeType!==b.nodeType)return false;if(a.nodeType!==1)return true;return a.tagName===b.tagName&&a.id===b.id&&a.getAttribute('data-i')===b.getAttribute('data-i');};
+ function patch(a,b){
+  if(a.nodeType!==1){if(a.nodeValue!==b.nodeValue)a.nodeValue=b.nodeValue;return;}
+  for(const at of b.attributes){if(a.getAttribute(at.name)!==at.value)a.setAttribute(at.name,at.value);}
+  for(const at of Array.from(a.attributes)){if(!b.hasAttribute(at.name))a.removeAttribute(at.name);}
+  for(const k of ON){if(a[k])a[k]=null;}
+  kids(a,b);
+ }
+ function kids(a,b){
+  let ai=a.firstChild,bi=b.firstChild;
+  while(bi){
+   const nb=bi.nextSibling;
+   if(!ai){a.appendChild(bi);}
+   else if(same(ai,bi)){const an=ai.nextSibling;patch(ai,bi);ai=an;}
+   else{a.insertBefore(bi,ai);}
+   bi=nb;
+  }
+  while(ai){const n=ai.nextSibling;a.removeChild(ai);ai=n;}
+ }
+ Object.defineProperty(Element.prototype,'innerHTML',{configurable:true,enumerable:desc.enumerable,get:desc.get,set(v){
+  if(this.id==='battle'&&this.firstChild){try{const t=document.createElement('template');desc.set.call(t,v);kids(this,t.content);return;}catch(e){}}
+  desc.set.call(this,v);
+ }});
+})();
+// ② 기기가 느려서 프레임이 계속 떨어지면 전투 중에만 자동으로 효과를 줄여요(설정은 바뀌지 않아요).
+(function(){
+ let run=0,last=0,acc=0,n=0,bad=0,auto=false;
+ function tick(t){
+  const root=document.documentElement;
+  if(!B){if(auto){root.classList.remove('lowfx');auto=false;}run=0;bad=0;return;}
+  if(last){const d=t-last;if(d<250){acc+=d;n++;}}
+  last=t;
+  if(n>=90){bad=(acc/n>26)?bad+1:0;acc=0;n=0;
+   if(bad>=2&&!auto&&!root.classList.contains('lowfx')){auto=true;root.classList.add('lowfx');try{toast('화면이 버벅여서 효과를 조금 줄였어요');}catch(e){}}}
+  requestAnimationFrame(tick);
+ }
+ window.__fpsGuard=function(){if(run)return;run=1;last=0;acc=0;n=0;requestAnimationFrame(tick);};
+})();
+
+function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGuard();B.trainerSkillUsed=B.trainerSkillUsed||{};const me=B.me,fo=B.foe;const my=B.side==='me'&&!B.busy&&!B.over&&(!B.coop||B.coop.active===BC.localIndex);
  const valid=targetsFor(B.sel);
  const unitH=(u,P,i)=>{if(!u)return '';const friendly=P===me;const mine=friendly&&(!B.coop||Number(u.coopOwner??0)===B.coop.active);const m=MON[u.id];const ready=mine&&my&&u.att>0&&!u.frozen;
   return `<div class="unit${ready?' ready':''}${mine&&B.sel===i?' sel':''}${!friendly&&valid.units.includes(i)?' tgt':''}${isTaunt(u)?' taunt':''}${u.frozen?' frozen':''}${u.shield?' shielded':''}${mine&&B.itemTargetMode&&!u.frozen?' itemTarget':''}${!friendly&&B.moonTargetMode?' itemTarget':''}${mine&&!ready&&my?' zz':''}" data-i="${i}">
    ${B.coop?(()=>{const ow=Number(u.coopOwner??0)===1?1:0;const nm=String((B.coop.players[ow]&&B.coop.players[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?`<span class=shieldBadge>🛡️${u.shield}</span>`:''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${monImg(u.id,mine?'back':'anim')}</div><div class=un>${esc(m.name)}</div><div class=tdots>${m.types.map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
    <div class=us><span class="st atk">${u.atk}</span><span class="st hp"${u.hp<u.max?' style="background:#d9393f"':''}>${u.hp}</span></div></div>`;};
  const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=B.coop?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front')}</div><div><div class=hn>${esc(P.name)}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
-  const mana=P=>`<div class=mana>${Array.from({length:6},(_,i)=>`<i class="${i<P.mana?'on':''}"${i>=P.maxMana&&i>=P.mana?' style="opacity:.3"':''}></i>`).join('')}<b>${P.mana}/${Math.max(P.maxMana,P.mana)}</b></div>`;
+  const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),bl=P.mana-bp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}<b>${bl}${bp?`<span style="color:#8a3fd6">+${bp}</span>`:''}/${den}</b></div>`;};
  $('#battle').innerHTML=`
   <div class=bTop>${B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front')}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:-12px"><b class=dmgp>-${me.board[B.sel].atk+(me.board[B.sel].kw==='quake'?1:0)}</b></div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front')}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill>${I('cards')} ${fo.hand.length}</span><span class=pill title="남은 덱">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<button class="btn ghost sm" id=bMenu>메뉴</button></div>
   <div class="lane${B.wildMode?` wildLane wildCount${fo.board.filter(Boolean).length}`:''}" id=foeLane>${fo.board.map((u,i)=>B.wildMode&&!u?'':`<div class=slot data-i="${i}">${unitH(u,fo,i)}</div>`).join('')}</div>
@@ -2973,7 +3021,7 @@ async function summon(P,hi,slot){const card=P.hand[hi];let id=card;
  if(isRandomMonCard(card)){const pool=ownedBand(P,card.band);if(!pool.length){toast('이 코스트 구간의 보유 포켓몬이 없어 사용할 수 없어요');return;}id=pool[Math.floor(playerRoll(P)*pool.length)];}
  if(!MON[id]||slot<0||!P.board||P.board[slot])return;
  const m=MON[id],pay=battleCost(card);if(P.mana<pay){toast(`에너지가 ${pay-P.mana} 모자라요`);return;}
- if(P===B.me&&!window.__sim)S.meta.dexSeen[id]=1;P.mana-=pay;P.hand.splice(hi,1);const u=mkUnit(id);if(B.coop)u.coopOwner=B.coop.active;P.board[slot]=u;B.pick=-1;sfx('summon');
+ if(P===B.me&&!window.__sim)S.meta.dexSeen[id]=1;spendMana(P,pay);P.hand.splice(hi,1);const u=mkUnit(id);if(B.coop)u.coopOwner=B.coop.active;P.board[slot]=u;B.pick=-1;sfx('summon');
  if(isRandomMonCard(card))fx(unitEl(P,slot),`${card.name}! ${m.name}`,'txt');
  const O=P===B.me?B.foe:B.me;renderBattle();slamFx(P,slot);await wait(380);
  // 나올 때 효과
@@ -2987,7 +3035,7 @@ async function playItem(P,hi,target=-1,remote=false){const card=P&&P.hand[hi];if
  const enemy=P===B.me?B.foe:B.me;
  if(card.item==='thunder'&&(target<0||!P.board[target]||P.board[target].frozen)){if(!remote)toast('재행동할 수 있는 포켓몬을 골라 주세요');return false;}
  if(card.item==='moon'&&(target<0||!enemy.board[target])){if(!remote)toast('기절시킬 상대 포켓몬을 골라 주세요');return false;}
- P.mana-=card.cost;P.hand.splice(hi,1);B.itemTargetMode=null;B.moonTargetMode=null;B.pick=-1;B.sel=-1;
+ spendMana(P,card.cost);P.hand.splice(hi,1);B.itemTargetMode=null;B.moonTargetMode=null;B.pick=-1;B.sel=-1;
  if(B.pvp&&!remote&&P===B.me)pvpSend({t:'item',h:hi,item:card.item,target});
  B.busy=true;renderBattle();
  if(card.item==='fire'){
@@ -3001,7 +3049,7 @@ async function playItem(P,hi,target=-1,remote=false){const card=P&&P.hand[hi];if
  }else if(card.item==='moon'){
   const u=enemy.board[target];if(u){u.frozen=1;u.att=0;fx(unitEl(enemy,target),'기절!','txt');fx($('#battle'),'달빛 봉인!','txt');sfx('wrong');}
  }else if(card.item==='sun'){
-  const before=P.mana;P.mana=Math.min(6,P.mana+1);const gain=P.mana-before;fx(heroEl(P),gain?`에너지 +${gain}`:'에너지가 이미 최대예요','heal');if(gain)sfx('win');else sfx('tap');
+  const before=P.mana;P.mana=Math.min(Math.max(6,P.mana),P.mana+1);const gain=P.mana-before;fx(heroEl(P),gain?`에너지 +${gain}`:'에너지가 이미 최대예요','heal');if(gain)sfx('win');else sfx('tap');
  }
  cleanup();B.busy=false;renderBattle();checkEnd();return true;}
 function typeMul(aid,did){const a=MON[aid],d=MON[did];const t=kwType(a);let k=1;d.types.forEach(x=>k*=TYPE_CHART[t][x]);return k;}
@@ -3278,9 +3326,9 @@ async function battleQ(q,opt){B.qn++;if(window.__sim)return{ok:rnd()<SIM.p,ms:30
 function cleanup(){[B.me,B.foe].forEach(P=>P.board.forEach((u,i)=>{if(u&&u.hp<=0){P.board[i]=null;}}));if(B&&B.wildMode)syncWildPrimary();}
 function checkEnd(){if(!B||B.over)return false;if(B.wildMode){const live=syncWildPrimary();if(!live.length){if(B.coop){if(BC.host)bossFinish('win');return true;}B.over=true;const caught=(B.wildState.caughtIds||[]).length>0;const note=caught?'야생 포켓몬 전투가 끝났어요. 포획한 포켓몬은 도감에 등록됐어요.':'야생 포켓몬이 모두 쓰러져 포획하지 못했어요.';if(!window.__sim)setTimeout(()=>finishEndlessWild(caught?'caught':'knockout',note),650);return true;}if(B.coop&&B.coop.players.some(p=>p.hp<=0)){if(BC.host)bossFinish('lost');return true;}if(B.me.hp<=0&&!B.coop){B.over=true;if(!window.__sim)setTimeout(()=>finishEndlessWild('lost','트레이너 체력이 0이 되어 야생 전투를 마쳤어요.'),650);return true;}const weak=live.filter(i=>B.foe.board[i].hp<=B.foe.board[i].max*.3).sort((a,b)=>B.foe.board[a].hp/B.foe.board[a].max-B.foe.board[b].hp/B.foe.board[b].max);if(weak.length&&!B.capturePrompted&&!(B.wildState&&B.wildState.scenarioMode)){B.capturePrompted=true;B.wildCaptureTargetSlot=weak[0];if(!window.__sim)setTimeout(scheduleWildCapturePrompt,180);}return false;}if(B.foe.hp<=0||B.me.hp<=0){B.over=true;if(window.__sim)return true;setTimeout(()=>endBattle(B.foe.hp<=0&&B.me.hp>0||(B.foe.hp<=0&&B.me.hp>=B.foe.hp)),600);return true;}return false;}
 async function startTurn(side){if(!B||B.over)return;closeInfo();if(B.coop&&side==='foe')bossSetActive(0);B.side=side;const P=side==='me'?B.me:B.foe;B.turn++;if(side==='me'){B.round++;B.counterActive=0;}
- P.maxMana=Math.min(6,P.maxMana+1);P.mana=P.maxMana;B.defUsed=false;
- if(side==='me'&&!B.pvp&&!window.__sim){const ml=B.coop?(Number(P.manaLv)||0):(Number(trainerSkillLevels().mana)||0);if(ml>0&&rnd()*100<manaChance(ml)){P.mana+=1;B.manaBonusFx=1;}}
- else if(B.pvp&&!window.__sim){const ml=Number(P.manaLv)||0;if(ml>0&&P.passRng()*100<manaChance(ml)){P.mana+=1;B.manaBonusFx=1;}}
+ P.maxMana=Math.min(6,P.maxMana+1);P.mana=P.maxMana;P.bonusMana=0;B.defUsed=false;  if(side==='me'&&!B.coop&&!B.pvp&&!window.__sim&&!B.studyUsesSet){B.studyUsesSet=1;const sx=studyExtraUses(trainerSkillLevels().study);if(sx)P.powerUses=(P.powerUses||0)+sx;}
+ if(side==='me'&&!B.pvp&&!window.__sim){const ml=B.coop?(Number(P.manaLv)||0):(Number(trainerSkillLevels().mana)||0);if(ml>0&&rnd()*100<manaChance(ml)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.manaBonusFx=1;}}
+ else if(B.pvp&&!window.__sim){const ml=Number(P.manaLv)||0;if(ml>0&&P.passRng()*100<manaChance(ml)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.manaBonusFx=1;}}
  const wildAliveCount=B.wildMode&&side==='foe'?B.foe.board.filter(u=>u&&u.hp>0).length:0;
  P.board.forEach(u=>{if(!u)return;if(B.coop&&side==='me'&&Number(u.coopOwner??0)!==B.coop.active)return;u.fresh=0;u.att=u.frozen?0:(B.wildMode&&P===B.foe?(u.rlAtt!=null?u.rlAtt:(((S.meta.settings.easy&&!B.coop)||wildAliveCount>=2)?1:2)):(u.kw==='double'?2:1));if(u.frozen&&side==='me'){}if(u.kw==='grow'&&u.grow<2){u.grow++;u.atk++;}});
  // 얼음은 한 차례만
@@ -3362,10 +3410,15 @@ async function foeTurn(){const fo=B.foe,me=B.me;B.busy=true;renderBattle();
    else{let best=null,bv=-Infinity;me.board.forEach((x,j)=>{if(!x)return;const v=aiTargetValue(u,x);if(v>bv){bv=v;best=j;}});
     // 포켓몬 위협도와 트레이너에게 줄 수 있는 피해를 비교해요. 포켓몬만 계속 노리거나
     // 트레이너만 무조건 공격하지 않도록, 트레이너 체력이 낮거나 총 피해가 큰 경우 직접 공격을 높게 평가해요.
-    const smart=B.gi>=0?.99:(B.diff>=5?.96:B.diff>=3?.91:B.diff>=2?.84:.76);
-    const trainerValue=faceDmg*2.35+(me.hp<=faceDmg*2?7:0)+(me.hp<=faceDmg*3?3:0)+(me.hp<=me.max*.25?3:0);
-    const worthUnit=best!=null&&bv>0&&bv>=trainerValue*.88;
-    if(worthUnit&&rnd()<smart)tg={u:best};else tg=bossPickTrainer(faceDmg);}
+    // 포켓몬 위주로 노리되, 확률적으로 트레이너도 노려서 긴장감을 유지해요.
+    // (처치 가능하면 위에서 이미 우선 처리돼요 / 트레이너 처치 가능하면 트레이너를 노려요)
+    const hpRatio=me.max?me.hp/me.max:1;
+    let tChance=B.gi>=0?.22:(B.diff>=5?.2:B.diff>=3?.16:.12); // 난이도가 높을수록 트레이너를 더 자주 노려요
+    if(hpRatio<=.4)tChance+=.12;else if(hpRatio<=.7)tChance+=.05;   // 트레이너가 약해지면 조금 더 압박
+    if(faceDmg>=me.hp*.6)tChance+=.08;                              // 한 번에 큰 피해를 줄 수 있을 때
+    tChance=Math.min(.42,tChance);
+    const canHitUnit=best!=null&&bv>-4;                             // 반격에 쓰러지는 헛공격만 아니면 포켓몬을 노려요
+    if(canHitUnit&&rnd()>=tChance)tg={u:best};else tg=bossPickTrainer(faceDmg);}
    await foeAttack(i,tg);u=fo.board[i];await wait(330);}}
  if(B.over)return;B.busy=false;await wait(250);if(B.coop)bossSetActive(0);startTurn('me');}
 async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)return;a.att--;
@@ -3381,7 +3434,7 @@ async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)
   await dealUnit(me,tg.u,dmg);if(a.kw==='freeze'&&me.board[tg.u])applyFreeze(me,tg.u);if(a.kw==='poison'&&me.board[tg.u])weakenAtk(me,tg.u,'psn','☠ 독! 공격 -1');
   let cd=a.kw==='wing'?0:applyType(d.atk,typeMul(d.id,a.id));if(d.kw==='wing')cd*=2;if(cd>0){await wait(200);await dealUnit(fo,i,cd);}}
  cleanup();renderBattle();checkEnd();}
-function battleMenu(){if(B&&B.wildMode){M(`<h2>야생 포켓몬 전투</h2><div class=explain style="font-size:14px">기존 배틀과 같은 방식으로 카드를 내고, 문제를 풀어 공격해요. 야생 포켓몬은 트레이너 체력 없이 체력이 30% 이하가 되면 포획을 시도할 수 있어요.</div><div class=mbtns><button class="btn gold" data-a=x>계속 싸우기</button><button class="btn ghost" data-a=q>전투 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),q:async()=>{if(await confirmBox('야생 포켓몬과의 전투를 포기할까요? 이번 포획 기회는 사라져요.','포기하기','계속 싸우기')){closeM();finishEndlessWild('fled','야생 포켓몬 전투를 포기했어요.');}}});return;}M(`<h2>배틀 메뉴</h2><div class=explain style="font-size:14px">${Object.values(KW).filter((v,i,a)=>a.findIndex(x=>x.n===v.n)===i).map(k=>`${I(k.ic)} <b>${k.n}</b> ${k.d}`).join('<br>')}<br><br><b>타입 상성</b>: 상성이 좋으면 피해 ×1.5(효과가 굉장했다!), 나쁘면 −1. 공격받은 포켓몬은 반격해요.<br>10번째 차례부터는 두 트레이너 모두 조금씩 지쳐요.<br><br><b>특수 카드 뽑기</b>: 일반 덱 카드 50%, 랜덤 포켓몬 카드 20%, 기본 돌 4종 합계 20%(화염의 돌·물의 돌·전기의 돌·달의 돌 각각 5%), 태양의 돌 10%예요. 태양의 돌은 비용 0으로 사용하면 이번 턴 에너지가 1 늘어요. 랜덤 카드 중 마스터볼 20%(5~6코스트·비용 4), 파워볼 30%(3~4코스트·비용 2), 포켓볼 50%(1~2코스트·비용 1) 비율로 나와요.<br><br><b>공부 기술</b>: 전투마다 2회 사용할 수 있고, 에너지를 소모하지 않아요. 사용할 때마다 남은 횟수가 1씩 줄어요. <b>달의 돌</b>은 3코스트로 상대 포켓몬 하나를 1턴 동안 기절시켜요.</div>
+function battleMenu(){if(B&&B.wildMode){M(`<h2>야생 포켓몬 전투</h2><div class=explain style="font-size:14px">기존 배틀과 같은 방식으로 카드를 내고, 문제를 풀어 공격해요. 야생 포켓몬은 트레이너 체력 없이 체력이 30% 이하가 되면 포획을 시도할 수 있어요.</div><div class=mbtns><button class="btn gold" data-a=x>계속 싸우기</button><button class="btn ghost" data-a=q>전투 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),q:async()=>{if(await confirmBox('야생 포켓몬과의 전투를 포기할까요? 이번 포획 기회는 사라져요.','포기하기','계속 싸우기')){closeM();finishEndlessWild('fled','야생 포켓몬 전투를 포기했어요.');}}});return;}M(`<h2>배틀 메뉴</h2><div class=explain style="font-size:14px">${Object.values(KW).filter((v,i,a)=>a.findIndex(x=>x.n===v.n)===i).map(k=>`${I(k.ic)} <b>${k.n}</b> ${k.d}`).join('<br>')}<br><br><b>타입 상성</b>: 상성이 좋으면 피해 ×1.5(효과가 굉장했다!), 나쁘면 −1. 공격받은 포켓몬은 반격해요.<br>10번째 차례부터는 두 트레이너 모두 조금씩 지쳐요.<br><br><b>특수 카드 뽑기</b>: 일반 덱 카드 50%, 랜덤 포켓몬 카드 20%, 기본 돌 4종 합계 20%(화염의 돌·물의 돌·전기의 돌·달의 돌 각각 5%), 태양의 돌 10%예요. 태양의 돌은 비용 0으로 사용하면 이번 턴 에너지가 1 늘어요. 랜덤 카드 중 마스터볼 20%(5~6코스트·비용 4), 파워볼 30%(3~4코스트·비용 2), 포켓볼 50%(1~2코스트·비용 1) 비율로 나와요.<br><br><b>공부 기술</b>: 전투마다 기본 2회(트레이너 스킬 '공부 강화'로 늘어나요) 사용할 수 있고, 에너지를 소모하지 않아요. 사용할 때마다 남은 횟수가 1씩 줄어요. <b>달의 돌</b>은 3코스트로 상대 포켓몬 하나를 1턴 동안 기절시켜요.</div>
  <div class=mbtns><button class="btn gold" data-a=x>계속하기</button>${B.pvp?'':`<button class="btn green" data-a=sv>${I('disk')} 저장하고 나가기</button>`}<button class="btn ghost" data-a=q>포기하기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),sv:()=>{if(B.busy||B.side!=='me'){toast('내 차례일 때 저장할 수 있어요');return;}const o=Object.assign({},B,{busy:false,sel:-1,pick:-1});delete o.rng;S.meta.bsave=JSON.stringify(o);saveLocal();closeM();B=null;$('#battle').classList.remove('on');$('#battle').innerHTML='';renderLeague();toast('배틀을 저장했어요! 지금 꺼도 다음에 이어서 할 수 있어요');},q:async()=>{if(await confirmBox('배틀을 포기할까요? 푼 문제는 기록에 남아요.','포기','계속')){closeM();if(B.pvp)pvpSend({t:'quit'});B.over=true;endBattle(false);}}});}
 async function endBattle(win){if(B&&B.wildMode){finishEndlessWild('fled','야생 포켓몬 전투를 종료했어요.');return;}if(B&&B.pvp)return pvpEnd(win);startBgm('adventure');const me=S.meta,g=B.g,gi=B.gi;const first=gi>=0&&win&&!me.gyms[gi];
  let coins=win?30+B.diff*10:10,candy=B.qc,packs=0,legend=0;
@@ -3410,22 +3463,28 @@ const TRAINER_SKILL_INFO={
  attack:{n:'공격',ic:'💥',desc:'상대 포켓몬 하나에게 스킬 레벨만큼 직접 피해를 줘요.',max:5},
  cheer:{n:'응원',ic:'📣',desc:'아군 포켓몬 하나의 공격력을 영구적으로 올리고 방어막(피해 1을 막아요)을 줘요. (공격력 Lv.1~5: +1/+1/+2/+2/+3 · 방어막 1/2/2/3/3개)',max:5},
  mana:{n:'마나 연구',ic:'🔮',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 매 턴 시작 시 일정 확률로 마나를 1 더 얻어요. (Lv.1 30% → Lv.5 70%)',eff:n=>n?`매 턴 ${manaChance(n)}% 확률로 마나 +1`:'아직 배우지 않았어요',max:5},
- study:{n:'공부 강화',ic:'📚',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 공부 기술로 문제를 맞혔을 때 일정 확률로 카드를 1장 더 뽑아요. (Lv.1 30% → Lv.5 70%)',eff:n=>n?`공부 기술 성공 시 ${studyChance(n)}% 확률로 카드 +1`:'아직 배우지 않았어요',max:5},
+ study:{n:'공부 강화',ic:'📚',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 전투마다 쓸 수 있는 공부 기술 횟수가 늘고, 공부 기술로 문제를 맞혔을 때 일정 확률로 카드를 1장 더 뽑아요. (Lv.1 +1회·30% / Lv.2 +1회·40% / Lv.3 +2회·50% / Lv.4 +2회·60% / Lv.5 +3회·70%)',eff:n=>n?`공부 기술 +${studyExtraUses(n)}회 · 성공 시 ${studyChance(n)}% 확률로 카드 +1`:'아직 배우지 않았어요',max:5},
+ hand:{n:'카드 보유량',ic:'🃏',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 손에 들 수 있는 카드 최대치가 늘어나요. (Lv.1~2 +1장 → 7장 / Lv.3~4 +2장 → 8장 / Lv.5 +3장 → 9장)',eff:n=>n?`카드 보유 최대 ${HAND_BASE+handBonusOf(n)}장 (+${handBonusOf(n)})`:'아직 배우지 않았어요',max:5},
  vit:{n:'체력 증강',ic:'❤️‍🔥',passive:1,desc:'패시브 · 찍어 두면 상시 적용돼요. 트레이너의 최대 체력이 스킬 레벨만큼 늘어요. (Lv.5 +5)',eff:n=>n?`트레이너 최대 체력 +${n}`:'아직 배우지 않았어요',max:5}
 };
-function trainerSkillLevels(){const m=S.meta;m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0},m.trainerSkills||{});return m.trainerSkills;}
+function trainerSkillLevels(){const m=S.meta;m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},m.trainerSkills||{});return m.trainerSkills;}
 const CHEER_ATK=[0,1,1,2,2,3],CHEER_SHIELD=[0,1,2,2,3,3];
 const studyChance=n=>n>0?Math.min(70,20+10*n):0;
-const studyBonusDraw=P=>{if(window.__sim||!P||P.hand.length>=6)return false;const shared=B.coop||B.pvp;const lv=shared?(Number(P.studyLv)||0):(Number(trainerSkillLevels().study)||0);if(lv<=0)return false;const r=B.pvp?P.passRng():rnd();if(r*100<studyChance(lv)){draw(P);return true;}return false;};
+const studyExtraUses=n=>[0,1,1,2,2,3][Math.max(0,Math.min(5,Number(n)||0))]||0;
+const HAND_BASE=6;
+const handBonusOf=n=>{n=Math.max(0,Math.min(5,Number(n)||0));return n>=5?3:n>=3?2:n>=1?1:0;};
+function handMax(P){let lv=0;try{if(!P||window.__sim||typeof B==='undefined'||!B)return HAND_BASE;if(B.coop||B.pvp)lv=Number(P.handLv)||0;else if(P===B.me)lv=Number(trainerSkillLevels().hand)||0;}catch(e){}return HAND_BASE+handBonusOf(lv);}
+function spendMana(P,n){const b=Math.min(P.bonusMana||0,n);P.bonusMana=(P.bonusMana||0)-b;P.mana-=n;}
+const studyBonusDraw=P=>{if(window.__sim||!P||P.hand.length>=handMax(P))return false;const shared=B.coop||B.pvp;const lv=shared?(Number(P.studyLv)||0):(Number(trainerSkillLevels().study)||0);if(lv<=0)return false;const r=B.pvp?P.passRng():rnd();if(r*100<studyChance(lv)){draw(P);return true;}return false;};
 const manaChance=n=>n>0?Math.min(70,20+10*n):0;
 const vitBonus=()=>Math.max(0,Math.min(5,Number(trainerSkillLevels().vit)||0));
 const heroHpMax=()=>HERO_HP+vitBonus();
 function trainerSkillUpgradeCost(nextLv){return nextLv<=2?1:nextLv<=4?2:3;}
 function trainerSkillInvestedPoints(levels){return Object.values(levels).reduce((sum,n)=>{n=Math.max(0,Math.min(5,Number(n)||0));for(let i=1;i<=n;i++)sum+=trainerSkillUpgradeCost(i);return sum;},0);}
 function renderTrainerSkills(){S.screen='trainerSkills';const m=S.meta,lv=trainerSkillLevels();
- $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">🛡️ 트레이너 스킬</h2><span class=hudSp></span><span class=pill>🔷 레벨 포인트 ${m.lp||0}</span></div><p class=mut style="font-size:13px">레벨 1~2는 각각 1포인트, 레벨 3~4는 각각 2포인트, 레벨 5는 3포인트가 필요해요. 전투에서는 일반 스킬을 종류별로 한 번씩 사용할 수 있고, 패시브 스킬은 자동으로 적용돼요.</p><div style="display:grid;gap:10px">${Object.entries(TRAINER_SKILL_INFO).map(([k,v])=>{const n=lv[k]||0,cost=n>=5?0:trainerSkillUpgradeCost(n+1);return `<div class=panel style="margin:0;border:2px solid ${n?'#b8a4f4':'var(--line)'};background:${n?'#f7f2ff':'#fff'}"><div style="display:flex;align-items:flex-start;gap:10px"><div style="font-size:30px">${v.ic}</div><div style="flex:1;min-width:0"><div class=jua style="font-size:19px">${v.n} <span class=mut style="font-size:14px">Lv.${n}/5</span></div><div class=mut style="font-size:13px;line-height:1.55">${v.desc}</div>${v.eff?`<div style="font-size:13px;color:#7c55c7;margin-top:3px">현재 효과: ${v.eff(n)}</div>`:''}<div style="margin-top:6px;color:#7c55c7;font-size:13px">${'★'.repeat(n)}${'☆'.repeat(5-n)}</div><div class=mut style="font-size:12px;margin-top:4px">${n>=5?'최대 레벨':`다음 레벨 비용: 🔷 ${cost}개`}</div></div><button class="btn ${n>=5?'ghost':'purple'} sm" data-skill-up="${k}" ${n>=5||(m.lp||0)<cost?'disabled':''}>${n>=5?'최대 레벨':`🔷 ${cost} 투자`}</button></div></div>`;}).join('')}</div><div class=mbtns><button class="btn ghost" id=tsBack>← 돌아가기</button><button class="btn red" id=tsReset ${m.coins<100?'disabled':''}>초기화 · 🪙 100코인</button></div><p class=mut style="font-size:12px">초기화하면 모든 트레이너 스킬 레벨이 0이 되고, 투자했던 레벨 포인트를 전부 돌려받아요.</p></div></div>`;
+ $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">🛡️ 트레이너 스킬</h2><span class=hudSp></span><span class=pill>🔷 레벨 포인트 ${m.lp||0}</span></div><p class=mut style="font-size:13px">레벨 1~2는 각각 1포인트, 레벨 3~4는 각각 2포인트, 레벨 5는 3포인트가 필요해요. 전투에서는 일반 스킬을 종류별로 한 번씩 사용할 수 있고, 패시브 스킬은 자동으로 적용돼요. 트레이너 레벨 5, 10, 15…에 도달할 때마다 보너스 레벨 포인트 +2를 받아요.</p><div style="display:grid;gap:10px">${Object.entries(TRAINER_SKILL_INFO).map(([k,v])=>{const n=lv[k]||0,cost=n>=5?0:trainerSkillUpgradeCost(n+1);return `<div class=panel style="margin:0;border:2px solid ${n?'#b8a4f4':'var(--line)'};background:${n?'#f7f2ff':'#fff'}"><div style="display:flex;align-items:flex-start;gap:10px"><div style="font-size:30px">${v.ic}</div><div style="flex:1;min-width:0"><div class=jua style="font-size:19px">${v.n} <span class=mut style="font-size:14px">Lv.${n}/5</span></div><div class=mut style="font-size:13px;line-height:1.55">${v.desc}</div>${v.eff?`<div style="font-size:13px;color:#7c55c7;margin-top:3px">현재 효과: ${v.eff(n)}</div>`:''}<div style="margin-top:6px;color:#7c55c7;font-size:13px">${'★'.repeat(n)}${'☆'.repeat(5-n)}</div><div class=mut style="font-size:12px;margin-top:4px">${n>=5?'최대 레벨':`다음 레벨 비용: 🔷 ${cost}개`}</div></div><button class="btn ${n>=5?'ghost':'purple'} sm" data-skill-up="${k}" ${n>=5||(m.lp||0)<cost?'disabled':''}>${n>=5?'최대 레벨':`🔷 ${cost} 투자`}</button></div></div>`;}).join('')}</div><div class=mbtns><button class="btn ghost" id=tsBack>← 돌아가기</button><button class="btn red" id=tsReset ${m.coins<100?'disabled':''}>초기화 · 🪙 100코인</button></div><p class=mut style="font-size:12px">초기화하면 모든 트레이너 스킬 레벨이 0이 되고, 투자했던 레벨 포인트를 전부 돌려받아요.</p></div></div>`;
  bindHud();$('#tsBack').onclick=()=>renderHub();$('#view').querySelectorAll('[data-skill-up]').forEach(b=>b.onclick=()=>{const k=b.dataset.skillUp,cur=trainerSkillLevels(),cost=trainerSkillUpgradeCost((cur[k]||0)+1);if((S.meta.lp||0)<cost||cur[k]>=5)return;S.meta.lp-=cost;cur[k]++;autoSave();renderTrainerSkills();toast(`${TRAINER_SKILL_INFO[k].n} Lv.${cur[k]} 달성! (레벨 포인트 ${cost}개 사용)`);});
- $('#tsReset').onclick=async()=>{if((S.meta.coins||0)<100){toast('코인이 100개 필요해요');return;}const yes=await confirmBox(`트레이너 스킬을 초기화할까요?<br>비용: 🪙 100코인<br>투자한 레벨 포인트는 모두 돌려받아요.`,'초기화','취소');if(!yes)return;const cur=trainerSkillLevels(),refund=trainerSkillInvestedPoints(cur);S.meta.coins-=100;S.meta.lp=(S.meta.lp||0)+refund;S.meta.trainerSkills={heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0};autoSave();renderTrainerSkills();toast(`스킬 초기화 완료! 레벨 포인트 ${refund}개를 돌려받았어요.`);};}
+ $('#tsReset').onclick=async()=>{if((S.meta.coins||0)<100){toast('코인이 100개 필요해요');return;}const yes=await confirmBox(`트레이너 스킬을 초기화할까요?<br>비용: 🪙 100코인<br>투자한 레벨 포인트는 모두 돌려받아요.`,'초기화','취소');if(!yes)return;const cur=trainerSkillLevels(),refund=trainerSkillInvestedPoints(cur);S.meta.coins-=100;S.meta.lp=(S.meta.lp||0)+refund;S.meta.trainerSkills={heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0};autoSave();renderTrainerSkills();toast(`스킬 초기화 완료! 레벨 포인트 ${refund}개를 돌려받았어요.`);};}
 function openTrainerSkillModal(){if(!B||B.over)return;const levels=trainerSkillLevels(),used=B.trainerSkillUsed||(B.trainerSkillUsed={});const myTurn=B.side==='me'&&!B.busy&&(!B.coop||B.coop.active===BC.localIndex);const skills=Object.entries(TRAINER_SKILL_INFO).filter(([k,v])=>!v.passive).map(([k,v])=>{const n=levels[k]||0,done=!!used[k],disabled=!n||done||!myTurn||(k==='attack'&&!B.foe.board.some(u=>u&&u.hp>0))||(k==='cheer'&&!B.me.board.some(u=>u&&u.hp>0))||(k==='heal'&&B.me.hp>=B.me.max);return `<button class="btn ${disabled?'ghost':'purple'}" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;margin:7px 0;white-space:normal" data-trainer-skill="${k}" ${disabled?'disabled':''}><span style="font-size:24px">${v.ic}</span><span style="flex:1"><b>${v.n} · Lv.${n}</b><br><small>${done?'이번 전투에서 사용 완료':!n?'아직 배우지 않았어요':v.desc}</small></span><span>${done?'✓':n?'사용':''}</span></button>`;}).join('');
  M(`<h2>🛡️ 트레이너 스킬</h2><p class=mut style="font-size:13px">배운 스킬은 종류별로 이 전투에서 한 번 사용할 수 있어요.</p>${skills}<div class=mbtns><button class="btn ghost" data-a=x>닫기</button><button class="btn ghost" data-a=manage>스킬 관리</button></div>`,{x:()=>closeM(),_close:()=>closeM(),manage:()=>{closeM();renderTrainerSkills();}});
  $('#mbox').querySelectorAll('[data-trainer-skill]').forEach(b=>b.onclick=()=>{const k=b.dataset.trainerSkill;if(!B||B.busy||B.side!=='me'||B.over)return;closeM();activateTrainerSkill(k);});}
@@ -3483,8 +3542,8 @@ async function bossConnect(host,code){bossClose();BC.host=host;BC.localIndex=hos
  const id='pkboss-coop-v1-'+code;const peer=host?new Peer(id):new Peer();BC.peer=peer;
  peer.on('error',e=>{const t=String(e&&e.type||'');bossBox(`<p style="color:#d9393f">${t==='unavailable-id'?'이미 사용 중인 코드예요. 새 방을 만들어 주세요.':t==='peer-unavailable'?'해당 방을 찾을 수 없어요. 코드를 확인해 주세요.':'연결에 실패했어요. 인터넷 연결을 확인해 주세요.'}</p><button class="btn ghost" id=bcCancel>돌아가기</button>`)});
  peer.on('open',()=>{if(host){bossBox(`<p>친구에게 아래 코드를 알려 주세요.</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구 접속 대기 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);peer.on('connection',c=>{if(BC.conn){c.close();return}BC.conn=c;bossBind(c)});}else{bossBox(`<p>방 ${code}에 접속 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);BC.conn=peer.connect(id,{reliable:true});bossBind(BC.conn)}});}
-const BOSS_NET_VER=2;
-function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:vitBonus(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,name:S.meta.name,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number),avatar:partnerId()});});c.on('data',d=>{if(!d||typeof d!=='object')return;
+const BOSS_NET_VER=3;
+function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:vitBonus(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,name:S.meta.name,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number),avatar:partnerId()});});c.on('data',d=>{if(!d||typeof d!=='object')return;
  if(d.t==='boss-hi'){if(d.v!==BOSS_NET_VER){BC.ready=false;BC.foe=null;bossBox(`<p style="color:#d9393f">친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}BC.foe=d;BC.ready=true;bossBox(`<h2>친구와 연결됐어요!</h2><p>${esc(d.name||'친구')}와 협동 보스전에 입장할 준비가 됐어요.</p><div class=explain>4성 80% · 5성 20% · 공유 필드 8칸</div>${BC.host?'<button class="btn red big" id=bcStart>보스전 시작</button>':'<p class=mut>방장이 보스전을 시작하기를 기다리는 중…</p>'}<button class="btn ghost" id=bcCancel>나가기</button>`);if(BC.host)bossSend({t:'boss-wait',name:S.meta.name});}
  else if(d.t==='boss-wait'){toast(`${esc(d.name||'친구')}가 접속했어요`)}
  else if(d.t==='boss-start'){if(!BC.host)bossApplySnapshot(d.state,true);}
@@ -3498,7 +3557,7 @@ function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:v
   else if(d.t==='boss-defa'&&BC.host){if(BC.defWait&&BC.defWait.id===d.id){const w=BC.defWait;BC.defWait=null;w.res(d.skip?null:{ok:!!d.ok});}}
  });c.on('close',()=>{if(BC.defWait){const w=BC.defWait;BC.defWait=null;w.res(null);}if(S.screen==='bosscoop'&&!BC.resultHandled&&!(B&&B.coop&&B.coop.result))bossBox(`<p>연결이 끊어졌어요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);else if(B&&B.coop){toast('협동 보스전 연결이 끊어졌어요. 방장 화면의 전투 상태는 유지됩니다.');}});}
 function bossWildId(){let pool=MON_IDS.filter(id=>MON[id]&&(MON[id].rar===4||MON[id].rar===5));const rar=rnd()<.2?5:4;let p=pool.filter(id=>MON[id].rar===rar);const fresh=p.filter(id=>!S.meta.col[id]);if(fresh.length)p=fresh;return rpick(p.length?p:pool);}
-function bossStartBattle(){if(!BC.host||!BC.ready||!BC.foe||!ensureDeck())return;const m=S.meta,other=BC.foe;const id=bossWildId(),ids=[id];if(rnd()<.1){let j=bossWildId(),n=0;while(j===id&&n++<10)j=bossWildId();ids.push(j);}const a=mkPlayer(m.name,m.deck,heroHpMax(),partnerId(),false,Object.keys(m.col||{}).map(Number),true);a.manaLv=Number(trainerSkillLevels().mana)||0;a.studyLv=Number(trainerSkillLevels().study)||0;const ov=Math.max(0,Math.min(5,Number(other.vit)||0));const b=mkPlayer(other.name||'친구',other.deck||[],HERO_HP+ov,other.avatar||partnerId(),false,other.owned||[],true);b.manaLv=Math.max(0,Math.min(5,Number(other.mana)||0));b.studyLv=Math.max(0,Math.min(5,Number(other.study)||0));const board=Array(8).fill(null);a.board=board;b.board=board;for(let i=0;i<3;i++){draw(a,true);draw(b,true);}const foe=mkPlayer(ids.map(x=>MON[x].name).join(' · '),[],1,id,true,[],false);const slots=ids.length===2?[1,3]:[2];ids.forEach((wid,k)=>{const u=mkUnit(wid);u.hp=MON[wid].hp*15;u.max=u.hp;u.atk=MON[wid].atk;u.att=0;u.fresh=0;u.wildEncounter=1;foe.board[slots[k]]=u;});
+function bossStartBattle(){if(!BC.host||!BC.ready||!BC.foe||!ensureDeck())return;const m=S.meta,other=BC.foe;const id=bossWildId(),ids=[id];if(rnd()<.1){let j=bossWildId(),n=0;while(j===id&&n++<10)j=bossWildId();ids.push(j);}const a=mkPlayer(m.name,m.deck,heroHpMax(),partnerId(),false,Object.keys(m.col||{}).map(Number),true);a.manaLv=Number(trainerSkillLevels().mana)||0;a.studyLv=Number(trainerSkillLevels().study)||0;a.powerUses+=studyExtraUses(a.studyLv);a.handLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().hand)||0));const ov=Math.max(0,Math.min(5,Number(other.vit)||0));const b=mkPlayer(other.name||'친구',other.deck||[],HERO_HP+ov,other.avatar||partnerId(),false,other.owned||[],true);b.manaLv=Math.max(0,Math.min(5,Number(other.mana)||0));b.studyLv=Math.max(0,Math.min(5,Number(other.study)||0));b.powerUses+=studyExtraUses(b.studyLv);b.handLv=Math.max(0,Math.min(5,Number(other.hand)||0));const board=Array(8).fill(null);a.board=board;b.board=board;for(let i=0;i<3;i++){draw(a,true);draw(b,true);}const foe=mkPlayer(ids.map(x=>MON[x].name).join(' · '),[],1,id,true,[],false);const slots=ids.length===2?[1,3]:[2];ids.forEach((wid,k)=>{const u=mkUnit(wid);u.hp=MON[wid].hp*15;u.max=u.hp;u.atk=MON[wid].atk;u.att=0;u.fresh=0;u.wildEncounter=1;foe.board[slots[k]]=u;});
  BC.resultHandled=false;BC.clientCaught=[];BC.lastSeqByPlayer={};const st={n:0,id,ids:ids.slice(),finished:false,caughtIds:[],caughtNewIds:[],captureModalOpen:false,note:'',previousScreen:'bosscoop',coopMode:true};B={gi:-2,g:{n:'협동 보스전',ldr:'보스 포켓몬',c:TYPE_COL[MON[id].types[0]]||'#ffc93c'},diff:Math.max(1,Math.ceil(lvOf(m.xp).lv/2)),turn:0,round:0,side:'me',me:a,foe,sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:false,over:false,wildMode:true,wildId:id,wildSlot:slots[0],wildIds:ids.slice(),wildSlots:slots.slice(),wildState:st,capturePrompted:false,coop:{players:[a,b],active:0,localIndex:0,seq:0,processing:false,result:null}};S.screen='battle';$('#bq').classList.remove('on');closeInfo();$('#battle').innerHTML='';$('#battle').classList.add('on');startBgm('battle');renderBattle();banner(ids.length===2?'보스 포켓몬 2마리 등장!':'보스 포켓몬 등장!',`${ids.map(x=>esc(MON[x].name)).join(' · ')} · 협동 전투 시작!`,1700);if(BC.conn&&BC.conn.open)bossSend({t:'boss-start',state:bossSnapshot(true)});startTurn('me');}
 function bossSetActive(i){if(!B||!B.coop)return;const p=B.coop.players;if(!p||p.length!==2)return;B.coop.active=i;const board=bossSharedBoard();p[0].board=board;p[1].board=board;B.me=p[i];B.me.board=board;B.foe=B.coop.foe||B.foe;}
 function bossSharedBoard(){if(!B||!B.coop||!Array.isArray(B.coop.players))return Array(8).fill(null);const p=B.coop.players;const a=Array.isArray(p[0]?.board)?p[0].board:[];const b=Array.isArray(p[1]?.board)?p[1].board:[];const board=Array(8).fill(null);for(let i=0;i<8;i++){const x=a[i]||null,y=b[i]||null;if(x&&y){const xo=Number(x.coopOwner??0),yo=Number(y.coopOwner??0);board[i]=xo===yo?x:(xo===1?x:y);}else board[i]=x||y;}return board;}
@@ -3640,7 +3699,7 @@ async function bossAnswerDefense(d){if(!B||!B.coop)return;const q=pickQ();if(!q)
 // 연결은 WebRTC(PeerJS). 처음 연결할 때만 PeerJS 공개 서버를 거치고, 그 뒤는 기기끼리 바로 주고받아요.
 const PVP_COST=60;       // 한 판에 드는 코인 (훈련 정답 12개쯤) — 쉬는 시간 내내 하지 않도록
 const PVP_WIN=30,PVP_LOSE=10;
-const PVP_VER=5; // 마나 연구·공부 강화 패시브가 대전에도 적용되는 버전
+const PVP_VER=6; // 마나 연구·공부 강화·카드 보유량 패시브가 대전에도 적용되는 버전
 const PV={peer:null,conn:null,host:false,code:'',q:[],busy:false,foe:null,started:false,charged:false};
 function loadPeer(){return new Promise((res,rej)=>{if(window.Peer)return res();const s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';s.onload=()=>res();s.onerror=()=>rej(new Error('연결 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'));document.head.appendChild(s);});}
 function pvpClose(){try{PV.conn&&PV.conn.close();}catch(e){}try{PV.peer&&PV.peer.destroy();}catch(e){}PV.peer=null;PV.conn=null;PV.q=[];PV.busy=false;PV.started=false;}
@@ -3673,7 +3732,7 @@ async function pvpStart(host,code){const m=S.meta;if(m.coins<PVP_COST){toast('�
   else{pvBox(`<p>방 ${code}에 들어가는 중…</p><button class="btn ghost" id=pvCancel>취소</button>`);const c=peer.connect(id,{reliable:true});PV.conn=c;pvBind(c);}});}
 function pvBind(c){
  c.on('open',()=>{const me=S.meta;const deck=shuffle(me.deck.slice());PV.myDeck=deck;PV.myOwned=Object.keys(me.col).map(Number).filter(id=>MON[id]);
-  pvpSend({t:'hi',v:PVP_VER,name:me.name,deck,col:PV.myOwned,av:partnerId(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,seed:PV.host?(Math.random()*1e9|0):0});});
+  pvpSend({t:'hi',v:PVP_VER,name:me.name,deck,col:PV.myOwned,av:partnerId(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,seed:PV.host?(Math.random()*1e9|0):0});});
  c.on('data',d=>{PV.q.push(d);pvpPump();});
  c.on('close',()=>{if(B&&B.pvp&&!B.over){B.over=true;toast('친구와 연결이 끊겼어요');pvpEnd(null);}else if(!PV.started&&S.screen==='pvp'){pvBox(`<p>연결이 끊겼어요</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);}});}
 // 받은 행동을 차례대로 하나씩 처리해요(애니메이션이 겹치지 않게)
@@ -3706,12 +3765,12 @@ function pvpBegin(seed){if(PV.started)return;PV.started=true;const me=S.meta,f=P
  // 마나 연구·공부 강화 확률도 두 기기에서 같은 결과가 나오도록 플레이어별 고정 난수를 써요.
  B.me.passRng=mkRng((seed^hashStr(B.me.name)^0x7C3D)>>>0);B.foe.passRng=mkRng((seed^hashStr(B.foe.name)^0x7C3D)>>>0);
  B.me.manaLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().mana)||0));B.me.studyLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().study)||0));
- B.foe.manaLv=Math.max(0,Math.min(5,Number(f.mana)||0));B.foe.studyLv=Math.max(0,Math.min(5,Number(f.study)||0));
+ B.foe.manaLv=Math.max(0,Math.min(5,Number(f.mana)||0));B.foe.studyLv=Math.max(0,Math.min(5,Number(f.study)||0));B.me.handLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().hand)||0));B.foe.handLv=Math.max(0,Math.min(5,Number(f.hand)||0));B.me.powerUses+=studyExtraUses(B.me.studyLv);B.foe.powerUses+=studyExtraUses(B.foe.studyLv);
  // 먼저 하는 사람(방장)은 3장, 나중에 하는 사람은 4장
  const meFirst=PV.host;for(let i=0;i<(meFirst?3:4);i++)draw(B.me,true);for(let i=0;i<(meFirst?4:3);i++)draw(B.foe,true);
  S.screen='battle';$('#view').innerHTML='';$('#battle').classList.add('on');startBgm('battle');renderBattle();
  banner('친구 대전!',`${esc(f.name)}와(과) 대결`,1800);
- setTimeout(()=>{if(!B)return;if(meFirst)startTurn('me');else{B.side='foe';B.turn++;B.foe.maxMana=1;B.foe.mana=1;if(B.foe.manaLv>0&&B.foe.passRng()*100<manaChance(B.foe.manaLv))B.foe.mana+=1;draw(B.foe);B.busy=false;renderBattle();pvpPump();}},1600);}
+ setTimeout(()=>{if(!B)return;if(meFirst)startTurn('me');else{B.side='foe';B.turn++;B.foe.maxMana=1;B.foe.mana=1;if(B.foe.manaLv>0&&B.foe.passRng()*100<manaChance(B.foe.manaLv)){B.foe.mana+=1;B.foe.bonusMana=1;}draw(B.foe);B.busy=false;renderBattle();pvpPump();}},1600);}
 async function pvpEnd(win){startBgm('adventure');const me=S.meta;const f=PV.foe||{name:'친구'};
  if(win!==null){me.pvp=me.pvp||{n:0,w:0,l:0,gg:0,foes:{}};me.pvp.n++;if(win)me.pvp.w++;else me.pvp.l++;me.pvp.foes[f.name]=(me.pvp.foes[f.name]||0)+1;me.pvp.last=Date.now();
   const back=win?PVP_WIN:PVP_LOSE;me.coins+=back;me.candy+=B.qc;me.stats.candyAll=(me.stats.candyAll||0)+B.qc;gainXP(win?30:15);}
@@ -4068,7 +4127,17 @@ async function cardPreload(m,spec){await Promise.race([(document.fonts?document.
 function crc32b(b){let crc=0xFFFFFFFF;for(let n=0;n<b.length;n++){let c=(crc^b[n])&0xFF;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;crc=(crc>>>8)^c;}return(crc^0xFFFFFFFF)>>>0;}
 async function cardPNG(cv){const b=await new Promise(r=>cv.toBlob(r,'image/png'));const u=new Uint8Array(await b.arrayBuffer());const ch=new Uint8Array(21),dv=new DataView(ch.buffer);dv.setUint32(0,9);ch.set([0x70,0x48,0x59,0x73],4);dv.setUint32(8,11811);dv.setUint32(12,11811);ch[16]=1;dv.setUint32(17,crc32b(ch.subarray(4,17)));const out=new Uint8Array(u.length+21);out.set(u.subarray(0,33));out.set(ch,33);out.set(u.subarray(33),54);return new Blob([out],{type:'image/png'});}
 async function cardDownload(cv,name){const b=await cardPNG(cv);const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name+'.png';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);toast('카드 이미지(300dpi)를 내려받았어요');}
-function cardPrint(cvs){const list=Array.isArray(cvs)?cvs:[cvs];const many=list.length>1;const html=`<!doctype html><meta charset=utf-8><title>카드 인쇄</title><style>@page{size:${many?'A4':CARD.MM.w+'mm '+CARD.MM.h+'mm'};margin:${many?'10mm':'0'}}html,body{margin:0}.w{display:flex;flex-wrap:wrap;gap:4mm}img{width:${CARD.MM.w}mm;height:${CARD.MM.h}mm;display:block;${many?'outline:.2mm dashed #bbb;':''}}</style><div class=w>${list.map(c=>`<img src="${c.toDataURL('image/png')}">`).join('')}</div>`;
+function cardPrint(cvs){const list=Array.isArray(cvs)?cvs:[cvs];const many=list.length>1;const html=`<!doctype html><meta charset=utf-8><title>카드 인쇄</title><style>@page{size:${many?'A4':CARD.MM.w+'mm '+CARD.MM.h+'mm'};margin:${many?'10mm':'0'}}html,body{margin:0}.w{display:flex;flex-wrap:wrap;gap:4mm}img{width:${CARD.MM.w}mm;height:${CARD.MM.h}mm;display:block;${many?'outline:.2mm dashed #bbb;':''}}
+/* ===== 전투 프레임 최적화 ===== */
+#battle .unit .sp img{will-change:transform}
+#battle .unit{backface-visibility:hidden}
+.dmg{animation-timing-function:cubic-bezier(.22,.7,.3,1)!important;will-change:transform,opacity;backface-visibility:hidden}
+.hring,.pcl{will-change:transform,opacity}
+#battle .card .holo{animation:none!important;mix-blend-mode:normal!important}
+#battle .card.r4,#battle .card.r5{animation:none!important}
+html.lowfx #battle .unit .sp img{filter:none!important}
+html.lowfx .unit.tgt,html.lowfx .slot.can,html.lowfx .unit.itemTarget{animation:none!important}
+</style><div class=w>${list.map(c=>`<img src="${c.toDataURL('image/png')}">`).join('')}</div>`;
  const f=document.createElement('iframe');f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';document.body.appendChild(f);f.onload=()=>{setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print();}catch(e){}setTimeout(()=>f.remove(),2000);},300);};f.srcdoc=html;}
 // ---- 학생 화면: 카드 꾸미기 ----
 let PIXC=0;
@@ -5613,7 +5682,7 @@ function rlLaunch(){const m=S.meta;if(!codeValid()||!m.name||!m.starter)return s
 
 // ---------- 전투 효과 연결 (유물) ----------
 const __rlDraw=draw;
-draw=function(P,quiet){if(B&&B.rl&&P===B.me&&!P.deck.length&&P.hand.length<6&&B.rl.deckAll&&B.rl.deckAll.length){P.deck=shuffle(B.rl.deckAll.slice());if(!quiet&&!window.__sim)toast('🔀 덱을 다시 섞었어요');}return __rlDraw.apply(this,arguments);};
+draw=function(P,quiet){if(B&&B.rl&&P===B.me&&!P.deck.length&&P.hand.length<handMax(P)&&B.rl.deckAll&&B.rl.deckAll.length){P.deck=shuffle(B.rl.deckAll.slice());if(!quiet&&!window.__sim)toast('🔀 덱을 다시 섞었어요');}return __rlDraw.apply(this,arguments);};
 const __rlResolveAttack=resolveAttack;
 resolveAttack=async function(A,D,si,tg,ok,cb,defReduce){
  if(B&&B.rl&&A===B.me){const a=A.board[si];if(a){const mul=rlAtkMul(a);if(mul>1){const old=a.atk;a.atk=Math.ceil(old*mul);try{return await __rlResolveAttack.apply(this,arguments);}finally{if(a)a.atk=old;}}}}
