@@ -1856,9 +1856,9 @@ function codeValid(){const c=S.meta.code&&parseCode(S.meta.code);return !!(c&&!c
 
 // ===== 상태 =====
 const SAVE_KEY=GAME.id+'-v1';
-const SAVE_VER=5; // 저장 형식이 바뀌면 올리고 upgradeMeta에 변환을 한 단계 추가해요(옛 저장도 이어서 하기)
+const SAVE_VER=6; // 저장 형식이 바뀌면 올리고 upgradeMeta에 변환을 한 단계 추가해요(옛 저장도 이어서 하기)
 function defaultMeta(){return{ver:SAVE_VER,name:'',code:'',gs:'',cls:'',focus:null,uMax:null,misc:{},starter:0,created:0,
- xp:0,lp:0,lpRetrofit:false,lpBonus5:true,trainerSkills:{heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},coins:0,candy:0,packs:0,dust:0,pity:{p4:0,p5:0},col:{},seen:{},dexSeen:{},deck:[],
+ xp:0,lp:0,lpRetrofit:false,lpBonus5Done:false,trainerSkills:{heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},coins:0,candy:0,packs:0,dust:0,pity:{p4:0,p5:0},col:{},seen:{},dexSeen:{},deck:[],
  sk:{},days:{},hist:[],train:{last:'',best:0,count:0,lastRes:null,daily:''},
  badges:{},gyms:{},battles:{w:0,l:0},stats:{q:0,c:0,streak:0,bestCombo:0,bestStreak:0,guessWrong:0,guessAlert:0,careful:0,lowerStar:0,shardDone:0,crafted:0,foundDone:0,superEff:0,gymTry:0,retryOk:0,bounce:0,fast:0,better:0,perfect:0,quickTrain:0,practice:0,comeback:0,flawless:0,defOk:0,candyAll:0,evolved:0,opened:0},
  unl:{},unlNew:{},ach:{},partner:0,bond:{},stoneSeen:null,card:null,uMaxAt:'',shard:{},dust:0,season:null,seasons:[],bsave:null,thist:[],first20:null,first20t:null,found:{},endless:{best:0,total:0,runs:0,caught:0},pvp:{n:0,w:0,l:0,gg:0,foes:{},last:0},tod:{m:0,a:0,e:0},firstPlay:0,scenario:{chapter:0,unlocked:0,cleared:[],seenIntro:false},settings:{anim:'calm',sound:true,bgm:true,lowfx:false,easy:false,safe:'auto',zoom:'auto',fit:'auto',imgs:true,defq:true}};}
@@ -1879,7 +1879,9 @@ function upgradeMeta(m){
  // v3 → v4: 트레이너 스킬 레벨 저장 칸을 추가해요.
  if((m.ver||1)<4){m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},m.trainerSkills||{});m.ver=4;}
   // v4 → v5: 카드 보유량 스킬 칸 + 5레벨마다 레벨 포인트 +2를 현재 레벨 기준으로 소급 지급해요.
-  if((m.ver||1)<5){m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},m.trainerSkills||{});if(!m.lpBonus5){m.lp=(Number(m.lp)||0)+lvBonusPts(1,lvOf(Math.max(0,Number(m.xp)||0)).lv);m.lpBonus5=true;}m.ver=5;}
+  if((m.ver||1)<5){m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},m.trainerSkills||{});m.ver=5;}
+  // v5 → v6: 5레벨마다 레벨 포인트 +2를 현재 레벨 기준으로 한 번만 소급 지급해요(기본값에 섞여 건너뛰지 않도록 별도 표시를 써요).
+  if((m.ver||1)<6){if(!m.lpBonus5Done){m.lp=(Number(m.lp)||0)+lvBonusPts(1,lvOf(Math.max(0,Number(m.xp)||0)).lv);m.lpBonus5Done=true;}m.ver=6;}
  m.ver=SAVE_VER;return m;}
 const S={meta:defaultMeta(),screen:'title',busy:false};
 
@@ -3401,12 +3403,13 @@ async function foeTurn(){const fo=B.foe,me=B.me;B.busy=true;renderBattle();
  for(let i=0;i<fo.board.length;i++){let u=fo.board[i];while(u&&u.att>0&&!u.frozen&&!B.over){
    const taunts=me.board.map((x,j)=>isTaunt(x)?j:-1).filter(j=>j>=0);let tg=null;
    const tauntActive=taunts.length>0;
+   const mustUnit=u.att>=2&&me.board.some(Boolean); // 2회 공격 포켓몬의 첫 공격은 출전한 포켓몬만 노려요(내 필드가 비었을 때만 예외)
    const faceDmg=fo.board.reduce((s,x)=>s+(x&&x.att>0&&!x.frozen&&(!tauntActive||x.kw==='sneak')?(x.atk*x.att+(x.kw==='quake'?x.att:0)):0),0);
    const defenseExpected=B.wildMode?0:(S.meta.settings.defq?fo.board.reduce((s,x)=>s+(x&&x.att>0&&!x.frozen&&x.atk+(x.kw==='quake'?1:0)>=2?Math.min(x.att,2):0),0):0);
    const likelyFaceDmg=Math.max(0,faceDmg-defenseExpected*1.25);
    const trainerLethal=B.coop?bossLethal(faceDmg)>=0:((S.meta.settings.defq?likelyFaceDmg:faceDmg)>=me.hp);
    if(taunts.length&&u.kw!=='sneak')tg={u:taunts.sort((a,b)=>aiTargetValue(u,me.board[b])-aiTargetValue(u,me.board[a]))[0]};
-   else if(trainerLethal)tg=bossPickTrainer(faceDmg);
+   else if(trainerLethal&&!mustUnit)tg=bossPickTrainer(faceDmg);
    else{let best=null,bv=-Infinity;me.board.forEach((x,j)=>{if(!x)return;const v=aiTargetValue(u,x);if(v>bv){bv=v;best=j;}});
     // 포켓몬 위협도와 트레이너에게 줄 수 있는 피해를 비교해요. 포켓몬만 계속 노리거나
     // 트레이너만 무조건 공격하지 않도록, 트레이너 체력이 낮거나 총 피해가 큰 경우 직접 공격을 높게 평가해요.
@@ -3418,7 +3421,7 @@ async function foeTurn(){const fo=B.foe,me=B.me;B.busy=true;renderBattle();
     if(faceDmg>=me.hp*.6)tChance+=.08;                              // 한 번에 큰 피해를 줄 수 있을 때
     tChance=Math.min(.42,tChance);
     const canHitUnit=best!=null&&bv>-4;                             // 반격에 쓰러지는 헛공격만 아니면 포켓몬을 노려요
-    if(canHitUnit&&rnd()>=tChance)tg={u:best};else tg=bossPickTrainer(faceDmg);}
+    if(mustUnit&&best!=null)tg={u:best};else if(canHitUnit&&rnd()>=tChance)tg={u:best};else tg=bossPickTrainer(faceDmg);}
    await foeAttack(i,tg);u=fo.board[i];await wait(330);}}
  if(B.over)return;B.busy=false;await wait(250);if(B.coop)bossSetActive(0);startTurn('me');}
 async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)return;a.att--;
