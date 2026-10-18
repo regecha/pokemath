@@ -1392,6 +1392,48 @@ html.lowfx .wildLane .unit::before,html.lowfx #foeLane.wildLane .unit::before{bo
 html.lowfx *{backdrop-filter:none!important}
 html.lowfx .hero.tgt,html.lowfx .unit.itemTarget{animation:none!important}
 html.lowfx .unit .sp img.idle,html.lowfx .buddy .bimg img.idle{will-change:auto}
+/* 도트 글자: 윤곽 그림자 8겹 → 4겹(대각선 4방향). 굵은 글꼴이라 모양은 거의 그대로예요 */
+.dmg{text-shadow:2px 2px 0 var(--o),-2px 2px 0 var(--o),2px -2px 0 var(--o),-2px -2px 0 var(--o),0 5px 0 rgba(0,0,0,.25)}
+/* ===== 데미지 숫자: 부드럽게 + 빨간색 + 임팩트 ===== */
+.dmg{--f:#ff3b3b;--o:#5a0a14;color:var(--f);font-size:38px;letter-spacing:-1px;
+ -webkit-text-stroke:5px var(--o);paint-order:stroke fill;
+ text-shadow:0 4px 0 rgba(0,0,0,.28);
+ animation:dmgPop 1s cubic-bezier(.22,.7,.3,1) forwards}
+.dmg.big{font-size:50px}
+.dmg.crit{--f:#ffd633;--o:#b3260a;font-size:60px;animation:dmgCrit 1.1s cubic-bezier(.22,.7,.3,1) forwards}
+.dmg.crit::after{content:'!';margin-left:2px}
+.dmg.heal{--f:#4be08a;--o:#0d5a30}
+.dmg.super{--f:#ffb02e;--o:#7a3a00}
+.dmg.txt{--o:transparent;-webkit-text-stroke:0;color:#3a2e3f;font-size:18px;letter-spacing:0;text-shadow:none;border-radius:10px;
+ box-shadow:0 3px 0 rgba(0,0,0,.18);animation:dmgTxt 1.1s cubic-bezier(.22,.7,.3,1) forwards}
+.dmg.txt.super{color:#b45a00;background:#fff3cf}
+.dmg.lbl{font-size:20px;-webkit-text-stroke:4px var(--o);white-space:nowrap;letter-spacing:0}
+@keyframes dmgPop{
+ 0%{opacity:0;transform:translate(calc(-50% + var(--jx,0px)),-20%) scale(.3)}
+ 10%{opacity:1;transform:translate(calc(-50% + var(--jx,0px)),-55%) scale(1.7)}
+ 22%{opacity:1;transform:translate(calc(-50% + var(--jx,0px)),-65%) scale(1)}
+ 70%{opacity:1;transform:translate(calc(-50% + var(--jx,0px)),-110%) scale(1)}
+ 100%{opacity:0;transform:translate(calc(-50% + var(--jx,0px)),-150%) scale(.95)}}
+@keyframes dmgCrit{
+ 0%{opacity:0;transform:translate(calc(-50% + var(--jx,0px)),-20%) scale(.3) rotate(-8deg)}
+ 9%{opacity:1;transform:translate(calc(-50% + var(--jx,0px)),-55%) scale(2.2) rotate(6deg)}
+ 18%{transform:translate(calc(-50% + var(--jx,0px)),-62%) scale(1.25) rotate(-3deg)}
+ 28%{opacity:1;transform:translate(calc(-50% + var(--jx,0px)),-68%) scale(1.1) rotate(0)}
+ 72%{opacity:1;transform:translate(calc(-50% + var(--jx,0px)),-115%) scale(1.1)}
+ 100%{opacity:0;transform:translate(calc(-50% + var(--jx,0px)),-160%) scale(1)}}
+@keyframes dmgTxt{
+ 0%{opacity:0;transform:translate(-50%,-20%) scale(.7)}
+ 14%{opacity:1;transform:translate(-50%,-60%) scale(1.1)}
+ 24%{transform:translate(-50%,-64%) scale(1)}
+ 75%{opacity:1;transform:translate(-50%,-90%) scale(1)}
+ 100%{opacity:0;transform:translate(-50%,-115%) scale(.95)}}
+/* 스킬 이름·타격 번쩍임·시작 글자도 뚝뚝 끊기지 않게 */
+.skName{animation:skName 1s cubic-bezier(.22,.7,.3,1) forwards}
+.hitflash{animation:hitFlash .28s ease-out forwards}
+.dmg,.skName,#banner{will-change:transform,opacity;contain:layout style}
+#pxWarm{position:fixed;left:-9999px;top:0;pointer-events:none;visibility:hidden}
+#pxWarm .dmg,#pxWarm .skName{position:static;animation:none!important}
+html.lowfx .dmg,html.lowfx .skName,html.lowfx #banner{will-change:auto}
 </style>
 
 </head>
@@ -1763,7 +1805,7 @@ const VW=()=>innerWidth/ZM(),VH=()=>innerHeight/ZM();
 function toast(msg){const d=document.createElement('div');d.className='tst';d.innerHTML=msg;$('#toast').appendChild(d);setTimeout(()=>d.remove(),2800);}
 function banner(b1,b2,ms=2200){const el=$('#banner');el.innerHTML=`<div class=b1>${b1}</div>${b2?`<div class=b2>${b2}</div>`:''}`;el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(banner.t);banner.t=setTimeout(()=>el.classList.remove('on'),ms);
  if(!banner.local&&BC.host&&B&&B.coop&&BC.conn&&BC.conn.open)bossSend({t:'boss-banner',b1,b2,ms});}
-function floatAt(el,text,cls=''){const r=el&&el.getBoundingClientRect?zRect(el):{left:VW()/2,top:VH()/2,width:0,height:0};const d=document.createElement('div');d.className='dmg '+cls;d.innerHTML=text;d.style.left=clamp(r.left+r.width/2,40,VW()-40)+'px';d.style.top=clamp(r.top+r.height/2,30,VH()-30)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),950);}
+function floatAt(el,text,cls=''){const r=el&&el.getBoundingClientRect?zRect(el):{left:VW()/2,top:VH()/2,width:0,height:0};const d=document.createElement('div');d.className='dmg '+cls;d.innerHTML=text;d.style.left=clamp(r.left+r.width/2,40,VW()-40)+'px';d.style.top=clamp(r.top+r.height/2,30,VH()-30)+'px';if(!/txt/.test(cls)&&!/^[-+]?\d+$/.test(String(text).replace(/<[^>]*>/g,'')))d.classList.add('lbl');d.style.setProperty('--jx',Math.round((Math.random()-.5)*36)+'px');if(/^-\d+$/.test(String(text))&&!/crit|big|txt/.test(cls)){d.style.fontSize=Math.min(60,32+Math.abs(+text)*2.4)+'px';}document.body.appendChild(d);setTimeout(()=>d.remove(),1150);}
 function confetti(n=46){if(S.meta.settings.lowfx)n=Math.min(n,16);const cols=['#ff6b6b','#ffcc4d','#51cf66','#339af0','#cc5de8','#ffffff'];for(let i=0;i<n;i++){const d=document.createElement('div');d.className='confetti';d.style.left=(VW()/2+(Math.random()-.5)*200)+'px';d.style.top=(VH()*.45)+'px';d.style.background=cols[i%cols.length];d.style.setProperty('--dx',((Math.random()-.5)*VW()*.9)+'px');d.style.setProperty('--dy',((Math.random()-.2)*VH()*.7)+'px');d.style.setProperty('--rr',(Math.random()*900-450)+'deg');d.style.animationDelay=(Math.random()*.15)+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),1900);}}
 function M(html,acts={},opt={}){const l2=!!opt.layer2;const md=$(l2?'#modal2':'#modal'),bx=$(l2?'#mbox2':'#mbox');bx.className='mbox panel'+(opt.wide?' wide':'');bx.innerHTML=html;md.classList.add('on');bx.scrollTop=0;
  bx.querySelectorAll('[data-a]').forEach(b=>b.onclick=e=>{e.stopPropagation();sfx('tap');const f=acts[b.dataset.a];if(f)f(b);});
@@ -2920,7 +2962,7 @@ function particles(el,col,n){if(!el||S.meta.settings.lowfx||window.__sim)return;
 function shakeEl(el,amp){if(!el||S.meta.settings.lowfx||window.__sim)return;const a=Math.max(2,Math.round(amp/2)*2),E='step-end';try{el.animate([{transform:'translate(0,0)',easing:E},{transform:`translate(${-a}px,${a/2}px)`,easing:E},{transform:`translate(${a}px,${-a/2}px)`,easing:E},{transform:`translate(${-a/2}px,0)`,easing:E},{transform:'translate(0,0)'}],{duration:260});}catch(e){}}
 function screenShake(dmg){const b=$('#battle');if(!b||S.meta.settings.lowfx||window.__sim||dmg<3)return;const a=Math.round(Math.min(12,dmg*1.6)/2)*2,E='step-end';try{b.animate([{transform:'translate(0,0)',easing:E},{transform:`translate(${a}px,${-a/2}px)`,easing:E},{transform:`translate(${-a}px,${a/2}px)`,easing:E},{transform:`translate(${a/2}px,${a/2}px)`,easing:E},{transform:'translate(0,0)'}],{duration:300});}catch(e){}}
 function impact(el,dmg,o={}){if(!el||window.__sim)return;bossFxSend({k:'im',e:bossFxDesc(el),d:dmg,op:o});const f=document.createElement('div');f.className='hitflash';if(o.hero)f.style.background='#ff5a5f';try{if(getComputedStyle(el).position==='static')el.style.position='relative';}catch(e){}el.appendChild(f);setTimeout(()=>f.remove(),320);
- shakeEl(el,6+Math.min(8,dmg));particles(el,o.col||'#ffd23f',6+Math.min(10,dmg*2));screenShake(dmg);sfx(dmg>=4?'thud':'hit');}
+ shakeEl(el,6+Math.min(8,dmg));requestAnimationFrame(()=>{particles(el,o.col||'#ffd23f',6+Math.min(10,dmg*2));});screenShake(dmg);setTimeout(()=>sfx(dmg>=4?'thud':'hit'),0);}
 async function faintFx(P,i){const el=unitEl(P,i);if(!el||window.__sim)return;bossFxSend({k:'fa',l:P===B.me?'m':'f',i});sfx('faint');particles(el,'#cfd8ea',14);try{await el.animate([{transform:'none',opacity:1,filter:'none'},{transform:'translateY(-10px) scale(1.05)',opacity:1,filter:'grayscale(1) brightness(1.6)',offset:.3},{transform:'translateY(30px) scale(.6) rotate(8deg)',opacity:0,filter:'grayscale(1)'}],{duration:480,easing:'ease-in',fill:'forwards'}).finished;}catch(e){}}
 function slamFx(P,slot){const el=unitEl(P,slot);if(!el||window.__sim)return;bossFxSend({k:'sl',l:P===B.me?'m':'f',i:slot});sfx('slam');try{el.animate([{transform:'translateY(-70px) scale(1.35)',opacity:.2},{transform:'translateY(0) scale(1.12,.9)',opacity:1,offset:.7},{transform:'none'}],{duration:380,easing:'cubic-bezier(.3,1.2,.5,1)'});}catch(e){}setTimeout(()=>{particles(unitEl(P,slot),'#c8b48e',8);shakeEl($(P===B.me?'#myLane':'#foeLane'),4);},260);}
 function targetsFor(si){const r={units:[],hero:false};if(si<0||!B||B.side!=='me')return r;const a=B.me.board[si];if(!a)return r;
@@ -3023,7 +3065,7 @@ const skRand=(a,b)=>a+Math.random()*(b-a);
 // 낮은 해상도 캔버스에 "칸(도트)" 단위로 찍고, 24프레임으로 뚝뚝 끊기게 움직여요. (레트로 게임 느낌 + 타격감)
 // 모든 연출은 Math.random(skRand)만 써요. 친구 대전의 씨앗 난수(brand)는 건드리지 않아요.
 const PXF=(()=>{
- const STEP=1000/24,q=Math.round;let cv=null,cx=null,S=4,cw=0,ch=0,parts=[],raf=0,last=0,frz=0;const DPAT={};
+ const STEP=1000/30,q=Math.round;let cv=null,cx=null,S=4,cw=0,ch=0,parts=[],raf=0,last=0,frz=0;const DPAT={};
  function size(){const w=VW(),h=VH();S=Math.max(3,Math.min(6,q(Math.min(w,h)/115)));const nw=Math.ceil(w/S),nh=Math.ceil(h/S);
   if(!cv){cv=document.createElement('canvas');cv.id='pxfx';document.body.appendChild(cv);cx=cv.getContext('2d');}
   if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;}cw=nw;ch=nh;cv.style.width=nw*S+'px';cv.style.height=nh*S+'px';}
@@ -5632,6 +5674,21 @@ init();
   if(buf.length>=120){const avg=buf.reduce((a,b)=>a+b,0)/buf.length;buf.length=0;
    if(avg>32)strikes++;else strikes=Math.max(0,strikes-1);
    if(strikes>=2){done=true;try{if(!S.meta.settings.lowfx){S.meta.settings.lowfx=true;applySafe();autoSave();toast('화면이 느려서 <b>가벼운 화면</b>으로 바꿨어요. (설정에서 되돌릴 수 있어요)');}}catch(e){}}}}
+ requestAnimationFrame(tick);})();
+
+// ===== 전투 글자 예열: 처음 전투에 들어갈 때 글꼴과 숫자 글자를 미리 불러와 첫 데미지·배너에서 안 끊기게 해요 =====
+(function fxWarm(){let done=false;
+ function words(){let t='0123456789+-!?×x연속콤보효과가굉장했다별로인듯약한공격을막았다차례끝시작승리패배';
+  try{if(typeof SKILL!=='undefined')SKILL.forEach(k=>{t+=k.n||'';});}catch(e){}
+  try{const src=[...document.scripts].map(x=>x.textContent).join('');(src.match(/(?:banner|fx|floatAt|toast)\([^)]{0,80}\)/g)||[]).forEach(m=>{t+=(m.match(/[가-힣0-9+\-!?]+/g)||[]).join('');});}catch(e){}
+  return Array.from(new Set(t)).join('');}
+ function warm(){if(done)return;done=true;
+  const txt=words();
+  try{if(document.fonts){document.fonts.load("34px 'Black Han Sans'",txt);document.fonts.load("20px 'Jua'",txt);}}catch(e){}
+  try{const w=document.createElement('div');w.id='pxWarm';
+   w.innerHTML=['','big','crit','heal','txt'].map(c=>`<div class="dmg ${c}">${c==='txt'?'효과가 굉장했다!':'0123456789-+'}</div>`).join('')+'<div class="skName">땅 흔들기</div><div id="bannerWarm" class="b1" style="font-family:\'Black Han Sans\';font-size:40px">전투 시작!</div>';
+   document.body.appendChild(w);setTimeout(()=>w.remove(),1500);}catch(e){}}
+ function tick(){requestAnimationFrame(tick);if(done)return;let b=false;try{b=S.screen==='battle'&&!!B;}catch(e){}if(b)(window.requestIdleCallback||setTimeout)(warm);}
  requestAnimationFrame(tick);})();
 if(S.screen==='title')renderTitle();</script><div style="position: fixed; left: 0px; top: 0px; width: 100%; height: 100%; pointer-events: none; visibility: hidden; z-index: -5;"></div>
 
