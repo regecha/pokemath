@@ -2587,24 +2587,25 @@ const TYPE_COL=['#7e8794','#e6502e','#247de0','#279b52','#c99700','#24a8ba','#ba
 const RAR_NAME=['','일반','고급','희귀','영웅','전설'];
 // 타입 능력: 좋아하는 포켓몬도 각자 쓸모가 있도록 (운빨던전에서 얻은 생각)
 const KW={
- 0:{k:'tough',n:'끈기',ic:'normal',d:'처음 쓰러질 때 체력 1로 버텨요'},
- 1:{k:'ember',n:'불씨',ic:'flame',d:'나올 때와 내 차례가 시작될 때마다 상대 포켓몬 하나에 1 피해'},
- 2:{k:'wave',n:'물결',ic:'drop',d:'나올 때 내 포켓몬 모두 체력 +1'},
- 3:{k:'heal',n:'광합성',ic:'leaf',d:'나올 때 내 트레이너 체력 +2'},
- 4:{k:'rush',n:'번개',ic:'bolt',d:'나온 차례에 바로 공격할 수 있어요'},
- 5:{k:'freeze',n:'얼음',ic:'snow',d:'공격한 상대를 한 차례 얼려요 (야생·보스·시나리오·모험에서는 얼음이 2번 쌓이면 얼어요)'},
- 6:{k:'fight',n:'격투',ic:'fist',d:'포켓몬을 공격할 때 공격 +1'},
- 7:{k:'poison',n:'독',ic:'skull',d:'공격한 상대의 공격 -1 (한 포켓몬당 최대 -3)'},
- 8:{k:'quake',n:'땅울림',ic:'ground',d:'트레이너를 공격할 때 +1 피해'},
- 9:{k:'wing',n:'날개',ic:'wing',d:'공격해도 반격을 받지 않아요 · 상대가 공격해 오면 반격 피해가 2배'},
- 10:{k:'draw',n:'예지',ic:'eye',d:'나올 때 카드 1장 뽑기'},
- 11:{k:'grow',n:'성장',ic:'bug',d:'내 차례가 시작될 때 공격 +1 (최대 +2)'},
- 12:{k:'taunt',n:'바위 벽',ic:'rock',d:'나올 때 방어막 +1 · 상대는 이 포켓몬부터 공격해야 해요'},
- 13:{k:'dodge',n:'유령',ic:'ghost',d:'처음 받는 공격을 피해요'},
- 14:{k:'double',n:'용의 기세',ic:'dragon',d:'한 차례에 두 번 공격'},
- 15:{k:'sneak',n:'기습',ic:'moon',d:'바위 벽을 무시하고 공격'},
- 16:{k:'armor',n:'강철',ic:'steel',d:'받는 피해 -1 · 상대는 이 포켓몬부터 공격'},
- 17:{k:'fairy',n:'요정의 빛',ic:'fairy',d:'나올 때 상대 포켓몬 하나의 공격이 랜덤으로 -1'}};
+ 0:{k:'tough',n:'끈기',ic:'normal',d:'처음 쓰러질 때 체력 1로 버텨요',l:'처음 쓰러질 때 체력 5로 버텨요 (최대 체력 이하)'},
+ 1:{k:'ember',n:'불씨',ic:'flame',d:'나올 때와 내 차례가 시작될 때마다 상대 포켓몬 하나에 1 피해',l:'나올 때와 내 차례 시작마다 서로 다른 상대 2마리에 1 피해 (한 마리면 2 피해)'},
+ 2:{k:'wave',n:'물결',ic:'drop',d:'나올 때 내 포켓몬 모두 체력 +1',l:'나올 때 내 포켓몬 모두 체력 +2 · 내 차례마다 내 포켓몬 2마리 체력 +1'},
+ 3:{k:'heal',n:'광합성',ic:'leaf',d:'나올 때 내 트레이너 체력 +2',l:'나올 때 내 트레이너 체력 +3 · 내 차례마다 +1'},
+ 4:{k:'rush',n:'번개',ic:'bolt',d:'나온 차례에 바로 공격할 수 있어요',l:'나온 차례에 바로 공격 · 공격할 때마다 상대 트레이너에게 고정 피해 1'},
+ 5:{k:'freeze',n:'얼음',ic:'snow',d:'공격한 상대에게 얼음 스택 +2 · 2스택이 되면 한 차례 얼어요 (야생·보스 포켓몬은 4스택)',l4:'공격한 상대에게 얼음 스택 +3 · 야생·보스(4스택)는 1스택이 쌓인 포켓몬을 바로 얼려요',l:'공격한 상대 얼음 스택 +4 (일반·야생·보스 모두 바로 얼어요) · 바로 옆 칸 포켓몬은 스택 +1'},
+ 6:{k:'fight',n:'격투',ic:'fist',d:'포켓몬을 공격할 때 공격 +1',l:'포켓몬을 공격할 때 공격 +2'},
+ 7:{k:'poison',n:'독',ic:'skull',d:'공격한 상대의 공격 -1 (한 포켓몬당 최대 -3)',l:'공격한 상대의 공격 -2 (한 포켓몬당 최대 -4)'},
+ 8:{k:'quake',n:'땅울림',ic:'ground',d:'트레이너를 공격할 때 +1 피해',l:'트레이너를 공격할 때 +2 피해'},
+ 9:{k:'wing',n:'날개',ic:'wing',d:'공격해도 반격을 받지 않아요 · 상대가 공격해 오면 반격 피해 1.5배',l:'공격해도 반격을 받지 않아요 · 상대가 공격해 오면 반격 피해 2배'},
+ 10:{k:'draw',n:'예지',ic:'eye',d:'나올 때 카드 1장 뽑기',l:'나올 때 카드 2장 뽑고 에너지 +1'},
+ 11:{k:'grow',n:'성장',ic:'bug',d:'내 차례가 시작될 때 공격 +1 (최대 +2)',l:'내 차례가 시작될 때 공격 +1, 체력 +1 (각 최대 +3)'},
+ 12:{k:'taunt',n:'바위 벽',ic:'rock',d:'나올 때 방어막 +1 · 상대는 이 포켓몬부터 공격해야 해요',l:'나올 때 방어막 +3 · 상대는 이 포켓몬부터 공격해야 해요'},
+ 13:{k:'dodge',n:'유령',ic:'ghost',d:'처음 받는 공격을 피해요',l:'처음 받는 공격 2번을 피해요'},
+ 14:{k:'double',n:'용의 기세',ic:'dragon',d:'한 차례에 두 번 공격 (첫 공격 피해 -2, 두 번째 공격은 그대로)',l:'한 차례에 두 번 공격 (첫 공격 피해 -1, 두 번째 공격 피해 +1)'},
+ 15:{k:'sneak',n:'기습',ic:'moon',d:'바위 벽을 무시하고 공격',l:'바위 벽·방어막을 무시하고 공격 · 바위 벽·방어막·강철 포켓몬에게 피해 +1'},
+ 16:{k:'armor',n:'강철',ic:'steel',d:'받는 피해 -1 · 상대는 이 포켓몬부터 공격',l:'받는 피해 -2 (최소 1) · 상대는 이 포켓몬부터 공격'},
+ 17:{k:'fairy',n:'요정의 빛',ic:'fairy',d:'나올 때 상대 포켓몬 하나의 공격이 랜덤으로 -1',l:'나올 때 상대 2마리의 공격 -1 (한 마리뿐이면 그 한 마리 -2)'}};
+const kwD=(m,kw)=>m.rar===5&&kw.l?kw.l:(m.rar===4&&kw.l4?kw.l4:kw.d);
 function kwOf(mon){let t=mon.types[0];if(t===0&&mon.types[1]!=null)t=mon.types[1];return KW[t];}
 // 그림: PokeAPI 스프라이트(인터넷). 막혀 있으면 타입 색 공 그림으로 대신해요.
 const SPR_BASE='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
@@ -2631,7 +2632,7 @@ function cardHTML(id,opt={}){const m=MON[id];const kw=kwOf(m);const t=m.types[0]
   <div class=cTop><span class=cName>${esc(m.name)}</span><span class=cost>${m.cost}</span></div>
   <div class=art>${monImg(id,lg?'art':'front')}</div>
   <div class=types>${typeChips(m)}</div>
-  <div class=kw>${I(kw.ic)} <b>${kw.n}</b><br>${kw.d}</div>
+  <div class=kw>${I(kw.ic)} <b>${m.rar===5?'★ ':''}${kw.n}</b><br>${kwD(m,kw)}</div>
   <div class=stats><span class="st atk">${m.atk}</span><span class=rar>${'★'.repeat(m.rar)}</span><span class="st hp">${m.hp}</span></div>
   ${opt.cnt>1?`<span class=cnt>×${opt.cnt}</span>`:''}</div>`;}
 function isBattleSpecial(v){return !!(v&&typeof v==='object'&&v.sp);}
@@ -2750,7 +2751,7 @@ function showCard(id){const m=MON[id],me=S.meta,own=me.col[id]||0;const kw=kwOf(
   ${!own&&(me.dexSeen[id]||sh)?`<div class=explain style="font-size:14px;width:100%">${need?`조각 <b>${sh} / ${need}</b> <span class=xpBar style="display:inline-block;width:120px;vertical-align:middle"><i style="width:${sh/need*100}%"></i></span><br>`:''}${I('star')} 별가루 ${DUST_COST[m.rar]}개로 ${need?'조각 1개':'카드'}를 만들 수 있어요 (지금 ${me.dust||0}개)<div class=mbtns><button class="btn purple sm" data-a=craft ${(me.dust||0)>=DUST_COST[m.rar]?'':'disabled'}>만들기</button></div></div>`:''}
   ${!own&&(me.dexSeen[id]||sh)?(m.rar>=5?`<div class=explain style="font-size:13px;width:100%;background:#fff3c4">${I('lock')} <b>전설의 포켓몬</b>은 살 수 없어요. 열심히 문제를 풀어 <b>조각</b>을 모아 만나요!</div>`:`<div class=explain style="font-size:13px;width:100%">${I('coin')} 이 카드의 가치는 <b>${CARD_VALUE[m.rar]}코인</b>이에요. 너무너무 갖고 싶다면 <b>${BUY_X}배인 ${buyPrice(id)}코인</b>으로 바로 데려올 수 있어요. (지금 ${me.coins}코인)<div class=mbtns><button class="btn red sm" data-a=buy ${me.coins>=buyPrice(id)?'':'disabled'}>${buyPrice(id)}코인으로 데려오기</button></div></div>`):''}
   ${own&&m.flavor?`<div class=explain style="font-size:14px">${esc(m.flavor)}</div>`:''}
-  ${own?`<div class=explain style="font-size:14px;background:#eef6ff;border-color:#9fc3ff">${I(kw.ic)} <b style="color:#2f62b5">${kw.n}</b> — ${kw.d}<br>희귀도 ${RAR_NAME[m.rar]} · 비용 ${m.cost} · 공격 ${m.atk} · 체력 ${m.hp}</div>`:''}
+  ${own?`<div class=explain style="font-size:14px;background:#eef6ff;border-color:#9fc3ff">${I(kw.ic)} <b style="color:#2f62b5">${kw.n}</b> — ${kwD(m,kw)}<br>희귀도 ${RAR_NAME[m.rar]} · 비용 ${m.cost} · 공격 ${m.atk} · 체력 ${m.hp}</div>`:''}
   ${m.to.length?`<div class=menuCol style="width:100%">${evo}<div class=mut style="font-size:12px;text-align:center">내 사탕 ${me.candy}개</div></div>`:''}
   ${m.from&&MON[m.from]?`<div class=mut style="font-size:13px">${esc(MON[m.from].name)}에서 진화해요</div>`:''}
   ${own?`<div class=row style="width:100%;align-items:center"><span class=mut style="font-size:13px">${regionOf(id)} 지역 · 함께 푼 문제 ${bondOf(id)}개</span>${partnerId()===id?`<span class=pill style="border-color:#ff5a8a">${I('heart')} 지금 파트너</span>`:`<button class="btn red sm" data-a=pt>${I('heart')} 파트너로 함께 공부</button>`}</div>`:''}
@@ -2835,7 +2836,19 @@ const brand=()=>B&&B.rng?B.rng():rnd();
 // 필드 칸 수 (3칸 → 5칸으로 늘림)
 const BOARD_N=5;
 function mkPlayer(name,deck,hp,av,keep,owned=[],specials=false){return{name,hp,max:hp,mana:0,maxMana:0,deck:keep?deck.slice():shuffle(deck.slice()),hand:[],board:Array(BOARD_N).fill(null),av,fat:0,owned:(owned||[]).map(Number).filter(id=>MON[id]),specials:!!specials,powerUses:2};}
-function mkUnit(id){const m=MON[id];const kw=kwOf(m).k;return{id,atk:m.atk,hp:m.hp,max:m.hp,kw,att:kw==='rush'?1:0,frozen:0,dodge:kw==='dodge'?1:0,tough:kw==='tough'?1:0,grow:0,fresh:1,shield:kw==='taunt'?1:0};}
+const isLeg=u=>!!(u&&MON[u.id]&&MON[u.id].rar===5);
+const fightB=u=>u&&u.kw==='fight'?(isLeg(u)?2:1):0;
+const quakeB=u=>u&&u.kw==='quake'?(isLeg(u)?2:1):0;
+const wingM=u=>u&&u.kw==='wing'?(isLeg(u)?2:1.5):1;
+const sneakB=(a,d)=>a&&a.kw==='sneak'&&isLeg(a)&&d&&(isTaunt(d)||d.shield>0)?1:0;
+const armorV=u=>u&&u.kw==='armor'?(isLeg(u)?2:1):0;
+const growCap=u=>isLeg(u)?3:2;
+// 용의 기세: 여러 번 공격할 때 몇 번째 공격이냐에 따라 피해가 달라져요
+// 일반(1~4성) 2회: -2, 그대로 / 3회: -2, -1, 그대로 · 전설(5성) 2회: -1, +1 / 3회: -1, 그대로, +1
+function dragonModAt(u,idx,tot){if(!u||u.kw!=='double')return 0;const leg=isLeg(u);const arr=tot>=3?(leg?[-1,0,1]:[-2,-1,0]):(leg?[-1,1]:[-2,0]);return arr[Math.max(0,Math.min(arr.length-1,idx))];}
+function dragonMod(u){if(!u||u.kw!=='double')return 0;const tot=u.attTot||2;return dragonModAt(u,tot-(u.att||0),tot);}
+function remDmg(x){if(!x||!(x.att>0))return 0;if(x.kw!=='double')return x.atk*x.att;const tot=x.attTot||2;let sum=0;for(let k=0;k<x.att;k++)sum+=Math.max(1,x.atk+dragonModAt(x,tot-x.att+k,tot));return sum;}
+function mkUnit(id){const m=MON[id];const kw=kwOf(m).k;const lg=m.rar===5;return{id,atk:m.atk,hp:m.hp,max:m.hp,kw,att:kw==='rush'?1:0,frozen:0,dodge:kw==='dodge'?(lg?2:1):0,tough:kw==='tough'?(lg?5:1):0,grow:0,fresh:1,shield:kw==='taunt'?(lg?3:1):0};}
 function playerRoll(P){return B&&B.pvp&&P&&P.drawRng?P.drawRng():brand();}
 function ownedBand(P,band){return (P&&P.owned||[]).filter(id=>MON[id]&&MON[id].cost>=band[0]&&MON[id].cost<=band[1]);}
 function drawSpecial(P){if(!P||!P.specials)return null;
@@ -2902,7 +2915,7 @@ function msg(t){const m=$('#bMsg');if(m)m.innerHTML=t;}
 
 // 상성: 공격하는 포켓몬(또는 고른 카드)과 상대 포켓몬 사이
 function matchup(aid,did){const k=typeMul(aid,did);return k>=2?{c:'adv',t:'유리 ×1.5'}:k<1?{c:'dis',t:'불리 −1'}:null;}
-function predDmg(a,d){if(d.dodge)return 0;let dmg=a.atk+(a.kw==='fight'?1:0);dmg=applyType(dmg,typeMul(a.id,d.id));if(d.kw==='armor'&&dmg>1)dmg-=1;return dmg;}
+function predDmg(a,d){if(d.dodge)return 0;let dmg=a.atk+fightB(a)+sneakB(a,d);const dm=dragonMod(a);if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);dmg=applyType(dmg,typeMul(a.id,d.id));if(armorV(d)&&dmg>1)dmg=Math.max(1,dmg-armorV(d));return dmg;}
 function tgtBadge(d,i){if(!B||B.side!=='me')return '';const me=B.me;let out='';
  if(B.sel>=0&&me.board[B.sel]){const a=me.board[B.sel];if(!targetsFor(B.sel).units.includes(i))return '';const mu=matchup(a.id,d.id);const dm=predDmg(a,d);
   out=(mu?`<b class=${mu.c}>${mu.t}</b>`:'')+`<b class=dmgp>-${dm}</b>`+(dm>=d.hp&&!d.tough?'<b class=ko>쓰러뜨려요!</b>':'');}
@@ -2962,10 +2975,10 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
  const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=B.coop?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front')}</div><div><div class=hn>${esc(P.name)}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
   const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),bl=P.mana-bp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}<b>${bl}${bp?`<span style="color:#8a3fd6">+${bp}</span>`:''}/${den}</b></div>`;};
  $('#battle').innerHTML=`
-  <div class=bTop>${B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front')}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:-12px"><b class=dmgp>-${me.board[B.sel].atk+(me.board[B.sel].kw==='quake'?1:0)}</b></div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front')}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill>${I('cards')} ${fo.hand.length}</span><span class=pill title="남은 덱">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<button class="btn ghost sm" id=bMenu>메뉴</button></div>
+  <div class=bTop>${B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front')}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:-12px"><b class=dmgp>-${(u=>Math.max(1,u.atk+quakeB(u)+dragonMod(u)))(me.board[B.sel])}</b></div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front')}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill>${I('cards')} ${fo.hand.length}</span><span class=pill title="남은 덱">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<button class="btn ghost sm" id=bMenu>메뉴</button></div>
   <div class="lane${B.wildMode?` wildLane wildCount${fo.board.filter(Boolean).length}`:''}" id=foeLane>${fo.board.map((u,i)=>B.wildMode&&!u?'':`<div class=slot data-i="${i}">${unitH(u,fo,i)}</div>`).join('')}</div>
   <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class=pill style="color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}</div>
-  <div class=lane${B.coop?' coopLane':''} id=myLane>${me.board.map((u,i)=>`<div class="slot${B.pick>=0&&!u?' can':''}" data-i="${i}">${unitH(u,me,i)}</div>`).join('')}</div>
+  <div class=lane${B.coop?' coopLane':''} id=myLane>${me.board.map((u,i)=>`<div class="slot${B.pick>=0&&!u&&!isItemCard(me.hand[B.pick])?' can':''}" data-i="${i}">${unitH(u,me,i)}</div>`).join('')}</div>
   ${B.coop?`<div class="bBot coopHeroes">${heroH(loc,'heroMe',B.side==='me'&&B.coop.active===BC.localIndex)}${ally?heroH(ally,'heroAlly',B.side==='me'&&B.coop.active!==BC.localIndex):''}</div>`:''}<div class=bBot>${B.coop?'':heroH(me,'heroMe',false)}${mana(loc)}
    <button class="btn purple sm" id=bPower ${my&&(loc.powerUses||0)>0?'':'disabled'} title="남은 사용 횟수 ${Math.max(0,loc.powerUses||0)}회: 문제를 맞히면 카드 1장">${I('book')} 공부 기술 <small style="font-size:11px">${Math.max(0,loc.powerUses||0)}회</small></button>
    <span class=hudSp></span><span class=pill>${I('book')} ${loc.deck.length}</span><button class="btn red endBtn" id=bEnd ${my?'':'disabled'}>차례 끝</button></div>
@@ -2974,7 +2987,7 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
  else if(B.trainerSkillTarget)msg(B.trainerSkillTarget.type==='attack'?'💥 트레이너 공격: 피해를 줄 상대 포켓몬을 눌러요':'📣 응원: 공격력과 방어막을 줄 아군 포켓몬을 눌러요');
  else if(B.itemTargetMode)msg('⚡ 전기의 돌: 한 번 더 행동할 내 포켓몬을 눌러요');
  else if(B.moonTargetMode)msg('🌙 달의 돌: 1턴 동안 기절시킬 상대 포켓몬을 눌러요');
- else if(B.pick>=0)msg(`<b>${esc(battleCardName(me.hand[B.pick]))}</b> — ${isItemCard(me.hand[B.pick])?'카드를 한 번 더 눌러 사용해요': '아래 「내보내기」 또는 빈칸을 눌러요'}`);
+ else if(B.pick>=0)msg(`<b>${esc(battleCardName(me.hand[B.pick]))}</b> — ${isItemCard(me.hand[B.pick])?'설명 창의 「사용하기」를 눌러요': '아래 「내보내기」 또는 빈칸을 눌러요'}`);
  else if(B.sel>=0)msg('공격할 상대를 눌러요 · 숫자는 예상 피해');
  else{const any=me.board.some(u=>u&&u.att>0&&!u.frozen);const canPlay=me.hand.some(v=>battleCost(v)<=me.mana&&(isItemCard(v)||me.board.includes(null)));msg(any?'초록빛 포켓몬을 눌러 공격!':canPlay?'카드나 돌 아이템을 눌러 사용해요':'할 일을 다 했으면 <b>차례 끝</b>');}
  if(B.coop&&BC.host&&!BC.processing)bossBroadcast();bindBattle();}
@@ -2987,10 +3000,9 @@ function bindBattle(){const me=B.me;
  $('#battle').querySelectorAll('.hand .card').forEach(c=>c.onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;const i=+c.dataset.h,v=(B.coop?B.coop.players[BC.localIndex].hand:me.hand)[i];
   if(B.itemTargetMode){if(i===B.itemTargetMode.hand){B.itemTargetMode=null;B.pick=-1;renderBattle();toast('전기의 돌 사용을 취소했어요');}else toast('먼저 전기의 돌을 사용할 포켓몬을 골라 주세요');return;}
   if(B.moonTargetMode){if(i===B.moonTargetMode.hand){B.moonTargetMode=null;B.pick=-1;renderBattle();toast('달의 돌 사용을 취소했어요');}else toast('먼저 달의 돌로 기절시킬 상대 포켓몬을 골라 주세요');return;}
-  const hasSlot=me.board.includes(null),can=battleCost(v)<=me.mana&&(isItemCard(v)||hasSlot);
+  closeInfo();const hasSlot=me.board.includes(null),can=battleCost(v)<=me.mana&&(isItemCard(v)||hasSlot);
   if(isItemCard(v)){
-   if(B.pick===i&&can){if(B.coop&&!BC.host){if(v.item==='thunder'){if(!me.board.some(u=>u&&!u.frozen)){toast('대상으로 고를 수 있는 포켓몬이 없어요');return;}B.itemTargetMode={hand:i};B.pick=-1;B.sel=-1;closeInfo();renderBattle();toast('한 번 더 행동할 포켓몬을 눌러 주세요');return;}if(v.item==='moon'){if(!B.foe.board.some(Boolean)){toast('기절시킬 상대 포켓몬이 없어요');return;}B.moonTargetMode={hand:i};B.pick=-1;B.sel=-1;closeInfo();renderBattle();toast('1턴 동안 기절시킬 상대 포켓몬을 눌러 주세요');return;}bossSubmit({type:'item',h:i,target:-1});return;}if(v.item==='thunder'){if(!me.board.some(u=>u&&!u.frozen)){toast('대상으로 고를 수 있는 포켓몬이 없어요');return;}B.itemTargetMode={hand:i};B.pick=-1;B.sel=-1;closeInfo();renderBattle();toast('한 번 더 행동할 포켓몬을 눌러 주세요');return;}if(v.item==='moon'){if(!B.foe.board.some(Boolean)){toast('기절시킬 상대 포켓몬이 없어요');return;}B.moonTargetMode={hand:i};B.pick=-1;B.sel=-1;closeInfo();renderBattle();toast('1턴 동안 기절시킬 상대 포켓몬을 눌러 주세요');return;}playItem(me,i);return;}
-   sfx('tap');B.pick=can?i:-1;B.sel=-1;renderBattle();if(!can)toast(battleCost(v)>me.mana?`에너지가 ${battleCost(v)-me.mana} 모자라요`:'카드를 사용할 수 없어요');else toast(`${battleCardName(v)} · ${v.desc} · 한 번 더 눌러 사용`);return;
+   sfx('tap');B.pick=can?i:-1;B.sel=-1;renderBattle();showItemInfo(v,{hand:i,can,why:battleCost(v)>me.mana?`에너지가 ${battleCost(v)-me.mana} 모자라요`:''});return;
   }
   if(B.pick===i&&can){closeInfo();const sl=me.board.indexOf(null);if(B.coop&&!BC.host){bossSubmit({type:'summon',h:i,s:sl});return;}if(B.pvp)pvpSend({t:'sum',h:i,s:sl});summon(me,i,sl);return;}
   sfx('tap');B.pick=can?i:-1;B.sel=-1;renderBattle();if(isRandomMonCard(v)){toast(can?`${v.name}: ${v.desc}`:battleCost(v)>me.mana?`에너지가 ${battleCost(v)-me.mana} 모자라요`:'필드가 꽉 찼어요');return;}showInfo(v,{hand:i,can,why:battleCost(v)>me.mana?`에너지가 ${battleCost(v)-me.mana} 모자라요`:!hasSlot?'필드가 꽉 찼어요':''});});
@@ -2998,7 +3010,7 @@ function bindBattle(){const me=B.me;
   if(B.trainerSkillTarget){resolveTrainerSkillTarget('me',i);return;}
   if(B.moonTargetMode){toast('달의 돌은 상대 포켓몬을 선택해야 해요');return;}
   if(B.itemTargetMode){if(!u){toast('포켓몬이 있는 칸을 골라 주세요');return;}if(B.coop&&Number(u.coopOwner??0)!==B.coop.active){toast('내 포켓몬만 재행동시킬 수 있어요');return;}if(u.frozen){toast('얼어 있는 포켓몬은 재행동할 수 없어요');return;}if(B.coop&&!BC.host){bossSubmit({type:'item',h:B.itemTargetMode.hand,target:i});B.itemTargetMode=null;B.pick=-1;return;}playItem(me,B.itemTargetMode.hand,i);return;}
-  if(!u){if(B.pick>=0){const selected=(B.coop?B.coop.players[BC.localIndex].hand:me.hand)[B.pick];if(isItemCard(selected)){toast('돌 아이템은 카드를 한 번 더 눌러 사용해요');return;}closeInfo();if(B.coop&&!BC.host){bossSubmit({type:'summon',h:B.pick,s:i});return;}if(B.pvp)pvpSend({t:'sum',h:B.pick,s:i});summon(me,B.pick,i);}return;}
+  if(!u){if(B.pick>=0){const selected=(B.coop?B.coop.players[BC.localIndex].hand:me.hand)[B.pick];if(isItemCard(selected)){toast('돌 아이템은 설명 창의 「사용하기」로 사용해요');return;}closeInfo();if(B.coop&&!BC.host){bossSubmit({type:'summon',h:B.pick,s:i});return;}if(B.pvp)pvpSend({t:'sum',h:B.pick,s:i});summon(me,B.pick,i);}return;}
   closeInfo();if(u.att>0&&!u.frozen&&(!B.coop||Number(u.coopOwner??0)===B.coop.active)){sfx('tap');B.sel=B.sel===i?-1:i;B.pick=-1;renderBattle();}
   else{sfx('tap');showInfo(u.id,{unit:u,why:u.frozen?'얼어서 이번 차례는 쉬어요':u.fresh?'방금 나온 포켓몬은 다음 차례부터 공격해요':'이번 차례에 이미 공격했어요'});}});
  $('#foeLane').querySelectorAll('.slot').forEach(s=>s.onclick=()=>{if(B.busy||(B.coop&&B.coop.active!==BC.localIndex))return;const i=+s.dataset.i;if(B.trainerSkillTarget){resolveTrainerSkillTarget('foe',i);return;}if(B.moonTargetMode){if(!B.foe.board[i]){toast('포켓몬이 있는 칸을 골라 주세요');return;}if(B.coop&&!BC.host){bossSubmit({type:'item',h:B.moonTargetMode.hand,target:i});B.moonTargetMode=null;B.pick=-1;return;}playItem(B.me,B.moonTargetMode.hand,i);return;}if(B.sel<0){if(B.foe.board[i]){sfx('tap');showInfo(B.foe.board[i].id,{unit:B.foe.board[i],foe:1});}return;}closeInfo();if(!targetsFor(B.sel).units.includes(i)){if(B.foe.board[i])toast('바위 벽(테두리) 포켓몬부터 공격해야 해요');return;}if(B.coop&&!BC.host){const si=B.sel;B.busy=true;const q=pickQ();(async()=>{let ok=true;if(q){const r=await battleQ(q,{who:me.board[si].id,what:`${esc(MON[B.foe.board[i].id].name)}에게 공격!`});ok=r.ok;}bossSubmit({type:'attack',si,tg:{u:i},ok});B.busy=false;})();return;}playerAttack(B.sel,{u:i});});
@@ -3007,13 +3019,27 @@ function bindBattle(){const me=B.me;
 function typesStrong(t){return TYPE_EN.map((_,x)=>x).filter(x=>TYPE_CHART[t][x]>=2);}
 function typesWeak(t){return TYPE_EN.map((_,x)=>x).filter(x=>TYPE_CHART[t][x]<1);}
 function closeInfo(){const b=$('#bInfo');if(b){b.classList.remove('on');b.innerHTML='';}}
+function useItemCard(i){const me=B.me,v=(B.coop?B.coop.players[BC.localIndex].hand:me.hand)[i];if(!isItemCard(v))return;closeInfo();
+ if(v.item==='thunder'){if(!me.board.some(u=>u&&!u.frozen)){toast('대상으로 고를 수 있는 포켓몬이 없어요');B.pick=-1;renderBattle();return;}B.itemTargetMode={hand:i};B.pick=-1;B.sel=-1;renderBattle();toast('한 번 더 행동할 포켓몬을 눌러 주세요');return;}
+ if(v.item==='moon'){if(!B.foe.board.some(Boolean)){toast('기절시킬 상대 포켓몬이 없어요');B.pick=-1;renderBattle();return;}B.moonTargetMode={hand:i};B.pick=-1;B.sel=-1;renderBattle();toast('1턴 동안 기절시킬 상대 포켓몬을 눌러 주세요');return;}
+ if(B.coop&&!BC.host){B.pick=-1;bossSubmit({type:'item',h:i,target:-1});return;}
+ playItem(me,i);}
+function showItemInfo(v,o={}){if(window.__sim)return;let b=$('#bInfo');if(!b){b=document.createElement('div');b.id='bInfo';document.body.appendChild(b);}
+ const tgt={thunder:'사용하면 내 포켓몬 하나를 골라요',moon:'사용하면 상대 포켓몬 하나를 골라요'}[v.item]||'누르면 바로 사용돼요';
+ b.innerHTML=`<div class=sheet>${battleCardHTML(v,{size:'sm',noHolo:1})}<div class=itx><h3>${esc(v.name)} <span class=mut style="font-size:13px">에너지 ${v.cost}</span></h3>
+  <div class=kwbox>${esc(v.desc)}</div><div class=mut style="font-size:13px">${tgt}</div>
+  ${o.why?`<div style="color:#d9393f;margin-top:4px">${o.why}</div>`:''}
+  <div class=mbtns style="margin-top:8px">${o.can?'<button class="btn red big" id=biUse>사용하기</button>':''}<button class="btn ghost" id=biX>닫기</button></div></div></div>`;
+ b.classList.add('on');
+ $('#biX').onclick=()=>{sfx('tap');closeInfo();B.pick=-1;renderBattle();};
+ const u=$('#biUse');if(u)u.onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;sfx('tap');useItemCard(o.hand);};}
 function showInfo(id,o={}){if(window.__sim)return;const m=MON[id],kw=kwOf(m),t=kwType(m);let b=$('#bInfo');if(!b){b=document.createElement('div');b.id='bInfo';document.body.appendChild(b);}
  const chips=a=>a.map(x=>`<span class=tchip style="background:${TYPE_COL[x]}">${TYPE_KO[x]}</span>`).join('')||'<span class=mut>없음</span>';
  const opp=o.foe?B.me.board:B.foe.board;
  const vs=opp.map(d=>{if(!d)return '';const mu=o.foe?matchup(d.id,id):matchup(id,d.id);return `<div class=vs>${monImg(d.id,'front')}<span style="flex:1">${esc(MON[d.id].name)}</span>${mu?`<span class=tchip style="background:${mu.c==='adv'?'#3cc47c':'#a7b0bd'}">${o.foe?(mu.c==='adv'?'나에게 유리':'나에게 불리'):mu.t}</span>`:'<span class=mut style="font-size:12px">보통</span>'}</div>`;}).join('');
- const st=o.unit?`<div class=mut style="font-size:13px">지금 공격 ${o.unit.atk} · 체력 ${o.unit.hp}/${o.unit.max}${o.unit.frozen?' · 얼음':''}${o.unit.icy?' · ❄ 얼음 '+o.unit.icy+'/2':''}${o.unit.kw==='grow'?' · 🌱 성장 '+Math.min(2,o.unit.grow||0)+'/2':''}${o.unit.psn?' · ☠ 독 공격 -'+o.unit.psn:''}${o.unit.fai?' · ✨ 요정의 빛 공격 -'+o.unit.fai:''}${o.unit.dodge?' · 피하기 남음':''}</div>`:'';
+ const st=o.unit?`<div class=mut style="font-size:13px">지금 공격 ${o.unit.atk} · 체력 ${o.unit.hp}/${o.unit.max}${o.unit.frozen?' · 얼음':''}${o.unit.icy?' · ❄ 얼음 '+o.unit.icy+'/'+iceMaxOf(o.unit):''}${o.unit.kw==='grow'?' · 🌱 성장 '+Math.min(growCap(o.unit),o.unit.grow||0)+'/'+growCap(o.unit):''}${o.unit.psn?' · ☠ 독 공격 -'+o.unit.psn:''}${o.unit.fai?' · ✨ 요정의 빛 공격 -'+o.unit.fai:''}${o.unit.dodge?' · 피하기 남음':''}</div>`:'';
  b.innerHTML=`<div class=sheet>${cardHTML(id,{noHolo:1})}<div class=itx><h3>${esc(m.name)} ${o.foe?'<span class=mut style="font-size:13px">(상대)</span>':''}</h3>${st}
-  <div class=kwbox>${I(kw.ic)} <b>${kw.n}</b> — ${kw.d}</div>
+  <div class=kwbox>${I(kw.ic)} <b>${m.rar===5?'★ ':''}${kw.n}</b> — ${kwD(m,kw)}</div>
   <div><b style="color:#1f8a52">이 타입에 강해요 ×1.5</b><div class=mrow>${chips(typesStrong(t))}</div></div>
   <div><b style="color:#7a86a8">이 타입에는 약하게 들어가요 −1</b><div class=mrow>${chips(typesWeak(t))}</div></div>
   ${vs?`<div style="margin-top:4px"><b>${o.foe?'내 포켓몬과 상성':'지금 상대와 상성'}</b>${vs}</div>`:''}
@@ -3030,7 +3056,7 @@ function screenShake(dmg){const b=$('#battle');if(!b||S.meta.settings.lowfx||win
 function impact(el,dmg,o={}){if(!el||window.__sim)return;bossFxSend({k:'im',e:bossFxDesc(el),d:dmg,op:o});const f=document.createElement('div');f.className='hitflash';if(o.hero)f.style.background='#ff5a5f';try{if(getComputedStyle(el).position==='static')el.style.position='relative';}catch(e){}el.appendChild(f);setTimeout(()=>f.remove(),320);
  shakeEl(el,6+Math.min(8,dmg));requestAnimationFrame(()=>{particles(el,o.col||'#ffd23f',6+Math.min(10,dmg*2));});screenShake(dmg);setTimeout(()=>sfx(dmg>=4?'thud':'hit'),0);}
 async function faintFx(P,i){const el=unitEl(P,i);if(!el||window.__sim)return;bossFxSend({k:'fa',l:P===B.me?'m':'f',i});sfx('faint');particles(el,'#cfd8ea',14);try{await el.animate([{transform:'none',opacity:1,filter:'none'},{transform:'translateY(-10px) scale(1.05)',opacity:1,filter:'grayscale(1) brightness(1.6)',offset:.3},{transform:'translateY(30px) scale(.6) rotate(8deg)',opacity:0,filter:'grayscale(1)'}],{duration:480,easing:'ease-in',fill:'forwards'}).finished;}catch(e){}}
-function slamFx(P,slot){const el=unitEl(P,slot);if(!el||window.__sim)return;bossFxSend({k:'sl',l:P===B.me?'m':'f',i:slot});sfx('slam');try{el.animate([{transform:'translateY(-70px) scale(1.35)',opacity:.2},{transform:'translateY(0) scale(1.12,.9)',opacity:1,offset:.7},{transform:'none'}],{duration:380,easing:'cubic-bezier(.3,1.2,.5,1)'});}catch(e){}setTimeout(()=>{particles(unitEl(P,slot),'#c8b48e',8);shakeEl($(P===B.me?'#myLane':'#foeLane'),4);},260);}
+function slamFx(P,slot){const el=unitEl(P,slot);if(!el||window.__sim)return;bossFxSend({k:'sl',l:P===B.me?'m':'f',i:slot});sfx('slam');try{el.animate([{transform:'translateY(-70px) scale(1.35)',opacity:.2},{transform:'translateY(0) scale(1.12,.9)',opacity:1,offset:.6},{transform:'none'}],{duration:240,easing:'cubic-bezier(.3,1.2,.5,1)'});}catch(e){}setTimeout(()=>{particles(unitEl(P,slot),'#ffffff',8);shakeEl($(P===B.me?'#myLane':'#foeLane'),4);},100);}
 function targetsFor(si){const r={units:[],hero:false};if(si<0||!B||B.side!=='me')return r;const a=B.me.board[si];if(!a)return r;
  const fo=B.foe;if(B.wildMode){r.units=fo.board.map((u,i)=>u?i:-1).filter(i=>i>=0);r.hero=false;return r;}const taunts=fo.board.map((u,i)=>isTaunt(u)?i:-1).filter(i=>i>=0);
  if(taunts.length&&a.kw!=='sneak'){r.units=taunts;return r;}
@@ -3041,14 +3067,20 @@ async function summon(P,hi,slot){const card=P.hand[hi];let id=card;
  const m=MON[id],pay=battleCost(card);if(P.mana<pay){toast(`에너지가 ${pay-P.mana} 모자라요`);return;}
  if(P===B.me&&!window.__sim)S.meta.dexSeen[id]=1;spendMana(P,pay);P.hand.splice(hi,1);const u=mkUnit(id);if(B.coop)u.coopOwner=B.coop.active;P.board[slot]=u;B.pick=-1;sfx('summon');
  if(isRandomMonCard(card))fx(unitEl(P,slot),`${card.name}! ${m.name}`,'txt');
- const O=P===B.me?B.foe:B.me;renderBattle();slamFx(P,slot);await wait(380);
+ const O=P===B.me?B.foe:B.me;renderBattle();slamFx(P,slot);await wait(240);
  // 나올 때 효과
- if(u.kw==='fairy'){const t=O.board.map((x,i)=>x?i:-1).filter(i=>i>=0);if(t.length){const ti=t[Math.floor(brand()*t.length)];weakenAtk(O,ti,'fai','✨ 요정의 빛! 공격 -1');sfx('heal');}}
- if(u.kw==='wave'){P.board.forEach((x,i)=>{if(x){x.hp++;x.max++;}});fx(unitEl(P,slot),'물결 +1','heal');sfx('heal');}
- if(u.kw==='heal'){const h=Math.min(2,P.max-P.hp);P.hp+=h;fx(heroEl(P),'+'+h,'heal');sfx('heal');}
- if(u.kw==='draw'){draw(P);fx(unitEl(P,slot),'카드 +1','txt');}
- if(u.kw==='ember'){const t=O.board.map((x,i)=>x?i:-1).filter(i=>i>=0);if(t.length){const ti=t[Math.floor(brand()*t.length)];await dealUnit(O,ti,1,'불씨');}else if(!B.wildMode){O.hp-=1;fx(heroEl(O),'-1','');}}
+ if(u.kw==='fairy')fairyHit(O,isLeg(u));
+ if(u.kw==='wave'){const wv=isLeg(u)?2:1;P.board.forEach((x,i)=>{if(x){x.hp+=wv;x.max+=wv;}});fx(unitEl(P,slot),'물결 +'+wv,'heal');sfx('heal');}
+ if(u.kw==='heal'){const h=Math.min(isLeg(u)?3:2,P.max-P.hp);P.hp+=h;fx(heroEl(P),'+'+h,'heal');sfx('heal');}
+ if(u.kw==='draw'){const dn=isLeg(u)?2:1;for(let q=0;q<dn;q++)draw(P);fx(unitEl(P,slot),'카드 +'+dn,'txt');if(isLeg(u)){const m0=P.mana;P.mana=Math.min(Math.max(6,P.mana),P.mana+1);if(P.mana>m0)fx(heroEl(P),'에너지 +1','heal');}}
+ if(u.kw==='ember')await emberHit(O,isLeg(u));
  cleanup();renderBattle();checkEnd();}
+async function emberHit(O,leg){const t=O.board.map((x,i)=>x?i:-1).filter(i=>i>=0);
+ if(!t.length){if(!B.wildMode){const d=leg?2:1;O.hp-=d;fx(heroEl(O),'-'+d,'');}return;}
+ const a=t[Math.floor(brand()*t.length)];if(!leg){await dealUnit(O,a,1,'불씨');return;}
+ const rest=t.filter(x=>x!==a);if(rest.length){const b=rest[Math.floor(brand()*rest.length)];await dealUnit(O,a,1,'불씨');await dealUnit(O,b,1,'불씨');}else await dealUnit(O,a,2,'불씨');}
+function fairyHit(O,leg){const pool=O.board.map((x,i)=>x?i:-1).filter(i=>i>=0);if(!pool.length)return;if(leg&&pool.length===1){weakenAtk(O,pool[0],'fai','✨ 요정의 빛! 공격 -2',3,2);sfx('heal');return;}const n=leg?Math.min(2,pool.length):1;for(let k=0;k<n;k++){const j=Math.floor(brand()*pool.length);const ti=pool.splice(j,1)[0];weakenAtk(O,ti,'fai','✨ 요정의 빛! 공격 -1');}sfx('heal');}
+function poisonHit(D,i,leg){weakenAtk(D,i,'psn',leg?'☠ 독! 공격 -2':'☠ 독! 공격 -1',leg?4:3,leg?2:1);}
 async function playItem(P,hi,target=-1,remote=false){const card=P&&P.hand[hi];if(!isItemCard(card))return false;if(P.mana<card.cost){toast(`에너지가 ${card.cost-P.mana} 모자라요`);return false;}
  const enemy=P===B.me?B.foe:B.me;
  if(card.item==='thunder'&&(target<0||!P.board[target]||P.board[target].frozen)){if(!remote)toast('재행동할 수 있는 포켓몬을 골라 주세요');return false;}
@@ -3075,29 +3107,34 @@ function kwType(m){let t=m.types[0];if(t===0&&m.types[1]!=null)t=m.types[1];retu
 function applyType(dmg,k){if(k>=2)return Math.ceil(dmg*1.5);if(k<1)return Math.max(1,dmg-1);return dmg;}
 // 얼음: 일반 대전은 한 번에 얼리지만, 야생·보스·시나리오·로그라이크(적이 1~2마리)에서는 2스택이 쌓여야 얼어요
 // 독·요정의 빛: 공격 -1 (누적량을 기록해서 뱃지로 표시, 독은 최대 -3)
-function weakenAtk(D,i,key,label){const x=D.board[i];if(!x)return;if(key==='psn'&&(x.psn||0)>=3){try{fx(unitEl(D,i),'☠ 독은 최대 -3까지!','txt');}catch(e){}return;}if(x.atk>0){x.atk--;x[key]=(x[key]||0)+1;}try{fx(unitEl(D,i),label,'txt');}catch(e){}}
+function weakenAtk(D,i,key,label,cap=3,n=1){const x=D.board[i];if(!x)return;if(key==='psn'&&(x.psn||0)>=cap){try{fx(unitEl(D,i),`☠ 독은 최대 -${cap}까지!`,'txt');}catch(e){}return;}const k=key==='psn'?Math.min(n,cap-(x.psn||0)):n;if(x.atk>0){const d=Math.min(k,x.atk);x.atk-=d;x[key]=(x[key]||0)+d;}try{fx(unitEl(D,i),label,'txt');}catch(e){}}
 // 성장·독·요정의 빛 뱃지 HTML
 function traitBadgeH(u){if(!u)return '';let h='';
- if(u.kw==='grow'){const g=Math.min(2,u.grow||0);h+=`<span class="stBadge grow${g>=2?' max':''}" title="성장 +${g}/2 (내 차례마다 공격 +1, 최대 +2)">🌱${g}/2</span>`;}
- if(u.psn>0)h+=`<span class="stBadge psn" title="독: 공격 -${u.psn} (최대 -3)">☠-${u.psn}${u.psn>=3?' MAX':''}</span>`;
+ if(u.kw==='grow'){const gc=growCap(u),g=Math.min(gc,u.grow||0);h+=`<span class="stBadge grow${g>=gc?' max':''}" title="성장 +${g}/${gc} (내 차례마다 공격 +1${isLeg(u)?'·체력 +1':''}, 최대 +${gc})">🌱${g}/${gc}</span>`;}
+ if(u.psn>0)h+=`<span class="stBadge psn" title="독: 공격 -${u.psn} (최대 -3, 전설의 독은 -4)">☠-${u.psn}${u.psn>=4?' MAX':''}</span>`;
  if(u.fai>0)h+=`<span class="stBadge fai" title="요정의 빛: 공격 -${u.fai}">✨-${u.fai}</span>`;
  return h;}
 // 얼음 스택 뱃지 HTML (야생·보스·시나리오·로그라이크 전투에서만 표시)
-function icyBadgeH(u){if(!u||!(B&&B.wildMode))return '';const full=!!(u.frozen&&u.icyFrozen);const c=full?2:(u.icy||0);if(c<1)return '';return `<span class="icyBadge${full?' full':''}" title="얼음 스택 ${c}/2">❄<i class="${c>=1?'on':''}"></i><i class="${c>=2?'on':''}"></i></span>`;}
+const iceMaxOf=u=>(B&&B.wildMode&&u&&(u.wildEncounter||(B.foe&&B.foe.board.includes(u))))?4:2;
+function icyBadgeH(u){if(!u)return '';const mx=iceMaxOf(u),c=Math.min(mx,u.icy||0);if(c<1)return '';const full=!!(u.frozen&&c>=mx);return `<span class="icyBadge${full?' full':''}" title="얼음 스택 ${c}/${mx}">❄${Array.from({length:mx},(_,k)=>`<i class="${c>k?'on':''}"></i>`).join('')}</span>`;}
 function refreshIcyBadge(D,i){try{const el=unitEl(D,i),k=el&&el.querySelector&&el.querySelector('.kwI');if(!k)return;const old=k.querySelector('.icyBadge');if(old)old.remove();const h=icyBadgeH(D.board[i]);if(h)k.insertAdjacentHTML('beforeend',h);}catch(e){}}
-function applyFreeze(D,i){const x=D.board[i];if(!x)return;
- if(!(B&&B.wildMode)){x.frozen=1;return;}
- x.icy=(x.icy||0)+1;
- if(x.icy>=2){x.icy=0;x.frozen=1;x.icyFrozen=1;fx(unitEl(D,i),'❄ 얼어붙었다!','txt');sfx('wrong');}
- else fx(unitEl(D,i),'❄ 얼음 1/2','txt');
+// 얼음 스택: 일반 포켓몬은 2스택, 야생·보스 포켓몬은 4스택이 쌓이면 얼어요(스택은 최대치를 넘지 않아요).
+// 한 차례 쉬고 나면(차례 시작에 녹을 때) 스택이 모두 사라져요.
+function addIce(D,i,n){const x=D.board[i];if(!x)return;const mx=iceMaxOf(x);x.icy=Math.min(mx,(x.icy||0)+n);
+ if(x.icy>=mx){if(!x.frozen){x.frozen=1;x.icyFrozen=1;fx(unitEl(D,i),'❄ 얼어붙었다!','txt');sfx('wrong');}}
+ else fx(unitEl(D,i),`❄ 얼음 ${x.icy}/${mx}`,'txt');
  refreshIcyBadge(D,i);}
-async function dealUnit(P,i,dmg,label){const u=P.board[i];if(!u)return 0;
- if(u.dodge){u.dodge=0;fx(unitEl(P,i),'피했다!','txt');return 0;}
- if(dmg>0&&u.shield>0){u.shield--;dmg=Math.max(0,dmg-1);fx(unitEl(P,i),'방어막!','txt');}
+// 1~3성: 공격한 포켓몬 +2 · 4성: +3 · 5성: 공격한 포켓몬 +4, 바로 옆 칸(1칸 이내) 포켓몬 +1
+function applyFreeze(D,i,a){if(!D.board[i])return;const leg=isLeg(a);
+ if(!leg){addIce(D,i,a&&MON[a.id]&&MON[a.id].rar===4?3:2);return;}
+ addIce(D,i,4);[i-1,i+1].forEach(j=>{if(j>=0&&j<D.board.length&&D.board[j]&&D.board[j].hp>0)addIce(D,j,1);});}
+async function dealUnit(P,i,dmg,label,pierce){const u=P.board[i];if(!u)return 0;
+ if(u.dodge){u.dodge--;fx(unitEl(P,i),'피했다!','txt');return 0;}
+ if(dmg>0&&u.shield>0&&!pierce){u.shield--;dmg=Math.max(0,dmg-1);fx(unitEl(P,i),'방어막!','txt');}
  if(dmg<=0){renderBattle();return 0;}
- if(u.kw==='armor'&&dmg>1)dmg-=1;
+ if(armorV(u)&&dmg>1)dmg=Math.max(1,dmg-armorV(u));
  u.hp-=dmg;const el=unitEl(P,i);impact(el,dmg,{col:TYPE_COL[MON[u.id].types[0]]});fx(el,'-'+dmg,dmg>=4?'big':'');
- if(u.hp<=0&&u.tough){u.tough=0;u.hp=1;await wait(100);fx(unitEl(P,i),'끈기!','txt');}
+ if(u.hp<=0&&u.tough){u.hp=Math.max(1,Math.min(u.max,u.tough));u.tough=0;await wait(100);fx(unitEl(P,i),'끈기!','txt');}
  else if(u.hp<=0){await wait(window.__sim?0:90);await faintFx(P,i);}
  return dmg;}
 // 돌진: 뒤로 살짝 젖혔다가(준비) 빠르게 부딪히고, 부딪히는 순간 잠깐 멈춰요(히트스톱)
@@ -3315,17 +3352,18 @@ async function playerAttack(si,tg,coopAnswer=null){const me=B.me,fo=B.foe;const 
 async function resolveAttack(A,D,si,tg,ok,cb,defReduce=0){const a=A.board[si];if(!a)return;
  let dmg=a.atk;let note='';
  if(ok){if(cb){dmg+=1;note='콤보 +1! ';}}else{dmg=Math.ceil(dmg/2);note='약한 공격… ';}
- a.att--;a.fresh=0;
- if(tg.hero){if(a.kw==='quake')dmg+=1;if(defReduce>0){dmg=Math.max(0,dmg-defReduce);note+=`방어 문제 정답 -${defReduce}! `;}const el=heroEl(D);await skillMove(A,si,el,ok,cb);D.hp-=dmg;if(dmg>0){impact(el,dmg,{hero:1,col:'#ff5a5f'});fx(el,'-'+dmg,ok?'crit big':'');}else fx(el,'공격을 막았다!','txt');if(ok&&dmg>0)sfx('crit');if(note)fx(unitEl(A,si),note,'txt');}
+ const dm=dragonMod(a);if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);a.att--;a.fresh=0;
+ if(tg.hero){dmg+=quakeB(a);if(defReduce>0){dmg=Math.max(0,dmg-defReduce);note+=`방어 문제 정답 -${defReduce}! `;}const el=heroEl(D);await skillMove(A,si,el,ok,cb);D.hp-=dmg;if(dmg>0){impact(el,dmg,{hero:1,col:'#ff5a5f'});fx(el,'-'+dmg,ok?'crit big':'');}else fx(el,'공격을 막았다!','txt');if(ok&&dmg>0)sfx('crit');if(note)fx(unitEl(A,si),note,'txt');}
  else{const d=D.board[tg.u];if(!d){return;}
-  if(a.kw==='fight')dmg+=1;const k=typeMul(a.id,d.id);dmg=applyType(dmg,k);
+  dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=applyType(dmg,k);
   await skillMove(A,si,unitEl(D,tg.u),ok,cb);
   if(k>=2){fx(unitEl(D,tg.u),'효과가 굉장했다!','txt super');if(A===B.me)S.meta.stats.superEff=(S.meta.stats.superEff||0)+1;}else if(k<1)fx(unitEl(D,tg.u),'효과가 별로인 듯…','txt');
-  await dealUnit(D,tg.u,dmg);
-  if(a.kw==='freeze'&&D.board[tg.u])applyFreeze(D,tg.u);
-  if(a.kw==='poison'&&D.board[tg.u])weakenAtk(D,tg.u,'psn','☠ 독! 공격 -1');
-  if(!(B.wildMode&&D===B.foe)){let cd=d.atk;const k2=typeMul(d.id,a.id);cd=a.kw==='wing'?0:applyType(cd,k2);if(d.kw==='wing')cd*=2;if(cd>0){await wait(220);await dealUnit(A,si,cd);}}
+  await dealUnit(D,tg.u,dmg,undefined,a.kw==='sneak'&&isLeg(a));
+  if(a.kw==='freeze'&&D.board[tg.u])applyFreeze(D,tg.u,a);
+  if(a.kw==='poison'&&D.board[tg.u])poisonHit(D,tg.u,isLeg(a));
+  if(!(B.wildMode&&D===B.foe)){let cd=d.atk;const k2=typeMul(d.id,a.id);cd=a.kw==='wing'?0:applyType(cd,k2);cd=Math.ceil(cd*wingM(d));if(cd>0){await wait(220);await dealUnit(A,si,cd);}}
   if(note)fx(unitEl(A,si),note,'txt');}
+ if(a.kw==='rush'&&isLeg(a)&&!(B.wildMode&&D===B.foe)){D.hp-=1;fx(heroEl(D),'⚡ 고정 -1','txt');}
  cleanup();renderBattle();checkEnd();}
 // 공부 기술: 에너지 2 → 문제 맞히면 카드 1장, 틀려도 설명을 보고 다시
 async function usePower(){const me=B.me;if(B.busy||(me.powerUses||0)<=0)return;B.busy=true;me.powerUses=Math.max(0,(me.powerUses||0)-1);renderBattle();
@@ -3344,14 +3382,18 @@ async function startTurn(side){if(!B||B.over)return;closeInfo();if(B.coop&&side=
  if(side==='me'&&!B.pvp&&!window.__sim){const ml=B.coop?(Number(P.manaLv)||0):(Number(trainerSkillLevels().mana)||0);if(ml>0&&rnd()*100<manaChance(ml)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.manaBonusFx=1;}}
  else if(B.pvp&&!window.__sim){const ml=Number(P.manaLv)||0;if(ml>0&&P.passRng()*100<manaChance(ml)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.manaBonusFx=1;}}
  const wildAliveCount=B.wildMode&&side==='foe'?B.foe.board.filter(u=>u&&u.hp>0).length:0;
- P.board.forEach(u=>{if(!u)return;if(B.coop&&side==='me'&&Number(u.coopOwner??0)!==B.coop.active)return;u.fresh=0;u.att=u.frozen?0:(B.wildMode&&P===B.foe?(u.rlAtt!=null?u.rlAtt:(((S.meta.settings.easy&&!B.coop)||wildAliveCount>=2)?1:2)):(u.kw==='double'?2:1));if(u.frozen&&side==='me'){}if(u.kw==='grow'&&u.grow<2){u.grow++;u.atk++;}});
+ P.board.forEach(u=>{if(!u)return;if(B.coop&&side==='me'&&Number(u.coopOwner??0)!==B.coop.active)return;u.fresh=0;u.att=u.frozen?0:(B.wildMode&&P===B.foe?((u.rlAtt!=null?u.rlAtt:(((S.meta.settings.easy&&!B.coop)||wildAliveCount>=2)?1:2))+(u.kw==='double'?1:0)):(u.kw==='double'?2:1));u.attTot=u.att;if(u.frozen&&side==='me'){}if(u.kw==='grow'&&u.grow<growCap(u)){u.grow++;u.atk++;if(isLeg(u)){u.hp++;u.max++;}}});
  // 얼음은 한 차례만
- P.board.forEach(u=>{if(u&&u.frozen&&(!B.coop||side==='foe'||Number(u.coopOwner??0)===B.coop.active)){u.frozen=0;u.icyFrozen=0;u.att=0;}});
+ P.board.forEach(u=>{if(u&&u.frozen&&(!B.coop||side==='foe'||Number(u.coopOwner??0)===B.coop.active)){u.frozen=0;u.icyFrozen=0;u.icy=0;u.att=0;}});
  if(!(B.wildMode&&side==='foe'))draw(P);
  // 불씨: 내 차례가 시작될 때마다 상대 포켓몬 하나에 1 피해
- if(!(B.wildMode&&side==='foe')){const O2=side==='me'?B.foe:B.me;const em=P.board.filter(u=>u&&u.kw==='ember').length;
-  for(let e=0;e<em&&!B.over;e++){const t=O2.board.map((x,i)=>x?i:-1).filter(i=>i>=0);if(t.length){const ti=t[Math.floor(brand()*t.length)];await dealUnit(O2,ti,1,'불씨');}else if(!B.wildMode){O2.hp-=1;fx(heroEl(O2),'-1','');}}
+ if(!(B.wildMode&&side==='foe')){const O2=side==='me'?B.foe:B.me;const ems=P.board.filter(u=>u&&u.kw==='ember'),em=ems.length;
+  for(let e=0;e<em&&!B.over;e++){await emberHit(O2,isLeg(ems[e]));}
   if(em){cleanup();renderBattle();if(checkEnd())return;}}
+ {// 전설 물결·광합성: 내 차례마다 효과
+  const lgs=P.board.filter(u=>u&&u.hp>0&&isLeg(u));
+  lgs.filter(u=>u.kw==='wave').forEach(()=>{const pool=P.board.map((x,i)=>x&&x.hp>0?i:-1).filter(i=>i>=0);const n=Math.min(2,pool.length);for(let k=0;k<n;k++){const j=Math.floor(brand()*pool.length);const ti=pool.splice(j,1)[0],x=P.board[ti];if(x.hp<x.max){x.hp++;fx(unitEl(P,ti),'물결 +1','heal');}}});
+  if(!(B.wildMode&&P===B.foe))lgs.filter(u=>u.kw==='heal').forEach(()=>{if(P.hp<P.max){P.hp++;fx(heroEl(P),'+1','heal');}});}
  const rd=B.pvp?Math.ceil(B.turn/2):B.round;
  if(rd>=10&&!(B.wildMode&&P===B.foe)){const sd=rd-9;P.hp-=sd;renderBattle();fx(heroEl(P),`지쳤다 -${sd}`,'');if(checkEnd())return;}
  renderBattle();
@@ -3366,15 +3408,15 @@ function aiIncomingDamage(attacker,target,base,multiplier=1){
  let dmg=applyType(base,typeMul(attacker.id,target.id))*multiplier;
  if(dmg>0&&target.dodge)return 0;
  if(dmg>0&&target.shield>0)dmg=Math.max(0,dmg-1);
- if(dmg>1&&target.kw==='armor')dmg-=1;
- return Math.max(0,dmg);
+ if(dmg>1&&armorV(target))dmg=Math.max(1,dmg-armorV(target));
+ return Math.max(0,Math.ceil(dmg));
 }
 function aiTargetValue(attacker,target){
- const raw=attacker.atk+(attacker.kw==='fight'?1:0);
+ const raw=Math.max(attacker.atk>0?1:0,attacker.atk+fightB(attacker)+sneakB(attacker,target)+dragonMod(attacker));
  const dealt=aiIncomingDamage(attacker,target,raw);
  const survives=target.tough&&dealt>=target.hp?1:dealt<target.hp?1:0;
  const killed=dealt>=target.hp&&!target.dodge&&!(target.shield&&raw>0&&dealt<target.hp)&&!target.tough;
- const retaliate=attacker.kw==='wing'?0:aiIncomingDamage(target,attacker,target.atk,target.kw==='wing'?2:1);
+ const retaliate=attacker.kw==='wing'?0:aiIncomingDamage(target,attacker,target.atk,wingM(target));
  const attackerSurvives=attacker.tough&&retaliate>=attacker.hp?1:retaliate<attacker.hp?1:0;
  const threat=target.atk*1.9+(target.kw==='double'?2.4:0)+(target.kw==='grow'?2.2:0)+(target.kw==='ember'?1.8:0)+(target.kw==='freeze'||target.kw==='poison'?1.4:0)+(target.kw==='rush'&&target.att>0?1.8:0);
  let value=Math.min(dealt,target.hp)*2.1+threat+MON[target.id].cost*.45;
@@ -3416,8 +3458,8 @@ async function foeTurn(){const fo=B.foe,me=B.me;B.busy=true;renderBattle();
    const taunts=me.board.map((x,j)=>isTaunt(x)?j:-1).filter(j=>j>=0);let tg=null;
    const tauntActive=taunts.length>0;
    const mustUnit=u.att>=2&&me.board.some(Boolean); // 2회 공격 포켓몬의 첫 공격은 출전한 포켓몬만 노려요(내 필드가 비었을 때만 예외)
-   const faceDmg=fo.board.reduce((s,x)=>s+(x&&x.att>0&&!x.frozen&&(!tauntActive||x.kw==='sneak')?(x.atk*x.att+(x.kw==='quake'?x.att:0)):0),0);
-   const defenseExpected=B.wildMode?0:(S.meta.settings.defq?fo.board.reduce((s,x)=>s+(x&&x.att>0&&!x.frozen&&x.atk+(x.kw==='quake'?1:0)>=2?Math.min(x.att,2):0),0):0);
+   const faceDmg=fo.board.reduce((s,x)=>s+(x&&x.att>0&&!x.frozen&&(!tauntActive||x.kw==='sneak')?(remDmg(x)+quakeB(x)*x.att):0),0);
+   const defenseExpected=B.wildMode?0:(S.meta.settings.defq?fo.board.reduce((s,x)=>s+(x&&x.att>0&&!x.frozen&&x.atk+quakeB(x)>=2?Math.min(x.att,2):0),0):0);
    const likelyFaceDmg=Math.max(0,faceDmg-defenseExpected*1.25);
    const trainerLethal=B.coop?bossLethal(faceDmg)>=0:((S.meta.settings.defq?likelyFaceDmg:faceDmg)>=me.hp);
    if(taunts.length&&u.kw!=='sneak')tg={u:taunts.sort((a,b)=>aiTargetValue(u,me.board[b])-aiTargetValue(u,me.board[a]))[0]};
@@ -3436,20 +3478,21 @@ async function foeTurn(){const fo=B.foe,me=B.me;B.busy=true;renderBattle();
     if(mustUnit&&best!=null)tg={u:best};else if(canHitUnit&&rnd()>=tChance)tg={u:best};else tg=bossPickTrainer(faceDmg);}
    await foeAttack(i,tg);u=fo.board[i];await wait(330);}}
  if(B.over)return;B.busy=false;await wait(250);if(B.coop)bossSetActive(0);startTurn('me');}
-async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)return;a.att--;
- let dmg=a.atk;
- if(tg.hero){if(a.kw==='quake')dmg+=1;
+async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)return;const dm=dragonMod(a);a.att--;
+ let dmg=a.atk;if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);
+ if(tg.hero){dmg+=quakeB(a);
   // 막기 문제: 내 트레이너가 피해 2 이상을 받을 때마다 방어 문제를 표시
   const tp=(B.coop&&tg.p!=null&&B.coop.players[tg.p])?B.coop.players[tg.p]:me;const remoteDef=!!B.coop&&tp!==B.coop.players[0];
    if(S.meta.settings.defq&&dmg>=2){renderBattle();bossMarkTarget(tp);let r=null;if(remoteDef){r=await bossAskDefense(tp,a);}else{const q=pickQ();if(q)r=await battleQ(q,{who:tp.av,what:`막기! ${esc(MON[a.id].name)}의 공격을 막아요`,defense:true});}
     if(r){if(r.ok){B.qc++;B.combo++;if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;dmg=Math.max(0,dmg-2);fx(heroEl(tp),'막았다!','txt');if(B.counterActive>0){await dealUnit(fo,i,B.counterActive);fx(heroEl(tp),`반격 -${B.counterActive}`,'txt');}}else B.combo=0;}}
   bossMarkTarget(tp);await skillMove(fo,i,heroEl(tp),true,false);tp.hp-=dmg;if(dmg){impact(heroEl(tp),dmg,{hero:1,col:'#ff5a5f'});fx(heroEl(tp),'-'+dmg,dmg>=4?'big':'');}}
- else{const d=me.board[tg.u];if(!d)return;if(a.kw==='fight')dmg+=1;const k=typeMul(a.id,d.id);dmg=applyType(dmg,k);
+ else{const d=me.board[tg.u];if(!d)return;dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=applyType(dmg,k);
   await skillMove(fo,i,unitEl(me,tg.u),true,false);if(k>=2)fx(unitEl(me,tg.u),'효과가 굉장했다!','txt');
-  await dealUnit(me,tg.u,dmg);if(a.kw==='freeze'&&me.board[tg.u])applyFreeze(me,tg.u);if(a.kw==='poison'&&me.board[tg.u])weakenAtk(me,tg.u,'psn','☠ 독! 공격 -1');
-  let cd=a.kw==='wing'?0:applyType(d.atk,typeMul(d.id,a.id));if(d.kw==='wing')cd*=2;if(cd>0){await wait(200);await dealUnit(fo,i,cd);}}
+  await dealUnit(me,tg.u,dmg,undefined,a.kw==='sneak'&&isLeg(a));if(a.kw==='freeze'&&me.board[tg.u])applyFreeze(me,tg.u,a);if(a.kw==='poison'&&me.board[tg.u])poisonHit(me,tg.u,isLeg(a));
+  let cd=a.kw==='wing'?0:applyType(d.atk,typeMul(d.id,a.id));cd=Math.ceil(cd*wingM(d));if(cd>0){await wait(200);await dealUnit(fo,i,cd);}}
+ if(a.kw==='rush'&&isLeg(a)){const dd=!tg.hero&&me.board[tg.u]?me.board[tg.u]:null;const tpx=B.coop?((tg.hero&&tg.p!=null&&B.coop.players[tg.p])||B.coop.players[Number((dd&&dd.coopOwner)??0)]||me):me;tpx.hp-=1;fx(heroEl(tpx),'⚡ 고정 -1','txt');}
  cleanup();renderBattle();checkEnd();}
-function battleMenu(){if(B&&B.wildMode){M(`<h2>야생 포켓몬 전투</h2><div class=explain style="font-size:14px">기존 배틀과 같은 방식으로 카드를 내고, 문제를 풀어 공격해요. 야생 포켓몬은 트레이너 체력 없이 체력이 30% 이하가 되면 포획을 시도할 수 있어요.</div><div class=mbtns><button class="btn gold" data-a=x>계속 싸우기</button><button class="btn ghost" data-a=q>전투 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),q:async()=>{if(await confirmBox('야생 포켓몬과의 전투를 포기할까요? 이번 포획 기회는 사라져요.','포기하기','계속 싸우기')){closeM();finishEndlessWild('fled','야생 포켓몬 전투를 포기했어요.');}}});return;}M(`<h2>배틀 메뉴</h2><div class=explain style="font-size:14px">${Object.values(KW).filter((v,i,a)=>a.findIndex(x=>x.n===v.n)===i).map(k=>`${I(k.ic)} <b>${k.n}</b> ${k.d}`).join('<br>')}<br><br><b>타입 상성</b>: 상성이 좋으면 피해 ×1.5(효과가 굉장했다!), 나쁘면 −1. 공격받은 포켓몬은 반격해요.<br>10번째 차례부터는 두 트레이너 모두 조금씩 지쳐요.<br><br><b>특수 카드 뽑기</b>: 일반 덱 카드 50%, 랜덤 포켓몬 카드 20%, 기본 돌 4종 합계 20%(화염의 돌·물의 돌·전기의 돌·달의 돌 각각 5%), 태양의 돌 10%예요. 태양의 돌은 비용 0으로 사용하면 이번 턴 에너지가 1 늘어요. 랜덤 카드 중 마스터볼 20%(5~6코스트·비용 4), 파워볼 30%(3~4코스트·비용 2), 포켓볼 50%(1~2코스트·비용 1) 비율로 나와요.<br><br><b>공부 기술</b>: 전투마다 기본 2회(트레이너 스킬 '공부 강화'로 늘어나요) 사용할 수 있고, 에너지를 소모하지 않아요. 사용할 때마다 남은 횟수가 1씩 줄어요. <b>달의 돌</b>은 3코스트로 상대 포켓몬 하나를 1턴 동안 기절시켜요.</div>
+function battleMenu(){if(B&&B.wildMode){M(`<h2>야생 포켓몬 전투</h2><div class=explain style="font-size:14px">기존 배틀과 같은 방식으로 카드를 내고, 문제를 풀어 공격해요. 야생 포켓몬은 트레이너 체력 없이 체력이 30% 이하가 되면 포획을 시도할 수 있어요.</div><div class=mbtns><button class="btn gold" data-a=x>계속 싸우기</button><button class="btn ghost" data-a=q>전투 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),q:async()=>{if(await confirmBox('야생 포켓몬과의 전투를 포기할까요? 이번 포획 기회는 사라져요.','포기하기','계속 싸우기')){closeM();finishEndlessWild('fled','야생 포켓몬 전투를 포기했어요.');}}});return;}M(`<h2>배틀 메뉴</h2><div class=explain style="font-size:14px">${Object.values(KW).filter((v,i,a)=>a.findIndex(x=>x.n===v.n)===i).map(k=>`${I(k.ic)} <b>${k.n}</b> ${k.d}${k.l?` <span style="color:#b07a00">★전설: ${k.l}</span>`:''}`).join('<br>')}<br><br><b>타입 상성</b>: 상성이 좋으면 피해 ×1.5(효과가 굉장했다!), 나쁘면 −1. 공격받은 포켓몬은 반격해요.<br>야생·보스·시나리오·모험의 용 포켓몬은 한 번 더 공격해요(3회: 일반 -2/-1/그대로, 전설 -1/그대로/+1).<br>10번째 차례부터는 두 트레이너 모두 조금씩 지쳐요.<br><br><b>특수 카드 뽑기</b>: 일반 덱 카드 50%, 랜덤 포켓몬 카드 20%, 기본 돌 4종 합계 20%(화염의 돌·물의 돌·전기의 돌·달의 돌 각각 5%), 태양의 돌 10%예요. 태양의 돌은 비용 0으로 사용하면 이번 턴 에너지가 1 늘어요. 랜덤 카드 중 마스터볼 20%(5~6코스트·비용 4), 파워볼 30%(3~4코스트·비용 2), 포켓볼 50%(1~2코스트·비용 1) 비율로 나와요.<br><br><b>공부 기술</b>: 전투마다 기본 2회(트레이너 스킬 '공부 강화'로 늘어나요) 사용할 수 있고, 에너지를 소모하지 않아요. 사용할 때마다 남은 횟수가 1씩 줄어요. <b>달의 돌</b>은 3코스트로 상대 포켓몬 하나를 1턴 동안 기절시켜요.</div>
  <div class=mbtns><button class="btn gold" data-a=x>계속하기</button>${B.pvp?'':`<button class="btn green" data-a=sv>${I('disk')} 저장하고 나가기</button>`}<button class="btn ghost" data-a=q>포기하기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),sv:()=>{if(B.busy||B.side!=='me'){toast('내 차례일 때 저장할 수 있어요');return;}const o=Object.assign({},B,{busy:false,sel:-1,pick:-1});delete o.rng;S.meta.bsave=JSON.stringify(o);saveLocal();closeM();B=null;$('#battle').classList.remove('on');$('#battle').innerHTML='';renderLeague();toast('배틀을 저장했어요! 지금 꺼도 다음에 이어서 할 수 있어요');},q:async()=>{if(await confirmBox('배틀을 포기할까요? 푼 문제는 기록에 남아요.','포기','계속')){closeM();if(B.pvp)pvpSend({t:'quit'});B.over=true;endBattle(false);}}});}
 async function endBattle(win){if(B&&B.wildMode){finishEndlessWild('fled','야생 포켓몬 전투를 종료했어요.');return;}if(B&&B.pvp)return pvpEnd(win);startBgm('adventure');const me=S.meta,g=B.g,gi=B.gi;const first=gi>=0&&win&&!me.gyms[gi];
  let coins=win?30+B.diff*10:10,candy=B.qc,packs=0,legend=0;
