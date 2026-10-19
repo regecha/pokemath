@@ -1749,6 +1749,34 @@ html.lowfx .packExplosion u{display:none}
 .mini .ms{font-size:8px;line-height:1;color:#e59a00;letter-spacing:-1px}
 .mini .mt{position:absolute;top:0;left:0;right:0;text-align:center;font-size:8.5px;line-height:13px;color:#fff;background:#ff5a5f;white-space:nowrap}
 .mini .mt.sh{background:#9a6bff}.mini .mt.dp{background:#7a86a8}.mini .mt.dn{background:#ffb321}
+
+/* 전설 카드 뽑기: 황금빛 섬광 · 회전 빛살 · 빛기둥 · 충격파 · 불꽃 + 카드 팝 */
+.lgsFx{position:fixed;width:0;height:0;z-index:300;pointer-events:none}
+.lgsFx s{position:absolute;left:-110vmax;top:-110vmax;width:220vmax;height:220vmax;border-radius:50%;text-decoration:none;background:radial-gradient(circle,rgba(255,255,255,.97) 0,rgba(255,238,160,.82) 5%,rgba(255,184,40,.44) 14%,rgba(255,150,20,.15) 28%,transparent 46%);animation:lgsFlash 1.05s ease-out both}
+.lgsFx u{position:absolute;left:0;top:0;display:block;width:min(170vw,900px);height:min(170vw,900px);border-radius:50%;text-decoration:none;
+ background:repeating-conic-gradient(from 0deg,rgba(255,190,40,0) 0deg 4deg,rgba(255,226,110,.8) 4.6deg 6.4deg,rgba(255,190,40,0) 7deg 12deg);
+ -webkit-mask-image:radial-gradient(circle closest-side,#000 0,rgba(0,0,0,.6) 45%,transparent 100%);mask-image:radial-gradient(circle closest-side,#000 0,rgba(0,0,0,.6) 45%,transparent 100%);
+ animation:bxRay 1.5s cubic-bezier(.12,.72,.16,1) both}
+.lgsFx u.b{background:repeating-conic-gradient(from 6deg,rgba(255,255,255,0) 0deg 9deg,rgba(255,250,215,.7) 9.6deg 10.6deg,rgba(255,255,255,0) 11.2deg 22deg);animation:bxRayB 1.7s cubic-bezier(.12,.72,.16,1) .08s both}
+.lgsFx em{position:absolute;left:-32px;top:-95vh;width:64px;height:190vh;background:linear-gradient(90deg,transparent,rgba(255,246,196,.96) 50%,transparent);-webkit-mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);animation:lgsPillar 1s ease-out both}
+.lgsFx b{position:absolute;left:0;top:0;border:5px solid #ffe27a;border-radius:50%;box-shadow:0 0 30px 10px rgba(255,190,40,.9),inset 0 0 22px rgba(255,220,100,.6);animation:packShock 1s cubic-bezier(.12,.72,.16,1) both}
+.lgsFx b.b{border-color:#fff;border-width:3px;animation-delay:.14s}.lgsFx b.c{border-color:#ffab2c;border-width:2px;animation-delay:.3s}
+.lgsFx i{position:absolute;left:0;top:0;width:var(--sz,8px);height:var(--sz,8px);border-radius:50%;background:var(--pc,#ffe27a);box-shadow:0 0 12px 2px var(--pc,#ffe27a);animation:packSpark 1.25s cubic-bezier(.12,.7,.2,1) var(--delay,0s) both}
+.lgsFx i.sq{border-radius:2px}
+@keyframes lgsFlash{0%{opacity:0;transform:scale(.3)}12%{opacity:1;transform:scale(.7)}100%{opacity:0;transform:scale(1.15)}}
+@keyframes bxRayB{0%{opacity:0;transform:translate(-50%,-50%) rotate(20deg) scale(.5)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) rotate(-26deg) scale(1.05)}}
+@keyframes lgsPillar{0%{opacity:0;transform:scaleX(0)}14%{opacity:1;transform:scaleX(1.5)}100%{opacity:0;transform:scaleX(.15)}}
+.flip.lgsHit{z-index:6}
+.flip.lgsHit .in{animation:lgsPop .8s cubic-bezier(.2,1.2,.3,1)}
+.flip.lgsHit .fc{animation:lgsGlow 1.7s ease-out both}
+@keyframes lgsPop{0%{scale:1}22%{scale:1.28}52%{scale:.95}100%{scale:1}}
+@keyframes lgsGlow{0%{filter:brightness(2.8) saturate(1.5)}28%{filter:brightness(1.55) drop-shadow(0 0 24px #ffc83a)}100%{filter:none}}
+#pack.lgsQuake .pkRow,#pack.lgsQuake .pkInfo,#pack.lgsQuake .mbtns,#pack.lgsQuake .pkSum{animation:lgsQ .55s linear}
+@keyframes lgsQ{0%,100%{translate:0 0}10%{translate:-8px 4px}25%{translate:7px -5px}40%{translate:-5px -3px}55%{translate:4px 4px}75%{translate:-2px 2px}}
+#banner.gold .b1{color:#fff3b0;-webkit-text-stroke:3px #a85a00;text-shadow:0 5px 0 #a85a00,0 0 26px #ffc83a,0 0 50px rgba(255,170,30,.8)}
+#banner.gold .b2{color:#7a4300;background:linear-gradient(#fff7c8,#ffd868);box-shadow:0 0 18px rgba(255,200,60,.9)}
+html.lowfx .lgsFx u,html.lowfx .lgsFx em,html.lowfx .lgsFx i{display:none}
+@media(prefers-reduced-motion:reduce){.lgsFx *,#pack.lgsQuake .pkRow,.flip.lgsHit .in,.flip.lgsHit .fc{animation-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -2086,6 +2114,14 @@ function sfx(n,p=0){
    [523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,.06,'square',.035,.05+i*.045));
    [[784,.42,.08],[1047,.5,.08],[1319,.58,.08],[1568,.66,.34]].forEach(([f,t,du])=>{tone(f,du,'square',.05,t);tone(f/2,du,'triangle',.07,t);});
    [2093,2637,3136,2637,3520].forEach((f,i)=>tone(f,.04,'square',.025-i*.003,.95+i*.07));break;
+  case 'legshard':
+   // 전설 카드 뽑기: 쾅(저음 낙하+소음) → 휘익 상승 아르페지오 → 웅장한 화음과 리드 → 반짝 꼬리
+   noise(.5,.38,260);noise(.3,.3,2600);noise(.7,.14,1700,.04);
+   tone(160,.7,'sine',.4,0,34);tone(80,.9,'triangle',.3,0,30);tone(220,.4,'sawtooth',.1,0,55);
+   [392,523,659,784,1047,1319,1568,2093].forEach((f,i)=>{tone(f,.14,'sawtooth',.05,.1+i*.055);tone(f*2,.1,'square',.025,.1+i*.055);});
+   [523,659,784,1047,1568].forEach(f=>{tone(f,1.1,'sawtooth',.045,.6);tone(f/2,1.2,'triangle',.08,.6);});
+   [[1047,.62,.14],[1319,.78,.14],[1568,.94,.14],[2093,1.1,.55]].forEach(([f,t,du])=>tone(f,du,'square',.06,t));
+   [3136,3951,4699,5274,6272].forEach((f,i)=>tone(f,.4,'sine',.03-i*.004,1.15+i*.09));noise(.8,.1,5200,1.1);break;
   case 'page':tone(440,.05,'sine',.05);break;
  }
 }
@@ -3071,6 +3107,20 @@ function rollPack(){const p=S.meta.pity;const out=[];
  if(p.p4>=10){out[3]=rpick(poolOf(4));p.p4=0;}
  if(p.p5>=40){out[4]=rpick(poolOf(5));p.p5=0;}
  return out.sort((a,b)=>MON[a].rar-MON[b].rar);}
+function legBanner(b1,b2){banner(b1,b2);const el=$('#banner');el.classList.add('gold');clearTimeout(legBanner.t);legBanner.t=setTimeout(()=>el.classList.remove('gold'),2300);}
+// 전설 카드를 뒤집을 때: 황금 섬광 + 회전 빛살 + 빛기둥 + 충격파 3겹 + 불꽃, 카드가 튀어 오르고 화면이 흔들려요
+function legendPullFx(f,g,id){const m=MON[id],low=!!(S.meta.settings&&S.meta.settings.lowfx);
+ try{sfx('legshard');}catch(e){}
+ const msg=g.k==='done'?['전설 조각 완성!',esc(m.name)+' 카드를 얻었어요']:g.k==='shard'?['전설의 조각!',esc(m.name)+' '+g.n+'/'+g.need]:['황금 전설!',esc(m.name)];
+ legBanner(msg[0],msg[1]);confetti(low?20:60);
+ f.classList.remove('lgsHit');void f.offsetWidth;f.classList.add('lgsHit');
+ const P=$('#pack');if(P&&!low){P.classList.remove('lgsQuake');void P.offsetWidth;P.classList.add('lgsQuake');setTimeout(()=>P.classList.remove('lgsQuake'),600);}
+ let cx=VW()/2,cy=VH()/2;try{const r=f.getBoundingClientRect(),z=ZM();cx=(r.left+r.width/2)/z;cy=(r.top+r.height/2)/z;}catch(e){}
+ const cols=['#fff6c4','#ffe27a','#ffc83a','#ffab2c','#ffffff'],n=low?0:64;
+ const bits=Array.from({length:n},(_,i)=>{const a=Math.PI*2*i/n+(Math.random()-.5)*.3,d=110+Math.random()*Math.min(VW(),VH())*.62;return `<i class="${i%3?'':'sq'}" style="--x:${(Math.cos(a)*d).toFixed(1)}px;--y:${(Math.sin(a)*d).toFixed(1)}px;--rot:${Math.round(Math.random()*900-450)}deg;--delay:${(Math.random()*.22).toFixed(2)}s;--sz:${(4+Math.random()*10).toFixed(1)}px;--pc:${cols[i%cols.length]}"></i>`;}).join('');
+ const o=document.createElement('div');o.className='lgsFx';o.style.cssText=`left:${cx}px;top:${cy}px`;
+ o.innerHTML='<s></s><u></u><u class=b></u><em></em><b class=a></b><b class=b></b><b class=c></b>'+bits;
+ document.body.appendChild(o);setTimeout(()=>o.remove(),2000);}
 async function openPack(n){const m=S.meta;if(m.packs<=0){toast('카드팩이 없어요. 오늘의 훈련을 하면 받을 수 있어요!');return;}
  n=Math.max(1,Math.min(+n||1,m.packs,20));const multi=n>1;
  m.packs-=n;m.stats.opened+=n;const res=[];for(let b=0;b<n;b++)rollPack().forEach(id=>res.push(gainCard(id)));if(multi)res.sort((a,b)=>MON[a.id].rar-MON[b.id].rar);const cards=res.map(g=>g.id);
@@ -3087,7 +3137,8 @@ async function openPack(n){const m=S.meta;if(m.packs<=0){toast('카드팩이 없
   P.classList.remove('charging','legCharge');if(multi)P.classList.add('multi');
   P.innerHTML=`${top>=4?`<div class="rays r${top}"></div>`:''}<div class=pkInfo>${multi?`✨ 카드 ${cards.length}장! 눌러서 공개하세요`:'✨ 카드를 눌러 운명의 카드를 공개하세요!'}</div><div class=pkRow>${cards.map((id,i)=>`<div class="flip g${MON[id].rar}" style="--i:${i}" data-i="${i}"><div class=in><div class=bk></div><div class=fc>${multi?mini(id,res[i]):tag(res[i])+face(id,res[i])}</div></div></div>`).join('')}</div><div class="pkSum hidden" id=pkSum></div><div class=mbtns><button class="btn gold" id=pkAll>✨ 모두 뒤집기</button><button class="btn green hidden" id=pkDone>다 봤어요!</button></div><div class=pkInfo style="font-size:13px">희귀 이상 포켓몬은 조각으로 나와요 · 이미 있는 카드는 코인·별가루로 바뀌어요</div>`;
   let left=cards.length;const flipOne=async(f,quiet)=>{if(f.classList.contains('open'))return;f.classList.add('open');left--;const i=+f.dataset.i,id=cards[i],r=MON[id].rar,g=res[i];
-   if(quiet){sfx(r>=4?'rare':'flip');}
+   if(!quiet&&r===5){legendPullFx(f,g,id);}
+   else if(quiet){sfx(r>=4?'rare':'flip');}
    else if(g.k==='done'){sfx('evolve');confetti(50);banner('조각 완성!',`${esc(MON[id].name)} 카드를 얻었어요`);}
    else if(r>=4){sfx('rare');confetti(r===5?52:32);if(r===5)banner('황금 전설!',esc(MON[id].name));else banner('무지개 레어!',esc(MON[id].name));}else sfx('flip');
    if(multi&&!quiet&&r>=4)try{f.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}
@@ -3096,7 +3147,7 @@ async function openPack(n){const m=S.meta;if(m.packs<=0){toast('카드팩이 없
    const el=$('#pkSum');if(!el)return;el.innerHTML=`<b>${cards.length}장 결과</b><br>NEW <b>${nw+dn}</b> · 조각 <b>${sh}</b>${coin||dust?` · 중복 코인 <b>+${coin}</b> · 별가루 <b>+${dust}</b>`:''}<br>가장 귀한 카드: <b>${esc(MON[bt].name)}</b> ${'★'.repeat(MON[bt].rar)}`;el.classList.remove('hidden');try{el.scrollIntoView({block:'nearest',behavior:'smooth'});}catch(e){}};
   P.querySelectorAll('.flip').forEach(f=>f.onclick=()=>flipOne(f));
   $('#pkAll').onclick=async()=>{const waiting=[...P.querySelectorAll('.flip:not(.open)')];for(const f of waiting){flipOne(f,multi);await wait(multi?110:520);}
-   if(multi){const bi=cards.reduce((a,id,i)=>MON[id].rar>=MON[cards[a]].rar?i:a,0),br=MON[cards[bi]].rar;if(br>=4){confetti(br===5?52:32);banner(br===5?'황금 전설!':'무지개 레어!',esc(MON[cards[bi]].name));}}};
+   if(multi){const bi=cards.reduce((a,id,i)=>MON[id].rar>=MON[cards[a]].rar?i:a,0),br=MON[cards[bi]].rar;if(br===5)legendPullFx(P.querySelectorAll('.flip')[bi],res[bi],cards[bi]);else if(br>=4){confetti(32);banner('무지개 레어!',esc(MON[cards[bi]].name));}}};
   $('#pkDone').onclick=()=>{P.classList.remove('on','multi');P.innerHTML='';afterPack();};
   if(all)$('#pkAll').click();};
  $('#pkBag').onclick=()=>reveal(false);$('#pkSkip').onclick=()=>reveal(true);}
@@ -3598,34 +3649,82 @@ async function emberHit(O,leg,src){const t=O.board.map((x,i)=>x?i:-1).filter(i=>
 function fairyHit(O,leg){const pool=O.board.map((x,i)=>x?i:-1).filter(i=>i>=0);if(!pool.length)return;if(leg&&pool.length===1){weakenAtk(O,pool[0],'fai','✨ 요정의 빛! 공격 -2',3,2);sfx('heal');return;}const n=leg?Math.min(2,pool.length):1;for(let k=0;k<n;k++){const j=Math.floor(brand()*pool.length);const ti=pool.splice(j,1)[0];weakenAtk(O,ti,'fai','✨ 요정의 빛! 공격 -1');}sfx('heal');}
 function poisonHit(D,i,leg){weakenAtk(D,i,'psn',leg?'☠ 독! 공격 -2':'☠ 독! 공격 -1',leg?4:3,leg?2:1);}
 
-// ===== 돌 카드 사용 연출 (화염·물·전기·달·태양) =====
-const STONE_FX={
- fire:{n:'화염의 돌',sub:'모든 적을 불태워라!',c1:'#ff8a3a',c2:'#ffe08a',c3:'#e8452a',dk:'#3a0a06',snd:'crit',shake:9},
- water:{n:'물의 돌',sub:'푸른 물결의 방패!',c1:'#4db3ff',c2:'#c9f0ff',c3:'#2358b0',dk:'#04183a',snd:'level',shake:0},
- thunder:{n:'전기의 돌',sub:'번개처럼 다시 한 번!',c1:'#ffd02a',c2:'#fffbd0',c3:'#f4ac16',dk:'#241a02',snd:'crit',shake:11},
- moon:{n:'달의 돌',sub:'달빛이 모든 것을 멈춘다…',c1:'#a58bff',c2:'#efe6ff',c3:'#5c3fa8',dk:'#0f0828',snd:'crit',shake:0},
- sun:{n:'태양의 돌',sub:'타오르는 에너지 충전!',c1:'#ff8a4a',c2:'#fff0a0',c3:'#ff6a4a',dk:'#3a0e0a',snd:'level',shake:0}};
-async function stoneFx(item){
- if(window.__sim)return;const T=STONE_FX[item];if(!T)return;
- const low=!!(S.meta&&S.meta.settings&&S.meta.settings.lowfx);
- const o=document.createElement('div');o.className='stFx '+item+(low?' low':'');
- o.style.cssText=`--s1:${T.c1};--s2:${T.c2};--s3:${T.c3};--sd:${T.dk}`;
- const R=(a,b)=>a+Math.random()*(b-a);
- let h='<div class=sfDim></div><div class=sfRays></div><div class=sfFlash></div><div class=sfWave></div><div class="sfWave w2"></div><div class="sfWave w3"></div>';
- if(!low){
-  if(item==='fire'){for(let i=0;i<26;i++)h+=`<i class="sfEmber" style="--x:${R(-46,46).toFixed(1)}vw;--dl:${R(0,.5).toFixed(2)}s;--sz:${R(6,16).toFixed(0)}px;--dur:${R(.7,1.2).toFixed(2)}s"></i>`;h+='<div class=sfFloor></div>';}
-  else if(item==='water'){for(let i=0;i<22;i++)h+=`<i class="sfDrop" style="--x:${R(-48,48).toFixed(1)}vw;--dl:${R(0,.5).toFixed(2)}s;--sz:${R(7,15).toFixed(0)}px;--dur:${R(.6,1).toFixed(2)}s"></i>`;h+='<div class=sfFloor></div>';}
-  else if(item==='thunder'){h+=`<svg class=sfBolt viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="${[0,1,2,3,4,5,6].map(k=>(30+k%2*14+R(-4,4)).toFixed(1)+','+(k*17).toFixed(1)).join(' ')}"/><polyline class=b2 points="${[0,1,2,3,4,5,6].map(k=>(66-k%2*12+R(-4,4)).toFixed(1)+','+(k*17).toFixed(1)).join(' ')}"/><polyline class=b3 points="${[0,1,2,3,4,5,6].map(k=>(48+k%2*10+R(-3,3)).toFixed(1)+','+(k*17).toFixed(1)).join(' ')}"/></svg>`;}
-  else if(item==='moon'){h+='<div class=sfMoon></div>';for(let i=0;i<18;i++)h+=`<i class="sfStar" style="--x:${R(-46,46).toFixed(1)}vw;--y:${R(-30,30).toFixed(1)}vh;--dl:${R(0,.6).toFixed(2)}s;--sz:${R(10,26).toFixed(0)}px">✦</i>`;}
-  else if(item==='sun'){h+='<div class=sfSun></div>';}
-  for(let i=0;i<30;i++){const a=Math.PI*2*i/30+R(-.15,.15),d=R(24,52);h+=`<i class=sfSpark style="--x:${(Math.cos(a)*d).toFixed(1)}vmin;--y:${(Math.sin(a)*d).toFixed(1)}vmin;--sz:${R(5,13).toFixed(0)}px;--dl:${R(.12,.3).toFixed(2)}s"></i>`;}
- }
- h+=`<div class=sfGemWrap>${stoneGemHTML(item)}</div><div class=sfTitle><b>${T.n}</b><small>${T.sub}</small></div>`;
- o.innerHTML=h;document.body.appendChild(o);
- try{sfx(T.snd);}catch(e){}
- try{if(!low&&T.shake){const bt=$('#battle');if(bt)setTimeout(()=>shakeEl(bt,T.shake),300);}}catch(e){}
- setTimeout(()=>o.remove(),1900);
- await wait(low?500:1050);
+// ===== 돌 카드 사용 연출 (도트) · 전체화면 대신 해당 진영/포켓몬 위에서만 짧게 보여요. PXF 캔버스 한 장에 그려서 가벼워요. =====
+function stLane(P){return document.querySelector('#'+(P===B.me?'myLane':'foeLane'));}
+function stFxBase(P,hit){ // 진영 영역과 도트 격자 좌표
+ const el=stLane(P);const r=el?zRect(el):{left:VW()*.1,top:VH()*.4,width:VW()*.8,height:VH()*.2};
+ return{l:r.left,t:r.top,w:r.width,h:r.height,cx:r.left+r.width/2,cy:r.top+r.height/2};}
+function stFlashEl(el,filt){try{if(el&&el.animate)el.animate([{filter:'none'},{filter:filt,offset:.3},{filter:'none'}],{duration:420,easing:'ease-out'});}catch(e){}}
+const ST_FIRE={c:'#ffd45c',c2:'#ff7a1c',w:'#fff6c0'},ST_FIRE2={c:'#ff7a1c',c2:'#c8261a',w:'#ffd45c'};
+function stoneFxFire(foe){const S=PXF.S(),b=stFxBase(foe),P=PXF.P,hmax=Math.max(6,Math.min(22,b.h/S/2*1.05));
+ const x0=b.l/S,x1=(b.l+b.w)/S,yb=(b.t+b.h)/S-1,DUR=880;
+ PXF.add(0,DUR,b.cx,b.cy,(P_,p,k)=>{const f=PXF.fr(p),env=k<.22?k/.22:k>.72?Math.max(0,(1-k)/.28):1;if(env<=0)return;
+  for(let layer=0;layer<2;layer++){const pal=layer?ST_FIRE:ST_FIRE2,step=layer?5:4,off=layer?2:0;
+   for(let x=x0+off;x<x1;x+=step){const wob=PXF.hz((x*.7|0)+(f>>1)*3+layer*17),h=Math.max(1,Math.round((layer?.35+.4*wob:.55+.45*wob)*hmax*env));
+    PXF.flame(x,yb+(layer?0:1),h,pal);}}
+  // 바닥 불길(타오르는 줄)
+  for(let x=x0;x<x1;x++){const hh=Math.round(2*env*(1+PXF.hz(x+f)));if(hh>0)P.rect(x,yb-hh+1,1,hh,(x+f)%3?'#ff7a1c':'#ffd45c');}});
+ // 불씨
+ PXF.debris(b.cx,b.t+b.h*.8,{n:14,cols:['#ffd45c','#ff7a1c','#fff6c0'],up:true,sp:150,g:-40,dur:700,sz:2,sx:b.w*.45,stagger:30});
+ setTimeout(()=>{try{PXF.flash('#ff7a1c');}catch(e){}},60);}
+function stoneFxWater(me){const S=PXF.S(),P=PXF.P,DUR=900;let n=0;
+ me.board.forEach((u,i)=>{if(!u)return;const el=unitEl(me,i);if(!el)return;n++;const r=zRect(el),x=r.left+r.width/2,y=r.top+r.height/2,R=Math.max(7,Math.round(Math.max(r.width,r.height)/S*.5)),d=i*45;
+  PXF.add(d,DUR,x,y,(P_,p,k,gx,gy)=>{const f=PXF.fr(p),grow=k<.18?PXF.ez.out(k/.18):1,pop=k>.82,rr=Math.max(2,Math.round(R*(pop?1+(k-.82)*1.8:grow)));
+   if(pop){const q=(k-.82)/.18;if(q>.7)return;P.ring(gx,gy,rr,(f&1)?'#ffffff':'#bfeaff',1,true);for(let a=0;a<8;a++){const an=a*Math.PI/4+.4;P.px(gx+Math.cos(an)*(rr+q*6),gy+Math.sin(an)*(rr+q*6),'#ffffff');}return;}
+   const wob=(f>>2)&1;P.disc(gx,gy,rr-1,'#bfeaff',true);P.ring(gx,gy,rr,'#4db3ff',1);P.ring(gx,gy,rr-1,'#9ad8ff',1,true);
+   // 하이라이트 + 반짝임
+   P.rect(gx-rr*.55,gy-rr*.45,2,Math.max(2,rr*.35),'#ffffff');P.px(gx-rr*.35,gy-rr*.62,'#ffffff');if(wob)P.px(gx+rr*.45,gy+rr*.5,'#ffffff');});
+  PXF.debris(x,y,{delay:d+DUR*.82,n:5,cols:['#bfeaff','#4db3ff','#ffffff'],sp:90,g:200,dur:380,sz:2});});
+ if(!n){const b=stFxBase(me);PXF.popRing(b.cx,b.cy,{c:'#bfeaff',c2:'#4db3ff',w:'#fff'},0,10);}}
+function stoneFxThunder(P0,i){const el=unitEl(P0,i);if(!el)return;const S=PXF.S(),P=PXF.P,r=zRect(el),x=r.left+r.width/2,y=r.top+r.height/2,R=Math.max(8,Math.round(Math.max(r.width,r.height)/S*.55));
+ const pts=[[x,-8]];let px=x;for(let j=1;j<=8;j++){const t=j/8;px=x+(j===8?0:PXF.hz(j*3.1+x)*44-22)*(1-t*.5);pts.push([px,-8+(y+8)*t]);}
+ // 번개: 번쩍 깜빡 ×2
+ PXF.add(80,360,x,y,(P_,p,k)=>{const f=PXF.fr(p);if(f%3===1||k>.8)return;const g=pts.map(a=>[a[0]/S,a[1]/S]);
+  for(let j=1;j<g.length;j++)P.line(g[j-1][0],g[j-1][1],g[j][0],g[j][1],'#f7b500',7);
+  for(let j=1;j<g.length;j++)P.line(g[j-1][0],g[j-1][1],g[j][0],g[j][1],'#ffe066',4);
+  for(let j=1;j<g.length;j++)P.line(g[j-1][0],g[j-1][1],g[j][0],g[j][1],'#fffde6',2);});
+ setTimeout(()=>{try{PXF.hit(x,y,'#ffe066',9);PXF.shock(x,y,R*S*1.8,'#ffe066',300,0,2);PXF.flash('#fff6a8');PXF.hold(50);stFlashEl(el,'brightness(2.2) saturate(1.4)');}catch(e){}},90);
+ // 재행동: 번개 불꽃이 선택한 포켓몬 둘레를 한 바퀴 돌아요
+ PXF.add(380,520,x,y,(P_,p,k,gx,gy)=>{const f=PXF.fr(p),rr=R+2,a0=k*Math.PI*2;for(let s=0;s<3;s++){const a=a0+s*Math.PI*2/3;for(let t=0;t<4;t++){const aa=a-t*.18,c=t?'#f7b500':'#fffde6';P.px(gx+Math.cos(aa)*rr,gy+Math.sin(aa)*rr*.9,c);}PXF.spark4(gx+Math.cos(a)*rr,gy+Math.sin(a)*rr*.9,1,'#ffe066','#f7b500');}});
+ PXF.debris(x,y,{delay:380,n:8,cols:['#ffe066','#fffde6','#f7b500'],up:true,sp:90,g:-30,dur:520,sz:2,sx:r.width*.4,stagger:25});}
+function stoneFxMoon(foe,i){const el=unitEl(foe,i);if(!el)return;const S=PXF.S(),P=PXF.P,r=zRect(el),x=r.left+r.width/2,y=r.top+r.height/2,R=Math.max(8,Math.round(Math.min(Math.max(r.width,r.height)/S*.5,16))),FALL=300,HOLD=240;
+ const crack=[[0,-1],[-.35,-.4],[.1,-.1],[-.2,.35],[.3,.9]];
+ PXF.add(0,FALL+HOLD,x,y,(P_,p,k,gx,gy)=>{const a=p.age,f=PXF.fr(p);let oy=0,jit=0;
+  if(a<FALL){const e=PXF.ez.out(a/FALL);oy=-(1-e)*(y*.5/S+10);}else jit=(f&1)?1:-1;
+  const cx=gx+jit,cy=gy+oy,sc=a<FALL?.5+.5*PXF.ez.out(a/FALL):1,rr=Math.max(3,Math.round(R*sc));
+  P.disc(cx,cy,rr+1,'#5c3fa8');P.disc(cx,cy,rr,'#cbbcff');P.disc(cx-1,cy-1,Math.max(1,rr-2),'#efe6ff');
+  if(rr>6){P.disc(cx+rr*.3,cy+rr*.25,Math.max(1,rr*.22),'#a58bff');P.disc(cx-rr*.35,cy+rr*.3,Math.max(1,rr*.16),'#a58bff');}
+  if(a>FALL*.9){const kk=Math.min(1,(a-FALL)/HOLD+.2),L=Math.ceil(kk*(crack.length-1));for(let c=1;c<=L;c++)P.line(cx+crack[c-1][0]*rr,cy+crack[c-1][1]*rr,cx+crack[c][0]*rr,cy+crack[c][1]*rr,'#ffffff',1);}});
+ const T=FALL+HOLD;
+ PXF.debris(x,y,{delay:T,n:16,cols:['#efe6ff','#cbbcff','#a58bff','#ffffff'],sp:200,g:420,dur:560,sz:3,draw:(a,b,s,c)=>{P.rect(a-s/2,b-s/2,s,Math.max(1,s-1),c);P.px(a+s/2,b+s/2,c);}});
+ PXF.shock(x,y,R*S*2.4,'#a58bff',340,T,2);
+ PXF.debris(x,y,{delay:T+40,n:8,cols:['#ffffff','#efe6ff'],up:true,sp:80,g:-30,dur:520,sz:2,draw:(a,b,s,c)=>PXF.spark4(a,b,2,c,'#a58bff')});
+ setTimeout(()=>{try{PXF.flash('#a58bff');PXF.hold(60);stFlashEl(el,'brightness(1.6) saturate(.4) hue-rotate(40deg)');}catch(e){}},T);}
+function stoneFxSun(me){const S=PXF.S(),P=PXF.P,b=stFxBase(me),sx=b.cx,sy=Math.max(34,b.t-12),DUR=900,R=11;
+ const prog=a=>Math.min(1,a/600);
+ PXF.add(0,DUR,sx,sy,(P_,p,k,gx,gy)=>{const a=p.age,f=PXF.fr(p);if(k>.86)return;let rr=Math.max(2,Math.round(R*(.25+.75*PXF.ez.out(prog(a))))),pulse=a>600?(f&1):0;rr+=pulse;
+  P.disc(gx,gy,rr+1,'#c8481a');P.disc(gx,gy,rr,'#ff9a2a');P.disc(gx-1,gy-1,Math.max(1,rr-2),'#ffd45c');P.disc(gx-1,gy-1,Math.max(1,rr-5),'#fff3b0');
+  const n=8,len=rr>6?4:2;for(let i=0;i<n;i++){const an=i*Math.PI/4+((f>>1)&1)*Math.PI/8;P.line(gx+Math.cos(an)*(rr+3),gy+Math.sin(an)*(rr+3),gx+Math.cos(an)*(rr+3+len),gy+Math.sin(an)*(rr+3+len),'#ffb703',1);}});
+ // 우리 편 진영에서 에너지 알갱이가 해로 모여요
+ for(let i=0;i<16;i++){const ex=b.l+b.w*(.05+.9*PXF.hz(i*1.7)),ey=b.t+b.h*(.3+.7*PXF.hz(i*2.9)),d=i*22,L=360;
+  PXF.add(d,L,ex,ey,(P_,p,k)=>{const e=PXF.ez.in(k),gx=(ex+(sx-ex)*e)/S,gy=(ey+(sy-ey)*e)/S,c=['#ffd45c','#ff9a2a','#fff3b0'][i%3];
+   for(let j=1;j<=2;j++){const e2=PXF.ez.in(Math.max(0,k-j*.1));P.px((ex+(sx-ex)*e2)/S,(ey+(sy-ey)*e2)/S,j===1?c:'#ff7a1c');}
+   P.rect(gx-1,gy-1,2,2,'#c8481a');P.px(gx-1,gy-1,c);});}
+ PXF.debris(sx,sy,{delay:640,n:10,cols:['#ffd45c','#fff3b0','#ff9a2a'],sp:120,g:60,dur:380,sz:2});
+ PXF.shock(sx,sy,60,'#ffd45c',300,640,2);
+ setTimeout(()=>{try{PXF.flash('#ffd45c');}catch(e){}},640);
+ PXF.popRing(b.cx,b.cy,{c:'#ffd45c',c2:'#ff9a2a',w:'#fff'},700,Math.round(Math.min(18,b.w/S/6)));}
+async function stoneFx(item,P,target){
+ if(window.__sim)return;if(pxFxOff()){await wait(120);return;}
+ const enemy=P===B.me?B.foe:B.me;
+ try{sfx(({fire:'crit',water:'level',thunder:'crit',moon:'crit',sun:'level'})[item]||'tap');}catch(e){}
+ try{
+  if(item==='fire'){stoneFxFire(enemy);try{const bt=$('#battle');if(bt)setTimeout(()=>shakeEl(bt,4),200);}catch(e){}await wait(700);}
+  else if(item==='water'){stoneFxWater(P);await wait(650);}
+  else if(item==='thunder'){stoneFxThunder(P,target);await wait(620);}
+  else if(item==='moon'){stoneFxMoon(enemy,target);await wait(760);}
+  else if(item==='sun'){stoneFxSun(P);await wait(780);}
+ }catch(e){}
 }
 async function playItem(P,hi,target=-1,remote=false){const card=P&&P.hand[hi];if(!isItemCard(card))return false;if(P.mana<card.cost){toast(`에너지가 ${card.cost-P.mana} 모자라요`);return false;}
  const enemy=P===B.me?B.foe:B.me;
@@ -3634,7 +3733,7 @@ async function playItem(P,hi,target=-1,remote=false){const card=P&&P.hand[hi];if
  spendMana(P,card.cost);P.hand.splice(hi,1);B.itemTargetMode=null;B.moonTargetMode=null;B.pick=-1;B.sel=-1;
  if(B.pvp&&!remote&&P===B.me)pvpSend({t:'item',h:hi,item:card.item,target});
  B.busy=true;renderBattle();
- try{await stoneFx(card.item);}catch(e){}
+ try{await stoneFx(card.item,P,target);}catch(e){}
  if(card.item==='fire'){
   fx($('#battle'),'화염의 돌! 상대 필드 공격','txt');
   const enemy=P===B.me?B.foe:B.me;
