@@ -1566,6 +1566,29 @@ html.lowfx .stoneGem,html.lowfx .stoneGem .gemSpark{animation:none!important}
 .unit.frozen .sp::before{content:'';position:absolute;left:12%;right:12%;bottom:-6px;height:16px;z-index:-1;pointer-events:none;border-radius:50%;
  background:radial-gradient(ellipse at 50% 40%,#fff 0%,#d6f4ff 45%,#8fd6ff 100%);border:2px solid rgba(255,255,255,.9);box-shadow:0 0 10px 2px rgba(120,210,255,.8)}
 html.lowfx .unit.frozen .sp img{filter:sepia(.55) hue-rotate(168deg) saturate(1.5) brightness(1.22)!important}
+
+/* ===== 2026-10 조정: 특성 아이콘 크게 · 숫자는 작은 색상 박스 · 상성/피해/처치 표시가 가려지지 않게 ===== */
+.unit .kwI .ic{width:17px;height:17px}
+.unit .kwI .numIc>img.ic{width:17px;height:17px}
+.unit .kwI .numIc{gap:1px;--bx:#4a64c8;--bd:#24338a}
+.numIc>b{font:900 10px/1 'Noto Sans KR','Jua',sans-serif;color:#fff;letter-spacing:0;margin-left:0;padding:2px 4px;border-radius:5px;background:var(--bx);border:1.5px solid var(--bd);text-shadow:none;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.unit .kwI .numIc.shield{--bx:#3b82e6;--bd:#16397d}
+.unit .kwI .numIc.grow{--bx:#3fae3a;--bd:#1f5a12}
+.unit .kwI .numIc.psn{--bx:#8e55cf;--bd:#3a1060}
+.unit .kwI .numIc.fai{--bx:#e65aa5;--bd:#7a1a55}
+.numIc.max>b{color:#ffe36b}
+@media(max-width:520px){.unit .kwI .ic,.unit .kwI .numIc>img.ic{width:15px;height:15px}.numIc>b{font-size:9px;padding:1px 3px;border-width:1px}}
+/* 상성·피해·처치 표시: 글자 작게, 특성 아이콘보다 항상 위 */
+.tbadge{z-index:40;top:-15px;gap:2px}
+.tbadge b{font-size:10.5px;padding:3px 5px;border-width:1.5px;border-radius:8px}
+@media(max-width:520px){.tbadge b{font-size:9.5px;padding:2px 4px}}
+/* 표시가 뜨는 포켓몬은 특성 아이콘을 표시 줄 아래로 내려서 겹치지 않게 */
+#foeLane .unit:has(.tbadge) .kwI{top:9px!important}
+
+.rl-nmimg{display:inline-flex;align-items:center;gap:2px;vertical-align:middle;background:#fff;border:2px solid #b8c8ff;border-radius:12px;padding:0 8px 0 2px;margin:0 2px;line-height:1}
+.rl-nmimg>img{width:40px;height:40px;object-fit:contain;image-rendering:pixelated}
+.rl-nmimg>b{font-family:'Jua',sans-serif;font-weight:400;color:#1d2b5a}
+
 </style>
 
 </head>
@@ -3097,10 +3120,10 @@ function msg(t){const m=$('#bMsg');if(m)m.innerHTML=t;}
 
 // 상성: 공격하는 포켓몬(또는 고른 카드)과 상대 포켓몬 사이
 function matchup(aid,did){const k=typeMul(aid,did);return k>=2?{c:'adv',t:'유리 ×1.5'}:k<1?{c:'dis',t:'불리 −1'}:null;}
-function predDmg(a,d){if(d.dodge)return 0;let dmg=a.atk+fightB(a)+sneakB(a,d);const dm=dragonMod(a);if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);dmg=applyType(dmg,typeMul(a.id,d.id));if(d.shield>0&&dmg>0&&!(a.kw==='sneak'&&isLeg(a)))dmg=Math.max(0,Math.max(0,dmg-1)-d.shield);if(armorV(d)&&dmg>1)dmg=Math.max(1,dmg-armorV(d));return dmg;}
+function predDmg(a,d){if(d.dodge)return 0;let dmg=a.atk+fightB(a)+sneakB(a,d);const dm=dragonMod(a);if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);dmg=Math.max(1,applyType(dmg,typeMul(a.id,d.id)));if(d.shield>0&&dmg>0&&!(a.kw==='sneak'&&isLeg(a)))dmg=Math.max(1,Math.max(0,dmg-1)-d.shield);if(armorV(d)&&dmg>1)dmg=Math.max(1,dmg-armorV(d));return Math.max(1,dmg);}
 function tgtBadge(d,i){if(!B||B.side!=='me')return '';const me=B.me;let out='';
  if(B.sel>=0&&me.board[B.sel]){const a=me.board[B.sel];if(!targetsFor(B.sel).units.includes(i))return '';const mu=matchup(a.id,d.id);const dm=predDmg(a,d);
-  out=(mu?`<b class=${mu.c}>${mu.t}</b>`:'')+`<b class=dmgp>-${dm}${d.shield>0?' 🛡️':''}</b>`+(dm>=d.hp&&!d.tough?'<b class=ko>쓰러뜨려요!</b>':'');}
+  out=(mu?`<b class=${mu.c}>${mu.t}</b>`:'')+`<b class=dmgp>-${dm}${d.shield>0?' 🛡️':''}</b>`+(dm>=d.hp&&!d.tough?'<b class=ko>처치!</b>':'');}
  else if(B.pick>=0&&me.hand[B.pick]!=null&&!isBattleSpecial(me.hand[B.pick])){const mu=matchup(me.hand[B.pick],d.id);if(mu)out=`<b class=${mu.c}>${mu.t}</b>`;}
  return out?`<div class=tbadge>${out}</div>`:'';}
 
@@ -3156,6 +3179,12 @@ function fitHandCrowd(){try{const h=document.querySelector('#battle .hand');if(!
  const each=(h.clientWidth-pad-gap*Math.max(0,n-1))/Math.max(1,n);
  if(n>=5&&each<base-2)h.classList.add('crowd');}catch(e){}}
 addEventListener('resize',()=>{try{fitHandCrowd();}catch(e){}});
+// 포켓몬 이름이 칸보다 길면 글자를 조금씩 줄여서 '…'으로 잘리지 않게 해요 (화면 크기가 달라도 6글자 이름까지 다 보여요)
+function fitUnitNames(){try{document.querySelectorAll('#battle .unit .un').forEach(e=>{if(e.style.fontSize)e.style.fontSize='';let fs=parseFloat(getComputedStyle(e).fontSize)||12,n=0;while(e.scrollWidth>e.clientWidth+0.5&&fs>6&&n<16){fs-=.5;e.style.fontSize=fs+'px';n++;}});}catch(e){}}
+(function(){let q=0;const go=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;fitUnitNames();});};
+ const start=()=>{const b=document.getElementById('battle');if(!b)return;new MutationObserver(go).observe(b,{childList:true,subtree:true});};
+ if(document.readyState==='loading')addEventListener('DOMContentLoaded',start);else start();
+ addEventListener('resize',go);})();
 function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGuard();B.trainerSkillUsed=B.trainerSkillUsed||{};const me=B.me,fo=B.foe;const my=B.side==='me'&&!B.busy&&!B.over&&(!B.coop||B.coop.active===BC.localIndex);
  const valid=targetsFor(B.sel);
  const unitH=(u,P,i)=>{if(!u)return '';const friendly=P===me;const mine=friendly&&(!B.coop||Number(u.coopOwner??0)===B.coop.active);const m=MON[u.id];const ready=mine&&my&&u.att>0&&!u.frozen;
@@ -3323,7 +3352,7 @@ function applyFreeze(D,i,a){if(!D.board[i])return;const leg=isLeg(a);
  addIce(D,i,4);[i-1,i+1].forEach(j=>{if(j>=0&&j<D.board.length&&D.board[j]&&D.board[j].hp>0)addIce(D,j,1);});}
 async function dealUnit(P,i,dmg,label,pierce){const u=P.board[i];if(!u)return 0;
  if(u.dodge){u.dodge--;fx(unitEl(P,i),'피했다!','txt');kwFx('dodge',unitEl(P,i));return 0;}
- if(dmg>0&&u.shield>0&&!pierce){const d0=dmg;dmg=Math.max(0,dmg-1);const ab=Math.min(u.shield,dmg);u.shield-=ab;dmg-=ab;fx(unitEl(P,i),`방어막! ${d0}→${dmg}${u.shield>0?' · 🛡️'+u.shield:' · 방어막 깨짐'}`,'txt');kwFx('shield',unitEl(P,i));} // 방어막: 피해 -1 후, 남은 피해를 방어막 수치만큼 먼저 흡수
+ if(dmg>0&&u.shield>0&&!pierce){const d0=dmg;dmg=Math.max(0,dmg-1);const ab=Math.min(u.shield,dmg);u.shield-=ab;dmg-=ab;if(dmg<1)dmg=1;fx(unitEl(P,i),`방어막! ${d0}→${dmg}${u.shield>0?' · 🛡️'+u.shield:' · 방어막 깨짐'}`,'txt');kwFx('shield',unitEl(P,i));} // 방어막: 피해 -1 후, 남은 피해를 방어막 수치만큼 먼저 흡수
  if(dmg<=0){renderBattle();return 0;}
  if(armorV(u)&&dmg>1){dmg=Math.max(1,dmg-armorV(u));kwFx('armor',unitEl(P,i));}
  u.hp-=dmg;const el=unitEl(P,i);impact(el,dmg,{col:TYPE_COL[MON[u.id].types[0]]});fx(el,'-'+dmg,dmg>=4?'big':'');
@@ -3624,7 +3653,7 @@ async function resolveAttack(A,D,si,tg,ok,cb,defReduce=0){const a=A.board[si];if
  const dm=dragonMod(a);if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);a.att--;a.fresh=0;
  if(tg.hero){dmg+=quakeB(a);if(defReduce>0){dmg=Math.max(0,dmg-defReduce);note+=`방어 문제 정답 -${defReduce}! `;}const el=heroEl(D);window.__sd=dmg;await skillMove(A,si,el,ok,cb);window.__sd=null;D.hp-=dmg;if(dmg>0){impact(el,dmg,{hero:1,col:'#ff5a5f'});fx(el,'-'+dmg,ok?'crit big':'');}else fx(el,'공격을 막았다!','txt');if(ok&&dmg>0)sfx('crit');if(note)fx(unitEl(A,si),note,'txt');}
  else{const d=D.board[tg.u];if(!d){return;}
-  dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=applyType(dmg,k);
+  dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=Math.max(1,applyType(dmg,k));
   await skillMove(A,si,unitEl(D,tg.u),ok,cb);
   if(k>=2){fx(unitEl(D,tg.u),'효과가 굉장했다!','txt super');if(A===B.me)S.meta.stats.superEff=(S.meta.stats.superEff||0)+1;}else if(k<1)fx(unitEl(D,tg.u),'효과가 별로인 듯…','txt');
   await dealUnit(D,tg.u,dmg,undefined,a.kw==='sneak'&&isLeg(a));
@@ -3645,7 +3674,7 @@ async function battleQ(q,opt){B.qn++;if(window.__sim)return{ok:rnd()<SIM.p,ms:30
  const r=await askQ($('#bqHost'),q,{fast:true,noRetry:true});recordAnswer(q,r.ok,r.ms,{choice:r.choice,guess:r.guess});box.classList.remove('on');box.innerHTML='';
  if(!r.ok){B.retryQ=q;}return r;}
 function cleanup(){[B.me,B.foe].forEach(P=>P.board.forEach((u,i)=>{if(u&&u.hp<=0){P.board[i]=null;}}));if(B&&B.wildMode)syncWildPrimary();}
-function checkEnd(){if(!B||B.over)return false;if(B.wildMode){const live=syncWildPrimary();if(!live.length){if(B.coop){if(BC.host)bossFinish('win');return true;}B.over=true;const caught=(B.wildState.caughtIds||[]).length>0;const note=caught?'야생 포켓몬 전투가 끝났어요. 포획한 포켓몬은 도감에 등록됐어요.':'야생 포켓몬이 모두 쓰러져 포획하지 못했어요.';if(!window.__sim)setTimeout(()=>finishEndlessWild(caught?'caught':'knockout',note),650);return true;}if(B.coop&&B.coop.players.some(p=>p.hp<=0)){if(BC.host)bossFinish('lost');return true;}if(B.me.hp<=0&&!B.coop){B.over=true;if(!window.__sim)setTimeout(()=>finishEndlessWild('lost','트레이너 체력이 0이 되어 야생 전투를 마쳤어요.'),650);return true;}const weak=live.filter(i=>B.foe.board[i].hp<=B.foe.board[i].max*.3).sort((a,b)=>B.foe.board[a].hp/B.foe.board[a].max-B.foe.board[b].hp/B.foe.board[b].max);if(weak.length&&!B.capturePrompted&&!(B.wildState&&B.wildState.scenarioMode)){B.capturePrompted=true;B.wildCaptureTargetSlot=weak[0];if(!window.__sim)setTimeout(scheduleWildCapturePrompt,180);}return false;}if(B.foe.hp<=0||B.me.hp<=0){B.over=true;if(window.__sim)return true;setTimeout(()=>endBattle(B.foe.hp<=0&&B.me.hp>0||(B.foe.hp<=0&&B.me.hp>=B.foe.hp)),600);return true;}return false;}
+function checkEnd(){if(!B||B.over)return false;if(B.wildMode){const live=syncWildPrimary();if(!live.length){if(B.coop){if(BC.host)bossFinish('win');return true;}B.over=true;const caught=(B.wildState.caughtIds||[]).length>0;const note=caught?'야생 포켓몬 전투가 끝났어요. 포획한 포켓몬은 도감에 등록됐어요.':'야생 포켓몬이 모두 쓰러져 포획하지 못했어요.';if(!window.__sim)setTimeout(()=>finishEndlessWild(caught?'caught':'knockout',note),650);return true;}if(B.coop&&B.coop.players.some(p=>p.hp<=0)){if(BC.host)bossFinish('lost');return true;}if(B.me.hp<=0&&!B.coop){B.over=true;if(!window.__sim)setTimeout(()=>finishEndlessWild('lost','트레이너 체력이 0이 되어 야생 전투를 마쳤어요.'),650);return true;}const weak=live.filter(i=>B.foe.board[i].hp<=B.foe.board[i].max*.3).sort((a,b)=>B.foe.board[a].hp/B.foe.board[a].max-B.foe.board[b].hp/B.foe.board[b].max);if(weak.length&&!B.capturePrompted&&!(B.wildState&&B.wildState.scenarioMode)){B.capturePrompted=true;B.wildCaptureTargetSlot=weak[0];if(!window.__sim)setTimeout(scheduleWildCapturePrompt,180);}return false;}if(B.foe.hp<=0||B.me.hp<=0){B.over=true;if(window.__sim)return true;const _win=B.foe.hp<=0&&B.me.hp>0||(B.foe.hp<=0&&B.me.hp>=B.foe.hp);if(B.pvp)pvpSend({t:'over',w:_win});setTimeout(()=>endBattle(_win),600);return true;}return false;}
 async function startTurn(side){if(!B||B.over)return;closeInfo();if(B.coop&&side==='foe')bossSetActive(0);B.side=side;const P=side==='me'?B.me:B.foe;B.turn++;if(side==='me'){B.round++;B.counterActive=0;}
  P.maxMana=Math.min(6,P.maxMana+1);P.mana=P.maxMana;P.bonusMana=0;B.defUsed=false;  if(side==='me'&&!B.coop&&!B.pvp&&!window.__sim&&!B.studyUsesSet){B.studyUsesSet=1;const sx=studyExtraUses(trainerSkillLevels().study);P.powerUses=STUDY_BASE+sx;}
  if(side==='me'&&!B.pvp&&!window.__sim){const ml=B.coop?(Number(P.manaLv)||0):(Number(trainerSkillLevels().mana)||0);if(ml>0&&rnd()*100<manaChance(ml)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.manaBonusFx=1;}}
@@ -3674,11 +3703,11 @@ function endTurn(){if(!B||B.over)return;if(B.coop){if(B.coop.active===0){bossSet
 // AI 평가: 실제 피해 처리 규칙(회피·방어막·강철·끈기·반격)을 반영해 공격 결과를 예측해요.
 function aiIncomingDamage(attacker,target,base,multiplier=1){
  if(!attacker||!target)return 0;
- let dmg=applyType(base,typeMul(attacker.id,target.id))*multiplier;
+ let dmg=Math.max(1,applyType(base,typeMul(attacker.id,target.id))*multiplier);
  if(dmg>0&&target.dodge)return 0;
- if(dmg>0&&target.shield>0)dmg=Math.max(0,Math.max(0,dmg-1)-target.shield);
+ if(dmg>0&&target.shield>0)dmg=Math.max(1,Math.max(0,dmg-1)-target.shield);
  if(dmg>1&&armorV(target))dmg=Math.max(1,dmg-armorV(target));
- return Math.max(0,Math.ceil(dmg));
+ return Math.max(1,Math.ceil(dmg));
 }
 function aiTargetValue(attacker,target){
  const raw=Math.max(attacker.atk>0?1:0,attacker.atk+fightB(attacker)+sneakB(attacker,target)+dragonMod(attacker));
@@ -3755,7 +3784,7 @@ async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)
    if(S.meta.settings.defq&&dmg>=2){renderBattle();bossMarkTarget(tp);let r=null;if(remoteDef){r=await bossAskDefense(tp,a);}else{const q=pickQ();if(q)r=await battleQ(q,{who:tp.av,what:`막기! ${esc(MON[a.id].name)}의 공격을 막아요`,defense:true});}
     if(r){if(r.ok){B.qc++;B.combo++;if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;dmg=Math.max(0,dmg-2);fx(heroEl(tp),'막았다!','txt');if(B.counterActive>0){await dealUnit(fo,i,B.counterActive);fx(heroEl(tp),`반격 -${B.counterActive}`,'txt');}}else B.combo=0;}}
   bossMarkTarget(tp);window.__sd=dmg;await skillMove(fo,i,heroEl(tp),true,false);window.__sd=null;tp.hp-=dmg;if(dmg){impact(heroEl(tp),dmg,{hero:1,col:'#ff5a5f'});fx(heroEl(tp),'-'+dmg,dmg>=4?'big':'');}}
- else{const d=me.board[tg.u];if(!d)return;dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=applyType(dmg,k);
+ else{const d=me.board[tg.u];if(!d)return;dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=Math.max(1,applyType(dmg,k));
   await skillMove(fo,i,unitEl(me,tg.u),true,false);if(k>=2)fx(unitEl(me,tg.u),'효과가 굉장했다!','txt');
   await dealUnit(me,tg.u,dmg,undefined,a.kw==='sneak'&&isLeg(a));if(a.kw==='freeze'&&me.board[tg.u])applyFreeze(me,tg.u,a);if(a.kw==='poison'&&me.board[tg.u])poisonHit(me,tg.u,isLeg(a));
   let cd=a.kw==='wing'?0:applyType(d.atk,typeMul(d.id,a.id));cd=Math.ceil(cd*wingM(d));if(cd>0){await wait(200);await dealUnit(fo,i,cd);}}
@@ -4031,6 +4060,8 @@ const PVP_VER=6; // 마나 연구·공부 강화·카드 보유량 패시브가 
 const PV={peer:null,conn:null,host:false,code:'',q:[],busy:false,foe:null,started:false,charged:false};
 function loadPeer(){return new Promise((res,rej)=>{if(window.Peer)return res();const s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';s.onload=()=>res();s.onerror=()=>rej(new Error('연결 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'));document.head.appendChild(s);});}
 function pvpClose(){try{PV.conn&&PV.conn.close();}catch(e){}try{PV.peer&&PV.peer.destroy();}catch(e){}PV.peer=null;PV.conn=null;PV.q=[];PV.busy=false;PV.started=false;}
+// 상대가 '대전 끝!'을 알려 오면, 내 화면 계산이 늦거나 달라도 종료 화면을 꼭 띄워요(친구에게 종료 화면이 안 뜨던 문제 방지)
+function pvpPeerOver(d){setTimeout(()=>{try{if(!B||!B.pvp||B.__pvDone)return;B.over=true;endBattle(!d.w);}catch(e){}},1400);}
 function pvpSend(o){try{PV.conn&&PV.conn.open&&PV.conn.send(o);}catch(e){}}
 function renderPvp(){S.screen='pvp';pvpClose();const m=S.meta;ensureDeck();const can=m.coins>=PVP_COST;
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><h2>${I('teacher')} 친구 대전</h2>
@@ -4061,7 +4092,7 @@ async function pvpStart(host,code){const m=S.meta;if(m.coins<PVP_COST){toast('�
 function pvBind(c){
  c.on('open',()=>{const me=S.meta;const deck=shuffle(me.deck.slice());PV.myDeck=deck;PV.myOwned=Object.keys(me.col).map(Number).filter(id=>MON[id]);
   pvpSend({t:'hi',v:PVP_VER,name:me.name,deck,col:PV.myOwned,av:partnerId(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,seed:PV.host?(Math.random()*1e9|0):0});});
- c.on('data',d=>{PV.q.push(d);pvpPump();});
+ c.on('data',d=>{if(d&&d.t==='over'){pvpPeerOver(d);return;}PV.q.push(d);pvpPump();});
  c.on('close',()=>{if(B&&B.pvp&&!B.over){B.over=true;toast('친구와 연결이 끊겼어요');pvpEnd(null);}else if(!PV.started&&S.screen==='pvp'){pvBox(`<p>연결이 끊겼어요</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);}});}
 // 받은 행동을 차례대로 하나씩 처리해요(애니메이션이 겹치지 않게)
 async function pvpPump(){if(PV.busy)return;PV.busy=true;
@@ -4099,7 +4130,7 @@ function pvpBegin(seed){if(PV.started)return;PV.started=true;const me=S.meta,f=P
  S.screen='battle';$('#view').innerHTML='';$('#battle').classList.add('on');startBgm('battle');renderBattle();
  banner('친구 대전!',`${esc(f.name)}와(과) 대결`,1800);
  setTimeout(()=>{if(!B)return;if(meFirst)startTurn('me');else{B.side='foe';B.turn++;B.foe.maxMana=1;B.foe.mana=1;if(B.foe.manaLv>0&&B.foe.passRng()*100<manaChance(B.foe.manaLv)){B.foe.mana+=1;B.foe.bonusMana=1;}draw(B.foe);B.busy=false;renderBattle();pvpPump();}},1600);}
-async function pvpEnd(win){startBgm('adventure');const me=S.meta;const f=PV.foe||{name:'친구'};
+async function pvpEnd(win){if(B&&B.pvp){if(B.__pvDone)return;B.__pvDone=true;}try{const q=$('#bq');if(q)q.classList.remove('on');}catch(e){}startBgm('adventure');const me=S.meta;const f=PV.foe||{name:'친구'};
  if(win!==null){me.pvp=me.pvp||{n:0,w:0,l:0,gg:0,foes:{}};me.pvp.n++;if(win)me.pvp.w++;else me.pvp.l++;me.pvp.foes[f.name]=(me.pvp.foes[f.name]||0)+1;me.pvp.last=Date.now();
   const back=win?PVP_WIN:PVP_LOSE;me.coins+=back;me.candy+=B.qc;me.stats.candyAll=(me.stats.candyAll||0)+B.qc;gainXP(win?30:15);}
  else if(PV.charged){me.coins+=Math.round(PVP_COST/2);}
@@ -5901,6 +5932,9 @@ function rlEnter(n){
 function rlBattleIntro(m,run){const kind=m.t,b=MON[m.id],f=rlFoeStats(kind,m.id,Math.min(run.step,RL.steps-1)),d=RL_NODE[kind];
  rlSetBg(kind==='boss'?'boss':'');
  rlScene(m,{tag:rlTag(m,d.n),ic:d.ic,title:esc(kind==='boss'?'보스 · '+b.name:b.name+(hasJong(b.name)?'이':'가')+' 나타났다!'),extra:`<div class="rl-foe">${monImg(m.id,'front')}<div><b>${esc(b.name)}</b> ${starsHTML(b.rar)}<div style="margin:4px 0">${typeChips(b)}</div><div class="rl-foestat">❤️ ${f.hp} · ⚔️ ${f.atk} · 🔁 ${f.att}회</div></div></div>`,text:rlText(m,run,rlCue(m)),btns:[{l:'⚔ 전투 시작',c:'red',big:1,f:()=>rlStartWild(m,kind)}]});}
+// 도감이 말하는 도입 대사에 보스 이름이 나올 때마다, 그 포켓몬 그림을 이름 옆에 같이 보여 줘요
+function rlNameImgs(nm,id){try{const root=document.querySelector('#view .sc-line');if(!root||!nm)return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+ nodes.forEach(n=>{if(n.nodeValue.indexOf(nm)<0)return;const t=document.createElement('template');t.innerHTML=esc(n.nodeValue).split(esc(nm)).join(`<span class="rl-nmimg">${monImg(id,'front')}<b>${esc(nm)}</b></span>`);n.replaceWith(t.content);});}catch(e){}}
 function rlGymIntro(m,run){const g=GYMS[m.gi],fr=rlGymFR(m,run);
  rlScene(m,{tag:rlTag(m,'관장 전투'),ic:'🏟️',title:esc(g.n),extra:`<div class="rl-foe">${monImg(g.av,'front')}<div><b>${esc(g.ldr)}</b><div style="margin:4px 0;font-size:13px" class="mut">${esc(g.d)}</div><div class="rl-foestat">승리 시 🪙 +${RL.gold.gym}</div><div class="rl-foestat">🎁 보상 · <span style="font-weight:900">${esc(rlGymRewardTxt(g))}</span> 1장이 동료가 돼요</div><div class="rl-foestat">👑 관장 유물 ${fr.length}개 <span class="mut" style="font-size:12px">(눌러서 확인 · 층이 오를수록 늘어요)</span></div><div class="rl-gfr">${fr.map(k=>`<button type="button" class="rl-bchip foe" data-frk="${k}">${RL_RELICS[k].ic}</button>`).join('')}</div></div></div>`,text:rlText(m,run,rlCue(m)),btns:[{l:'⚔ 대결!',c:'red',big:1,f:()=>rlStartGym(m)}]});
  $('#view').querySelectorAll('[data-frk]').forEach(b=>b.onclick=()=>{sfx('tap');rlRelicInfo(b.dataset.frk,'👑 관장이 가진 유물이에요. 관장 포켓몬이 강해져요.');});}
@@ -6051,11 +6085,13 @@ function rlPrologue(){const run=RUN(),reg=SC_REGIONS[run.bg],rl=rlMeta();rlSetBg
  const V={p:reg.place,m:MON[run.boss].name},P=(rl.runs||1)<=1?RL_PRO_FIRST:rlProLater(rl);let i=0;
  const show=()=>{if(i>=P.length)return rlPrologueDeck();const pg=P[i];
   rlShell(`<div class="scv-stage"><div class="scv-card rl-scene"><span class="sc-tag">PROLOGUE · ${reg.icon} ${esc(reg.name)}</span><h3>끝없는 길의 시작</h3>${pg.sp?`<div class="sc-speaker" style="font-family:'Jua';color:#485eaa;margin-top:6px">${pg.sp}</div>`:''}<p class="sc-line">${rlTxt(pg.t,V)}</p><div class="sc-story-index">${P.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('')}</div><div class="mbtns"><button class="btn gold big" id="rlNx">${i<P.length-1?'다음 ▶':'덱 확인하기 ▶'}</button><button class="btn ghost" id="rlSk">건너뛰기</button></div></div></div>`);
+  rlNameImgs(V.m,run.boss);
   $('#rlNx').onclick=()=>{sfx('page');i++;show();};$('#rlSk').onclick=()=>{sfx('tap');i=P.length;show();};};
  show();}
 function rlPrologueDeck(){const run=RUN(),reg=SC_REGIONS[run.bg];rlSetBg('');
  const deal=run.start.map(p=>`<div class="rl-dealc">${p[0]!=null?'<small>⭐ 내 카드</small>':'<small>🎲 랜덤</small>'}${cardHTML(p[1],{size:'deck'})}</div>`).join('');
  rlShell(`<div class="scv-stage"><div class="scv-card rl-scene"><span class="sc-tag">PROLOGUE · ${reg.icon} ${esc(reg.name)}</span><h3>끝없는 길의 시작</h3><p class="sc-line">${rlTxt(reg.theme+'. 이곳 {p}의 끝에서 {m이} 우리 기록을 삼키고 있다.\n\n손에는 카드 여덟 장, 가방에는 간식… 은 없지만 용기는 만땅! 쓰러지면 끝이니까 머리를 쓰면서 가자. 지워진 이름들을 되찾으러, 출발!',{p:reg.place,m:MON[run.boss].name})}</p><h4 class="rl-h">🎲 시작 덱 (내 카드 3장 + 랜덤 5장)</h4><div class="rl-deal">${deal}</div><div class="rl-foe" style="margin-top:12px"><div class="mut" style="font-size:13px">1층의 보스</div>${monImg(run.boss,'front')}<b>${esc(MON[run.boss].name)}</b></div><div class="mbtns"><button class="btn gold big" id="rlGo">첫 분기점으로 ▶</button></div></div></div>`);
+ rlNameImgs(MON[run.boss].name,run.boss);
  $('#rlGo').onclick=()=>{sfx('page');rlRenderMap();};}
 function rlRewardCalc(run,win){let r;
  if(win)r={xp:180+run.fights*8,coins:200+run.fights*10,candy:60+run.fights*3,dust:30+run.fights*2};
