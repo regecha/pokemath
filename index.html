@@ -1896,6 +1896,41 @@ html.lowfx .lgsFx u,html.lowfx .lgsFx em,html.lowfx .lgsFx i{display:none}
 .studio canvas{display:block;image-rendering:pixelated;filter:drop-shadow(0 2px 3px rgba(10,20,70,.3))}
 #view>.title.intro>.studio{animation:ttFadeUp calc(.7s*var(--sp)) var(--ez) calc(var(--o) + 2.5s*var(--sp)) backwards}
 @media(max-height:840px){#view>.title>.peek{height:60px}#view>.title>.peek img,#view>.title>.peek img:nth-child(2){width:64px;height:64px}#view>.title{padding-top:4px;padding-bottom:6px}}
+
+/* ===== 도트 버튼 UI — 게임 전체 공통 (크림색 기본 + 용도별 색) ===== */
+.btn:not(.pxb),.fbtn,.ch{
+ --n:3px;--a:#fffdf3;--b:#f4e6b8;--fr:#d8b866;--fg:#5b4a2f;--ts:none;
+ position:relative;isolation:isolate;overflow:hidden;
+ color:var(--fg);background:var(--fr);border:0;border-radius:0;box-shadow:none;text-shadow:var(--ts);
+ clip-path:polygon(0 var(--n),var(--n) var(--n),var(--n) 0,calc(100% - var(--n)) 0,calc(100% - var(--n)) var(--n),100% var(--n),100% calc(100% - var(--n)),calc(100% - var(--n)) calc(100% - var(--n)),calc(100% - var(--n)) 100%,var(--n) 100%,var(--n) calc(100% - var(--n)),0 calc(100% - var(--n)));
+}
+.btn:not(.pxb)::before,.fbtn::before,.ch::before{
+ content:"";position:absolute;inset:2px;z-index:-1;pointer-events:none;
+ background:linear-gradient(#ffffff80,#ffffff80) 6px 2px/calc(100% - 12px) 2px no-repeat,linear-gradient(180deg,var(--a),var(--b));
+ box-shadow:inset 0 -3px 0 #0000001f;
+ clip-path:polygon(0 2px,2px 2px,2px 0,calc(100% - 2px) 0,calc(100% - 2px) 2px,100% 2px,100% calc(100% - 2px),calc(100% - 2px) calc(100% - 2px),calc(100% - 2px) 100%,2px 100%,2px calc(100% - 2px),0 calc(100% - 2px));
+}
+.btn:not(.pxb):hover,.fbtn:hover{filter:none}
+.btn:not(.pxb):hover::before,.fbtn:hover::before,.ch:hover::before{filter:brightness(1.07)}
+.btn:not(.pxb):hover,.fbtn:hover,.ch:hover{--fr:#fff}
+.btn:not(.pxb):active,.fbtn:active,.ch:active{transform:translateY(3px);box-shadow:none}
+.btn.sm:not(.pxb){--n:2px;border-radius:0}.btn.big:not(.pxb){--n:4px;border-radius:0}
+.fbtn{--n:2px}
+/* 색깔별 */
+.btn.red:not(.pxb){--a:#f2665f;--b:#c23a4a;--fr:#ffd9cf;--fg:#fff;--ts:0 1px 0 rgba(0,0,0,.28)}
+.btn.gold:not(.pxb){--a:#ffd45a;--b:#e8a21c;--fr:#fff0b8;--fg:#5a3b00}
+.btn.green:not(.pxb){--a:#3fc78a;--b:#1d8b64;--fr:#c9f7e1;--fg:#fff;--ts:0 1px 0 rgba(0,0,0,.28)}
+.btn.blue:not(.pxb){--a:#52a9ee;--b:#2b6fc2;--fr:#d2eaff;--fg:#fff;--ts:0 1px 0 rgba(0,0,0,.28)}
+.btn.purple:not(.pxb){--a:#8f74f2;--b:#5a40c6;--fr:#e0d5ff;--fg:#fff;--ts:0 1px 0 rgba(0,0,0,.28)}
+.btn.ghost:not(.pxb){--a:#fffdf3;--b:#f4e6b8;--fr:#d8b866;--fg:#5b4a2f;--ts:none}
+.btn.red:not(.pxb):hover,.btn.gold:not(.pxb):hover,.btn.green:not(.pxb):hover,.btn.blue:not(.pxb):hover,.btn.purple:not(.pxb):hover{--fr:#fff}
+/* 필터 칩: 선택되면 보라 도트 */
+.fbtn.on{--a:#6b7bd8;--b:#3a479e;--fr:#d6dcff;--fg:#fff;--ts:0 1px 0 rgba(0,0,0,.28);background:var(--fr);border:0}
+/* 퀴즈 보기 */
+.ch{--n:4px;border:0;box-shadow:none}
+.ch:active{box-shadow:none}
+.ch.ok{--a:#8fe6b2;--b:#3cc47c;--fr:#dcffe9;--fg:#0f5a35;background:var(--fr);border:0;box-shadow:none}
+.ch.no{--a:#ff9a9d;--b:#ec4f56;--fr:#ffe1e3;--fg:#7a1218;background:var(--fr);border:0;box-shadow:none}
 </style>
 </head>
 <body>
@@ -1911,7 +1946,7 @@ f.innerHTML=h;})();</script>
   <div class="menuCol"><button class="btn red big" id="tGo"><img class="ic px " src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAmklEQVR42mNgoBAw4pKw0rP/j8w/dukgVrUsuDQe1VFAEbdmYPiPzSBGdM3oGtGB9ZUHKIYwYmiODEGoXr6GoCFMGLIwTTg0w7wH8yoTVqdDNVtfecBgfeUBXi+xIDsLw6aLByBy+g44DWCiNB2woNuGElhQm/HJoUQhKQAlEEkF1voO2FMmMa5AT+IkGYJNMyMxGYlQhqIIAACNUKccQMqsyAAAAABJRU5ErkJggg==" alt="" draggable="false"> 시작하기</button>
    <button class="btn green" id="tSave"><img class="ic px " src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAjElEQVR42mNkQAJWevb/GQiAY5cOMlrp2f8/dukgIwO65qiV/wkCmDqYZUwwzQrVB/DaHL0KQsPUKVQfYLDSs//PRIxmfICJgUJAtAFLw7CLs+Dy6+DzAi6A4YUeT8KaSrYPJi8MAgOOXTrI+KDVgYGBgYEBRhMDHrQ6MBy7dJCRETk3wrIqMQbAsjMAl/5T+xZpijwAAAAASUVORK5CYII=" alt="" draggable="false"> 저장 · 불러오기</button>
    <div class="row"><button class="btn ghost" id="tSet"><img class="ic px " src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA00lEQVR42qWTPQ6CQBCFv91wBs9gRaxpOIUewMSKysKWwpaCiooEem24go21MRSewUusFWSyDIvRV032zbz52RkIIIlTl8Sp4xckcerarndt1wdFIj8I4P68GU1wsCVvpMPhXAFQ5xnV5TrJ9ni9R34QsVpZWjDAZr2avFlZVp1nqlNIxMpp+5mLsqEom9khAxjZu1T3A0/HvToLy58wshytBT87QLbbjnOLBkNbFj9QQv3GobcQfB+75LDEmbl1BZCbqZU/uQVJ+GLafXx1kUvn/AHNX2qN2Vlm0QAAAABJRU5ErkJggg==" alt="" draggable="false"> 설정</button><button class="btn ghost" id="tTeach"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="#ffd8b5" stroke="#8a5a3c" stroke-width="1.6"></circle><path d="M4 21c0-5 3.6-7.5 8-7.5s8 2.5 8 7.5z" fill="#7fb4ff" stroke="#2f62b5" stroke-width="1.6"></path></svg> 선생님</button></div></div>
-  <p class="notice">이 앱은 <b>수업용</b>이에요. 선생님께 받은 <b>학년·학기 코드</b>가 있어야 시작할 수 있어요. 이름 대신 <b>닉네임</b>만 써요.<br>비영리 교육용 팬 제작물이며 포켓몬 관련 권리는 각 권리자에게 있어요.</p>
+  <p class="notice">본 앱은 <b>교육용 앱</b>입니다. 선생님께 받은 <b>학년·학기 코드</b>가 필요합니다.<br>실명 대신 <b>닉네임</b>을 사용해 주세요.<br>비영리 교육용 팬 콘텐츠이며, 포켓몬 관련 권리는 각 권리자에게 있습니다.</p>
   <p class="notice" style="font-family:'Jua';font-size:14px;color:#2f5aa8">좌삼초.</p>
   </div></div>
 <div id="battle" class="art" style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAC0CAYAAADl5PURAAAK2ElEQVR42u3dPY8cSRnA8ZrVyjIyrHWssSyfDBf4jgAimwRxgpgIkSD4Cj4hR/AhiJClEykZggCkC44ECbFaRGDOIgAh7A0My52Mz+bkAYuVA5YA2ozH89Jv1V1d9fsn4/U+NbvbXfWfp6q6qmbv/vX0NABAgey4BAAIEAAIEAAIEAAIEAAIEAAIEACmz+7UfuGvvtos/ufvu8kAJizAptJbV5YMAUxGgF3Et+n9iBBACAmPAfYtv+X3jvn+AGSAyYlP9xhAcgJMIRvTPQYIsDjxyQpRAnXbWml1fjbWdlg5jMERJHKeRCyhfu+qJrJFkF+pw0JWgshokVk9jPH4WK71e7Qu8KfOnoYv7M+yuZAyQJT4ATz1ej+qACumKsLfPn7x0n14MtMSoecxITGONgb44cnsuQQXRZKSDJcFt+3vATCt8cNRJ0EqaSxmg02kMzakBwSzwH2KZFGGBAfU66WkNoz0/0RmRoCkA+Qpwin12DwHCGTG8jBSKkKaSiJDgECGIiQ6AgSKFSHqsVN9Ynj16tVraa+z24/+fepzAIAdoQGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAEgGQGeP/Pf7XO8evXqtbTX2d35qd1gAOgCAwABAgABAgABAgABAgABAgABAgABAkDI4mD0t//01gtfv/XZtze+kXjx4sVPLf6llSDLb7TM8huLF19S/Bc//vkXvv7NP3/fa7zrP2z87ObtG6dV0OI3P3fp0yGEEP7w4C9r31S8+BziK0ktymlT/Dc+85UQQgg/+fOvosQ3/X3c3/bxOyGE8J1ffOuFAtU3l/9dIV58TvE/+uNBuLK/Xzv+e4c/a/T+TeOb/j4l3t877/+gl/jZzds3Ttf98EVWmVW8ePHipxxvFhhAKPoxmPvHf29USLx48eJziN+pkzquSyfFixcvfsrxO9uCNr2ZePHixU85fnbz9o3TKkV87conG6WU4sWLFz/leJMgAIplZ3GAsM7gonjx4sXnEj/72k+/ufJQpOV0cdsPEy9evPipxT8X4Hff/PpLT6xvQrx48eKnHr9TfXPxtc6biRcvXvzU42e/fvjjlV3gVbbc9APFixcvfmrxa/cDfPXW78Jrly88//pL3//2RsuKFy9e/NTiPQYDINgSHwAKY/bLv/3w1GUAIAMEgILY/ce/5hsDPvGxvY3fV1555ZWfankZIABdYAAIJkEAQAYIAAQIADmyuy3ALFP+5e89Oiq2Abx+4ar6U3D53YBJ8ODpw0b/3+R9v3zlzWKv68HxYZT7UkeumEAGiLgSqyuwkiUVk5jXtY5c191/8gxmgVOnadeRxBArMyVMGeDgcstBaI9PnhR/r/fPnp98ZlpHmCRJgLUFl5LcYkoqxcbv+sYR5jZJlijI2Tv3b53mPMuzboxlaMF1aWQkVaZch77v6wS5SYxTnyXezX2WNKbomlRuEtO9Tr1+rWsrbcSoCzxwF7Zv0dWpfKSGVOQZs77WFeOlcxfNAk9JeJsqDbmhpO54H/V9WYhTyBCTFWDfwlt180kOiNc+piDE5ARYia+L8MgOSE+KlRBTEuFWAQ41S9NVfIs3i+yA+FJs284qEV46d9Fa4C7iIz0gjDYx07b9VW394PgwPHj6cNSMcHfsR1e6ZHykB6Qjw6btcVGEY0lwtDHAe4+OOmV95Aek2T1u0zbHkuCOtZsASm2XO9ZuAii1XY52LvD82TwcHB827gZXnzLGAIG05NdlVnj+bL7SJVmvBa4kGEJoJUKzwMB0H4mp2v782bzctcDVH99GhH1MyQMY5znAMcUXUlgJ8t4Hd176v70ze1aCABmvBFklvuuXr5W5FG6VBBdFGKwFBrJYC7wu4xtLfkmtBV4nwlhCtBsMSC7ubjDburhjii+5tcB1RRhTiPYDRM6PoPRdX5sKr+KNV646F3jbp8I2ES5f7HW71rYVY53KYkdopPJcXcz6ta5tNZ3EWBRfsCN0PRFWBr/70VEjIcYSY8wde8nTw8EpngnSdrb2+uVrWzMw+wGGOGOGTbvQToUjqdyv77ZT4bo+lpLCmF6xB6N3FWJTQToXOFjDGqZ1kHrfz91NUXjZCnAoMTaVZG7CRDpCiym33ERX7LnA68rHFGNfwiTPsiQ2lNBCg0mKXNt/yO1c4K6TLMtsm3QZulJ3aUzkOs51TWGp17ZMLvVJiuBc4HGoPg03fYIMmUXGbEwxJZA6qUmqz+ytTgZUOtmPAYZCxiORZw8FMkCVmjxJDASoMclMSQqDCnDqszzKby+/SQK5//3qf9nlJ3kmCACEUg9FAoBgFhgAZIAAQIAAEFI/F1h55ZVXfuzyMkAAusAAEMwCA4AMEAAIEACCtcDBLJPyyisfrAUGANthYao8ePowPHj6sPN75FD+9QtXVYhgFhiJce/RUXAWSJj02SDkKgMkMJJKmpjXuatcCZQAJys0AkPXOtBUoIRpLXDj8nXHknIS2uOTJ1rA/9g/ez4bgdYV5usXrhY/S7wra0tXbLEFlXKjd63jC7OOKHM/VnM3pxnNdf8/pty6NCyCyicDTLEe1GkXmySZQ1d7UrPAmzK5oSTXtCKTGHKtcznIMVkBrpJdTMnVrWSEhlyEGbMur5JjilJMQoBDyG5bpSA2EGXcNpGiFLcKMMYszfJ4XV+y23RDCQ5Irz0tS3FZiLFniXfHmKDoKrx1N4bkgDDIxFBfbXDZBctCvHTuYpjcLPByl7aL8FZdaKID0pRj1/Y6tBB7HQOsxNen8MgOyKsr3aVNV0Lsa+ywswAXs7224lu8QIQHlCPEtu19MTPsIsPWAuya7ZEegD5l2EaEs3fu3zptOsty79FRZ/GRHoA+3XBwfPjSGGHv5wK3ld/jkyfh8cmTsH/2PPkBCKsmS/bPnn/uitBiaV/TDXJ3hpIf8QFoKsLYEqw9BthVfgAwlD8Ojg9rjQk6FAlAcC4wAARb4odVa+nmz+bh4PiwcTe46svrBgMYqvs7fzbv/1zgSoKhxaBm25kdAOWJrw/5RekCd5EgEQKI9ahcU/mF0HAlyHsf3Hn+770ze1aCAEhmJcii/K5fvhZnKdyiBBdFSIYAxlgLvJz11ZVf67XAyxLsKyu0GwxgN5im2V5b+bVeC7xJgstZof0AgbJ3ke5DeOuyvUXeeOVq4x2jWwuwjghjCNGO0EC62+V3bYNNhLdJfIMdjL74w+9+dLR25njTH9nm2UJnggD5nQlSdxa36upue85vlFPh6mSFmzJEp8IBZZwK1/SxlaZjfEkci9lUiENJ0bnAcC5wGOxc4KayiyG8JM4FbiPEdVIcQo5tKhdhIvc6t2lBRBvZDSG8JM4FXi7fVoipybGPykueJJZSPYghuSbCy+Jc4DYXoakUN92MOkv3YkmyS+WNvWSQYMu+1nXaRR+SCzVma0Oqu8GMLcVFg6+bZe7jJtZd3zxkNhm70ViTneeHQd263KfcYs3Sjt4Fngp9dKO7drVT636jLKENIbYxx+sIMHE59iFMAiWwsYSWq+SKF2DqkowpUHIdRlKpCqxkuUVdCxwGnCVOqXyqokxNrlMjVUmFjpMN2u/eNCdBQuKTM3VvQNuJG40edTK11CcZwtTPBMG4zzmlLFDEF9i2DAbGABHyGvc0HgYZIDR6IDgXGADGPRc4mCVWXnnlMysvAwSgCwwAwSwwAMgAAYAAASBH/gP2qT+QdaSDAQAAAABJRU5ErkJggg==&quot;);"></div>
@@ -5325,7 +5360,7 @@ function renderTitle(){S.screen='title';const m=S.meta;$('#battle').classList.re
   <div class=menuCol>${m.name?`<button class="btn red big" id=tGo>${I('ball')} 이어하기 <small style="font-size:13px">${esc(m.name)} · Lv.${lvOf(m.xp).lv}</small></button>`:`<button class="btn red big" id=tGo>${I('ball')} 시작하기</button>`}
    <button class="btn green" id=tSave>${I('disk')} 저장 · 불러오기</button>
    <div class=row><button class="btn ghost" id=tSet>${I('gear')} 설정</button><button class="btn ghost" id=tTeach>${I('teacher')} 선생님</button></div></div>
-  <p class=notice>이 앱은 <b>수업용</b>이에요. 선생님께 받은 <b>학년·학기 코드</b>가 있어야 시작할 수 있어요. 이름 대신 <b>닉네임</b>만 써요.<br>비영리 교육용 팬 제작물이며 포켓몬 관련 권리는 각 권리자에게 있어요.</p>
+  <p class=notice>본 앱은 <b>교육용 앱</b>입니다. 선생님께 받은 <b>학년·학기 코드</b>가 필요합니다.<br>실명 대신 <b>닉네임</b>을 사용해 주세요.<br>비영리 교육용 팬 콘텐츠이며, 포켓몬 관련 권리는 각 권리자에게 있습니다.</p>
   
   <p class=notice style="font-family:'Jua';font-size:14px;color:#2f5aa8">좌삼초.</p>
   ${!STORE_OK?`<p class=notice style="color:#d9393f">이 화면에서는 자동 저장이 막혀 있어요. 저장 코드를 꼭 만들어 두세요.</p>`:''}</div>`;
@@ -6997,7 +7032,7 @@ init();
    skin(t.querySelector('#tSet'),'pxw pxk','gear','설정');
    skin(t.querySelector('#tTeach'),'pxw pxt','teacher','선생님');
    const nt=t.querySelector('.notice');
-   if(nt&&nt.innerHTML.indexOf('수업용')>=0)nt.innerHTML='<span class="nl">이 앱은 <b>수업용</b>이에요. 선생님께 받은 <b>학년·학기 코드</b>가 있어야 시작할 수 있어요.</span><span class="nl nick">이름 대신 <b>닉네임</b>만 써요.</span><span class="nl">비영리 교육용 팬 제작물이며 포켓몬 관련 권리는 각 권리자에게 있어요.</span>';
+   if(nt&&nt.innerHTML.indexOf('학년·학기 코드')>=0)nt.innerHTML='<span class="nl">본 앱은 <b>교육용 앱</b>입니다. 선생님께 받은 <b>학년·학기 코드</b>가 필요합니다.</span><span class="nl nick">실명 대신 <b>닉네임</b>을 사용해 주세요.</span><span class="nl">비영리 교육용 팬 콘텐츠이며, 포켓몬 관련 권리는 각 권리자에게 있습니다.</span>';
    (function(){const all=t.querySelectorAll('.notice');const last=all[all.length-1];if(last&&last.textContent.trim()==='좌삼초.'){last.replaceWith(studioEl());}})();
    drawLogo(t);
    try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(t.isConnected){t.querySelector('.logo').dataset.k='';drawLogo(t);}});}catch(e){}
