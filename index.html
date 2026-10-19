@@ -1886,8 +1886,8 @@ html.lowfx .lgsFx u,html.lowfx .lgsFx em,html.lowfx .lgsFx i{display:none}
 .pxw{min-height:44px}
 #view>.title>.notice{margin-top:8px;padding:10px 16px!important;font-size:12px}
 
-#view>.title>.logo small{font-size:clamp(16px,4.2vw,22px);letter-spacing:.38em;padding-left:.38em;margin-top:12px;color:#fff;
- text-shadow:1px 0 #24409a,-1px 0 #24409a,0 1px #24409a,0 -1px #24409a,0 3px 0 #1b2f7a,0 0 12px rgba(20,35,100,.5)}
+#view>.title>.logo small{font-size:clamp(16px,4.2vw,22px);letter-spacing:.38em;padding-left:.38em;margin-top:12px;color:#1b2f7a;
+ text-shadow:1px 0 #fff,-1px 0 #fff,0 1px #fff,0 -1px #fff,1px 1px #fff,-1px -1px #fff,1px -1px #fff,-1px 1px #fff,0 0 8px rgba(255,255,255,.95),0 2px 6px rgba(255,255,255,.8)}
 
 /* 크림색 안내문 + 제작사 로고 */
 #view>.title>.notice{color:#5b4a2f;background:linear-gradient(180deg,#fffcef,#f6ecd0)!important;box-shadow:inset 0 0 0 2px #d8b866!important}
@@ -6908,18 +6908,18 @@ init();
  /* ---- 도트 로고: 글자를 작은 격자에 찍어 픽셀 단위로 가공한 뒤 정수 배율로 확대 ---- */
  const LOGO_FONT="900 {F}px 'Black Han Sans','Jua','Noto Sans KR','Noto Sans CJK KR',sans-serif";
  const PAL=['#fff8d2','#ffe56a','#ffc936','#f59a24','#d9741c'],OUT='#2c47b8',OUT2='#18246e',SHADOW='#101a55';
- function rasterText(lines,F){
+ function rasterText(lines,F,font){font=font||LOGO_FONT;
   const c=document.createElement('canvas'),x=c.getContext('2d',{willReadFrequently:true});
-  x.font=LOGO_FONT.replace('{F}',F);const lh=Math.round(F*1.12);
+  x.font=font.replace('{F}',F);const lh=Math.round(F*1.12);
   const w=Math.ceil(Math.max(...lines.map(l=>x.measureText(l).width)));
   const P=5,W=w+P*2,H=lh*lines.length+P*2+2;c.width=W;c.height=H;
-  x.font=LOGO_FONT.replace('{F}',F);x.textAlign='center';x.textBaseline='middle';x.fillStyle='#000';
+  x.font=font.replace('{F}',F);x.textAlign='center';x.textBaseline='middle';x.fillStyle='#000';
   lines.forEach((l,i)=>x.fillText(l,W/2,P+lh*i+lh/2+1));
   const d=x.getImageData(0,0,W,H).data,m=new Uint8Array(W*H);for(let i=0;i<W*H;i++)m[i]=d[i*4+3]>120?1:0;
   return {m,W,H};
  }
  function buildLogo(lines,F,sc,op){op=op||{};const PAL_=op.pal||PAL,OUT_=op.out||OUT,OUT2_=op.out2||OUT2,SH_=op.sh||SHADOW,SD=op.sd==null?3:op.sd;
-  const {m,W,H}=rasterText(lines,F);
+  const {m,W,H}=rasterText(lines,F,op.font);
   const at=(a,x,y)=>x>=0&&y>=0&&x<W&&y<H&&a[y*W+x];
   const dil=(a,r)=>{const o=new Uint8Array(W*H);for(let y=0;y<H;y++)for(let x=0;x<W;x++){let v=0;for(let j=-r;j<=r&&!v;j++)for(let i=-r;i<=r;i++)if(at(a,x+i,y+j)){v=1;break;}o[y*W+x]=v;}return o;};
   const o1=dil(m,1),o2=op.thin?o1:dil(m,2);
@@ -6961,7 +6961,7 @@ init();
   const w=document.createElement('div');w.className='studio';w.setAttribute('role','img');w.setAttribute('aria-label','좌삼초');
   const sc=2;
   w.appendChild(buildSprout(sc));
-  const t=buildLogo(['좌삼초'],18,sc,{thin:1,pal:['#ffffff','#fffbe6','#fff3c4','#f6dc8e','#e5bf63'],out:'#33457f',out2:'#1d2a63',sh:'#141d52',sd:2});t.className='pxStudio';w.appendChild(t);
+  const t=buildLogo(['좌삼초'],18,sc,{thin:1,font:"400 {F}px 'Jua','Noto Sans KR',sans-serif",pal:['#ffffff','#fffbe6','#fff3c4','#f6dc8e','#e5bf63'],out:'#33457f',out2:'#1d2a63',sh:'#141d52',sd:2});t.className='pxStudio';w.appendChild(t);
   return w;
  }
  function drawLogo(t){
