@@ -1972,25 +1972,63 @@ html body :is(#view,.modal,#bq) *:not(.title *){backdrop-filter:none}
 /* 각진 모서리 (전투 화면 제외) */
 body:not(:has(#battle.on)) :is(#view,.modal,#coach,#toast,#unlock,#banner) *:not(.title *):not(.dmg):not([class*=shadow]):not(.card):not(.card *):not(.dexCell){border-radius:0!important}
 /* 큰 패널: 4px 테두리 + 아래 계단 그림자 */
-html body :is(.panel,.qCard,.tile,.scv-card,.sc-panel,.mbox,.hero,.gym,.sc-stage){border:4px solid var(--px-edge)!important;background-color:var(--paper);color:var(--ink);
- box-shadow:inset 0 3px 0 #fff,inset 0 -5px 0 rgba(185,143,62,.2),0 4px 0 #d9b765!important}
+html body :is(.panel,.qCard,.tile,.scv-card,.sc-panel,.mbox,.hero,.gym,.sc-stage){border:2px solid var(--px-edge)!important;background-color:var(--paper);color:var(--ink);
+ box-shadow:inset 0 2px 0 #fff,inset 0 -3px 0 rgba(185,143,62,.14),0 2px 0 #e6c878!important}
 html body .tile.main{background:linear-gradient(120deg,#fff6d9,#ffe3b0);border-color:#d99a2b!important}
-html body :is(.inp,.pill,.skRow,.thinkBar,.explain,.rl-pn,.rl-rules,.rl-slot,.dexCell,.deckBar,.nextFeat,.saybox){border-width:3px!important;border-color:var(--px-soft)!important}
+html body :is(.inp,.pill,.skRow,.thinkBar,.explain,.rl-pn,.rl-rules,.rl-slot,.dexCell,.deckBar,.nextFeat,.saybox){border-width:2px!important;border-color:var(--px-soft)!important}
 html body .inp:focus{border-color:#e0a400!important}
-html body .hud{background:#fff0c8;border-bottom:4px solid var(--px-edge);box-shadow:0 4px 0 rgba(185,143,62,.25);backdrop-filter:none}
-html body :is(.xpBar,.prog,.sc-progress,.sc-quizbar,.scv-prog){background:#f3dfae;border:3px solid var(--px-soft)}
+html body .hud{background:#fff0c8;border-bottom:2px solid var(--px-edge);box-shadow:0 2px 0 rgba(185,143,62,.2);backdrop-filter:none}
+html body :is(.xpBar,.prog,.sc-progress,.sc-quizbar,.scv-prog){background:#f3dfae;border:2px solid var(--px-soft)}
 html body :is(.xpBar i,.prog .me,.sc-progress i,.sc-quizbar i,.scv-prog i){background:repeating-linear-gradient(90deg,#ffb52e 0 6px,#f08a1c 6px 8px)!important}
 html body .week .d b{background:repeating-linear-gradient(0deg,#6fb8f2 0 6px,#4d9cff 6px 8px)}
 html body .week .d.today b{background:repeating-linear-gradient(0deg,#ffd56b 0 6px,#ff9a3d 6px 8px)}
 html body .modal{background-color:rgba(74,56,32,.55);backdrop-filter:none}
 /* 방어 퀴즈: 문제 카드·보기 버튼을 푸른빛으로 */
-html body #bq .sheet.defense{background:#edf6ff;border:4px solid #74b6f4;box-shadow:inset 0 3px 0 #fff,0 -4px 0 #a8d4ff}
-html body #bq .sheet.defense .qCard{background:#dceeff;border-color:#74b6f4!important;box-shadow:inset 0 3px 0 #fff,inset 0 -5px 0 rgba(77,156,255,.25),0 4px 0 #a8d4ff!important}
+html body #bq .sheet.defense{background:#edf6ff;border:2px solid #74b6f4;box-shadow:inset 0 2px 0 #fff,0 -2px 0 #a8d4ff}
+html body #bq .sheet.defense .qCard{background:#dceeff;border-color:#74b6f4!important;box-shadow:inset 0 2px 0 #fff,inset 0 -3px 0 rgba(77,156,255,.2),0 2px 0 #a8d4ff!important}
 html body #bq .sheet.defense .ch:not(.ok):not(.no){--a:#d6ecff;--b:#8fc5ff;--fr:#4d9cff;--fg:#123c73;background:var(--fr)}
 html body #bq .sheet.defense .ch:not(.ok):not(.no):hover{--fr:#7dbaff}
 /* 포켓몬 카드·도감 칸은 원래의 둥근 모서리 */
 html body .card{border-radius:12px}html body .card .art{border-radius:8px}html body .card .cost{border-radius:50%}html body .card .kw{border-radius:6px}
 html body .dexCell{border-radius:14px}
+
+/* ===== 전투 화면: 도트 감성 + 고급스러운 금테 프레임 ===== */
+html body :is(#battle,#bq,#bInfo,#coach) *{clip-path:none}
+html body :is(#battle,#bq,#bInfo) :is(.hero,.wildTop,.wildEntry,.pill),
+html body #bInfo .sheet,html body #bq .sheet:not(.defense),
+html:has(#battle.on) body .mbox{
+ background:linear-gradient(180deg,#fffdf1,#fff0c6)!important;border:2px solid #a97c2f!important;border-radius:10px!important;
+ box-shadow:inset 0 0 0 1px #fff8dc,inset 0 -2px 0 rgba(185,143,62,.18),0 2px 0 rgba(90,60,10,.22),0 4px 8px rgba(0,0,0,.12)!important}
+html body #battle .hero{padding:4px 14px 4px 5px}
+html body #battle .hero .av{border:2px solid #a97c2f!important;border-radius:8px!important;background-clip:padding-box;box-shadow:inset 0 0 0 1px #fff8dc}
+html body #battle .hero .hn{color:#4a3820}
+html body #battle .hero.turnNow{border-color:#e0a000!important;box-shadow:inset 0 0 0 1px #fff3b0,0 2px 0 rgba(90,60,10,.22),0 0 0 2px rgba(255,200,60,.55)!important}
+html body #battle .pill{border-radius:8px!important;padding:3px 9px;color:#4a3820}
+/* 안내 말풍선: JRPG 대화창 */
+html body #battle .mid .msg{background:linear-gradient(180deg,#3d3120,#2a2114)!important;color:#fff1c8;border:2px solid #d9b765;border-radius:9px;padding:5px 14px;
+ box-shadow:inset 0 0 0 1px #6a5230,0 2px 0 rgba(0,0,0,.25),0 4px 8px rgba(0,0,0,.15);text-shadow:1px 1px 0 #000a}
+html body #battle .mid .msg b{color:#ffd86b}
+/* 버튼: 입체 도트 버튼 */
+html body #battle .btn,html body :is(#bq,#bInfo) .btn{--a:#fffdf0;--b:#f6e5b4;--bd:#a97c2f;--fg:#4a3820;
+ background:linear-gradient(180deg,var(--a),var(--b))!important;color:var(--fg);border:2px solid var(--bd)!important;border-radius:9px!important;overflow:visible;text-shadow:none;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(0,0,0,.12),0 2px 0 var(--bd)!important}
+html body #battle .btn::before,html body :is(#bq,#bInfo) .btn::before{display:none}
+html body :is(#battle,#bq,#bInfo) .btn:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 0 0 var(--bd)!important}
+html body :is(#battle,#bq,#bInfo) .btn.red{--a:#ff8478;--b:#d9404f;--bd:#8e1f2c;--fg:#fff;text-shadow:0 1px 0 rgba(90,0,10,.55)}
+html body :is(#battle,#bq,#bInfo) .btn.purple{--a:#a98fff;--b:#6a4bd6;--bd:#402a94;--fg:#fff;text-shadow:0 1px 0 rgba(30,10,90,.55)}
+html body :is(#battle,#bq,#bInfo) .btn.gold{--a:#ffe486;--b:#f0a823;--bd:#9a6410;--fg:#5a3b00}
+html body :is(#battle,#bq,#bInfo) .btn.green{--a:#58dca0;--b:#26a06f;--bd:#135f43;--fg:#fff;text-shadow:0 1px 0 rgba(0,60,30,.5)}
+html body :is(#battle,#bq,#bInfo) .btn.blue{--a:#70bcff;--b:#2f79d1;--bd:#174a8a;--fg:#fff;text-shadow:0 1px 0 rgba(0,30,80,.5)}
+html body #battle .btn.endBtn{padding:9px 20px}
+/* 능력치 배지·칸 */
+html body #battle .st{border-radius:7px;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 2px 0 rgba(0,0,0,.28)}
+html body #battle .slot{border-radius:12px;border:2px dashed rgba(255,250,225,.7);background:rgba(255,250,225,.12);box-shadow:inset 0 0 0 1px rgba(90,70,30,.12)}
+html body #battle .slot.can{border-color:#3cc47c;background:rgba(60,196,124,.2)}
+/* 카드 정보·문제 시트 */
+html body #bInfo .sheet,html body #bq .sheet{border-radius:14px 14px 8px 8px!important}
+html body #bq .sheet.defense{border-radius:14px 14px 8px 8px;box-shadow:inset 0 0 0 1px #e6f3ff,0 -2px 0 #a8d4ff,0 -6px 12px rgba(47,98,181,.2)}
+html body #bq .qCard,html body #bq .ch{border-radius:10px!important}
+html body #bq .qCard{border-width:2px!important}
 </style>
 </head>
 <body>
