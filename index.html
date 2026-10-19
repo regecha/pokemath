@@ -1528,9 +1528,9 @@ html.lowfx .dmg,html.lowfx .skName,html.lowfx #banner{will-change:auto}
 #myLane .unit .sp::after,#foeLane:not(.wildLane) .unit .sp::after{content:'';position:absolute;left:22%;right:22%;bottom:-2px;height:9px;border-radius:50%;background:rgba(0,0,0,.18);z-index:-1;pointer-events:none}
 
 /* ===== 돌 카드: 면이 나뉜 보석 모양 SVG ===== */
-.stoneGem{width:48px;height:54px;display:block;filter:drop-shadow(0 0 5px var(--gem)) drop-shadow(0 3px 2px #30284555);animation:gemFloat 3.2s ease-in-out infinite}
-.stoneGem svg{width:100%;height:100%;display:block;overflow:visible}
-.hand .card.battleSpec .stoneGem{height:92%;width:auto;aspect-ratio:48/54}
+.stoneGem{width:46px;height:48px;display:block;filter:drop-shadow(0 0 5px var(--gem)) drop-shadow(0 3px 2px #30284555);animation:gemFloat 3.2s ease-in-out infinite}
+.stoneGem img{width:100%;height:100%;display:block;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated}
+.hand .card.battleSpec .stoneGem{height:92%;width:auto;aspect-ratio:21/22}
 .stoneGem .gemSpark{transform-box:fill-box;transform-origin:center;animation:gemTwinkle 2.4s ease-in-out infinite}
 @keyframes gemFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 @keyframes gemTwinkle{0%,100%{opacity:.25;transform:scale(.55) rotate(0)}50%{opacity:1;transform:scale(1.1) rotate(25deg)}}
@@ -1552,24 +1552,14 @@ html.lowfx .stoneGem,html.lowfx .stoneGem .gemSpark{animation:none!important}
 #foeLane:not(.wildLane) .unit .kwI{left:auto;right:-5px;justify-content:flex-end}
 #foeLane.wildLane .unit .kwI{top:3px!important;left:auto!important;right:3px!important;justify-content:flex-end;z-index:9!important}
 
-/* ===== 숫자가 있는 특성(방어막·성장·독·요정의 빛): 아이콘 위에 숫자를 크게 겹쳐서 표시 ===== */
-.unit .kwI .numIc{--ol:#1c2a5a;position:relative;display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
-.numIc>svg,.numIc>i{position:absolute;left:0;top:0;width:100%;height:100%}
-.numIc>i{font-style:normal;font-size:18px;line-height:20px;text-align:center;opacity:.92}
-.numIc>b{position:relative;z-index:1;font:900 12px/1 'Noto Sans KR','Jua',sans-serif;color:#fff;letter-spacing:-.5px;
- text-shadow:-1px 0 var(--ol),1px 0 var(--ol),0 -1px var(--ol),0 1px var(--ol),-1px -1px var(--ol),1px 1px var(--ol),-1px 1px var(--ol),1px -1px var(--ol)}
-.numIc.shield>b{margin-top:1px}
-.numIc.grow{--ol:#1f5a12}.numIc.psn{--ol:#3a1060}.numIc.fai{--ol:#7a1a55}
-.numIc.psn>b,.numIc.fai>b,.numIc.grow>b{font-size:10.5px}
-.numIc.grow,.numIc.psn,.numIc.fai{border-radius:50%;border:1.5px solid var(--ol)}
-.numIc.grow{background:radial-gradient(circle at 35% 30%,#d6f7b8,#5fbf3a 70%)}
-.numIc.psn{background:radial-gradient(circle at 35% 30%,#ecd4ff,#9a5bd6 70%)}
-.numIc.fai{background:radial-gradient(circle at 35% 30%,#ffe0f2,#e46aae 70%)}
-.numIc.grow>i,.numIc.psn>i,.numIc.fai>i{font-size:13px;line-height:17px;opacity:.5}
-.numIc.max{box-shadow:0 0 0 1.5px #ffd23f}
-.numIc.max{filter:drop-shadow(0 0 3px #ffd23f) drop-shadow(0 0 1px #ffd23f)}
-@media(max-width:520px){.unit .kwI .numIc{width:18px;height:18px}.numIc>i{font-size:16px;line-height:18px}.numIc.grow>i,.numIc.psn>i,.numIc.fai>i{font-size:12px;line-height:15px}.numIc>b{font-size:11px}.numIc.psn>b,.numIc.fai>b,.numIc.grow>b{font-size:9.5px}}
-
+/* ===== 숫자가 있는 특성(방어막·성장·독·요정의 빛): 도트 아이콘 옆에 현재 수치만 크게 표시 ===== */
+.unit .kwI .numIc{--ol:#1c2a5a;display:inline-flex;align-items:center;gap:0;flex:none;height:auto;width:auto;filter:none;background:none;border:0;box-shadow:none}
+.unit .kwI .numIc>img.ic{width:14px;height:14px}
+.numIc>b{font:900 13px/1 'Noto Sans KR','Jua',sans-serif;color:#fff;letter-spacing:-.3px;margin-left:-1px;
+ text-shadow:-1.5px 0 var(--ol),1.5px 0 var(--ol),0 -1.5px var(--ol),0 1.5px var(--ol),-1px -1px var(--ol),1px 1px var(--ol),-1px 1px var(--ol),1px -1px var(--ol)}
+.unit .kwI .numIc.shield{--ol:#16397d}.unit .kwI .numIc.grow{--ol:#1f5a12}.unit .kwI .numIc.psn{--ol:#3a1060}.unit .kwI .numIc.fai{--ol:#7a1a55}
+.numIc.max>b{color:#ffe36b}
+@media(max-width:520px){.unit .kwI .numIc>img.ic{width:12px;height:12px}.numIc>b{font-size:12px}}
 /* ===== 얼어붙은 포켓몬: 회색 대신 차가운 하늘색 + 얼음막 ===== */
 .unit.frozen .sp img,.wildLane .unit.frozen .sp img,#foeLane.wildLane .unit.frozen .sp img,#myLane .unit.frozen .sp img{
  filter:sepia(.55) hue-rotate(168deg) saturate(1.5) brightness(1.22) contrast(.95) drop-shadow(0 0 5px rgba(130,215,255,.95)) drop-shadow(0 4px 4px rgba(0,70,130,.3))!important}
@@ -2804,29 +2794,36 @@ const GEM_PAL={
  thunder:{a:'#fffdd0',b:'#ffe650',c:'#f4ac16',d:'#c8700c',e:'#8a4606',glow:'#ffd02a'},
  moon:{a:'#fff4ff',b:'#d2c0ff',c:'#9370dc',d:'#5c3fa8',e:'#3a2578',glow:'#a58bff'},
  sun:{a:'#fff4cf',b:'#ffc45a',c:'#ff7440',d:'#dc2f55',e:'#9c1640',glow:'#ff6a4a'}};
-const GEM_GLYPH={
- fire:'<path d="M12 2.2c.9 3.6 5.4 5.7 5.4 11a5.4 5.4 0 0 1-10.8 0c0-2 .9-3.4 2-4.4.1 1.8.9 2.9 1.9 3.2-.5-3.9.2-6.4 1.5-9.8z"/>',
- water:'<path d="M12 2.5C9.2 7 6 10.2 6 14.2a6 6 0 0 0 12 0c0-4-3.2-7.2-6-11.7z"/>',
- thunder:'<path d="M13.6 2 5.4 13.2h5.6L9.8 22l8.8-12.2h-5.8z"/>',
- moon:'<path d="M15.6 2.8a9.3 9.3 0 1 0 5.6 13.4 7.4 7.4 0 0 1-5.6-13.4z"/>',
- sun:'<circle cx="12" cy="12" r="4.6"/><g stroke-width="2.2" stroke-linecap="round"><path d="M12 2.6v3M12 18.4v3M2.6 12h3M18.4 12h3M5.4 5.4l2.1 2.1M16.5 16.5l2.1 2.1M18.6 5.4l-2.1 2.1M7.5 16.5l-2.1 2.1"/></g>'};
-function stoneGemHTML(item){const P=GEM_PAL[item]||GEM_PAL.fire,g=GEM_GLYPH[item]||GEM_GLYPH.fire,u='sg'+(++__gemUid);
- return `<div class="stoneGem ${item}" style="--gem:${P.glow}"><svg viewBox="0 0 48 54" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-<defs><linearGradient id="${u}t" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${P.a}"/><stop offset=".55" stop-color="${P.b}"/><stop offset="1" stop-color="${P.c}"/></linearGradient>
-<radialGradient id="${u}r" cx=".5" cy=".42" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
-<ellipse cx="24" cy="51.5" rx="15" ry="2.6" fill="#302845" opacity=".22"/>
-<g stroke-linejoin="round">
-<path d="M24 2 5 13 11 17 24 9z" fill="${P.a}"/><path d="M24 2 43 13 37 17 24 9z" fill="${P.b}"/>
-<path d="M5 13 3 35 10 34 11 17z" fill="${P.c}"/><path d="M43 13 45 35 38 34 37 17z" fill="${P.d}"/>
-<path d="M3 35 16 52 24 46 10 34z" fill="${P.d}"/><path d="M45 35 30 52 24 46 38 34z" fill="${P.e}"/><path d="M16 52 30 52 24 46z" fill="${P.c}"/>
-<path d="M24 9 37 17 38 34 24 46 10 34 11 17z" fill="url(#${u}t)"/>
-<path d="M24 9 37 17 38 34 24 46 10 34 11 17z" fill="url(#${u}r)"/>
-<path d="M24 9 24 46M11 17 38 34M37 17 10 34" stroke="#fff" stroke-opacity=".28" stroke-width=".8" fill="none"/>
-<path d="M24 2 43 13 45 35 30 52 16 52 3 35 5 13z" fill="none" stroke="#302845" stroke-width="2.4"/>
-<path d="M5 13 11 17 24 9 37 17 43 13M3 35 10 34 24 46 38 34 45 35" fill="none" stroke="#302845" stroke-opacity=".35" stroke-width="1"/></g>
-<g transform="translate(24 27.5) scale(1) translate(-12 -12)" fill="#fff" stroke="#302845" stroke-width="1.6" stroke-linejoin="round" paint-order="stroke" style="color:#fff">${g}</g>
-<path d="M9 15.5 8 25" stroke="#fff" stroke-opacity=".75" stroke-width="2" stroke-linecap="round" fill="none"/>
-<path class="gemSpark" d="M39 7.5l1.1 2.6 2.6 1.1-2.6 1.1L39 14.9l-1.1-2.6-2.6-1.1 2.6-1.1z" fill="#fff"/></svg></div>`;}
+/* 돌 카드 그림: 20×22 도트로 직접 그려서 크게 늘려도 도트가 선명하게 보이게 해요 */
+const GEM_BMP={
+ fire:['...X...','..XX...','..XXX..','.XXXXX.','.XXXXX.','.XXXXX.','..XXX..'],
+ water:['...X...','..XXX..','..XXX..','.XXXXX.','XXXXXXX','XXXXXXX','.XXXXX.'],
+ thunder:['....XX.','...XX..','..XX...','.XXXXX.','...XX..','..XX...','.XX....'],
+ moon:['..XXX..','.XXX...','XXX....','XXX....','XXX....','.XXXXX.','..XXX..'],
+ sun:['...X...','.X.X.X.','..XXX..','XXXXXXX','..XXX..','.X.X.X.','...X...']};
+const GEM_URL={};
+function gemDataURL(item){if(GEM_URL[item])return GEM_URL[item];const P=GEM_PAL[item]||GEM_PAL.fire,W=21,H=22,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+ const poly=[[10.5,.3],[18.8,5.6],[20.6,11.5],[10.5,21.9],[.4,11.5],[2.2,5.6]];
+ const inside=(x,y)=>{let c=false;for(let a=0,b=poly.length-1;a<poly.length;b=a++){const[xa,ya]=poly[a],[xb,yb]=poly[b];if((ya>y)!==(yb>y)&&x<(xb-xa)*(y-ya)/(yb-ya)+xa)c=!c;}return c;};
+ const m=[];for(let y=0;y<H;y++){m[y]=[];for(let x=0;x<W;x++)m[y][x]=inside(x+.5,y+.5);}
+ const edge=(x,y)=>m[y][x]&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>{const X=x+dx,Y=y+dy;return X<0||Y<0||X>=W||Y>=H||!m[Y][X];});
+ const px=(x,y,c)=>{g.fillStyle=c;g.fillRect(x,y,1,1);};
+ const cx=10.5;
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(!m[y][x])continue;if(edge(x,y)){px(x,y,'#302845');continue;}
+  const dx=x+.5-cx;let c;
+  if(y<=5){c=dx<-4?P.b:dx<0?P.a:dx<4?P.b:P.c;}            /* 윗면(왕관) */
+  else if(y===6){c=P.a;}                                    /* 허리선 하이라이트 */
+  else{c=dx<-6?P.c:dx<-1.5?P.b:dx<3.5?P.c:dx<7?P.d:P.e;    /* 아랫면 */
+   if(y>=16)c=dx<0?P.c:P.d; if(y>=19)c=dx<0?P.d:P.e;}
+  px(x,y,c);}
+ px(4,5,'#fff');px(5,5,'#fff');px(4,6,'#fff');px(3,8,'#fff');px(3,9,'#ffffffcc');
+ const bm=GEM_BMP[item]||GEM_BMP.fire,ox=7,oy=6,set=new Set();
+ bm.forEach((r,yy)=>[...r].forEach((ch,xx)=>{if(ch==='X')set.add((ox+xx)+','+(oy+yy));}));
+ set.forEach(k=>{const[x,y]=k.split(',').map(Number);[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]].forEach(([dx,dy])=>{const kk=(x+dx)+','+(y+dy);if(!set.has(kk))px(x+dx,y+dy,P.e);});});
+ set.forEach(k=>{const[x,y]=k.split(',').map(Number);px(x,y,'#ffffff');});
+ [[16,2],[15,3],[16,3],[17,3],[16,4]].forEach(([x,y],n)=>{if(m[y]&&m[y][x]&&!edge(x,y))px(x,y,n===0||n===4?'#ffffffaa':'#fff');});
+ return GEM_URL[item]=cv.toDataURL('image/png');}
+function stoneGemHTML(item){const P=GEM_PAL[item]||GEM_PAL.fire;return `<div class="stoneGem ${item}" style="--gem:${P.glow}"><img src="${gemDataURL(item)}" alt="" draggable="false"></div>`;}
 function battleCardHTML(v,opt={}){if(!isBattleSpecial(v))return cardHTML(v,opt);const size=opt.size||'sm',cls=opt.cls||'';let visual='',kind='';
  if(v.sp==='random'){kind=v.ball;visual=`<div class="battleOrb ${v.ball}">${v.ball==='master'?'<b>M</b>':''}</div>`;}
  else{kind=v.item;const em={fire:'🔥',water:'💧',thunder:'⚡',moon:'🌙',sun:'☀️'}[v.item]||'✦';visual=stoneGemHTML(v.item);}
@@ -3163,7 +3160,7 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
  const valid=targetsFor(B.sel);
  const unitH=(u,P,i)=>{if(!u)return '';const friendly=P===me;const mine=friendly&&(!B.coop||Number(u.coopOwner??0)===B.coop.active);const m=MON[u.id];const ready=mine&&my&&u.att>0&&!u.frozen;
   return `<div class="unit${ready?' ready':''}${mine&&B.sel===i?' sel':''}${!friendly&&valid.units.includes(i)?' tgt':''}${isTaunt(u)?' taunt':''}${u.frozen?' frozen':''}${u.shield?' shielded':''}${mine&&B.itemTargetMode&&!u.frozen?' itemTarget':''}${!friendly&&B.moonTargetMode?' itemTarget':''}${mine&&!ready&&my?' zz':''}" data-i="${i}">
-   ${B.coop?(()=>{const ow=Number(u.coopOwner??0)===1?1:0;const nm=String((B.coop.players[ow]&&B.coop.players[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield',NUM_SHIELD_SVG,u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${monImgU(u.id,mine?'back':'anim')}</div><div class=un>${esc(m.name)}</div><div class=tdots>${m.types.map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
+   ${B.coop?(()=>{const ow=Number(u.coopOwner??0)===1?1:0;const nm=String((B.coop.players[ow]&&B.coop.players[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${monImgU(u.id,mine?'back':'anim')}</div><div class=un>${esc(m.name)}</div><div class=tdots>${m.types.map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
    <div class=us><span class="st atk">${u.atk}</span><span class="st hp"${u.hp<u.max?' style="background:#d9393f"':''}>${u.hp}</span></div></div>`;};
  const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=B.coop?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front')}</div><div><div class=hn>${esc(P.name)}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
   const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),bl=P.mana-bp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}<b>${bl}${bp?`<span style="color:#8a3fd6">+${bp}</span>`:''}/${den}</b></div>`;};
@@ -3304,12 +3301,11 @@ function applyType(dmg,k){if(k>=2)return Math.ceil(dmg*1.5);if(k<1)return Math.m
 // 독·요정의 빛: 공격 -1 (누적량을 기록해서 뱃지로 표시, 독은 최대 -3)
 function weakenAtk(D,i,key,label,cap=3,n=1){const x=D.board[i];if(!x)return;if(key==='psn'&&(x.psn||0)>=cap){try{fx(unitEl(D,i),`☠ 독은 최대 -${cap}까지!`,'txt');}catch(e){}return;}const k=key==='psn'?Math.min(n,cap-(x.psn||0)):n;if(x.atk>0){const d=Math.min(k,x.atk);x.atk-=d;x[key]=(x[key]||0)+d;}try{fx(unitEl(D,i),label,'txt');kwFx(key==='psn'?'poison':key==='fai'?'fairy':'',unitEl(D,i));}catch(e){}}
 // 성장·독·요정의 빛 뱃지 HTML
-const NUM_SHIELD_SVG='<svg viewBox="0 0 24 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 1.6 21.6 5v8.6c0 6-4 10.3-9.6 13C6.4 23.9 2.4 19.6 2.4 13.6V5z" fill="#3f98ea" stroke="#16397d" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 3.4 20 6.2v7.4c0 1.4-.2 2.7-.6 3.9C17.6 12.3 6.4 12.3 4.6 17.5 4.2 16.3 4 15 4 13.6V6.2z" fill="#9fd6ff" opacity=".55"/></svg>';
-function numIcH(cls,bg,n,title){return `<span class="numIc ${cls}" title="${title}">${bg}<b>${n}</b></span>`;}
+function numIcH(cls,icon,n,title){return `<span class="numIc ${cls}" title="${title}">${I(icon)}<b>${n}</b></span>`;}
 function traitBadgeH(u){if(!u)return '';let h='';
- if(u.kw==='grow'){const gc=growCap(u),g=Math.min(gc,u.grow||0);h+=numIcH('grow'+(g>=gc?' max':''),'<i>🌱</i>','+'+g,`성장 +${g}/${gc} (내 차례마다 공격 +1${isLeg(u)?'·체력 +1':''}, 최대 +${gc})`);}
- if(u.psn>0)h+=numIcH('psn'+(u.psn>=4?' max':''),'<i>☠️</i>','-'+u.psn,`독: 공격 -${u.psn} (최대 -3, 전설의 독은 -4)`);
- if(u.fai>0)h+=numIcH('fai','<i>✨</i>','-'+u.fai,`요정의 빛: 공격 -${u.fai}`);
+ if(u.kw==='grow'){const gc=growCap(u),g=Math.min(gc,u.grow||0);h+=numIcH('grow'+(g>=gc?' max':''),'leaf','+'+g,`성장 +${g}/${gc} (내 차례마다 공격 +1${isLeg(u)?'·체력 +1':''}, 최대 +${gc})`);}
+ if(u.psn>0)h+=numIcH('psn'+(u.psn>=4?' max':''),'skull','-'+u.psn,`독: 공격 -${u.psn} (최대 -3, 전설의 독은 -4)`);
+ if(u.fai>0)h+=numIcH('fai','fairy','-'+u.fai,`요정의 빛: 공격 -${u.fai}`);
  return h;}
 // 얼음 스택 뱃지 HTML (야생·보스·시나리오·로그라이크 전투에서만 표시)
 const iceMaxOf=u=>(B&&B.wildMode&&u&&(u.wildEncounter||(B.foe&&B.foe.board.includes(u))))?4:2;
