@@ -3430,7 +3430,8 @@ function targetsFor(si){const r={units:[],hero:false};if(si<0||!B||B.side!=='me'
  r.units=fo.board.map((u,i)=>u?i:-1).filter(i=>i>=0);r.hero=true;return r;}
 
 // ===== 전설 포켓몬 출전 연출 (도트 · 낮은 해상도 캔버스 한 장을 16프레임으로 끊어서, 포켓몬 주변에서만) =====
-// 황금빛 번쩍임을 "칸(도트)" 단위로 다시 그렸어요: 4×4 디더링 빛, 도트 햇살, 도트 충격파, 도트 불똥·반짝이, 도트 글씨.
+// 절제한 도트 연출: 번쩍임 → 십자 빛줄기 → 도트 충격파 → 불똥, 글씨는 모던 고딕을 도트로 또렷하게 찍어요.
+// 글씨는 가운데에서 양옆으로 열리며 나타나고, 끝날 때는 디더링으로 스르르 사라져요.
 // 효과음은 sfx('legend')(사각파 칩튠). 연출은 Math.random만 써서 친구 대전의 씨앗 난수는 건드리지 않아요.
 async function legendFx(P,slot,name){
  if(window.__sim)return;
@@ -3445,92 +3446,92 @@ async function legendFx(P,slot,name){
  o.appendChild(cv);
  const g=cv.getContext('2d');if(!g){o.remove();return;}
  const img=g.createImageData(N,N),buf=new Uint32Array(img.data.buffer);
- // 금빛 팔레트(7색) — 칸마다 이 색만 써서 도트 느낌을 지켜요
  const rgb=(r,gn,b)=>((255<<24)|(b<<16)|(gn<<8)|r)>>>0;
- const CREAM=rgb(255,248,214),WHITE=rgb(255,255,255),LIGHT=rgb(255,226,122),GOLD=rgb(255,200,58),ORANGE=rgb(255,157,26),AMBER=rgb(184,98,10),DARK=rgb(106,58,0);
+ const CREAM=rgb(255,248,214),WHITE=rgb(255,255,255),LIGHT=rgb(255,226,122),GOLD=rgb(255,200,58),ORANGE=rgb(255,157,26),AMBER=rgb(184,98,10),DARK=rgb(78,38,0);
  const GL=[0,ORANGE,GOLD,LIGHT,CREAM];
  const R=(a,b)=>a+Math.random()*(b-a),cl=k=>Math.max(0,Math.min(1,k)),eo=k=>1-Math.pow(1-cl(k),3);
- // 중심에서의 거리·각도를 칸마다 한 번만 계산해 둬요
- const D=new Float32Array(N*N),A=new Float32Array(N*N);
- for(let y=0;y<N;y++)for(let x=0;x<N;x++){const dx=x+.5-C,dy=y+.5-C;D[y*N+x]=Math.hypot(dx,dy);let a=Math.atan2(dy,dx);if(a<0)a+=Math.PI*2;A[y*N+x]=a;}
+ const D=new Float32Array(N*N);
+ for(let y=0;y<N;y++)for(let x=0;x<N;x++){D[y*N+x]=Math.hypot(x+.5-C,y+.5-C);}
  const BY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>(v+.5)/16); // 4×4 디더 무늬
- const SEC=Math.PI*2/16,STEP=1000/16,T=1500;
+ const STEP=1000/16,T=1450;
  const px=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x>=0&&y>=0&&x<N&&y<N)buf[y*N+x]=c;};
- const star=(x,y,r)=>{x=Math.round(x);y=Math.round(y);px(x,y,WHITE);for(let i=1;i<=r;i++){const c=i===r?GOLD:LIGHT;px(x+i,y,c);px(x-i,y,c);px(x,y+i,c);px(x,y-i,c);}
-  if(r>=3){px(x+1,y+1,LIGHT);px(x-1,y-1,LIGHT);px(x+1,y-1,LIGHT);px(x-1,y+1,LIGHT);}};
- // 입자들
- const sparks=Array.from({length:low?12:30},()=>({a:R(0,Math.PI*2),v:R(34,86)*K,life:R(.5,1.05),dl:R(0,.1),big:Math.random()<.35}));
- const stars=Array.from({length:low?3:8},(_,i)=>{const a=R(0,Math.PI*2),d=R(14,46)*K;return{x:Math.cos(a)*d,y:Math.sin(a)*d,dl:R(.05,.6),life:R(.45,.8),big:i<2};});
- const embers=Array.from({length:low?5:14},()=>({x:C+R(-22,22)*K,y:C+R(8,26)*K,v:R(16,40)*K,dl:R(.12,.7),life:R(.6,1.1),ph:Math.floor(R(0,3))}));
- const SR=[1,2,3,3,2,1];
- const RINGS=[{dl:0,du:700,rm:52,th:4,col:GOLD},{dl:140,du:760,rm:60,th:2,col:CREAM}];
- // ---------- 도트 글씨: 작은 캔버스에 글자를 쓰고, 글자 모양을 1비트로 잘라 칸으로 찍어요 ----------
- const maskOf=(txt,pxs)=>{
+ const star=(x,y,r)=>{x=Math.round(x);y=Math.round(y);px(x,y,WHITE);for(let i=1;i<=r;i++){const c=i===r?GOLD:LIGHT;px(x+i,y,c);px(x-i,y,c);px(x,y+i,c);px(x,y-i,c);}};
+ // 입자는 적게, 대신 또렷하게
+ const sparks=Array.from({length:low?8:18},()=>({a:R(0,Math.PI*2),v:R(40,92)*K,life:R(.5,.95),dl:R(0,.08),big:Math.random()<.3}));
+ const stars=Array.from({length:low?2:4},(_,i)=>{const a=R(0,Math.PI*2),d=R(18,44)*K;return{x:Math.cos(a)*d,y:Math.sin(a)*d,dl:R(.08,.5),life:R(.4,.7),big:i<1};});
+ const embers=Array.from({length:low?3:8},()=>({x:C+R(-20,20)*K,y:C+R(8,24)*K,v:R(16,38)*K,dl:R(.15,.65),life:R(.6,1),ph:Math.floor(R(0,3))}));
+ const SR=[1,2,3,2,1];
+ const RINGS=[{dl:0,du:600,rm:52,th:2,col:GOLD},{dl:110,du:640,rm:60,th:1,col:CREAM}];
+ // ---------- 도트 글씨: 모던 고딕(굵게)을 작은 캔버스에 써서 1비트로 잘라 칸으로 찍어요 ----------
+ const maskOf=(txt,pxs,wt)=>{
   const c=document.createElement('canvas'),g2=c.getContext('2d',{willReadFrequently:true});if(!g2)return{m:new Uint8Array(0),w:0,h:0};
-  const font=`700 ${pxs}px "Jua","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif`;
+  const font=`${wt} ${pxs}px "Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif`;
   g2.font=font;const w0=Math.ceil(g2.measureText(txt).width)+4,h0=Math.ceil(pxs*1.4)+2;
   c.width=w0;c.height=h0;g2.font=font;g2.textBaseline='middle';g2.fillStyle='#000';g2.fillText(txt,2,h0/2+1);
   const d=g2.getImageData(0,0,w0,h0).data;let x0=w0,x1=-1,y0=h0,y1=-1;
-  for(let y=0;y<h0;y++)for(let x=0;x<w0;x++)if(d[(y*w0+x)*4+3]>120){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
+  for(let y=0;y<h0;y++)for(let x=0;x<w0;x++)if(d[(y*w0+x)*4+3]>130){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
   if(x1<0)return{m:new Uint8Array(0),w:0,h:0};
   const w=x1-x0+1,h=y1-y0+1,m=new Uint8Array(w*h);
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++)m[y*w+x]=d[((y+y0)*w0+(x+x0))*4+3]>120?1:0;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)m[y*w+x]=d[((y+y0)*w0+(x+x0))*4+3]>130?1:0;
   return{m,w,h};};
  const BS=VW()<340?2:3,nm=String(name||'');
  const maxW=Math.floor(Math.min(VW(),420)*.92/BS)-6;
- let npx=14,nmk=maskOf(nm,npx);while(nmk.w>maxW&&npx>9){npx--;nmk=maskOf(nm,npx);}
- const lbk=maskOf('전설 등장',11);
- const lbH=Math.max(lbk.h,7),gap=3,lbRowW=lbk.w+2*(7+3);
+ let npx=21;let nmk=maskOf(nm,npx,900);while(nmk.w>maxW&&npx>9){npx--;nmk=maskOf(nm,npx,900);}
+ const lbk=maskOf('전설 등장',13,800);
+ const LN=9,LG=4; // 라벨 양옆 가는 선 길이·간격
+ const lbH=Math.max(lbk.h,5),gap=4,lbRowW=lbk.w+2*(LN+LG);
  const bw=Math.max(nmk.w,lbRowW)+6,bh=lbH+gap+nmk.h+6;
  const bC=document.createElement('canvas');bC.width=bw;bC.height=bh;
  const bg=(nmk.w&&bC.getContext)?bC.getContext('2d'):null;
- let bImg=null,bB=null;
+ let bImg=null,bB=null,clipH=0,fade=0;
  if(bg){bImg=bg.createImageData(bw,bh);bB=new Uint32Array(bImg.data.buffer);
   bC.className='lgBn';bC.style.cssText=`width:${bw*BS}px;height:${bh*BS}px;left:${-Math.round(bw*BS/2)}px;top:56px;visibility:hidden`;o.appendChild(bC);}
- const bpx=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x>=0&&y>=0&&x<bw&&y<bh)bB[y*bw+x]=c;};
- const bstar=(x,y,r)=>{bpx(x,y,WHITE);for(let i=1;i<=r;i++){const c=i===r?GOLD:CREAM;bpx(x+i,y,c);bpx(x-i,y,c);bpx(x,y+i,c);bpx(x,y-i,c);}};
- // 글씨: 1칸 검갈색 테두리(위·아래·좌·우) + 위에서 아래로 밝은 금→주황, 한 번 반짝 스치는 빛줄기
- const bText=(mk,ox,oy,shine)=>{const{m,w,h}=mk;
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(m[y*w+x]){bpx(ox+x+1,oy+y,DARK);bpx(ox+x-1,oy+y,DARK);bpx(ox+x,oy+y+1,DARK);bpx(ox+x,oy+y-1,DARK);}
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(m[y*w+x]){const f=y/h;let c=f<.34?LIGHT:f<.72?GOLD:ORANGE;if(shine!=null&&Math.abs((x+y*.6)-shine)<1.7)c=f<.5?WHITE:CREAM;bpx(ox+x,oy+y,c);}};
- const drawBanner=st=>{
-  bB.fill(0);const tw=st%2?3:2;
-  const lx=Math.round((bw-lbk.w)/2),ly=3+Math.round((lbH-lbk.h)/2);
-  bText(lbk,lx,ly,null);bstar(lx-7,3+Math.floor(lbH/2),tw);bstar(lx+lbk.w+6,3+Math.floor(lbH/2),tw);
-  const sh=st>=11&&st<=19?(st-11)*(nmk.w+10)/8-5:null;
+ // 글씨 칸 찍기: 가운데에서 양옆으로 열리는 범위(clipH) 안만, 끝날 때는 디더링으로 사라져요(fade)
+ const bpx=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=bw||y>=bh)return;if(Math.abs(x+.5-bw/2)>clipH)return;if(fade>0&&BY[(y&3)*4+(x&3)]<fade)return;bB[y*bw+x]=c;};
+ // 글씨: 1칸 짙은 갈색 테두리 + 아래 1칸 그림자 + 위→아래 3단 금빛, 한 번 스치는 빛줄기
+ const bText=(mk,ox,oy,shine,thin)=>{const{m,w,h}=mk;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(m[y*w+x]){if(thin){bpx(ox+x+1,oy+y+1,DARK);}else{bpx(ox+x+1,oy+y,DARK);bpx(ox+x-1,oy+y,DARK);bpx(ox+x,oy+y-1,DARK);bpx(ox+x,oy+y+1,DARK);}}
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(m[y*w+x]){const f=y/h;let c=f<.4?CREAM:f<.74?GOLD:ORANGE;if(shine!=null&&Math.abs((x+y*.5)-shine)<1.3)c=WHITE;bpx(ox+x,oy+y,c);}};
+ const drawBanner=ts=>{
+  bB.fill(0);
+  const lx=Math.round((bw-lbk.w)/2),ly=3+Math.round((lbH-lbk.h)/2),my=3+Math.floor(lbH/2);
+  bText(lbk,lx,ly,null,true);
+  for(let i=0;i<LN;i++){const c=i<3?CREAM:i<6?LIGHT:GOLD;bpx(lx-LG-1-i,my,c);bpx(lx+lbk.w+LG+i,my,c);bpx(lx-LG-1-i,my+1,DARK);bpx(lx+lbk.w+LG+i,my+1,DARK);}
+  const sh=ts>=560&&ts<880?(ts-560)*(nmk.w+10)/320-5:null;
   bText(nmk,Math.round((bw-nmk.w)/2),3+lbH+gap,sh);
   bg.putImageData(bImg,0,0);};
  // ---------- 한 칸 그리기 ----------
  const draw=st=>{const ts=st*STEP;buf.fill(0);
-  const tg=ts/760,gOn=tg<1,rg=(12+62*eo(ts/460))*K;
-  const bOn=!low&&ts>=60&&ts<1050,rb=(10+58*eo((ts-60)/420))*K,bf=1-cl((ts-620)/430),rot=Math.floor(ts/125)*.09;
-  const pOn=ts<950,pw=pOn?(3+11*Math.sin(Math.PI*Math.min(1,ts/950)))*K:0;
+  // 1) 번쩍임: 흰 핵이 디더링 빛으로 번졌다가 꺼져요
+  const tg=ts/270,rg=(8+40*eo(ts/210))*K;
+  // 2) 십자 빛줄기: 가로·세로 한 줄이 쭉 뻗고 디더링으로 걷혀요
+  const tc=ts/760,cLen=(N*.5)*eo(ts/230),cFade=1-cl((ts-90)/660);
   const rr=RINGS.map(r=>{const k=(ts-r.dl)/r.du;return(k>=0&&k<1)?{k,R:(5+r.rm*eo(k))*K,th:Math.max(1,Math.round(r.th*(1-k)*K+.3)),col:r.col}:null;});
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
    const i=y*N+x,d=D[i],b=BY[(y&3)*4+(x&3)];let c=0;
-   if(gOn&&d<rg){const v=(1-d/rg)*(1-tg)*1.5,l=Math.floor(v*4+b);if(l>0)c=GL[l>4?4:l];if(ts<130&&d<rg*.55)c=WHITE;}
-   if(bOn&&d<rb&&(Math.floor((A[i]+rot)/SEC)&1)){const v=(1-d/rb)*bf;if(v>b*.8+.05)c=v>.5?LIGHT:GOLD;}
-   if(pOn){const ax=Math.abs(x+.5-C);if(ax<pw&&y<C+6*K){if(ax<pw*.4)c=CREAM;else if(ax<pw-1||((x+y)&1))c=b<.5?LIGHT:GOLD;}}
-   for(let j=0;j<rr.length;j++){const r=rr[j];if(r&&Math.abs(d-r.R)<r.th/2+.35){if(r.k<.7||((x+y)&1)===0)c=r.k<.3?CREAM:r.col;}}
+   if(tg<1&&d<rg){const v=(1-d/rg)*(1-tg)*1.15,l=Math.floor(v*4+b);if(l>0)c=GL[l>4?4:l];if(ts<110&&d<rg*.5)c=WHITE;}
+   if(cFade>0){const dx=Math.abs(x+.5-C),dy=Math.abs(y+.5-C);
+    const th=ts<140?1.4:.8;
+    if(dy<th&&dx<cLen&&cFade>b*.9){c=dx<cLen*.25?WHITE:dx<cLen*.6?CREAM:LIGHT;}
+    else if(dx<th*.9&&dy<cLen*.8&&cFade>b*1.1){c=dy<cLen*.2?WHITE:dy<cLen*.55?CREAM:LIGHT;}}
+   for(let j=0;j<rr.length;j++){const r=rr[j];if(r&&Math.abs(d-r.R)<r.th/2+.35){if(r.k<.75||((x+y)&1)===0)c=r.k<.3?CREAM:r.col;}}
    if(c)buf[i]=c;}
   // 불똥(꼬리 한 칸 + 머리 1~2칸)
   for(const p of sparks){const age=ts/1000-p.dl;if(age<=0||age>=p.life)continue;const k=age/p.life;
-   const pos=ag=>{const dd=p.v*(1-Math.exp(-3*ag))/3,gy=34*K*ag*ag;return[C+Math.cos(p.a)*dd,C+Math.sin(p.a)*dd+gy];};
+   const pos=ag=>{const dd=p.v*(1-Math.exp(-3.4*ag))/3.4,gy=26*K*ag*ag;return[C+Math.cos(p.a)*dd,C+Math.sin(p.a)*dd+gy];};
    if(k>.78&&(st&1))continue;
    const[x,y]=pos(age),[x2,y2]=pos(Math.max(0,age-STEP/1000));
    px(x2,y2,k<.5?ORANGE:AMBER);
    const c=k<.25?CREAM:k<.6?LIGHT:k<.85?GOLD:ORANGE,sz=(p.big&&k<.6)?2:1;
    for(let a=0;a<sz;a++)for(let b2=0;b2<sz;b2++)px(x+a,y+b2,c);}
-  // 반짝이 별(1→2→3→3→2→1 칸으로 커졌다 줄어요)
   for(const s of stars){const age=ts/1000-s.dl;if(age<=0||age>=s.life)continue;const k=age/s.life;
-   star(C+s.x,C+s.y-age*10*K,SR[Math.min(SR.length-1,Math.floor(k*SR.length))]+(s.big?2:0));}
-  // 불씨(위로 올라가며 좌우로 한 칸씩 흔들려요)
+   star(C+s.x,C+s.y-age*8*K,SR[Math.min(SR.length-1,Math.floor(k*SR.length))]+(s.big?2:0));}
   for(const e of embers){const age=ts/1000-e.dl;if(age<=0||age>=e.life)continue;const k=age/e.life;if(k>.7&&(st&1))continue;
    const x=e.x+(((st>>1)+e.ph)%3-1),y=e.y-e.v*age;px(x,y,k<.4?LIGHT:GOLD);if(k<.5)px(x,y-1,CREAM);}
   g.putImageData(img,0,0);
-  // 글씨: 0.42초에 위에서 뚝뚝 떨어지며 등장 → 유지 → 마지막에 깜빡
-  if(bg){const t0b=7;if(st<t0b)bC.style.visibility='hidden';
-   else{const drop=[-10,-5,-2,0][Math.min(3,st-t0b)];const blink=ts>=1250&&(st&1);bC.style.visibility=blink?'hidden':'visible';bC.style.transform=`translateY(${drop*BS}px)`;drawBanner(st);}}
+  // 글씨: 0.1초 뒤 가운데에서 양옆으로 0.3초간 열림 → 유지 → 1.05초부터 디더링으로 스르르 사라짐
+  if(bg){if(ts<100)bC.style.visibility='hidden';
+   else{clipH=(bw/2+1)*eo((ts-100)/300);fade=cl((ts-1050)/330);bC.style.visibility=fade>=1?'hidden':'visible';drawBanner(ts);}}
  };
  document.body.appendChild(o);
  try{sfx('legend');}catch(e){}
