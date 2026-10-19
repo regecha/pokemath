@@ -1723,6 +1723,32 @@ html.lowfx .unit.frozen .sp img{filter:sepia(.55) hue-rotate(168deg) saturate(1.
 .lgFx canvas{position:absolute;display:block;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated}
 .lgFx canvas.lgBn{will-change:transform}
 @media(prefers-reduced-motion:reduce){.lgFx canvas{display:none}}
+
+/* 카드팩 폭발: 화면 크기 사각형을 돌리지 않고, 둥글게 번지는 빛살만 따로 그려요 */
+.packExplosion,.packExplosion.hero,.packExplosion.legend{background:none!important;animation:none!important}
+.packExplosion u{position:absolute;left:50%;top:47%;display:block;width:min(150vw,820px);height:min(150vw,820px);border-radius:50%;text-decoration:none;
+ background:repeating-conic-gradient(from 0deg,rgba(255,255,255,0) 0deg 5deg,rgba(255,255,255,.5) 5.5deg 6.5deg,rgba(255,255,255,0) 7deg 13deg);
+ -webkit-mask-image:radial-gradient(circle closest-side,#000 0,rgba(0,0,0,.55) 42%,transparent 100%);mask-image:radial-gradient(circle closest-side,#000 0,rgba(0,0,0,.55) 42%,transparent 100%);
+ animation:bxRay 1.15s cubic-bezier(.12,.72,.16,1) both}
+.packExplosion.hero u{background:repeating-conic-gradient(from 0deg,rgba(255,150,230,0) 0deg 5deg,rgba(255,170,240,.55) 5.5deg 6.8deg,rgba(150,200,255,0) 7.2deg 13deg)}
+.packExplosion.legend u{background:repeating-conic-gradient(from 0deg,rgba(255,190,40,0) 0deg 5deg,rgba(255,204,64,.7) 5.5deg 7.2deg,rgba(255,190,40,0) 7.6deg 13deg)}
+@keyframes bxRay{0%{opacity:0;transform:translate(-50%,-50%) rotate(-18deg) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) rotate(22deg) scale(1)}}
+html.lowfx .packExplosion u{display:none}
+/* 카드팩 여러 개 열기: 카드가 많으면 위아래로 스크롤 */
+#pack.multi{overflow-y:auto;overflow-x:hidden;justify-content:flex-start;padding:14px 0 30px;-webkit-overflow-scrolling:touch}
+#pack.multi>*{flex-shrink:0}
+#pack.multi .pkRow{max-width:900px}
+#pack.multi .pkRow .flip{width:clamp(66px,17vw,112px);animation-duration:.45s;animation-delay:calc(min(var(--i,0),16)*45ms)}
+.pkSum{font-size:14px;line-height:1.5;text-align:center;color:#fff;text-shadow:0 2px 0 #101333;padding:8px 14px;border-radius:14px;background:rgba(10,12,40,.5);max-width:92vw}
+.pkSum b{color:#ffe27a}
+.mini{position:absolute;inset:0;border-radius:10px;border:3px solid var(--bc,#9aa5b8);background:linear-gradient(165deg,#fff 20%,var(--bg,#eef1f7));display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:11px 2px 3px;overflow:hidden;color:#3a2e3f;font-weight:800;box-shadow:0 4px 10px rgba(0,0,0,.35)}
+.mini.r3{--bc:#4d9cff;--bg:#dcecff}.mini.r2{--bc:#4fc27a;--bg:#e0f6e8}.mini.r4{--bc:#b46bff;--bg:#f0e0ff;box-shadow:0 0 12px 3px rgba(190,120,255,.85)}.mini.r5{--bc:#ffbe28;--bg:#fff3c4;box-shadow:0 0 14px 4px rgba(255,190,40,.95)}
+.mini .mi{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.mini .mi img{max-width:92%;max-height:100%;object-fit:contain}
+.mini .mn{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;line-height:1.2}
+.mini .ms{font-size:8px;line-height:1;color:#e59a00;letter-spacing:-1px}
+.mini .mt{position:absolute;top:0;left:0;right:0;text-align:center;font-size:8.5px;line-height:13px;color:#fff;background:#ff5a5f;white-space:nowrap}
+.mini .mt.sh{background:#9a6bff}.mini .mt.dp{background:#7a86a8}.mini .mt.dn{background:#ffb321}
 </style>
 </head>
 <body>
@@ -2867,7 +2893,7 @@ async function showTrainResult(res,gh,rw){const m=S.meta;S.screen='result';sfx('
   ${ns.length?`<h3>새로 별을 얻었어요</h3><div class=skList>${ns.map(id=>`<div class=skRow><span class=sn>${esc(SKM[id].n)}</span>${starsHTML(m.sk[id].st)}</div>`).join('')}</div>`:''}
   ${nb.length?`<h3>단원 배지!</h3>${nb.map(k=>{const[s,u]=k.split('|');return `<div class=skRow>${I('medal','uBadge')}<span class=sn>${semName(s)} ${u}단원 「${esc(UNITS[s][u-1])}」 배지 — 카드팩 +1</span></div>`;}).join('')}`:''}
   <div class=mbtns><button class="btn gold big" id=rHub>트레이너 방으로</button>${m.packs>0?`<button class="btn red big" id=rPack>${I('ball')} 카드팩 열기</button>`:''}${featOn('endless')||rw.endless?`<button class="btn purple big" id=rMore>${I('flame')} 계속 공부하기</button>`:''}</div></div></div>`;
- $('#rHub').onclick=()=>{sfx('tap');renderHub();};if($('#rPack'))$('#rPack').onclick=()=>{sfx('tap');openPack();};if($('#rMore'))$('#rMore').onclick=()=>{sfx('tap');startTraining({endless:true});};
+ $('#rHub').onclick=()=>{sfx('tap');renderHub();};if($('#rPack'))$('#rPack').onclick=()=>{sfx('tap');packTile();};if($('#rMore'))$('#rMore').onclick=()=>{sfx('tap');startTraining({endless:true});};
  if(S.lvUp){await wait(500);levelUpFx();}
  if(nb.length){await wait(300);banner('단원 배지!',`${nb.length}개 얻었어요`);}}
 function levelUpFx(){const L=lvOf(S.meta.xp);const gp=Math.max(1,S.lvUp||1)+(S.lvBonus||0);sfx('level');confetti(60);banner('레벨 업!',`Lv.${L.lv} ${L.title} · 레벨 포인트 +${gp}`);S.lvUp=0;S.lvBonus=0;
@@ -3045,26 +3071,33 @@ function rollPack(){const p=S.meta.pity;const out=[];
  if(p.p4>=10){out[3]=rpick(poolOf(4));p.p4=0;}
  if(p.p5>=40){out[4]=rpick(poolOf(5));p.p5=0;}
  return out.sort((a,b)=>MON[a].rar-MON[b].rar);}
-async function openPack(){const m=S.meta;if(m.packs<=0){toast('카드팩이 없어요. 오늘의 훈련을 하면 받을 수 있어요!');return;}
- m.packs--;m.stats.opened++;const raw=rollPack();const res=raw.map(id=>gainCard(id));const cards=res.map(g=>g.id);
+async function openPack(n){const m=S.meta;if(m.packs<=0){toast('카드팩이 없어요. 오늘의 훈련을 하면 받을 수 있어요!');return;}
+ n=Math.max(1,Math.min(+n||1,m.packs,20));const multi=n>1;
+ m.packs-=n;m.stats.opened+=n;const res=[];for(let b=0;b<n;b++)rollPack().forEach(id=>res.push(gainCard(id)));if(multi)res.sort((a,b)=>MON[a.id].rar-MON[b.id].rar);const cards=res.map(g=>g.id);
  autoSave();
  cards.forEach(id=>{const im=new Image();im.src=spriteURL(id);});
  const P=$('#pack');const top=Math.max(...cards.map(id=>MON[id].rar));
- P.innerHTML=`<div class=pkInfo id=pkHint>✨ 카드팩을 터치하고 전설의 빛을 깨워 보세요!</div><div class=pkShowcase><div class=pkHalo></div><div class="pkRing a"></div><div class="pkRing b"></div><div class="pkRing c"></div><div class=pkBag id=pkBag><div class=bl></div><div class=packLogo>POKÉMON CARD</div></div></div><button class="btn ghost sm" id=pkSkip>바로 공개하기</button>`;P.classList.add('on');
+ P.classList.toggle('multi',false);P.scrollTop=0;P.innerHTML=`<div class=pkInfo id=pkHint>${multi?`✨ 카드팩 ${n}개! 터치해서 한 번에 열어요!`:'✨ 카드팩을 터치하고 전설의 빛을 깨워 보세요!'}</div><div class=pkShowcase><div class=pkHalo></div><div class="pkRing a"></div><div class="pkRing b"></div><div class="pkRing c"></div><div class=pkBag id=pkBag><div class=bl></div><div class=packLogo>POKÉMON CARD</div></div></div><button class="btn ghost sm" id=pkSkip>바로 공개하기</button>`;P.classList.add('on');
  let opened=false;
  const tag=g=>g.k==='new'?'<span class=newB>NEW!</span>':g.k==='done'?'<span class=newB style="background:#ffb321">조각 완성! NEW</span>':g.k==='shard'?`<span class=newB style="background:#9a6bff">조각 ${g.n}/${g.need}</span>`:`<span class=newB style="background:#7a86a8">+코인 ${g.coin} · 별가루 ${g.dust}</span>`;
+ const mini=(id,g)=>{const t=g.k==='new'?'<b class=mt>NEW!</b>':g.k==='done'?'<b class="mt dn">조각 완성!</b>':g.k==='shard'?`<b class="mt sh">조각 ${g.n}/${g.need}</b>`:'<b class="mt dp">중복 · 코인</b>';return `<div class="mini r${MON[id].rar}">${t}<div class=mi>${monImg(id)}</div><div class=mn>${esc(MON[id].name)}</div><div class=ms>${'★'.repeat(MON[id].rar)}</div></div>`;};
  const face=(id,g)=>g.k==='shard'?`<div class="card r${MON[id].rar} shardCard" data-id="${id}" style="--tc:${TYPE_COL[MON[id].types[0]]};--tc2:#fff"><div class=cTop><span class=cName>${esc(MON[id].name)}</span></div><div class=art>${monImg(id)}<div class=shardMask style="--p:${g.n/g.need}"></div></div><div class=kw style="font-size:12px">조각을 ${g.need}개 모으면<br>내 카드가 돼요!</div><div class=stats><span class=rar>${'★'.repeat(MON[id].rar)}</span></div></div>`:cardHTML(id);
  const reveal=async(all)=>{if(opened)return;opened=true;const bag=$('#pkBag');if(bag){P.classList.add('charging');if(top>=5)P.classList.add('legCharge');bag.classList.add('shake');if(top>=4)bag.classList.add('hard');sfx('shake');const hint=$('#pkHint');if(hint)hint.textContent=top>=5?'🌟 전설의 기운이 폭발 직전…!':top>=4?'🌈 눈부신 희귀 에너지가 모인다…!':'⚡ 카드팩이 강하게 흔들린다…!';if(!all)await wait(top>=5?2850:top>=4?2350:1700);else await wait(420);}
-  if(!S.meta.settings.lowfx){const colors=top>=5?['#fff3b0','#ffd044','#ffb81f','#ffe27a','#ff9f37','#ffd966']:top>=4?['#fff','#ff75c8','#ffdf72','#68f5dc','#78b9ff','#bd8cff']:['#fff','#8ce9ff','#ffe27b','#ff9db8'];const count=top>=5?148:top>=4?118:82;const bits=Array.from({length:count},(_,i)=>{const a=(Math.PI*2*i/count)+(Math.random()-.5)*.24;const d=135+Math.random()*(Math.min(innerWidth,innerHeight)*.68);const x=Math.cos(a)*d,y=Math.sin(a)*d;return `<i style="--x:${x.toFixed(1)}px;--y:${y.toFixed(1)}px;--rot:${Math.round(Math.random()*1080-540)}deg;--delay:${(Math.random()*.2).toFixed(2)}s;--sz:${(5+Math.random()*12).toFixed(1)}px;--pc:${colors[i%colors.length]}"></i>`;}).join('');const fx=document.createElement('div');fx.className=`packExplosion ${top>=5?'legend':top>=4?'hero':''}`;fx.innerHTML='<b class=burstShock></b><b class=burstShock second></b>'+bits;P.appendChild(fx);await wait(all?650:1250);fx.remove();}
-  P.classList.remove('charging','legCharge');
-  P.innerHTML=`${top>=4?`<div class="rays r${top}"></div>`:''}<div class=pkInfo>✨ 카드를 눌러 운명의 카드를 공개하세요!</div><div class=pkRow>${cards.map((id,i)=>`<div class="flip g${MON[id].rar}" style="--i:${i}" data-i="${i}"><div class=in><div class=bk></div><div class=fc>${tag(res[i])}${face(id,res[i])}</div></div></div>`).join('')}</div><div class=mbtns><button class="btn gold" id=pkAll>✨ 모두 뒤집기</button><button class="btn green hidden" id=pkDone>다 봤어요!</button></div><div class=pkInfo style="font-size:13px">희귀 이상 포켓몬은 조각으로 나와요 · 이미 있는 카드는 코인·별가루로 바뀌어요</div>`;
-  let left=5;const flipOne=async(f)=>{if(f.classList.contains('open'))return;f.classList.add('open');left--;const i=+f.dataset.i,id=cards[i],r=MON[id].rar,g=res[i];
-   if(g.k==='done'){sfx('evolve');confetti(50);banner('조각 완성!',`${esc(MON[id].name)} 카드를 얻었어요`);}
+  if(!S.meta.settings.lowfx){const colors=top>=5?['#fff3b0','#ffd044','#ffb81f','#ffe27a','#ff9f37','#ffd966']:top>=4?['#fff','#ff75c8','#ffdf72','#68f5dc','#78b9ff','#bd8cff']:['#fff','#8ce9ff','#ffe27b','#ff9db8'];const count=top>=5?148:top>=4?118:82;const bits=Array.from({length:count},(_,i)=>{const a=(Math.PI*2*i/count)+(Math.random()-.5)*.24;const d=135+Math.random()*(Math.min(innerWidth,innerHeight)*.68);const x=Math.cos(a)*d,y=Math.sin(a)*d;return `<i style="--x:${x.toFixed(1)}px;--y:${y.toFixed(1)}px;--rot:${Math.round(Math.random()*1080-540)}deg;--delay:${(Math.random()*.2).toFixed(2)}s;--sz:${(5+Math.random()*12).toFixed(1)}px;--pc:${colors[i%colors.length]}"></i>`;}).join('');const fx=document.createElement('div');fx.className=`packExplosion ${top>=5?'legend':top>=4?'hero':''}`;fx.innerHTML='<u></u><b class=burstShock></b><b class=burstShock second></b>'+bits;P.appendChild(fx);await wait(all?650:1250);fx.remove();}
+  P.classList.remove('charging','legCharge');if(multi)P.classList.add('multi');
+  P.innerHTML=`${top>=4?`<div class="rays r${top}"></div>`:''}<div class=pkInfo>${multi?`✨ 카드 ${cards.length}장! 눌러서 공개하세요`:'✨ 카드를 눌러 운명의 카드를 공개하세요!'}</div><div class=pkRow>${cards.map((id,i)=>`<div class="flip g${MON[id].rar}" style="--i:${i}" data-i="${i}"><div class=in><div class=bk></div><div class=fc>${multi?mini(id,res[i]):tag(res[i])+face(id,res[i])}</div></div></div>`).join('')}</div><div class="pkSum hidden" id=pkSum></div><div class=mbtns><button class="btn gold" id=pkAll>✨ 모두 뒤집기</button><button class="btn green hidden" id=pkDone>다 봤어요!</button></div><div class=pkInfo style="font-size:13px">희귀 이상 포켓몬은 조각으로 나와요 · 이미 있는 카드는 코인·별가루로 바뀌어요</div>`;
+  let left=cards.length;const flipOne=async(f,quiet)=>{if(f.classList.contains('open'))return;f.classList.add('open');left--;const i=+f.dataset.i,id=cards[i],r=MON[id].rar,g=res[i];
+   if(quiet){sfx(r>=4?'rare':'flip');}
+   else if(g.k==='done'){sfx('evolve');confetti(50);banner('조각 완성!',`${esc(MON[id].name)} 카드를 얻었어요`);}
    else if(r>=4){sfx('rare');confetti(r===5?52:32);if(r===5)banner('황금 전설!',esc(MON[id].name));else banner('무지개 레어!',esc(MON[id].name));}else sfx('flip');
-   if(!left){$('#pkAll').classList.add('hidden');$('#pkDone').classList.remove('hidden');}};
+   if(multi&&!quiet&&r>=4)try{f.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}
+   if(!left){$('#pkAll').classList.add('hidden');$('#pkDone').classList.remove('hidden');if(multi)pkSummary();}};
+  const pkSummary=()=>{let nw=0,sh=0,coin=0,dust=0,dn=0;res.forEach(g=>{if(g.k==='new')nw++;else if(g.k==='done')dn++;else if(g.k==='shard')sh++;else{coin+=g.coin||0;dust+=g.dust||0;}});const bt=cards.reduce((a,id)=>MON[id].rar>MON[a].rar?id:a,cards[0]);
+   const el=$('#pkSum');if(!el)return;el.innerHTML=`<b>${cards.length}장 결과</b><br>NEW <b>${nw+dn}</b> · 조각 <b>${sh}</b>${coin||dust?` · 중복 코인 <b>+${coin}</b> · 별가루 <b>+${dust}</b>`:''}<br>가장 귀한 카드: <b>${esc(MON[bt].name)}</b> ${'★'.repeat(MON[bt].rar)}`;el.classList.remove('hidden');try{el.scrollIntoView({block:'nearest',behavior:'smooth'});}catch(e){}};
   P.querySelectorAll('.flip').forEach(f=>f.onclick=()=>flipOne(f));
-  $('#pkAll').onclick=async()=>{const waiting=[...P.querySelectorAll('.flip:not(.open)')];for(const f of waiting){flipOne(f);await wait(520);}};
-  $('#pkDone').onclick=()=>{P.classList.remove('on');P.innerHTML='';afterPack();};
+  $('#pkAll').onclick=async()=>{const waiting=[...P.querySelectorAll('.flip:not(.open)')];for(const f of waiting){flipOne(f,multi);await wait(multi?110:520);}
+   if(multi){const bi=cards.reduce((a,id,i)=>MON[id].rar>=MON[cards[a]].rar?i:a,0),br=MON[cards[bi]].rar;if(br>=4){confetti(br===5?52:32);banner(br===5?'황금 전설!':'무지개 레어!',esc(MON[cards[bi]].name));}}};
+  $('#pkDone').onclick=()=>{P.classList.remove('on','multi');P.innerHTML='';afterPack();};
   if(all)$('#pkAll').click();};
  $('#pkBag').onclick=()=>reveal(false);$('#pkSkip').onclick=()=>reveal(true);}
 function afterPack(){featTick();if(S.screen==='dex')renderDex();else renderHub();}
@@ -3474,10 +3507,10 @@ async function legendFx(P,slot,name){
   const w=x1-x0+1,h=y1-y0+1,m=new Uint8Array(w*h);
   for(let y=0;y<h;y++)for(let x=0;x<w;x++)m[y*w+x]=d[((y+y0)*w0+(x+x0))*4+3]>130?1:0;
   return{m,w,h};};
- const BS=VW()<340?2:3,nm=String(name||'');
+ const BS=VW()<700?2:3,nm=String(name||'');
  const maxW=Math.floor(Math.min(VW(),420)*.92/BS)-6;
- let npx=15;let nmk=maskOf(nm,npx,900);while(nmk.w>maxW&&npx>9){npx--;nmk=maskOf(nm,npx,900);}
- const lbk=maskOf('전설!',12,800);
+ let npx=14;let nmk=maskOf(nm,npx,900);while(nmk.w>maxW&&npx>9){npx--;nmk=maskOf(nm,npx,900);}
+ const lbk=maskOf('전설!',11,800);
  const LN=7,LG=4; // 라벨 양옆 가는 선 길이·간격
  const lbH=Math.max(lbk.h,5),gap=4,lbRowW=lbk.w+2*(LN+LG);
  const bw=Math.max(nmk.w,lbRowW)+6,bh=lbH+gap+nmk.h+6;
@@ -4871,7 +4904,11 @@ function featCelebrate(list){const f=list.shift();if(!f){if(S.screen==='hub')ren
  u.querySelector('.uIc .ic').style.cssText='width:120px;height:120px';
  $('#unOk').onclick=()=>{sfx('tap');u.classList.remove('on');featCelebrate(list);};}
 const NAV={card:()=>renderCardScreen(),season:()=>renderSeason(),endless:()=>startTraining({endless:true}),pvp:()=>renderPvp(),bosscoop:()=>renderBossCoop(),ach:()=>renderAch(),pack:()=>packTile(),dex:()=>renderDex(),league:()=>renderLeague(),grow:()=>renderGrowth(),map:()=>renderMap(),deck:()=>renderDeck()};
-function packTile(){const m=S.meta;if(m.packs>0)return openPack();
+function packCountMenu(){const m=S.meta,cap=20,ks=[1,5,10,20].filter(k=>k<=m.packs);if(m.packs<=cap&&ks.indexOf(m.packs)<0)ks.push(m.packs);ks.sort((a,b)=>a-b);
+ const lab=k=>k===m.packs&&k>1?`모두 열기 (${k}개)`:`${k}개 열기`;
+ const acts={x:()=>closeM(),_close:()=>closeM()};ks.forEach(k=>acts['o'+k]=()=>{closeM();openPack(k);});
+ M(`<h2>${I('ball')} 카드팩 열기</h2><p class=mut style="font-size:13px;text-align:center">카드팩이 <b>${m.packs}개</b> 있어요. 몇 개를 열까요?${m.packs>cap?`<br>한 번에 최대 ${cap}개까지 열 수 있어요.`:''}</p><div class=mbtns style="flex-direction:column;align-items:stretch">${ks.map(k=>`<button class="btn ${k===m.packs&&k>1?'red':'gold'} big" data-a="o${k}">${lab(k)}</button>`).join('')}<button class="btn ghost" data-a=x>닫기</button></div>`,acts);}
+function packTile(){const m=S.meta;if(m.packs>1)return packCountMenu();if(m.packs>0)return openPack();
  if(m.coins>=100){confirmBox(`카드팩이 없어요. 코인 100개로 카드팩 1개를 살까요?<br><span class=mut>지금 코인 ${m.coins}개</span>`,'사기','아니요').then(y=>{if(y){m.coins-=100;m.packs++;sfx('coin');autoSave();openPack();}});return;}
  toast('카드팩이 없어요. 오늘의 훈련을 하거나 코인 100개를 모으면 받을 수 있어요!');}
 
