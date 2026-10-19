@@ -3431,7 +3431,7 @@ function targetsFor(si){const r={units:[],hero:false};if(si<0||!B||B.side!=='me'
 
 // ===== 전설 포켓몬 출전 연출 (도트 · 낮은 해상도 캔버스 한 장을 16프레임으로 끊어서, 포켓몬 주변에서만) =====
 // 절제한 도트 연출: 번쩍임 → 십자 빛줄기 → 도트 충격파 → 불똥, 글씨는 모던 고딕을 도트로 또렷하게 찍어요.
-// 글씨는 가운데에서 양옆으로 열리며 나타나고, 끝날 때는 디더링으로 스르르 사라져요.
+// 글씨는 이펙트와 함께 가운데에서 양옆으로 열리며 나타나고, 이펙트가 걷힐 때 같이 디더링으로 사라져요.
 // 효과음은 sfx('legend')(사각파 칩튠). 연출은 Math.random만 써서 친구 대전의 씨앗 난수는 건드리지 않아요.
 async function legendFx(P,slot,name){
  if(window.__sim)return;
@@ -3453,13 +3453,13 @@ async function legendFx(P,slot,name){
  const D=new Float32Array(N*N);
  for(let y=0;y<N;y++)for(let x=0;x<N;x++){D[y*N+x]=Math.hypot(x+.5-C,y+.5-C);}
  const BY=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>(v+.5)/16); // 4×4 디더 무늬
- const STEP=1000/16,T=1450;
+ const STEP=1000/16,T=1060;
  const px=(x,y,c)=>{x=Math.round(x);y=Math.round(y);if(x>=0&&y>=0&&x<N&&y<N)buf[y*N+x]=c;};
  const star=(x,y,r)=>{x=Math.round(x);y=Math.round(y);px(x,y,WHITE);for(let i=1;i<=r;i++){const c=i===r?GOLD:LIGHT;px(x+i,y,c);px(x-i,y,c);px(x,y+i,c);px(x,y-i,c);}};
  // 입자는 적게, 대신 또렷하게
- const sparks=Array.from({length:low?8:18},()=>({a:R(0,Math.PI*2),v:R(40,92)*K,life:R(.5,.95),dl:R(0,.08),big:Math.random()<.3}));
+ const sparks=Array.from({length:low?8:18},()=>({a:R(0,Math.PI*2),v:R(40,92)*K,life:R(.45,.8),dl:R(0,.06),big:Math.random()<.3}));
  const stars=Array.from({length:low?2:4},(_,i)=>{const a=R(0,Math.PI*2),d=R(18,44)*K;return{x:Math.cos(a)*d,y:Math.sin(a)*d,dl:R(.08,.5),life:R(.4,.7),big:i<1};});
- const embers=Array.from({length:low?3:8},()=>({x:C+R(-20,20)*K,y:C+R(8,24)*K,v:R(16,38)*K,dl:R(.15,.65),life:R(.6,1),ph:Math.floor(R(0,3))}));
+ const embers=Array.from({length:low?3:8},()=>({x:C+R(-20,20)*K,y:C+R(8,24)*K,v:R(16,38)*K,dl:R(.05,.3),life:R(.45,.7),ph:Math.floor(R(0,3))}));
  const SR=[1,2,3,2,1];
  const RINGS=[{dl:0,du:600,rm:52,th:2,col:GOLD},{dl:110,du:640,rm:60,th:1,col:CREAM}];
  // ---------- 도트 글씨: 모던 고딕(굵게)을 작은 캔버스에 써서 1비트로 잘라 칸으로 찍어요 ----------
@@ -3476,9 +3476,9 @@ async function legendFx(P,slot,name){
   return{m,w,h};};
  const BS=VW()<340?2:3,nm=String(name||'');
  const maxW=Math.floor(Math.min(VW(),420)*.92/BS)-6;
- let npx=21;let nmk=maskOf(nm,npx,900);while(nmk.w>maxW&&npx>9){npx--;nmk=maskOf(nm,npx,900);}
- const lbk=maskOf('전설 등장',13,800);
- const LN=9,LG=4; // 라벨 양옆 가는 선 길이·간격
+ let npx=15;let nmk=maskOf(nm,npx,900);while(nmk.w>maxW&&npx>9){npx--;nmk=maskOf(nm,npx,900);}
+ const lbk=maskOf('전설!',12,800);
+ const LN=7,LG=4; // 라벨 양옆 가는 선 길이·간격
  const lbH=Math.max(lbk.h,5),gap=4,lbRowW=lbk.w+2*(LN+LG);
  const bw=Math.max(nmk.w,lbRowW)+6,bh=lbH+gap+nmk.h+6;
  const bC=document.createElement('canvas');bC.width=bw;bC.height=bh;
@@ -3497,7 +3497,7 @@ async function legendFx(P,slot,name){
   const lx=Math.round((bw-lbk.w)/2),ly=3+Math.round((lbH-lbk.h)/2),my=3+Math.floor(lbH/2);
   bText(lbk,lx,ly,null,true);
   for(let i=0;i<LN;i++){const c=i<3?CREAM:i<6?LIGHT:GOLD;bpx(lx-LG-1-i,my,c);bpx(lx+lbk.w+LG+i,my,c);bpx(lx-LG-1-i,my+1,DARK);bpx(lx+lbk.w+LG+i,my+1,DARK);}
-  const sh=ts>=560&&ts<880?(ts-560)*(nmk.w+10)/320-5:null;
+  const sh=ts>=220&&ts<520?(ts-220)*(nmk.w+10)/300-5:null;
   bText(nmk,Math.round((bw-nmk.w)/2),3+lbH+gap,sh);
   bg.putImageData(bImg,0,0);};
  // ---------- 한 칸 그리기 ----------
@@ -3529,9 +3529,9 @@ async function legendFx(P,slot,name){
   for(const e of embers){const age=ts/1000-e.dl;if(age<=0||age>=e.life)continue;const k=age/e.life;if(k>.7&&(st&1))continue;
    const x=e.x+(((st>>1)+e.ph)%3-1),y=e.y-e.v*age;px(x,y,k<.4?LIGHT:GOLD);if(k<.5)px(x,y-1,CREAM);}
   g.putImageData(img,0,0);
-  // 글씨: 0.1초 뒤 가운데에서 양옆으로 0.3초간 열림 → 유지 → 1.05초부터 디더링으로 스르르 사라짐
-  if(bg){if(ts<100)bC.style.visibility='hidden';
-   else{clipH=(bw/2+1)*eo((ts-100)/300);fade=cl((ts-1050)/330);bC.style.visibility=fade>=1?'hidden':'visible';drawBanner(ts);}}
+  // 글씨: 번쩍임과 함께 가운데에서 양옆으로 열림 → 이펙트가 걷힐 때 같이 디더링으로 사라짐
+  if(bg){if(ts<50)bC.style.visibility='hidden';
+   else{clipH=(bw/2+1)*eo((ts-50)/230);fade=cl((ts-680)/330);bC.style.visibility=fade>=1?'hidden':'visible';drawBanner(ts);}}
  };
  document.body.appendChild(o);
  try{sfx('legend');}catch(e){}
