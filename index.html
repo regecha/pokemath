@@ -1585,6 +1585,10 @@ html.lowfx .unit.frozen .sp img{filter:sepia(.55) hue-rotate(168deg) saturate(1.
 /* 표시가 뜨는 포켓몬은 특성 아이콘을 표시 줄 아래로 내려서 겹치지 않게 */
 #foeLane .unit:has(.tbadge) .kwI{top:9px!important}
 
+#myLane.fitSp .slot,#foeLane.fitSp .slot{height:var(--slotH)!important;min-height:0!important;max-height:var(--slotH)!important;aspect-ratio:auto!important}
+#myLane.fitSp .unit .sp,#foeLane.fitSp .unit .sp{flex:0 0 var(--spH)!important;height:var(--spH)!important;min-height:0!important;max-height:var(--spH)!important}
+#myLane.fitSp .unit .sp img,#foeLane.fitSp .unit .sp img{height:100%;width:auto;max-width:100%;min-width:0;min-height:0;aspect-ratio:auto;object-fit:contain}
+
 .rl-nmimg{display:inline-flex;align-items:center;gap:2px;vertical-align:middle;background:#fff;border:2px solid #b8c8ff;border-radius:12px;padding:0 8px 0 2px;margin:0 2px;line-height:1}
 .rl-nmimg>img{width:40px;height:40px;object-fit:contain;image-rendering:pixelated}
 .rl-nmimg>b{font-family:'Jua',sans-serif;font-weight:400;color:#1d2b5a}
@@ -3180,7 +3184,15 @@ function fitHandCrowd(){try{const h=document.querySelector('#battle .hand');if(!
  if(n>=5&&each<base-2)h.classList.add('crowd');}catch(e){}}
 addEventListener('resize',()=>{try{fitHandCrowd();}catch(e){}});
 // 포켓몬 이름이 칸보다 길면 글자를 조금씩 줄여서 '…'으로 잘리지 않게 해요 (화면 크기가 달라도 6글자 이름까지 다 보여요)
-function fitUnitNames(){try{document.querySelectorAll('#battle .unit .un').forEach(e=>{if(e.style.fontSize)e.style.fontSize='';let fs=parseFloat(getComputedStyle(e).fontSize)||12,n=0;while(e.scrollWidth>e.clientWidth+0.5&&fs>6&&n<16){fs-=.5;e.style.fontSize=fs+'px';n++;}});}catch(e){}}
+// 화면(특히 야생 전투)이 낮아서 포켓몬 칸이 줄어들면, 그림 크기를 줄여서 이름·공격/체력이 트레이너 칸에 가려지지 않게 해요
+function fitLaneSprites(){try{['#myLane','#foeLane:not(.wildLane)'].forEach(sel=>{const lane=document.querySelector('#battle '+sel);if(!lane)return;
+ lane.classList.remove('fitSp');lane.style.removeProperty('--spH');lane.style.removeProperty('--slotH');
+ const cs=getComputedStyle(lane),L=lane.clientHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0);if(L<40)return;
+ let need=null;
+ lane.querySelectorAll('.slot').forEach(sl=>{const u=sl.querySelector('.unit'),sp=u&&u.querySelector('.sp'),un=u&&u.querySelector('.un'),us=u&&u.querySelector('.us');if(!sp||!un||!us)return;
+  if(sl.offsetHeight<=L+2)return;const below=us.getBoundingClientRect().bottom-un.getBoundingClientRect().top;const room=L-below-12;need=need===null?room:Math.min(need,room);});
+ if(need!==null){lane.style.setProperty('--slotH',Math.floor(L)+'px');lane.style.setProperty('--spH',Math.max(30,Math.floor(need))+'px');lane.classList.add('fitSp');}});}catch(e){}}
+function fitUnitNames(){fitLaneSprites();try{document.querySelectorAll('#battle .unit .un').forEach(e=>{if(e.style.fontSize)e.style.fontSize='';let fs=parseFloat(getComputedStyle(e).fontSize)||12,n=0;while(e.scrollWidth>e.clientWidth+0.5&&fs>6&&n<16){fs-=.5;e.style.fontSize=fs+'px';n++;}});}catch(e){}}
 (function(){let q=0;const go=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;fitUnitNames();});};
  const start=()=>{const b=document.getElementById('battle');if(!b)return;new MutationObserver(go).observe(b,{childList:true,subtree:true});};
  if(document.readyState==='loading')addEventListener('DOMContentLoaded',start);else start();
