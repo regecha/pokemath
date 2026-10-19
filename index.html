@@ -3649,80 +3649,147 @@ async function emberHit(O,leg,src){const t=O.board.map((x,i)=>x?i:-1).filter(i=>
 function fairyHit(O,leg){const pool=O.board.map((x,i)=>x?i:-1).filter(i=>i>=0);if(!pool.length)return;if(leg&&pool.length===1){weakenAtk(O,pool[0],'fai','✨ 요정의 빛! 공격 -2',3,2);sfx('heal');return;}const n=leg?Math.min(2,pool.length):1;for(let k=0;k<n;k++){const j=Math.floor(brand()*pool.length);const ti=pool.splice(j,1)[0];weakenAtk(O,ti,'fai','✨ 요정의 빛! 공격 -1');}sfx('heal');}
 function poisonHit(D,i,leg){weakenAtk(D,i,'psn',leg?'☠ 독! 공격 -2':'☠ 독! 공격 -1',leg?4:3,leg?2:1);}
 
-// ===== 돌 카드 사용 연출 (도트) · 전체화면 대신 해당 진영/포켓몬 위에서만 짧게 보여요. PXF 캔버스 한 장에 그려서 가벼워요. =====
+// ===== 돌 카드 사용 연출 (도트) · 해당 진영/포켓몬 위에서만 짧게 보여요. PXF 캔버스 한 장에 그려서 가벼워요. =====
 function stLane(P){return document.querySelector('#'+(P===B.me?'myLane':'foeLane'));}
-function stFxBase(P,hit){ // 진영 영역과 도트 격자 좌표
+function stFxBase(P){
  const el=stLane(P);const r=el?zRect(el):{left:VW()*.1,top:VH()*.4,width:VW()*.8,height:VH()*.2};
  return{l:r.left,t:r.top,w:r.width,h:r.height,cx:r.left+r.width/2,cy:r.top+r.height/2};}
-function stFlashEl(el,filt){try{if(el&&el.animate)el.animate([{filter:'none'},{filter:filt,offset:.3},{filter:'none'}],{duration:420,easing:'ease-out'});}catch(e){}}
-const ST_FIRE={c:'#ffd45c',c2:'#ff7a1c',w:'#fff6c0'},ST_FIRE2={c:'#ff7a1c',c2:'#c8261a',w:'#ffd45c'};
-function stoneFxFire(foe){const S=PXF.S(),b=stFxBase(foe),P=PXF.P,hmax=Math.max(6,Math.min(22,b.h/S/2*1.05));
- const x0=b.l/S,x1=(b.l+b.w)/S,yb=(b.t+b.h)/S-1,DUR=880;
- PXF.add(0,DUR,b.cx,b.cy,(P_,p,k)=>{const f=PXF.fr(p),env=k<.22?k/.22:k>.72?Math.max(0,(1-k)/.28):1;if(env<=0)return;
-  for(let layer=0;layer<2;layer++){const pal=layer?ST_FIRE:ST_FIRE2,step=layer?5:4,off=layer?2:0;
-   for(let x=x0+off;x<x1;x+=step){const wob=PXF.hz((x*.7|0)+(f>>1)*3+layer*17),h=Math.max(1,Math.round((layer?.35+.4*wob:.55+.45*wob)*hmax*env));
-    PXF.flame(x,yb+(layer?0:1),h,pal);}}
-  // 바닥 불길(타오르는 줄)
-  for(let x=x0;x<x1;x++){const hh=Math.round(2*env*(1+PXF.hz(x+f)));if(hh>0)P.rect(x,yb-hh+1,1,hh,(x+f)%3?'#ff7a1c':'#ffd45c');}});
- // 불씨
- PXF.debris(b.cx,b.t+b.h*.8,{n:14,cols:['#ffd45c','#ff7a1c','#fff6c0'],up:true,sp:150,g:-40,dur:700,sz:2,sx:b.w*.45,stagger:30});
- setTimeout(()=>{try{PXF.flash('#ff7a1c');}catch(e){}},60);}
-function stoneFxWater(me){const S=PXF.S(),P=PXF.P,DUR=900;let n=0;
- me.board.forEach((u,i)=>{if(!u)return;const el=unitEl(me,i);if(!el)return;n++;const r=zRect(el),x=r.left+r.width/2,y=r.top+r.height/2,R=Math.max(7,Math.round(Math.max(r.width,r.height)/S*.5)),d=i*45;
-  PXF.add(d,DUR,x,y,(P_,p,k,gx,gy)=>{const f=PXF.fr(p),grow=k<.18?PXF.ez.out(k/.18):1,pop=k>.82,rr=Math.max(2,Math.round(R*(pop?1+(k-.82)*1.8:grow)));
-   if(pop){const q=(k-.82)/.18;if(q>.7)return;P.ring(gx,gy,rr,(f&1)?'#ffffff':'#bfeaff',1,true);for(let a=0;a<8;a++){const an=a*Math.PI/4+.4;P.px(gx+Math.cos(an)*(rr+q*6),gy+Math.sin(an)*(rr+q*6),'#ffffff');}return;}
-   const wob=(f>>2)&1;P.disc(gx,gy,rr-1,'#bfeaff',true);P.ring(gx,gy,rr,'#4db3ff',1);P.ring(gx,gy,rr-1,'#9ad8ff',1,true);
-   // 하이라이트 + 반짝임
-   P.rect(gx-rr*.55,gy-rr*.45,2,Math.max(2,rr*.35),'#ffffff');P.px(gx-rr*.35,gy-rr*.62,'#ffffff');if(wob)P.px(gx+rr*.45,gy+rr*.5,'#ffffff');});
-  PXF.debris(x,y,{delay:d+DUR*.82,n:5,cols:['#bfeaff','#4db3ff','#ffffff'],sp:90,g:200,dur:380,sz:2});});
+function stFlashEl(el,filt,dur){try{if(el&&el.animate)el.animate([{filter:'none'},{filter:filt,offset:.25},{filter:'none'}],{duration:dur||420,easing:'ease-out'});}catch(e){}}
+function stUnitInfo(el){const r=zRect(el);return{x:r.left+r.width/2,y:r.top+r.height/2,w:r.width,h:r.height};}
+
+// ---------- 화염의 돌: 상대 진영 바닥에서 불길이 솟구쳐 타올라요 ----------
+function stTongue(P,x,yb,H,W,sway,ph,pal){
+ for(let r=0;r<H;r++){const t=r/H,w=W*Math.pow(1-t,.72)*(1+.22*Math.sin(t*5+ph)),cxr=x+Math.sin(ph+r*.3)*sway*t*t*1.4,hw=Math.max(.5,w),y=yb-r;
+  P.rect(cxr-hw,y,hw*2,1,pal.o);
+  if(hw>=1.5&&t<.85)P.rect(cxr-hw*.66,y,hw*1.32,1,pal.m);
+  if(hw>=1.5&&t<.62&&pal.i)P.rect(cxr-hw*.38,y,hw*.76,1,pal.i);
+  if(hw>=1.5&&t<.36&&pal.w)P.rect(cxr-hw*.16,y,Math.max(1,hw*.32),1,pal.w);}}
+function stoneFxFire(foe){const S=PXF.S(),b=stFxBase(foe),P=PXF.P,DUR=900;
+ const x0=b.l/S,x1=(b.l+b.w)/S,yb=Math.round((b.t+b.h)/S)-1,Hm=Math.max(14,Math.min(34,b.h/S*1.1));
+ const LY=[{sp:5,off:0,W:3.6,hs:1,sd:1,pal:{o:'#7a1010',m:'#c8261a',i:'#ff4a1c'}},
+  {sp:4,off:2,W:3,hs:.82,sd:5,pal:{o:'#e03a14',m:'#ff6a1c',i:'#ffb02e',w:'#ffe066'}},
+  {sp:6,off:1,W:2.4,hs:.5,sd:9,pal:{o:'#ff7a1c',m:'#ffb02e',i:'#ffe066',w:'#fff6c0'}}];
+ PXF.add(0,DUR,b.cx,b.cy,(P_,p)=>{const f=PXF.fr(p),a=p.age,out=a>660?Math.max(0,1-(a-660)/240):1;if(out<=0)return;
+  P.rect(x0,yb+1,x1-x0,2,'#4a0808');
+  LY.forEach(l=>{let i=0;for(let x=x0+l.off;x<x1;x+=l.sp,i++){
+   const st=PXF.hz(i*3.7+l.sd)*140,up=Math.min(1,Math.max(0,(a-st)/170)),env=PXF.ez.out(up)*out;if(env<=0)continue;
+   const n=PXF.hz(i*7.3+l.sd*13+(f>>2)*1.9),H=Math.max(3,Math.round(Hm*l.hs*(.5+.65*n)*env));
+   stTongue(P,x,yb,H,l.W*(.8+.4*PXF.hz(i+l.sd)),2.2,f*.2+i*1.3+l.sd,l.pal);}});});
+ // 솟아오르는 불씨
+ PXF.debris(b.cx,b.t+b.h*.85,{n:26,cols:['#ffe066','#ffb02e','#ff6a1c','#fff6c0'],up:true,sp:170,g:-50,dur:760,sz:2,sx:b.w*.46,stagger:22,draw:(x,y,s,c,k)=>{PXF.P.rect(x,y,1,k<.5?2:1,c);}});
+ foe.board.forEach((u,i)=>{if(u){const el=unitEl(foe,i);setTimeout(()=>stFlashEl(el,'brightness(1.5) sepia(.9) saturate(3.5)',560),120);}});}
+
+// ---------- 물의 돌: 맑은 물방울 방어막이 포켓몬을 감쌌다가 퐁 터져요 ----------
+function stBubbleRing(P,cx,cy,Rx,Ry,off,fadeAlt){
+ const N=Math.max(28,Math.ceil(Rx*7));
+ for(let i=0;i<N;i++){if(fadeAlt&&i%2)continue;const a=i/N*Math.PI*2,d=a*180/Math.PI,x=cx+Math.cos(a)*(Rx+off),y=cy+Math.sin(a)*(Ry+off);
+  let c='#5fb8ff';if(d>205&&d<245)c='#ffffff';else if(d>=180&&d<=275)c='#cdf1ff';else if(d>15&&d<75)c='#aee6ff';else if(d>110&&d<170)c='#3a8be0';
+  P.px(x,y,c);if(!off&&d>195&&d<255)P.px(cx+Math.cos(a)*(Rx-1),cy+Math.sin(a)*(Ry-1),'#e4f8ff');}}
+function stoneFxWater(me){const S=PXF.S(),P=PXF.P,DUR=980;let n=0;
+ me.board.forEach((u,i)=>{if(!u)return;const el=unitEl(me,i);if(!el)return;n++;const U=stUnitInfo(el),R=Math.max(9,Math.round(Math.max(U.w,U.h)/S*.47)),d=i*50,POP=730;
+  // 발밑 물결
+  PXF.add(d,420,U.x,U.y+U.h*.36,(P_,p,k,gx,gy)=>{const rx=R*(.5+.7*PXF.ez.out(k)),ry=rx*.28,N=Math.ceil(rx*5);for(let j=0;j<N;j++){if(k>.55&&j%2)continue;const a=j/N*Math.PI*2;P.px(gx+Math.cos(a)*rx,gy+Math.sin(a)*ry,k<.4?'#d8f6ff':'#7fcfff');}});
+  PXF.add(d,DUR,U.x,U.y,(P_,p,k,gx,gy)=>{const a=p.age,f=PXF.fr(p);
+   if(a<POP){const s=a<130?.4+.68*PXF.ez.out(a/130):1.08-.08*Math.min(1,(a-130)/80),w=Math.sin(a*.011);
+    stBubbleRing(P,gx,gy,R*s*(1-.035*w),R*s*(1+.035*w),0,a<130&&(f&1));
+    if(a>140){ // 안쪽 반사광 + 떠오르는 작은 방울
+     for(let t=205;t<=245;t+=8){const an=t*Math.PI/180;P.px(gx+Math.cos(an)*R*.68,gy+Math.sin(an)*R*.68,'#ffffff');}
+     P.px(gx+R*.45,gy+R*.5,'#ffffff');P.px(gx+R*.52,gy+R*.42,'#cdf1ff');
+     for(let j=0;j<3;j++){const ph=((a/760+PXF.hz(j*3.3+i))%1),bx=gx+(PXF.hz(j*1.9+i*2)-.5)*R*1.1,by=gy+R*.55-ph*R*1.1;P.px(bx,by,'#cdf1ff');P.px(bx+1,by,'#7fcfff');P.px(bx,by+1,'#7fcfff');}
+     const sa=Math.floor(a/110),ang=PXF.hz(sa*2.1+i)*Math.PI*2;if((a/110)%1<.6)PXF.spark4(gx+Math.cos(ang)*R*1.02,gy+Math.sin(ang)*R*1.02,1,'#ffffff','#bfeaff');}
+   }else{ // 팡! 물방울이 조각나며 흩어져요
+    const q=(a-POP)/(DUR-POP);if(q>.9)return;const N=Math.ceil(R*6),rr=R+q*R*.9;
+    for(let j=0;j<N;j++){if(j%3===0||(q>.5&&j%2))continue;const an=j/N*Math.PI*2;P.px(gx+Math.cos(an)*rr,gy+Math.sin(an)*rr,q<.3?'#ffffff':'#8fd8ff');}}});
+  PXF.debris(U.x,U.y,{delay:d+POP,n:9,cols:['#ffffff','#bfeaff','#5fb8ff'],sp:95,g:260,dur:420,sz:2,draw:(x,y,s,c)=>{P.rect(x,y,1,2,c);}});});
  if(!n){const b=stFxBase(me);PXF.popRing(b.cx,b.cy,{c:'#bfeaff',c2:'#4db3ff',w:'#fff'},0,10);}}
-function stoneFxThunder(P0,i){const el=unitEl(P0,i);if(!el)return;const S=PXF.S(),P=PXF.P,r=zRect(el),x=r.left+r.width/2,y=r.top+r.height/2,R=Math.max(8,Math.round(Math.max(r.width,r.height)/S*.55));
- const pts=[[x,-8]];let px=x;for(let j=1;j<=8;j++){const t=j/8;px=x+(j===8?0:PXF.hz(j*3.1+x)*44-22)*(1-t*.5);pts.push([px,-8+(y+8)*t]);}
- // 번개: 번쩍 깜빡 ×2
- PXF.add(80,360,x,y,(P_,p,k)=>{const f=PXF.fr(p);if(f%3===1||k>.8)return;const g=pts.map(a=>[a[0]/S,a[1]/S]);
-  for(let j=1;j<g.length;j++)P.line(g[j-1][0],g[j-1][1],g[j][0],g[j][1],'#f7b500',7);
-  for(let j=1;j<g.length;j++)P.line(g[j-1][0],g[j-1][1],g[j][0],g[j][1],'#ffe066',4);
-  for(let j=1;j<g.length;j++)P.line(g[j-1][0],g[j-1][1],g[j][0],g[j][1],'#fffde6',2);});
- setTimeout(()=>{try{PXF.hit(x,y,'#ffe066',9);PXF.shock(x,y,R*S*1.8,'#ffe066',300,0,2);PXF.flash('#fff6a8');PXF.hold(50);stFlashEl(el,'brightness(2.2) saturate(1.4)');}catch(e){}},90);
- // 재행동: 번개 불꽃이 선택한 포켓몬 둘레를 한 바퀴 돌아요
- PXF.add(380,520,x,y,(P_,p,k,gx,gy)=>{const f=PXF.fr(p),rr=R+2,a0=k*Math.PI*2;for(let s=0;s<3;s++){const a=a0+s*Math.PI*2/3;for(let t=0;t<4;t++){const aa=a-t*.18,c=t?'#f7b500':'#fffde6';P.px(gx+Math.cos(aa)*rr,gy+Math.sin(aa)*rr*.9,c);}PXF.spark4(gx+Math.cos(a)*rr,gy+Math.sin(a)*rr*.9,1,'#ffe066','#f7b500');}});
- PXF.debris(x,y,{delay:380,n:8,cols:['#ffe066','#fffde6','#f7b500'],up:true,sp:90,g:-30,dur:520,sz:2,sx:r.width*.4,stagger:25});}
-function stoneFxMoon(foe,i){const el=unitEl(foe,i);if(!el)return;const S=PXF.S(),P=PXF.P,r=zRect(el),x=r.left+r.width/2,y=r.top+r.height/2,R=Math.max(8,Math.round(Math.min(Math.max(r.width,r.height)/S*.5,16))),FALL=300,HOLD=240;
- const crack=[[0,-1],[-.35,-.4],[.1,-.1],[-.2,.35],[.3,.9]];
- PXF.add(0,FALL+HOLD,x,y,(P_,p,k,gx,gy)=>{const a=p.age,f=PXF.fr(p);let oy=0,jit=0;
-  if(a<FALL){const e=PXF.ez.out(a/FALL);oy=-(1-e)*(y*.5/S+10);}else jit=(f&1)?1:-1;
-  const cx=gx+jit,cy=gy+oy,sc=a<FALL?.5+.5*PXF.ez.out(a/FALL):1,rr=Math.max(3,Math.round(R*sc));
-  P.disc(cx,cy,rr+1,'#5c3fa8');P.disc(cx,cy,rr,'#cbbcff');P.disc(cx-1,cy-1,Math.max(1,rr-2),'#efe6ff');
-  if(rr>6){P.disc(cx+rr*.3,cy+rr*.25,Math.max(1,rr*.22),'#a58bff');P.disc(cx-rr*.35,cy+rr*.3,Math.max(1,rr*.16),'#a58bff');}
-  if(a>FALL*.9){const kk=Math.min(1,(a-FALL)/HOLD+.2),L=Math.ceil(kk*(crack.length-1));for(let c=1;c<=L;c++)P.line(cx+crack[c-1][0]*rr,cy+crack[c-1][1]*rr,cx+crack[c][0]*rr,cy+crack[c][1]*rr,'#ffffff',1);}});
- const T=FALL+HOLD;
- PXF.debris(x,y,{delay:T,n:16,cols:['#efe6ff','#cbbcff','#a58bff','#ffffff'],sp:200,g:420,dur:560,sz:3,draw:(a,b,s,c)=>{P.rect(a-s/2,b-s/2,s,Math.max(1,s-1),c);P.px(a+s/2,b+s/2,c);}});
- PXF.shock(x,y,R*S*2.4,'#a58bff',340,T,2);
- PXF.debris(x,y,{delay:T+40,n:8,cols:['#ffffff','#efe6ff'],up:true,sp:80,g:-30,dur:520,sz:2,draw:(a,b,s,c)=>PXF.spark4(a,b,2,c,'#a58bff')});
- setTimeout(()=>{try{PXF.flash('#a58bff');PXF.hold(60);stFlashEl(el,'brightness(1.6) saturate(.4) hue-rotate(40deg)');}catch(e){}},T);}
-function stoneFxSun(me){const S=PXF.S(),P=PXF.P,b=stFxBase(me),sx=b.cx,sy=Math.max(34,b.t-12),DUR=900,R=11;
- const prog=a=>Math.min(1,a/600);
- PXF.add(0,DUR,sx,sy,(P_,p,k,gx,gy)=>{const a=p.age,f=PXF.fr(p);if(k>.86)return;let rr=Math.max(2,Math.round(R*(.25+.75*PXF.ez.out(prog(a))))),pulse=a>600?(f&1):0;rr+=pulse;
-  P.disc(gx,gy,rr+1,'#c8481a');P.disc(gx,gy,rr,'#ff9a2a');P.disc(gx-1,gy-1,Math.max(1,rr-2),'#ffd45c');P.disc(gx-1,gy-1,Math.max(1,rr-5),'#fff3b0');
-  const n=8,len=rr>6?4:2;for(let i=0;i<n;i++){const an=i*Math.PI/4+((f>>1)&1)*Math.PI/8;P.line(gx+Math.cos(an)*(rr+3),gy+Math.sin(an)*(rr+3),gx+Math.cos(an)*(rr+3+len),gy+Math.sin(an)*(rr+3+len),'#ffb703',1);}});
- // 우리 편 진영에서 에너지 알갱이가 해로 모여요
- for(let i=0;i<16;i++){const ex=b.l+b.w*(.05+.9*PXF.hz(i*1.7)),ey=b.t+b.h*(.3+.7*PXF.hz(i*2.9)),d=i*22,L=360;
-  PXF.add(d,L,ex,ey,(P_,p,k)=>{const e=PXF.ez.in(k),gx=(ex+(sx-ex)*e)/S,gy=(ey+(sy-ey)*e)/S,c=['#ffd45c','#ff9a2a','#fff3b0'][i%3];
-   for(let j=1;j<=2;j++){const e2=PXF.ez.in(Math.max(0,k-j*.1));P.px((ex+(sx-ex)*e2)/S,(ey+(sy-ey)*e2)/S,j===1?c:'#ff7a1c');}
-   P.rect(gx-1,gy-1,2,2,'#c8481a');P.px(gx-1,gy-1,c);});}
- PXF.debris(sx,sy,{delay:640,n:10,cols:['#ffd45c','#fff3b0','#ff9a2a'],sp:120,g:60,dur:380,sz:2});
- PXF.shock(sx,sy,60,'#ffd45c',300,640,2);
- setTimeout(()=>{try{PXF.flash('#ffd45c');}catch(e){}},640);
- PXF.popRing(b.cx,b.cy,{c:'#ffd45c',c2:'#ff9a2a',w:'#fff'},700,Math.round(Math.min(18,b.w/S/6)));}
+
+// ---------- 전기의 돌: 가는 푸른 번개가 떨어지고, 전류가 포켓몬 둘레를 한 바퀴 돌아요 ----------
+function stBoltPts(x0,y0,x1,y1,seed){const n=Math.max(5,Math.round(Math.hypot(x1-x0,y1-y0)/6)),pts=[[x0,y0]];
+ for(let i=1;i<n;i++){const t=i/n,jx=(i%2?1:-1)*(1.5+PXF.hz(seed+i*2.3)*4.5)*(1-t*.55);pts.push([x0+(x1-x0)*t+jx,y0+(y1-y0)*t]);}pts.push([x1,y1]);return pts;}
+function stoneFxThunder(P0,i){const el=unitEl(P0,i);if(!el)return;const S=PXF.S(),P=PXF.P,U=stUnitInfo(el),x=U.x,y=U.y,R=Math.max(9,Math.round(Math.max(U.w,U.h)/S*.5)),ty=(y-U.h*.12)/S,gx0=x/S;
+ const seed=Math.random()*50,main=stBoltPts(gx0+(PXF.hz(seed)-.5)*14,-2,gx0,ty,seed);
+ const br=[2,4].map((k,j)=>{const o=main[k],dir=j?1:-1,pts=[o];for(let s=1;s<=4;s++)pts.push([o[0]+dir*s*3+(s%2?1:-1)*PXF.hz(seed+s+j*9),o[1]+s*3.2]);return pts;});
+ const seg=(pts,upto,c,th,ox)=>{for(let s=1;s<=upto&&s<pts.length;s++)P.line(pts[s-1][0]+ox,pts[s-1][1],pts[s][0]+ox,pts[s][1],c,th);};
+ PXF.add(30,340,x,y,(P_,p,k)=>{const a=p.age,f=PXF.fr(p),grow=Math.min(1,a/65),up=Math.max(1,Math.ceil(grow*(main.length-1)));
+  const on=!(f%4===2||k>.82);if(!on)return;const bright=(f&1)===0||a<130;
+  if(bright){seg(main,up,'#3d6fe0',1,-1);seg(main,up,'#3d6fe0',1,1);br.forEach(b=>seg(b,Math.ceil(grow*4),'#6ab0ff',1,0));}
+  seg(main,up,'#bfe0ff',1,0);if(a>20)seg(main.slice(0,up+1),up,'#ffffff',1,0);});
+ // 번개가 닿는 순간
+ setTimeout(()=>{try{PXF.hold(55);PXF.star(x,y,R*S*1.9,{c:'#8fc8ff',c2:'#3d6fe0'},260);stFlashEl(el,'brightness(1.6) saturate(.8) hue-rotate(-15deg)',520);}catch(e){}},95);
+ PXF.shock(x,y,R*S*1.7,'#8fc8ff',300,95,2);
+ PXF.debris(x,y,{delay:95,n:12,cols:['#ffffff','#8fc8ff','#3d6fe0'],sp:190,g:260,dur:480,sz:2,draw:(xx,yy,s,c,k)=>{P.rect(xx,yy,k<.5?2:1,1,c);}});
+ // 전류가 포켓몬 둘레를 한 바퀴
+ const Rr=R+2;
+ PXF.add(330,560,x,y,(P_,p,k,gx,gy)=>{const f=PXF.fr(p),head=-Math.PI/2+k*Math.PI*2.05,jit=(a,j)=>{const jt=(PXF.hz(j*5.1+(f>>1)*2.7)-.5)*2.6;return[gx+Math.cos(a)*(Rr+jt),gy+Math.sin(a)*(Rr*.92+jt)];};
+  if(k<.92)for(let j=0;j<20;j++){if(PXF.hz(j*4.1+f)>.55)continue;const q=jit(j/20*Math.PI*2,j);P.px(q[0],q[1],'#2f5fd0');}
+  [[head,2.6],[head+Math.PI,1.5]].forEach(([h,TL],hi)=>{let prev=null;const st=24;for(let s=0;s<=st;s++){const u=s/st,q=jit(h-TL*(1-u),s+hi*40);if(prev)P.line(prev[0],prev[1],q[0],q[1],u>.85?'#ffffff':u>.55?'#bfe0ff':u>.25?'#6ab0ff':'#2f5fd0',1);prev=q;}
+   const hd=jit(h,99+hi);PXF.spark4(hd[0],hd[1],hi?1:2,'#ffffff','#6ab0ff');});});
+ PXF.shock(x,y,R*S*1.5,'#bfe0ff',260,880,2);}
+
+// ---------- 달의 돌: 작은 초승달이 떨어져 금이 가고 산산이 부서져요 ----------
+let ST_MOON=null;
+function stMoonData(){if(ST_MOON)return ST_MOON;const R=6,bx=R*.62,by=-R*.3,br=R*.83;
+ const inA=(x,y)=>x*x+y*y<=R*R+R*.6,inB=(x,y)=>{const dx=x-bx,dy=y-by;return dx*dx+dy*dy<=br*br;},body=(x,y)=>inA(x,y)&&!inB(x,y);
+ const pix=[],set={};
+ for(let y=-R-1;y<=R+1;y++)for(let x=-R-1;x<=R+1;x++){if(!body(x,y))continue;
+  const outer=[[1,0],[-1,0],[0,1],[0,-1]].some(d=>!inA(x+d[0],y+d[1]));let c;
+  if(outer)c='#4b3aa6';else{const dd=Math.hypot(x-bx,y-by)-br;c=dd<1.6?'#ffffff':dd<3.1?'#efe9ff':dd<4.6?'#cfc3fb':'#a897ee';}
+  const q={x,y,c};pix.push(q);set[x+','+y]=q;}
+ [[-3,2],[-4,-1],[-2,4]].forEach(([x,y])=>{const q=set[x+','+y];if(q&&q.c!=='#4b3aa6')q.c='#9f90e6';});
+ pix.forEach(q=>{const a=Math.atan2(q.y,q.x)+(PXF.hz(q.x*3+q.y*5)-.5)*.7,r=Math.hypot(q.x,q.y);q.ch=((Math.floor((a+Math.PI)/(2*Math.PI)*6)+6)%6)*2+(r>R*.62?1:0);});
+ const cent={};pix.forEach(q=>{const c=cent[q.ch]||(cent[q.ch]={x:0,y:0,n:0});c.x+=q.x;c.y+=q.y;c.n++;});
+ const vel={};Object.keys(cent).forEach(k=>{const c=cent[k],cx=c.x/c.n,cy=c.y/c.n,l=Math.hypot(cx,cy)||1,sp=62+PXF.hz(+k*3.1)*46;vel[k]={vx:cx/l*sp+(PXF.hz(+k)-.5)*20,vy:cy/l*sp-30};});
+ // 금: 바깥 가장자리에서 안쪽으로 지그재그
+ const crack=[];[[-4.9,-3.6],[-5.7,1.2],[-2.9,5.2]].forEach((s0,ci)=>{let x=s0[0],y=s0[1];for(let st=0;st<9;st++){const dx=bx-x,dy=by-y,l=Math.hypot(dx,dy)||1,j=(st%2?1:-1)*(.6+PXF.hz(ci*7+st)*.9);x+=dx/l+(-dy/l)*j;y+=dy/l+(dx/l)*j;const rx=Math.round(x),ry=Math.round(y);if(set[rx+','+ry])crack.push([rx,ry]);else if(st>2)break;}});
+ return ST_MOON={R,pix,vel,crack};}
+function stoneFxMoon(foe,i){const el=unitEl(foe,i);if(!el)return;const S=PXF.S(),P=PXF.P,U=stUnitInfo(el),M=stMoonData(),TF=250,TB=510,x=U.x,y=U.y-U.h*.05;
+ const sx0=30/S,sy0=-70/S;
+ PXF.add(0,TB,x,y,(P_,p,k,gx,gy)=>{const a=p.age,f=PXF.fr(p),e=Math.min(1,a/TF),ee=e*e,ox=(1-ee)*sx0,oy=(1-ee)*sy0;let jx=0,jy=0;
+  if(a>=TF){jx=(f&1)?1:-1;jy=((f>>1)&1)?1:0;}
+  const cx=gx+ox+jx,cy=gy+oy+jy;
+  if(a<TF){for(let j=4;j>=1;j--){const e2=Math.max(0,(a-j*28)/TF),e22=e2*e2;P.px(gx+(1-e22)*sx0,gy+(1-e22)*sy0,['#cbbcff','#a58bff','#7a62d8','#5a46b0'][j-1]);}
+   for(let j=0;j<4;j++){const an=j*Math.PI/2+f*.5;P.px(cx+Math.cos(an)*9,cy+Math.sin(an)*9,'#a58bff');}}
+  else{for(let j=0;j<10;j++){const an=j*Math.PI/5+f*.2;if(j%2)P.px(cx+Math.cos(an)*10,cy+Math.sin(an)*10,'#a58bff');}}
+  const flash=a>=TF&&(f%3===2);M.pix.forEach(q=>P.px(cx+q.x,cy+q.y,flash?'#ffffff':q.c));
+  if(a>=TF){const prog=Math.min(1,(a-TF+40)/(TB-TF-40)),n=Math.ceil(prog*M.crack.length);for(let j=0;j<n;j++)P.px(cx+M.crack[j][0],cy+M.crack[j][1],'#ffffff'),P.px(cx+M.crack[j][0]+1,cy+M.crack[j][1],'#7a62d8');}});
+ // 부서지는 순간: 조각이 사방으로, 번쩍 + 충격 링
+ PXF.add(TB,640,x,y,(P_,p,k,gx,gy)=>{const t=p.age/1000,f=PXF.fr(p),ex=1+t*1.6;if(k>.72&&(f&1))return;M.pix.forEach(q=>{const v=M.vel[q.ch];P.rect(gx+q.x*ex+v.vx*t*.6,gy+q.y*ex+v.vy*t*.6+110*t*t,2,2,k>.6?'#a897ee':q.c);});});
+ PXF.add(TB,120,x,y,(P_,p,k,gx,gy)=>{P.disc(gx,gy,Math.round(M.R*1.3*(1-k*.7)),'#ffffff',k>.4);});
+ PXF.shock(x,y,M.R*S*3.2,'#cbbcff',360,TB,2);PXF.shock(x,y,M.R*S*2,'#ffffff',260,TB+30,2);
+ setTimeout(()=>{try{PXF.hold(80);PXF.star(x,y,M.R*S*3.4,{c:'#efe9ff',c2:'#a58bff'},300);stFlashEl(el,'brightness(1.35) saturate(.5) hue-rotate(35deg)',520);}catch(e){}},TB);
+ PXF.debris(x,y,{delay:TB+20,n:10,cols:['#ffffff','#efe9ff','#cbbcff'],sp:120,g:70,dur:640,sz:2,draw:(xx,yy,s,c)=>PXF.spark4(xx,yy,1+(s>1?1:0),c,'#a58bff')});
+ // 기절한 별이 머리 위를 빙글
+ PXF.add(TB+120,460,x,y,(P_,p,k,gx,gy)=>{if(k>.85)return;for(let j=0;j<3;j++){const a=k*Math.PI*3+j*Math.PI*2/3;PXF.spark4(gx+Math.cos(a)*(U.w/S*.3),gy-U.h/S*.5+Math.sin(a)*2.2,1,j?'#efe9ff':'#ffffff','#a58bff');}});}
+
+// ---------- 태양의 돌: 작은 태양이 우리 진영 위에서 빛을 사방으로 퍼뜨려요 ----------
+function stSunSpr(P,x,y,rr,f,rays){P.disc(x,y,rr+1,'#a8340f');P.disc(x,y,rr,'#ff8a1c');P.disc(x-.5,y-.5,Math.max(1,rr-1),'#ffc034');P.disc(x-1,y-1,Math.max(1,rr-3),'#ffe680');if(rr>=5)P.disc(x-1,y-1,Math.max(1,rr-5),'#fff7c8');
+ if(!rays)return;const ph=((f>>2)&1)*Math.PI/8;for(let i=0;i<8;i++){const a=i*Math.PI/4+ph,L=(i%2?2:3)+((f>>3)&1&&i%2===0?1:0),r0=rr+3;P.line(x+Math.cos(a)*r0,y+Math.sin(a)*r0,x+Math.cos(a)*(r0+L),y+Math.sin(a)*(r0+L),i%2?'#ffb02e':'#ffd24a',1);}}
+function stoneFxSun(me){const S=PXF.S(),P=PXF.P,b=stFxBase(me),sx=b.cx,sy=Math.max(26,b.t-4),R=5,END=900;
+ PXF.add(0,END,sx,sy,(P_,p,k,gx,gy)=>{const a=p.age,f=PXF.fr(p);let rr;if(a<170)rr=Math.round(R*(.3+.95*PXF.ez.out(a/170)));else if(a<250)rr=R+((f>>1)&1?0:0);else if(a<740)rr=R;else rr=Math.round(R*Math.max(0,1-(a-740)/160));
+  if(rr<=0)return;stSunSpr(P,gx,gy,rr,f,a>150&&a<740);});
+ // 퍼져 나가는 빛의 물결
+ for(let i=0;i<4;i++)PXF.add(150+i*130,420,sx,sy,(P_,p,k,gx,gy)=>{const r=Math.round(R+3+26*PXF.ez.out(k));P.ring(gx,gy,r,k<.22?'#ffffff':k<.55?'#ffe680':'#ff9a2a',1,k>.45);});
+ // 사방으로 뻗는 빛줄기
+ for(let i=0;i<16;i++){const an=i/16*Math.PI*2+.2,d=170+PXF.hz(i*2.3)*170,ca=Math.cos(an),sa=Math.sin(an);
+  PXF.add(d,340,sx,sy,(P_,p,k,gx,gy)=>{const e=PXF.ez.out(k),t1=R+6+e*(i%2?30:22),t0=t1-7*(1-k)-2;P.line(gx+ca*t0,gy+sa*t0,gx+ca*t1,gy+sa*t1,k<.55?'#fff3b0':'#ffb02e',1);});}
+ // 우리 포켓몬에게 내려앉는 빛 알갱이
+ const tg=[];me.board.forEach((u,i)=>{if(u){const el=unitEl(me,i);if(el)tg.push(stUnitInfo(el));}});if(!tg.length)for(let j=0;j<4;j++)tg.push({x:b.l+b.w*(.2+.2*j),y:b.cy,w:60,h:60});
+ tg.forEach((t,i)=>{const d=230+i*55,L=420,tx=t.x,ty=t.y-t.h*.2,bow=(i%2?1:-1)*26;
+  PXF.add(d,L,sx,sy,(P_,p,k)=>{const f=PXF.fr(p);const pos=kk=>{const e=PXF.ez.out(Math.max(0,kk));return[(sx+(tx-sx)*e+Math.sin(Math.max(0,kk)*Math.PI)*bow)/S,(sy+(ty-sy)*e)/S];};
+   for(let j=5;j>=1;j--){const q=pos(k-j*.05);P.rect(q[0],q[1],j<3?2:1,j<3?2:1,j<3?'#ffe680':j<5?'#ffb02e':'#ff8a1c');}const h=pos(k);PXF.spark4(h[0],h[1],2+(f&1),'#ffffff','#ffd24a');});
+  PXF.popRing(tx,ty,{c:'#ffe680',c2:'#ffb02e',w:'#ffffff'},d+L-30,7);
+  PXF.debris(tx,t.y,{delay:d+L-20,n:5,cols:['#ffe680','#ffffff','#ffb02e'],up:true,sp:60,g:-30,dur:420,sz:2,draw:(xx,yy,s,c)=>{P.rect(xx-1,yy,3,1,c);P.rect(xx,yy-1,1,3,c);}});});}
+
 async function stoneFx(item,P,target){
  if(window.__sim)return;if(pxFxOff()){await wait(120);return;}
  const enemy=P===B.me?B.foe:B.me;
+ try{PXF.add(0,1,0,0,()=>{});}catch(e){} // 도트 캔버스 크기를 먼저 맞춰 둬요
  try{sfx(({fire:'crit',water:'level',thunder:'crit',moon:'crit',sun:'level'})[item]||'tap');}catch(e){}
  try{
-  if(item==='fire'){stoneFxFire(enemy);try{const bt=$('#battle');if(bt)setTimeout(()=>shakeEl(bt,4),200);}catch(e){}await wait(700);}
-  else if(item==='water'){stoneFxWater(P);await wait(650);}
-  else if(item==='thunder'){stoneFxThunder(P,target);await wait(620);}
-  else if(item==='moon'){stoneFxMoon(enemy,target);await wait(760);}
+  if(item==='fire'){stoneFxFire(enemy);try{const bt=$('#battle');if(bt)setTimeout(()=>shakeEl(bt,4),200);}catch(e){}await wait(720);}
+  else if(item==='water'){stoneFxWater(P);await wait(640);}
+  else if(item==='thunder'){stoneFxThunder(P,target);await wait(760);}
+  else if(item==='moon'){stoneFxMoon(enemy,target);await wait(780);}
   else if(item==='sun'){stoneFxSun(P);await wait(780);}
  }catch(e){}
 }
