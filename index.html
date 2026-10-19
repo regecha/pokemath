@@ -1185,6 +1185,11 @@ body.ttBg #bgFx{display:block}
 #myLane .unit .sp img,#foeLane:not(.wildLane) .unit .sp img{width:86%;aspect-ratio:1/1;object-fit:contain;max-width:none;max-height:100%;min-width:56px;min-height:56px;transform:scale(1.14)}
 @media(max-width:520px){.slot{width:clamp(64px,18.2vw,104px)}.lane{gap:3px;padding:2px 3px}}
 @media(max-height:480px){#myLane .slot,#foeLane:not(.wildLane) .slot{min-height:96px}}
+/* PC: 출전 포켓몬 이름이 칸 너비에 맞춰 줄어들고, 그래도 길면 잘리지 않고 두 줄로 보여요 */
+@media(min-width:521px){
+#myLane .unit,#foeLane:not(.wildLane) .unit{container-type:inline-size}
+#myLane .unit .un,#foeLane:not(.wildLane) .unit .un{font-size:clamp(8px,13cqw,13px);padding:0 4px;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;word-break:keep-all;text-align:center;line-height:1.15}
+}
 
 /* ===== 시나리오 연출 : 등장 포켓몬 ===== */
 .scv-cast{display:flex;justify-content:center;align-items:flex-end;gap:clamp(6px,3vw,34px);padding:0 4px;margin-bottom:-2px;pointer-events:none}
@@ -1506,6 +1511,36 @@ html.lowfx .unit .sp img.idle,html.lowfx .buddy .bimg img.idle{will-change:auto}
 #pxWarm{position:fixed;left:-9999px;top:0;pointer-events:none;visibility:hidden}
 #pxWarm .dmg,#pxWarm .skName{position:static;animation:none!important}
 html.lowfx .dmg,html.lowfx .skName,html.lowfx #banner{will-change:auto}
+/* ===== 출전 포켓몬: 바닥에 붙이고, 특성·방패 뱃지가 항상 맨 위에 보이게 ===== */
+/* 그림이 칸 안에서 세로 가운데에 떠 보이지 않게 아래쪽 기준으로 정렬 */
+#myLane .unit .sp,#foeLane:not(.wildLane) .unit .sp{align-items:flex-end}
+#myLane .unit .sp img,#foeLane:not(.wildLane) .unit .sp img{object-position:50% 100%}
+/* 겹치는 순서(아래 → 위): 방어막 테두리(.unit 안쪽 그림자) < 포켓몬 그림 < 바위벽 테두리 < 특성·방패 뱃지 */
+#myLane .unit .sp,#foeLane:not(.wildLane) .unit .sp{position:relative;z-index:1}
+#myLane .unit.taunt::before,#foeLane:not(.wildLane) .unit.taunt::before,
+#myLane .unit.ready.taunt::before,#foeLane:not(.wildLane) .unit.ready.taunt::before{z-index:2!important}
+#myLane .unit .kwI,#foeLane:not(.wildLane) .unit .kwI{z-index:6}
+/* 이름·속성 점·공격력·체력도 바위벽 테두리보다 위에 */
+#myLane .unit .un,#myLane .unit .tdots,#myLane .unit .us,
+#foeLane:not(.wildLane) .unit .un,#foeLane:not(.wildLane) .unit .tdots,#foeLane:not(.wildLane) .unit .us{position:relative;z-index:6}
+/* 그림자: 칸 고정 위치 대신 포켓몬 발밑(그림 영역 맨 아래)에 */
+#myLane .unit .shadow,#foeLane:not(.wildLane) .unit .shadow{display:none}
+#myLane .unit .sp::after,#foeLane:not(.wildLane) .unit .sp::after{content:'';position:absolute;left:22%;right:22%;bottom:-2px;height:9px;border-radius:50%;background:rgba(0,0,0,.18);z-index:-1;pointer-events:none}
+
+/* ===== 돌 카드: 면이 나뉜 보석 모양 SVG ===== */
+.stoneGem{width:48px;height:54px;display:block;filter:drop-shadow(0 0 5px var(--gem)) drop-shadow(0 3px 2px #30284555);animation:gemFloat 3.2s ease-in-out infinite}
+.stoneGem svg{width:100%;height:100%;display:block;overflow:visible}
+.hand .card.battleSpec .stoneGem{height:92%;width:auto;aspect-ratio:48/54}
+.stoneGem .gemSpark{transform-box:fill-box;transform-origin:center;animation:gemTwinkle 2.4s ease-in-out infinite}
+@keyframes gemFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes gemTwinkle{0%,100%{opacity:.25;transform:scale(.55) rotate(0)}50%{opacity:1;transform:scale(1.1) rotate(25deg)}}
+.card.battleSpec.fire .art{background:radial-gradient(circle at 50% 58%,#ffd9b8 0,#fff2e6 55%,rgba(255,255,255,.4) 100%)}
+.card.battleSpec.water .art{background:radial-gradient(circle at 50% 58%,#bfe8ff 0,#eaf8ff 55%,rgba(255,255,255,.4) 100%)}
+.card.battleSpec.thunder .art{background:radial-gradient(circle at 50% 58%,#fff0a0 0,#fff9d8 55%,rgba(255,255,255,.4) 100%)}
+.card.battleSpec.moon .art{background:radial-gradient(circle at 50% 58%,#d9ccff 0,#f1ecff 55%,rgba(255,255,255,.4) 100%)}
+.card.battleSpec.sun .art{background:radial-gradient(circle at 50% 58%,#ffc9c0 0,#fff0ea 55%,rgba(255,255,255,.4) 100%)}
+html.lowfx .stoneGem,html.lowfx .stoneGem .gemSpark{animation:none!important}
+@media(prefers-reduced-motion:reduce){.stoneGem,.stoneGem .gemSpark{animation:none!important}}
 </style>
 
 </head>
@@ -2715,9 +2750,39 @@ function battleCost(v){return isBattleSpecial(v)?v.cost:((MON[v]&&MON[v].cost)||
 function battleCardName(v){if(!isBattleSpecial(v))return MON[v]?MON[v].name:'포켓몬 카드';return v.name||'특수 카드';}
 function randomBandCard(ball){const x={master:{sp:'random',ball:'master',cost:4,band:[5,6],name:'마스터볼',desc:'보유한 5~6코스트 포켓몬 중 랜덤 소환'},power:{sp:'random',ball:'power',cost:2,band:[3,4],name:'파워볼',desc:'보유한 3~4코스트 포켓몬 중 랜덤 소환'},poke:{sp:'random',ball:'poke',cost:1,band:[1,2],name:'포켓볼',desc:'보유한 1~2코스트 포켓몬 중 랜덤 소환'}}[ball];return x?{...x}:null;}
 function stoneCard(item){const x={fire:{name:'화염의 돌',cost:3,desc:'상대 필드의 모든 포켓몬에게 피해 2'},water:{name:'물의 돌',cost:3,desc:'내 필드의 모든 포켓몬에게 방어막 +1'},thunder:{name:'전기의 돌',cost:3,desc:'내 포켓몬 하나가 한 번 더 행동'},moon:{name:'달의 돌',cost:3,desc:'상대 포켓몬 하나를 1턴 동안 기절시켜요'},sun:{name:'태양의 돌',cost:0,desc:'사용하면 이번 턴 에너지 +1'}}[item];return x?{sp:'item',item,cost:x.cost,name:x.name,desc:x.desc}:null;}
+var __gemUid=0;
+const GEM_PAL={
+ fire:{a:'#fff0a8',b:'#ffa043',c:'#e8452a',d:'#a01e3a',e:'#6e1030',glow:'#ff7a3a'},
+ water:{a:'#f2fdff',b:'#8fdcff',c:'#3f93e8',d:'#2358b0',e:'#173a80',glow:'#4db3ff'},
+ thunder:{a:'#fffdd0',b:'#ffe650',c:'#f4ac16',d:'#c8700c',e:'#8a4606',glow:'#ffd02a'},
+ moon:{a:'#fff4ff',b:'#d2c0ff',c:'#9370dc',d:'#5c3fa8',e:'#3a2578',glow:'#a58bff'},
+ sun:{a:'#fff4cf',b:'#ffc45a',c:'#ff7440',d:'#dc2f55',e:'#9c1640',glow:'#ff6a4a'}};
+const GEM_GLYPH={
+ fire:'<path d="M12 2.2c.9 3.6 5.4 5.7 5.4 11a5.4 5.4 0 0 1-10.8 0c0-2 .9-3.4 2-4.4.1 1.8.9 2.9 1.9 3.2-.5-3.9.2-6.4 1.5-9.8z"/>',
+ water:'<path d="M12 2.5C9.2 7 6 10.2 6 14.2a6 6 0 0 0 12 0c0-4-3.2-7.2-6-11.7z"/>',
+ thunder:'<path d="M13.6 2 5.4 13.2h5.6L9.8 22l8.8-12.2h-5.8z"/>',
+ moon:'<path d="M15.6 2.8a9.3 9.3 0 1 0 5.6 13.4 7.4 7.4 0 0 1-5.6-13.4z"/>',
+ sun:'<circle cx="12" cy="12" r="4.6"/><g stroke-width="2.2" stroke-linecap="round"><path d="M12 2.6v3M12 18.4v3M2.6 12h3M18.4 12h3M5.4 5.4l2.1 2.1M16.5 16.5l2.1 2.1M18.6 5.4l-2.1 2.1M7.5 16.5l-2.1 2.1"/></g>'};
+function stoneGemHTML(item){const P=GEM_PAL[item]||GEM_PAL.fire,g=GEM_GLYPH[item]||GEM_GLYPH.fire,u='sg'+(++__gemUid);
+ return `<div class="stoneGem ${item}" style="--gem:${P.glow}"><svg viewBox="0 0 48 54" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<defs><linearGradient id="${u}t" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${P.a}"/><stop offset=".55" stop-color="${P.b}"/><stop offset="1" stop-color="${P.c}"/></linearGradient>
+<radialGradient id="${u}r" cx=".5" cy=".42" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="24" cy="51.5" rx="15" ry="2.6" fill="#302845" opacity=".22"/>
+<g stroke-linejoin="round">
+<path d="M24 2 5 13 11 17 24 9z" fill="${P.a}"/><path d="M24 2 43 13 37 17 24 9z" fill="${P.b}"/>
+<path d="M5 13 3 35 10 34 11 17z" fill="${P.c}"/><path d="M43 13 45 35 38 34 37 17z" fill="${P.d}"/>
+<path d="M3 35 16 52 24 46 10 34z" fill="${P.d}"/><path d="M45 35 30 52 24 46 38 34z" fill="${P.e}"/><path d="M16 52 30 52 24 46z" fill="${P.c}"/>
+<path d="M24 9 37 17 38 34 24 46 10 34 11 17z" fill="url(#${u}t)"/>
+<path d="M24 9 37 17 38 34 24 46 10 34 11 17z" fill="url(#${u}r)"/>
+<path d="M24 9 24 46M11 17 38 34M37 17 10 34" stroke="#fff" stroke-opacity=".28" stroke-width=".8" fill="none"/>
+<path d="M24 2 43 13 45 35 30 52 16 52 3 35 5 13z" fill="none" stroke="#302845" stroke-width="2.4"/>
+<path d="M5 13 11 17 24 9 37 17 43 13M3 35 10 34 24 46 38 34 45 35" fill="none" stroke="#302845" stroke-opacity=".35" stroke-width="1"/></g>
+<g transform="translate(24 27.5) scale(1) translate(-12 -12)" fill="#fff" stroke="#302845" stroke-width="1.6" stroke-linejoin="round" paint-order="stroke" style="color:#fff">${g}</g>
+<path d="M9 15.5 8 25" stroke="#fff" stroke-opacity=".75" stroke-width="2" stroke-linecap="round" fill="none"/>
+<path class="gemSpark" d="M39 7.5l1.1 2.6 2.6 1.1-2.6 1.1L39 14.9l-1.1-2.6-2.6-1.1 2.6-1.1z" fill="#fff"/></svg></div>`;}
 function battleCardHTML(v,opt={}){if(!isBattleSpecial(v))return cardHTML(v,opt);const size=opt.size||'sm',cls=opt.cls||'';let visual='',kind='';
  if(v.sp==='random'){kind=v.ball;visual=`<div class="battleOrb ${v.ball}">${v.ball==='master'?'<b>M</b>':''}</div>`;}
- else{kind=v.item;const em={fire:'🔥',water:'💧',thunder:'⚡',moon:'🌙',sun:'☀️'}[v.item]||'✦';visual=`<div class="stoneOrb ${v.item}">${em}</div>`;}
+ else{kind=v.item;const em={fire:'🔥',water:'💧',thunder:'⚡',moon:'🌙',sun:'☀️'}[v.item]||'✦';visual=stoneGemHTML(v.item);}
  const label=v.sp==='random'?v.desc:v.desc;
  return `<div class="card ${size} battleSpec ${kind} ${cls}" data-special="${v.sp==='random'?v.ball:v.item}" style="--tc:${v.sp==='random'?(v.ball==='master'?'#a24cff':v.ball==='power'?'#48a5ff':'#ff5a5f'):(v.item==='fire'?'#ff8a4c':v.item==='water'?'#4d9cff':v.item==='moon'?'#9b86eb':v.item==='sun'?'#ff4f6d':'#f1bd26')};--tc2:#fff0c9">
   <div class=cTop><span class=cName>${esc(v.name)}</span><span class=cost>${v.cost}</span></div><div class=art>${visual}</div>
@@ -2991,7 +3056,7 @@ function matchup(aid,did){const k=typeMul(aid,did);return k>=2?{c:'adv',t:'유�
 function predDmg(a,d){if(d.dodge)return 0;let dmg=a.atk+fightB(a)+sneakB(a,d);const dm=dragonMod(a);if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);dmg=applyType(dmg,typeMul(a.id,d.id));if(d.shield>0&&dmg>0&&!(a.kw==='sneak'&&isLeg(a)))dmg=Math.max(0,Math.max(0,dmg-1)-d.shield);if(armorV(d)&&dmg>1)dmg=Math.max(1,dmg-armorV(d));return dmg;}
 function tgtBadge(d,i){if(!B||B.side!=='me')return '';const me=B.me;let out='';
  if(B.sel>=0&&me.board[B.sel]){const a=me.board[B.sel];if(!targetsFor(B.sel).units.includes(i))return '';const mu=matchup(a.id,d.id);const dm=predDmg(a,d);
-  out=(mu?`<b class=${mu.c}>${mu.t}</b>`:'')+`<b class=dmgp>-${dm}</b>`+(dm>=d.hp&&!d.tough?'<b class=ko>쓰러뜨려요!</b>':'');}
+  out=(mu?`<b class=${mu.c}>${mu.t}</b>`:'')+`<b class=dmgp>-${dm}${d.shield>0?' 🛡️':''}</b>`+(dm>=d.hp&&!d.tough?'<b class=ko>쓰러뜨려요!</b>':'');}
  else if(B.pick>=0&&me.hand[B.pick]!=null&&!isBattleSpecial(me.hand[B.pick])){const mu=matchup(me.hand[B.pick],d.id);if(mu)out=`<b class=${mu.c}>${mu.t}</b>`;}
  return out?`<div class=tbadge>${out}</div>`:'';}
 
@@ -3110,7 +3175,7 @@ function showInfo(id,o={}){if(window.__sim)return;const m=MON[id],kw=kwOf(m),t=k
  const chips=a=>a.map(x=>`<span class=tchip style="background:${TYPE_COL[x]}">${TYPE_KO[x]}</span>`).join('')||'<span class=mut>없음</span>';
  const opp=o.foe?B.me.board:B.foe.board;
  const vs=opp.map(d=>{if(!d)return '';const mu=o.foe?matchup(d.id,id):matchup(id,d.id);return `<div class=vs>${monImg(d.id,'front')}<span style="flex:1">${esc(MON[d.id].name)}</span>${mu?`<span class=tchip style="background:${mu.c==='adv'?'#3cc47c':'#a7b0bd'}">${o.foe?(mu.c==='adv'?'나에게 유리':'나에게 불리'):mu.t}</span>`:'<span class=mut style="font-size:12px">보통</span>'}</div>`;}).join('');
- const st=o.unit?`<div class=mut style="font-size:13px">지금 공격 ${rlAtkLabel(o.unit,o.foe)} · 체력 ${o.unit.hp}/${o.unit.max}${o.unit.frozen?' · 얼음':''}${o.unit.icy?' · ❄ 얼음 '+o.unit.icy+'/'+iceMaxOf(o.unit):''}${o.unit.kw==='grow'?' · 🌱 성장 '+Math.min(growCap(o.unit),o.unit.grow||0)+'/'+growCap(o.unit):''}${o.unit.psn?' · ☠ 독 공격 -'+o.unit.psn:''}${o.unit.fai?' · ✨ 요정의 빛 공격 -'+o.unit.fai:''}${o.unit.dodge?' · 피하기 남음':''}</div>`:'';
+ const st=o.unit?`<div class=mut style="font-size:13px">지금 공격 ${rlAtkLabel(o.unit,o.foe)} · 체력 ${o.unit.hp}/${o.unit.max}${o.unit.frozen?' · 얼음':''}${o.unit.icy?' · ❄ 얼음 '+o.unit.icy+'/'+iceMaxOf(o.unit):''}${o.unit.kw==='grow'?' · 🌱 성장 '+Math.min(growCap(o.unit),o.unit.grow||0)+'/'+growCap(o.unit):''}${o.unit.psn?' · ☠ 독 공격 -'+o.unit.psn:''}${o.unit.fai?' · ✨ 요정의 빛 공격 -'+o.unit.fai:''}${o.unit.dodge?' · 피하기 남음':''}${o.unit.shield>0?' · 🛡️ 방어막 '+o.unit.shield:''}</div>${o.unit.shield>0?`<div class=mut style="font-size:12px">🛡️ 방어막: 맞을 때마다 피해 -1, 남은 피해는 방어막 수치만큼 먼저 막고 그만큼 줄어요</div>`:''}`:'';
  b.innerHTML=`<div class=sheet>${cardHTML(id,{noHolo:1})}<div class=itx><h3>${esc(m.name)} ${o.foe?'<span class=mut style="font-size:13px">(상대)</span>':''}</h3>${st}
   <div class=kwbox>${I(kw.ic)} <b>${m.rar===5?'★ ':''}${kw.n}</b> — ${kwD(m,kw)}</div>
   <div><b style="color:#1f8a52">이 타입에 강해요 ×1.5</b><div class=mrow>${chips(typesStrong(t))}</div></div>
@@ -3204,7 +3269,7 @@ function applyFreeze(D,i,a){if(!D.board[i])return;const leg=isLeg(a);
  addIce(D,i,4);[i-1,i+1].forEach(j=>{if(j>=0&&j<D.board.length&&D.board[j]&&D.board[j].hp>0)addIce(D,j,1);});}
 async function dealUnit(P,i,dmg,label,pierce){const u=P.board[i];if(!u)return 0;
  if(u.dodge){u.dodge--;fx(unitEl(P,i),'피했다!','txt');kwFx('dodge',unitEl(P,i));return 0;}
- if(dmg>0&&u.shield>0&&!pierce){const d0=dmg;dmg=Math.max(0,dmg-1);const ab=Math.min(u.shield,dmg);u.shield-=ab;dmg-=ab;fx(unitEl(P,i),`방어막! ${d0}→${dmg}`,'txt');kwFx('shield',unitEl(P,i));} // 방어막: 피해 -1 후, 남은 피해를 방어막 수치만큼 먼저 흡수
+ if(dmg>0&&u.shield>0&&!pierce){const d0=dmg;dmg=Math.max(0,dmg-1);const ab=Math.min(u.shield,dmg);u.shield-=ab;dmg-=ab;fx(unitEl(P,i),`방어막! ${d0}→${dmg}${u.shield>0?' · 🛡️'+u.shield:' · 방어막 깨짐'}`,'txt');kwFx('shield',unitEl(P,i));} // 방어막: 피해 -1 후, 남은 피해를 방어막 수치만큼 먼저 흡수
  if(dmg<=0){renderBattle();return 0;}
  if(armorV(u)&&dmg>1){dmg=Math.max(1,dmg-armorV(u));kwFx('armor',unitEl(P,i));}
  u.hp-=dmg;const el=unitEl(P,i);impact(el,dmg,{col:TYPE_COL[MON[u.id].types[0]]});fx(el,'-'+dmg,dmg>=4?'big':'');
@@ -5827,7 +5892,7 @@ function rlEvent(m,run){const ev=RL_EVENTS[m.ev];rlSt(run).seen[m.ev]=1;
  rlScene(m,{tag:rlTag(m,m.ev==='wanderer'?'만남':'사건'),ic:ev.ic,title:esc(ev.n),text:scE(base)+(sit?'<br><br>'+rlTxt(sit,rlVars(m,run)):''),btns:chs.map(c=>({l:`${c.l}${c.d?`<small>${esc(c.d)}</small>`:''}`,c:'blue',dis:!!(c.ok&&!c.ok(run)),why:c.why,f:async()=>{if(RL_BUSY)return;RL_BUSY=true;let msg;try{msg=await c.f(m,run);}finally{RL_BUSY=false;}if(msg===undefined)return rlEvent(m,run);rlFinish(m,msg);}}))});}
 
 // ---------- 전투 연결 ----------
-function rlMkMe(){const run=RUN();const sh=(rlHas('shield')?3:0)+(rlHas('noel')?2:0);const me=mkPlayer(S.meta.name||'트레이너',run.deck,run.hp+sh,partnerId(),false,[],false);me.max=run.max+sh;if(rlHas('elixir'))me.maxMana=2;return me;}
+function rlMkMe(){const run=RUN();const sh=(rlHas('shield')?3:0)+(rlHas('noel')?2:0);const me=mkPlayer(S.meta.name||'트레이너',run.deck,run.hp+sh,partnerId(),false,[],false);me.max=run.max+sh;me.rlSh=sh;me.rlBase=run.hp;if(rlHas('elixir'))me.maxMana=2;return me;}
 function rlOpenBattle(){$('#bq').classList.remove('on');closeInfo();$('#view').innerHTML='';$('#battle').innerHTML='';$('#battle').classList.add('on');startBgm('battle');}
 function rlStartWild(m,kind){
  const run=RUN(),id=m.id,wild=MON[id];if(!run||!wild)return;
@@ -5859,7 +5924,7 @@ function rlStartGym(m){
  (async()=>{await wait(200);banner(esc(G.n),`${esc(G.ldr)}와(과) 대결!`,1700);await wait(1500);startTurn('me');})();}
 async function rlBattleEnd(m,kind,win,me,fled){
  const run=RUN();if(!run)return;
- run.hp=clamp(Math.round(me.hp),0,run.max);S.screen='scenarioRLNode';
+ run.hp=clamp(Math.round(me.rlSh>0?me.hp-Math.min(me.rlSh,Math.max(0,me.hp-me.rlBase)):me.hp),0,run.max);S.screen='scenarioRLNode'; // 수호의 방패 등 추가 체력은 방어막: 남은 분은 전투 후 사라져요
  if(fled)return rlEnd(false,'abandon');
  if(!win||run.hp<=0)return rlEnd(false,'lost');
  run.fights++;
