@@ -1541,6 +1541,41 @@ html.lowfx .dmg,html.lowfx .skName,html.lowfx #banner{will-change:auto}
 .card.battleSpec.sun .art{background:radial-gradient(circle at 50% 58%,#ffc9c0 0,#fff0ea 55%,rgba(255,255,255,.4) 100%)}
 html.lowfx .stoneGem,html.lowfx .stoneGem .gemSpark{animation:none!important}
 @media(prefers-reduced-motion:reduce){.stoneGem,.stoneGem .gemSpark{animation:none!important}}
+
+/* ===== 특성·방어막 뱃지: 작게, 카드 모서리 테두리에 걸치게 (내 포켓몬은 왼쪽 위, 상대·야생·보스는 오른쪽 위) ===== */
+.unit .kwI{gap:1px;flex-wrap:nowrap;max-width:none}
+.unit .kwI .ic{width:13px;height:13px}
+.unit .kwI .shieldBadge,.unit .kwI .icyBadge,.unit .kwI .stBadge{font-size:8.5px;line-height:12px;padding:0 3px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.unit .kwI .icyBadge i{width:4px;height:4px}
+@media(max-width:520px){.unit .kwI .ic{width:11px;height:11px}.unit .kwI .shieldBadge,.unit .kwI .icyBadge,.unit .kwI .stBadge{font-size:8px;line-height:11px;padding:0 2px}}
+#myLane .unit .kwI,#foeLane:not(.wildLane) .unit .kwI{top:-7px;left:-5px}
+#foeLane:not(.wildLane) .unit .kwI{left:auto;right:-5px;justify-content:flex-end}
+#foeLane.wildLane .unit .kwI{top:3px!important;left:auto!important;right:3px!important;justify-content:flex-end;z-index:9!important}
+
+/* ===== 숫자가 있는 특성(방어막·성장·독·요정의 빛): 아이콘 위에 숫자를 크게 겹쳐서 표시 ===== */
+.unit .kwI .numIc{--ol:#1c2a5a;position:relative;display:inline-flex;align-items:center;justify-content:center;flex:none;width:20px;height:20px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.numIc>svg,.numIc>i{position:absolute;left:0;top:0;width:100%;height:100%}
+.numIc>i{font-style:normal;font-size:18px;line-height:20px;text-align:center;opacity:.92}
+.numIc>b{position:relative;z-index:1;font:900 12px/1 'Noto Sans KR','Jua',sans-serif;color:#fff;letter-spacing:-.5px;
+ text-shadow:-1px 0 var(--ol),1px 0 var(--ol),0 -1px var(--ol),0 1px var(--ol),-1px -1px var(--ol),1px 1px var(--ol),-1px 1px var(--ol),1px -1px var(--ol)}
+.numIc.shield>b{margin-top:1px}
+.numIc.grow{--ol:#1f5a12}.numIc.psn{--ol:#3a1060}.numIc.fai{--ol:#7a1a55}
+.numIc.psn>b,.numIc.fai>b,.numIc.grow>b{font-size:10.5px}
+.numIc.grow,.numIc.psn,.numIc.fai{border-radius:50%;border:1.5px solid var(--ol)}
+.numIc.grow{background:radial-gradient(circle at 35% 30%,#d6f7b8,#5fbf3a 70%)}
+.numIc.psn{background:radial-gradient(circle at 35% 30%,#ecd4ff,#9a5bd6 70%)}
+.numIc.fai{background:radial-gradient(circle at 35% 30%,#ffe0f2,#e46aae 70%)}
+.numIc.grow>i,.numIc.psn>i,.numIc.fai>i{font-size:13px;line-height:17px;opacity:.5}
+.numIc.max{box-shadow:0 0 0 1.5px #ffd23f}
+.numIc.max{filter:drop-shadow(0 0 3px #ffd23f) drop-shadow(0 0 1px #ffd23f)}
+@media(max-width:520px){.unit .kwI .numIc{width:18px;height:18px}.numIc>i{font-size:16px;line-height:18px}.numIc.grow>i,.numIc.psn>i,.numIc.fai>i{font-size:12px;line-height:15px}.numIc>b{font-size:11px}.numIc.psn>b,.numIc.fai>b,.numIc.grow>b{font-size:9.5px}}
+
+/* ===== 얼어붙은 포켓몬: 회색 대신 차가운 하늘색 + 얼음막 ===== */
+.unit.frozen .sp img,.wildLane .unit.frozen .sp img,#foeLane.wildLane .unit.frozen .sp img,#myLane .unit.frozen .sp img{
+ filter:sepia(.55) hue-rotate(168deg) saturate(1.5) brightness(1.22) contrast(.95) drop-shadow(0 0 5px rgba(130,215,255,.95)) drop-shadow(0 4px 4px rgba(0,70,130,.3))!important}
+.unit.frozen .sp::before{content:'';position:absolute;left:12%;right:12%;bottom:-6px;height:16px;z-index:-1;pointer-events:none;border-radius:50%;
+ background:radial-gradient(ellipse at 50% 40%,#fff 0%,#d6f4ff 45%,#8fd6ff 100%);border:2px solid rgba(255,255,255,.9);box-shadow:0 0 10px 2px rgba(120,210,255,.8)}
+html.lowfx .unit.frozen .sp img{filter:sepia(.55) hue-rotate(168deg) saturate(1.5) brightness(1.22)!important}
 </style>
 
 </head>
@@ -2731,6 +2766,18 @@ function fallbackSprite(id){if(FB[id])return FB[id];const m=MON[id];const c=m?TY
 function imgFail(el){const id=+el.dataset.id;if(el.dataset.f==='1'){el.src=fallbackSprite(id);el.dataset.f='2';return;}
  if(el.dataset.k&&el.dataset.k!=='front'){el.dataset.f='1';el.src=SPR_BASE+id+'.png';return;}el.dataset.f='2';el.src=fallbackSprite(id);}
 function monImg(id,kind='front',cls=''){if((kind==='anim'||kind==='back')&&S.meta.settings.anim!=='gif')cls=(cls?cls+' ':'')+'idle';return `<img class="${cls}" style="--d:${(id%7)*.17}s" src="${spriteURL(id,kind)}" data-id="${id}" data-k="${kind}" alt="" loading="lazy" draggable="false" onerror="imgFail(this)">`;}
+/* ===== 전투 칸의 포켓몬 그림: 그림 파일 아래쪽의 투명한 여백을 없애 발이 바닥에 닿게 해요 ===== */
+const SPR_SHIFT=new Map();
+function monImgU(id,kind){let h=monImg(id,kind);try{const u=spriteURL(id,kind),c=SPR_SHIFT.get(u);if(c&&c!==u)h=h.replace('src="'+u+'"','src="'+c+'" data-shifted="1"');}catch(e){}return h;}
+function shiftSpriteDown(src){return new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';
+ im.onload=()=>{try{const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h||w>600||h>600)return res(src);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(im,0,0);
+  const d=cx.getImageData(0,0,w,h).data;let maxY=-1;for(let y=h-1;y>=0&&maxY<0;y--){for(let x=0;x<w;x++){if(d[(y*w+x)*4+3]>24){maxY=y;break;}}}
+  const pad=h-1-maxY;if(maxY<0||pad<2)return res(src);const c2=document.createElement('canvas');c2.width=w;c2.height=h;const c2x=c2.getContext('2d');c2x.imageSmoothingEnabled=false;c2x.drawImage(im,0,pad);res(c2.toDataURL('image/png'));}catch(e){res(src);}};
+ im.onerror=()=>res(src);im.src=src;}catch(e){res(src);}});}
+document.addEventListener('load',e=>{const im=e.target;if(!im||im.tagName!=='IMG'||im.dataset.shifted||!im.closest||!im.closest('#myLane .unit .sp,#foeLane:not(.wildLane) .unit .sp'))return;
+ const src=im.currentSrc||im.src;if(!src||src.startsWith('data:')||/\.gif(\?|$)/i.test(src))return;
+ if(SPR_SHIFT.has(src)){const c=SPR_SHIFT.get(src);if(c!==src){im.dataset.shifted='1';im.src=c;}return;}
+ shiftSpriteDown(src).then(c=>{SPR_SHIFT.set(src,c);if(c!==src&&im.isConnected&&(im.currentSrc||im.src)===src){im.dataset.shifted='1';im.src=c;}});},true);
 function typeChips(m){return m.types.map(t=>{const dark=[0,4,5,8,11,12,16,17].includes(t);return `<span class=tchip style="background:${TYPE_COL[t]};color:${dark?'#201a2a':'#fff'};text-shadow:${dark?'0 1px 0 rgba(255,255,255,.22)':'0 1px 0 rgba(0,0,0,.28)'}">${TYPE_KO[t]}</span>`;}).join('');}
 function cardHTML(id,opt={}){const m=MON[id];const kw=kwOf(m);const t=m.types[0],t2=m.types[1]!=null?m.types[1]:t;
  const lg=opt.size==='lg';
@@ -3104,11 +3151,19 @@ function tgtBadge(d,i){if(!B||B.side!=='me')return '';const me=B.me;let out='';
  window.__fpsGuard=function(){if(run)return;run=1;last=0;acc=0;n=0;requestAnimationFrame(tick);};
 })();
 
+/* 손패가 5장 이상이어도, 카드 한 장이 기본 크기(PC 96px·모바일 76px)를 유지할 만큼 가로가 넉넉하면 세로로 긴 '빽빽한' 배치를 쓰지 않아요 */
+function fitHandCrowd(){try{const h=document.querySelector('#battle .hand');if(!h)return;const n=h.querySelectorAll('.card').length;
+ const cs=getComputedStyle(h),gap=parseFloat(cs.columnGap)||parseFloat(cs.gap)||6,pad=(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.paddingRight)||0);
+ const base=innerWidth<=520?76:(document.documentElement.classList.contains('short')?84:96);
+ const was=h.classList.contains('crowd');h.classList.remove('crowd');
+ const each=(h.clientWidth-pad-gap*Math.max(0,n-1))/Math.max(1,n);
+ if(n>=5&&each<base-2)h.classList.add('crowd');}catch(e){}}
+addEventListener('resize',()=>{try{fitHandCrowd();}catch(e){}});
 function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGuard();B.trainerSkillUsed=B.trainerSkillUsed||{};const me=B.me,fo=B.foe;const my=B.side==='me'&&!B.busy&&!B.over&&(!B.coop||B.coop.active===BC.localIndex);
  const valid=targetsFor(B.sel);
  const unitH=(u,P,i)=>{if(!u)return '';const friendly=P===me;const mine=friendly&&(!B.coop||Number(u.coopOwner??0)===B.coop.active);const m=MON[u.id];const ready=mine&&my&&u.att>0&&!u.frozen;
   return `<div class="unit${ready?' ready':''}${mine&&B.sel===i?' sel':''}${!friendly&&valid.units.includes(i)?' tgt':''}${isTaunt(u)?' taunt':''}${u.frozen?' frozen':''}${u.shield?' shielded':''}${mine&&B.itemTargetMode&&!u.frozen?' itemTarget':''}${!friendly&&B.moonTargetMode?' itemTarget':''}${mine&&!ready&&my?' zz':''}" data-i="${i}">
-   ${B.coop?(()=>{const ow=Number(u.coopOwner??0)===1?1:0;const nm=String((B.coop.players[ow]&&B.coop.players[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?`<span class=shieldBadge>🛡️${u.shield}</span>`:''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${monImg(u.id,mine?'back':'anim')}</div><div class=un>${esc(m.name)}</div><div class=tdots>${m.types.map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
+   ${B.coop?(()=>{const ow=Number(u.coopOwner??0)===1?1:0;const nm=String((B.coop.players[ow]&&B.coop.players[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield',NUM_SHIELD_SVG,u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${monImgU(u.id,mine?'back':'anim')}</div><div class=un>${esc(m.name)}</div><div class=tdots>${m.types.map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
    <div class=us><span class="st atk">${u.atk}</span><span class="st hp"${u.hp<u.max?' style="background:#d9393f"':''}>${u.hp}</span></div></div>`;};
  const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=B.coop?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front')}</div><div><div class=hn>${esc(P.name)}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
   const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),bl=P.mana-bp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}<b>${bl}${bp?`<span style="color:#8a3fd6">+${bp}</span>`:''}/${den}</b></div>`;};
@@ -3120,7 +3175,7 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
   ${B.coop?`<div class="bBot coopHeroes">${heroH(loc,'heroMe',B.side==='me'&&B.coop.active===BC.localIndex)}${ally?heroH(ally,'heroAlly',B.side==='me'&&B.coop.active!==BC.localIndex):''}</div>`:''}<div class=bBot>${B.coop?'':heroH(me,'heroMe',false)}${mana(loc)}
    <button class="btn purple sm" id=bPower ${my&&(loc.powerUses||0)>0?'':'disabled'} title="남은 사용 횟수 ${Math.max(0,loc.powerUses||0)}회: 문제를 맞히면 카드 1장">${I('book')} 공부 기술 <small style="font-size:11px">${Math.max(0,loc.powerUses||0)}회</small></button>
    <span class=hudSp></span><span class=pill>${I('book')} ${loc.deck.length}</span><button class="btn red endBtn" id=bEnd ${my?'':'disabled'}>차례 끝</button></div>
-  <div id=bInfoSlot></div><div class="hand${(B.coop?B.coop.players[BC.localIndex].hand:me.hand).length>=5?' crowd':''}">${(B.coop?B.coop.players[BC.localIndex].hand:me.hand).map((id,i)=>{const handP=B.coop?B.coop.players[BC.localIndex]:me;const can=my&&B.coop&&B.coop.active!==BC.localIndex?false:my&&battleCost(id)<=handP.mana&&(isItemCard(id)||me.board.includes(null));return battleCardHTML(id,{size:'sm',noHolo:1,cls:(can?'':'cant')+(B.pick===i?' pick':'')}).replace('class="card','data-h="'+i+'" class="card');}).join('')}</div>`;
+  <div id=bInfoSlot></div><div class="hand">${(B.coop?B.coop.players[BC.localIndex].hand:me.hand).map((id,i)=>{const handP=B.coop?B.coop.players[BC.localIndex]:me;const can=my&&B.coop&&B.coop.active!==BC.localIndex?false:my&&battleCost(id)<=handP.mana&&(isItemCard(id)||me.board.includes(null));return battleCardHTML(id,{size:'sm',noHolo:1,cls:(can?'':'cant')+(B.pick===i?' pick':'')}).replace('class="card','data-h="'+i+'" class="card');}).join('')}</div>`;
  if(!my)msg(B.side==='foe'?(B.wildMode?`야생 ${wildNames().map(esc).join(' · ')}의 차례… 공격을 조심해요!`:`${esc(fo.name)}의 차례…${B.pvp?' (친구가 생각 중이에요)':''}`):'');
  else if(B.trainerSkillTarget)msg(B.trainerSkillTarget.type==='attack'?'💥 트레이너 공격: 피해를 줄 상대 포켓몬을 눌러요':'📣 응원: 공격력과 방어막을 줄 아군 포켓몬을 눌러요');
  else if(B.itemTargetMode)msg('⚡ 전기의 돌: 한 번 더 행동할 내 포켓몬을 눌러요');
@@ -3135,6 +3190,7 @@ function bindBattle(){const me=B.me;
  $('#battle').querySelectorAll('[data-wild-catch-slot]').forEach(btn=>btn.onclick=()=>askWildCapture(Number(btn.dataset.wildCatchSlot))); 
  $('#bEnd').onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;sfx('tap');B.sel=-1;B.pick=-1;B.trainerSkillTarget=null;if(B.coop&&!BC.host){bossSubmit({type:'end'});return;}if(B.pvp)pvpSend({t:'end'});endTurn();};
  $('#bPower').onclick=()=>{if(B&&B.coop&&!BC.host){if(B.busy||B.side!=='me'||B.coop.active!==BC.localIndex)return;const q=pickQ();(async()=>{if(!q){bossSubmit({type:'power',ok:true});return;}const r=await battleQ(q,{who:B.me.av,what:'공부 기술: 맞히면 카드 1장!'});bossSubmit({type:'power',ok:r.ok});})();return;}usePower();};
+ fitHandCrowd();
  $('#battle').querySelectorAll('.hand .card').forEach(c=>c.onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;const i=+c.dataset.h,v=(B.coop?B.coop.players[BC.localIndex].hand:me.hand)[i];
   if(B.itemTargetMode){if(i===B.itemTargetMode.hand){B.itemTargetMode=null;B.pick=-1;renderBattle();toast('전기의 돌 사용을 취소했어요');}else toast('먼저 전기의 돌을 사용할 포켓몬을 골라 주세요');return;}
   if(B.moonTargetMode){if(i===B.moonTargetMode.hand){B.moonTargetMode=null;B.pick=-1;renderBattle();toast('달의 돌 사용을 취소했어요');}else toast('먼저 달의 돌로 기절시킬 상대 포켓몬을 골라 주세요');return;}
@@ -3248,10 +3304,12 @@ function applyType(dmg,k){if(k>=2)return Math.ceil(dmg*1.5);if(k<1)return Math.m
 // 독·요정의 빛: 공격 -1 (누적량을 기록해서 뱃지로 표시, 독은 최대 -3)
 function weakenAtk(D,i,key,label,cap=3,n=1){const x=D.board[i];if(!x)return;if(key==='psn'&&(x.psn||0)>=cap){try{fx(unitEl(D,i),`☠ 독은 최대 -${cap}까지!`,'txt');}catch(e){}return;}const k=key==='psn'?Math.min(n,cap-(x.psn||0)):n;if(x.atk>0){const d=Math.min(k,x.atk);x.atk-=d;x[key]=(x[key]||0)+d;}try{fx(unitEl(D,i),label,'txt');kwFx(key==='psn'?'poison':key==='fai'?'fairy':'',unitEl(D,i));}catch(e){}}
 // 성장·독·요정의 빛 뱃지 HTML
+const NUM_SHIELD_SVG='<svg viewBox="0 0 24 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 1.6 21.6 5v8.6c0 6-4 10.3-9.6 13C6.4 23.9 2.4 19.6 2.4 13.6V5z" fill="#3f98ea" stroke="#16397d" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 3.4 20 6.2v7.4c0 1.4-.2 2.7-.6 3.9C17.6 12.3 6.4 12.3 4.6 17.5 4.2 16.3 4 15 4 13.6V6.2z" fill="#9fd6ff" opacity=".55"/></svg>';
+function numIcH(cls,bg,n,title){return `<span class="numIc ${cls}" title="${title}">${bg}<b>${n}</b></span>`;}
 function traitBadgeH(u){if(!u)return '';let h='';
- if(u.kw==='grow'){const gc=growCap(u),g=Math.min(gc,u.grow||0);h+=`<span class="stBadge grow${g>=gc?' max':''}" title="성장 +${g}/${gc} (내 차례마다 공격 +1${isLeg(u)?'·체력 +1':''}, 최대 +${gc})">🌱${g}/${gc}</span>`;}
- if(u.psn>0)h+=`<span class="stBadge psn" title="독: 공격 -${u.psn} (최대 -3, 전설의 독은 -4)">☠-${u.psn}${u.psn>=4?' MAX':''}</span>`;
- if(u.fai>0)h+=`<span class="stBadge fai" title="요정의 빛: 공격 -${u.fai}">✨-${u.fai}</span>`;
+ if(u.kw==='grow'){const gc=growCap(u),g=Math.min(gc,u.grow||0);h+=numIcH('grow'+(g>=gc?' max':''),'<i>🌱</i>','+'+g,`성장 +${g}/${gc} (내 차례마다 공격 +1${isLeg(u)?'·체력 +1':''}, 최대 +${gc})`);}
+ if(u.psn>0)h+=numIcH('psn'+(u.psn>=4?' max':''),'<i>☠️</i>','-'+u.psn,`독: 공격 -${u.psn} (최대 -3, 전설의 독은 -4)`);
+ if(u.fai>0)h+=numIcH('fai','<i>✨</i>','-'+u.fai,`요정의 빛: 공격 -${u.fai}`);
  return h;}
 // 얼음 스택 뱃지 HTML (야생·보스·시나리오·로그라이크 전투에서만 표시)
 const iceMaxOf=u=>(B&&B.wildMode&&u&&(u.wildEncounter||(B.foe&&B.foe.board.includes(u))))?4:2;
