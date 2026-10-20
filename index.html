@@ -7650,30 +7650,57 @@ function visibleTargets(){
     return e.contains(t)||t.contains(e)||!!t.closest('#tutBox,#tutHL,#tutDim,#tutBoss');
   });
 }
-/* 말풍선 위치: 강조할 곳이 있으면 내 카드존 바로 위, 없으면(첫 소개 등) 화면 가운데 */
-function placeBox(els){
+/* 강조 대상의 화면 영역 계산 (상세창에 가려진 부분은 잘라냄) */
+function calcBoxes(){
+  const T=cur;
+  const covered=!!document.querySelector('#bq.on')||modalOpen();
+  const els=(!T||T.done||covered)?[]:visibleTargets();
+  const sh=document.querySelector('#bInfo.on .sheet');
+  const sr=sh?zRect(sh):null;
+  const els2=[],boxes=[];
+  els.forEach(e=>{
+    const r=zRect(e);
+    const pt=(e.classList&&e.classList.contains('unit')&&e.querySelector('.tbadge'))?20:4;   // 예상 피해 숫자까지 감싸기
+    let o={l:r.left-4,t:r.top-pt,w:r.width+8,h:r.height+pt+4};
+    if(sr&&!sh.contains(e)&&o.t+o.h>sr.top-2){o.h=sr.top-4-o.t;}      // 상세창 위로 테두리가 올라타지 않게
+    if(o.h<24)return;
+    els2.push(e);boxes.push(o);
+  });
+  return{covered,els:els2,boxes,sr,inInfo:els2.length&&sh?sh.contains(els2[0]):false};
+}
+/* 말풍선 위치: 빛나는 곳·상세창과 겹치지 않는 빈 자리에, 첫 번째 강조 대상 가까이 */
+function placeBox(c){
   const bx=document.getElementById('tutBox');if(!bx)return;
-  const has=(els||visibleTargets()).length>0;
-  const lane=document.getElementById('myLane');
-  if(!has||!lane){bx.classList.add('atMid');bx.style.bottom='';bx.style.top='';return;}
+  c=c||calcBoxes();
+  const boxes=c.boxes;
+  if(!boxes.length){bx.classList.add('atMid');bx.style.bottom='';bx.style.top='';return;}
+  const G=10,vh=VH(),top0=8,bot0=vh-54;                 // 아래 54px은 보스 띠 자리
+  const H=bx.classList.contains('on')?zRect(bx).height||140:140;
+  const blocked=boxes.map(o=>[o.t-G,o.t+o.h+G]);
+  if(c.sr)blocked.push([c.sr.top-4,c.sr.top+c.sr.height]);
+  blocked.sort((x,y)=>x[0]-y[0]);
+  const merged=[];blocked.forEach(iv=>{const l=merged[merged.length-1];if(l&&iv[0]<=l[1])l[1]=Math.max(l[1],iv[1]);else merged.push(iv.slice());});
+  const gaps=[];let cur0=top0;
+  merged.forEach(iv=>{if(iv[0]-cur0>0)gaps.push([cur0,iv[0]]);cur0=Math.max(cur0,iv[1]);});
+  if(bot0-cur0>0)gaps.push([cur0,bot0]);
+  const p=boxes[0],pc=p.t+p.h/2;
+  let best=null,bd=1e9;
+  gaps.forEach(g=>{if(g[1]-g[0]<H)return;const gc=(g[0]+g[1])/2,d=Math.abs(gc-pc);if(d<bd){bd=d;best=g;}});
+  if(!best){gaps.forEach(g=>{if(!best||g[1]-g[0]>best[1]-best[0])best=g;});}
+  if(!best){bx.classList.add('atMid');bx.style.bottom='';bx.style.top='';return;}
+  const above=(best[0]+best[1])/2<pc;                 // 대상 위쪽 빈자리면 아래쪽 끝에, 아래쪽이면 위쪽 끝에 붙임
+  let y=above?best[1]-H:best[0];
+  y=Math.max(top0,Math.min(y,vh-H-8));
   bx.classList.remove('atMid');
-  const sl=lane.querySelector('.slot');                 // 카드 칸(빈 칸 포함) 맨 윗선 바로 위
-  const r=zRect(sl||lane);
-  bx.style.top='auto';bx.style.bottom=Math.max(8,VH()-r.top+8)+'px';
+  bx.style.bottom='auto';bx.style.top=y+'px';
 }
 let dimKey='';
 function updateFrames(){
   const hl=document.getElementById('tutHL');if(!hl)return;
   const T=cur;
-  const covered=!!document.querySelector('#bq.on')||modalOpen();
+  const c=calcBoxes(),covered=c.covered,els=c.els,boxes=c.boxes;
   const bx=document.getElementById('tutBox');
   if(bx)bx.style.visibility=covered?'hidden':'';
-  const els=(!T||T.done||covered)?[]:visibleTargets();
-  const boxes=els.map(e=>{
-    const r=zRect(e);
-    const pt=(e.classList&&e.classList.contains('unit')&&e.querySelector('.tbadge'))?20:4;   // 예상 피해 숫자까지 감싸기
-    return{l:r.left-4,t:r.top-pt,w:r.width+8,h:r.height+pt+4};
-  });
   const frs=hl.querySelectorAll('.tutFr');
   for(let i=frs.length;i<boxes.length;i++){const f=document.createElement('div');f.className='tutFr';hl.appendChild(f);}
   hl.querySelectorAll('.tutFr').forEach((f,i)=>{
@@ -7697,7 +7724,7 @@ function updateFrames(){
   }
   const ar=document.getElementById('tutArrow');
   if(ar){
-    if(!els.length){ar.style.display='none';}
+    if(!els.length||c.inInfo){ar.style.display='none';}      // 상세창 안 대상은 테두리만(화살표가 글자를 가림)
     else{
       const o=boxes[0];
       const below=o.t<64||!!(els[0].closest&&els[0].closest('#foeLane'));   // 상대 칸은 숫자를 가리지 않게 아래에서 가리킴
@@ -7706,7 +7733,7 @@ function updateFrames(){
       ar.style.top=(below?o.t+o.h+4:o.t-30)+'px';
     }
   }
-  placeBox(els);
+  placeBox(c);
 }
 
 /* ---------- 허용한 행동만 누를 수 있게 막기 ---------- */
@@ -7842,7 +7869,7 @@ async function partA(){
   setHand([FIRE_ID]);grant(MON[FIRE_ID].cost);
   banner('내 차례!','',900);await wait(850);chk();
   T.allow=A.summon(0);
-  T.hi=()=>B.pick>=0?[document.getElementById('biPlay'),emptySlotEl()]:[handEl(0),manaEl()];
+  T.hi=()=>B.pick>=0?[document.querySelector('#bInfo .kwbox'),document.getElementById('biPlay'),emptySlotEl()]:[handEl(0),manaEl()];
   T.th=['에너지','bolt'];T.sc=2;say('<b>에너지</b>는 포켓몬을 출전시키거나 카드를 쓸 때 필요한 자원이야. 처음에는 에너지가 적지만 턴이 지날수록 늘어. 지금 에너지에 맞는 포켓몬을 출전시켜 보자!');
   let r=await W('pick','summon');
   while(r.evt==='pick'){
@@ -7896,7 +7923,7 @@ T.th=['공격하기','sword'];    say('포켓몬을 출전시켰다고 공격까
   /* 장면 4. 물결 출전과 회복 (턴 2, 같은 차례) */
   setHand([WATER_ID]);grant(MON[WATER_ID].cost);
   T.allow=A.summon(0);
-  T.hi=()=>B.pick>=0?[document.getElementById('biPlay'),emptySlotEl()]:[handEl(0),manaEl()];
+  T.hi=()=>B.pick>=0?[document.querySelector('#bInfo .kwbox'),document.getElementById('biPlay'),emptySlotEl()]:[handEl(0),manaEl()];
   T.th=['물결','drop'];T.sc=4;say('체력이 줄어든 포켓몬이 있네. <b>물결</b> 특성 포켓몬을 출전시켜 보자! 출전할 때 내 포켓몬 모두의 체력이 <b>+1</b> 회복돼.');
   r=await W('pick','summon');
   while(r.evt==='pick'){
