@@ -2030,6 +2030,44 @@ html body #bq .sheet.defense{border-radius:14px 14px 8px 8px;box-shadow:inset 0 
 html body #bq .qCard,html body #bq .ch{border-radius:10px!important}
 html body #bq .qCard{border-width:2px!important}
 </style>
+<style id="cream-accent-skin">
+/* ===== 크림 기본 + 화면별 은은한 포인트색 (도트 버튼 느낌의 두꺼운 아래 테두리) ===== */
+html{--acc:#d99a2b}
+html[data-th=grow]{--acc:#6fae6a}html[data-th=map]{--acc:#7fae58}html[data-th=deck]{--acc:#5b93c9}
+html[data-th=dex]{--acc:#d4766a}html[data-th=league]{--acc:#e0903a}html[data-th=ach]{--acc:#cfa92f}
+html[data-th=season]{--acc:#9a86d6}html[data-th=tskills]{--acc:#5aa9ad}html[data-th=pvp]{--acc:#d06b7e}
+html[data-th=boss]{--acc:#b86a98}html[data-th=sc]{--acc:#8c78c8}html[data-th=rl]{--acc:#d28a3a}
+html[data-th] body{--px-edge:color-mix(in srgb,var(--acc) 38%,#b98f3e);--px-soft:color-mix(in srgb,var(--acc) 30%,#e6c878)}
+/* 패널: 크림 바탕에 포인트색을 살짝 + 버튼처럼 두꺼운 아래 테두리 */
+html[data-th] body :is(.panel,.qCard,.scv-card,.sc-panel,.mbox,.hero,.gym,.sc-stage){
+ background-color:color-mix(in srgb,var(--acc) 6%,var(--paper));
+ box-shadow:inset 0 0 0 2px #fffbe8,inset 0 -4px 0 color-mix(in srgb,var(--acc) 16%,transparent),0 3px 0 color-mix(in srgb,var(--acc) 45%,#e6c878)!important}
+/* 상단 바 */
+html[data-th] body .hud{background:color-mix(in srgb,var(--acc) 14%,#fff3d0);border-bottom:3px solid var(--px-edge);box-shadow:0 3px 0 color-mix(in srgb,var(--acc) 35%,transparent)}
+/* 진행 막대 */
+html[data-th] body :is(.xpBar i,.prog .me,.sc-progress i,.sc-quizbar i,.scv-prog i){background:repeating-linear-gradient(90deg,var(--acc) 0 6px,color-mix(in srgb,var(--acc) 78%,#000) 6px 8px)!important}
+html[data-th] body :is(.xpBar,.prog,.sc-progress,.sc-quizbar,.scv-prog){background:color-mix(in srgb,var(--acc) 14%,#f6e8c0);border-color:var(--px-soft)}
+/* 홈 타일: 크림 면 + 색 아이콘 판 + 버튼 같은 아래 테두리 */
+html body .tile{--ta:#d99a2b;background-image:linear-gradient(180deg,#fffdf0,var(--paper2))!important;
+ box-shadow:inset 0 0 0 2px #fffbe8,inset 0 -5px 0 color-mix(in srgb,var(--ta) 24%,transparent),0 4px 0 color-mix(in srgb,var(--ta) 50%,#d9b765)!important;transition:transform .08s}
+html body .tile:hover{transform:translateY(-2px)}html body .tile:active{transform:translateY(3px);box-shadow:inset 0 0 0 2px #fffbe8,0 1px 0 color-mix(in srgb,var(--ta) 50%,#d9b765)!important}
+html body .tile span.ti{display:inline-flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--ta) 16%,#fffdf0);border:2px solid color-mix(in srgb,var(--ta) 45%,#e6c878);box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--ta) 20%,transparent);padding:6px}
+html body .tile .tn{color:var(--ink)}
+html body .tiles>.tile:nth-child(6n+2){--ta:#6aa5d6}html body .tiles>.tile:nth-child(6n+3){--ta:#78b472}
+html body .tiles>.tile:nth-child(6n+4){--ta:#e0a04a}html body .tiles>.tile:nth-child(6n+5){--ta:#a08ad8}
+html body .tiles>.tile:nth-child(6n+6){--ta:#62b0b3}html body .tiles>.tile:nth-child(6n+1){--ta:#d98a7a}
+html body .tile.main{--ta:#e0903a;background-image:linear-gradient(120deg,#fff6d9,#ffe3b0)!important}
+html body #scHubTile.tile.main{--ta:#8c78c8}html body #rlHubTile.tile.main{--ta:#d28a3a}
+html body .tile.main span.ti{padding:8px}html body .tile span.ti>.ti{border:0;background:none;box-shadow:none;padding:0}
+html body .tile .newTag{border-radius:3px}
+/* 전투 화면은 기존 금테 유지 */
+html[data-th=battle] body{--px-edge:#b98f3e;--px-soft:#e6c878}
+</style>
+<script id="cream-accent-js">(function(){var T={title:'hub',gate:'hub',name:'hub',starter:'hub',teacher:'tskills',hub:'hub',grow:'grow',map:'map',deck:'deck',dex:'dex',league:'league',ach:'ach',season:'season',trainerSkills:'tskills',pvp:'pvp',bosscoop:'boss',card:'deck',train:'deck',result:'league',battle:'battle'};
+function th(){try{var s=S.screen||'hub',t=T[s];if(!t){t=/^scenarioRL/.test(s)?'rl':/^scenario/.test(s)?'sc':'hub';}
+var r=document.documentElement;if(r.getAttribute('data-th')!==t)r.setAttribute('data-th',t);}catch(e){}}
+setInterval(th,200);th();})();</script>
+
 </head>
 <body>
 <div id="ttFade"></div>
