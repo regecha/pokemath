@@ -2612,7 +2612,7 @@ function defaultMeta(){return{ver:SAVE_VER,name:'',code:'',gs:'',cls:'',focus:nu
  xp:0,lp:0,lpRetrofit:false,lpBonus5Done:false,trainerSkills:{heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},coins:0,candy:0,packs:0,dust:0,pity:{p4:0,p5:0},col:{},seen:{},dexSeen:{},deck:[],
  sk:{},days:{},hist:[],train:{last:'',best:0,count:0,lastRes:null,daily:''},
  badges:{},gyms:{},battles:{w:0,l:0},stats:{q:0,c:0,streak:0,bestCombo:0,bestStreak:0,guessWrong:0,guessAlert:0,careful:0,lowerStar:0,shardDone:0,crafted:0,foundDone:0,superEff:0,gymTry:0,retryOk:0,bounce:0,fast:0,better:0,perfect:0,quickTrain:0,practice:0,comeback:0,flawless:0,defOk:0,candyAll:0,evolved:0,opened:0},
- unl:{},unlNew:{},ach:{},partner:0,bond:{},stoneSeen:null,card:null,uMaxAt:'',shard:{},dust:0,season:null,seasons:[],bsave:null,thist:[],first20:null,first20t:null,found:{},endless:{best:0,total:0,runs:0,caught:0},pvp:{n:0,w:0,l:0,gg:0,foes:{},last:0},tod:{m:0,a:0,e:0},firstPlay:0,scenario:{chapter:0,unlocked:0,cleared:[],seenIntro:false},settings:{anim:'calm',sound:true,bgm:true,lowfx:false,easy:false,safe:'auto',zoom:'auto',fit:'auto',imgs:true,defq:true}};}
+ unl:{},unlNew:{},ach:{},partner:0,bond:{},stoneSeen:null,card:null,uMaxAt:'',shard:{},dust:0,season:null,seasons:[],bsave:null,thist:[],first20:null,first20t:null,found:{},endless:{best:0,total:0,runs:0,caught:0},pvp:{n:0,w:0,l:0,gg:0,foes:{},last:0},tod:{m:0,a:0,e:0},firstPlay:0,scenario:{chapter:0,unlocked:0,cleared:[],seenIntro:false},settings:{anim:'calm',sound:true,bgm:true,lowfx:false,easy:false,safe:'auto',zoom:(/Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent)||(window.matchMedia&&matchMedia('(pointer:coarse)').matches)?'0.85':'auto'),fit:'auto',imgs:true,defq:true}};}
 function mergeMeta(m){const d=defaultMeta();if(!m||typeof m!=='object')return d;for(const k in d){if(!(k in m))continue;if(d[k]&&typeof d[k]==='object'&&!Array.isArray(d[k]))d[k]=Object.assign(d[k],m[k]);else d[k]=m[k];}for(const k in m){if(!(k in d))d[k]=m[k];}return d;}  // 기본값에 없는 키(예: 로그라이크 rl 기록)도 버리지 않고 그대로 이어받아요
 function upgradeMeta(m){
  // v1 → v2: 처음 20문제 기록·개념별 최근 기록이 생겼어요. 옛 기록에서 알 수 있는 만큼 채워요.
@@ -5935,9 +5935,10 @@ function renderMap(){S.screen='map';const m=S.meta;const map=unitsWithSkills();c
  $('#view').querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{sfx('tap');startTraining({pool:map[b.dataset.pk],n:8});});}
 
 // ---- 설정 ----
-function showSettings(){const st=S.meta.settings;if(st.easy===undefined)st.easy=false;const seg=(k,opts)=>`<div class=seg>${opts.map(([v,n])=>`<button class="${String(st[k])===String(v)?'on':''}" data-s="${k}" data-v="${v}">${n}</button>`).join('')}</div>`;
+function showSettings(){const st=S.meta.settings;if(st.easy===undefined)st.easy=false;if(st.enTts===undefined)st.enTts=true;const seg=(k,opts)=>`<div class=seg>${opts.map(([v,n])=>`<button class="${String(st[k])===String(v)?'on':''}" data-s="${k}" data-v="${v}">${n}</button>`).join('')}</div>`;
  M(`<h2>${I('gear')} 설정</h2>
   <div class=setRow><b>효과음</b>${seg('sound',[[true,'켜기'],[false,'끄기']])}</div>
+  <div class=setRow><span><b>영어 발음 🔊</b><br><span class=mut style="font-size:12px">영어 문제에서 단어·문장을 자동으로 읽어 줘요. (🔊 듣기 버튼은 항상 쓸 수 있어요)</span></span>${seg('enTts',[[true,'자동 재생'],[false,'버튼만']])}</div>
   <div class=setRow><span><b>배경 음악 🎵</b><br><span class=mut style="font-size:12px">처음 화면을 터치하면 음악이 재생되고, 전투 중에는 긴장감 있는 음악으로 바뀌어요</span></span>${seg('bgm',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>배경 음악 크기 🔊</b><br><span class=mut style="font-size:12px">막대를 밀어서 크기를 맞춰요 (효과음은 그대로예요)</span></span><div class=volBar><input type=range id=bgmVol min=0 max=100 step=5 value="${st.bgmVol==null?100:st.bgmVol}" aria-label="배경 음악 크기"><b id=bgmVolN>${st.bgmVol==null?100:st.bgmVol}%</b></div></div>
   <div class=setRow><span><b>효과음 크기 🔔</b><br><span class=mut style="font-size:12px">막대를 밀면 '딩' 소리로 크기를 들어볼 수 있어요</span></span><div class=volBar><input type=range id=sfxVol min=0 max=100 step=5 value="${st.sfxVol==null?100:st.sfxVol}" aria-label="효과음 크기"><b id=sfxVolN>${st.sfxVol==null?100:st.sfxVol}%</b></div></div>
@@ -6640,6 +6641,35 @@ recordAnswer=function(q,ok,ms,opt={}){
  gainXP(ok?10:opt.guess?0:3);autoSave();};
 const __qHTMLBeforeEnglish=qHTML;
 qHTML=function(q,head=''){if(!q||!q.en)return __qHTMLBeforeEnglish(q,head);const two=q.ch.length===2;return `${head}<div class=qCard><span class="qSk">영어 · ${esc(EN_LEVELS[(S.meta.enLevel||1)-1].n)} · ${{vocabulary:'단어',grammar:'문법',translation:'문장 해석',reading:'독해'}[q.type]||'영어'}${q.rv?' · 복습':''}</span><div class=qText>${q.q}</div></div><div class="choices${two?' two':''}">${q.ch.map((c,i)=>`<button class=ch data-i="${i}">${esc(c)}</button>`).join('')}</div><div class=qAfter></div>`;};
+// ---- 영어 발음(TTS): 브라우저 내장 음성 사용, 별도 파일 없음 ----
+const ENTTS={voice:null,ok(){return typeof speechSynthesis!=='undefined'&&typeof SpeechSynthesisUtterance!=='undefined';},auto(){try{return S.meta.settings.enTts!==false;}catch(e){return true;}}};
+function enPickVoice(){if(!ENTTS.ok())return null;try{const vs=speechSynthesis.getVoices()||[];if(!vs.length)return ENTTS.voice;
+ const en=vs.filter(v=>/^en[-_]/i.test(v.lang));const pref=[/Google US English/i,/Samantha|Ava|Allison|Aria|Jenny|Zira/i,/en[-_]US/i,/en[-_]GB/i];
+ for(const re of pref){const f=en.find(v=>re.test(v.name)||re.test(v.lang));if(f)return ENTTS.voice=f;}return ENTTS.voice=en[0]||null;}catch(e){return null;}}
+try{if(ENTTS.ok()){speechSynthesis.onvoiceschanged=()=>{ENTTS.voice=null;enPickVoice();};enPickVoice();}}catch(e){}
+function enSpeak(text){if(!ENTTS.ok()||!text)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(text));u.lang='en-US';const v=enPickVoice();if(v){u.voice=v;u.lang=v.lang||'en-US';}u.rate=text.length>40?.9:.8;u.pitch=1;u.volume=1;speechSynthesis.speak(u);}catch(e){}}
+// 문제에서 읽을 영어 문장 만들기
+function enSayText(q){const r=q&&q.ref;if(!r)return'';const i=r.l-1;try{
+ if(r.t==='vocabulary')return EN_WORDS[i][r.i][0];
+ if(r.t==='translation')return EN_TRANS[i][r.i].s;
+ if(r.t==='grammar'){const g=EN_GRAMMAR[i][r.i];return g.p?String(g.a):String(g.q).replace(/_{2,}/,g.a);}
+ if(r.t==='reading'){const p=EN_READ[i][r.i];return p.p.replace(/\n/g,' ')+' '+p.qs[r.j].q;}
+ }catch(e){}return'';}
+const __makeEnglishQBeforeTts=makeEnglishQ;
+makeEnglishQ=function(){const q=__makeEnglishQBeforeTts.apply(this,arguments);try{q.say=enSayText(q);}catch(e){}return q;};
+const __qHTMLBeforeTts=qHTML;
+qHTML=function(q,head=''){let h=__qHTMLBeforeTts(q,head);if(!q||!q.en||!q.say||!ENTTS.ok())return h;
+ h=h.replace(/(<span class="qSk">[\s\S]*?<\/span>)/,'$1<button type="button" class="enSay" aria-label="영어 발음 듣기">🔊 듣기</button>');
+ // 문제가 보일 때 자동 재생: 영어 단어·문장을 보고 뜻을 고르는 문제만 (독해·빈칸은 정답 후에 읽어 줘요)
+ const r=q.ref||{};if(ENTTS.auto()&&((r.t==='vocabulary'&&r.d==='ek')||r.t==='translation'))setTimeout(()=>{if(S.curQ===q)enSpeak(q.say);},350);
+ return h;};
+document.addEventListener('click',e=>{const t=e.target&&e.target.closest?e.target:null;if(!t)return;
+ const sb=t.closest('.enSay');if(sb){e.stopPropagation();e.preventDefault();if(S.curQ&&S.curQ.say)enSpeak(S.curQ.say);return;}
+ const ch=t.closest('.ch');const q=S.curQ;if(!ch||!q||!q.en||!q.say||q.__said||ch.classList.contains('wait'))return;
+ // 답을 고르면 정답 영어를 읽어 줘요 (이미 읽어 준 '단어→뜻' 문제와 긴 독해 제외)
+ const r=q.ref||{};if(!ENTTS.auto()||r.t==='reading'||(r.t==='vocabulary'&&r.d==='ek')||r.t==='translation')return;
+ q.__said=1;setTimeout(()=>enSpeak(q.say),120);},true);
+try{const st=document.createElement('style');st.textContent='.enSay{margin-left:8px;border:0;border-radius:999px;padding:4px 12px;background:#e6f0ff;color:#2f5aa8;font:inherit;font-size:13px;font-weight:700;cursor:pointer;vertical-align:middle}.enSay:active{transform:scale(.95)}';document.head.appendChild(st);}catch(e){}
 const __renderTitleWithScenario=renderTitle;
 function chooseEnglishMode(fromHub,target){
  target=target==='mix'?'mix':'english';
@@ -7924,12 +7954,13 @@ new MutationObserver(sync).observe(document.getElementById('view'),{childList:tr
 #tutFade.out{opacity:0;pointer-events:none}
 
 /* 안내 말풍선 (포켓몬 수학 코치마크 스타일) */
-#tutBox{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--sb,0px) + 52px);z-index:48;width:min(460px,calc(100% - 16px));display:none}
-#tutBox.atMid{top:50%;bottom:auto;transform:translate(-50%,-50%)}
-#tutBox.atMid.on{animation:tutPopMid .3s cubic-bezier(.3,1.6,.5,1)}
-@keyframes tutPopMid{from{opacity:0;transform:translate(-50%,-50%) scale(.92)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-#tutBox.on{display:block;animation:tutPop .3s cubic-bezier(.3,1.6,.5,1)}
-@keyframes tutPop{from{opacity:0;transform:translateX(-50%) scale(.92)}to{opacity:1;transform:translateX(-50%) scale(1)}}
+#tutBox{position:fixed;left:50%;top:50%;transform:translateX(-50%);z-index:48;width:min(460px,calc(100% - 16px));opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility 0s linear .22s;will-change:top,opacity}
+#tutBox.on{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .22s ease,visibility 0s}
+#tutBox.on.cov{opacity:0;pointer-events:none}
+#tutBox .tbIn{transform:translateY(12px) scale(.97);transition:transform .3s cubic-bezier(.3,1.4,.5,1)}
+#tutBox.on .tbIn{transform:none}
+#tutBox.sw .tbHead,#tutBox.sw .tbTxt{animation:tutSwap .24s ease}
+@keyframes tutSwap{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 #tutBox .tbIn{background:#fffaf1;border:3px solid #ffd166;border-radius:18px;padding:12px 14px;box-shadow:0 6px 0 #e0a83a,0 16px 40px rgba(0,0,0,.35)}
 #tutBox .tbHead{display:flex;align-items:center;gap:6px;font-family:'Jua',sans-serif;font-size:19px;color:#3a2e3f}
 #tutBox .tbHead .ic{width:34px;height:34px;image-rendering:pixelated}
@@ -7951,14 +7982,26 @@ new MutationObserver(sync).observe(document.getElementById('view'),{childList:tr
 
 /* 반짝이는 테두리 · 화살표 */
 #tutHL{position:fixed;inset:0;z-index:46;pointer-events:none}
-#tutDim{position:fixed;inset:0;z-index:30;pointer-events:none;display:none}
+#tutDim{position:fixed;inset:0;z-index:30;pointer-events:none;opacity:0;transition:opacity .3s ease}
+#tutDimR{transition:fill .3s ease}
 #tutDim svg{position:absolute;inset:0;width:100%;height:100%}
 #battle.tutOn .hero.tgt{outline:none!important;animation:none!important;cursor:default}
+#battle.tutSel #foeLane .unit:not(.tgt){opacity:.4;filter:grayscale(.7)}
+#battle.tutHeroOnly #foeLane .unit.tgt{box-shadow:none!important;animation:none!important}
+.tutDexGrid{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;margin:8px 0}
+.tutDexGrid img{width:42px;height:42px;object-fit:contain;image-rendering:pixelated}
 #battle.tutOn #heroFoe .tbadge{display:none}
-#tutHL .tutFr{position:fixed;display:none;border:3px solid #ffe27a;border-radius:16px;box-shadow:0 0 0 2px rgba(58,46,63,.55),0 0 14px 3px rgba(255,226,122,.8);animation:tutPulse 1.1s ease-in-out infinite}
+#tutHL .tutFr{position:fixed;display:none;will-change:left,top,width,height;border:3px solid #ffe27a;border-radius:16px;box-shadow:0 0 0 2px rgba(58,46,63,.55),0 0 14px 3px rgba(255,226,122,.8);animation:tutPulse 1.1s ease-in-out infinite}
 @keyframes tutPulse{50%{transform:scale(1.04);opacity:.6}}
-#tutArrow{position:fixed;display:none;width:24px;text-align:center;font-size:24px;line-height:1;color:#ff7a00;text-shadow:0 2px 0 #3a2e3f,0 0 6px #fff;animation:tutBob .6s ease-in-out infinite alternate}
+#tutArrow{position:fixed;display:none;margin:0;width:24px;text-align:center;font-size:24px;line-height:1;color:#ff7a00;text-shadow:0 2px 0 #3a2e3f,0 0 6px #fff;animation:tutBob .6s ease-in-out infinite alternate}
 @keyframes tutBob{from{transform:translateY(0)}to{transform:translateY(7px)}}
+/* 보스가 노리는 대상을 보여 주는 점선 화살표 */
+#tutAim{position:fixed;inset:0;width:100%;height:100%;z-index:47;pointer-events:none;overflow:visible;transition:opacity .25s ease}
+body.aimOn #tutArrow{display:none!important}
+#tutAim .aimBg{fill:none;stroke:rgba(58,46,63,.55);stroke-width:9;stroke-linecap:round;stroke-dasharray:1 15}
+#tutAim .aimPath{fill:none;stroke:#ff5a5f;stroke-width:5.5;stroke-linecap:round;stroke-dasharray:1 15;animation:aimFlow .55s linear infinite}
+#tutAim .aimHead{fill:#ff5a5f;stroke:#3a2e3f;stroke-width:2;stroke-linejoin:round}
+@keyframes aimFlow{to{stroke-dashoffset:-16}}
 #tutHL.nudge .tutFr{animation:tutShake .3s linear 1,tutPulse 1.1s ease-in-out infinite}
 @keyframes tutShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 
@@ -8011,7 +8054,7 @@ function ui(){
   mk('div','tutBoss','','<div class=tbL><b>BOSS</b> 레지드래고 <span class=tbStar>★★★★★</span> · <span>용의 기세</span><small>도감에는 등록되지 않는 상대예요</small></div><div class=tbR>특성 <b id=tutProg>0</b>/'+TOTAL+'</div>');
   mk('div','tutFade','','');
 }
-function removeUi(){['tutBox','tutHL','tutDim','tutBoss','tutFade'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove();});}
+function removeUi(){document.body.classList.remove('aimOn');['tutBox','tutHL','tutDim','tutBoss','tutFade','tutAim'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove();});}
 function setProg(n){const e=document.getElementById('tutProg');if(e)e.textContent=n;}
 
 function say(html,o={}){
@@ -8019,10 +8062,12 @@ function say(html,o={}){
   const th=cur.th||['안내','ball'];
   bx.querySelector('.tbIcW').innerHTML=I(o.ic||th[1]||'ball');
   bx.querySelector('.tbTitle').textContent=o.h||th[0]||'안내';
-  bx.querySelector('.tbN').textContent=cur.sc?cur.sc+'/5':'';
+  bx.querySelector('.tbN').textContent=cur.sc?cur.sc+'/'+(cur.scN||5):'';
   bx.querySelector('.tbTxt').innerHTML=html;
   const b=bx.querySelector('.tbNext');
   b.style.display=o.btn?'':'none';b.textContent=o.btn||'';
+  if(bx.classList.contains('on')){bx.classList.remove('sw');void bx.offsetWidth;bx.classList.add('sw');}   // 이미 떠 있으면 글만 부드럽게 교체
+  else{bx.classList.remove('sw');sm.bxJump=1;}
   bx.classList.add('on');cur.sayOn=1;placeBox();
   if(!o.btn)return Promise.resolve();
   return new Promise(res=>{cur.sayRes=res;b.onclick=()=>{sfx('tap');b.onclick=null;cur.sayRes=null;res();};}).then(chk);
@@ -8052,20 +8097,24 @@ function calcBoxes(){
     const r=zRect(e);
     const pt=(e.classList&&e.classList.contains('unit')&&e.querySelector('.tbadge'))?20:4;   // 예상 피해 숫자까지 감싸기
     let o={l:r.left-4,t:r.top-pt,w:r.width+8,h:r.height+pt+4};
-    if(sr&&!sh.contains(e)&&o.t+o.h>sr.top-2){o.h=sr.top-4-o.t;}      // 상세창 위로 테두리가 올라타지 않게
-    if(o.h<24)return;
+    let clipped=false;
+    if(sr&&!sh.contains(e)&&o.t+o.h>sr.top-2){o.h=sr.top-4-o.t;clipped=true;}      // 상세창 위로 테두리가 올라타지 않게
+    if(clipped&&o.h<24)return;
+    if(o.h<30){const d=30-o.h;o.t-=d/2;o.h=30;}                      // 에너지 게이지처럼 얇은 대상도 테두리가 보이게
     els2.push(e);boxes.push(o);
   });
   return{covered,els:els2,boxes,sr,inInfo:els2.length&&sh?sh.contains(els2[0]):false};
 }
-/* 말풍선 위치: 빛나는 곳·상세창과 겹치지 않는 빈 자리에, 첫 번째 강조 대상 가까이 */
+/* 말풍선 위치(목표값만 계산): 빛나는 곳·상세창과 겹치지 않는 빈 자리에, 첫 번째 강조 대상 가까이 */
+const sm={fr:[],hole:[],ar:null,bxY:null,bxT:null,bxJump:1,tg:{boxes:[],dimOn:false,arrow:null},raf:0,last:0};
 function placeBox(c){
   const bx=document.getElementById('tutBox');if(!bx)return;
   c=c||calcBoxes();
-  const boxes=c.boxes;
-  if(!boxes.length){bx.classList.add('atMid');bx.style.bottom='';bx.style.top='';return;}
-  const G=10,vh=VH(),top0=8,bot0=vh-54;                 // 아래 54px은 보스 띠 자리
-  const H=bx.classList.contains('on')?zRect(bx).height||140:140;
+  const boxes=c.boxes,vh=VH();
+  const H=zRect(bx).height||150;
+  const mid=Math.max(8,(vh-H)/2);
+  if(!boxes.length){sm.bxT=mid;return;}
+  const G=10,top0=8,bot0=vh-54;                         // 아래 54px은 보스 띠 자리
   const blocked=boxes.map(o=>[o.t-G,o.t+o.h+G]);
   if(c.sr)blocked.push([c.sr.top-4,c.sr.top+c.sr.height]);
   blocked.sort((x,y)=>x[0]-y[0]);
@@ -8077,53 +8126,135 @@ function placeBox(c){
   let best=null,bd=1e9;
   gaps.forEach(g=>{if(g[1]-g[0]<H)return;const gc=(g[0]+g[1])/2,d=Math.abs(gc-pc);if(d<bd){bd=d;best=g;}});
   if(!best){gaps.forEach(g=>{if(!best||g[1]-g[0]>best[1]-best[0])best=g;});}
-  if(!best){bx.classList.add('atMid');bx.style.bottom='';bx.style.top='';return;}
+  if(!best){sm.bxT=mid;return;}
   const above=(best[0]+best[1])/2<pc;                 // 대상 위쪽 빈자리면 아래쪽 끝에, 아래쪽이면 위쪽 끝에 붙임
   let y=above?best[1]-H:best[0];
-  y=Math.max(top0,Math.min(y,vh-H-8));
-  bx.classList.remove('atMid');
-  bx.style.bottom='auto';bx.style.top=y+'px';
+  sm.bxT=Math.max(top0,Math.min(y,vh-H-8));
 }
-let dimKey='';
+/* 목표값 갱신(느슨한 주기) — 실제 화면 반영은 아래 애니메이션 루프가 부드럽게 따라가요 */
 function updateFrames(){
   const hl=document.getElementById('tutHL');if(!hl)return;
   const T=cur;
   const c=calcBoxes(),covered=c.covered,els=c.els,boxes=c.boxes;
   const bx=document.getElementById('tutBox');
-  if(bx)bx.style.visibility=covered?'hidden':'';
-  const frs=hl.querySelectorAll('.tutFr');
-  for(let i=frs.length;i<boxes.length;i++){const f=document.createElement('div');f.className='tutFr';hl.appendChild(f);}
-  hl.querySelectorAll('.tutFr').forEach((f,i)=>{
-    const o=boxes[i];if(!o){f.style.display='none';return;}
-    f.style.display='block';f.style.left=o.l+'px';f.style.top=o.t+'px';f.style.width=o.w+'px';f.style.height=o.h+'px';
-  });
-  /* 중요한 곳만 밝게: 나머지는 살짝 어둡게 */
+  if(bx)bx.classList.toggle('cov',covered);
+  const dimOn=!!T&&!T.done&&!covered&&(boxes.length>0||!!T.sayOn);
+  let arrow=null;
+  if(els.length&&!c.inInfo){                          // 상세창 안 대상은 테두리만(화살표가 글자를 가림)
+    const o=boxes[0];
+    const below=o.t<64||!!(els[0].closest&&els[0].closest('#foeLane'));   // 상대 칸은 숫자를 가리지 않게 아래에서 가리킴
+    arrow={ch:below?'▲':'▼',x:o.l+o.w/2-12,y:below?o.t+o.h+4:o.t-30};
+  }
+  sm.tg={boxes:boxes.map(o=>({l:o.l,t:o.t,w:o.w,h:o.h})),dimOn,arrow};
+  placeBox(c);
+  loop();
+}
+/* 프레임·어둡게 구멍·화살표·말풍선을 매 프레임 부드럽게 이동/크기 변경 */
+function loop(){if(sm.raf)return;sm.last=performance.now();sm.raf=requestAnimationFrame(tick);}
+function tick(now){
+  sm.raf=0;
+  const hl=document.getElementById('tutHL');
+  if(!hl||!cur||cur.done){sm.fr=[];sm.hole=[];sm.ar=null;return;}
+  const dt=Math.min(64,Math.max(1,now-sm.last));sm.last=now;
+  const k=1-Math.exp(-dt/70),ka=1-Math.exp(-dt/110);
+  const tg=sm.tg,boxes=tg.boxes;
+  let busy=false;
+  /* 강조 테두리 + 어둡게 구멍 */
+  const g=document.getElementById('tutHoles');
+  const n=Math.max(boxes.length,sm.fr.length);
+  while(hl.querySelectorAll('.tutFr').length<n){const f=document.createElement('div');f.className='tutFr';hl.appendChild(f);}
+  const els=hl.querySelectorAll('.tutFr');
+  for(let i=0;i<n;i++){
+    const t=boxes[i];let d=sm.fr[i];
+    if(t&&!d){const near=sm.fr.find(x=>x&&x.a>.3);d=sm.fr[i]=near?{l:near.l,t:near.t,w:near.w,h:near.h,a:0}:{l:t.l,t:t.t,w:t.w,h:t.h,a:0};}
+    if(!d)continue;
+    if(t){d.l+=(t.l-d.l)*k;d.t+=(t.t-d.t)*k;d.w+=(t.w-d.w)*k;d.h+=(t.h-d.h)*k;d.a+=(1-d.a)*ka;
+      if(Math.abs(t.l-d.l)+Math.abs(t.t-d.t)+Math.abs(t.w-d.w)+Math.abs(t.h-d.h)>.4||d.a<.98)busy=true;else{d.l=t.l;d.t=t.t;d.w=t.w;d.h=t.h;d.a=1;}}
+    else{d.a+=(0-d.a)*ka;if(d.a<.02){sm.fr[i]=null;}else busy=true;}
+    const f=els[i],h=sm.hole[i]||(g&&(sm.hole[i]=document.createElementNS('http://www.w3.org/2000/svg','rect')));
+    if(g&&h&&!h.parentNode){h.setAttribute('rx','16');h.setAttribute('fill','#000');g.appendChild(h);}
+    if(!sm.fr[i]){if(f)f.style.display='none';if(h)h.setAttribute('width','0');continue;}
+    if(f){f.style.display='block';f.style.left=d.l+'px';f.style.top=d.t+'px';f.style.width=d.w+'px';f.style.height=d.h+'px';f.style.opacity=d.a;}
+    if(h){h.setAttribute('x',d.l);h.setAttribute('y',d.t);h.setAttribute('width',Math.max(0,d.w));h.setAttribute('height',Math.max(0,d.h));h.setAttribute('fill-opacity',d.a);}
+  }
+  while(sm.fr.length&&!sm.fr[sm.fr.length-1])sm.fr.pop();
   const dim=document.getElementById('tutDim');
   if(dim){
-    const on=!!T&&!T.done&&!covered&&(boxes.length>0||T.sayOn);
-    dim.style.display=on?'block':'none';
-    if(on){
-      const key=boxes.map(o=>[o.l,o.t,o.w,o.h].map(Math.round).join(',')).join('|');
-      if(key!==dimKey){
-        dimKey=key;
-        const g=document.getElementById('tutHoles');
-        if(g)g.innerHTML=boxes.map(o=>'<rect x="'+o.l+'" y="'+o.t+'" width="'+o.w+'" height="'+o.h+'" rx="16" fill="#000"/>').join('');
-        const rr=document.getElementById('tutDimR');if(rr)rr.setAttribute('fill',boxes.length?'rgba(30,30,56,.5)':'rgba(30,30,56,.38)');
-      }
-    }
+    dim.style.display='block';dim.style.opacity=tg.dimOn?'1':'0';
+    const rr=document.getElementById('tutDimR');if(rr)rr.style.fill=boxes.length?'rgba(30,30,56,.5)':'rgba(30,30,56,.38)';
   }
+  /* 화살표 */
   const ar=document.getElementById('tutArrow');
   if(ar){
-    if(!els.length||c.inInfo){ar.style.display='none';}      // 상세창 안 대상은 테두리만(화살표가 글자를 가림)
-    else{
-      const o=boxes[0];
-      const below=o.t<64||!!(els[0].closest&&els[0].closest('#foeLane'));   // 상대 칸은 숫자를 가리지 않게 아래에서 가리킴
-      ar.style.display='block';ar.textContent=below?'▲':'▼';
-      ar.style.left=(o.l+o.w/2-12)+'px';
-      ar.style.top=(below?o.t+o.h+4:o.t-30)+'px';
-    }
+    const t=tg.arrow;let d=sm.ar;
+    if(t&&!d)d=sm.ar={x:t.x,y:t.y,a:0};
+    if(d){
+      if(t){d.x+=(t.x-d.x)*k;d.y+=(t.y-d.y)*k;d.a+=(1-d.a)*ka;ar.textContent=t.ch;if(Math.abs(t.x-d.x)+Math.abs(t.y-d.y)>.4||d.a<.98)busy=true;}
+      else{d.a+=(0-d.a)*ka;if(d.a<.02){sm.ar=null;}else busy=true;}
+      if(sm.ar){ar.style.display='block';ar.style.left=d.x+'px';ar.style.top=d.y+'px';ar.style.opacity=d.a;}else ar.style.display='none';
+    }else ar.style.display='none';
   }
-  placeBox(c);
+  /* 말풍선 위치 */
+  const bx=document.getElementById('tutBox');
+  if(bx&&sm.bxT!=null){
+    if(sm.bxY==null||sm.bxJump||!bx.classList.contains('on')){sm.bxY=sm.bxT;sm.bxJump=0;}
+    else{const dy=sm.bxT-sm.bxY;if(Math.abs(dy)<.4)sm.bxY=sm.bxT;else{sm.bxY+=dy*(1-Math.exp(-dt/90));busy=true;}}
+    bx.style.bottom='auto';bx.style.top=sm.bxY+'px';
+  }
+  if(busy)sm.raf=requestAnimationFrame(tick);
+}
+
+/* ---------- 점선 화살표(보스가 노리는 대상 표시) ---------- */
+function aimArrow(fromEl,toEl){
+  let svg=document.getElementById('tutAim');if(svg)svg.remove();
+  svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.id='tutAim';svg.style.opacity='0';
+  svg.innerHTML='<path class="aimBg"/><path class="aimPath"/><polygon class="aimHead"/>';
+  document.body.appendChild(svg);
+  const bg=svg.querySelector('.aimBg'),pa=svg.querySelector('.aimPath'),hd=svg.querySelector('.aimHead');
+  const P=el=>{const r=zRect(el);return{x:r.left+r.width/2,y:r.top+r.height/2,r};};
+  const A0=P(fromEl);let S0={x:A0.x,y:A0.r.top+A0.r.height*.8};
+  let E=(()=>{const q=P(toEl);return{x:q.x,y:q.r.top+2};})();
+  const draw=()=>{
+    const dx=E.x-S0.x,dy=E.y-S0.y,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L,off=Math.min(60,L*.18)*(dx>=0?1:-1)*(Math.abs(dx)<4?1:1);
+    const cx=(S0.x+E.x)/2+nx*off,cy=(S0.y+E.y)/2+ny*off;
+    const tx=E.x-cx,ty=E.y-cy,tl=Math.hypot(tx,ty)||1,ux=tx/tl,uy=ty/tl;
+    const bx=E.x-ux*16,by=E.y-uy*16;                      // 화살촉 뒤쪽까지만 점선
+    const d='M'+S0.x+' '+S0.y+' Q'+cx+' '+cy+' '+bx+' '+by;
+    bg.setAttribute('d',d);pa.setAttribute('d',d);
+    const px=-uy,py=ux;
+    hd.setAttribute('points',[E.x,E.y,bx+px*11,by+py*11,bx-px*11,by-py*11].map(v=>v.toFixed(1)).join(' '));
+  };
+  draw();requestAnimationFrame(()=>{svg.style.opacity='1';});
+  const o={
+    async to(el,ms){                                       // 화살표 끝을 다른 포켓몬으로 부드럽게 옮김
+      const q=P(el),t={x:q.x,y:q.r.top+2},s={x:E.x,y:E.y},t0=performance.now();ms=ms||520;
+      await new Promise(res=>{const st=now=>{const u=Math.min(1,(now-t0)/ms),e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;E={x:s.x+(t.x-s.x)*e,y:s.y+(t.y-s.y)*e};draw();if(u<1)requestAnimationFrame(st);else res();};requestAnimationFrame(st);});
+    },
+    async off(){svg.style.opacity='0';await wait(260);svg.remove();}
+  };
+  return o;
+}
+async function aimSeq(decoyIdx,realIdx,t1,t2,hi1,hi2){          // 다른 포켓몬을 노리다가 → 바위 벽/강철로 바뀜
+  const T=cur,me=B.me,boss=unitEl(B.foe,BOSS_SLOT);
+  if(!boss||realIdx<0)return;
+  const dIdx=decoyIdx>=0?decoyIdx:realIdx;
+  T.hi=()=>[unitEl(me,dIdx)];
+  say(t1);
+  await wait(500);chk();
+  document.body.classList.add('aimOn');
+  const ar=aimArrow(boss,unitEl(me,dIdx));
+  fx(unitEl(me,dIdx),'🎯 노려요!','txt');sfx('tap');
+  await wait(1500);chk();
+  if(dIdx!==realIdx){
+    T.hi=()=>[unitEl(me,realIdx)];
+    say(t2);
+    await ar.to(unitEl(me,realIdx),650);
+    fx(unitEl(me,realIdx),'🔀 대상 변경!','txt');sfx('win');
+    await wait(1300);chk();
+  }
+  await ar.off();
+  document.body.classList.remove('aimOn');
+  T.hi=()=>[];
 }
 
 /* ---------- 허용한 행동만 누를 수 있게 막기 ---------- */
@@ -8146,11 +8277,11 @@ function installGuard(){
     if(e.target.closest('#bMenu'))return;
     const k=kindOf(e.target);if(k.k==='other')return;
     let ok=false;try{ok=!T.lock&&!!T.allow&&!!T.allow(k);}catch(x){ok=false;}
-    if(ok)return;
+    if(ok){if(T.onClick){try{T.onClick(k);}catch(x){}}return;}
     e.stopPropagation();e.preventDefault();
     const now=Date.now();
     const vis=visibleTargets().length,nb=document.querySelector('#tutBox.on .tbNext');const hasNext=!!(nb&&nb.style.display!=='none');
-    if(now-lastNudge>1400){lastNudge=now;sfx('wrong');toast(vis?'지금은 <b>반짝이는 곳</b>만 누를 수 있어요!':hasNext?'안내를 읽고 <b>다음</b>을 눌러 주세요!':'잠깐만 기다려 주세요!');}
+    if(now-lastNudge>1400){lastNudge=now;sfx('wrong');toast((T.hint&&T.hint(k))||(vis?'지금은 <b>반짝이는 곳</b>만 누를 수 있어요!':hasNext?'안내를 읽고 <b>다음</b>을 눌러 주세요!':'잠깐만 기다려 주세요!'));}
     const hl=document.getElementById('tutHL');
     if(hl&&vis){hl.classList.remove('nudge');void hl.offsetWidth;hl.classList.add('nudge');}
   },true);
@@ -8185,10 +8316,10 @@ async function newMyTurn(){
   me.board.forEach(u=>{if(u){u.fresh=0;u.att=1;u.attTot=1;}});
   renderBattle();banner('내 차례!','',1000);await wait(950);chk();
 }
-async function foeTurnBegin(label){
+async function foeTurnBegin(label,fast){
   cur.allow=A.none;cur.hi=()=>[];hideSay();
   B.side='foe';B.busy=true;B.sel=-1;B.pick=-1;renderBattle();
-  await wait(350);banner('보스의 차례!',label||'',1300);await wait(1100);chk();
+  await wait(fast?250:350);banner('보스의 차례!',label||'',fast?1000:1300);await wait(fast?850:1100);chk();
 }
 
 /* ---------- 수학 문제 안내(첫 공격 직전) ---------- */
@@ -8208,24 +8339,48 @@ async function mathIntro(){
 /* ---------- 내 공격(튜토리얼 규칙) ---------- */
 async function tutAttack(si,tg){
   const T=cur;if(!T||T.lock)return;
-  const me=B.me,foe=B.foe,a=me.board[si],d=foe.board[tg.u];
-  if(!a||!d)return;
+  const me=B.me,foe=B.foe,a=me.board[si];
+  if(!a)return;
+  const isHero=!!tg.hero,d=isHero?null:foe.board[tg.u];
+  if(!isHero&&!d)return;
   T.lock=true;B.busy=true;B.sel=-1;T.hi=()=>[];hideSay();renderBattle();
   let ok=true;
   try{
     if(!T.q1done){                          // 첫 공격만 진짜 문제 · 이후는 연습 정답
       T.q1done=true;await mathIntro();chk();let q=null;try{q=pickQ();}catch(e){}
-      if(q){const r=await battleQ(q,{who:a.id,what:name(d.id)+'에게 공격!'});ok=!!r.ok;if(ok){B.qc++;}}
+      if(q){const r=await battleQ(q,{who:a.id,what:(isHero?esc(foe.name):name(d.id))+'에게 공격!'});ok=!!r.ok;if(ok){B.qc++;}}
     }
     chk();
-    a.att--;a.fresh=0;
-    let dmg=ok?a.atk:Math.ceil(a.atk/2);
-    dmg=Math.max(1,Math.min(dmg,d.hp-1));    // 보스 보호: 체력 1 미만으로 내려가지 않아요
-    await skillMove(me,si,unitEl(foe,tg.u),ok,false);
-    await dealUnit(foe,tg.u,dmg);
-    fx(unitEl(me,si),ok?'정답!':'약한 공격…','txt');if(ok)sfx('crit');
-    const cd=Math.max(0,Math.min(COUNTER,a.hp-1));   // 반격도 스크립트 고정값
-    if(cd>0){await wait(240);await dealUnit(me,si,cd);}
+    a.fresh=0;T.lastAtk=a.id;
+    for(let once=0;once<1;once++){           // 용의 기세는 재행동: 입력 한 번에 공격 한 번
+      const tot=a.attTot||(a.kw==='double'?2:1),h=Math.max(0,Math.min(tot-1,tot-(a.att||1)));
+      a.att=Math.max(0,(a.att||0)-1);
+      const base=a.kw==='double'?Math.max(1,a.atk+dragonModAt(a,h,tot)):a.atk;
+      let dmg=ok?base:Math.ceil(base/2);
+      const tags=[];
+      if(isHero){const q2=quakeB(a);if(q2){dmg+=q2;tags.push('땅울림 +'+q2);}}
+      else{const f2=fightB(a);if(f2){dmg+=f2;tags.push('격투 +'+f2);}}
+      if(a.kw==='double')tags.push(h===0?'첫 공격 -2':'두 번째 공격 그대로');
+      const toEl=isHero?heroEl(foe):unitEl(foe,tg.u);
+      const cap=isHero?foe.hp-1:(foe.board[tg.u]?foe.board[tg.u].hp-1:1);
+      dmg=Math.max(1,Math.min(dmg,cap));         // 보스 보호: 체력 1 미만으로 내려가지 않아요
+      await skillMove(me,si,toEl,ok,false);chk();
+      if(isHero){foe.hp-=dmg;impact(toEl,dmg,{hero:1,col:'#ff5a5f'});fx(toEl,'-'+dmg,ok?'crit big':'');renderBattle();await wait(250);}
+      else{await dealUnit(foe,tg.u,dmg);}
+      if(!isHero){
+        if(a.kw==='freeze'&&foe.board[tg.u])applyFreeze(foe,tg.u,a);
+        if(a.kw==='poison'&&foe.board[tg.u])poisonHit(foe,tg.u,false);
+      }
+      const lead=h===0?(ok?'정답! ':'약한 공격… '):'';
+      const lab=(lead+tags.join(' · ')).trim();
+      if(lab)fx(unitEl(me,si),lab,'txt');
+      if(ok&&h===0)sfx('crit');
+      if(!isHero){
+        if(a.kw==='wing'){await wait(220);fx(unitEl(me,si),'반격 없음!','txt');}
+        else{const cd=Math.max(0,Math.min(COUNTER,a.hp-1));if(cd>0){await wait(240);await dealUnit(me,si,cd);}}   // 반격도 스크립트 고정값
+      }
+      if(a.kw==='double'&&a.att>0&&a.hp>0){try{await dragonFangFx(me,si);}catch(e){}}   // 재행동 연출
+    }
     cleanup();
   }finally{T.lock=false;B.busy=false;if(B&&B.tut)renderBattle();}
   fire('attackDone',{ok});
@@ -8348,8 +8503,437 @@ T.th=['공격하기','sword'];    say('포켓몬을 출전시켰다고 공격까
   T.th=['쓰러짐과 특성','heart'];await say('포켓몬은 전투 중 피해를 받아 체력이 0이 되면 쓰러질 수 있어. 하지만 어떤 포켓몬은 쓰러질 위기에도 버티고, 공격을 피하고, 아군을 보호하는 특별한 능력을 가지고 있지.',{btn:'다음'});
 }
 
+/* ===================================================================
+   파트 B · 특성 체험 (8묶음)
+   - 각 묶음은 같은 순서(준비 → 설명 → 체험 → 확인 → 정리)를 따르고 장면만 다릅니다.
+   - 체험 포켓몬은 EXP 표에서 고르고, 특성 설명문은 게임 데이터(kwOf)를 그대로 보여 줘요.
+   - 묶음을 더 만들 때는 async 함수를 하나 만들어 parts 배열에 넣으면 돼요.
+   =================================================================== */
+const EXP={tough:52,taunt:74,dodge:92,armor:599,heal:191,rush:172,freeze:361,fight:236,poison:23,quake:50,wing:16,draw:280,grow:10,double:147,sneak:261,fairy:173};
+const ROCK_ID=377,ROCK_SLOT=3;
+const kwI=id=>kwOf(MON[id]);
+const kdesc=id=>kwI(id).d;
+const icOf=id=>kwI(id).ic;
+const quote=id=>'‘'+kdesc(id)+'’';
+const setTh=(h,ic,n,N)=>{cur.th=[h,ic];if(n){cur.sc=n;cur.scN=N||5;}};
+const heroFoeEl=()=>document.getElementById('heroFoe');
+const slotOf=id=>B.me.board.findIndex(u=>u&&u.id===id);
+const myEl=id=>{const i=slotOf(id);return i<0?null:unitEl(B.me,i);};
+const foeEl=s=>unitEl(B.foe,s);
+const handEls=()=>Array.from(document.querySelectorAll('#battle .hand .card'));
+
+/* 내 공격 허용: 고른 내 포켓몬 → 상대 포켓몬(칸 번호) 또는 상대 트레이너 */
+A.atk=(mine,foeSlots,hero)=>k=>(k.k==='my'&&!k.empty&&mine.includes(k.i))||(k.k==='foe'&&foeSlots.includes(k.i)&&B.sel>=0)||(k.k==='foeHero'&&!!hero&&B.sel>=0);
+
+/* ---------- 묶음 공통 도우미 ---------- */
+async function myTurn(){                         // 내 차례 시작(남은 포켓몬은 다시 공격할 수 있어요)
+  const me=B.me;cur.hint=null;cur.onClick=null;
+  B.side='me';B.turn++;B.round++;B.busy=false;B.sel=-1;B.pick=-1;
+  me.board.forEach(u=>{if(u){u.fresh=0;u.frozen=0;u.att=u.kw==='double'?2:1;u.attTot=u.att;}});
+  renderBattle();banner('내 차례!','',900);await wait(850);chk();
+}
+async function growTick(){                       // 성장: 내 차례가 시작될 때 공격 +1
+  const me=B.me;
+  me.board.forEach((u,i)=>{if(u&&u.kw==='grow'&&u.grow<growCap(u)){u.grow++;u.atk++;try{kwFx('grow',unitEl(me,i));}catch(e){}fx(unitEl(me,i),'성장 '+u.grow+'/'+growCap(u)+(u.grow>=growCap(u)?' (최대)':''),'txt');}});
+  renderBattle();await wait(800);chk();
+}
+async function bossStrike(i,dmg,label,o){        // 보스의 공격: 기본은 체력 1 아래로 내리지 않는 연출 피해
+  o=o||{};const me=B.me,u=me.board[i];if(!u)return 0;
+  await skillMove(B.foe,o.from!=null?o.from:BOSS_SLOT,unitEl(me,i),true,false);chk();
+  const d=o.raw?dmg:Math.max(0,Math.min(dmg,u.hp-1));
+  const r=await dealUnit(me,i,d);
+  if(label)fx(unitEl(me,i),label,'txt');
+  cleanup();renderBattle();await wait(300);chk();
+  return r;
+}
+async function heroHit(P,dmg){                   // 보스가 내 트레이너를 직접 공격(체력 1은 남김)
+  await skillMove(B.foe,BOSS_SLOT,heroEl(P),true,false);chk();
+  const d=Math.max(0,Math.min(dmg,P.hp-1));
+  P.hp-=d;impact(heroEl(P),d,{hero:1,col:'#ff5a5f'});fx(heroEl(P),'-'+d,'crit big');
+  renderBattle();await wait(500);chk();
+}
+async function doSummon(idx,intro,pick){         // 손패 카드 고르기 → 내보내기
+  const T=cur;
+  T.allow=A.summon(idx);
+  T.hi=()=>B.pick>=0?[document.querySelector('#bInfo .kwbox'),document.getElementById('biPlay'),emptySlotEl()]:[handEl(idx),manaEl()];
+  say(intro);
+  let r=await W('pick','summon');
+  while(r.evt==='pick'){say(pick||'<b>내보내기</b>를 눌러서 출전시켜 보자!');r=await W('pick','summon');}
+}
+async function attackStep(o){                    // 내 포켓몬 고르기 → 대상 누르기
+  const T=cur;
+  const mine=o.ids.map(slotOf).filter(i=>i>=0);
+  T.hint=o.hint||null;T.heroOnly=!!o.hero;
+  T.allow=A.atk(mine,o.foe||[],!!o.hero);
+  const tgt=()=>o.hero?[heroFoeEl()]:(o.foe||[]).map(s=>foeEl(s));
+  T.hi=()=>B.sel>=0?tgt():mine.map(i=>unitEl(B.me,i));
+  say(o.pick);
+  let r=await W('select','attackDone');
+  while(r.evt==='select'){say(o.sel);r=await W('select','attackDone');}
+  T.allow=A.none;T.hint=null;T.heroOnly=false;
+  return r.d||{};
+}
+async function endTurnStep(txt){
+  const T=cur;T.allow=A.end;T.hi=()=>[endEl()];
+  setTh('차례 끝','check');
+  say(txt||'할 일을 다 했으면 <b>차례 끝</b>을 눌러 줘.');
+  await W('end');
+}
+async function note(html,hi,btn){                // 확인: 효과가 나온 곳을 강조하고 한 줄 설명
+  const T=cur;T.allow=A.none;T.hint=null;T.hi=hi||(()=>[]);
+  await say(html,{btn:btn||'다음'});
+}
+async function sweep(o){                         // 정리: 상태 초기화 → 마무리 일격 → 카드로 돌아가기
+  o=o||{};const T=cur,me=B.me,foe=B.foe;
+  const keep=o.keep||[];
+  await foeTurnBegin('마무리 일격!');
+  resetBoss(false);
+  const strikers=o.strikers||[BOSS_SLOT];
+  const idx=me.board.map((u,i)=>u?i:-1).filter(i=>i>=0&&!keep.includes(i));
+  if(idx.length){
+    for(let k=0;k<strikers.length;k++){await skillMove(foe,strikers[k],unitEl(me,idx[Math.min(k,idx.length-1)]),true,false);chk();}
+    shakeBoard();
+    await Promise.all(idx.map(i=>returnToCard(i)));
+    idx.forEach(i=>{me.board[i]=null;});
+  }
+  me.hand=[];grant(0);me.hp=me.max;foe.hp=foe.max;
+  resetBoss(true);
+  B.side='me';B.busy=false;renderBattle();
+  await wait(300);chk();
+}
+
+/* ---------- B1. 끈기 → 바위 벽 ---------- */
+async function groupB1(){
+  const T=cur,me=B.me,TG=EXP.tough,RW=EXP.taunt;
+  banner('끈기 → 바위 벽','특성 체험',1400);await wait(1300);chk();
+  setHand([TG]);grant(battleCost(TG));
+  await myTurn();
+  setTh('끈기',icOf(TG),1,5);
+  await doSummon(0,'이번엔 쓰러질 위기에서 버티는 포켓몬이야. <b>'+name(TG)+'</b>의 특성 <b>끈기</b>는 이렇게 적혀 있어. '+quote(TG)+'<br>출전시켜 보자!');
+  setProg(3);
+  await endTurnStep('출전했어! <b>차례 끝</b>을 눌러 보스에게 차례를 넘기자.');
+  await foeTurnBegin('보스의 큰 공격!',true);
+  setTh('끈기!',icOf(TG),2,5);
+  await bossStrike(slotOf(TG),5,'',{raw:true});      // 체력이 0이 되는 순간 끈기 발동
+  await wait(400);chk();
+  await note('쓰러질 만큼 센 공격이었는데 <b>체력 1</b>로 버텼어! 체력이 많은 것과는 달라. 끈기는 딱 <b>한 번만</b> 발동해.',()=>[myEl(TG)]);
+  setHand([RW]);grant(battleCost(RW));
+  await myTurn();
+  setTh('바위 벽',icOf(RW),3,5);
+  await doSummon(0,'이번엔 동료를 지켜 주는 포켓몬이야. <b>'+name(RW)+'</b>의 특성 <b>바위 벽</b>은 이렇게 적혀 있어. '+quote(RW)+'<br>출전시켜 보자!');
+  setProg(4);
+  await note('<b>방어막</b> 아이콘과 <b>갈색 테두리</b>가 생겼지? 이제 상대는 이 포켓몬부터 공격해야 해.',()=>[myEl(RW)]);
+  await endTurnStep();
+  await foeTurnBegin('공격 대상이 바뀌어요!',true);
+  setTh('대상이 바뀌어요',icOf(RW),4,5);
+  const ti=slotOf(TG),ri=slotOf(RW);
+  await aimSeq(ti,ri,'보스는 먼저 <b>끈기</b> 포켓몬을 노리고 있어…','그런데 <b>바위 벽</b> 포켓몬이 있으면 <b>그 포켓몬부터</b> 공격해야 해!');
+  await bossStrike(ri,3,'',{raw:true});
+  await note('끈기 포켓몬을 노렸지만 <b>바위 벽</b> 포켓몬이 먼저 맞아야 해! <b>방어막</b>이 피해를 막아 줬어.',()=>[myEl(RW)]);
+  await sweep();
+  setTh('정리','check',5,5);
+  await note('좋아! 끈기와 바위 벽, 두 가지 버티는 방법을 배웠어. 다음 특성으로 가 보자!');
+}
+
+/* ---------- B2. 유령 → 강철 ---------- */
+async function groupB2(){
+  const T=cur,me=B.me,DG=EXP.dodge,AR=EXP.armor;
+  banner('유령 → 강철','특성 체험',1400);await wait(1300);chk();
+  setHand([DG]);grant(battleCost(DG));
+  await myTurn();
+  setTh('유령',icOf(DG),1,6);
+  await doSummon(0,'이번엔 공격을 피하는 포켓몬이야. <b>'+name(DG)+'</b>의 특성 <b>유령</b>은 '+quote(DG)+'<br>출전시켜 보자!');
+  setProg(5);
+  await endTurnStep();
+  await foeTurnBegin('보스의 공격!',true);
+  setTh('피했다!',icOf(DG),2,6);
+  await bossStrike(slotOf(DG),5,'',{raw:true});
+  await note('공격이 스르륵 <b>빗나갔어</b>! 하지만 피하는 건 <b>처음 한 번</b>뿐이야.',()=>[myEl(DG)]);
+  setHand([AR]);grant(battleCost(AR));
+  await myTurn();
+  setTh('강철',icOf(AR),3,6);
+  await doSummon(0,'이번엔 단단한 포켓몬이야. <b>'+name(AR)+'</b>의 특성 <b>강철</b>은 '+quote(AR)+'<br>출전시켜 보자!');
+  setProg(6);
+  await note('<b>회색 테두리</b>가 생겼지? 강철도 상대가 먼저 노려야 하는 포켓몬이야.',()=>[myEl(AR)]);
+  await endTurnStep();
+  await foeTurnBegin('보스의 공격!',true);
+  setTh('대상이 바뀌어요',icOf(AR),4,6);
+  await aimSeq(slotOf(DG),slotOf(AR),'보스는 먼저 <b>유령</b> 포켓몬을 노리고 있어…','그런데 <b>강철</b> 포켓몬이 있으면 <b>그 포켓몬부터</b> 공격해야 해!');
+  setTh('피해가 줄어요',icOf(AR),5,6);
+  await bossStrike(slotOf(AR),3,'강철 -1',{raw:true});
+  await note('받는 피해가 <b>1 줄었어</b>! 바위 벽은 방어막이 사라지면 끝이지만, 강철은 공격을 받을 때마다 피해를 줄여 줘.',()=>[myEl(AR)]);
+  await sweep();
+  setTh('정리','check',6,6);
+  await note('피하고, 단단하게 버티는 법까지 배웠네! 다음은 트레이너와 속도에 관한 특성이야.');
+}
+
+/* ---------- B3. 광합성 → 번개 ---------- */
+async function groupB3(){
+  const T=cur,me=B.me,HL=EXP.heal,RS=EXP.rush;
+  banner('광합성 → 번개','특성 체험',1400);await wait(1300);chk();
+  setTh('트레이너 체력',icOf(HL),1,4);
+  await foeTurnBegin('트레이너를 직접 공격!',true);
+  await heroHit(me,8);
+  await note('필드에 포켓몬이 없으면 <b>트레이너</b>가 직접 공격을 받아! 포켓몬의 체력과 트레이너의 체력은 따로야.',()=>[heroEl(me)]);
+  setHand([HL,RS]);grant(battleCost(HL)+battleCost(RS));
+  await myTurn();
+  setTh('광합성',icOf(HL),2,4);
+  await doSummon(0,'트레이너가 다쳤네. <b>광합성</b> 포켓몬을 내 보자! <b>'+name(HL)+'</b>의 특성은 '+quote(HL));
+  setProg(7);
+  await note('트레이너 체력이 <b>회복</b>됐어! 광합성은 나올 때 트레이너 체력을 채워 줘.',()=>[heroEl(me)]);
+  setTh('번개',icOf(RS),3,4);
+  await doSummon(0,'이번엔 <b>번개</b> 포켓몬이야. <b>'+name(RS)+'</b>의 특성은 '+quote(RS)+'<br>방금 낸 광합성 포켓몬과 비교해 봐!');
+  setProg(8);
+  const r=await attackStep({ids:[RS],foe:[BOSS_SLOT],
+    pick:'<b>초록색 테두리</b>가 있는 번개 포켓몬만 지금 공격할 수 있어! 눌러서 공격해 보자!',
+    sel:'좋아! 이제 공격할 <b>상대 포켓몬</b>을 눌러 줘.'});
+  await note('번개 포켓몬은 나온 차례에 <b>바로 공격</b>했어! 광합성 포켓몬은 다음 차례부터 공격할 수 있어.',()=>[myEl(RS)]);
+  await endTurnStep();
+  await sweep();
+  setTh('정리','check',4,4);
+  await note('트레이너를 고치고, 출전하자마자 공격하는 법을 배웠어!');
+}
+
+/* ---------- B4. 얼음 → 격투 ---------- */
+async function groupB4(){
+  const T=cur,me=B.me,FZ=EXP.freeze,FT=EXP.fight;
+  banner('얼음 → 격투','특성 체험',1400);await wait(1300);chk();
+  setHand([FZ]);grant(battleCost(FZ));
+  await myTurn();
+  setTh('얼음',icOf(FZ),1,5);
+  await doSummon(0,'이번엔 상대를 얼리는 포켓몬이야. <b>'+name(FZ)+'</b>의 특성 <b>얼음</b>은 '+quote(FZ)+'<br>출전시켜 보자!');
+  setProg(9);
+  await endTurnStep();
+  await foeTurnBegin('보스의 공격!',true);
+  await bossStrike(slotOf(FZ),2,'');
+  setHand([FT]);grant(battleCost(FT));
+  await myTurn();
+  setTh('얼음 공격',icOf(FZ),2,5);
+  await attackStep({ids:[FZ],foe:[BOSS_SLOT],
+    pick:'얼음 포켓몬에 <b>초록색 테두리</b>가 생겼어! 눌러서 보스를 공격해 보자!',
+    sel:'좋아! 공격할 <b>상대 포켓몬</b>을 눌러 줘.'});
+  await note('얼음 스택이 가득 찼어! 얼어붙은 포켓몬은 <b>한 차례 움직이지 못해</b>. (야생·일반 대전의 보스 포켓몬은 4스택이 필요해서 더 단단해.)',()=>[foeEl(BOSS_SLOT)]);
+  await doSummon(0,'이어서 <b>'+name(FT)+'</b>도 출전시켜 두자!');
+  setProg(10);
+  await endTurnStep();
+  await foeTurnBegin('보스의 차례',true);
+  setTh('얼어붙은 보스',icOf(FZ),3,5);
+  fx(foeEl(BOSS_SLOT),'❄ 얼어서 이번 차례는 쉬어요','txt');
+  await wait(1000);chk();
+  await myTurn();
+  setTh('격투',icOf(FT),4,5);
+  await attackStep({ids:[FT],foe:[BOSS_SLOT],
+    pick:'보스가 얼어서 <b>공격하지 못했어</b>! 자, 이제 격투 포켓몬을 써 보자. <b>'+name(FT)+'</b>의 특성 <b>격투</b>는 '+quote(FT)+'<br>상대 포켓몬을 공격해 봐!',
+    sel:'좋아! 공격할 <b>상대 포켓몬</b>을 눌러 줘.'});
+  await note('피해 숫자에 <b>격투 +1</b>이 붙었지? 아까 얼음 포켓몬이 공격했을 때보다 더 세게 들어갔어!',()=>[foeEl(BOSS_SLOT)]);
+  await endTurnStep();
+  await sweep();
+  setTh('정리','check',5,5);
+  await note('상대를 얼리고, 공격력을 높이는 법을 배웠어!');
+}
+
+/* ---------- B5. 독 → 땅울림 ---------- */
+async function groupB5(){
+  const T=cur,me=B.me,foe=B.foe,PS=EXP.poison,QK=EXP.quake;
+  banner('독 → 땅울림','특성 체험',1400);await wait(1300);chk();
+  foe.hp=10;renderBattle();                      // 보스 본체 체력은 튜토리얼 전용으로 10
+  setHand([PS]);grant(battleCost(PS));
+  await myTurn();
+  setTh('독',icOf(PS),1,5);
+  await doSummon(0,'이번엔 상대를 약하게 만드는 포켓몬이야. <b>'+name(PS)+'</b>의 특성 <b>독</b>은 '+quote(PS)+'<br>출전시켜 보자!');
+  setProg(11);
+  await endTurnStep();
+  await foeTurnBegin('보스의 공격!',true);
+  await bossStrike(slotOf(PS),2,'');
+  setHand([QK]);grant(battleCost(QK));
+  await myTurn();
+  setTh('독 공격',icOf(PS),2,5);
+  await attackStep({ids:[PS],foe:[BOSS_SLOT],
+    pick:'독 포켓몬에 <b>초록색 테두리</b>가 생겼어! 눌러서 보스를 공격해 보자!',
+    sel:'좋아! 공격할 <b>상대 포켓몬</b>을 눌러 줘.'});
+  await note('보스의 공격력이 <b>1 줄었어</b>! 독은 직접 피해를 주는 게 아니라 상대를 <b>약하게</b> 만드는 특성이야.',()=>[foeEl(BOSS_SLOT)]);
+  await doSummon(0,'이어서 <b>'+name(QK)+'</b>도 출전시켜 두자!');
+  setProg(12);
+  await endTurnStep();
+  await foeTurnBegin('약해진 보스의 공격!',true);
+  setTh('약해진 공격',icOf(PS),3,5);
+  await bossStrike(slotOf(PS),1,'독 -1');
+  await note('독에 걸린 보스의 공격이 <b>약해졌어</b>! 피해가 아까보다 작지?',()=>[myEl(PS)]);
+  await myTurn();
+  setTh('땅울림',icOf(QK),4,5);
+  await attackStep({ids:[QK],foe:[],hero:true,hint:k=>k.k==='foe'?'상대 <b>트레이너</b>를 눌러 봐!':null,
+    pick:'<b>'+name(QK)+'</b>의 특성 <b>땅울림</b>은 '+quote(QK)+'<br>이번엔 포켓몬 대신 <b>상대 트레이너</b>를 노려 봐! 트레이너를 공격하면 반격도 없어.',
+    sel:'좋아! 이제 <b>상대 트레이너</b>를 눌러 줘.'});
+  await note('트레이너에게 <b>땅울림 +1</b>까지 더해져서 체력이 줄었어! 반격도 없었지?',()=>[heroFoeEl()]);
+  await endTurnStep();
+  await sweep();
+  setTh('정리','check',5,5);
+  await note('상대를 약하게 만들고, 트레이너를 직접 노리는 법을 배웠어!');
+}
+
+/* ---------- B6. 날개 → 예지 ---------- */
+async function groupB6(){
+  const T=cur,me=B.me,foe=B.foe,WG=EXP.wing,DR=EXP.draw;
+  banner('날개 → 예지','특성 체험',1400);await wait(1300);chk();
+  setHand([WG]);grant(battleCost(WG));
+  await myTurn();
+  setTh('날개',icOf(WG),1,5);
+  await doSummon(0,'이번엔 반격을 피하는 포켓몬이야. <b>'+name(WG)+'</b>의 특성 <b>날개</b>는 '+quote(WG)+'<br>출전시켜 보자!');
+  setProg(13);
+  await endTurnStep();
+  await foeTurnBegin('보스의 공격!',true);
+  setTh('반격 ×1.5',icOf(WG),2,5);
+  {
+    const wi=slotOf(WG);
+    await bossStrike(wi,1,'');
+    const w=me.board[wi];
+    if(w){
+      const cd=Math.max(1,Math.min(Math.ceil(w.atk*wingM(w)),bossHp()-1));
+      await skillMove(me,wi,foeEl(BOSS_SLOT),true,false);chk();
+      await dealUnit(foe,BOSS_SLOT,cd);
+      fx(foeEl(BOSS_SLOT),'반격 ×1.5','txt');
+      cleanup();renderBattle();await wait(400);chk();
+    }
+  }
+  await note('공격한 보스가 오히려 <b>더 큰 반격</b>을 맞았어!',()=>[foeEl(BOSS_SLOT)]);
+  setHand([DR]);grant(battleCost(DR));
+  T.deckTop=[EXP.grow];                          // 예지로 뽑을 카드(다음 묶음에서 쓸 성장 포켓몬)
+  await myTurn();
+  setTh('반격 없음',icOf(WG),3,5);
+  await attackStep({ids:[WG],foe:[BOSS_SLOT],
+    pick:'앞에서는 공격하면 반격을 받았지? 날개 포켓몬으로 보스를 공격해 보자!',
+    sel:'좋아! 공격할 <b>상대 포켓몬</b>을 눌러 줘.'});
+  await note('<b>반격 없음!</b> 날개 포켓몬은 공격해도 반격을 받지 않아!',()=>[myEl(WG)]);
+  setTh('예지',icOf(DR),4,5);
+  await doSummon(0,'손패가 한 장뿐이야. <b>'+name(DR)+'</b>의 특성 <b>예지</b>는 '+quote(DR)+'<br>출전시켜서 카드가 늘어나는지 봐!');
+  setProg(14);
+  await note('카드가 <b>한 장 늘었어</b>! 손패가 다 떨어지기 전에 카드를 채워 두는 것도 중요해!',()=>handEls());
+  await endTurnStep();
+  await sweep();
+  setTh('정리','check',5,5);
+  await note('반격을 피하고, 카드를 채우는 법까지 배웠어!');
+}
+
+/* ---------- B7. 성장 → 용의 기세 ---------- */
+async function groupB7(){
+  const T=cur,me=B.me,GR=EXP.grow,DB=EXP.double;
+  banner('성장 → 용의 기세','특성 체험',1400);await wait(1300);chk();
+  setHand([GR]);grant(battleCost(GR));
+  await myTurn();
+  setTh('성장',icOf(GR),1,4);
+  await doSummon(0,'이번엔 시간이 지날수록 강해지는 포켓몬이야. <b>'+name(GR)+'</b>의 특성 <b>성장</b>은 '+quote(GR)+'<br>출전시켜 보자!');
+  setProg(15);
+  await endTurnStep();
+  await foeTurnBegin('보스의 공격!',true);
+  await bossStrike(slotOf(GR),2,'');
+  setHand([]);grant(0);
+  await myTurn();
+  await growTick();
+  setTh('공격력이 자라요',icOf(GR),2,4);
+  await note('내 차례가 시작되자 <b>공격력이 올랐어</b>! 지금 공격할지, 조금 더 기다려 더 강하게 키울지는 내 선택이야. 이번엔 <b>기다려 보자</b>!',()=>[myEl(GR)]);
+  setHand([DB]);grant(battleCost(DB));
+  await doSummon(0,'이번엔 한 번에 두 번 공격하는 포켓몬이야. <b>'+name(DB)+'</b>의 특성 <b>용의 기세</b>는 '+quote(DB)+'<br>출전시켜 보자!');
+  setProg(16);
+  await endTurnStep();
+  await foeTurnBegin('보스의 공격!',true);
+  await bossStrike(slotOf(DB),1,'');
+  await myTurn();
+  await growTick();
+  setTh('두 번 공격',icOf(DB),3,4);
+  await note('성장은 <b>+2까지</b>야. 이제 공격해 보자!',()=>[myEl(GR)]);
+  await attackStep({ids:[DB],foe:[BOSS_SLOT],
+    pick:'<b>용의 기세</b> 포켓몬을 눌러 공격해 봐. 공격한 뒤에도 <b>한 번 더</b> 행동할 수 있어!',
+    sel:'좋아! 공격할 <b>상대 포켓몬</b>을 눌러 줘.'});
+  await note('첫 공격은 <b>-2</b>! 하지만 용의 기세는 <b>재행동</b>이라 이 포켓몬이 <b>한 번 더</b> 행동할 수 있어. 다시 눌러 보자!',()=>[myEl(DB)]);
+  await attackStep({ids:[DB],foe:[BOSS_SLOT],
+    pick:'<b>용의 기세</b> 포켓몬을 한 번 더 눌러 <b>두 번째 공격</b>을 해 보자!',
+    sel:'<b>상대 포켓몬</b>을 눌러 줘. 두 번째 공격은 피해가 <b>그대로</b>야!'});
+  await note('두 번째 공격은 피해가 <b>그대로</b>야! 용의 기세는 이렇게 <b>두 번 행동</b>해.',()=>[foeEl(BOSS_SLOT)]);
+  await attackStep({ids:[GR],foe:[BOSS_SLOT],
+    pick:'이번엔 <b>성장</b> 포켓몬을 눌러 공격해 보자!',
+    sel:'좋아! 공격할 <b>상대 포켓몬</b>을 눌러 줘.'});
+  await note('기다려서 키운 공격력이야! 빠르게 공격할지, 기다려서 키울지 생각하는 것도 전략이야.',()=>[foeEl(BOSS_SLOT)]);
+  await endTurnStep();
+  await sweep({keep:[slotOf(GR)]});               // 성장 포켓몬은 다음 묶음을 위해 남겨 둬요
+  setTh('정리','check',4,4);
+  await note('성장하는 포켓몬과 두 번 공격하는 포켓몬까지 배웠어! 성장 포켓몬은 조금 더 남겨 둘게.');
+}
+
+/* ---------- B8. 기습 → 요정의 빛 ---------- */
+async function groupB8(){
+  const T=cur,me=B.me,foe=B.foe,SN=EXP.sneak,FR=EXP.fairy,GR=EXP.grow;
+  banner('기습 → 요정의 빛','특성 체험',1400);await wait(1300);chk();
+  setTh('레지락 합류',icOf(ROCK_ID),1,5);
+  {
+    const n=mkUnit(ROCK_ID);n.fresh=0;foe.board[ROCK_SLOT]=n;renderBattle();
+    try{slamFx(foe,ROCK_SLOT);}catch(e){}
+    try{await legendFx(foe,ROCK_SLOT,MON[ROCK_ID].name);}catch(e){}
+    try{kwFx('rockwall',foeEl(ROCK_SLOT));}catch(e){}
+    await wait(500);chk();
+    const bl=document.querySelector('#tutBoss .tbL');
+    if(bl)bl.innerHTML='<b>BOSS</b> 레지드래고 · 레지락 <span class=tbStar>★★★★★</span><small>용의 기세 · 바위 벽 · 도감에는 등록되지 않는 상대예요</small>';
+  }
+  await note('또 한 마리가 나타났어! 레지락의 <b>바위 벽</b>은 ‘'+kwI(ROCK_ID).l+'’. 전설 포켓몬은 방어막이 더 두꺼워.',()=>[foeEl(ROCK_SLOT)]);
+  setHand([SN]);grant(battleCost(SN));
+  await myTurn();
+  setTh('막힌 공격',icOf(ROCK_ID),2,5);
+  {
+    const gi=slotOf(GR);
+    T.allow=A.atk([gi],[BOSS_SLOT],false);
+    T.hi=()=>B.sel>=0?[foeEl(BOSS_SLOT)]:[unitEl(me,gi)];
+    T.onClick=k=>{if(k.k==='foe'&&k.i===BOSS_SLOT)fire('tryDragon');};
+    say('먼저 남아 있는 <b>성장 포켓몬</b>으로 공격하려 해 보자. 포켓몬을 눌러 봐!');
+    let r=await W('select','tryDragon');
+    if(r.evt==='select'){
+      say('이제 <b>레지드래고</b>를 눌러 볼까?');
+      r=await W('tryDragon');
+    }
+    T.onClick=null;T.allow=A.none;
+    await note('레지락의 바위 벽 때문에 <b>레지락만</b> 공격할 수 있어! 그런데 이 방어를 뚫는 특성이 있어. 지금 손패의 포켓몬을 내 보자.',()=>[foeEl(ROCK_SLOT)]);
+    B.sel=-1;renderBattle();
+  }
+  setTh('기습',icOf(SN),3,5);
+  await doSummon(0,'<b>'+name(SN)+'</b>의 특성 <b>기습</b>은 '+quote(SN)+'<br>출전시켜 보자!');
+  setProg(17);
+  await endTurnStep();
+  await foeTurnBegin('보스의 공격!',true);
+  await bossStrike(slotOf(SN),1,'');
+  await myTurn();
+  setTh('기습',icOf(SN),3,5);
+  await attackStep({ids:[SN],foe:[BOSS_SLOT],
+    hint:k=>(k.k==='foe'&&k.i===ROCK_SLOT)?'레지락이 아니라 <b>레지드래고</b>를 눌러 봐!':null,
+    pick:'기습은 <b>바위 벽을 무시하고</b> 공격해요. 기습 포켓몬을 눌러서 레지락을 건너뛰고 <b>레지드래고</b>를 직접 공격해 봐!',
+    sel:'좋아! 이번엔 <b>레지드래고</b>를 눌러 줘.'});
+  await note('방어 특성이 강력해도 이를 공략하는 포켓몬이 있어! 전설 기습은 방어막과 강철에도 대응해.',()=>[foeEl(BOSS_SLOT)]);
+  setHand([FR]);grant(battleCost(FR));
+  setTh('요정의 빛',icOf(FR),4,5);
+  await doSummon(0,'마지막 특성이야! <b>'+name(FR)+'</b>의 특성 <b>요정의 빛</b>은 '+quote(FR)+'<br>출전시켜 보자!');
+  setProg(18);
+  {
+    const d=foe.board[BOSS_SLOT],r=foe.board[ROCK_SLOT];
+    const hit=(d&&d.fai>0)?{n:'레지드래고',s:BOSS_SLOT}:(r&&r.fai>0)?{n:'레지락',s:ROCK_SLOT}:null;
+    if(hit)await note('<b>'+hit.n+'</b>의 공격력이 <b>1 줄었어</b>! 어느 쪽이 약해질지는 랜덤이야. 독은 공격한 상대를 약하게 만들지만, 요정의 빛은 <b>내는 순간 바로</b> 적용돼.',()=>[foeEl(hit.s)]);
+    else await note('요정의 빛은 나올 때 상대 포켓몬 하나의 공격을 <b>랜덤으로 -1</b> 해! 독과 달리 <b>내는 순간 바로</b> 적용돼.',()=>[foeEl(BOSS_SLOT),foeEl(ROCK_SLOT)]);
+  }
+  await endTurnStep();
+  await sweep({strikers:[BOSS_SLOT,ROCK_SLOT]});
+  setTh('정리','check',5,5);
+  await note('18가지 특성을 모두 체험했어! 이제 포켓몬이 아닌 카드를 써 볼까?');
+}
+
+async function partB(){
+  await groupB1();chk();
+  await groupB2();chk();
+  await groupB3();chk();
+  await groupB4();chk();
+  await groupB5();chk();
+  await groupB6();chk();
+  await groupB7();chk();
+  await groupB8();chk();
+}
+
 /* ---------- 진행 · 마무리 ---------- */
-const parts=[partA];
+const parts=[partA,partB];
 
 async function run(T){
   try{
@@ -8363,14 +8947,15 @@ async function run(T){
 }
 async function finish(T){
   hideSay();T.hi=()=>[];T.allow=A.none;
-  const jo=(w,p)=>josa(w,p).slice(w.length);
-  const n1=name(FIRE_ID),n2=name(WATER_ID);
-  const names='<b>'+n1+'</b>'+jo(n1,'와과')+' <b>'+n2+'</b>'+jo(n2,'이가');
   S.meta.seen=S.meta.seen||{};
-  if(!T.replay)S.meta.seen.tutA=1;
+  const ids=[FIRE_ID,WATER_ID].concat(Object.keys(EXP).map(k=>EXP[k]));
+  if(!T.replay){
+    S.meta.seen.tutA=1;
+    try{ids.forEach(id=>{if(!S.meta.col[id])addCard(id,1);else S.meta.dexSeen[id]=1;});}catch(e){console.warn('tutorial dex',e);}
+  }
   autoSave();
   await new Promise(res=>{
-    M('<div style="text-align:center"><h2 style="font-size:28px">첫 전투 연습 끝!</h2><div style="display:flex;justify-content:center;gap:6px;height:90px">'+monImg(FIRE_ID,'anim')+monImg(WATER_ID,'anim')+'</div><p style="margin:8px 0;line-height:1.6">공격하고, 특성을 쓰고, 차례를 넘기는 방법을 모두 배웠어!<br>체험 포켓몬 '+names+' 도감에 등록됐어.</p><div class=mbtns><button class="btn gold big" data-a=ok>좋아요!</button></div></div>',{ok:()=>{closeM();res();},_close:()=>{}});
+    M('<div style="text-align:center"><h2 style="font-size:28px">튜토리얼 끝!</h2><div class=tutDexGrid>'+ids.map(id=>monImg(id,'front')).join('')+'</div><p style="margin:8px 0;line-height:1.6">공격하고, 18가지 특성을 모두 써 봤어!<br>체험 포켓몬 18마리가 도감에 등록됐어.</p><div class=mbtns><button class="btn gold big" data-a=ok>좋아요!</button></div></div>',{ok:()=>{closeM();res();},_close:()=>{}});
     sfx('win');try{confetti(50);}catch(e){}
   });
 }
@@ -8417,7 +9002,7 @@ function begin(o={}){
   const bt=document.getElementById('battle');bt.classList.add('on','tutOn');
   try{startBgm('battle');}catch(e){}
   ui();installGuard();
-  clearInterval(poll);poll=setInterval(()=>{if(cur&&!cur.done)updateFrames();},140);
+  clearInterval(poll);poll=setInterval(()=>{if(cur&&!cur.done)updateFrames();},70);
   run(T);
 }
 function afterStarter(){
@@ -8438,7 +9023,11 @@ summon=async function(P,hi,slot){
   if(!(B&&B.tut&&P===B.me))return _summon.apply(this,arguments);
   const T=cur;if(T.lock)return;
   T.lock=true;T.hi=()=>[];hideSay();
-  try{await _summon.apply(this,arguments);}finally{T.lock=false;}
+  try{
+    await _summon.apply(this,arguments);
+    const su=B.me.board[slot];
+    if(su&&su.kw==='draw'&&T.deckTop&&T.deckTop.length){const nid=T.deckTop.shift();B.me.hand.push(nid);renderBattle();try{await drawFlyFx(unitEl(B.me,slot),1);}catch(e){}try{hlNewCards(1);}catch(e){}}
+  }finally{T.lock=false;}
   fire('summon',{slot});
 };
 const _showInfo=showInfo;
@@ -8448,6 +9037,7 @@ function afterRender(){
   const T=cur;if(!T||T.done||!B||!B.tut)return;
   const bt=document.getElementById('battle');if(bt&&!bt.classList.contains('tutOn'))bt.classList.add('tutOn');
   installGuard();updateFrames();
+  if(bt){bt.classList.toggle('tutSel',B.sel>=0);bt.classList.toggle('tutHeroOnly',!!T.heroOnly);}
   if(B.sel>=0)fire('select');
 }
 renderBattle=function(){const r=_renderBattle.apply(this,arguments);try{afterRender();}catch(e){console.warn('tutorial render',e);}return r;};
