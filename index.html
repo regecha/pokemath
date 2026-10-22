@@ -4334,7 +4334,15 @@ const PXF=(()=>{
  function size(){const w=VW(),h=VH();const S0=Math.max(3,Math.min(6,q(Math.min(w,h)/115)));S=Math.max(2,Math.min(3,q(Math.min(w,h)/200)));K=Math.max(1,S0/S);const nw=Math.ceil(w/S),nh=Math.ceil(h/S);
   if(!cv){cv=document.createElement('canvas');cv.id='pxfx';document.body.appendChild(cv);cx=cv.getContext('2d');}
   if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;}cw=nw;ch=nh;cv.style.width=nw*S+'px';cv.style.height=nh*S+'px';}
+ const rgba=(h,a)=>{const n=parseInt(h.slice(1),16);return 'rgba('+(n>>16)+','+((n>>8)&255)+','+(n&255)+','+a+')';};
  const P={
+  blend(m){cx.globalCompositeOperation=m||'source-over';},
+  // 부드러운 빛무리(방사형 번짐)
+  halo(x,y,r,c,a){if(a<=.003||r<=.5)return;const A=a*baseA,g=cx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,rgba(c,A));g.addColorStop(.3,rgba(c,A*.55));g.addColorStop(.65,rgba(c,A*.16));g.addColorStop(1,rgba(c,0));cx.save();cx.globalAlpha=1;cx.fillStyle=g;cx.fillRect(x-r,y-r,r*2,r*2);cx.restore();},
+  // 결 고운 빛 고리(양쪽으로 부드럽게 사라지는 링)
+  ringGlow(x,y,r,w,c,a,sy){if(a<=.003||r<=.5)return;w=Math.max(.6,w);const r0=Math.max(0,r-w),r1=r+w,A=a*baseA,m=Math.min(.99,Math.max(.01,(r-r0)/(r1-r0))),g=cx.createRadialGradient(0,0,r0,0,0,r1);g.addColorStop(0,rgba(c,0));g.addColorStop(m,rgba(c,A));g.addColorStop(1,rgba(c,0));cx.save();cx.globalAlpha=1;cx.translate(x,y);cx.scale(1,sy||.88);cx.fillStyle=g;cx.beginPath();cx.arc(0,0,r1,0,6.2832);cx.fill();cx.restore();},
+  // 끝으로 갈수록 옅어지는 빛살
+  ray(x,y,ang,len,w,c,a){if(a<=.003||len<=.5)return;const A=a*baseA;cx.save();cx.globalAlpha=1;cx.translate(x,y);cx.rotate(ang);const g=cx.createLinearGradient(0,0,len,0);g.addColorStop(0,rgba(c,A));g.addColorStop(1,rgba(c,0));cx.fillStyle=g;cx.beginPath();cx.moveTo(0,-w);cx.lineTo(len,0);cx.lineTo(0,w);cx.closePath();cx.fill();cx.restore();},
   px(x,y,c){cx.fillStyle=c;cx.fillRect(q(x),q(y),1,1);},
   rect(x,y,w,h,c){cx.fillStyle=c;cx.fillRect(q(x),q(y),Math.max(1,q(w)),Math.max(1,q(h)));},
   line(x0,y0,x1,y1,c,th){th=th||1;x0=q(x0);y0=q(y0);x1=q(x1);y1=q(y1);cx.fillStyle=c;const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1,o=-(th>>1);let e=dx+dy,n=0;
@@ -4364,7 +4372,7 @@ const PXF=(()=>{
   if(frz>0)frz-=dt;else{const st=Math.min(dt,50);for(let i=0;i<parts.length;i++)parts[i].age+=st;}
   let w=0;for(let i=0;i<parts.length;i++){const p=parts[i];if(p.age<p.dur)parts[w++]=p;}parts.length=w;
   cx.clearRect(0,0,cw,ch);
-  for(let i=0;i<parts.length;i++){const p=parts[i];if(p.age<0)continue;const kf=p.age/p.dur;baseA=(!p.nf&&kf>.72)?Math.max(0,(1-kf)/.28):1;cx.globalAlpha=baseA;try{p.f(P,p,kf,p.x/S,p.y/S);}catch(e){}}baseA=1;cx.globalAlpha=1;
+  for(let i=0;i<parts.length;i++){const p=parts[i];if(p.age<0)continue;const kf=p.age/p.dur;baseA=(!p.nf&&kf>.72)?Math.max(0,(1-kf)/.28):1;cx.globalAlpha=baseA;cx.globalCompositeOperation='source-over';try{p.f(P,p,kf,p.x/S,p.y/S);}catch(e){}cx.globalCompositeOperation='source-over';}baseA=1;cx.globalAlpha=1;
   if(!parts.length){cancelAnimationFrame(raf);raf=0;last=0;cx.clearRect(0,0,cw,ch);return;}
   cs+=performance.now()-t0;if(++cn>=20){const avg=cs/cn;cs=0;cn=0;if(avg>6.5)cap=SLOWF;else if(avg<3)cap=FAST;}}
  const hz=n=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s);};
@@ -4979,6 +4987,70 @@ const SKH={
   SKH.ribbon(P,D,cx,cyUp,by,R*.92,Math.PI*1.55,1,sw*.7,R*.22,t0+400,5,PAL[1],hz);},
  // 4갈래 반짝이 (도트 + 모양)
  twinkle(P,D,x,y,sz,c1,c2){P.rect(x*D,y*D,D,D,'#ffffff');for(let i=1;i<=sz;i++){const c=i===sz&&sz>1?c2:c1;P.rect((x+i)*D,y*D,D,D,c);P.rect((x-i)*D,y*D,D,D,c);P.rect(x*D,(y+i)*D,D,D,c);P.rect(x*D,(y-i)*D,D,D,c);}},
+
+
+ // ===== 드래곤 브레스: 빛무리 속에서 다섯 가닥의 푸른 에너지 리본이 꼬이며 흐르는 혜성 =====
+ WV:{st:[{a:'#8a3cff',b:'#3fd8ff',c2:'#eafcff',f:1,ph:0,w:1},{a:'#3a6bff',b:'#8ff0ff',c2:'#ffffff',f:1,ph:1.26,w:.9},{a:'#d24fe6',b:'#7ad8ff',c2:'#ffe3fb',f:1,ph:2.51,w:.95},{a:'#5b3cff',b:'#bff6ff',c2:'#ffffff',f:1.35,ph:3.77,w:.6},{a:'#ff7ad9',b:'#9fe9ff',c2:'#ffffff',f:.8,ph:5.03,w:.7}]},
+ lerp(c1,c2,t){const a=parseInt(c1.slice(1),16),b=parseInt(c2.slice(1),16);return '#'+[16,8,0].map(sh=>Math.round(((a>>sh)&255)+(((b>>sh)&255)-((a>>sh)&255))*t).toString(16).padStart(2,'0')).join('');},
+ waveBreath(k,a,b,pw){
+  const F=PXF,S0=F.S(),hz=F.hz,ez=F.ez,WV=SKH.WV,sc=(pw>=1?Math.min(1.5,pw):.65)*.75,dx=b[0]-a[0],dy=b[1]-a[1],Lpx=Math.hypot(dx,dy)||1,ang=Math.atan2(dy,dx),ca=Math.cos(ang),sa=Math.sin(ang),nx=-sa,ny=ca,
+   ax=a[0]/S0,ay=a[1]/S0,bx=b[0]/S0,by=b[1]/S0,Lg=Lpx/S0,dur=1100,tr=400,hold=680,turns=Math.max(1,Lpx/400),M=56;
+  F.add(0,dur,a[0],a[1],(P,pp,kk)=>{
+   const age=pp.age,sH=ez.out(Math.min(1,age/tr)),sT=age>hold?ez.in(Math.min(1,(age-hold)/(dur-hold)))*.92*sH:0,fo=age>dur-150?Math.max(0,(dur-age)/150):1,span=Math.max(.02,sH-sT),th0=age*.010,Amax=8*sc,Wmax=5.4*sc,
+    pos=(s2,off)=>[ax+ca*Lg*s2+nx*off,ay+sa*Lg*s2+ny*off],env=q=>Math.pow(q,.62)*(.35+.65*Math.min(1,(1-q)/.08)),[Hx,Hy]=pos(sH,0);
+   // ① 깔리는 어두운 남빛 띠(밝은 배경에서도 형체가 보이게) + 길게 번지는 빛무리
+   {const U=[],L=[];for(let i=0;i<=24;i++){const q=i/24,e=env(q),s2=sT+span*q,hw=(Amax*e+Wmax*e*1.5+.6)*(1+.1*Math.sin(q*14-age*.01)),[X,Y]=pos(s2,0);U.push([X+nx*hw,Y+ny*hw]);L.push([X-nx*hw,Y-ny*hw]);}
+    P.poly(U.concat(L.reverse()),'#10196e',.34*fo);}
+   P.blend('lighter');
+   for(let i=0;i<8;i++){const q=i/7,s2=sT+span*q,[X,Y]=pos(s2,0),e=env(q);P.halo(X,Y,(8+24*e)*sc,i%2?'#3a6bff':'#3fd8ff',.2*fo*(.35+e));}
+   P.blend('source-over');
+   // ② 다섯 가닥 리본: 바깥 번짐 → 몸통(꼬리 보라 → 머리 하늘색 그라데이션) → 밝은 심지. 앞뒤(z) 순으로 그려요
+   const segs=[];
+   WV.st.forEach((st,k2)=>{let prev=null;
+    for(let i=0;i<=M;i++){const q=i/M,s2=sT+span*q,e=env(q),th=6.2832*turns*st.f*s2-th0*1.7*st.f+st.ph,y=Amax*e*Math.sin(th)+Math.sin(q*19-age*.012+k2*2)*Wmax*.25*e,z=Math.cos(th),w=Wmax*st.w*(.2+.8*e)*(.45+.55*Math.abs(z))*(1+.14*Math.sin(q*31-age*.015+k2)),[X,Y]=pos(s2,y),col=SKH.lerp(st.a,st.b,Math.pow(q,.8));
+     if(prev){const zz=(z+prev.z)/2,qd=(f,c2,al,add,dz)=>segs.push({z:zz+dz,add,col:c2,al,pts:[[prev.X+nx*prev.w*f,prev.Y+ny*prev.w*f],[X+nx*w*f,Y+ny*w*f],[X-nx*w*f,Y-ny*w*f],[prev.X-nx*prev.w*f,prev.Y-ny*prev.w*f]]});
+      qd(2.5,col,.13*fo,1,-.03);qd(1.6,col,.28*fo,1,-.02);
+      qd(1,zz>0?col:shade(col,.6),(zz>0?.92:.72)*fo,0,0);
+      if(zz>.1)qd(.4,SKH.lerp(col,st.c2,.75),.95*fo,1,.02);}
+     prev={X,Y,w,z};}});
+   segs.sort((u,v)=>u.z-v.z);for(const g of segs){P.blend(g.add?'lighter':'source-over');P.poly(g.pts,g.col,g.al);}P.blend('source-over');
+   // ③ 가는 빛결: 리본 주변을 휘감는 가느다란 선들
+   P.blend('lighter');
+   for(let j=0;j<8;j++){const hc=['#3fd8ff','#a98bff','#ff9de6','#bff6ff'][j%4],fq=.7+.3*hz(j+3),am=Amax*(1.15+.5*hz(j)),ph=j*1.9;let px0=null;
+    for(let i=0;i<=34;i++){const q=i/34,s2=sT+span*q,y=am*env(q)*Math.sin(6.2832*turns*fq*s2-th0*(1+.3*hz(j))+ph),[X,Y]=pos(s2,y);if(px0){P.ga(.5*fo*Math.min(1,q*4));P.line(px0[0],px0[1],X,Y,hc,1);}px0=[X,Y];}P.ga(1);}
+   // ④ 머리: 큰 빛무리 + 빛살 + 앞으로 휘어진 초승달 파문
+   const hs=age>hold?Math.max(0,1-(age-hold)/(dur-hold)*.8):1;
+   P.halo(Hx,Hy,30*sc*hs,'#3a6bff',.55*fo);P.halo(Hx,Hy,17*sc*hs,'#3fd8ff',.75*fo);P.halo(Hx,Hy,8*sc*hs,'#e9fcff',.95*fo);P.halo(Hx,Hy,3.5*sc*hs,'#ffffff',1*fo);
+   for(let i=0;i<8;i++){const an=i*Math.PI/4+age*.0008,lg=(i%2?12:34)*sc*hs;P.ray(Hx,Hy,an,lg,(i%2?.7:1.1)*sc*hs,i%2?'#bff6ff':'#ffffff',.7*fo);}
+   for(let i=0;i<3;i++){const r=(5+i*3.6)*sc*hs;P.ga((1-i*.25)*.3*fo);P.arc(Hx-ca*r*.35,Hy-sa*r*.35,r,ang-1.15,ang+1.15,'#3fd8ff',4);P.ga((1-i*.25)*fo);P.arc(Hx-ca*r*.35,Hy-sa*r*.35,r,ang-1.15,ang+1.15,i?'#8ff0ff':'#ffffff',1);}P.ga(1);
+   // ⑤ 입구의 빛 + 흩날리는 빛 알갱이(작은 후광이 달린 별가루)
+   if(sT<.05){P.halo(ax,ay,18*sc,'#3fd8ff',.6*fo);P.halo(ax,ay,8*sc,'#ffffff',.8*fo);}
+   for(let j=0;j<40;j++){const q=((j/40)+age*.0016)%1,s2=sT+span*q,off=(hz(j*3.1)-.5)*2*(Amax*env(q)+Wmax*2.2),[X,Y]=pos(s2,off),tw=.5+.5*Math.sin(age*.014+j*2.3),al=fo*Math.min(1,q*5)*(1-q*.3)*(.5+.5*tw),c=['#bff6ff','#ffffff','#ffc2f4','#a9c4ff'][j%4];
+    P.halo(X,Y,(2.2+tw*2)*sc*.8,c,.45*al);P.ga(Math.min(1,al*1.4));P.rect(X,Y,1.4,1.4,'#ffffff');if(j%8===0&&tw>.6)F.spark4(X,Y,2,'#ffffff',c);P.ga(1);}
+   P.blend('source-over');
+   if(age>tr*.8){const t=Math.min(1,(age-tr*.8)/300);P.blend('lighter');P.halo(bx,by,20*sc*t,'#3fd8ff',.4*t*fo);P.blend('source-over');}
+  },{nf:1});
+  return tr;},
+ // ===== 타격: 빛무리가 번쩍 퍼지고 결 고운 파동 고리가 겹겹이 번져 나가요 =====
+ waveBurst(x,y,R,s){
+  const F=PXF,S0=F.S(),hz=F.hz,ez=F.ez,Rg=Math.max(7,R*.5*s/S0),dur=1150,CL=[['#ffffff','#bff6ff'],['#3fd8ff','#5ac8ff'],['#3a6bff','#6f8fff'],['#d24fe6','#ff8fe8'],['#8a3cff','#b48cff']];
+  F.add(0,dur,x,y,(P,pp,kk,gx,gy)=>{
+   const age=pp.age,f0=Math.max(0,1-age/520),f1=Math.max(0,1-age/950);
+   P.blend('lighter');
+   // 중심 빛무리: 번쩍 → 서서히 사그라들어요
+   P.halo(gx,gy,Rg*(1.7+.5*(1-f1)),'#3a6bff',.5*f1);P.halo(gx,gy,Rg*(1.05+.35*(1-f0)),'#3fd8ff',.7*f0+.18*f1);P.halo(gx,gy,Rg*.55,'#ffffff',.95*f0);
+   // 빛살: 천천히 돌며 길게 뻗었다 사라져요
+   const grow=ez.out(Math.min(1,age/320));
+   for(let i=0;i<14;i++){const an=i/14*6.2832+age*.0006,len=Rg*(i%2?1.15:1.9)*grow*(1-kk*.45);P.ray(gx,gy,an,len,Rg*(i%2?.05:.085),i%3?'#8fe8ff':'#ffffff',.6*f1);}
+   // 퍼지는 파동 고리 5겹
+   for(let i=0;i<5;i++){const u=Math.min(1,Math.max(0,(age-i*110)/760));if(u<=0||u>=1)continue;
+    const e=ez.out(u),r=Rg*(.12+1.5*e),fade=Math.pow(1-u,1.2),w=Rg*(.2*(1-u)+.06);
+    P.ringGlow(gx,gy,r,w*2,CL[i][1],.5*fade);P.ringGlow(gx,gy,r,w*.85,CL[i][0],.9*fade);P.ringGlow(gx,gy,r,Math.max(.8,w*.24),'#ffffff',.95*fade);}
+   // 파동을 타고 퍼지는 빛 알갱이 + 십자 반짝이
+   for(let j=0;j<28;j++){const d=hz(j*2.7)*190,u=Math.min(1,Math.max(0,(age-d)/760));if(u<=0)continue;const an=hz(j*3.3+1)*6.2832,r=Rg*(.25+1.45*ez.out(u)),X=gx+Math.cos(an)*r,Y=gy+Math.sin(an)*r*.88,al=(1-u)*(1-u),c=CL[j%5][1];
+    P.halo(X,Y,3.2,c,.5*al);P.ga(al);P.rect(X,Y,1.5,1.5,'#ffffff');if(j%5===0)F.spark4(X,Y,3,'#ffffff',c);P.ga(1);}
+   P.blend('source-over');
+  },{nf:1});},
  // ===== 불꽃·드래곤 브레스: 입구에서 겹겹의 불꽃 덩어리가 쉬지 않고 뿜어져 나가요 (바깥 실루엣에만 윤곽, 안쪽은 색 띠, 매 프레임 부드럽게) =====
  BP:{
   fire:{ol:'#6e1006',cols:['#d92b14','#ff5a14','#ff9a1f','#ffd23f','#fff4b8'],spk:['#ffffff','#ffe27a','#ff9a1f'],smoke:'#3a1410',bloom:'#ff7a1c',wid:1},
@@ -5134,7 +5206,7 @@ function skFireBlast(x,y,R,pw,cb){
  if(big)F.add(0,140,0,0,(P_,pp,kk)=>{P.fill('#fff4cc',.14*(1-kk));},{nf:1});
 }
 // 날아가는 기술: 타입마다 모양이 다른 발사체가 부드러운 꼬리를 끌며 날아가요
-function skShoot(k,a,b,pw){if(k.fx==='fire'&&!pxFxOff())return wait(skFireStreak(a,b,pw));if(k.fx==='fire'||k.fx==='dragon')return wait(SKH.breath(k,a,b,pw,k.fx));
+function skShoot(k,a,b,pw){if(k.fx==='dragon')return wait(SKH.waveBreath(k,a,b,pw));if(k.fx==='fire'&&!pxFxOff())return wait(skFireStreak(a,b,pw));if(k.fx==='fire'||k.fx==='dragon')return wait(SKH.breath(k,a,b,pw,k.fx));
  if(k.fx==='water'||k.fx==='shadow')return wait(SKH.stream(k,a,b,pw,k.fx==='fire'?'flame':k.fx==='dragon'?'dragon':k.fx==='water'?'jet':'smoke'));
  const P0=SKP[k.fx]||SKP.fire,n=Math.max(1,Math.round(P0.n*(pw>=1?1:.6))),dur=320,gap=55,p=PXF.pal(k),sc=(pw>=1?Math.min(1.5,pw):.65)*1.7;
  const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L,ang=Math.atan2(dy,dx),ca=Math.cos(ang),sa=Math.sin(ang);
@@ -5197,7 +5269,7 @@ function skBurst(k,el,pw,cb){if(!el)return;const[x,y]=center(el),r=zRect(el),R=M
   case 'swarm':for(let i=0;i<N(14);i++){const a0=skRand(0,6.28);F.add(i*15,600,x,y,(P_,pp,kk,gx,gy)=>{const aa=a0+kk*Math.PI*3,rr=Rg*(.4+kk*.8)*(1-kk*.2),bx=gx+Math.cos(aa)*rr,by=gy+Math.sin(aa)*rr,f2=F.fr(pp)&1;P.glow(bx,by,2.2,k.c,.55,3);P.rect(bx-1,by-1,2,2,'#2c3306');P.px(bx,by-1,k.c);P.ga(.8);P.line(bx-(f2?1:2),by-2,bx-1,by-1,'#ffffff',1);P.line(bx+(f2?1:2),by-2,bx+1,by-1,'#ffffff',1);P.ga(1);},{nf:1});}break;
   case 'rockfall':F.debris(x,y,{n:N(8),cols:[k.c,k.c2,'#a08a4a'],up:true,sp:230,g:700,dur:640,sz:2,draw:(a,b,s2,c,kk,pp,ph)=>SKH.rock(P,a,b,2.4,ph,k.c,k.c2,p.o)});F.dust(x,y+R*.4,N(10));break;
   case 'shadow':F.add(0,600,x,y,(P_,pp,kk,gx,gy)=>{const e=ez.out(kk);P.glow(gx,gy,Rg*(.5+1.0*e),'#140a24',.55*(1-kk),6);P.glow(gx,gy,Rg*(.35+.6*e),k.c2,.35*(1-kk),5);P.ga(1-kk);P.ring(gx,gy,Rg*(.4+1.2*e),k.c,1);for(let i=0;i<8;i++){const an=i/8*6.2832+kk*1.5,d=Rg*(.3+1.1*e);P.glow(gx+Math.cos(an)*d,gy+Math.sin(an)*d*.9,2.2,'#6a4aa0',.6,3);}P.ga(1);},{nf:1});break;
-  case 'dragon':SKH.flameRing(x,y,R,s,'dragon');break;
+  case 'dragon':SKH.waveBurst(x,y,R,s);try{el.animate([{transform:'scale(1)'},{transform:'scale(1.06)',offset:.18},{transform:'scale(.99)',offset:.4},{transform:'scale(1)'}],{duration:460,easing:'ease-out'});}catch(e){}break;
   case 'claw':[-1,0,1].forEach((o,i)=>SKH.sl(x+o*R*.4,y,62,R*2.2*s,k.c,'#c0392b',i*55,380,2));break;
   case 'steel':SKH.sl(x,y,-45,R*2.8*s,'#ffffff',k.c2,0,400,1);F.debris(x,y,{n:N(10),cols:['#ffffff','#d9dbe8',k.c2],sp:260,g:280,dur:480,sz:2,draw:(a,b,s2,c)=>P.line(a,b,a+3,b-3,c,1)});break;
   case 'fairy':for(let i=0;i<N(14);i++){const ox=skRand(-R,R)*1.4,oy=skRand(-R,R)*1.2,c=[k.c2,'#fff4a8','#ffffff',k.c][i%4];F.add(i*22,560,x+ox,y+oy,(P_,pp,kk,gx,gy)=>{const rr=kk<.5?Math.round(1+kk*6):Math.round(4-(kk-.5)*6);if(rr>0){P.glow(gx,gy-kk*3,rr+1.5,c,.3,3);F.spark4(gx,gy-kk*3,rr,c,k.c2);}},{nf:1});}break;
@@ -5256,7 +5328,7 @@ async function skillMove(A,si,toEl,ok,cb,ov){const a=ov?{id:ov.id}:A.board[si];c
  try{fromEl.animate([{transform:'none'},{transform:`translateY(${A===B.me?6:-6}px) scale(${epic&&ok?1.12:.94})`,offset:.5},{transform:'none'}],{duration:260});}catch(e){}
  await wait(170);
  const[bx,by]=center(toEl);
- if(k.m==='proj'){await skShoot(k,center(fromEl),[bx,by],pw);}
+ if(k.m==='proj'){let sp=center(fromEl);if(k.fx==='dragon'||k.fx==='fire'){const r=zRect(fromEl);sp=[sp[0]+Math.sign(bx-sp[0])*r.width*.16,r.top+r.height*.3];}await skShoot(k,sp,[bx,by],pw);}
  else if(k.m==='sky'){if(k.fx==='bolt'){skBolt(k,bx,by,pw);await wait(90);}else{skRockFall(k,bx,by,pw);await wait(pw>=1?260+3*45:260+45);}}
  else if(k.m==='ground'){const r=zRect(toEl);skUpheave(k,bx,by,Math.max(24,Math.min(r.width,r.height)/2),pw);await wait(200);}
  skBurst(k,toEl,pw,cb);if(epic&&ok)skEpicBurst(k,toEl);}
