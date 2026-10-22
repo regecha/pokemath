@@ -4081,7 +4081,7 @@ async function summon(P,hi,slot){const card=P.hand[hi];let id=card;
  if(u.kw==='draw'){const dn=isLeg(u)?2:1;const h0=P.hand.length;for(let q=0;q<dn;q++)draw(P);drawnN=P.hand.length-h0;fx(unitEl(P,slot),'카드 +'+dn,'txt');kwFx('draw',unitEl(P,slot));if(drawnN>0&&P===myP&&!pxFxOff()){renderBattle();await drawFlyFx(unitEl(P,slot),drawnN);}if(isLeg(u)){const m0=P.mana;P.mana=Math.min(Math.max(6,P.mana),P.mana+1);if(P.mana>m0)fx(heroEl(P),'에너지 +1','heal');}}
  if(u.kw==='ember')await emberHit(O,isLeg(u),unitEl(P,slot));
  cleanup();renderBattle();if(drawnN>0&&P===myP)hlNewCards(drawnN);checkEnd();}
-async function emberHit(O,leg,src){const t=O.board.map((x,i)=>x?i:-1).filter(i=>i>=0);
+async function emberHit(O,leg,src){const t=O.board.map((x,i)=>x&&x.hp>0?i:-1).filter(i=>i>=0);   // 이미 불씨로 쓰러진(체력 0 이하) 포켓몬은 대상에서 빼요
  if(!t.length){if(!B.wildMode){const d=leg?2:1;await pxEmberFx(src,heroEl(O));O.hp-=d;fx(heroEl(O),'-'+d,'');}return;}
  const a=t[Math.floor(brand()*t.length)];if(!leg){await pxEmberFx(src,unitEl(O,a));await dealUnit(O,a,1,'불씨');return;}
  const rest=t.filter(x=>x!==a);if(rest.length){const b=rest[Math.floor(brand()*rest.length)];await pxEmberFx(src,unitEl(O,a));await dealUnit(O,a,1,'불씨');await pxEmberFx(src,unitEl(O,b));await dealUnit(O,b,1,'불씨');}else{await pxEmberFx(src,unitEl(O,a));await dealUnit(O,a,2,'불씨');}}
@@ -4394,7 +4394,7 @@ const PXF=(()=>{
  function crackLine(x,y,w,p,delay){add(delay||0,520,x,y,(P_,pp,k,gx,gy)=>{const L=w/S,g=Math.min(1,k/.35),fade=k>.7;let px0=gx-L*g,py0=gy;for(let i=1;i<=14;i++){const nx=gx-L*g+L*g*2*i/14,ny=gy+(i%2?1:-1)*(1+(i%3));if(!fade||(i&1))P.line(px0,py0,nx,ny,p.o,2);px0=nx;py0=ny;}});}
  // ---------- 외부에서 쓰는 이펙트 ----------
  function dust(x,y,n,col){debris(x,y,{n:n,cols:[col||'#d8c8a0','#b8a47a','#efe2bd'],up:true,sp:90,g:-30,dur:620,sz:3,sx:14,draw:(xx,yy,s,c,k)=>{P.ga(1-k*.85);P.glow(xx,yy,s*(.9+k),c,.55,3);P.ga(1);}});}
- return{P,add,hold(ms){frz=Math.max(frz,ms);},S:()=>{if(!parts.length)size();return S;},ez,hz,pal,fr,orb,spark4,flame,shock,star,debris,slash,popRing,crackLine,dust,ROCK,LEAF1,LEAF2,
+ return{P,add,K:()=>K,hold(ms){frz=Math.max(frz,ms);},S:()=>{if(!parts.length)size();return S;},ez,hz,pal,fr,orb,spark4,flame,shock,star,debris,slash,popRing,crackLine,dust,ROCK,LEAF1,LEAF2,
   flash(col,mode){add(0,mode==='long'?260:180,0,0,(P_,p,k)=>{if(k<.34)P.fill(col,.32);else if(k<.67)P.fill(col,.3,true);});},
   hit(x,y,col,n){if(!/^#[0-9a-f]{6}$/i.test(col))col='#ffd23f';const p={c:col,c2:shade(col,.6),o:shade(col,.4),w:'#ffffff'};debris(x,y,{n:n,cols:[col,'#ffffff',shade(col,.7),'#ffe066'],sp:230,g:420,dur:520,sz:3});star(x,y,44,p,240);shock(x,y,64,col,320,0,2);}};
 })();
@@ -4606,7 +4606,7 @@ function waveFx(el,idx){if(pxFxOff()||!el)return;try{
  PXF.add(d+90,1050,U.x,U.y-U.h*.12,(P_,p,k,gx,gy)=>{const e=ez.out(k),yy=gy-e*H*.42,s=k<.15?2:3;P.glow(gx,yy,s+3,'#5be37d',.35*(1-k),4);
   P.rect(gx-s,yy,s*2+1,1,'#baffcb');P.rect(gx,yy-s,1,s*2+1,'#baffcb');P.px(gx,yy,'#ffffff');});
 }catch(e){}}
-// 불씨가 닿은 뒤: 맞은 포켓몬이 화르륵 불타요 (약 1초)
+
 // 요정의 빛: 분홍빛 후광이 번지고 반짝이는 별가루가 나선으로 피어올라요 (약 1.1초)
 function fairyFx(el){if(pxFxOff()||!el)return;try{
  const{S,U,R,W,H}=unitFxGeom(el),P=PXF.P,ez=PXF.ez,cols=['#ffffff','#ffc2e6','#ff8fd0','#fff0a8'];
@@ -4925,6 +4925,127 @@ const SKH={
  feather(P,x,y,len,ang,c1,c2){const ca=Math.cos(ang),sa=Math.sin(ang),nx=-sa,ny=ca,L=[],Rr=[];for(let j=0;j<=8;j++){const u=-1+2*j/8,wv=len*.36*Math.pow(Math.max(0,1-u*u),.6)*(u<-.3?.7:1);L.push([x+ca*u*len+nx*wv,y+sa*u*len+ny*wv]);Rr.push([x+ca*u*len-nx*wv,y+sa*u*len-ny*wv]);}
   P.poly(L.concat(Rr.reverse()),c2);const L2=[],R2=[];for(let j=1;j<=7;j++){const u=-.9+1.7*j/8,wv=len*.17*Math.pow(Math.max(0,1-u*u),.6);L2.push([x+ca*u*len+nx*wv,y+sa*u*len+ny*wv]);R2.push([x+ca*u*len-nx*wv,y+sa*u*len-ny*wv]);}P.poly(L2.concat(R2.reverse()),c1);
   P.line(x-ca*len*1.15,y-sa*len*1.15,x+ca*len*.95,y+sa*len*.95,c2,1);},
+
+
+ D(){PXF.S();return Math.max(2,Math.round(PXF.K()*1.35));},
+ D2(){PXF.S();return Math.max(1,Math.round(PXF.K()*.6));},
+ pick(cols,th,val,i,j){let n=0;while(n<th.length&&val>=th[n])n++;if(n<th.length&&th[n]-val<.06&&((i+j)&1))n++;return cols[Math.min(n,cols.length-1)];},
+ // ===== 도트 불꽃 몸체: 둥근 불덩이 + 휘어 오르는 끝 + 양옆 작은 혀. 색 띠 + 체크무늬 디더, 속은 하얀 심지에 옅은 청록·분홍 반짝임 =====
+ FB:{cols:['#fff6d0','#ffe27a','#ffb82e','#ff7a1c','#e8401c','#9a1e0e'],th:[.15,.3,.48,.68,.86]},
+ flameBody(P,D,cx,by,rx,h,tm,o){
+  o=o||{};const t0=tm*.0042,F=SKH.FB,hz=PXF.hz,fade=o.fade||0,tt=Math.floor(t0*3),
+   T=[{dx:0,w:1,h:1,ph:0,add:0},{dx:-.98,w:.42,h:.55,ph:2.1,add:.1},{dx:1,w:.38,h:.45,ph:4.2,add:.12}];
+  for(let r=0;r<=h;r++){const row=[];
+   for(let c=-Math.ceil(rx*1.5);c<=Math.ceil(rx*1.5);c++){
+    let best=9;
+    for(const q of T){
+     const hh=h*q.h*(1+.08*Math.sin(t0*1.7+q.ph)),t=r/hh;if(t>1)continue;
+     const rr=rx*q.w;let w=Math.max(rr*Math.sqrt(Math.max(0,1-Math.pow((t-.36)/.36,2))),t>.5?rr*.26*Math.pow(1-(t-.5)/.5,1.3):0)*(1+.08*Math.sin(t*8-t0*2+q.ph));
+     const cc=q.dx*rx+Math.sin(t0+q.ph*.5)*rx*.6*t*t+Math.sin(t0*.6+q.ph)*rx*.12*t,s=Math.abs(c-cc)/Math.max(.6,w);if(s>1)continue;
+     const e=s*.82+Math.abs(t-.28)*.62+q.add+(hz(c*3.1+r*7.7+tt)-.5)*.08;if(e<best)best=e;
+    }
+    if(best>=9)continue;
+    const v=best+fade*.7;if(v>1.04)continue;
+    let col=SKH.pick(F.cols,F.th,v,c,r);
+    if(v<.2&&o.tint!==false){const m=(c+r)&3;if(m===0)col='#c6f3ef';else if(m===2&&v<.14)col='#ffd9ea';}
+    P.rect((cx+c)*D,(by-r)*D,D,D,col);
+   }}},
+
+ // ===== 소용돌이 불덩이: 둥근 불덩이(하얀 심지 + 옅은 청록·분홍 반짝임)를 휘어 오르는 불꽃 리본이 감싸요 =====
+ disc(P,D,cx,cy,r,col){r=Math.max(.5,r);const R=Math.ceil(r);for(let dy=-R;dy<=R;dy++){const hw=Math.floor(Math.sqrt(Math.max(0,r*r+.6-dy*dy)));if(hw<0)continue;P.rect((cx-hw)*D,(cy+dy)*D,(2*hw+1)*D,D,col);}},
+ // 나선으로 감아 오르는 불꽃 리본 하나 (바깥 빨강 → 주황 → 노랑을 같은 줄기에 겹쳐 찍어요)
+ ribbon(P,D,cx,cyUp,by,R,a0,dir,sweep,wmax,tm,k,pal,hz){
+  const N=34,pts=[];
+  for(let i=0;i<=N;i++){const s=i/N,ph=a0+dir*s*sweep,rho=R*(.8+.7*s+.06*Math.sin(tm*.006+s*7+k)),up=cyUp+Math.sin(ph)*rho*.95+R*.95*s*s,xx=cx+Math.cos(ph)*rho*1.05,w=wmax*(Math.sin(Math.PI*Math.pow(s,.55))*(1-.28*s))+.3;pts.push([xx,by-up,w]);}
+  [[1,pal[0]],[.66,pal[1]],[.34,pal[2]]].forEach(([f,c])=>{for(const p of pts)SKH.disc(P,D,Math.round(p[0]),Math.round(p[1]),p[2]*f,c);});},
+ fireball(P,D,cx,by,R,tm,o){
+  o=o||{};const fade=o.fade||0,hz=PXF.hz,cyUp=R,t0=tm,tt=Math.floor(tm*.012),
+   PAL=[['#d93a14','#ff7a1c','#ffc83a'],['#e8481c','#ff8a2a','#ffe27a']],
+   sw=1.75+.25*Math.sin(t0*.004);
+  // 뒤쪽 큰 불꽃 리본 두 줄 (반대로 휘어 올라요)
+  SKH.ribbon(P,D,cx,cyUp,by,R,Math.PI*1.1,-1,sw+.2,R*.55,t0,0,PAL[0],hz);
+  SKH.ribbon(P,D,cx,cyUp,by,R,Math.PI*-.3,1,sw-.2,R*.42,t0,2,PAL[1],hz);
+  // 둥근 몸통: 가장자리는 불꽃처럼 일렁이고, 안쪽은 색 띠 + 체크무늬
+  const Re=Math.ceil(R*1.2),cols=['#fff8dc','#ffe27a','#ffb82e','#ff7a1c','#e8401c'],th=[.22,.42,.64,.84];
+  for(let j=-Re;j<=Re;j++)for(let i=-Re;i<=Re;i++){
+   const d0=Math.hypot(i,j)/R,an=Math.atan2(j,i),edge=1+.07*Math.sin(an*3+t0*.006)+.05*Math.sin(an*5-t0*.009)+(hz(Math.round(an*4)+tt)-.5)*.06;
+   const d=d0/edge;if(d>1)continue;
+   const v=d+fade*.5;if(v>1)continue;
+   let c=SKH.pick(cols,th,v,i,j);
+   if(d<.5&&o.tint!==false){const k=(i*.7+j*.7)/R,m=(i+j)&1;if(d<.4&&k>.12&&(m===0||d<.3))c='#ffc2e0';else if(d<.4&&k<-.12&&(m===0||d<.3))c='#b6f4f0';}
+   P.rect((cx+i)*D,(by-cyUp-j)*D,D,D,c);
+  }
+  // 앞쪽 가는 불꽃 한 줄 (몸통 앞을 스치며 감아요)
+  SKH.ribbon(P,D,cx,cyUp,by,R*.92,Math.PI*1.55,1,sw*.7,R*.22,t0+400,5,PAL[1],hz);},
+ // 4갈래 반짝이 (도트 + 모양)
+ twinkle(P,D,x,y,sz,c1,c2){P.rect(x*D,y*D,D,D,'#ffffff');for(let i=1;i<=sz;i++){const c=i===sz&&sz>1?c2:c1;P.rect((x+i)*D,y*D,D,D,c);P.rect((x-i)*D,y*D,D,D,c);P.rect(x*D,(y+i)*D,D,D,c);P.rect(x*D,(y-i)*D,D,D,c);}},
+ // ===== 불꽃·드래곤 브레스: 입구에서 겹겹의 불꽃 덩어리가 쉬지 않고 뿜어져 나가요 (바깥 실루엣에만 윤곽, 안쪽은 색 띠, 매 프레임 부드럽게) =====
+ BP:{
+  fire:{ol:'#6e1006',cols:['#d92b14','#ff5a14','#ff9a1f','#ffd23f','#fff4b8'],spk:['#ffffff','#ffe27a','#ff9a1f'],smoke:'#3a1410',bloom:'#ff7a1c',wid:1},
+  dragon:{ol:'#240b4a',cols:['#5a1fa0','#9a36d6','#e04bd0','#ff8de6','#ffe9fb'],spk:['#ffffff','#ffb3f0','#c78bff'],smoke:'#1a0a33',bloom:'#c04fd8',wid:1.15}},
+ // 방울 불꽃: 둥근 머리(앞) + 휘어지며 가늘어지는 꼬리(뒤)
+ drop(P,x,y,ang,len,w,curl,c,al){
+  const ca=Math.cos(ang),sa=Math.sin(ang),nx=-sa,ny=ca,pts=[],T=[],U=[];
+  for(let j=0;j<=8;j++){const f=-Math.PI/2+Math.PI*j/8;pts.push([x+ca*Math.cos(f)*w+nx*Math.sin(f)*w,y+sa*Math.cos(f)*w+ny*Math.sin(f)*w]);}
+  for(let j=2;j<=8;j++){const t=j/8,lat=w*Math.pow(1-t,1.15),cu=curl*len*t*t,bx=x-ca*len*t,by=y-sa*len*t;T.push([bx+nx*(lat+cu),by+ny*(lat+cu)]);U.push([bx+nx*(-lat+cu),by+ny*(-lat+cu)]);}
+  P.poly(pts.concat(T,U.reverse()),c,al);},
+ // 혀 불꽃: 밑동이 넓고 끝이 뾰족하게 휘어요 (불꽃 고리용)
+ lick(P,x,y,ang,len,w,curl,c,al){
+  const ca=Math.cos(ang),sa=Math.sin(ang),nx=-sa,ny=ca,L=[],R=[],n=8;
+  for(let j=0;j<=n;j++){const t=j/n,wp=w*Math.pow(1-t,.8)*(1+.3*Math.sin(t*3)),cu=curl*len*t*t,cx=x+ca*len*t+nx*cu,cy=y+sa*len*t+ny*cu;L.push([cx+nx*wp,cy+ny*wp]);R.push([cx-nx*wp,cy-ny*wp]);}
+  P.poly(L.concat(R.reverse()),c,al);},
+ // 항목 여러 개를 두 번에 나눠 그려요: ① 바깥 윤곽만 모아서 ② 색 띠를 겹쳐서 → 불꽃끼리 겹친 안쪽엔 윤곽선이 남지 않아요
+ layers(P,items,B,shape){
+  const C=B.cols,f=SKH[shape];
+  for(const it of items)f(P,it.x,it.y,it.an,it.len*1.12,it.w*1.2,it.curl,B.ol,it.al*.92);
+  for(const it of items){const b=it.heat>.6?1:0;
+   f(P,it.x,it.y,it.an,it.len,it.w,it.curl,C[b],it.al);
+   f(P,it.x,it.y,it.an,it.len*.84,it.w*.74,it.curl*.85,C[b+1],it.al);
+   f(P,it.x,it.y,it.an,it.len*.62,it.w*.5,it.curl*.7,C[b+2],it.al);
+   if(it.heat>.3)f(P,it.x,it.y,it.an,it.len*.4,it.w*.28,it.curl*.5,C[b+3],it.al);}},
+ breath(k,a,b,pw,style){
+  const F=PXF,S0=F.S(),hz=F.hz,ez=F.ez,B=SKH.BP[style],sc=(pw>=1?Math.min(1.5,pw):.65)*1.7,dx=b[0]-a[0],dy=b[1]-a[1],Lpx=Math.hypot(dx,dy)||1,ang=Math.atan2(dy,dx),ca=Math.cos(ang),sa=Math.sin(ang),nx=-sa,ny=ca,
+   ax=a[0]/S0,ay=a[1]/S0,bx=b[0]/S0,by=b[1]/S0,dur=1000,tr=400,N=48,wd=B.wid,rise=dy>0?-.2:.2;
+  F.add(0,dur,a[0],a[1],(P,pp,kk)=>{
+   const age=pp.age,front=ez.out(Math.min(1,age/tr)),Lf=Lpx*front/S0,fo=age>dur-300?Math.max(0,(dur-age)/300):1,pos=(d,off)=>[ax+ca*d+nx*off,ay+sa*d+ny*off];
+   P.glow(...pos(Lf*.45,0),(5+Lf*.1)*sc*wd,B.bloom,.12*fo,5);P.glow(...pos(Lf*.85,0),(7+Lf*.1)*sc*wd,B.bloom,.09*fo,5);
+   const ps=[];for(let i=0;i<N;i++)ps.push([((i/N)+age*.0018)%1,i]);ps.sort((u,v)=>v[0]-u[0]);
+   const items=[];
+   for(const [ph,i] of ps){
+    const spread=(.9+ph*6.4)*sc*.62*wd,off=(hz(i*7.1)-.5)*2*spread+Math.sin(age*.0055+i*1.9)*spread*.3,[X,Y]=pos(ph*Lf,off),
+     r=(1.9+ph*5.6)*sc*wd*(.85+.3*hz(i*1.9)),al=fo*Math.min(1,ph*8)*(ph>.86?(1-ph)/.14:1);
+    if(al<=.03)continue;
+    items.push({x:X,y:Y,an:ang+(hz(i*5.7)-.5)*.4*ph+rise*ph*ph,len:r*(2.6+ph),w:r,curl:(hz(i*3.3)-.5)*.8+Math.sin(age*.008+i)*.25,heat:1-ph*.95,al});
+   }
+   // 입구의 밝은 부채꼴 불꽃
+   for(let m=-2;m<=2;m++){const an=ang+m*.28+Math.sin(age*.016+m*1.7)*.09,len=(8.5-Math.abs(m)*1.4)*sc*(.88+.12*Math.sin(age*.025+m)),[X,Y]=pos(len*.15,0);items.push({x:X,y:Y,an,len,w:len*.3,curl:Math.sin(age*.012+m)*.3,heat:1,al:fo});}
+   SKH.layers(P,items,B,'drop');
+   const lk=[];for(let j=0;j<16;j++){const ph=((j/16)+age*.0021)%1,sd=j%2?1:-1,sp=(1+ph*6.4)*sc*.62*wd*(.8+.5*hz(j*2.9)),[X,Y]=pos(ph*Lf*.97,sd*sp),al=fo*Math.min(1,ph*8)*(ph>.86?(1-ph)/.14:1),len=(5+ph*10)*sc*wd;
+    if(al>.03)lk.push({x:X,y:Y,an:ang+sd*(.5-ph*.25)+rise*ph,len,w:len*.2,curl:-sd*(.5+.3*Math.sin(age*.01+j)),heat:.9-ph*.85,al});}
+   SKH.layers(P,lk,B,'lick');
+   for(let j=0;j<30;j++){const ph=((j/30)+age*.0034)%1,d=ph*Lf*(.45+.55*ph),side=(hz(j*3+5)-.5)*2,[X,Y]=pos(d,side*(2+ph*ph*9)*sc*wd),al=fo*(1-ph*.7);P.ga(al);if(j%6===0)F.spark4(X,Y,2,B.spk[0],B.spk[1]);else P.rect(X,Y,2,2,B.spk[j%3]);P.ga(1);}
+   P.glow(ax,ay,4.5*sc,'#ffffff',.5*fo,3);P.glow(ax,ay,8*sc,B.bloom,.3*fo,4);
+   if(age>tr*.8){const t=Math.min(1,(age-tr*.8)/300);P.glow(bx,by,(5+4*t)*sc*wd,B.bloom,.28*t*fo,4);}
+  },{nf:1});
+  return tr;},
+ // 맞는 곳: 불꽃(보라 불꽃) 고리가 소용돌이치며 피어올라요
+ flameRing(x,y,R,s,style){
+  const F=PXF,S0=F.S(),hz=F.hz,ez=F.ez,B=SKH.BP[style],Rg=Math.max(9,R*1.1*s/S0),dur=900,M=15;
+  F.add(0,dur,x,y,(P,pp,kk,gx,gy)=>{
+   const age=pp.age,e=ez.out(Math.min(1,age/280)),fade=kk>.58?Math.max(0,1-(kk-.58)/.42):1,rot=age*.0017,rr=Rg*(.42+.6*e);
+   if(kk<.18)P.glow(gx,gy,Rg*1.25,'#ffffff',.5*(1-kk/.18),5);
+   P.glow(gx,gy,rr*1.05,B.bloom,.2*fade,5);P.glow(gx,gy,rr*.55,B.cols[2],.14*fade,4);
+   const items=[];
+   for(let layer=0;layer<2;layer++){const cnt=layer?M-5:M,R2=rr*(layer?.72:1),dir=layer?-1:1;
+    for(let i=0;i<cnt;i++){
+     const th=i/cnt*6.2832+rot*dir*(layer?1.4:1)+hz(i+layer*9)*.2,
+      len=(.7+.45*hz(i*2.3+layer*5)+.1*Math.sin(age*.012+i*2))*Math.min(1,e*1.25)*Rg*(layer?.62:.86)*(1-kk*.45),
+      X=gx+Math.cos(th)*R2,Y=gy+Math.sin(th)*R2*.9,tg=th+dir*Math.PI/2-dir*.28,vx=Math.cos(tg),vy=Math.sin(tg)*.85-.42;
+     items.push({x:X,y:Y,an:Math.atan2(vy,vx),len,w:len*.42,curl:dir*.5+Math.sin(age*.01+i)*.15,heat:layer?.9:.45,al:fade});
+    }}
+   SKH.layers(P,items,B,'lick');
+   for(let j=0;j<22;j++){const ph=Math.min(1,age/720+hz(j*1.7)*.15),an=hz(j*3.3+1)*6.2832,rr2=Rg*(.9+.9*ph)*(.7+.3*hz(j+7)),X=gx+Math.cos(an)*rr2,Y=gy+Math.sin(an)*rr2*.9-ph*Rg*.5,al=fade*(1-ph*.6);P.ga(al);if(j%3===0)F.spark4(X,Y,2,B.spk[0],B.spk[1]);else P.rect(X,Y,2,2,B.spk[j%3]);P.ga(1);}
+  },{nf:1});},
  // 줄기형 발사: 화염방사기·물대포·브레스처럼 입구에서 목표까지 끊김 없이 뿜어져 나가요. 도착 시간(ms)을 돌려줘요
  stream(k,a,b,pw,style){const S0=PXF.S(),hz=PXF.hz,ez=PXF.ez,sc=(pw>=1?Math.min(1.5,pw):.65)*1.7,dx=b[0]-a[0],dy=b[1]-a[1],Lpx=Math.hypot(dx,dy)||1,ang=Math.atan2(dy,dx),ca=Math.cos(ang),sa=Math.sin(ang),nx=-sa,ny=ca,ax=a[0]/S0,ay=a[1]/S0,bx=b[0]/S0,by=b[1]/S0;
   const C={flame:{dur:800,tr:340,N:52,fl:.0022,cols:['#fff6c8','#ffd23f','#ff7a1c','#e8261a'],smoke:'#4a2418',w0:1.6,w1:6.4,sp:8.5,spark:['#ffffff','#ffd23f','#ff7a1c']},
@@ -5013,7 +5134,8 @@ function skFireBlast(x,y,R,pw,cb){
  if(big)F.add(0,140,0,0,(P_,pp,kk)=>{P.fill('#fff4cc',.14*(1-kk));},{nf:1});
 }
 // 날아가는 기술: 타입마다 모양이 다른 발사체가 부드러운 꼬리를 끌며 날아가요
-function skShoot(k,a,b,pw){if(k.fx==='fire'&&!pxFxOff())return wait(skFireStreak(a,b,pw));if(k.fx==='fire'||k.fx==='dragon'||k.fx==='water'||k.fx==='shadow')return wait(SKH.stream(k,a,b,pw,k.fx==='fire'?'flame':k.fx==='dragon'?'dragon':k.fx==='water'?'jet':'smoke'));
+function skShoot(k,a,b,pw){if(k.fx==='fire'&&!pxFxOff())return wait(skFireStreak(a,b,pw));if(k.fx==='fire'||k.fx==='dragon')return wait(SKH.breath(k,a,b,pw,k.fx));
+ if(k.fx==='water'||k.fx==='shadow')return wait(SKH.stream(k,a,b,pw,k.fx==='fire'?'flame':k.fx==='dragon'?'dragon':k.fx==='water'?'jet':'smoke'));
  const P0=SKP[k.fx]||SKP.fire,n=Math.max(1,Math.round(P0.n*(pw>=1?1:.6))),dur=320,gap=55,p=PXF.pal(k),sc=(pw>=1?Math.min(1.5,pw):.65)*1.7;
  const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L,ang=Math.atan2(dy,dx),ca=Math.cos(ang),sa=Math.sin(ang);
  for(let i=0;i<n;i++){const off=n>1?(i-(n-1)/2)*(P0.spread||0):0,wob=k.fx==='swarm'?skRand(-18,18):0,seed=Math.random()*50;
@@ -5049,15 +5171,15 @@ function skBolt(k,x,y,pw){const p=PXF.pal(k),big=pw>=1;let px=x+skRand(-40,40);c
  if(big)PXF.add(0,170,0,0,(P_,pp,kk)=>{PXF.P.fill('#fff6b0',.14*(1-kk));},{nf:1});}
 // 맞는 곳에서 터지는 연출: 섬광 + 타입별 마무리
 function skBurst(k,el,pw,cb){if(!el)return;const[x,y]=center(el),r=zRect(el),R=Math.max(24,Math.min(r.width,r.height)/2),s=pw>=1?(cb?1.9:1.45):.75,N=v=>Math.max(3,Math.round(v*s*1.3)),p=PXF.pal(k),F=PXF,P=F.P,ez=F.ez,hz=F.hz,Rg=R/F.S()*Math.pow(s,.85);
- if(k.fx==='fire'){F.hold(pw>=1?70:30);skFireBlast(x,y,R,pw,cb);return;}
- F.hold(pw>=1?70:30);SKH.flare(x,y,R*1.7*s,k.c,k.c2,340);F.shock(x,y,R*2.3*s,k.c2,380,0,1);if(pw>=1)F.shock(x,y,R*3.1*s,k.c,520,100,1);
+ if(k.fx==='fire'&&!pxFxOff()){F.hold(pw>=1?70:30);skFireBlast(x,y,R,pw,cb);return;}
+ F.hold(pw>=1?70:30);if(k.fx!=='fire'&&k.fx!=='dragon'){SKH.flare(x,y,R*1.7*s,k.c,k.c2,340);F.shock(x,y,R*2.3*s,k.c2,380,0,1);if(pw>=1)F.shock(x,y,R*3.1*s,k.c,520,100,1);}
  if(pw>=1)F.add(0,170,0,0,(P_,pp,kk)=>{P.fill('#ffffff',.14*(1-kk));},{nf:1});
  if(cb){F.shock(x,y,R*3*s,'#ffd23f',460,60,1);F.debris(x,y,{n:10,cols:['#ffe066','#ffffff','#ff9a1f'],sp:230,g:200,dur:640,sz:3,draw:(a,b,s2,c)=>F.spark4(a,b,2,c,'#fff')});}
  const flames=(c1,c2,c3)=>F.add(0,700,x,y,(P_,pp,kk,gx,gy)=>{const e=ez.out(Math.min(1,kk*1.4)),fd=1-kk*kk;P.glow(gx,gy,Rg*(.6+.9*e),c1,.5*fd,8);P.glow(gx,gy,Rg*(.3+.5*e),c2,.7*fd,6);
   for(let i=0;i<24;i++){const an=hz(i*2+1)*6.2832,rr=Rg*(.15+1.15*e)*(.35+.65*hz(i+4)),X=gx+Math.cos(an)*rr,Y=gy+Math.sin(an)*rr*.9-kk*Rg*.25,r=(1.8+3.2*hz(i+8))*s*(1-kk*.4),life=kk+hz(i)*.2,col=life<.25?c3:life<.55?c2:c1;P.glow(X,Y,r*1.4,c1,.3*fd,3);P.glow(X,Y,r,col,.65*fd,3);}
   for(let j=0;j<18;j++){const an=hz(j*3+2)*6.2832,rr=Rg*(.3+1.6*e)*(.5+.5*hz(j+9));P.ga(fd);P.px(gx+Math.cos(an)*rr,gy+Math.sin(an)*rr*.92,j%3?c2:'#ffffff');}P.ga(1);},{nf:1});
  switch(k.fx){
-  case 'fire':skFireBlast(x,y,R,pw,cb);break;
+  case 'fire':SKH.flameRing(x,y,R,s,'fire');break;
   case 'water':F.add(0,560,x,y,(P_,pp,kk,gx,gy)=>{const e=ez.out(kk);P.glow(gx,gy,Rg*.9*e,k.c2,.35*(1-kk),6);for(let i=0;i<16;i++){const an=-Math.PI*(.1+.8*i/15),sp=Rg*(1.1+.5*hz(i+2));const px=gx+Math.cos(an)*sp*kk*1.1,py=gy+Math.sin(an)*sp*kk*1.1+kk*kk*Rg*.9;P.ga(1-kk);P.glow(px,py,1.7,i%2?'#ffffff':k.c,.9,2);P.px(px,py+1,k.c2);}P.ga(1);},{nf:1});F.shock(x,y,R*1.6*s,'#ffffff',320,90,1);break;
   case 'leaf':for(let i=0;i<N(10);i++){const an=i/N(10)*6.2832+skRand(0,.5),sp=skRand(.7,1.2);F.add(i*18,720,x,y,(P_,pp,kk,gx,gy)=>{const e=ez.out(kk),rr=Rg*(.3+1.2*sp*e),a2=an+kk*2.2,lx=gx+Math.cos(a2)*rr,ly=gy+Math.sin(a2)*rr*.85-kk*Rg*.3;P.ga(1-kk*.9);SKH.leaf(P,lx,ly,4.6,a2*2+kk*6,k.c2,k.c);P.ga(1);},{nf:1});}
    F.add(0,500,x,y,(P_,pp,kk,gx,gy)=>{P.glow(gx,gy,Rg*(.6+.7*ez.out(kk)),k.c,.4*(1-kk),6);},{nf:1});break;
@@ -5075,7 +5197,7 @@ function skBurst(k,el,pw,cb){if(!el)return;const[x,y]=center(el),r=zRect(el),R=M
   case 'swarm':for(let i=0;i<N(14);i++){const a0=skRand(0,6.28);F.add(i*15,600,x,y,(P_,pp,kk,gx,gy)=>{const aa=a0+kk*Math.PI*3,rr=Rg*(.4+kk*.8)*(1-kk*.2),bx=gx+Math.cos(aa)*rr,by=gy+Math.sin(aa)*rr,f2=F.fr(pp)&1;P.glow(bx,by,2.2,k.c,.55,3);P.rect(bx-1,by-1,2,2,'#2c3306');P.px(bx,by-1,k.c);P.ga(.8);P.line(bx-(f2?1:2),by-2,bx-1,by-1,'#ffffff',1);P.line(bx+(f2?1:2),by-2,bx+1,by-1,'#ffffff',1);P.ga(1);},{nf:1});}break;
   case 'rockfall':F.debris(x,y,{n:N(8),cols:[k.c,k.c2,'#a08a4a'],up:true,sp:230,g:700,dur:640,sz:2,draw:(a,b,s2,c,kk,pp,ph)=>SKH.rock(P,a,b,2.4,ph,k.c,k.c2,p.o)});F.dust(x,y+R*.4,N(10));break;
   case 'shadow':F.add(0,600,x,y,(P_,pp,kk,gx,gy)=>{const e=ez.out(kk);P.glow(gx,gy,Rg*(.5+1.0*e),'#140a24',.55*(1-kk),6);P.glow(gx,gy,Rg*(.35+.6*e),k.c2,.35*(1-kk),5);P.ga(1-kk);P.ring(gx,gy,Rg*(.4+1.2*e),k.c,1);for(let i=0;i<8;i++){const an=i/8*6.2832+kk*1.5,d=Rg*(.3+1.1*e);P.glow(gx+Math.cos(an)*d,gy+Math.sin(an)*d*.9,2.2,'#6a4aa0',.6,3);}P.ga(1);},{nf:1});break;
-  case 'dragon':flames('#7a3fd0','#ff7ad9','#ffffff');F.debris(x,y,{n:N(12),cols:[k.c,k.c2,'#ff7ad9'],up:true,sp:180,g:-70,dur:680,sz:2,sx:R*.5,stagger:14,draw:(a,b,s2,c)=>P.px(a,b,c)});F.shock(x,y,R*2.6*s,k.c,460,60,1);break;
+  case 'dragon':SKH.flameRing(x,y,R,s,'dragon');break;
   case 'claw':[-1,0,1].forEach((o,i)=>SKH.sl(x+o*R*.4,y,62,R*2.2*s,k.c,'#c0392b',i*55,380,2));break;
   case 'steel':SKH.sl(x,y,-45,R*2.8*s,'#ffffff',k.c2,0,400,1);F.debris(x,y,{n:N(10),cols:['#ffffff','#d9dbe8',k.c2],sp:260,g:280,dur:480,sz:2,draw:(a,b,s2,c)=>P.line(a,b,a+3,b-3,c,1)});break;
   case 'fairy':for(let i=0;i<N(14);i++){const ox=skRand(-R,R)*1.4,oy=skRand(-R,R)*1.2,c=[k.c2,'#fff4a8','#ffffff',k.c][i%4];F.add(i*22,560,x+ox,y+oy,(P_,pp,kk,gx,gy)=>{const rr=kk<.5?Math.round(1+kk*6):Math.round(4-(kk-.5)*6);if(rr>0){P.glow(gx,gy-kk*3,rr+1.5,c,.3,3);F.spark4(gx,gy-kk*3,rr,c,k.c2);}},{nf:1});}break;
