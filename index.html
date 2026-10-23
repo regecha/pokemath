@@ -156,7 +156,7 @@ h2{font-size:26px;margin-bottom:8px}h3{font-size:19px;margin:12px 0 6px}
 .gdPet{position:absolute;width:calc(var(--s,44) * var(--k,1) * 1px);height:calc(var(--s,44) * var(--k,1) * 1px);transform:translate(-50%,-100%);transition:left 3.6s linear,top 3.6s linear;cursor:pointer;z-index:3;display:flex;align-items:flex-end;justify-content:center}
 .gdPet img{max-width:100%;max-height:100%;image-rendering:pixelated;transition:transform .3s;filter:drop-shadow(0 1px 0 rgba(255,255,255,.35))}
 .gdPet.flip img{transform:scaleX(-1)}
-.gdPet.fly:after{opacity:.5;bottom:-14px;left:24%;right:24%}
+.gdPet.fly:after{display:none}
 .gdPet:after{content:"";position:absolute;bottom:-3px;left:14%;right:14%;height:7px;border-radius:50%;background:rgba(20,60,20,.22);z-index:-1}
 .gdHatch{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%) scale(var(--k,1));z-index:2;display:flex;flex-direction:column;align-items:center;pointer-events:none}
 .gdDome{position:relative;width:76px;height:88px;border-radius:38px 38px 10px 10px;background:linear-gradient(140deg,rgba(255,255,255,.6),rgba(200,235,255,.22) 55%,rgba(255,255,255,.35));border:2px solid rgba(255,255,255,.95);box-shadow:inset 0 0 14px rgba(255,255,255,.75),0 0 18px rgba(255,232,150,.8),0 0 0 2px rgba(201,162,74,.55);display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px}
@@ -11770,9 +11770,10 @@ function gdEggSVG(t,fed,empty){const c=empty?'#c9c4b8':TYPE_COL[t],hi=gdShade(c,
   ${cr>=1?`<path d="M42 8l-5 9 7 5-6 8 5 6" stroke="${dk}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:''}${cr>=2?`<path d="M14 50l8-5 3 8 7-4 4 7" stroke="${dk}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:''}${cr>=3?`<path d="M66 48l-9 3 3 9-8 3-2 8M52 26l9 5-4 7" stroke="${dk}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:''}
   <path d="${E}" fill="none" stroke="${dk}" stroke-width="2.6"/><path d="${E}" fill="none" stroke="url(#${id}g)" stroke-width=".9" transform="translate(40 52) scale(.96) translate(-40 -52)" opacity=".7"/></svg>`;}
 function gdFly(id){try{return !!(MON[id]&&MON[id].types&&MON[id].types.includes(9));}catch(e){return false;}}
-function gdPos(id){const f=document.getElementById('gdField'),H=f&&f.clientHeight>50?f.clientHeight:267,k=f&&f.clientWidth?f.clientWidth/400:1;
- if(gdFly(id)){const lo=Math.min(46,Math.max(14,Math.ceil(gdSize(id)*k/H*100)+3));return {x:8+Math.random()*84,y:lo+Math.random()*Math.max(0,47-lo),fly:1};}
- return {x:8+Math.random()*84,y:56+Math.random()*38,fly:0};}
+function gdPos(id){const f=document.getElementById('gdField'),H=f&&f.clientHeight>50?f.clientHeight:267,k=f&&f.clientWidth?f.clientWidth/400:1,sp=gdSize(id)*k/H*100;
+ // 비행 포켓몬: 몸 전체가 정원 절반 위쪽 / 걷는 포켓몬: 발은 물론 몸도 대부분 정원 절반 아래쪽 (y = 발 위치 %)
+ if(gdFly(id)){const lo=Math.min(46,Math.max(14,Math.ceil(sp)+3));return {x:8+Math.random()*84,y:lo+Math.random()*Math.max(0,47-lo),fly:1};}
+ const lo=Math.min(92,Math.max(56,Math.ceil(50+sp*.85)));return {x:8+Math.random()*84,y:lo+Math.random()*Math.max(0,97-lo),fly:0};}
 function gdSize(id){const h=(MON[id]&&+MON[id].ht)||1;return Math.round(Math.max(40,Math.min(115,32+26*Math.sqrt(h))));}
 function gdIncHTML(egg){const e=!!egg,c=e?TYPE_COL[egg.t]:'#7b819c',lit=e?Math.floor(egg.fed/10):0,hi=gdShade(c,.5);
  const leds=[...Array(10)].map((_,i)=>{const x=22+i*8.4,y=124+(1-Math.pow((i-4.5)/4.5,2))*4.5,on=i<lit;return `<rect class="${on?'gdLed':''}" x="${(x-2.6).toFixed(1)}" y="${y.toFixed(1)}" width="5.2" height="3.2" rx="1.4" fill="${on?c:'#2c3050'}" ${on?`style="filter:drop-shadow(0 0 3px ${c})"`:''} stroke="#0e1020" stroke-width=".6"/>`;}).join('');
