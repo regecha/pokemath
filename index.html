@@ -465,7 +465,7 @@ html.safe .hand{padding-left:72px}
 html.safe .bBot{padding-left:72px}
 @media(max-width:560px){.bTop,.bBot{flex-wrap:wrap;gap:5px;padding:4px 8px}.mana i{width:11px;height:11px;border-width:1.5px}.mana b{font-size:13px}.hero .av{width:36px;height:36px}.hero .av img{width:32px;height:32px}.hero{padding:2px 8px 2px 2px;gap:5px}.hero .hhp{font-size:18px}.hero .hn{font-size:13px}#bPower{font-size:12px;padding:6px 8px}.bTop .pill,.bBot .pill{font-size:13px;padding:2px 7px}.mid{min-height:28px}.mid .msg{font-size:14px}}
 @media(max-width:520px){.card.sm{width:76px}.hand{--hg:3px;padding-left:4px;padding-right:4px}.slot{width:clamp(56px,18.2vw,104px)}.unit .un{font-size:10.5px;padding:0 4px}.unit .st{min-width:20px;height:19px;font-size:12.5px;padding:0 3px}.unit .kwI .ic{width:14px;height:14px}.unit .tdots i{width:7px;height:7px}.tbadge b{font-size:11px;padding:3px 5px}.tiles{grid-template-columns:repeat(2,1fr)}.tile.main{flex-direction:column;text-align:center}}
-@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important}}
+/* (동작 줄이기 설정에서 애니메이션을 0.01초로 압축해 NEW 표시가 초고속으로 깜빡이던 규칙 제거) */
 
 /* ===== 카드팩 오픈 연출 업그레이드: 우주빛 충전 → 폭발 공개 ===== */
 #pack{overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#3c438f 0%,#17183f 55%,#090b22 100%)}
@@ -567,7 +567,7 @@ html.lowfx .packExplosion i{display:none}
 html.lowfx .pkShowcase::before{animation:none!important;opacity:.25}
 @media(max-width:560px){.flip{animation-delay:calc(var(--i,0)*420ms)}.pkShowcase::before{inset:-15px}}
 
-@media(prefers-reduced-motion:reduce){#pack.charging .pkShowcase,.pkShowcase::before,.packExplosion,.packExplosion b.burstShock,.packExplosion i,.flip{animation-duration:.01ms!important;animation-delay:0ms!important}}
+/* (동작 줄이기 설정에서 애니메이션을 0.01초로 압축해 NEW 표시가 초고속으로 깜빡이던 규칙 제거) */
 
 
 
@@ -1791,7 +1791,7 @@ html.lowfx .packExplosion u{display:none}
 #banner.gold .b1{color:#e8e3c7;-webkit-text-stroke:3px #a85a00;text-shadow:0 5px 0 #a85a00,0 0 26px #ffc83a,0 0 50px rgba(255,170,30,.8)}
 #banner.gold .b2{color:#7a4300;background:linear-gradient(#efecd8,#ffd868);box-shadow:0 0 18px rgba(255,200,60,.9)}
 html.lowfx .lgsFx u,html.lowfx .lgsFx em,html.lowfx .lgsFx i{display:none}
-@media(prefers-reduced-motion:reduce){.lgsFx *,#pack.lgsQuake .pkRow,.flip.lgsHit .in,.flip.lgsHit .fc{animation-duration:.01ms!important}}
+/* (동작 줄이기 설정에서 애니메이션을 0.01초로 압축해 NEW 표시가 초고속으로 깜빡이던 규칙 제거) */
 
 /* ===== v8: 부드러운 인트로 · 통일된 컬러 버튼 · 도트 로고 ===== */
 #ttFade{position:fixed;inset:0;z-index:300;background:#0d0b26;pointer-events:none;opacity:1;will-change:opacity;animation:ttFadeOut .01s 9s forwards}
@@ -2682,7 +2682,7 @@ function defaultMeta(){return{ver:SAVE_VER,name:'',code:'',gs:'',cls:'',focus:nu
  xp:0,lp:0,lpRetrofit:false,lpBonus5Done:false,trainerSkills:{heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},coins:0,candy:0,packs:0,dust:0,pity:{p4:0,p5:0},col:{},seen:{},dexSeen:{},deck:[],
  sk:{},days:{},hist:[],train:{last:'',best:0,count:0,lastRes:null,daily:''},
  badges:{},gyms:{},battles:{w:0,l:0},stats:{q:0,c:0,streak:0,bestCombo:0,bestStreak:0,guessWrong:0,guessAlert:0,careful:0,lowerStar:0,shardDone:0,crafted:0,foundDone:0,superEff:0,gymTry:0,retryOk:0,bounce:0,fast:0,better:0,perfect:0,quickTrain:0,practice:0,comeback:0,flawless:0,defOk:0,candyAll:0,evolved:0,opened:0},
- unl:{},unlNew:{},ach:{},partner:0,bond:{},stoneSeen:null,card:null,uMaxAt:'',shard:{},dust:0,season:null,seasons:[],bsave:null,thist:[],first20:null,first20t:null,found:{},endless:{best:0,total:0,runs:0,caught:0},pvp:{n:0,w:0,l:0,gg:0,foes:{},last:0},tod:{m:0,a:0,e:0},firstPlay:0,scenario:{chapter:0,unlocked:0,cleared:[],seenIntro:false},settings:{anim:'calm',sound:true,bgm:true,lowfx:false,easy:false,safe:'auto',zoom:(/Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent)||(window.matchMedia&&matchMedia('(pointer:coarse)').matches)?'0.85':'auto'),fit:'auto',imgs:true,defq:true,iq:true}};}
+ unl:{},unlNew:{},ach:{},partner:0,bond:{},stoneSeen:null,card:null,uMaxAt:'',shard:{},dust:0,season:null,seasons:[],bsave:null,thist:[],first20:null,first20t:null,found:{},endless:{best:0,total:0,runs:0,caught:0},pvp:{n:0,w:0,l:0,gg:0,foes:{},last:0},tod:{m:0,a:0,e:0},firstPlay:0,scenario:{chapter:0,unlocked:0,cleared:[],seenIntro:false},settings:{anim:'gif',sound:true,bgm:true,lowfx:false,easy:false,safe:'auto',zoom:(/Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent)||(window.matchMedia&&matchMedia('(pointer:coarse)').matches)?'0.85':'auto'),fit:'auto',imgs:true,defq:true,iq:true}};}
 function mergeMeta(m){const d=defaultMeta();if(!m||typeof m!=='object')return d;for(const k in d){if(!(k in m))continue;if(d[k]&&typeof d[k]==='object'&&!Array.isArray(d[k]))d[k]=Object.assign(d[k],m[k]);else d[k]=m[k];}for(const k in m){if(!(k in d))d[k]=m[k];}return d;}  // 기본값에 없는 키(예: 로그라이크 rl 기록)도 버리지 않고 그대로 이어받아요
 function upgradeMeta(m){
  // v1 → v2: 처음 20문제 기록·개념별 최근 기록이 생겼어요. 옛 기록에서 알 수 있는 만큼 채워요.
@@ -7369,7 +7369,7 @@ function showSettings(){const st=S.meta.settings;if(st.easy===undefined)st.easy=
   <div class=setRow><span><b>배경 음악 🎵</b><br><span class=mut style="font-size:12px">처음 화면을 터치하면 음악이 재생되고, 전투 중에는 긴장감 있는 음악으로 바뀌어요</span></span>${seg('bgm',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>배경 음악 크기 🔊</b><br><span class=mut style="font-size:12px">막대를 밀어서 크기를 맞춰요 (효과음은 그대로예요)</span></span><div class=volBar><input type=range id=bgmVol min=0 max=100 step=5 value="${st.bgmVol==null?100:st.bgmVol}" aria-label="배경 음악 크기"><b id=bgmVolN>${st.bgmVol==null?100:st.bgmVol}%</b></div></div>
   <div class=setRow><span><b>효과음 크기 🔔</b><br><span class=mut style="font-size:12px">막대를 밀면 '딩' 소리로 크기를 들어볼 수 있어요</span></span><div class=volBar><input type=range id=sfxVol min=0 max=100 step=5 value="${st.sfxVol==null?100:st.sfxVol}" aria-label="효과음 크기"><b id=sfxVolN>${st.sfxVol==null?100:st.sfxVol}%</b></div></div>
-  <div class=setRow><span><b>포켓몬 움직임</b><br><span class=mut style="font-size:12px">움직이는 그림은 PC에서 빠르게 보일 수 있어요</span></span>${seg('anim',[['calm','부드럽게'],['gif','움직이는 그림']])}</div>
+  <div class=setRow><span><b>포켓몬 움직임</b><br><span class=mut style="font-size:12px">3D 모델링은 PC에서 빠르게 보일 수 있어요</span></span>${seg('anim',[['calm','2D 도트'],['gif','3D 모델링']])}</div>
   <div class=setRow><span><b>가벼운 화면</b><br><span class=mut style="font-size:12px">느린 기기에서 반짝임·흔들림을 줄여요</span></span>${seg('lowfx',[[false,'보통'],[true,'가볍게']])}</div>
   <div class=setRow><span><b>포켓몬 그림 불러오기</b><br><span class=mut style="font-size:12px">인터넷이 막힌 곳에서는 '끄기'</span></span>${seg('imgs',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>쉬운 전투 모드</b><br><span class=mut style="font-size:12px">켜면 야생 포켓몬과 시나리오 포켓몬이 한 차례에 1번만 공격해요. 끄면 1마리와 싸울 때 2번 공격해요</span></span>${seg('easy',[[true,'켜기'],[false,'끄기']])}</div>
