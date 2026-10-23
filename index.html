@@ -2127,6 +2127,22 @@ setInterval(th,200);th();})();</script>
 <style id="home-round-v2">
 /* 홈 큰 버튼: 세로 줄이기 + 버튼 간격 줄이기 */
 html body .tiles{gap:8px}
+/* 카드 획득·카드팩 개봉: 1장은 크게, 카드팩 5장은 한 줄에 2장씩(2·2·1) */
+html body #pack:not(.multi) .pkRow .flip:only-child{width:min(64vw,250px)}
+@media(max-width:700px){
+html body #pack:not(.multi) .pkRow{max-width:100%;gap:8px}
+html body #pack:not(.multi) .pkRow .flip:first-child:nth-last-child(n+2):nth-last-child(-n+6),html body #pack:not(.multi) .pkRow .flip:first-child:nth-last-child(n+2):nth-last-child(-n+6)~.flip{width:min(42vw,170px)}
+}
+/* 덱 짜기: 좁은 화면에서도 한 줄에 카드 3장 이상 */
+@media(max-width:700px){html body .colGrid,html body .deckBar{gap:6px}html body .colGrid>.card.deck,html body .deckBar>.card.deck{width:calc((100% - 12px)/3)!important;max-width:150px;box-sizing:border-box;padding:4px!important}
+html body .card.deck .kw{font-size:8.5px;min-height:30px;padding:2px 3px}html body .card.deck .st{min-width:20px;height:20px;font-size:12.5px}html body .card.deck .cTop{font-size:11px}html body .card.deck .cost{width:18px;height:18px;font-size:12px}}
+/* 로그라이크 포켓몬 고르기: 자동 선택·선택 해제·모험 시작 버튼을 화면 아래에 고정 */
+html body .rlBar{position:sticky!important;bottom:-20px;z-index:6;margin:10px -8px -8px!important;padding:12px 8px calc(8px + var(--sb,0px))!important;background:linear-gradient(180deg,rgba(253,248,239,0),#fdf8ef 34%);overflow:visible;flex-wrap:wrap;justify-content:center}
+/* 내보내기·닫기 버튼: 정보창이 길어도 항상 아래에 떠 있게 */
+html body #bInfo .itx .mbtns{position:sticky;bottom:-4px;z-index:2;margin:6px -4px -4px!important;padding:14px 4px 6px;background:linear-gradient(180deg,rgba(253,248,239,0),#fdf8ef 38%)}
+html body #view .wrap{gap:8px}
+html body #view .wrap>.panel{margin-top:0!important;margin-bottom:0!important}
+html body #view .wrap>.nextFeat{margin-top:0}
 html body .tile.main{padding:7px 14px!important;gap:12px;flex-direction:row!important;justify-content:flex-start!important;text-align:left!important;min-height:0!important}
 html body .tile.main .ti,html body .tile.main span.ti{width:50px!important;height:50px!important;padding:5px!important}
 html body .tile.main .tn{font-size:21px}
@@ -4961,7 +4977,7 @@ async function summon(P,hi,slot){const card=P.hand[hi];let id=card;
  const O=P===B.me?B.foe:B.me;renderBattle();slamFx(P,slot);if(m.rar===5){try{await legendFx(P,slot,m.name);}catch(e){}}await wait(240);
  // 나올 때 효과
  let drawnN=0;const myP=B.coop?B.coop.players[BC.localIndex]:B.me;
- if(u.kw==='fairy'){fairyHit(O,isLeg(u));await fxWait(550);}
+ if(u.kw==='fairy'){fairyHit(O,isLeg(u),u);await fxWait(550);}
  if(u.kw==='taunt'){kwFx('rockwall',unitEl(P,slot));await fxWait(520);}
  if(u.kw==='armor'){kwFx('steelup',unitEl(P,slot));await fxWait(520);}
  if(u.kw==='wave'){const wv=isLeg(u)?2:1;P.board.forEach((x,i)=>{if(x){x.hp+=wv;x.max+=wv;kwFx('wave',unitEl(P,i),i);fx(unitEl(P,i),'체력 +'+wv,'heal');}});sfx('heal');await fxWait(750);}
@@ -4974,7 +4990,14 @@ async function emberHit(O,leg,src){const t=O.board.map((x,i)=>x&&x.hp>0?i:-1).fi
  if(!t.length){if(!B.wildMode){const d=leg?2:1;await pxEmberFx(src,heroEl(O));O.hp-=d;fx(heroEl(O),'-'+d,'');}return;}
  const a=t[Math.floor(brand()*t.length)];if(!leg){await pxEmberFx(src,unitEl(O,a));await dealUnit(O,a,1,'불씨');return;}
  const rest=t.filter(x=>x!==a);if(rest.length){const b=rest[Math.floor(brand()*rest.length)];await pxEmberFx(src,unitEl(O,a));await dealUnit(O,a,1,'불씨');await pxEmberFx(src,unitEl(O,b));await dealUnit(O,b,1,'불씨');}else{await pxEmberFx(src,unitEl(O,a));await dealUnit(O,a,2,'불씨');}}
-function fairyHit(O,leg){const pool=O.board.map((x,i)=>x?i:-1).filter(i=>i>=0);if(!pool.length)return;if(leg&&pool.length===1){weakenAtk(O,pool[0],'fai','✨ 요정의 빛! 공격 -2',3,2);sfx('heal');return;}const n=leg?Math.min(2,pool.length):1;for(let k=0;k<n;k++){const j=Math.floor(brand()*pool.length);const ti=pool.splice(j,1)[0];weakenAtk(O,ti,'fai','✨ 요정의 빛! 공격 -1');}sfx('heal');}
+// 독: 한 번 걸릴 때마다(스택) 상대 포켓몬이 자기 차례를 2번 보내는 동안만 공격이 약해지고, 그 뒤 사라져요
+function tickPoison(side){if(!B)return;const Q=side==='me'?B.foe:B.me;if(!Q)return;
+ Q.board.forEach((x,i)=>{if(!x||!x.psnT||!x.psnT.length)return;let back=0;x.psnT.forEach(e=>{e.t--;});x.psnT=x.psnT.filter(e=>{if(e.t>0)return true;back+=e.n;return false;});
+  if(back>0){x.atk+=back;x.psn=Math.max(0,(x.psn||0)-back);if(!x.psn)delete x.psn;try{fx(unitEl(Q,i),`☠ 독 해제! 공격 +${back}`,'txt');}catch(e){}}});}
+function releaseFairy(){if(!B)return;const sides=[B.me,B.foe].filter(Boolean),alive=new Set();sides.forEach(P=>P.board.forEach(u=>{if(u&&u.hp>0&&u.uid)alive.add(u.uid);}));
+ sides.forEach(P=>P.board.forEach((x,i)=>{if(!x||!x.faiSrc||!x.faiSrc.length)return;let back=0;x.faiSrc=x.faiSrc.filter(e=>{if(alive.has(e.id))return true;back+=e.n;return false;});
+  if(back>0){x.atk+=back;x.fai=Math.max(0,(x.fai||0)-back);if(!x.fai)delete x.fai;try{fx(unitEl(P,i),`✨ 요정의 빛 해제! 공격 +${back}`,'txt');}catch(e){}}}));}
+function fairyHit(O,leg,src){const pool=O.board.map((x,i)=>x?i:-1).filter(i=>i>=0);if(!pool.length)return;if(leg&&pool.length===1){weakenAtk(O,pool[0],'fai','✨ 요정의 빛! 공격 -2',3,2,src);sfx('heal');return;}const n=leg?Math.min(2,pool.length):1;for(let k=0;k<n;k++){const j=Math.floor(brand()*pool.length);const ti=pool.splice(j,1)[0];weakenAtk(O,ti,'fai','✨ 요정의 빛! 공격 -1',3,1,src);}sfx('heal');}
 function poisonHit(D,i,leg){weakenAtk(D,i,'psn',leg?'☠ 독! 공격 -2':'☠ 독! 공격 -1',leg?4:3,leg?2:1);}
 
 // ===== 돌 카드 사용 연출 (도트) · 해당 진영/포켓몬 위에서만 짧게 보여요. PXF 캔버스 한 장에 그려서 가벼워요. =====
@@ -5056,19 +5079,19 @@ function stoneFxThunder(P0,i){const el=unitEl(P0,i);if(!el)return;const S=PXF.S(
 
 // ---------- 달의 돌: 작은 초승달이 떨어져 금이 가고 산산이 부서져요 ----------
 let ST_MOON=null;
-function stMoonData(){if(ST_MOON)return ST_MOON;const R=6,bx=R*.62,by=-R*.3,br=R*.83;
+function stMoonData(){if(ST_MOON)return ST_MOON;const R=8,K6=R/6,bx=R*.62,by=-R*.3,br=R*.83;
  const inA=(x,y)=>x*x+y*y<=R*R+R*.6,inB=(x,y)=>{const dx=x-bx,dy=y-by;return dx*dx+dy*dy<=br*br;},body=(x,y)=>inA(x,y)&&!inB(x,y);
  const pix=[],set={};
  for(let y=-R-1;y<=R+1;y++)for(let x=-R-1;x<=R+1;x++){if(!body(x,y))continue;
   const outer=[[1,0],[-1,0],[0,1],[0,-1]].some(d=>!inA(x+d[0],y+d[1]));let c;
   if(outer)c='#4b3aa6';else{const dd=Math.hypot(x-bx,y-by)-br;c=dd<1.6?'#ffffff':dd<3.1?'#efe9ff':dd<4.6?'#cfc3fb':'#a897ee';}
   const q={x,y,c};pix.push(q);set[x+','+y]=q;}
- [[-3,2],[-4,-1],[-2,4]].forEach(([x,y])=>{const q=set[x+','+y];if(q&&q.c!=='#4b3aa6')q.c='#9f90e6';});
+ [[-3,2],[-4,-1],[-2,4]].forEach(([x0,y0])=>{const x=Math.round(x0*K6),y=Math.round(y0*K6),q=set[x+','+y];if(q&&q.c!=='#4b3aa6')q.c='#9f90e6';});
  pix.forEach(q=>{const a=Math.atan2(q.y,q.x)+(PXF.hz(q.x*3+q.y*5)-.5)*.7,r=Math.hypot(q.x,q.y);q.ch=((Math.floor((a+Math.PI)/(2*Math.PI)*6)+6)%6)*2+(r>R*.62?1:0);});
  const cent={};pix.forEach(q=>{const c=cent[q.ch]||(cent[q.ch]={x:0,y:0,n:0});c.x+=q.x;c.y+=q.y;c.n++;});
  const vel={};Object.keys(cent).forEach(k=>{const c=cent[k],cx=c.x/c.n,cy=c.y/c.n,l=Math.hypot(cx,cy)||1,sp=62+PXF.hz(+k*3.1)*46;vel[k]={vx:cx/l*sp+(PXF.hz(+k)-.5)*20,vy:cy/l*sp-30};});
  // 금: 바깥 가장자리에서 안쪽으로 지그재그
- const crack=[];[[-4.9,-3.6],[-5.7,1.2],[-2.9,5.2]].forEach((s0,ci)=>{let x=s0[0],y=s0[1];for(let st=0;st<9;st++){const dx=bx-x,dy=by-y,l=Math.hypot(dx,dy)||1,j=(st%2?1:-1)*(.6+PXF.hz(ci*7+st)*.9);x+=dx/l+(-dy/l)*j;y+=dy/l+(dx/l)*j;const rx=Math.round(x),ry=Math.round(y);if(set[rx+','+ry])crack.push([rx,ry]);else if(st>2)break;}});
+ const crack=[];[[-4.9,-3.6],[-5.7,1.2],[-2.9,5.2]].forEach((s0,ci)=>{let x=s0[0]*K6,y=s0[1]*K6;for(let st=0;st<12;st++){const dx=bx-x,dy=by-y,l=Math.hypot(dx,dy)||1,j=(st%2?1:-1)*(.6+PXF.hz(ci*7+st)*.9);x+=dx/l+(-dy/l)*j;y+=dy/l+(dx/l)*j;const rx=Math.round(x),ry=Math.round(y);if(set[rx+','+ry])crack.push([rx,ry]);else if(st>2)break;}});
  return ST_MOON={R,pix,vel,crack};}
 function stoneFxMoon(foe,i){const el=unitEl(foe,i);if(!el)return;const S=PXF.S(),P=PXF.P,U=stUnitInfo(el),M=stMoonData(),TF=250,TB=510,x=U.x,y=U.y-U.h*.05;
  const sx0=30/S,sy0=-70/S;
@@ -5076,8 +5099,8 @@ function stoneFxMoon(foe,i){const el=unitEl(foe,i);if(!el)return;const S=PXF.S()
   if(a>=TF){jx=(f&1)?1:-1;jy=((f>>1)&1)?1:0;}
   const cx=gx+ox+jx,cy=gy+oy+jy;
   if(a<TF){for(let j=4;j>=1;j--){const e2=Math.max(0,(a-j*28)/TF),e22=e2*e2;P.px(gx+(1-e22)*sx0,gy+(1-e22)*sy0,['#cbbcff','#a58bff','#7a62d8','#5a46b0'][j-1]);}
-   for(let j=0;j<4;j++){const an=j*Math.PI/2+f*.5;P.px(cx+Math.cos(an)*9,cy+Math.sin(an)*9,'#a58bff');}}
-  else{for(let j=0;j<10;j++){const an=j*Math.PI/5+f*.2;if(j%2)P.px(cx+Math.cos(an)*10,cy+Math.sin(an)*10,'#a58bff');}}
+   for(let j=0;j<4;j++){const an=j*Math.PI/2+f*.5;P.px(cx+Math.cos(an)*12,cy+Math.sin(an)*12,'#a58bff');}}
+  else{for(let j=0;j<10;j++){const an=j*Math.PI/5+f*.2;if(j%2)P.px(cx+Math.cos(an)*13,cy+Math.sin(an)*13,'#a58bff');}}
   const flash=a>=TF&&(f%3===2);M.pix.forEach(q=>P.px(cx+q.x,cy+q.y,flash?'#ffffff':q.c));
   if(a>=TF){const prog=Math.min(1,(a-TF+40)/(TB-TF-40)),n=Math.ceil(prog*M.crack.length);for(let j=0;j<n;j++)P.px(cx+M.crack[j][0],cy+M.crack[j][1],'#ffffff'),P.px(cx+M.crack[j][0]+1,cy+M.crack[j][1],'#7a62d8');}});
  // 부서지는 순간: 조각이 사방으로, 번쩍 + 충격 링
@@ -5156,13 +5179,13 @@ function kwType(m){let t=m.types[0];if(t===0&&m.types[1]!=null)t=m.types[1];retu
 function applyType(dmg,k){if(k>=2)return Math.ceil(dmg*1.5);if(k<1)return Math.max(1,dmg-1);return dmg;}
 // 얼음: 일반 대전은 한 번에 얼리지만, 야생·보스·시나리오·로그라이크(적이 1~2마리)에서는 2스택이 쌓여야 얼어요
 // 독·요정의 빛: 공격 -1 (누적량을 기록해서 뱃지로 표시, 독은 최대 -3)
-function weakenAtk(D,i,key,label,cap=3,n=1){const x=D.board[i];if(!x)return;if(key==='psn'&&(x.psn||0)>=cap){try{fx(unitEl(D,i),`☠ 독은 최대 -${cap}까지!`,'txt');}catch(e){}return;}const k=key==='psn'?Math.min(n,cap-(x.psn||0)):n;if(x.atk<1)x.atk=1;if(x.atk>1){const d=Math.min(k,x.atk-1);x.atk-=d;x[key]=(x[key]||0)+d;}  /* 공격력은 1 아래로 내려가지 않아요 */try{fx(unitEl(D,i),label,'txt');kwFx(key==='psn'?'poison':key==='fai'?'fairy':'',unitEl(D,i));}catch(e){}}
+function weakenAtk(D,i,key,label,cap=3,n=1,src=null){const x=D.board[i];if(!x)return;if((key==='psn'||key==='fai')&&(x[key]||0)>=cap){try{fx(unitEl(D,i),key==='fai'?`✨ 요정의 빛은 최대 -${cap}까지!`:`☠ 독은 최대 -${cap}까지!`,'txt');}catch(e){}return;}const k=(key==='psn'||key==='fai')?Math.min(n,cap-(x[key]||0)):n;if(x.atk<1)x.atk=1;if(x.atk>1){const d=Math.min(k,x.atk-1);x.atk-=d;x[key]=(x[key]||0)+d;if(key==='psn'&&d>0)(x.psnT=x.psnT||[]).push({n:d,t:2});if(key==='fai'&&src&&d>0){if(!src.uid)src.uid=(window.__UID=(window.__UID||0)+1);(x.faiSrc=x.faiSrc||[]).push({id:src.uid,n:d});}}  /* 공격력은 1 아래로 내려가지 않아요 */try{fx(unitEl(D,i),label,'txt');kwFx(key==='psn'?'poison':key==='fai'?'fairy':'',unitEl(D,i));}catch(e){}}
 // 성장·독·요정의 빛 뱃지 HTML
 function numIcH(cls,icon,n,title){return `<span class="numIc ${cls}" title="${title}">${I(icon)}<b>${n}</b></span>`;}
 function traitBadgeH(u){if(!u)return '';let h='';
  if(u.kw==='armor'){const av=armorV(u);h+=numIcH('armor','steel',av,`강철: 받는 피해 -${av} (최소 1)`);}
  if(u.kw==='grow'){const gc=growCap(u),g=Math.min(gc,u.grow||0);h+=numIcH('grow'+(g>=gc?' max':''),'leaf','+'+g,`성장 +${g}/${gc} (내 차례마다 공격 +1${isLeg(u)?'·체력 +1':''}, 최대 +${gc})`);}
- if(u.psn>0)h+=numIcH('psn'+(u.psn>=4?' max':''),'skull','-'+u.psn,`독: 공격 -${u.psn} (최대 -3, 전설의 독은 -4)`);
+ if(u.psn>0)h+=numIcH('psn'+(u.psn>=4?' max':''),'skull','-'+u.psn,`독: 공격 -${u.psn} (한 번 걸릴 때마다 2턴 동안만, 최대 -3, 전설의 독은 -4)`);
  if(u.fai>0)h+=numIcH('fai','fairy','-'+u.fai,`요정의 빛: 공격 -${u.fai}`);
  return h;}
 // 얼음 스택 뱃지 HTML (야생·보스·시나리오·로그라이크 전투에서만 표시)
@@ -6320,7 +6343,7 @@ async function battleQ(q,opt){B.qn++;if(q&&q.tier==='H')opt=Object.assign({},opt
  if(!r.ok){B.retryQ=q;}return r;}
 function cleanup(){[B.me,B.foe].forEach(P=>P.board.forEach((u,i)=>{if(u&&u.hp<=0){P.board[i]=null;}}));if(B&&B.wildMode)syncWildPrimary();}
 function checkEnd(){if(!B||B.over)return false;if(B.wildMode){const live=syncWildPrimary();if(!live.length){if(B.coop){if(BC.host)bossFinish('win');return true;}B.over=true;const caught=(B.wildState.caughtIds||[]).length>0;const note=caught?'야생 포켓몬 전투가 끝났어요. 포획한 포켓몬은 도감에 등록됐어요.':'야생 포켓몬이 모두 쓰러져 포획하지 못했어요.';if(!window.__sim)setTimeout(()=>finishEndlessWild(caught?'caught':'knockout',note),650);return true;}if(B.coop&&B.coop.players.some(p=>p.hp<=0)){if(BC.host)bossFinish('lost');return true;}if(B.me.hp<=0&&!B.coop){B.over=true;if(!window.__sim)setTimeout(()=>finishEndlessWild('lost','트레이너 체력이 0이 되어 야생 전투를 마쳤어요.'),650);return true;}const weak=live.filter(i=>B.foe.board[i].hp<=B.foe.board[i].max*.3).sort((a,b)=>B.foe.board[a].hp/B.foe.board[a].max-B.foe.board[b].hp/B.foe.board[b].max);if(weak.length&&!B.capturePrompted&&!(B.wildState&&B.wildState.scenarioMode)){B.capturePrompted=true;B.wildCaptureTargetSlot=weak[0];if(!window.__sim)setTimeout(scheduleWildCapturePrompt,180);}return false;}if(B.foe.hp<=0||B.me.hp<=0){B.over=true;if(window.__sim)return true;const _win=B.foe.hp<=0&&B.me.hp>0||(B.foe.hp<=0&&B.me.hp>=B.foe.hp);if(B.pvp)pvpSend({t:'over',w:_win});setTimeout(()=>endBattle(_win),600);return true;}return false;}
-async function startTurn(side){if(!B||B.over)return;closeInfo();if(B.coop&&side==='foe')bossSetActive(0);B.side=side;const P=side==='me'?B.me:B.foe;B.turn++;if(side==='me'){B.round++;B.counterActive=0;}
+async function startTurn(side){if(!B||B.over)return;closeInfo();if(B.coop&&side==='foe')bossSetActive(0);B.side=side;const P=side==='me'?B.me:B.foe;B.turn++;try{releaseFairy();tickPoison(side);}catch(e){}if(side==='me'){B.round++;B.counterActive=0;}
  P.maxMana=Math.min(6,P.maxMana+1);P.mana=P.maxMana;P.bonusMana=0;P.sunMana=0;B.defUsed=false;  if(side==='me'&&!B.coop&&!B.pvp&&!window.__sim&&!B.studyUsesSet){B.studyUsesSet=1;const sx=studyExtraUses(trainerSkillLevels().study);P.powerUses=STUDY_BASE+sx;}
  if(side==='me'&&!B.pvp&&!window.__sim){const ml=B.coop?(Number(P.manaLv)||0):(Number(trainerSkillLevels().mana)||0);if(ml>0&&rnd()*100<manaChance(ml)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.manaBonusFx=1;}}
  else if(B.pvp&&!window.__sim){const ml=Number(P.manaLv)||0;if(ml>0&&P.passRng()*100<manaChance(ml)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.manaBonusFx=1;}}
@@ -8943,7 +8966,7 @@ function rlRenderEntry(){
   const filters=`<div class="filters" style="margin:6px 0"><button class="fbtn${RL_KW?'':' on'}" data-kw="">전체 특성 <small>${owned.length}</small></button>${names.map(n=>{const k=Object.keys(KW).map(x=>KW[x]).find(v=>v.n===n);return `<button class="fbtn${RL_KW===n?' on':''}" data-kw="${esc(n)}">${I(k.ic)} ${esc(n)} <small>${cnt(n)}</small></button>`;}).join('')}</div>${sel?`<div class="mut" style="font-size:13px;margin-bottom:8px">${I(sel.ic)} <b>${esc(sel.n)}</b> · ${esc(sel.d)}</div>`:''}`;
   const slots=Array.from({length:RL.pick},(_,i)=>{const id=RL_SEL[i];return `<div class="rl-slot${id!=null?' on':''}" ${id!=null?`data-rm="${id}"`:''} title="${id!=null?'누르면 빼요':''}">${id!=null?monImg(id,'front'):'<span>?</span>'}</div>`;}).join('')+`<div class="rl-plus">+</div>`+Array.from({length:RL.rand},()=>'<div class="rl-slot rnd"><span>🎲</span></div>').join('');
   const ready=RL_SEL.length>=need;
-  body=`<div class="scv-card"><span class="sc-tag">🎲 모험 준비</span><h3>데려갈 내 포켓몬 고르기 <small class="mut" style="font-size:.6em">${RL_SEL.length} / ${need}</small></h3><p class="sc-note">내가 가진 포켓몬 중 <b>${RL.pick}장</b>을 골라요. 고른 카드는 모험에서 바로 쓸 수 있고, 시작하면 <b>완전 랜덤 ${RL.rand}장</b>이 더해져 총 ${RL.pick+RL.rand}장으로 출발해요. (같은 카드를 여러 장 가져가진 못해요)</p><div class="rl-slots">${slots}</div>${owned.length?`${filters}<div class="colGrid" id="rlStGrid">${owned.filter(id=>!RL_KW||kwOf(MON[id]).n===RL_KW).map(id=>cardHTML(id,{size:'deck',cnt:col[id],cls:RL_SEL.indexOf(id)>=0?'rl-selected':''})).join('')}</div>`:'<p class="mut" style="text-align:center;margin:12px">아직 가진 포켓몬이 없어요. 그대로 시작하면 덱 8장이 모두 랜덤이에요.</p>'}<div class="mbtns"><button class="btn blue sm" id="rlAutoSel">자동 선택</button><button class="btn ghost sm" id="rlClrSel">선택 해제</button><button class="btn red big" id="rlStart" ${ready?'':'disabled'}>🎲 모험 시작${ready?'':` (${need-RL_SEL.length}장 더 골라요)`}</button></div></div>`;}
+  body=`<div class="scv-card"><span class="sc-tag">🎲 모험 준비</span><h3>데려갈 내 포켓몬 고르기 <small class="mut" style="font-size:.6em">${RL_SEL.length} / ${need}</small></h3><p class="sc-note">내가 가진 포켓몬 중 <b>${RL.pick}장</b>을 골라요. 고른 카드는 모험에서 바로 쓸 수 있고, 시작하면 <b>완전 랜덤 ${RL.rand}장</b>이 더해져 총 ${RL.pick+RL.rand}장으로 출발해요. (같은 카드를 여러 장 가져가진 못해요)</p><div class="rl-slots">${slots}</div>${owned.length?`${filters}<div class="colGrid" id="rlStGrid">${owned.filter(id=>!RL_KW||kwOf(MON[id]).n===RL_KW).map(id=>cardHTML(id,{size:'deck',cnt:col[id],cls:RL_SEL.indexOf(id)>=0?'rl-selected':''})).join('')}</div>`:'<p class="mut" style="text-align:center;margin:12px">아직 가진 포켓몬이 없어요. 그대로 시작하면 덱 8장이 모두 랜덤이에요.</p>'}<div class="mbtns rlBar"><button class="btn blue sm" id="rlAutoSel">자동 선택</button><button class="btn ghost sm" id="rlClrSel">선택 해제</button><button class="btn red big" id="rlStart" ${ready?'':'disabled'}>🎲 모험 시작${ready?'':` (${need-RL_SEL.length}장 더 골라요)`}</button></div></div>`;}
  rlShell(`<div class="scv-card rl-intro"><span class="sc-tag">✦ 로그라이크 모험</span><h3>끝없는 길</h3><p class="sc-line" style="margin:6px 0 10px">📖 도감의 글씨가 하나둘 지워지고 있다. 길 끝의 보스가 우리 기록을 삼키고 있기 때문이다.<br><b>보스를 쓰러뜨릴 때마다 먹힌 포켓몬이 도감으로 돌아온다. 되찾으러 가자!</b></p>${rules}${stats}<div class="mbtns"><button class="btn purple sm" id="rlDex">📖 유물 도감</button></div></div>${body}`,{noRun:true,screen:'scenarioRLEntry'});
  $('#rlDex').onclick=()=>{sfx('tap');rlRelicDex();};
  if(run){$('#rlResume').onclick=()=>{sfx('tap');if(run.cur)rlEnter(run.cur);else rlRenderMap();};$('#rlAbandon').onclick=async()=>{sfx('tap');if(await confirmBox('진행 중인 모험을 포기할까요?<br><span class=mut style="font-size:14px">간 만큼의 작은 보상만 받아요.</span>','포기하기','취소'))rlEnd(false,'abandon');};return;}
