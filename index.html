@@ -2146,14 +2146,19 @@ html body .hud,html[data-th] body .hud{--tw:clamp(262px,54%,340px);--hs:62px;pos
 html body .hud::before,html body .hud::after{content:"";position:absolute;inset:0;z-index:-1}
 html body .hud::before{background:#6b5a3e;clip-path:polygon(0 0,100% 0,100% var(--hs),var(--tw) var(--hs),calc(var(--tw) - 26px) 100%,0 100%)}
 html body .hud::after{clip-path:polygon(0 0,100% 0,100% calc(var(--hs) - 3px),calc(var(--tw) - 1px) calc(var(--hs) - 3px),calc(var(--tw) - 30px) calc(100% - 3px),0 calc(100% - 3px));
- background:linear-gradient(#e3a92e,#e3a92e) 0 calc(100% - 3px)/calc(var(--tw) - 30px) 4px no-repeat,linear-gradient(#e3a92e,#e3a92e) var(--tw) calc(var(--hs) - 7px)/100% 4px no-repeat,linear-gradient(180deg,#fffefb,#f4eee0)}
+ background:linear-gradient(180deg,#fffefb,#f4eee0)}
+html body .hud{--gx:0px}
+html body .hud .hudGold{position:absolute;inset:0;z-index:0;pointer-events:none;background:#e3a92e;clip-path:polygon(var(--gx) calc(100% - 3px),calc(var(--tw) - 30px) calc(100% - 3px),calc(var(--tw) - 1px) calc(var(--hs) - 3px),calc(100% - var(--gx)) calc(var(--hs) - 3px),calc(100% - var(--gx)) calc(var(--hs) - 7px),calc(var(--tw) - 1px) calc(var(--hs) - 7px),calc(var(--tw) - 30px) calc(100% - 7px),var(--gx) calc(100% - 7px))!important}
+@media(min-width:1000px){html body .hud,html[data-th] body .hud{width:min(952px,100%);margin-left:auto;margin-right:auto}
+html body .hud{--gx:3px}
+html body .hud::after{clip-path:polygon(3px 0,calc(100% - 3px) 0,calc(100% - 3px) calc(var(--hs) - 3px),calc(var(--tw) - 1px) calc(var(--hs) - 3px),calc(var(--tw) - 30px) calc(100% - 3px),3px calc(100% - 3px))}}
 html body .hud .hudL{flex:0 0 var(--tw);box-sizing:border-box;padding:8px 40px 9px 12px;display:flex;flex-direction:column;gap:6px}
 html body .hud .hl1,html body .hud .hl2{display:flex;align-items:center;gap:6px;min-width:0}
 html body .hud .hl1 .lvBox{flex:1;min-width:0;gap:6px}
 html body .hud .hudR{flex:1;min-width:0;box-sizing:border-box;height:var(--hs);display:flex;flex-wrap:wrap;align-content:center;gap:4px;align-items:center;padding:4px 12px 8px 8px}
 html body .hud .hudR .pill{font-size:13px;padding:1px 6px;gap:3px}
 html body .hud .hudR .pill .ic{width:17px;height:17px}
-html body .hud .hudR .lgPill{flex:1 1 96px;min-width:0;border-color:color-mix(in srgb,var(--lc) 55%,#6b5a3e);background:linear-gradient(180deg,#fff,color-mix(in srgb,var(--lc) 18%,#f6f0e2));padding:1px 8px 1px 4px}
+html body .hud .hudR .lgPill{flex:0 1 auto;min-width:0;border-color:color-mix(in srgb,var(--lc) 55%,#6b5a3e);background:linear-gradient(180deg,#fff,color-mix(in srgb,var(--lc) 18%,#f6f0e2));padding:1px 8px 1px 4px}
 html body .hud .hudR .lgPill .ic{width:22px;height:22px;flex:none}
 html body .hud .hudR .lgPill b{font-weight:400;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;color:#3a2e1c}
 html body .hud .lvNum{font-size:17px;color:#ffe27a;background:linear-gradient(180deg,#4a4f94,#2f3470);border:2px solid #1d2050;border-radius:8px;padding:1px 9px 0;text-shadow:0 2px 0 #1d2050;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),0 2px 0 #1d205066;line-height:1.35}
@@ -2172,7 +2177,7 @@ html body .hud .gsTag{font-size:12px;padding:2px 6px;min-width:0;overflow:hidden
 html body .hud .hudR{gap:3px;padding:4px 8px 8px 6px}
 html body .hud .hudR .pill{font-size:12px;padding:1px 4px;gap:2px}
 html body .hud .hudR .pill .ic{width:14px;height:14px}
-html body .hud .hudR .lgPill{padding:1px 6px 1px 3px;flex:1 1 80px}
+html body .hud .hudR .lgPill{padding:1px 6px 1px 3px;flex:0 1 auto}
 html body .hud .hudR .lgPill .ic{width:20px;height:20px}
 html body .hud .hudR .lgPill b{font-size:12px}
 }
@@ -7229,7 +7234,7 @@ const gymBadge=(i,won)=>{const c=won===false?'#b8b2a6':GYMS[i].c,mx=(a,b,t)=>{co
  if(won!==false){GYM_SYM[i].forEach((r,y)=>{for(let x=0;x<8;x++)if(r[x]!=='.')rows[4+y][4+x]=r[x];});}else{[[7,5],[8,5],[8,6],[8,7],[7,8],[8,10]].forEach(p=>{rows[p[1]][p[0]]='d';});}
  return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+PXG(rows.map(r=>r.join('')),pal)+'</svg>';};
 function hudHTML(){const m=S.meta,L=lvOf(m.xp);let lgI=-1;try{Object.keys(m.gyms||{}).forEach(k=>{if(+k>lgI)lgI=+k;});}catch(e){}const lgName=lgI>=0?GYMS[lgI].n:'도전 전';
- return `<div class=hud><div class=hudL><div class=hl1><button class="btn ghost sm" id=hHome>${I('ball')}<span class=bt> 방</span></button><div class=lvBox><span class=lvNum>Lv.${L.lv}</span><div class=xpBar title="${L.cur}/${L.need}"><i style="width:${L.cur/L.need*100}%"></i></div></div></div><div class=hl2><span class=gsTag>${esc(semName(m.gs))}</span><span class=hudSp></span><button class="btn green sm" id=hSave title="누르면 바로 저장돼요. 저장 코드·파일은 길게 누르거나 설정에서">${I('disk')}<span class=bt> 저장</span></button><button class="btn ghost sm" id=hSet>${I('gear')}</button></div></div><div class=hudR><span class=pill title="사탕">${I('candy')}${m.candy}</span><span class=pill title="코인">${I('coin')}${m.coins}</span><span class=pill title="카드팩">${I('ball')}${m.packs}</span><span class=pill title="별가루">${I('star')}${m.dust||0}</span><span class=pill title="레벨 포인트">🔷${m.lp||0}</span><span class="pill lgPill" title="현재 리그: ${lgName}" style="--lc:${lgI>=0?GYMS[lgI].c:'#b8b2a6'}">${gymBadge(Math.max(lgI,0),lgI>=0)}<b>${lgName}</b></span></div></div>`;}
+ return `<div class=hud><i class=hudGold></i><div class=hudL><div class=hl1><button class="btn ghost sm" id=hHome>${I('ball')}<span class=bt> 방</span></button><div class=lvBox><span class=lvNum>Lv.${L.lv}</span><div class=xpBar title="${L.cur}/${L.need}"><i style="width:${L.cur/L.need*100}%"></i></div></div></div><div class=hl2><span class=gsTag>${esc(semName(m.gs))}</span><span class=hudSp></span><button class="btn green sm" id=hSave title="누르면 바로 저장돼요. 저장 코드·파일은 길게 누르거나 설정에서">${I('disk')}<span class=bt> 저장</span></button><button class="btn ghost sm" id=hSet>${I('gear')}</button></div></div><div class=hudR><span class=pill title="사탕">${I('candy')}${m.candy}</span><span class=pill title="코인">${I('coin')}${m.coins}</span><span class=pill title="카드팩">${I('ball')}${m.packs}</span><span class=pill title="별가루">${I('star')}${m.dust||0}</span><span class=pill title="레벨 포인트">🔷${m.lp||0}</span><span class="pill lgPill" title="현재 리그: ${lgName}" style="--lc:${lgI>=0?GYMS[lgI].c:'#b8b2a6'}">${gymBadge(Math.max(lgI,0),lgI>=0)}<b>${lgName}</b></span></div></div>`;}
 function bindHud(){const h=$('#hHome');if(h)h.onclick=()=>{sfx('tap');renderHub();};const s=$('#hSave');if(s){s.onclick=()=>{sfx('coin');quickSave();};s.oncontextmenu=e=>{e.preventDefault();showSaveBox();};}const t=$('#hSet');if(t)t.onclick=()=>{sfx('tap');showSettings();};}
 
 // ---- 기능 단계적 열림 ----
