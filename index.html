@@ -145,6 +145,58 @@ h2{font-size:26px;margin-bottom:8px}h3{font-size:19px;margin:12px 0 6px}
 .bubble{position:relative;background:#fff;border:3px solid var(--line);border-radius:14px;padding:5px 12px;font-family:'Jua';font-size:16px;margin-bottom:22px;box-shadow:0 3px 0 var(--line)}
 .bubble::before{content:'';position:absolute;left:-10px;bottom:8px;border:7px solid transparent;border-right-color:var(--line)}
 .bubble.pop{animation:popIn .3s}
+
+/* ===== 포켓몬 정원 ===== */
+.gardenPanel{background:linear-gradient(#fffdf5,#fbf1d9)!important;border:3px solid #d8b45a!important;box-shadow:inset 0 0 0 2px #fff6d6,0 3px 0 rgba(138,100,32,.35)!important;padding:10px 12px}
+.gdHead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.gdHead b{font-size:20px;color:#5a4220}
+.gardenPanel .motto{background:linear-gradient(#ffe58a,#f4c542);color:#6b4a10;border:2px solid #c99a2e;border-radius:999px;padding:1px 12px}
+.gardenPanel .pill{background:linear-gradient(#fffbe0,#ffefa6);border:2px solid #e0b43a;color:#7a4a00}
+.gdField{position:relative;height:270px;margin-top:8px;border-radius:18px;overflow:hidden;border:4px solid #c9a24a;box-shadow:inset 0 0 0 2px #fff3c4,inset 0 0 18px rgba(255,255,255,.35),0 3px 0 #8a6420;background:#9ad77f}
+.gdBg{position:absolute;inset:0;width:100%;height:100%}
+.gdPet{position:absolute;width:44px;height:44px;transform:translate(-50%,-100%);transition:left 3.6s linear,top 3.6s linear;cursor:pointer;z-index:3;display:flex;align-items:flex-end;justify-content:center}
+.gdPet img{max-width:100%;max-height:100%;image-rendering:pixelated;transition:transform .3s;filter:drop-shadow(0 1px 0 rgba(255,255,255,.35))}
+.gdPet.flip img{transform:scaleX(-1)}
+.gdPet:after{content:"";position:absolute;bottom:-3px;left:14%;right:14%;height:7px;border-radius:50%;background:rgba(20,60,20,.22);z-index:-1}
+.gdHatch{position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.gdDome{position:relative;width:76px;height:88px;border-radius:38px 38px 10px 10px;background:linear-gradient(140deg,rgba(255,255,255,.6),rgba(200,235,255,.22) 55%,rgba(255,255,255,.35));border:2px solid rgba(255,255,255,.95);box-shadow:inset 0 0 14px rgba(255,255,255,.75),0 0 18px rgba(255,232,150,.8),0 0 0 2px rgba(201,162,74,.55);display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px}
+.gdDome:before{content:"";position:absolute;left:11px;top:10px;width:9px;height:34px;border-radius:9px;background:linear-gradient(rgba(255,255,255,.9),rgba(255,255,255,0));transform:rotate(14deg)}
+.gdDome:after{content:"";position:absolute;left:0;right:0;top:-6px;margin:auto;width:14px;height:10px;border-radius:50%;background:radial-gradient(#fff3b0,#d9a935);border:2px solid #a8791f}
+.gdBase{width:104px;height:20px;border-radius:50%/60%;background:linear-gradient(#fff2b8,#e0b441 55%,#a87a1e);border:2px solid #8a6420;margin-top:-8px;box-shadow:0 4px 0 rgba(90,60,10,.3),0 0 16px rgba(255,220,120,.7)}
+.gdLbl{font-family:'Jua';font-size:12px;background:linear-gradient(#fffaf0,#f3e6c4);border-radius:999px;padding:1px 11px;border:2px solid #c99a2e;color:#5a4220;margin-top:5px;white-space:nowrap;box-shadow:0 2px 0 rgba(138,100,32,.3)}
+.gdSp{position:absolute;font-style:normal;color:#fff6a8;text-shadow:0 0 6px #ffd23f;animation:gdTw 2.4s ease-in-out infinite;font-size:12px}
+.gdSp.s1{left:-12px;top:14px}.gdSp.s2{right:-10px;top:32px;animation-delay:.8s;font-size:10px}.gdSp.s3{left:-6px;top:62px;animation-delay:1.5s;font-size:9px}
+@keyframes gdTw{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.25)}}
+.gdInc{position:relative;width:104px;height:121px;pointer-events:none}
+.gdIncIn{position:absolute;left:0;top:0;width:120px;height:140px;transform:scale(.867);transform-origin:0 0}
+.gdIncIn>svg{position:absolute;left:0;top:0;width:120px;height:140px;overflow:visible}
+.gdIncIn .gdEgg{position:absolute;left:38px;top:46px;width:44px;height:55px;animation:gdBob 3s ease-in-out infinite}
+.gdIncIn .gdEgg.wob{animation:gdWob .5s ease-in-out}
+@keyframes gdBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.gdRing1{animation:gdDash 6s linear infinite}.gdRing2{animation:gdDash 9s linear infinite reverse}
+@keyframes gdDash{to{stroke-dashoffset:-60}}
+.gdPt{position:absolute;width:4px;height:4px;border-radius:50%;background:var(--gl);box-shadow:0 0 6px 1px var(--gl);bottom:30px;opacity:0;animation:gdUp 3.2s linear infinite}
+@keyframes gdUp{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:.95}100%{transform:translateY(-70px) scale(1.1);opacity:0}}
+.gdLed{animation:gdLed 1.4s ease-in-out infinite}@keyframes gdLed{50%{opacity:.6}}
+.gdEgg{width:44px;height:55px;filter:drop-shadow(0 0 5px var(--gl,#ffd23f)) drop-shadow(0 2px 1px rgba(0,0,0,.3))}
+.gdEgg.wob{animation:gdWob .5s ease-in-out}
+.gdEgg.empty{opacity:.4;filter:grayscale(1)}
+@keyframes gdWob{0%,100%{transform:rotate(0)}20%{transform:rotate(-12deg)}50%{transform:rotate(10deg)}80%{transform:rotate(-6deg)}}
+.gdBar{position:relative;height:16px;border-radius:999px;background:#efe6cc;border:2px solid #c99a2e;overflow:hidden;margin-top:9px;box-shadow:inset 0 2px 3px rgba(0,0,0,.12)}
+.gdBar i{display:block;height:100%;border-radius:999px;background:repeating-linear-gradient(45deg,#ffd84a 0 8px,#ffb938 8px 16px);transition:width .4s}
+.gdBar span{position:absolute;inset:0;text-align:center;font:700 11px/12px 'Jua',sans-serif;color:#6b4a10}
+.gdBtns{display:flex;gap:8px;flex-wrap:nowrap;justify-content:center;margin-top:10px}
+.gdBtns .gdB{padding:6px 12px;font-size:17px;white-space:nowrap;flex:0 1 auto}
+.gdB{--sh:#c98200;display:inline-flex;align-items:center;gap:6px;border:3px solid var(--bd,#f0a000);border-radius:999px;padding:6px 14px;font-family:'Jua';font-size:15px;cursor:pointer;color:var(--fg,#7a4a00);background:var(--bg,linear-gradient(#fff6b0,#ffd84a));box-shadow:0 4px 0 var(--sh);transition:transform .1s,box-shadow .1s}
+.gdB:hover{transform:translateY(-1px)}.gdB:active{transform:translateY(3px);box-shadow:0 1px 0 var(--sh)}
+.gdB small{background:rgba(255,255,255,.75);border-radius:999px;padding:0 8px;font-size:12px}
+.gdB .zp{display:inline-block;animation:gdZap 1.6s ease-in-out infinite}
+.gdB .ic{width:1.3em;height:1.3em}
+@keyframes gdZap{0%,60%,100%{transform:rotate(0) scale(1)}70%{transform:rotate(-16deg) scale(1.25)}85%{transform:rotate(12deg) scale(1.15)}}
+.gdB.feed2{--bd:#e0568a;--sh:#b83a6b;--fg:#7a1f45;--bg:linear-gradient(#ffe0ee,#ff9ec4)}
+.gdB.pick{--bd:#3aa66a;--sh:#237a49;--fg:#124a2a;--bg:linear-gradient(#e2ffd8,#8fe3a0)}
+.gdB.pets{--bd:#4f93d8;--sh:#2f68a8;--fg:#123e6e;--bg:linear-gradient(#e6f4ff,#a6d4fb)}
+.gdTypes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.gdTypes button{border:3px solid #3a2e3f;border-radius:12px;padding:10px 4px;font-family:'Jua';font-size:16px;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.35);cursor:pointer}
 .stonePanel{background:rgba(255,250,241,.82);padding:10px 14px}
 .stoneHead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.stoneHead b{font-size:20px}.motto{font-family:'Jua';color:#8a6a3c;background:#eee9d5;border-radius:10px;padding:2px 10px;font-size:15px}
 .stoneBox{display:flex;justify-content:center;cursor:pointer}.stoneSvg{width:min(100%,420px);height:auto;max-height:240px;overflow:visible}
@@ -416,9 +468,22 @@ html.lowfx .card .holo{animation:none;mix-blend-mode:normal;opacity:.25}
 .mbox{width:min(560px,100%);max-height:100%;overflow-y:auto;overscroll-behavior:contain;animation:popIn .22s cubic-bezier(.3,1.5,.5,1)}
 .mbox.wide{width:min(820px,100%)}
 @keyframes popIn{from{transform:scale(.9);opacity:0}}
+.bmBtns{position:sticky;bottom:-6px;z-index:5;margin:10px -6px -6px!important;padding:12px 6px 8px;background:linear-gradient(180deg,rgba(243,239,224,0),#f3efe0 30%);border-radius:0 0 10px 10px}
+.scSetBtn .bt{margin-left:2px}
+.scSetFloat{position:fixed;top:calc(var(--vt) + 8px);right:10px;z-index:30}
 .mbtns{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
 #toast{position:fixed;left:50%;top:calc(var(--vt) + 12px);transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;width:min(520px,94vw)}
 .tst{background:#3a2e3f;color:#fff;padding:9px 16px;border-radius:14px;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.25);animation:popIn .25s;text-align:center}
+#autoCast{position:fixed;left:50%;top:calc(var(--vt) + var(--vh) * .46);transform:translate(-50%,-50%);z-index:120;width:min(560px,92vw);display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
+#autoCast .acl{background:rgba(20,24,40,.84);color:#fff;border-radius:14px;padding:8px 14px;font-weight:800;font-size:clamp(14px,3.5vw,18px);line-height:1.45;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.35);border:2px solid #6aa7ff;animation:acIn .25s ease-out;transition:opacity .4s}
+#autoCast .acl.f{border-color:#ff6a6a}
+#autoCast .acl.sv{border-color:#ffd23f}
+#autoCast .acl.out{opacity:0}
+#autoCast .acl b{color:#ffd23f}
+#autoCast .acl .sup{color:#ff9d6e}
+#autoCast .acl .weak{color:#b8c2d6}
+body:has(#bq.on) #autoCast{opacity:0}
+@keyframes acIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
 #banner{position:fixed;left:50%;top:calc(var(--vt) + var(--vh) * .38);transform:translate(-50%,-50%) scale(.6);z-index:250;pointer-events:none;opacity:0;text-align:center;white-space:nowrap}
 #banner.on{animation:bnr 2.2s ease forwards}
 #banner .b1{font-family:'Black Han Sans';font-size:clamp(34px,9vw,60px);color:#ffd23f;-webkit-text-stroke:3px #2f5aa8;paint-order:stroke fill;text-shadow:0 5px 0 #2f5aa8}
@@ -4107,7 +4172,7 @@ function recordAnswer(q,ok,ms,opt={}){const m=S.meta,v=q.iq?{c:0,x:0,st:0,run:0,
  if(!opt.retry){m.hist.push(ok?1:0);if(m.hist.length>200)m.hist.shift();m.thist=m.thist||[];m.thist.push(Math.round(Math.min(ms,60000)/100)/10);if(m.thist.length>200)m.thist.shift();
   if(!m.first20&&m.hist.length>=20){m.first20=m.hist.slice(0,20);m.first20t=m.thist.slice(-20);}
   const se=m.season;if(se&&se.f20&&se.f20.length<20){se.f20.push(ok?1:0);se.f20t.push(m.thist[m.thist.length-1]);}}
- {const pid=partnerId();m.bond=m.bond||{};m.bond[pid]=(m.bond[pid]||0)+1;}
+ {const pid=partnerId();m.bond=m.bond||{};bondTick(pid);}
  foundUpdate(q,ok);
  if(opt.guess){m.stats.guessWrong=(m.stats.guessWrong||0)+1;}
  gainXP(ok?10:opt.guess?0:3); // 틀려도 노력 점수(단, 찍은 답은 빼요)
@@ -4415,23 +4480,28 @@ const kwD=(m,kw)=>m.rar===5&&kw.l?kw.l:(m.rar===4&&kw.l4?kw.l4:kw.d);
 function kwOf(mon){let t=mon.types[0];if(t===0&&mon.types[1]!=null)t=mon.types[1];return KW[t];}
 // 그림: PokeAPI 스프라이트(인터넷). 막혀 있으면 타입 색 공 그림으로 대신해요.
 const SPR_BASE='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
-function spriteURL(id,kind='front'){if(!S.meta.settings.imgs)return fallbackSprite(id);
- if(kind==='art')return SPR_BASE+'other/official-artwork/'+id+'.png';
+// ===== 이로치: 파트너로 정한 포켓몬과 함께 문제를 100개 풀면 이로치로 변해요. 파트너를 바꾸면 원래 모습으로 돌아와요 =====
+const SHINY_AT=100;
+function shinyOn(id){try{const m=S.meta;return !!(m&&m.col&&id&&id===partnerId()&&((m.bond&&m.bond[id])||0)>=SHINY_AT);}catch(e){return false;}}
+function bondTick(pid){const m=S.meta;m.bond=m.bond||{};const b=(m.bond[pid]||0)+1;m.bond[pid]=b;
+ if(b===SHINY_AT){try{setTimeout(()=>{sfx('win');confetti(60);toast(`✨ ${josa(esc(MON[pid].name),'이가')} 이로치로 변했어요! 파트너로 함께 있는 동안 반짝여요!`);},900);}catch(e){}}}
+function spriteURL(id,kind='front',ns){if(!S.meta.settings.imgs)return fallbackSprite(id);const sh=!ns&&shinyOn(id)?'shiny/':'';
+ if(kind==='art')return SPR_BASE+'other/official-artwork/'+sh+id+'.png';
  // 움직이는 GIF는 프레임 간격이 아주 짧아 PC 브라우저에서 너무 빨리 움직여요 → 기본은 도트 그림 + 숨쉬기 움직임(설정에서 GIF 선택 가능)
  const gif=S.meta.settings.anim==='gif';
- if(kind==='anim')return gif?SPR_BASE+'other/showdown/'+id+'.gif':SPR_BASE+id+'.png';
- if(kind==='back')return gif?SPR_BASE+'other/showdown/back/'+id+'.gif':SPR_BASE+'back/'+id+'.png';
- return SPR_BASE+id+'.png';}
+ if(kind==='anim')return gif?SPR_BASE+'other/showdown/'+sh+id+'.gif':SPR_BASE+sh+id+'.png';
+ if(kind==='back')return gif?SPR_BASE+'other/showdown/back/'+sh+id+'.gif':SPR_BASE+'back/'+sh+id+'.png';
+ return SPR_BASE+sh+id+'.png';}
 const FB={};
 function fallbackSprite(id){if(FB[id])return FB[id];const m=MON[id];const c=m?TYPE_COL[m.types[0]]:'#aaa';const c2=m&&m.types[1]!=null?TYPE_COL[m.types[1]]:c;
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><circle cx="48" cy="52" r="30" fill="${c}" stroke="#3a2e3f" stroke-width="4"/><path d="M18 52a30 30 0 0 1 60 0z" fill="${c2}" opacity=".6"/><circle cx="38" cy="48" r="4" fill="#3a2e3f"/><circle cx="58" cy="48" r="4" fill="#3a2e3f"/><path d="M42 60q6 5 12 0" stroke="#3a2e3f" stroke-width="3" fill="none"/><text x="48" y="92" font-size="12" text-anchor="middle" fill="#3a2e3f">${m?m.id:''}</text></svg>`;
  return FB[id]='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);}
-function imgFail(el){const id=+el.dataset.id;if(el.dataset.f==='1'){el.src=fallbackSprite(id);el.dataset.f='2';return;}
+function imgFail(el){const id=+el.dataset.id;if((el.getAttribute('src')||'').indexOf('/shiny/')>=0){el.removeAttribute('data-shifted');el.src=spriteURL(id,el.dataset.k||'front',true);return;}if(el.dataset.f==='1'){el.src=fallbackSprite(id);el.dataset.f='2';return;}
  if(el.dataset.k&&el.dataset.k!=='front'){el.dataset.f='1';el.src=SPR_BASE+id+'.png';return;}el.dataset.f='2';el.src=fallbackSprite(id);}
-function monImg(id,kind='front',cls=''){if((kind==='anim'||kind==='back')&&S.meta.settings.anim!=='gif')cls=(cls?cls+' ':'')+'idle';return `<img class="${cls}" style="--d:${(id%7)*.17}s" src="${spriteURL(id,kind)}" data-id="${id}" data-k="${kind}" alt="" loading="lazy" draggable="false" onerror="imgFail(this)">`;}
+function monImg(id,kind='front',cls='',ns){if((kind==='anim'||kind==='back')&&S.meta.settings.anim!=='gif')cls=(cls?cls+' ':'')+'idle';return `<img class="${cls}" style="--d:${(id%7)*.17}s" src="${spriteURL(id,kind,ns)}" data-id="${id}" data-k="${kind}" alt="" loading="lazy" draggable="false" onerror="imgFail(this)">`;}
 /* ===== 전투 칸의 포켓몬 그림: 그림 파일 아래쪽의 투명한 여백을 없애 발이 바닥에 닿게 해요 ===== */
 const SPR_SHIFT=new Map();
-function monImgU(id,kind){let h=monImg(id,kind);try{const u=spriteURL(id,kind),c=SPR_SHIFT.get(u);if(c&&c!==u)h=h.replace('src="'+u+'"','src="'+c+'" data-shifted="1"');}catch(e){}return h;}
+function monImgU(id,kind,ns){let h=monImg(id,kind,'',ns);try{const u=spriteURL(id,kind,ns),c=SPR_SHIFT.get(u);if(c&&c!==u)h=h.replace('src="'+u+'"','src="'+c+'" data-shifted="1"');}catch(e){}return h;}
 function shiftSpriteDown(src){return new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';
  im.onload=()=>{try{const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h||w>600||h>600)return res(src);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(im,0,0);
   const d=cx.getImageData(0,0,w,h).data;let maxY=-1;for(let y=h-1;y>=0&&maxY<0;y--){for(let x=0;x<w;x++){if(d[(y*w+x)*4+3]>24){maxY=y;break;}}}
@@ -4541,8 +4611,8 @@ function partnerId(){const m=S.meta;if(m.partner&&m.col[m.partner])return m.part
 function setPartner(id){S.meta.partner=id;autoSave();sfx('level');toast(`${josa(esc(MON[id].name),'와과')} 함께 공부해요!`);}
 const bondOf=id=>(S.meta.bond&&S.meta.bond[id])||0;
 function partnerPicker(after){const m=S.meta;const ids=Object.keys(m.col).map(Number).sort((a,b)=>bondOf(b)-bondOf(a)||a-b);const cur=partnerId();
- M(`<h2>${I('heart')} 함께 공부할 파트너</h2><p class=mut style="font-size:13px">가진 포켓몬 누구와도 함께 공부할 수 있어요. 함께 푼 문제가 쌓이면 단짝이 돼요!</p>
-  <div class=dexGrid style="margin-top:8px;max-height:56vh;overflow-y:auto">${ids.map(id=>`<div class="dexCell" data-pid="${id}" style="${id===cur?'border-color:#ff5a8a;border-width:3px':''}">${bondOf(id)?`<span class=n2>${bondOf(id)}</span>`:''}${monImg(id)}<span class=nm>${esc(MON[id].name)}</span></div>`).join('')}</div>
+ M(`<h2>${I('heart')} 함께 공부할 파트너</h2><p class=mut style="font-size:13px">가진 포켓몬 누구와도 함께 공부할 수 있어요. 함께 푼 문제가 쌓이면 단짝이 돼요!<br>✨ 파트너와 함께 <b>100문제</b>를 풀면 <b>이로치</b>로 변해요! 파트너를 바꾸면 원래 모습으로 돌아와요.</p>
+  <div class=dexGrid style="margin-top:8px;max-height:56vh;overflow-y:auto">${ids.map(id=>`<div class="dexCell" data-pid="${id}" style="${id===cur?'border-color:#ff5a8a;border-width:3px':''}">${bondOf(id)?`<span class=n2>${bondOf(id)}</span>`:''}${monImg(id,'front','',id!==cur)}<span class=nm>${esc(MON[id].name)}${id===cur&&shinyOn(id)?' ✨':''}</span></div>`).join('')}</div>
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,{x:()=>closeM(),_close:()=>closeM()},{wide:1});
  $('#mbox').querySelectorAll('[data-pid]').forEach(c=>c.onclick=()=>{setPartner(+c.dataset.pid);closeM();if(after)after();});}
 // 카드팩: 5장. 진화 전(기본) 포켓몬이 많이 나오고, 희귀 이상 1장은 꼭. 영웅은 10팩, 전설은 40팩 안에 꼭(천장).
@@ -4918,12 +4988,12 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
  const valid=targetsFor(B.sel);
  const unitH=(u,P,i)=>{if(!u)return '';const friendly=P===me;const mine=friendly&&(!B.coop||Number(u.coopOwner??0)===B.coop.active);const m=MON[u.id];const ready=mine&&my&&u.att>0&&!u.frozen;
   return `<div class="unit${ready?' ready':''}${mine&&B.sel===i?' sel':''}${!friendly&&valid.units.includes(i)?' tgt':''}${isTaunt(u)?' taunt':''}${u.frozen?' frozen':''}${u.frozen&&u.moon?' moonstun':''}${u.shield?' shielded':''}${mine&&B.itemTargetMode&&!u.frozen?' itemTarget':''}${!friendly&&B.moonTargetMode?' itemTarget':''}${mine&&!ready&&my?' zz':''}" data-i="${i}">
-   ${B.coop?(()=>{const ow=Number(u.coopOwner??0)===1?1:0;const nm=String((B.coop.players[ow]&&B.coop.players[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${monImgU(u.id,mine?'back':'anim')}</div><div class=un>${esc(m.name)}</div><div class=tdots>${m.types.map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
+   ${B.coop?(()=>{const ow=Number(u.coopOwner??0)===1?1:0;const nm=String((B.coop.players[ow]&&B.coop.players[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${monImgU(u.id,mine?'back':'anim',!mine)}</div><div class=un>${esc(m.name)}</div><div class=tdots>${m.types.map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
    <div class=us><span class="st atk">${u.atk}</span><span class="st hp"${u.hp<u.max?' style="background:#d9393f"':''}>${u.hp}</span></div></div>`;};
- const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=B.coop?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front')}</div><div><div class=hn>${esc(P.name)}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
+ const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=B.coop?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front','',P===B.foe)}</div><div><div class=hn>${esc(P.name)}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
   const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),sp=Math.max(0,Math.min(P.sunMana||0,P.mana-bp)),bl=P.mana-bp-sp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}${Array.from({length:sp},()=>'<i class="on sun"></i>').join('')}<b>${bl}${bp+sp?`<span class=manaPlus>+${bp+sp}</span>`:''}/${den}</b></div>`;};
  $('#battle').innerHTML=`
-  <div class=bTop>${B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front')}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:-12px"><b class=dmgp>-${(u=>Math.max(1,Math.ceil(u.atk*rlBoost(u))+quakeB(u)+dragonMod(u)))(me.board[B.sel])}</b></div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front')}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill title="상대 손에 든 카드 수">${I('cards')} ${fo.hand.length}</span><span class=pill title="상대 남은 덱 카드 수">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<button class="btn ghost sm" id=bMenu>메뉴</button></div>
+  <div class=bTop>${B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:-12px"><b class=dmgp>-${(u=>Math.max(1,Math.ceil(u.atk*rlBoost(u))+quakeB(u)+dragonMod(u)))(me.board[B.sel])}</b></div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front','',true)}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill title="상대 손에 든 카드 수">${I('cards')} ${fo.hand.length}</span><span class=pill title="상대 남은 덱 카드 수">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<button class="btn ghost sm" id=bMenu>메뉴</button></div>
   <div class="lane${B.wildMode?` wildLane wildCount${fo.board.filter(Boolean).length}`:''}" id=foeLane>${fo.board.map((u,i)=>B.wildMode&&!u?'':`<div class=slot data-i="${i}">${unitH(u,fo,i)}</div>`).join('')}</div>
   <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class=pill style="color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}</div>
   <div class=lane${B.coop?' coopLane':''} id=myLane>${me.board.map((u,i)=>`<div class="slot${B.pick>=0&&!u&&!isItemCard(me.hand[B.pick])?' can':''}" data-i="${i}">${unitH(u,me,i)}</div>`).join('')}</div>
@@ -6494,14 +6564,14 @@ async function resolveAttack(A,D,si,tg,ok,cb,defReduce=0,crit=false){const a=A.b
  let dmg=a.atk;let note='';
  if(ok){if(cb){dmg+=1;note='콤보 +1! ';}if(crit){dmg+=1;S.meta.stats.heavyCrit=(S.meta.stats.heavyCrit||0)+(A===B.me?1:0);}}else{dmg=Math.ceil(dmg/2);note='약한 공격… ';}
  const dm=dragonMod(a);if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);a.att--;a.fresh=0;
- await preAtkFx(A,si,a,tg);
+ await preAtkFx(A,si,a,tg);acAtk(A,D,a,tg,ok,crit);
  if(crit&&ok){fx(unitEl(A,si),'크리티컬! +1','crit');sfx('crit');}
- if(tg.hero){dmg+=quakeB(a);if(defReduce>0){dmg=Math.max(0,dmg-defReduce);note+=`방어 문제 정답 -${defReduce}! `;}const el=heroEl(D);window.__sd=dmg;await skillMove(A,si,el,ok,cb);window.__sd=null;if(quakeB(a)>0)await quakeFx(el);D.hp-=dmg;if(dmg>0){impact(el,dmg,{hero:1,col:'#ff5a5f'});fx(el,'-'+dmg,ok?'crit big':'');}else fx(el,'공격을 막았다!','txt');if(ok&&dmg>0)sfx('crit');if(note)fx(unitEl(A,si),note,'txt');}
+ if(tg.hero){dmg+=quakeB(a);if(defReduce>0){dmg=Math.max(0,dmg-defReduce);note+=`방어 문제 정답 -${defReduce}! `;}const el=heroEl(D);window.__sd=dmg;await skillMove(A,si,el,ok,cb);window.__sd=null;if(quakeB(a)>0)await quakeFx(el);D.hp-=dmg;acHero(dmg,D);if(dmg>0){impact(el,dmg,{hero:1,col:'#ff5a5f'});fx(el,'-'+dmg,ok?'crit big':'');}else fx(el,'공격을 막았다!','txt');if(ok&&dmg>0)sfx('crit');if(note)fx(unitEl(A,si),note,'txt');}
  else{const d=D.board[tg.u];if(!d){return;}
   dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=Math.max(1,applyType(dmg,k));
   await skillMove(A,si,unitEl(D,tg.u),ok,cb);
   if(k>=2){fx(unitEl(D,tg.u),'효과가 굉장했다!','txt super');if(A===B.me)S.meta.stats.superEff=(S.meta.stats.superEff||0)+1;}else if(k<1)fx(unitEl(D,tg.u),'효과가 별로인 듯…','txt');
-  await dealUnit(D,tg.u,dmg,undefined,a.kw==='sneak'&&isLeg(a));
+  acUnit(D,tg.u,await dealUnit(D,tg.u,dmg,undefined,a.kw==='sneak'&&isLeg(a)),k);
   if(a.kw==='freeze'&&D.board[tg.u])applyFreeze(D,tg.u,a);
   if(a.kw==='poison'&&D.board[tg.u])poisonHit(D,tg.u,isLeg(a));
   if(!(B.wildMode&&D===B.foe)){let cd=d.atk;const k2=typeMul(d.id,a.id);cd=a.kw==='wing'?0:applyType(cd,k2);cd=Math.ceil(cd*wingM(d));if(cd>0){if(wingM(d)>1)await wingFx(D,tg.u,A,si,wingM(d));await wait(220);await dealUnit(A,si,cd);}}
@@ -6548,8 +6618,27 @@ async function startTurn(side){if(!B||B.over)return;closeInfo();if(B.coop&&side=
  else{await wait(700);await foeTurn();}}
 // ===== 자동전투: 카드 내기·공격·차례 끝을 자동으로 해요. 공격 때 나오는 문제는 그대로 나오고, 직접 풀어야 넘어가요 =====
 const AUTO={on:false,running:false};
+// ===== 자동전투 중계: 공격·막기 상황을 화면 가운데에 한 줄씩 보여줘요 =====
+const CAST_MV=['몸통박치기','화염 방사','물대포','덩굴 채찍','백만 볼트','냉동 빔','인파이트','오물 폭탄','지진','공중 날기','사이코키네시스','벌레의 야단법석','스톤 에지','섀도 볼','용의 파동','어둠의 파동','아이언 헤드','문 포스'];
+const AC={cur:null};
+function acOn(){try{return !!(AUTO.on&&B&&!B.over&&!B.pvp&&!B.coop&&!window.__sim);}catch(e){return false;}}
+function acClear(){try{const b=document.getElementById('autoCast');if(b)b.innerHTML='';AC.cur=null;}catch(e){}}
+function acSay(html,cls,ms=3600){try{if(!acOn())return null;let b=document.getElementById('autoCast');if(!b){b=document.createElement('div');b.id='autoCast';document.body.appendChild(b);}
+ const d=document.createElement('div');d.className='acl'+(cls?' '+cls:'');d.innerHTML=html;b.appendChild(d);while(b.children.length>4)b.removeChild(b.firstChild);
+ setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),450);},ms);return d;}catch(e){return null;}}
+function acAdd(html){try{if(!acOn())return;const d=AC.cur;if(d&&d.isConnected&&!d.classList.contains('out'))d.insertAdjacentHTML('beforeend',html);else AC.cur=acSay(html.trim());}catch(e){}}
+function acAtk(A,D,a,tg,ok,crit){try{if(!acOn()||!a||!MON[a.id])return;let tn;if(tg.hero)tn=D.name||'트레이너';else{const d=D.board[tg.u];if(!d||!MON[d.id])return;tn=MON[d.id].name;}
+ const mv=CAST_MV[kwType(MON[a.id])]||CAST_MV[0];
+ let h=`${esc(josa(MON[a.id].name,'이가'))} ${esc(josa(mv,'이로'))} ${esc(josa(tn,'을를'))} 공격!`;
+ if(A===B.me){if(!ok)h+=' <span class=weak>약한 공격…</span>';else if(crit)h+=' <b>크리티컬!</b>';}
+ AC.cur=acSay(h,A===B.me?'':'f');}catch(e){}}
+function acHero(dmg,P){try{if(!acOn())return;const d=AC.cur,alive=d&&d.isConnected&&!d.classList.contains('out');const pre=alive?' ':`${esc((P&&P.name)||'트레이너')} `;acAdd(dmg>0?`${pre}<b>-${dmg}</b>`:`${pre}<span class=weak>공격을 막았다!</span>`);}catch(e){}}
+function acUnit(P,i,dealt,k){try{if(!acOn())return;if(!dealt){acAdd(' <span class=weak>피했다!</span>');return;}
+ let h=` <b>-${dealt}</b>`;if(k>=2)h+=' <span class=sup>효과는 굉장했다!</span>';else if(k<1)h+=' <span class=weak>효과는 별로였다.</span>';
+ const u=P.board[i];if(!u||u.hp<=0)h+=' 쓰러졌다!';acAdd(h);}catch(e){}}
+function acDef(P,hv){try{if(!acOn())return;AC.cur=null;acSay(`${esc(P.name||'트레이너')} ${hv?'슈퍼세이브! -3':'막았다! -2'}`,'sv');}catch(e){}}
 function autoBind(){try{const bt=$('#bAuto'),bat=$('#battle');if(bat)bat.classList.toggle('autoOn',!!(AUTO.on&&bt));
- if(bt)bt.onclick=()=>{sfx('tap');AUTO.on=!AUTO.on;toast(AUTO.on?'자동전투 시작! 공격 문제는 직접 풀어 주세요':'자동전투를 껐어요');renderBattle();};
+ if(bt)bt.onclick=()=>{sfx('tap');AUTO.on=!AUTO.on;if(!AUTO.on)acClear();toast(AUTO.on?'자동전투 시작! 공격 문제는 직접 풀어 주세요':'자동전투를 껐어요');renderBattle();};
  if(AUTO.on&&bt)autoKick();}catch(e){}}
 function autoKick(){if(AUTO.running||!AUTO.on)return;AUTO.running=true;autoRun().catch(e=>console.warn('auto',e)).finally(()=>{AUTO.running=false;});}
 async function autoRun(){let idle=0,guard=0;
@@ -6652,22 +6741,22 @@ async function foeTurn(){const fo=B.foe,me=B.me;B.busy=true;renderBattle();
  if(B.over)return;B.busy=false;await wait(250);if(B.coop)bossSetActive(0);startTurn('me');}
 async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)return;const dm=dragonMod(a);a.att--;
  let dmg=a.atk;if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);
- await preAtkFx(fo,i,a,tg);
+ await preAtkFx(fo,i,a,tg);acAtk(fo,me,a,tg,true,false);
  if(tg.hero){dmg+=quakeB(a);
   // 막기 문제: 내 트레이너가 피해 2 이상을 받을 때마다 방어 문제를 표시
   const tp=(B.coop&&tg.p!=null&&B.coop.players[tg.p])?B.coop.players[tg.p]:me;const remoteDef=!!B.coop&&tp!==B.coop.players[0];
    if(S.meta.settings.defq&&dmg>=2){renderBattle();bossMarkTarget(tp);let r=null,dq=null;if(remoteDef){r=await bossAskDefense(tp,a);}else{const q=pickQ({cyc:1});dq=q;if(q)r=await battleQ(q,{who:tp.av,what:`막기! ${esc(MON[a.id].name)}의 공격을 막아요`,defense:true});}
-    if(r){if(r.ok){B.qc++;B.combo++;if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;{const hv=!!((dq&&dq.tier==='H')||(r&&r.sv));dmg=Math.max(0,dmg-2-(hv?1:0));fx(heroEl(tp),hv?'슈퍼세이브! -3':'막았다!',hv?'crit':'txt');if(hv)sfx('crit');}heroBlockFx(heroEl(tp));if(B.counterActive>0){await trainerAtkFx(heroEl(tp),unitEl(fo,i),Math.min(5,B.counterActive),'counter');await dealUnit(fo,i,B.counterActive);fx(heroEl(tp),`반격 -${B.counterActive}`,'txt');}}else B.combo=0;}}
-  bossMarkTarget(tp);window.__sd=dmg;await skillMove(fo,i,heroEl(tp),true,false);window.__sd=null;if(quakeB(a)>0)await quakeFx(heroEl(tp));tp.hp-=dmg;if(dmg){impact(heroEl(tp),dmg,{hero:1,col:'#ff5a5f'});fx(heroEl(tp),'-'+dmg,dmg>=4?'big':'');}}
+    if(r){if(r.ok){B.qc++;B.combo++;if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;{const hv=!!((dq&&dq.tier==='H')||(r&&r.sv));dmg=Math.max(0,dmg-2-(hv?1:0));acDef(tp,hv);fx(heroEl(tp),hv?'슈퍼세이브! -3':'막았다!',hv?'crit':'txt');if(hv)sfx('crit');}heroBlockFx(heroEl(tp));if(B.counterActive>0){await trainerAtkFx(heroEl(tp),unitEl(fo,i),Math.min(5,B.counterActive),'counter');await dealUnit(fo,i,B.counterActive);fx(heroEl(tp),`반격 -${B.counterActive}`,'txt');}}else{B.combo=0;if(acOn()){AC.cur=null;acSay('방어 실패…','sv');}}}}
+  bossMarkTarget(tp);window.__sd=dmg;await skillMove(fo,i,heroEl(tp),true,false);window.__sd=null;if(quakeB(a)>0)await quakeFx(heroEl(tp));tp.hp-=dmg;acHero(dmg,tp);if(dmg){impact(heroEl(tp),dmg,{hero:1,col:'#ff5a5f'});fx(heroEl(tp),'-'+dmg,dmg>=4?'big':'');}}
  else{const d=me.board[tg.u];if(!d)return;dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=Math.max(1,applyType(dmg,k));
   await skillMove(fo,i,unitEl(me,tg.u),true,false);if(k>=2)fx(unitEl(me,tg.u),'효과가 굉장했다!','txt');
-  await dealUnit(me,tg.u,dmg,undefined,a.kw==='sneak'&&isLeg(a));if(a.kw==='freeze'&&me.board[tg.u])applyFreeze(me,tg.u,a);if(a.kw==='poison'&&me.board[tg.u])poisonHit(me,tg.u,isLeg(a));
+  acUnit(me,tg.u,await dealUnit(me,tg.u,dmg,undefined,a.kw==='sneak'&&isLeg(a)),k);if(a.kw==='freeze'&&me.board[tg.u])applyFreeze(me,tg.u,a);if(a.kw==='poison'&&me.board[tg.u])poisonHit(me,tg.u,isLeg(a));
   let cd=a.kw==='wing'?0:applyType(d.atk,typeMul(d.id,a.id));cd=Math.ceil(cd*wingM(d));if(cd>0){if(wingM(d)>1)await wingFx(me,tg.u,fo,i,wingM(d));await wait(200);await dealUnit(fo,i,cd);}}
  if(a.kw==='double'&&a.att>0&&a.hp>0)await dragonFangFx(fo,i);
  if(a.kw==='rush'&&isLeg(a)){const dd=!tg.hero&&me.board[tg.u]?me.board[tg.u]:null;const tpx=B.coop?((tg.hero&&tg.p!=null&&B.coop.players[tg.p])||B.coop.players[Number((dd&&dd.coopOwner)??0)]||me):me;tpx.hp-=1;fx(heroEl(tpx),'⚡ 고정 -1','txt');}
  cleanup();renderBattle();checkEnd();}
-function battleMenu(){if(B&&B.wildMode){M(`<h2>야생 포켓몬 전투</h2><div class=explain style="font-size:14px">기존 배틀과 같은 방식으로 카드를 내고, 문제를 풀어 공격해요. 야생 포켓몬은 트레이너 체력 없이 체력이 30% 이하가 되면 포획을 시도할 수 있어요.</div><div class=mbtns><button class="btn gold" data-a=x>계속 싸우기</button><button class="btn ghost" data-a=q>전투 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),q:async()=>{if(await confirmBox('야생 포켓몬과의 전투를 포기할까요? 이번 포획 기회는 사라져요.','포기하기','계속 싸우기')){closeM();finishEndlessWild('fled','야생 포켓몬 전투를 포기했어요.');}}});return;}M(`<h2>배틀 메뉴</h2><div class=explain style="font-size:14px">${Object.values(KW).filter((v,i,a)=>a.findIndex(x=>x.n===v.n)===i).map(k=>`${I(k.ic)} <b>${k.n}</b> ${k.d}${k.l?` <span style="color:#b07a00">★전설: ${k.l}</span>`:''}`).join('<br>')}<br><br><b>타입 상성</b>: 상성이 좋으면 피해 ×1.5(효과가 굉장했다!), 나쁘면 −1. 공격받은 포켓몬은 반격해요.<br>야생·보스·시나리오·모험의 용 포켓몬은 한 번 더 공격해요(3회: 일반 -2/-1/그대로, 전설 -1/그대로/+1).<br>10번째 차례부터는 두 트레이너 모두 조금씩 지쳐요.<br><br><b>특수 카드 뽑기</b>: 일반 덱 카드 50%, 랜덤 포켓몬 카드 20%, 기본 돌 4종 합계 20%(화염의 돌·물의 돌·전기의 돌·달의 돌 각각 5%), 태양의 돌 10%예요. 태양의 돌은 비용 0으로 사용하면 이번 턴 에너지가 1 늘어요. 랜덤 카드 중 마스터볼 20%(5~6코스트·비용 4), 파워볼 30%(3~4코스트·비용 2), 포켓볼 50%(1~2코스트·비용 1) 비율로 나와요.<br><br><b>공부 기술</b>: 전투마다 기본 2회(트레이너 스킬 '공부 강화'로 늘어나요) 사용할 수 있고, 에너지를 소모하지 않아요. 사용할 때마다 남은 횟수가 1씩 줄어요. <b>달의 돌</b>은 3코스트로 상대 포켓몬 하나를 1턴 동안 기절시켜요.</div>
- <div class=mbtns><button class="btn gold" data-a=x>계속하기</button>${B.pvp?'':`<button class="btn green" data-a=sv>${I('disk')} 저장하고 나가기</button>`}<button class="btn ghost" data-a=q>포기하기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),sv:()=>{if(B.busy||B.side!=='me'){toast('내 차례일 때 저장할 수 있어요');return;}const o=Object.assign({},B,{busy:false,sel:-1,pick:-1});delete o.rng;S.meta.bsave=JSON.stringify(o);saveLocal();closeM();B=null;$('#battle').classList.remove('on');$('#battle').innerHTML='';renderLeague();toast('배틀을 저장했어요! 지금 꺼도 다음에 이어서 할 수 있어요');},q:async()=>{if(await confirmBox('배틀을 포기할까요? 푼 문제는 기록에 남아요.','포기','계속')){closeM();if(B.pvp)pvpSend({t:'quit'});B.over=true;endBattle(false);}}});}
+function battleMenu(){if(B&&B.wildMode){M(`<h2>야생 포켓몬 전투</h2><div class=explain style="font-size:14px">기존 배틀과 같은 방식으로 카드를 내고, 문제를 풀어 공격해요. 야생 포켓몬은 트레이너 체력 없이 체력이 30% 이하가 되면 포획을 시도할 수 있어요.</div><div class="mbtns bmBtns"><button class="btn gold" data-a=x>계속 싸우기</button><button class="btn blue" data-a=set>${I('gear')} 설정</button><button class="btn ghost" data-a=q>전투 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),set:()=>showSettings(true),q:async()=>{if(await confirmBox('야생 포켓몬과의 전투를 포기할까요? 이번 포획 기회는 사라져요.','포기하기','계속 싸우기')){closeM();finishEndlessWild('fled','야생 포켓몬 전투를 포기했어요.');}}});return;}M(`<h2>배틀 메뉴</h2><div class=explain style="font-size:14px">${Object.values(KW).filter((v,i,a)=>a.findIndex(x=>x.n===v.n)===i).map(k=>`${I(k.ic)} <b>${k.n}</b> ${k.d}${k.l?` <span style="color:#b07a00">★전설: ${k.l}</span>`:''}`).join('<br>')}<br><br><b>타입 상성</b>: 상성이 좋으면 피해 ×1.5(효과가 굉장했다!), 나쁘면 −1. 공격받은 포켓몬은 반격해요.<br>야생·보스·시나리오·모험의 용 포켓몬은 한 번 더 공격해요(3회: 일반 -2/-1/그대로, 전설 -1/그대로/+1).<br>10번째 차례부터는 두 트레이너 모두 조금씩 지쳐요.<br><br><b>특수 카드 뽑기</b>: 일반 덱 카드 50%, 랜덤 포켓몬 카드 20%, 기본 돌 4종 합계 20%(화염의 돌·물의 돌·전기의 돌·달의 돌 각각 5%), 태양의 돌 10%예요. 태양의 돌은 비용 0으로 사용하면 이번 턴 에너지가 1 늘어요. 랜덤 카드 중 마스터볼 20%(5~6코스트·비용 4), 파워볼 30%(3~4코스트·비용 2), 포켓볼 50%(1~2코스트·비용 1) 비율로 나와요.<br><br><b>공부 기술</b>: 전투마다 기본 2회(트레이너 스킬 '공부 강화'로 늘어나요) 사용할 수 있고, 에너지를 소모하지 않아요. 사용할 때마다 남은 횟수가 1씩 줄어요. <b>달의 돌</b>은 3코스트로 상대 포켓몬 하나를 1턴 동안 기절시켜요.</div>
+ <div class="mbtns bmBtns"><button class="btn gold" data-a=x>계속하기</button>${B.pvp?'':`<button class="btn green" data-a=sv>${I('disk')} 저장하고 나가기</button>`}<button class="btn blue" data-a=set>${I('gear')} 설정</button><button class="btn ghost" data-a=q>포기하기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),set:()=>showSettings(true),sv:()=>{if(B.busy||B.side!=='me'){toast('내 차례일 때 저장할 수 있어요');return;}const o=Object.assign({},B,{busy:false,sel:-1,pick:-1});delete o.rng;S.meta.bsave=JSON.stringify(o);saveLocal();closeM();B=null;$('#battle').classList.remove('on');$('#battle').innerHTML='';renderLeague();toast('배틀을 저장했어요! 지금 꺼도 다음에 이어서 할 수 있어요');},q:async()=>{if(await confirmBox('배틀을 포기할까요? 푼 문제는 기록에 남아요.','포기','계속')){closeM();if(B.pvp)pvpSend({t:'quit'});B.over=true;endBattle(false);}}});}
 async function endBattle(win){if(B&&B.wildMode){finishEndlessWild('fled','야생 포켓몬 전투를 종료했어요.');return;}if(B&&B.pvp)return pvpEnd(win);startBgm('adventure');const me=S.meta,g=B.g,gi=B.gi;const first=gi>=0&&win&&!me.gyms[gi];
  let coins=win?30+B.diff*10:10,candy=B.qc,packs=0,legend=0,lgNew=false;
  if(win)me.battles.w++;else me.battles.l++;
@@ -7503,8 +7592,8 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
   return `<button class=tile data-f="${f.k}">${extra}${m.unlNew[f.k]?'<i class=newTag>NEW</i>':''}<span class=ti>${I(f.ic,'ti')}</span><span class=tn>${f.n}</span><span class=td>${td}</span></button>`;}).join('');
  const next=FEAT.find(f=>!m.unl[f.k]);
  $('#view').innerHTML=hudHTML()+`<div class=wrap>
-  <div class=panel style="display:flex;gap:12px;align-items:center"><div style="width:96px;height:96px;flex:none">${monImg(partner,'anim')}</div><div style="flex:1"><div class=jua style="font-size:22px">${esc(m.name)}</div><div class=mut style="font-size:14px">${esc(lvOf(m.xp).title)} · ${josa(esc(MON[partner].name),'와과')} 함께해요</div><div style="font-size:15px;margin-top:4px">${hubLine()}</div></div><button class="btn ghost sm" id=hPartner style="align-self:flex-start">${I('heart')} 파트너<br>바꾸기</button></div>
-  ${stonePanel(m)}
+  <div class=panel style="display:flex;gap:12px;align-items:center"><div style="width:96px;height:96px;flex:none">${monImg(partner,'anim')}</div><div style="flex:1"><div class=jua style="font-size:22px">${esc(m.name)}</div><div class=mut style="font-size:14px">${esc(lvOf(m.xp).title)} · ${josa(esc(MON[partner].name),'와과')} 함께해요${shinyOn(partner)?' ✨':''}</div><div class=mut style="font-size:12px">${shinyOn(partner)?'✨ 이로치 파트너! (파트너를 바꾸면 원래 모습으로 돌아가요)':`이로치까지 함께 푼 문제 ${Math.min(bondOf(partner),SHINY_AT)} / ${SHINY_AT}`}</div><div style="font-size:15px;margin-top:4px">${hubLine()}</div></div><button class="btn ghost sm" id=hPartner style="align-self:flex-start">${I('heart')} 파트너<br>바꾸기</button></div>
+  ${gardenPanel(m)}
   <div class=panel style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="font-size:30px">🛡️</div><div style="flex:1"><b class=jua style="font-size:19px">트레이너 스킬</b><div class=mut style="font-size:13px">레벨 포인트 ${m.lp||0}개 · 스킬을 배우고 전투에서 사용해요</div></div><button class="btn purple" id="hTrainerSkills">스킬 관리</button></div>
   <div class=tiles>
    <button class="tile main" id=tTrain>${done?'':'<i class=newTag>오늘!</i>'}<span class=ti>${I('flame','ti')}</span><span><span class=tn>오늘의 훈련</span><br><span class=td>${done?'오늘 훈련 완료! 한 번 더 하면 사탕을 더 받아요.':`문제 ${trainN()}개 · 오늘의 카드팩 받기`}${gh?`<br>어제의 나: ${gh.n}문제 중 ${gh.c}개 정답`:''}</span></span></button>
@@ -7520,7 +7609,7 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
  if(m.uMax&&m.uMax<20&&m.uMaxAt&&dayDiff(m.uMaxAt,today())>=14&&!CO&&!modalOpen())setTimeout(()=>{if(S.screen==='hub'&&!modalOpen())askUnit(()=>renderHub(),true);},900);
  if(m.uMax&&!m.uMaxAt){m.uMaxAt=today();autoSave();}
  $('#hPartner').onclick=()=>{sfx('tap');partnerPicker(()=>renderHub());};
- $('#stonePanel').onclick=()=>{sfx('tap');stoneInfo();};
+
  $('#view').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{sfx('tap');const k=b.dataset.f;if(m.unlNew[k]){delete m.unlNew[k];autoSave();}NAV[k]();});
  if(S.lvUp)levelUpFx();
  featTick();setTimeout(achCelebrate,600);
@@ -8283,7 +8372,7 @@ recordAnswer=function(q,ok,ms,opt={}){
    if(ok)e.c=(e.c||0)+1;else e.x=(e.x||0)+1;
    if(ok){e.run++;if(e.run>=3&&e.st<5){e.run=0;e.st++;S.foundMsg=S.foundMsg||'영어 별 획득! 좌삼에 돌이 하나 쌓였어요.';}}else e.run=0;}
   // 파트너 함께 푼 문제 수는 수학과 영어를 모두 포함한다.
-  const pid=partnerId();m.bond=m.bond||{};m.bond[pid]=(m.bond[pid]||0)+1;
+  const pid=partnerId();m.bond=m.bond||{};bondTick(pid);
   // 영어는 수학 단원에 섞지 않고 레벨·영역별 기초 기록으로 별도 관리한다.
   const sid=q.sk||('en:'+((q.ref&&q.ref.l)||m.enLevel||1)+':'+(q.type||'mixed'));m.enSkillHistory=m.enSkillHistory||{};const h=m.enSkillHistory[sid]||(m.enSkillHistory[sid]=[]);h.push(ok?1:0);if(h.length>10)h.shift();
   m.enFound=m.enFound||{};const lv=+((q.ref&&q.ref.l)||m.enLevel)||1;const typ=q.type||'mixed';const key=lv+':'+typ;const recent=h.slice(-6);const weak=recent.length>=4&&recent.filter(v=>v===1).length/recent.length<.5;
@@ -11248,5 +11337,103 @@ window.TUT_A={begin,afterStarter,abort,parts,get state(){return cur;},
   api:{say,hideSay,W,fire,grant,setHand,resetBoss,newMyTurn,foeTurnBegin,returnToCard,setProg,A,bossUnit,handEl,endEl,manaEl,emptySlotEl,chk}};
 })();
 
+
+// 시나리오·로그라이크 화면에도 설정 버튼 표시
+(function(){function add(){try{const v=document.getElementById('view');if(!v)return;const pg=v.querySelector('.sc-page');if(!pg||pg.querySelector('.scSetBtn'))return;
+ const b=document.createElement('button');b.className='btn ghost sm scSetBtn';b.innerHTML=I('gear')+'<span class=bt> 설정</span>';b.onclick=()=>{sfx('tap');showSettings();};
+ const bar=pg.querySelector('.scv-bar');if(bar)bar.appendChild(b);else{b.classList.add('scSetFloat');pg.appendChild(b);}}catch(e){}}
+ try{new MutationObserver(add).observe(document.body,{childList:true,subtree:true});}catch(e){}})();
+
+// ===== 포켓몬 정원 · 알 부화기 =====
+// 에너지 = 예전 좌삼 돌 (개념을 3번 연속 맞히면 1개). 알에게 100번 먹이면 그 속성의 전설 포켓몬이 태어나요.
+const GD_MAX=5,GD_NEED=100,GD_EGG_COST=1000,GD_BOND=100;
+function gd(m){if(!m.garden||typeof m.garden!=='object')m.garden={pets:[],egg:null,spent:0,born:0};const g=m.garden;if(!Array.isArray(g.pets))g.pets=[];g.spent=g.spent||0;g.born=g.born||0;return g;}
+function gdEnergy(m){return Math.max(0,stoneList(m).length-gd(m).spent);}
+function gdPets(m){const g=gd(m);return g.pets.filter((id,i,a)=>m.col&&m.col[id]&&bondOf(id)>=GD_BOND&&a.indexOf(id)===i).slice(0,GD_MAX);}
+function gdShade(hex,k){const n=parseInt(hex.slice(1),16);let r=n>>16,g=(n>>8)&255,b=n&255;const f=k<0?0:255,t=Math.abs(k);r=Math.round(r+(f-r)*t);g=Math.round(g+(f-g)*t);b=Math.round(b+(f-b)*t);return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
+function gdEggSVG(t,fed,empty){const c=empty?'#c9c4b8':TYPE_COL[t],hi=gdShade(c,.55),lo=gdShade(c,-.35),dk=gdShade(c,-.6),cr=fed>=75?3:fed>=50?2:fed>=25?1:0,id='ge'+(empty?'x':t);
+ const E='M40 4C20 4 7 42 7 65c0 20 15 31 33 31s33-11 33-31C73 42 60 4 40 4z';
+ const star=(x,y,r,o)=>`<path d="M${x} ${y-r}L${x+r*.28} ${y-r*.28} ${x+r} ${y} ${x+r*.28} ${y+r*.28} ${x} ${y+r} ${x-r*.28} ${y+r*.28} ${x-r} ${y} ${x-r*.28} ${y-r*.28}z" fill="#fff" opacity="${o}"/>`;
+ return `<svg class="gdEgg${empty?' empty':''}" viewBox="0 0 80 100" style="--gl:${c}"><defs>
+  <radialGradient id="${id}b" cx="36%" cy="28%" r="85%"><stop offset="0" stop-color="${hi}"/><stop offset=".45" stop-color="${c}"/><stop offset="1" stop-color="${lo}"/></radialGradient>
+  <linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b8872b"/><stop offset=".3" stop-color="#fff0a8"/><stop offset=".55" stop-color="#e2b441"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient>
+  <clipPath id="${id}c"><path d="${E}"/></clipPath></defs>
+  <path d="${E}" fill="url(#${id}b)"/>
+  <g clip-path="url(#${id}c)">
+   <path d="M0 52Q40 64 80 52V60Q40 72 0 60Z" fill="url(#${id}g)"/>
+   <path d="M0 55Q40 67 80 55" stroke="${dk}" stroke-width=".6" fill="none" opacity=".5" stroke-dasharray="2 2.5"/>
+   ${[14,27,40,53,66].map((x,i)=>{const y=60.5+Math.sin((x/80)*Math.PI)*3.4-1;return `<path d="M${x} ${y-3.2}l2.6 3.2-2.6 3.2-2.6-3.2z" fill="${dk}" opacity=".55"/><path d="M${x} ${y-2}l1.5 2-1.5 2-1.5-2z" fill="#fff6c8"/>`;}).join('')}
+   <path d="M0 30Q40 40 80 30" stroke="url(#${id}g)" stroke-width="1.6" fill="none" opacity=".9"/>
+   <path d="M0 82Q40 92 80 82" stroke="url(#${id}g)" stroke-width="1.6" fill="none" opacity=".9"/>
+   <ellipse cx="28" cy="26" rx="9" ry="17" fill="#fff" opacity=".32" transform="rotate(24 28 26)"/>
+   <ellipse cx="22" cy="44" rx="2.6" ry="5.5" fill="#fff" opacity=".28" transform="rotate(20 22 44)"/>
+  </g>
+  ${empty?'':star(52,22,5,.9)+star(60,78,3.2,.75)+star(19,74,2.6,.7)}
+  ${cr>=1?`<path d="M42 8l-5 9 7 5-6 8 5 6" stroke="${dk}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:''}${cr>=2?`<path d="M14 50l8-5 3 8 7-4 4 7" stroke="${dk}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:''}${cr>=3?`<path d="M66 48l-9 3 3 9-8 3-2 8M52 26l9 5-4 7" stroke="${dk}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:''}
+  <path d="${E}" fill="none" stroke="${dk}" stroke-width="2.6"/><path d="${E}" fill="none" stroke="url(#${id}g)" stroke-width=".9" transform="translate(40 52) scale(.96) translate(-40 -52)" opacity=".7"/></svg>`;}
+function gdSize(id){const h=(MON[id]&&+MON[id].ht)||1;return Math.round(Math.max(30,Math.min(100,24+20*Math.sqrt(h))));}
+function gdIncHTML(egg){const e=!!egg,c=e?TYPE_COL[egg.t]:'#7b819c',lit=e?Math.floor(egg.fed/10):0,hi=gdShade(c,.5);
+ const leds=[...Array(10)].map((_,i)=>{const x=22+i*8.4,y=124+(1-Math.pow((i-4.5)/4.5,2))*4.5,on=i<lit;return `<rect class="${on?'gdLed':''}" x="${(x-2.6).toFixed(1)}" y="${y.toFixed(1)}" width="5.2" height="3.2" rx="1.4" fill="${on?c:'#2c3050'}" ${on?`style="filter:drop-shadow(0 0 3px ${c})"`:''} stroke="#0e1020" stroke-width=".6"/>`;}).join('');
+ const back=`<svg viewBox="0 0 120 140"><defs>
+  <linearGradient id="gdM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6a7090"/><stop offset=".45" stop-color="#30344f"/><stop offset="1" stop-color="#12142a"/></linearGradient>
+  <linearGradient id="gdG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a8791f"/><stop offset=".35" stop-color="#ffe9a0"/><stop offset=".7" stop-color="#d9a935"/><stop offset="1" stop-color="#8a5f14"/></linearGradient>
+  <radialGradient id="gdIn" cx="50%" cy="62%" r="60%"><stop offset="0" stop-color="${c}" stop-opacity=".75"/><stop offset=".6" stop-color="${c}" stop-opacity=".22"/><stop offset="1" stop-color="${c}" stop-opacity=".05"/></radialGradient>
+  <linearGradient id="gdSh" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="${hi}" stop-opacity=".7"/><stop offset="1" stop-color="${hi}" stop-opacity="0"/></linearGradient></defs>
+  <ellipse cx="60" cy="122" rx="57" ry="15" fill="none" stroke="${c}" stroke-width="1.4" stroke-dasharray="3 5" opacity=".85" class="gdRing1" style="filter:drop-shadow(0 0 3px ${c})"/>
+  <ellipse cx="60" cy="122" rx="48" ry="11.5" fill="none" stroke="${c}" stroke-width="1" stroke-dasharray="10 4 2 4" opacity=".7" class="gdRing2"/>
+  <path d="M22 112V46Q22 16 60 16Q98 16 98 46V112Z" fill="url(#gdIn)"/>
+  <path d="M42 112L48 52H72L78 112Z" fill="url(#gdSh)" opacity=".55"/>
+  <path d="M8 117Q60 103 112 117L106 131Q60 144 14 131Z" fill="url(#gdM)" stroke="url(#gdG)" stroke-width="1.6"/>
+  <path d="M14 131Q60 144 106 131" fill="none" stroke="#ffe9a0" stroke-width=".8" opacity=".5"/>
+  <ellipse cx="60" cy="112" rx="40" ry="8.5" fill="#1c1f38" stroke="url(#gdG)" stroke-width="1.6"/><ellipse cx="60" cy="111" rx="33" ry="6" fill="${c}" opacity="${e?.45:.12}"/>
+  ${leds}</svg>`;
+ const front=`<svg viewBox="0 0 120 140">
+  <path d="M22 112V46Q22 16 60 16Q98 16 98 46V112" fill="none" stroke="#e9f6ff" stroke-width="2" opacity=".85"/>
+  <path d="M22 112V46Q22 16 60 16Q98 16 98 46V112Z" fill="#fff" opacity=".07"/>
+  <path d="M30 100V50Q30 28 48 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" opacity=".55"/><path d="M33 108v-3" stroke="#fff" stroke-width="3.2" stroke-linecap="round" opacity=".55"/>
+  <rect x="20" y="40" width="5" height="72" rx="2.5" fill="url(#gdM)" stroke="url(#gdG)" stroke-width=".9"/><rect x="95" y="40" width="5" height="72" rx="2.5" fill="url(#gdM)" stroke="url(#gdG)" stroke-width=".9"/>
+  <path d="M20 66h5M95 66h5M20 86h5M95 86h5" stroke="${c}" stroke-width="1.6" style="filter:drop-shadow(0 0 2px ${c})"/>
+  <path d="M34 26Q60 2 86 26L82 30Q60 14 38 30Z" fill="url(#gdM)" stroke="url(#gdG)" stroke-width="1.6"/>
+  <path d="M60 4V-2" stroke="url(#gdG)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M60 3l5 6-5 6-5-6z" fill="${c}" stroke="url(#gdG)" stroke-width="1.4" style="filter:drop-shadow(0 0 5px ${c})"/><path d="M58 6l2-2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".9"/>
+  <path d="M10 117h6M104 117h6" stroke="url(#gdG)" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+ const pts=e?[0,1,2,3,4].map(i=>`<i class=gdPt style="left:${34+i*13}px;animation-delay:${(i*.65).toFixed(2)}s"></i>`).join(''):'';
+ return `<div class=gdInc style="--gl:${c}"><div class=gdIncIn>${back}${e?gdEggSVG(egg.t,egg.fed):gdEggSVG(0,0,true)}${pts}${front}</div></div>`;}
+function gardenPanel(m){const g=gd(m),all=stoneList(m).length,seen=m.stoneSeen==null?all:Math.min(m.stoneSeen,all),en=gdEnergy(m),pets=gdPets(m),egg=g.egg;
+ const pos=pets.map(id=>{const x=8+Math.random()*84,y=42+Math.random()*50,sz=gdSize(id);return `<div class="gdPet" data-gd="pet" data-id="${id}" style="width:${sz}px;height:${sz}px;left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;z-index:${3+Math.round(y)}">${monImg(id,'anim')}</div>`;}).join('');
+ const html=`<div class="panel gardenPanel" id=gardenPanel><div class=gdHead><b class=jua>나의 좌삼</b><span class=motto>포켓몬 정원</span><span class=hudSp></span><span class=pill title="개념을 3번 연속 맞히면 에너지 1개">⚡ 에너지 ${en}</span><button class="btn ghost sm" data-gd=info>ⓘ</button></div>
+  <div class=gdField id=gdField><svg class=gdBg viewBox="0 0 400 270" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="gdSk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd3ff"/><stop offset="1" stop-color="#e9f9ff"/></linearGradient><linearGradient id="gdGr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a6e27f"/><stop offset="1" stop-color="#63bd5c"/></linearGradient><radialGradient id="gdTr" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#7fd66a"/><stop offset="1" stop-color="#3a9a46"/></radialGradient><radialGradient id="gdSun" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff7c2" stop-opacity=".95"/><stop offset="1" stop-color="#fff7c2" stop-opacity="0"/></radialGradient><linearGradient id="gdPd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8ecff"/><stop offset="1" stop-color="#6cc3ee"/></linearGradient></defs><rect width="400" height="270" fill="url(#gdSk)"/><circle cx="330" cy="38" r="55" fill="url(#gdSun)"/><circle cx="330" cy="38" r="15" fill="#fff2a0"/><g fill="#fff" opacity=".92"><ellipse cx="70" cy="40" rx="30" ry="9"/><ellipse cx="92" cy="34" rx="20" ry="9"/><ellipse cx="190" cy="62" rx="26" ry="7"/><ellipse cx="208" cy="57" rx="16" ry="7"/></g><path d="M0 110Q60 70 130 100T270 92T400 108V150H0Z" fill="#b6e6a0"/><path d="M0 125Q90 92 190 120T400 118V160H0Z" fill="#9edb86"/><rect y="118" width="400" height="152" fill="url(#gdGr)"/><path d="M0 118Q100 108 200 118T400 116V124H0Z" fill="#b9ee94" opacity=".7"/><g fill="#fff" opacity=".13"><ellipse cx="60" cy="170" rx="70" ry="6"/><ellipse cx="300" cy="200" rx="80" ry="7"/><ellipse cx="170" cy="240" rx="90" ry="6"/></g><ellipse cx="200" cy="185" rx="92" ry="34" fill="#d9cfb0"/><ellipse cx="200" cy="182" rx="88" ry="31" fill="#f3ead2" stroke="#cdbf9a" stroke-width="2"/><ellipse cx="200" cy="182" rx="70" ry="23" fill="none" stroke="#d9c89a" stroke-width="1.5" stroke-dasharray="6 5"/><ellipse cx="62" cy="228" rx="42" ry="17" fill="#8fcf74"/><ellipse cx="62" cy="226" rx="36" ry="13" fill="url(#gdPd)" stroke="#fff" stroke-width="2"/><path d="M44 224q8-5 16 0" stroke="#fff" stroke-width="2" fill="none" opacity=".8"/><g transform="translate(28 92) scale(1)"><rect x="-4" y="0" width="8" height="26" rx="3" fill="#8a5a2b"/><circle cx="0" cy="-8" r="22" fill="url(#gdTr)"/><circle cx="-12" cy="2" r="14" fill="url(#gdTr)"/><circle cx="12" cy="2" r="14" fill="url(#gdTr)"/><circle cx="-6" cy="-16" r="6" fill="#fff" opacity=".18"/></g><g transform="translate(376 88) scale(1.05)"><rect x="-4" y="0" width="8" height="26" rx="3" fill="#8a5a2b"/><circle cx="0" cy="-8" r="22" fill="url(#gdTr)"/><circle cx="-12" cy="2" r="14" fill="url(#gdTr)"/><circle cx="12" cy="2" r="14" fill="url(#gdTr)"/><circle cx="-6" cy="-16" r="6" fill="#fff" opacity=".18"/></g><g transform="translate(344 118) scale(0.7)"><rect x="-4" y="0" width="8" height="26" rx="3" fill="#8a5a2b"/><circle cx="0" cy="-8" r="22" fill="url(#gdTr)"/><circle cx="-12" cy="2" r="14" fill="url(#gdTr)"/><circle cx="12" cy="2" r="14" fill="url(#gdTr)"/><circle cx="-6" cy="-16" r="6" fill="#fff" opacity=".18"/></g><g transform="translate(58 120) scale(0.62)"><rect x="-4" y="0" width="8" height="26" rx="3" fill="#8a5a2b"/><circle cx="0" cy="-8" r="22" fill="url(#gdTr)"/><circle cx="-12" cy="2" r="14" fill="url(#gdTr)"/><circle cx="12" cy="2" r="14" fill="url(#gdTr)"/><circle cx="-6" cy="-16" r="6" fill="#fff" opacity=".18"/></g><g transform="translate(120 214)"><circle cx="-3" cy="0" r="2.6" fill="#ff9ec4"/><circle cx="3" cy="0" r="2.6" fill="#ff9ec4"/><circle cx="0" cy="-3" r="2.6" fill="#ff9ec4"/><circle cx="0" cy="3" r="2.6" fill="#ff9ec4"/><circle r="1.8" fill="#ffe27a"/></g><g transform="translate(136 222)"><circle cx="-3" cy="0" r="2.6" fill="#fff"/><circle cx="3" cy="0" r="2.6" fill="#fff"/><circle cx="0" cy="-3" r="2.6" fill="#fff"/><circle cx="0" cy="3" r="2.6" fill="#fff"/><circle r="1.8" fill="#ffe27a"/></g><g transform="translate(316 230)"><circle cx="-3" cy="0" r="2.6" fill="#ffd23f"/><circle cx="3" cy="0" r="2.6" fill="#ffd23f"/><circle cx="0" cy="-3" r="2.6" fill="#ffd23f"/><circle cx="0" cy="3" r="2.6" fill="#ffd23f"/><circle r="1.8" fill="#ffe27a"/></g><g transform="translate(332 240)"><circle cx="-3" cy="0" r="2.6" fill="#ff9ec4"/><circle cx="3" cy="0" r="2.6" fill="#ff9ec4"/><circle cx="0" cy="-3" r="2.6" fill="#ff9ec4"/><circle cx="0" cy="3" r="2.6" fill="#ff9ec4"/><circle r="1.8" fill="#ffe27a"/></g><g transform="translate(252 246)"><circle cx="-3" cy="0" r="2.6" fill="#fff"/><circle cx="3" cy="0" r="2.6" fill="#fff"/><circle cx="0" cy="-3" r="2.6" fill="#fff"/><circle cx="0" cy="3" r="2.6" fill="#fff"/><circle r="1.8" fill="#ffe27a"/></g><g transform="translate(96 150)"><circle cx="-3" cy="0" r="2.6" fill="#fff"/><circle cx="3" cy="0" r="2.6" fill="#fff"/><circle cx="0" cy="-3" r="2.6" fill="#fff"/><circle cx="0" cy="3" r="2.6" fill="#fff"/><circle r="1.8" fill="#ffe27a"/></g><g transform="translate(305 150)"><circle cx="-3" cy="0" r="2.6" fill="#ff9ec4"/><circle cx="3" cy="0" r="2.6" fill="#ff9ec4"/><circle cx="0" cy="-3" r="2.6" fill="#ff9ec4"/><circle cx="0" cy="3" r="2.6" fill="#ff9ec4"/><circle r="1.8" fill="#ffe27a"/></g><g transform="translate(22 190)"><circle cx="-3" cy="0" r="2.6" fill="#ffd23f"/><circle cx="3" cy="0" r="2.6" fill="#ffd23f"/><circle cx="0" cy="-3" r="2.6" fill="#ffd23f"/><circle cx="0" cy="3" r="2.6" fill="#ffd23f"/><circle r="1.8" fill="#ffe27a"/></g><g transform="translate(380 190)"><circle cx="-3" cy="0" r="2.6" fill="#fff"/><circle cx="3" cy="0" r="2.6" fill="#fff"/><circle cx="0" cy="-3" r="2.6" fill="#fff"/><circle cx="0" cy="3" r="2.6" fill="#fff"/><circle r="1.8" fill="#ffe27a"/></g><g fill="#fff6a8" opacity=".9"><path d="M170 130l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z"/><path d="M236 120l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z"/></g></svg>${pos}${!pets.length?`<div style="position:absolute;left:0;right:0;top:10px;text-align:center;font-size:12px;color:#3f5a3a;padding:0 10px">파트너로 <b>100문제</b> 이상 함께 푼 포켓몬을 정원에 풀어놓을 수 있어요 (최대 ${GD_MAX}마리)</div>`:''}
+   <div class=gdHatch>${gdIncHTML(egg)}<span class=gdLbl>${egg?`${TYPE_KO[egg.t]} 알 · ${egg.fed}/${GD_NEED}`:'알 부화기 (비어 있음)'}</span></div></div>
+  ${egg?`<div class=gdBar><i style="width:${Math.min(100,egg.fed/GD_NEED*100)}%"></i><span>${egg.fed} / ${GD_NEED}</span></div>`:''}
+  <div class=gdBtns>${egg?`<button class="gdB feed" data-gd=feed1 title="에너지 1개 주기"><span class=zp>⚡</span></button><button class="gdB feed2" data-gd=feed10 title="에너지 10개 주기"><span class=zp>⚡</span>×10</button>`:`<button class="gdB pick" data-gd=pick title="알 고르기">🥚<small>🪙${GD_EGG_COST}</small></button>`}<button class="gdB pets" data-gd=pets title="정원 꾸리기">${I('ball')}<small>${pets.length}/${GD_MAX}</small></button></div></div>`;
+ if(all>seen){m.stoneSeen=all;autoSave();setTimeout(()=>{sfx('summon');toast(`⚡ 에너지가 <b>${all-seen}개</b> 더 모였어요!`);},600);}
+ else if(m.stoneSeen==null){m.stoneSeen=all;}
+ return html;}
+function gdInfo(){M(`<h2>⚡ 에너지와 알 부화기</h2><div style="line-height:1.8;font-size:15px">
+  <b>에너지</b>는 개념 하나를 <b>3번 연속</b> 맞히면 1개씩 모여요. 쉽게 모이지 않아요!<br>
+  <b>알</b>은 부화기가 비어 있을 때 🪙${GD_EGG_COST}코인으로 18가지 속성 중에서 골라요.<br>
+  알에게 에너지를 <b>${GD_NEED}번</b> 주면 그 속성의 <b>전설 포켓몬</b>이 랜덤으로 태어나요!<br>
+  <b>정원</b>에는 파트너로 <b>${GD_BOND}문제</b> 이상 함께 푼 포켓몬을 ${GD_MAX}마리까지 풀어놓을 수 있어요.</div><div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,{x:()=>closeM(),_close:()=>closeM()});}
+function gdPick(){const m=S.meta,g=gd(m);if(g.egg)return;
+ M(`<h2>🥚 알 고르기</h2><p class=mut style="font-size:13px;text-align:center">속성을 골라요. 🪙${GD_EGG_COST}코인이 들어요. (내 코인 🪙${m.coins})</p><div class=gdTypes>${TYPE_KO.map((n,i)=>`<button data-a="t${i}" style="background:${TYPE_COL[i]}">${n}</button>`).join('')}</div><div class=mbtns><button class="btn ghost" data-a=x>닫기</button></div>`,
+  Object.assign({x:()=>closeM(),_close:()=>closeM()},Object.fromEntries(TYPE_KO.map((n,i)=>['t'+i,()=>{if(m.coins<GD_EGG_COST){toast(`코인이 부족해요 (🪙${GD_EGG_COST} 필요)`);return;}if(g.egg){closeM();return;}m.coins-=GD_EGG_COST;g.egg={t:i,fed:0};autoSave();closeM();sfx('level');toast(`${TYPE_KO[i]} 속성 알을 부화기에 넣었어요!`);renderHub();}]))));}
+function gdFeed(n){const m=S.meta,g=gd(m),e=g.egg;if(!e)return;const en=gdEnergy(m);if(en<=0){toast('에너지가 없어요. 개념을 3번 연속 맞히면 모여요!');return;}
+ const k=Math.min(n,en,GD_NEED-e.fed);if(k<=0)return;g.spent+=k;e.fed+=k;sfx('tap');autoSave();
+ if(e.fed>=GD_NEED){gdHatch();return;}
+ renderHub();setTimeout(()=>{const el=document.querySelector('#gardenPanel .gdEgg');if(el){el.classList.add('wob');}},30);}
+function gdHatch(){const m=S.meta,g=gd(m),t=g.egg.t;const pool=MON_IDS.filter(id=>MON[id].rar===5&&MON[id].types.includes(t));const fresh=pool.filter(id=>!m.col[id]);const id=rpick(fresh.length?fresh:pool);
+ g.egg=null;g.born=(g.born||0)+1;const isNew=addCard(id);autoSave();sfx('win');confetti(80);
+ M(`<div style="text-align:center"><h2>🥚 알이 부화했어요!</h2><div style="display:flex;justify-content:center;height:150px">${monImg(id,'art')}</div><p style="font-size:19px;margin:6px 0"><b>${esc(MON[id].name)}</b> ${typeChips(MON[id])}</p><p class=mut style="font-size:14px">${TYPE_KO[t]} 속성 전설 포켓몬${isNew?' · 새로 도감에 등록됐어요!':' · 이미 가진 포켓몬이라 카드가 한 장 늘었어요'}</p><div class=mbtns><button class="btn gold" data-a=x>좋아요!</button></div></div>`,{x:()=>{closeM();renderHub();},_close:()=>{closeM();renderHub();}});}
+function gdPetsPick(){const m=S.meta,g=gd(m);const ids=Object.keys(m.col).map(Number).filter(id=>MON[id]&&bondOf(id)>=GD_BOND).sort((a,b)=>bondOf(b)-bondOf(a)||a-b);
+ const draw=()=>{const cur=gdPets(m);
+  M(`<h2>🌿 정원 꾸리기 (${cur.length}/${GD_MAX})</h2><p class=mut style="font-size:13px">파트너로 ${GD_BOND}문제 이상 함께 푼 포켓몬만 풀어놓을 수 있어요.</p>${ids.length?`<div class=dexGrid style="margin-top:8px;max-height:52vh;overflow-y:auto">${ids.map(id=>`<div class="dexCell" data-pid="${id}" style="${cur.includes(id)?'border-color:#3aa64a;border-width:3px;background:#e9ffe3':''}"><span class=n2>${bondOf(id)}</span>${monImg(id,'front','',id!==partnerId())}<span class=nm>${esc(MON[id].name)}${cur.includes(id)?' ✔':''}</span></div>`).join('')}</div>`:'<p style="text-align:center;margin:16px 0">아직 없어요. 포켓몬을 파트너로 정하고 100문제를 함께 풀어 보세요!</p>'}<div class=mbtns><button class="btn gold" data-a=x>완료</button></div>`,{x:()=>{closeM();renderHub();},_close:()=>{closeM();renderHub();}},{wide:1});
+  $('#mbox').querySelectorAll('[data-pid]').forEach(c=>c.onclick=()=>{const id=+c.dataset.pid;let a=gdPets(m);if(a.includes(id))a=a.filter(x=>x!==id);else if(a.length>=GD_MAX){toast(`정원에는 ${GD_MAX}마리까지만 풀어놓을 수 있어요`);return;}else a.push(id);g.pets=a;autoSave();sfx('tap');draw();});};
+ draw();}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-gd]');if(!b)return;const a=b.dataset.gd;try{
+ if(a==='info'){sfx('tap');gdInfo();}else if(a==='pick'){sfx('tap');gdPick();}else if(a==='pets'){sfx('tap');gdPetsPick();}
+ else if(a==='feed1')gdFeed(1);else if(a==='feed10')gdFeed(10);
+ else if(a==='pet'){const id=+b.dataset.id;sfx('tap');try{floatAt(b,'♥','crit');}catch(_){}toast(`${esc(MON[id].name)}: ${rpick(['반가워요!','오늘도 공부 파이팅!','정원이 좋아요~','쓰다듬어 줘서 고마워요!'])}`);}
+}catch(err){console.warn('garden',err);}});
+setInterval(()=>{try{const f=document.getElementById('gdField');if(!f||document.hidden)return;f.querySelectorAll('.gdPet').forEach(p=>{if(Math.random()<.35)return;const x=8+Math.random()*84,y=42+Math.random()*50,ox=parseFloat(p.style.left);p.classList.toggle('flip',x<ox);p.style.left=x.toFixed(1)+'%';p.style.top=y.toFixed(1)+'%';p.style.zIndex=3+Math.round(y);});}catch(e){}},3700);
 </script>
 </body></html>
