@@ -4243,9 +4243,9 @@ function carefulPopup(){return new Promise(res=>{S.carefulMsg=0;sfx('heal');let 
   <p class=mut style="font-size:13px">다음 몇 문제는 생각할 시간이 지난 뒤에 고를 수 있어요.</p>
   <div class=mbtns><button class="btn gold big" data-a=x disabled id=cfOk>숨 고르기… 3</button></div></div>`,{x:()=>{closeM();res();},_close:()=>{}});
  const iv=setInterval(()=>{t--;const b=$('#cfOk');if(!b){clearInterval(iv);return;}if(t<=0){clearInterval(iv);b.disabled=false;b.textContent='천천히 해 볼게요!';}else b.textContent='숨 고르기… '+t;},1000);});}
-function askQ(host,q,opt={}){return new Promise(async res=>{
+function askQ(host,q,opt={}){return new Promise(async res0=>{const res=v=>{try{window.PADX&&PADX.end(host);}catch(e){}res0(v);};
  if(S.carefulMsg&&!window.__sim)await carefulPopup();
- S.curQ=q;host.innerHTML=qHTML(q,opt.head||'');const t0=performance.now();let done=false;
+ S.curQ=q;host.innerHTML=qHTML(q,opt.head||'');const t0=performance.now();let done=false;try{window.PADX&&PADX.start(host,q);}catch(e){}
  // 모든 문제: 0.5초는 고를 수 없어요(연타 방지). 천천히 모드: 읽는 시간만큼 기다려요.
  const lock=S.careful?thinkMs(q):500;if(S.careful)S.careful--;
  const chs=host.querySelectorAll('.ch');chs.forEach(b=>{b.classList.add('wait');b.style.setProperty('--lk',lock+'ms');});
@@ -12115,5 +12115,220 @@ function gdPetFx(b){try{if(b.__fx)return;b.__fx=1;setTimeout(()=>{b.__fx=0;},650
   d.animate([{transform:`translate(${x0}px,${top}px) scale(.4)`,opacity:0},{opacity:1,offset:.2},{transform:`translate(${x0+dx}px,${top-dy}px) scale(1.15)`,opacity:0}],{duration:850+Math.random()*350,delay:i*55,easing:'ease-out',fill:'both'});}
  setTimeout(()=>root.remove(),1700);}catch(e){}}
 
+</script>
+<style id="scratch-pad-css">
+.padBtn{position:absolute;top:6px;right:6px;z-index:2;display:inline-flex;align-items:center;gap:4px;padding:5px 9px 5px 7px;border:2px solid #c9a24a;border-radius:12px;background:#fff8e1;color:#6b4e12;font:700 12px/1 'Jua','Noto Sans KR',sans-serif;cursor:pointer;box-shadow:0 2px 0 #c9a24a;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.padBtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.padBtn:active{transform:translateY(2px);box-shadow:0 0 0 #c9a24a}
+.padBtn.on{background:#ffd966;color:#4a3300}
+.qCard.hasPad .qSk{padding:0 70px}
+#padPop{position:fixed;left:8px;right:8px;margin:0 auto;max-width:760px;z-index:41;display:none;flex-direction:column;background:#fffdf3;border:3px solid #c9a24a;border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(60,40,0,.32);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#padPop.on{display:flex}
+#padPop.bottom{bottom:calc(8px + var(--sb,0px))}
+#padPop .padBar{flex:0 0 auto;display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:5px 6px;background:#f6e7b8;border-bottom:2px solid #c9a24a}
+#padPop .padTtl{font:700 14px/1 'Jua','Noto Sans KR',sans-serif;color:#6b4e12;margin:0 4px 0 4px}
+#padPop .padBar .sp{flex:1 1 4px}
+#padPop .padBar button{width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:2px solid transparent;border-radius:10px;background:transparent;color:#5a4410;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#padPop .padBar button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+#padPop .padBar button.on{background:#fff;border-color:#c9a24a}
+#padPop .padBar button:active{transform:scale(.92)}
+#padPop .padBar button.col i{display:block;width:18px;height:18px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
+#padPop .padBar button.szb i{display:block;border-radius:50%;background:currentColor;width:var(--d);height:var(--d)}
+#padPop .padBar .sep{width:2px;height:20px;background:#c9a24a55;margin:0 2px}
+#padPop .padPaper{position:relative;flex:1 1 auto;min-height:0;background-color:#fffef8;background-image:linear-gradient(#e8e0c4 1px,transparent 1px),linear-gradient(90deg,#e8e0c4 1px,transparent 1px);background-size:26px 26px;background-position:-1px -1px}
+#padPop canvas{position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none;cursor:crosshair;display:block}
+html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px))!important}
+@media (max-width:420px){#padPop .padTtl{display:none}#padPop .padBar button{width:32px;height:32px}}
+</style>
+<script id="scratch-pad-js">
+(function(){
+ const SVG={
+  pen:'<path d="M3 21l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L7 20z"/><path d="M14.5 6.5l3 3"/>',
+  eraser:'<path d="M7 21h13"/><path d="M5.2 14.2l8-8a2 2 0 0 1 2.8 0l3.3 3.3a2 2 0 0 1 0 2.8L12 19H8.2l-3-3a2 2 0 0 1 0-1.8z"/><path d="M9 11l6 6"/>',
+  undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  trash:'<path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/>',
+  big:'<path d="M4 9V4h5M20 15v5h-5"/><path d="M4 4l6 6M20 20l-6-6"/>',
+  close:'<path d="M5 5l14 14M19 5L5 19"/>'};
+ const ic=n=>`<svg viewBox="0 0 24 24" aria-hidden="true">${SVG[n]}</svg>`;
+ const COLORS=['#2b2b2b','#e53935','#1e66f5'];
+ const SIZES=[{w:2.2,d:5},{w:3.6,d:9},{w:6,d:14}];
+ const P={want:false,on:false,mode:'bottom',host:null,strokes:[],undone:null,cur:null,tool:'pen',color:0,size:1,big:false,penSeen:false,pid:null};
+ let el,cv,ctx,paper,dpr=1,rect=null,iv=0,ro=null,btn=null;
+
+ function vh(){const v=parseFloat(document.documentElement.style.getPropertyValue('--vh'));return v>0?v:window.innerHeight;}
+ function vt(){const v=parseFloat(document.documentElement.style.getPropertyValue('--vt'));return v>0?v:0;}
+
+ function build(){
+  if(el)return;
+  el=document.createElement('div');el.id='padPop';
+  el.innerHTML=`<div class=padBar><span class=padTtl>연습장</span>
+   <button type=button data-t=pen class=on title="펜" aria-label="펜">${ic('pen')}</button>
+   <button type=button data-t=eraser title="지우개" aria-label="지우개">${ic('eraser')}</button><i class=sep></i>
+   ${COLORS.map((c,i)=>`<button type=button class="col${i?'':' on'}" data-c=${i} style="--c:${c}" aria-label="색 ${i+1}"><i></i></button>`).join('')}<i class=sep></i>
+   <button type=button class=szb data-sz title="굵기" aria-label="굵기"><i></i></button>
+   <span class=sp></span>
+   <button type=button data-undo title="되돌리기" aria-label="되돌리기">${ic('undo')}</button>
+   <button type=button data-clear title="모두 지우기" aria-label="모두 지우기">${ic('trash')}</button>
+   <button type=button data-big title="크게/작게" aria-label="크게/작게">${ic('big')}</button>
+   <button type=button data-x title="닫기" aria-label="닫기">${ic('close')}</button></div>
+   <div class=padPaper><canvas></canvas></div>`;
+  document.body.appendChild(el);
+  paper=el.querySelector('.padPaper');cv=el.querySelector('canvas');
+  try{ctx=cv.getContext('2d',{desynchronized:true});}catch(e){}
+  if(!ctx)ctx=cv.getContext('2d');
+  const $=s=>el.querySelector(s);
+  el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{P.tool=b.dataset.t;sync();});
+  el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{P.color=+b.dataset.c;P.tool='pen';sync();});
+  $('[data-sz]').onclick=()=>{P.size=(P.size+1)%SIZES.length;sync();};
+  $('[data-undo]').onclick=undo;
+  $('[data-clear]').onclick=clearAll;
+  $('[data-big]').onclick=()=>{P.big=!P.big;layout();};
+  $('[data-x]').onclick=()=>{P.want=false;hide();};
+  cv.addEventListener('pointerdown',down);cv.addEventListener('pointermove',move);
+  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);cv.addEventListener('lostpointercapture',up);
+  cv.addEventListener('contextmenu',e=>e.preventDefault());
+  ['touchstart','touchmove'].forEach(t=>el.addEventListener(t,e=>{if(e.target===cv&&e.cancelable)e.preventDefault();},{passive:false}));
+  if(window.ResizeObserver){ro=new ResizeObserver(()=>fit());ro.observe(paper);}
+  window.addEventListener('resize',()=>{if(P.on)layout();});
+  sync();
+ }
+ function sync(){
+  el.querySelectorAll('[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===P.tool));
+  el.querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('on',P.tool==='pen'&&+b.dataset.c===P.color));
+  const s=el.querySelector('[data-sz]');s.style.setProperty('--d',SIZES[P.size].d+'px');
+  if(btn)btn.classList.toggle('on',P.on);
+ }
+ // ---- 위치·크기 ----
+ function layout(){
+  if(!el||!P.on)return;
+  const H=vh(),T=vt();
+  if(P.mode==='top'){
+   const sheet=document.querySelector('#bq .sheet');
+   const bottomLimit=sheet?sheet.getBoundingClientRect().top-8:T+H*.55;
+   const top=T+8;let h=bottomLimit-top;
+   h=Math.max(150,Math.min(h,P.big?H*.62:Math.min(H*.42,380)));
+   el.classList.remove('bottom');el.style.top=top+'px';el.style.bottom='auto';el.style.height=h+'px';
+   document.body.classList.remove('padBot');
+   if(sheet&&ro&&ro._sh!==sheet){if(ro._sh)ro.unobserve(ro._sh);ro._sh=sheet;ro.observe(sheet);}
+  }else{
+   const h=Math.round(P.big?Math.min(H*.62,560):Math.min(H*.4,330));
+   el.classList.add('bottom');el.style.top='auto';el.style.bottom='';el.style.height=h+'px';
+   document.documentElement.style.setProperty('--padH',(h+8)+'px');document.body.classList.add('padBot');
+  }
+  fit();
+ }
+ function fit(){
+  if(!el||!P.on)return;
+  const r=paper.getBoundingClientRect();if(r.width<2||r.height<2)return;
+  dpr=Math.min(window.devicePixelRatio||1,2.5);
+  const w=Math.round(r.width*dpr),h=Math.round(r.height*dpr);
+  if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;redraw();}
+  if(P.mode==='top')layoutFollow();
+ }
+ let lf=0;
+ function layoutFollow(){ // 전투 문제창 높이가 바뀌면 연습장 높이도 따라가요
+  const sheet=document.querySelector('#bq .sheet');if(!sheet)return;
+  const want=sheet.getBoundingClientRect().top-8-(vt()+8);
+  const cur=parseFloat(el.style.height)||0;
+  const H=vh(),max=P.big?H*.62:Math.min(H*.42,380);
+  const tgt=Math.max(150,Math.min(want,max));
+  if(Math.abs(tgt-cur)>3&&!lf){lf=1;requestAnimationFrame(()=>{lf=0;if(P.on)el.style.height=tgt+'px';});}
+ }
+ // ---- 그리기 ----
+ function styleFor(s){
+  ctx.globalCompositeOperation=s.er?'destination-out':'source-over';
+  ctx.strokeStyle=ctx.fillStyle=s.er?'#000':s.col;ctx.lineCap='round';ctx.lineJoin='round';
+ }
+ function dot(s,b){ctx.beginPath();ctx.arc(b.x,b.y,Math.max(.6,b.w/2),0,6.2832);ctx.fill();}
+ function addPt(s,i){
+  const p=s.p,b=p[i];styleFor(s);
+  if(i===0){dot(s,b);s.lm=b;return;}
+  const a=p[i-1],mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2,w:(a.w+b.w)/2},f=s.lm||a;
+  ctx.lineWidth=mid.w;ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.quadraticCurveTo(a.x,a.y,mid.x,mid.y);ctx.stroke();s.lm=mid;
+ }
+ function endStroke(s){
+  const p=s.p;if(p.length<2||!s.lm)return;const b=p[p.length-1];styleFor(s);
+  ctx.lineWidth=b.w;ctx.beginPath();ctx.moveTo(s.lm.x,s.lm.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+ }
+ function redraw(){
+  if(!ctx)return;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.setTransform(dpr,0,0,dpr,0,0);
+  for(const s of P.strokes){s.lm=null;for(let i=0;i<s.p.length;i++)addPt(s,i);endStroke(s);}
+  ctx.globalCompositeOperation='source-over';
+ }
+ function pt(e,s){
+  let w=s.base;
+  if(!s.er&&e.pointerType==='pen'&&e.pressure>0)w=s.base*(.45+e.pressure*1.1);
+  return{x:e.clientX-rect.left,y:e.clientY-rect.top,w};
+ }
+ function down(e){
+  if(e.pointerType==='pen')P.penSeen=true;
+  if(P.penSeen&&e.pointerType==='touch')return;   // 펜을 쓰면 손바닥 터치는 무시
+  if(P.pid!==null||(e.pointerType==='mouse'&&e.button!==0))return;
+  e.preventDefault();rect=cv.getBoundingClientRect();P.pid=e.pointerId;
+  try{cv.setPointerCapture(e.pointerId);}catch(_){}
+  const er=P.tool==='eraser';
+  const s={er,col:COLORS[P.color],base:er?SIZES[P.size].w*4.5:SIZES[P.size].w,p:[],lm:null};
+  P.strokes.push(s);P.cur=s;P.undone=null;
+  s.p.push(pt(e,s));addPt(s,0);
+ }
+ function move(e){
+  const s=P.cur;if(!s||e.pointerId!==P.pid)return;e.preventDefault();
+  const list=(e.getCoalescedEvents&&e.getCoalescedEvents())||[];const evs=list.length?list:[e];
+  for(const ev of evs){
+   const n=pt(ev,s),l=s.p[s.p.length-1];
+   if(Math.abs(n.x-l.x)+Math.abs(n.y-l.y)<.6)continue;
+   n.w=l.w*.6+n.w*.4;            // 굵기 변화를 부드럽게
+   s.p.push(n);addPt(s,s.p.length-1);
+  }
+ }
+ function up(e){
+  const s=P.cur;if(!s||(e&&e.pointerId!==undefined&&e.pointerId!==P.pid))return;
+  endStroke(s);P.cur=null;P.pid=null;rect=null;
+  try{cv.releasePointerCapture(e.pointerId);}catch(_){}
+ }
+ function undo(){
+  if(P.strokes.length){P.strokes.pop();redraw();}
+  else if(P.undone){P.strokes=P.undone;P.undone=null;redraw();}
+ }
+ function clearAll(){
+  if(!P.strokes.length)return;P.undone=P.strokes;P.strokes=[];redraw();
+ }
+ // ---- 열고 닫기 ----
+ function show(){
+  build();P.on=true;el.classList.add('on');layout();sync();
+  clearInterval(iv);iv=setInterval(()=>{ // 문제 화면이 사라지면(그만두기 등) 연습장도 같이 닫아요
+   if(!P.host||!P.host.isConnected||!P.host.querySelector('.qCard'))hide(true);
+   else if(P.mode==='top')layoutFollow();},400);
+ }
+ function hide(reset){
+  P.on=false;clearInterval(iv);iv=0;
+  if(el)el.classList.remove('on');
+  document.body.classList.remove('padBot');document.documentElement.style.removeProperty('--padH');
+  if(reset){P.strokes=[];P.undone=null;P.cur=null;P.pid=null;if(ctx&&cv){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);}}
+  sync();
+ }
+ function toggle(){if(P.on){P.want=false;hide();}else{P.want=true;show();}}
+ const SVGBTN=ic('pen');
+ window.PADX={
+  start(host,q){
+   if(!host||(q&&q.en))return;
+   P.host=host;P.mode=host.id==='bqHost'?'top':'bottom';
+   P.strokes=[];P.undone=null;P.cur=null;P.pid=null;
+   if(ctx&&cv){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);}
+   const card=host.querySelector('.qCard');
+   if(card){
+    card.classList.add('hasPad');
+    btn=document.createElement('button');btn.type='button';btn.className='padBtn';btn.innerHTML=SVGBTN+'연습장';
+    btn.onclick=e=>{e.stopPropagation();toggle();};card.appendChild(btn);
+   }
+   if(P.want){show();}else{hide(true);}
+   if(btn)btn.classList.toggle('on',P.on);
+  },
+  end(host){
+   if(P.host!==host)return;
+   hide(true);P.host=null;btn=null;
+  }
+ };
+})();
 </script>
 </body></html>
