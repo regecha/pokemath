@@ -3743,21 +3743,25 @@ sk('15r','5-2',6,'회전판 가능성을 말로(그림)',R=>{const n=R.p([2,4,6,
  return{q:'회전판을 돌릴 때 화살이 파란색에 멈출 가능성을 알맞은 말로 나타내세요. (모든 칸의 크기가 같아요.)',pic:spinner(n,k,R),a:ans,ch:W,e:k===0?'파란색 칸이 없으니까 불가능해요.':k===n?'모두 파란색이니까 확실해요.':`파란색이 전체 ${n}칸 중 ${k}칸이에요. ${k*2<n?'절반보다 적어서':k*2===n?'정확히 절반이라서':'절반보다 많아서'} '${ans}'예요.`};});
 // ---------- 6-1 각기둥 · 각뿔 ----------
 const prism=(kind,n,hl,R)=>{const cx=130,cb=116,rx=56,ry=24,hh=kind==='prism'?62:78,off=90/n;const th=i=>rad(off+i*360/n),bot=[...Array(n)].map((_,i)=>[cx+Math.cos(th(i))*rx,cb+Math.sin(th(i))*ry]),top=kind==='prism'?bot.map(p=>[p[0],p[1]-hh]):null,ap=[cx,cb-hh];const front=bot.map(p=>p[1]>cb);let s='';
+ // 면이 보이는지로 선의 실선/점선을 정해요(옆면 i = 꼭짓점 i와 i+1 사이). 윤곽선에 걸친 모서리는 실선이에요.
+ const eV=Math.asin(ry/rx),Hq=hh/Math.cos(eV),cT=rx*Math.tan(eV)/Hq;
+ const fv=[...Array(n)].map((_,i)=>{const sm=Math.sin(rad(off+(i+.5)*360/n));return kind==='prism'?sm>0:sm>-cT*Math.cos(Math.PI/n);});
+ const eVis=i=>fv[i],vVis=i=>fv[(i+n-1)%n]||fv[i];
  const seg=(a,b,vis)=>line(a,b,INK,vis?2.6:1.6,vis?'':'5 4');
  if(kind==='prism'){
-  for(let i=0;i<n;i++){const j=(i+1)%n;if(!front[i]&&!front[j])s+=seg(bot[i],bot[j],false);}
-  bot.forEach((p,i)=>{if(!front[i])s+=seg(p,top[i],false);});
+  for(let i=0;i<n;i++){const j=(i+1)%n;if(!eVis(i))s+=seg(bot[i],bot[j],false);}
+  bot.forEach((p,i)=>{if(!vVis(i))s+=seg(p,top[i],false);});
   if(hl==='side'){const fi=[...Array(n)].map((_,i)=>i).filter(i=>front[i]&&front[(i+1)%n]);const i=fi.length?fi[Math.floor(fi.length/2)]:0,j=(i+1)%n;s+=`<polygon points="${ps([bot[i],bot[j],top[j],top[i]])}" fill="rgba(232,67,79,.55)"/>`;}
   s+=`<polygon points="${ps(top)}" fill="${hl==='base'?'rgba(232,67,79,.55)':'rgba(255,244,214,.85)'}" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/>`;
-  for(let i=0;i<n;i++){const j=(i+1)%n;if(front[i]||front[j])s+=seg(bot[i],bot[j],true);}
-  bot.forEach((p,i)=>{if(front[i])s+=seg(p,top[i],true);});
+  for(let i=0;i<n;i++){const j=(i+1)%n;if(eVis(i))s+=seg(bot[i],bot[j],true);}
+  bot.forEach((p,i)=>{if(vVis(i))s+=seg(p,top[i],true);});
  }else{
   if(hl==='base')s+=`<polygon points="${ps(bot)}" fill="rgba(232,67,79,.55)"/>`;
-  for(let i=0;i<n;i++){const j=(i+1)%n;if(!front[i]&&!front[j])s+=seg(bot[i],bot[j],false);}
-  bot.forEach((p,i)=>{if(!front[i])s+=seg(p,ap,false);});
+  for(let i=0;i<n;i++){const j=(i+1)%n;if(!eVis(i))s+=seg(bot[i],bot[j],false);}
+  bot.forEach((p,i)=>{if(!vVis(i))s+=seg(p,ap,false);});
   if(hl==='side'){const fi=[...Array(n)].map((_,i)=>i).filter(i=>front[i]&&front[(i+1)%n]);const i=fi.length?fi[Math.floor(fi.length/2)]:0,j=(i+1)%n;s+=`<polygon points="${ps([bot[i],bot[j],ap])}" fill="rgba(232,67,79,.55)"/>`;}
-  for(let i=0;i<n;i++){const j=(i+1)%n;if(front[i]||front[j])s+=seg(bot[i],bot[j],true);}
-  bot.forEach((p,i)=>{if(front[i])s+=seg(p,ap,true);});}
+  for(let i=0;i<n;i++){const j=(i+1)%n;if(eVis(i))s+=seg(bot[i],bot[j],true);}
+  bot.forEach((p,i)=>{if(vVis(i))s+=seg(p,ap,true);});}
  return SV(260,150,s,300);};
 sk('15s','6-1',2,'각기둥 · 각뿔의 이름(그림)',R=>{const n=R.i(3,6),kind=R.r()<.5?'prism':'pyr',nm=`${NMK[n]}각${kind==='prism'?'기둥':'뿔'}`,all=[3,4,5,6].flatMap(x=>[`${NMK[x]}각기둥`,`${NMK[x]}각뿔`]).filter(x=>x!==nm),ch=[nm,...shuf(R,all.filter(x=>x.slice(0,2)===nm.slice(0,2)||x.slice(2)===nm.slice(2))).slice(0,3)];return{q:'이 입체도형의 이름은 무엇일까요?',pic:prism(kind,n,null,R),a:nm,ch,e:`밑면이 ${kind==='prism'?'2개이고 모양이 서로 같고 평행한':'1개인'} ${NMK[n]}각형이고 옆면이 ${kind==='prism'?'직사각형':'삼각형'}이라서 ${nm}이에요.`};});
 sk('15t','6-1',2,'면 · 모서리 · 꼭짓점의 수(그림)',R=>{const n=R.i(3,6),kind=R.r()<.5?'prism':'pyr',t=R.i(0,2),F=kind==='prism'?n+2:n+1,E=kind==='prism'?3*n:2*n,V=kind==='prism'?2*n:n+1,v=[F,E,V][t],nm=['면','모서리','꼭짓점'][t];const c=choicesNum(v,[v+1,v-1,v+2,[F,E,V][(t+1)%3]],R.r);
@@ -4149,6 +4153,7 @@ function iqQ(){
 SKM['iq']={id:'iq',s:'',u:0,n:'🧠 IQ 퀴즈',es:[]};
 
 function pickQ(opt={}){let pool=opt.pool,found=null;let tier=opt.cyc?(opt.tier||nextCyc()):null;if(tier==='I'){const iq=iqQ();if(iq)return iq;tier='H';}
+ if((!opt.pool||opt.lad)&&window.LADX){const lq=LADX.pick(tier);if(lq)return lq;}
  if(!pool){const fp=foundPool();if(fp.length&&rnd()<.35){pool=fp;found=1;}else pool=rnd()<.7?focusSkills():reviewSkills();}
  if(!pool.length)return null;
  if(tier)pool=tierPool(pool,tier);
@@ -4225,7 +4230,7 @@ function growthTalk(m=S.meta){const L=learned(m),h=m.hist||[];const out=[];
 
 // ---- 문제 화면 (훈련과 배틀이 같이 써요) ----
 function qHTML(q,head=''){const two=q.ch.length===2;
- return `${head}<div class=qCard>${q.retry?'<span class=retryTag>다시 도전!</span>':q.found?`<span class=retryTag style="background:#8a6a3c">좌삼 쌓기 · 기초 다지기</span>`:''}<div class=qSk>${SKM[q.sk].s?esc(semName(SKM[q.sk].s))+' · '+esc(SKM[q.sk].n):esc(SKM[q.sk].n)}${q.rv?' · 복습':''}</div><div class=qText>${fmtMath(q.q)}</div>${q.pic?`<div class=qPic>${q.pic}</div>`:''}</div>
+ return `${head}<div class=qCard>${q.retry?'<span class=retryTag>다시 도전!</span>':q.ladTag?`<span class=retryTag style="background:#2f8f6b;white-space:nowrap">${q.ladTag}</span>`:q.found?`<span class=retryTag style="background:#8a6a3c">좌삼 쌓기 · 기초 다지기</span>`:''}<div class=qSk>${SKM[q.sk].s?esc(semName(SKM[q.sk].s))+' · '+esc(SKM[q.sk].n):esc(SKM[q.sk].n)}${q.rv?' · 복습':''}</div><div class=qText>${fmtMath(q.q)}</div>${q.pic?`<div class=qPic>${q.pic}</div>`:''}</div>
  <div class="choices${two?' two':''}">${q.ch.map((c,i)=>`<button class=ch data-i="${i}">${fmtMath(esc(c))}</button>`).join('')}</div><div class=qAfter></div>`;}
 // ---- 찍기 방지: 문제를 읽을 시간보다 훨씬 빨리 고르고 자꾸 틀리면 '천천히 모드' ----
 // 읽는 데 필요한 최소 시간(글자 수·그림에 따라). 이보다 빠르면 '너무 빠른 답'.
@@ -4285,7 +4290,7 @@ function buildRx(){try{const m=S.meta;if((m.questionMode||'math')!=='math')retur
  return{weak,focus,review,names,mode,ratio,before,res:{},sk:{},plan:null,i:0};}catch(e){console.warn('buildRx',e);return null;}}
 function rxMakePlan(rx,N){const R=rx.ratio||[.55,.3,.15],w=Math.max(1,Math.round(N*R[0])),r=(rx.review.length&&N>=6)?Math.max(1,Math.round(N*R[2])):0,f=Math.max(0,N-w-r);
  const a=[...Array(w).fill('weak'),...Array(f).fill('focus'),...Array(r).fill('review')];for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]];}rx.plan=a;rx.i=0;}
-function rxPick(rx,N){if(!rx.plan)rxMakePlan(rx,N);const kind=rx.plan[rx.i++]||'weak';const tag={weak:'🎯 처방 · 약한 개념',focus:'📘 처방 · 이번 단원',review:'🔁 처방 · 복습'};
+function rxPick(rx,N){{const lq=window.LADX&&LADX.pick(null);if(lq)return lq;}if(!rx.plan)rxMakePlan(rx,N);const kind=rx.plan[rx.i++]||'weak';const tag={weak:'🎯 처방 · 약한 개념',focus:'📘 처방 · 이번 단원',review:'🔁 처방 · 복습'};
  for(const k of [kind,'weak','focus','review']){const pool=rx[k];if(!pool||!pool.length)continue;const q=pickQ({pool});if(q){q.rxTag=tag[k];q.rxKind=k;return q;}}return pickQ();}
 function rxSummary(rx){try{const m=S.meta;const kn={weak:'🎯 약한 개념',focus:'📘 이번 단원',review:'🔁 복습'};
  const rows=Object.keys(kn).filter(k=>rx.res[k]).map(k=>{const e=rx.res[k];return `<div class=skRow><span class=sn>${kn[k]}</span><span class=mut style="font-size:13px">${e.n}문제 중 ${e.c}개 정답</span><span class=pill>${Math.round(e.c/e.n*100)}%</span></div>`;}).join('');
@@ -12134,6 +12139,8 @@ function gdPetFx(b){try{if(b.__fx)return;b.__fx=1;setTimeout(()=>{b.__fx=0;},650
 #padPop .padBar button:active{transform:scale(.92)}
 #padPop .padBar button.col i{display:block;width:18px;height:18px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
 #padPop .padBar button.szb i{display:block;border-radius:50%;background:currentColor;width:var(--d);height:var(--d)}
+#padPop .padBar button.zr{width:auto;min-width:44px;padding:0 6px;font:700 12px/1 'Jua','Noto Sans KR',sans-serif;opacity:.55}
+#padPop .padBar button.zr.on{opacity:1;background:#fff;border-color:#c9a24a}
 #padPop .padBar .sep{width:2px;height:20px;background:#c9a24a55;margin:0 2px}
 #padPop .padPaper{position:relative;flex:1 1 auto;min-height:0;background-color:#fffef8;background-image:linear-gradient(#e8e0c4 1px,transparent 1px),linear-gradient(90deg,#e8e0c4 1px,transparent 1px);background-size:26px 26px;background-position:-1px -1px}
 #padPop canvas{position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none;cursor:crosshair;display:block}
@@ -12155,6 +12162,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
  const P={want:false,on:false,mode:'bottom',host:null,strokes:[],undone:null,cur:null,tool:'pen',color:0,size:1,big:false,penSeen:false,pid:null};
  let el,cv,ctx,paper,dpr=1,rect=null,iv=0,ro=null,btn=null;
 
+ function zm(){const z=parseFloat(document.documentElement.style.zoom);return z>0?z:1;}
  function vh(){const v=parseFloat(document.documentElement.style.getPropertyValue('--vh'));return v>0?v:window.innerHeight;}
  function vt(){const v=parseFloat(document.documentElement.style.getPropertyValue('--vt'));return v>0?v:0;}
 
@@ -12167,6 +12175,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
    ${COLORS.map((c,i)=>`<button type=button class="col${i?'':' on'}" data-c=${i} style="--c:${c}" aria-label="색 ${i+1}"><i></i></button>`).join('')}<i class=sep></i>
    <button type=button class=szb data-sz title="굵기" aria-label="굵기"><i></i></button>
    <span class=sp></span>
+   <button type=button data-zr class=zr title="원래 크기로" aria-label="원래 크기로">100%</button>
    <button type=button data-undo title="되돌리기" aria-label="되돌리기">${ic('undo')}</button>
    <button type=button data-clear title="모두 지우기" aria-label="모두 지우기">${ic('trash')}</button>
    <button type=button data-big title="크게/작게" aria-label="크게/작게">${ic('big')}</button>
@@ -12180,13 +12189,13 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{P.tool=b.dataset.t;sync();});
   el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{P.color=+b.dataset.c;P.tool='pen';sync();});
   $('[data-sz]').onclick=()=>{P.size=(P.size+1)%SIZES.length;sync();};
-  $('[data-undo]').onclick=undo;
+  $('[data-undo]').onclick=undo;$('[data-zr]').onclick=resetView;
   $('[data-clear]').onclick=clearAll;
   $('[data-big]').onclick=()=>{P.big=!P.big;layout();};
   $('[data-x]').onclick=()=>{P.want=false;hide();};
   cv.addEventListener('pointerdown',down);cv.addEventListener('pointermove',move);
   cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);cv.addEventListener('lostpointercapture',up);
-  cv.addEventListener('contextmenu',e=>e.preventDefault());
+  cv.addEventListener('contextmenu',e=>e.preventDefault());cv.addEventListener('wheel',wheel,{passive:false});
   ['touchstart','touchmove'].forEach(t=>el.addEventListener(t,e=>{if(e.target===cv&&e.cancelable)e.preventDefault();},{passive:false}));
   if(window.ResizeObserver){ro=new ResizeObserver(()=>fit());ro.observe(paper);}
   window.addEventListener('resize',()=>{if(P.on)layout();});
@@ -12199,12 +12208,13 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   if(btn)btn.classList.toggle('on',P.on);
  }
  // ---- 위치·크기 ----
+ function sheetTop(sh){const bq=document.querySelector('#bq');const pb=bq?parseFloat(getComputedStyle(bq).paddingBottom)||0:0;return window.innerHeight/zm()-pb-sh.offsetHeight;}
  function layout(){
   if(!el||!P.on)return;
   const H=vh(),T=vt();
   if(P.mode==='top'){
    const sheet=document.querySelector('#bq .sheet');
-   const bottomLimit=sheet?sheet.getBoundingClientRect().top-8:T+H*.55;
+   const bottomLimit=sheet?sheetTop(sheet)-8:T+H*.55;
    const top=T+8;let h=bottomLimit-top;
    h=Math.max(150,Math.min(h,P.big?H*.62:Math.min(H*.42,380)));
    el.classList.remove('bottom');el.style.top=top+'px';el.style.bottom='auto';el.style.height=h+'px';
@@ -12219,16 +12229,16 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
  }
  function fit(){
   if(!el||!P.on)return;
-  const r=paper.getBoundingClientRect();if(r.width<2||r.height<2)return;
-  dpr=Math.min(window.devicePixelRatio||1,2.5);
-  const w=Math.round(r.width*dpr),h=Math.round(r.height*dpr);
+  const cw=paper.clientWidth,ch=paper.clientHeight;if(cw<2||ch<2)return;
+  dpr=Math.min((window.devicePixelRatio||1)*zm(),3);
+  const w=Math.round(cw*dpr),h=Math.round(ch*dpr);
   if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;redraw();}
   if(P.mode==='top')layoutFollow();
  }
  let lf=0;
  function layoutFollow(){ // 전투 문제창 높이가 바뀌면 연습장 높이도 따라가요
   const sheet=document.querySelector('#bq .sheet');if(!sheet)return;
-  const want=sheet.getBoundingClientRect().top-8-(vt()+8);
+  const want=sheetTop(sheet)-8-(vt()+8);
   const cur=parseFloat(el.style.height)||0;
   const H=vh(),max=P.big?H*.62:Math.min(H*.42,380);
   const tgt=Math.max(150,Math.min(want,max));
@@ -12250,41 +12260,100 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   const p=s.p;if(p.length<2||!s.lm)return;const b=p[p.length-1];styleFor(s);
   ctx.lineWidth=b.w;ctx.beginPath();ctx.moveTo(s.lm.x,s.lm.y);ctx.lineTo(b.x,b.y);ctx.stroke();
  }
+ const V={s:1,tx:0,ty:0};let rq=0,gest=null,glock=false;const touches=new Map();
+ function setT(){if(ctx)ctx.setTransform(dpr*V.s,0,0,dpr*V.s,dpr*V.tx,dpr*V.ty);}
  function redraw(){
-  if(!ctx)return;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.setTransform(dpr,0,0,dpr,0,0);
+  if(!ctx)return;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);setT();
   for(const s of P.strokes){s.lm=null;for(let i=0;i<s.p.length;i++)addPt(s,i);endStroke(s);}
   ctx.globalCompositeOperation='source-over';
+ }
+ function applyView(){ // 모눈종이도 같이 움직이고, 그림은 다음 프레임에 한 번만 다시 그려요
+  if(paper){const g=26*V.s;paper.style.backgroundSize=g+'px '+g+'px';paper.style.backgroundPosition=(V.tx-1)+'px '+(V.ty-1)+'px';}
+  if(el){const z=el.querySelector('[data-zr]');if(z){z.textContent=Math.round(V.s*100)+'%';z.classList.toggle('on',Math.abs(V.s-1)>.01||V.tx!==0||V.ty!==0);}}
+  if(!rq){rq=requestAnimationFrame(()=>{rq=0;redraw();});}
+ }
+ function setView(sc,tx,ty){
+  const cw=cv.clientWidth,ch=cv.clientHeight;sc=Math.max(.5,Math.min(6,sc));
+  tx=Math.max(Math.min(tx,cw-40),40-cw*sc);ty=Math.max(Math.min(ty,ch-40),40-ch*sc);
+  if(sc===1&&Math.abs(tx)<1&&Math.abs(ty)<1){tx=0;ty=0;}
+  V.s=sc;V.tx=tx;V.ty=ty;applyView();
+ }
+ function resetView(){V.s=1;V.tx=0;V.ty=0;applyView();}
+ // 화면 배율(zoom)·브라우저 차이와 상관없이 맞도록, 실제로 눌리는 캔버스 영역을 직접 재서 좌표를 환산해요.
+ function measure(e){
+  const W=innerWidth,H=innerHeight,cx=Math.min(W-1,Math.max(0,Math.round(e.clientX))),cy=Math.min(H-1,Math.max(0,Math.round(e.clientY)));
+  const hit=(x,y)=>document.elementFromPoint(x,y)===cv;
+  const edge=(inX,fixed,horiz,lo,hi,dir)=>{ // inX: 캔버스 안쪽 점, lo~hi: 바깥쪽 한계. 경계에 가장 가까운 안쪽 좌표를 찾아요
+   let a=inX,b=dir>0?hi:lo;const t=v=>horiz?hit(v,fixed):hit(fixed,v);
+   if(t(b))return b;
+   while(Math.abs(b-a)>1){const m=Math.round((a+b)/2);if(t(m))a=m;else b=m;}
+   return a;};
+  let x0=edge(cx,cy,true,0,W-1,-1),x1=edge(cx,cy,true,0,W-1,1),y0=edge(cy,cx,false,0,H-1,-1),y1=edge(cy,cx,false,0,H-1,1);
+  if(!hit(cx,cy)||x1<=x0||y1<=y0){const r=cv.getBoundingClientRect();return{x0:r.left,y0:r.top,kx:cv.clientWidth/(r.width||1),ky:cv.clientHeight/(r.height||1)};}
+  return{x0,y0,kx:cv.clientWidth/(x1-x0+1),ky:cv.clientHeight/(y1-y0+1)};
  }
  function pt(e,s){
   let w=s.base;
   if(!s.er&&e.pointerType==='pen'&&e.pressure>0)w=s.base*(.45+e.pressure*1.1);
-  return{x:e.clientX-rect.left,y:e.clientY-rect.top,w};
+  return{x:((e.clientX-rect.x0)*rect.kx-V.tx)/V.s,y:((e.clientY-rect.y0)*rect.ky-V.ty)/V.s,w};
+ }
+ function cancelStroke(){
+  if(P.cur){const k=P.strokes.indexOf(P.cur);if(k>=0)P.strokes.splice(k,1);P.cur=null;P.pid=null;redraw();}
+ }
+ function cpos(e,r){return{x:(e.clientX-r.x0)*r.kx,y:(e.clientY-r.y0)*r.ky};}
+ function gInfo(){
+  const a=[...touches.values()].slice(0,2),A=cpos(a[0],gest.r),B=cpos(a[1],gest.r);
+  return{d:Math.max(8,Math.hypot(A.x-B.x,A.y-B.y)),mx:(A.x+B.x)/2,my:(A.y+B.y)/2};
+ }
+ function startGesture(e){
+  cancelStroke();gest={r:measure(e)};
+  const i=gInfo();gest.d0=i.d;gest.s0=V.s;gest.m0=i;gest.tx0=V.tx;gest.ty0=V.ty;
+ }
+ function runGesture(){
+  const i=gInfo(),sc=Math.max(.5,Math.min(6,gest.s0*i.d/gest.d0));
+  const wx=(gest.m0.mx-gest.tx0)/gest.s0,wy=(gest.m0.my-gest.ty0)/gest.s0;
+  setView(sc,i.mx-wx*sc,i.my-wy*sc);
  }
  function down(e){
   if(e.pointerType==='pen')P.penSeen=true;
-  if(P.penSeen&&e.pointerType==='touch')return;   // 펜을 쓰면 손바닥 터치는 무시
-  if(P.pid!==null||(e.pointerType==='mouse'&&e.button!==0))return;
-  e.preventDefault();rect=cv.getBoundingClientRect();P.pid=e.pointerId;
+  if(e.pointerType==='touch'){
+   touches.set(e.pointerId,{pointerId:e.pointerId,clientX:e.clientX,clientY:e.clientY});
+   try{cv.setPointerCapture(e.pointerId);}catch(_){}
+   if(touches.size>=2){e.preventDefault();if(!gest){glock=true;startGesture(e);}return;}
+   if(P.penSeen||glock)return;   // 펜을 쓰면 손바닥 터치는 무시
+  }
+  if(P.pid!==null||gest||(e.pointerType==='mouse'&&e.button!==0))return;
+  e.preventDefault();rect=measure(e);P.pid=e.pointerId;setT();
   try{cv.setPointerCapture(e.pointerId);}catch(_){}
   const er=P.tool==='eraser';
-  const s={er,col:COLORS[P.color],base:er?SIZES[P.size].w*4.5:SIZES[P.size].w,p:[],lm:null};
+  const s={er,col:COLORS[P.color],base:(er?SIZES[P.size].w*4.5:SIZES[P.size].w)/V.s,p:[],lm:null};
   P.strokes.push(s);P.cur=s;P.undone=null;
   s.p.push(pt(e,s));addPt(s,0);
  }
  function move(e){
+  if(touches.has(e.pointerId)){const t=touches.get(e.pointerId);t.clientX=e.clientX;t.clientY=e.clientY;
+   if(gest&&touches.size>=2){e.preventDefault();runGesture();return;}}
   const s=P.cur;if(!s||e.pointerId!==P.pid)return;e.preventDefault();
   const list=(e.getCoalescedEvents&&e.getCoalescedEvents())||[];const evs=list.length?list:[e];
   for(const ev of evs){
    const n=pt(ev,s),l=s.p[s.p.length-1];
-   if(Math.abs(n.x-l.x)+Math.abs(n.y-l.y)<.6)continue;
+   if((Math.abs(n.x-l.x)+Math.abs(n.y-l.y))*V.s<.6)continue;
    n.w=l.w*.6+n.w*.4;            // 굵기 변화를 부드럽게
    s.p.push(n);addPt(s,s.p.length-1);
   }
  }
  function up(e){
+  if(e&&touches.has(e.pointerId)){touches.delete(e.pointerId);if(touches.size<2)gest=null;if(!touches.size)glock=false;}
   const s=P.cur;if(!s||(e&&e.pointerId!==undefined&&e.pointerId!==P.pid))return;
   endStroke(s);P.cur=null;P.pid=null;rect=null;
   try{cv.releasePointerCapture(e.pointerId);}catch(_){}
+ }
+ function wheel(e){ // 마우스 휠·트랙패드 두 손가락 스크롤로 확대/축소
+  e.preventDefault();
+  const r=measure(e),c=cpos(e,r);
+  let dy=e.deltaY;if(e.deltaMode===1)dy*=16;else if(e.deltaMode===2)dy*=300;
+  const k=Math.exp(-dy*(e.ctrlKey?.012:.0022)),ns=Math.max(.5,Math.min(6,V.s*k));
+  setView(ns,c.x-(c.x-V.tx)*ns/V.s,c.y-(c.y-V.ty)*ns/V.s);
  }
  function undo(){
   if(P.strokes.length){P.strokes.pop();redraw();}
@@ -12304,7 +12373,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   P.on=false;clearInterval(iv);iv=0;
   if(el)el.classList.remove('on');
   document.body.classList.remove('padBot');document.documentElement.style.removeProperty('--padH');
-  if(reset){P.strokes=[];P.undone=null;P.cur=null;P.pid=null;if(ctx&&cv){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);}}
+  if(reset){P.strokes=[];P.undone=null;P.cur=null;P.pid=null;if(ctx&&cv){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);}V.s=1;V.tx=0;V.ty=0;gest=null;glock=false;touches.clear();if(paper)applyView();}
   sync();
  }
  function toggle(){if(P.on){P.want=false;hide();}else{P.want=true;show();}}
@@ -12315,6 +12384,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
    P.host=host;P.mode=host.id==='bqHost'?'top':'bottom';
    P.strokes=[];P.undone=null;P.cur=null;P.pid=null;
    if(ctx&&cv){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);}
+   V.s=1;V.tx=0;V.ty=0;gest=null;glock=false;touches.clear();if(paper)applyView();
    const card=host.querySelector('.qCard');
    if(card){
     card.classList.add('hasPad');
@@ -12329,6 +12399,125 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
    hide(true);P.host=null;btn=null;
   }
  };
+})();
+</script>
+<script id="num-ladder-js">
+// ===== 수와 연산 위계 사다리: 연속 2문제 틀리면 한 단계 아래로, 아래 단계에서 연속 5문제 맞히면 한 단계 위로 =====
+(function(){
+ const NEED_WRONG=2,NEED_RIGHT=5;
+ const es=n=>'es:6수01-'+n;
+ // rungs: 아래(쉬움) → 위(어려움). 각 단계는 같은 수준의 개념 묶음이에요.
+ const LAD={
+  mul:{n:'곱셈',rungs:[
+   {t:'곱셈구구',ids:['4b2','4b3','4b4','4b5','4b6','4b7','4b8','4b9','4c']},
+   {t:'(두 자리)×(한 자리)',ids:['5n','5d','6a']},
+   {t:'(두 자리)×(두 자리)',ids:['6j','6b']},
+   {t:'(세 자리)×(두 자리)',ids:['7n','7e']}]},
+  div:{n:'나눗셈',base:'mul',rungs:[
+   {t:'똑같이 나누기',ids:['5c','5l']},
+   {t:'나머지가 있는 나눗셈',ids:['6c']},
+   {t:'(세 자리)÷(한 자리)',ids:['6d']},
+   {t:'(두 자리)÷(두 자리)',ids:['7o','7p']},
+   {t:'(세 자리)÷(두 자리)',ids:['7f']}]},
+  add:{n:'덧셈과 뺄셈',rungs:[
+   {t:'9까지의 덧셈·뺄셈',ids:['1d','1e']},
+   {t:'두 자리 덧셈·뺄셈(받아올림·내림 없음)',ids:['2l','2m','2b']},
+   {t:'받아올림·받아내림 있는 (몇)±(몇)',ids:['2f','2g']},
+   {t:'받아올림·받아내림 있는 두 자리 수',ids:['3b','3c']},
+   {t:'세 자리 수의 덧셈·뺄셈',ids:['5a','5b']}]},
+  frac:{n:'분수',rungs:[
+   {t:'분수의 뜻과 크기',ids:['5g','5h']},
+   {t:'분수의 종류와 크기 비교',ids:['6e','6f','6m']},
+   {t:'분모가 같은 분수의 덧셈·뺄셈',ids:['8a','8b']},
+   {t:'대분수의 덧셈·뺄셈',ids:['8c','8g','8h','8i']},
+   {t:'분모가 다른 분수의 덧셈·뺄셈',ids:[es('08-01'),es('08-05')]},
+   {t:'분수와 자연수의 곱셈',ids:[es('09-02'),es('09-04')]},
+   {t:'(진분수)×(진분수)',ids:[es('09-06')]},
+   {t:'분수의 나눗셈',ids:[es('11-02')]}]},
+  dec:{n:'소수',rungs:[
+   {t:'소수 한 자리 수',ids:['5i','5q']},
+   {t:'분수와 소수, 소수의 크기',ids:['5r','8d']},
+   {t:'소수의 덧셈·뺄셈',ids:['8e','8f']},
+   {t:'(소수)×(자연수)',ids:[es('13-01'),es('13-02')]},
+   {t:'(소수)×(소수)',ids:[es('13-03')]},
+   {t:'(소수)÷(자연수)',ids:[es('15-01')]}]}
+ };
+const R=(t,ids)=>({t,ids:ids.split(' ')});
+ Object.assign(LAD,{
+  time:{n:'시계와 시간',rungs:[R('시계 바늘 · 몇 시','13g 2c'),R('몇 시 몇 분 · 하루·일주일','4d 4m'),R('시간과 분 바꾸기','4e 4l'),R('분과 초 바꾸기','5f'),R('시간의 덧셈과 뺄셈','5p')]},
+  unit:{n:'길이·들이·무게',rungs:[R('길이 비교 · 자로 재기','1p 13k'),R('자로 길이 재기(0이 아닌 곳부터)','13l 13m 13p'),R('m와 cm · 알맞은 단위','3m 3n 4k'),R('cm·mm, km·m','5e'),R('들이·무게 단위','6h'),R('들이·무게의 덧셈과 뺄셈','6n')]},
+  plane:{n:'평면도형',rungs:[R('모양 알아보기','13a 13b 13d 13e 13f'),R('삼각형·사각형·오각형·육각형','13h 13i 13j'),R('직각 · 직각삼각형 · 직사각형','13u 13v 13w 13x 13y 13z'),R('사각형 · 다각형의 이름','8q 14p 8s 14s 14o'),R('사각형 사이의 관계 · 평행선','8ab 8r 14r 14q'),R('대각선 · 정다각형','8t 14u 8u 14t')]},
+  angle:{n:'각도와 삼각형',rungs:[R('예각·직각·둔각','7k 14h 14i'),R('각도기로 각도 읽기','14g 14j'),R('각도의 합과 차','7c 7d 7m'),R('사각형 네 각의 합 · 나머지 한 각','7l 14k'),R('이등변삼각형·정삼각형 · 삼각형 분류','7t 7u 7v 14l 14m 14n')]},
+  circle:{n:'원',rungs:[R('원의 중심·반지름·지름','14a 14b 14c 6o'),R('원주 구하기','12h 16f'),R('원의 넓이','12i 12j')]},
+  area:{n:'둘레와 넓이',rungs:[R('둘레 구하기','9d 15e'),R('직사각형·정사각형의 넓이','9e 15f'),R('평행사변형·삼각형의 넓이','9f 9g 9m'),R('마름모·사다리꼴의 넓이','9h 9i'),R('복잡한 도형의 넓이 · 넓이로 변 구하기','15d 9j 9k 9l')]},
+  solid:{n:'입체도형과 부피',rungs:[R('직육면체의 면·모서리·꼭짓점','10f 10h'),R('모서리 길이의 합 · 전개도','10g 15n 15o'),R('각기둥·각뿔','11a 11b 11c 11d 15s 15t 15u'),R('직육면체·정육면체의 부피','11o 11p 15z'),R('겉넓이 · 부피 단위 · 쌓기나무 부피','11q 11r 16a 11s 11t 11u')]},
+  stack:{n:'쌓기나무',rungs:[R('층별 쌓기나무 개수','12a 16d'),R('위·앞에서 본 모양으로 개수 구하기','12b 16b 16c')]},
+  round:{n:'원기둥·원뿔·구',rungs:[R('원기둥·원뿔·구 알아보기','12l 16g 12n 16k'),R('전개도 · 돌려서 만든 입체도형','12m 16h 16i 16j')]},
+  move:{n:'도형의 이동·대칭',rungs:[R('밀기·뒤집기·돌리기','8y 14v 14w'),R('돌린 각도','8z 8aa'),R('합동','10a 15g 15h'),R('선대칭·점대칭','10b 10c 10d 10e 15i 15j 15k 15l 15m')]},
+  pat:{n:'규칙과 대응',rungs:[R('규칙 찾기(수·모양)','2q 2r'),R('곱셈 배열 · 두 수 사이의 관계','4n 7z'),R('모양 배열의 규칙','7za 15a 15b'),R('대응 관계에서 값 구하기','9a 15c'),R('대응 관계를 식으로','9b 9c')]},
+  ratio:{n:'비와 비율',base:'frac',rungs:[R('비로 나타내기','11e 15v'),R('비율을 분수·소수·백분율로','11f 11g 15w'),R('백분율 비교 · 기준량과 비교하는 양','11h 11i'),R('속력·인구 밀도·할인율','11j 11k'),R('비의 성질 · 비율이 같은 비','12d 12e'),R('비례식','12c 12g'),R('비례배분','12f 16e')]},
+  graph:{n:'표와 그래프',rungs:[R('분류하여 세기','13n 13o'),R('표 · ○ 그래프 읽기','13q 13r 13s 13t'),R('그림그래프','14d 14e 14f'),R('막대그래프','7w 7x 7y'),R('꺾은선그래프','8v 8w 8x'),R('띠그래프·원그래프','11l 11m 11n 15x 15y')]},
+  avg:{n:'평균',rungs:[R('평균 구하기','10i 15p'),R('평균으로 합·모르는 값 구하기','10j')]},
+  prob:{n:'가능성',rungs:[R('가능성을 말로','10k 15r'),R('가능성을 수로','10l 15q')]}
+ });
+ LAD.place={n:'수 읽기와 자릿값',rungs:[R('9까지의 수 · 50까지의 수','1a 1b 1f 1g 1h 1m 1n'),R('100까지의 수 · 짝수와 홀수','2a 2h 2i 2j'),R('세 자리 수','3a 3e 3f 3g 3h'),R('네 자리 수','4a 4f 4g 4h'),R('큰 수 · 10배·100배','7a 7b 7g 7h 7i 7j')]};
+ const AD=(l,r,ids)=>{LAD[l].rungs[r].ids.push(...ids.split(' '));};
+ AD('add',0,'1i 1j 1k 1l');AD('add',1,'2k 2n 2o 2p');AD('add',2,'2d 2e 2s 2t');AD('add',3,'3i 3j 3k 3l');AD('add',4,'5j 5k');
+ AD('mul',0,'3d 3o 3p 3q 4i 4j');AD('mul',1,'5o 6i');AD('mul',3,'7s');
+ AD('div',0,'5m');AD('div',1,'6k 6l');AD('div',3,'7q 7r');
+ AD('frac',0,'6g');AD('frac',3,'8j');
+ AD('dec',1,'8k 8l 8m');AD('dec',2,'8n 8o 8p');
+ AD('plane',0,'13c');AD('place',0,'1c 1o');
+ const MAP={};for(const l in LAD)LAD[l].rungs.forEach((r,i)=>r.ids.forEach(id=>{if(!MAP[id])MAP[id]={l,r:i};}));
+ const st=()=>{const m=S.meta;return m.lad||(m.lad={w:{l:'',n:0},a:null,next:null});};
+ const allowedSet=()=>new Set(allowedSkills().map(s=>s.id));
+ const eff=(l,al)=>LAD[l].rungs.map((r,i)=>({l,r:i,ids:r.ids.filter(id=>al.has(id)&&SKM[id])})).filter(x=>x.ids.length);
+ // 한 단계 아래: 같은 사다리에서 먼저, 없으면 바탕이 되는 사다리(나눗셈→곱셈)의 맨 아래 단계
+ function lower(ref,al){
+  const e=eff(ref.l,al).filter(x=>x.r<ref.r);if(e.length){const x=e[e.length-1];return{l:x.l,r:x.r};}
+  const b=LAD[ref.l].base;if(b){const f=eff(b,al);if(f.length){const x=f[f.length-1];return{l:x.l,r:x.r};}}
+  return null;}
+ const rungOf=ref=>LAD[ref.l].rungs[ref.r];
+ function mk(ref,tag,desc){
+  const al=allowedSet(),ids=rungOf(ref).ids.filter(id=>al.has(id)&&SKM[id]);if(!ids.length)return null;
+  for(let k=0;k<10;k++){const s=SKM[ids[Math.floor(rnd()*ids.length)]];const q=makeQ(s,rnd);if(!q)continue;
+   if(RECENT.includes(q.key)&&k<8)continue;RECENT.push(q.key);if(RECENT.length>8)RECENT.shift();
+   balanceAns(q);q.tier=null;q.ladTag=tag;q.ladDesc=desc?1:0;return q;}
+  return null;}
+ function pick(tier){
+  const L=st();
+  if(L.next){const ref=L.next;L.next=null;const q=mk(ref,'⬆ 원래 단계로 돌아가요',false);if(q)return q;}
+  const a=L.a;if(!a)return null;
+  if(a.fresh||rnd()<.85){a.fresh=0;const ref=a.path[a.path.length-1];
+   const q=mk(ref,`⬇ 기초 다지기 · 연속 정답 ${a.right}/${NEED_RIGHT}`,true);
+   if(q)return q;L.a=null;}   // 이 단계가 없어졌다면(학년 변경 등) 사다리를 끝내요
+  return null;}
+ function tick(q,ok,opt){
+  if(opt.retry)return;const info=MAP[q.sk];if(!info)return;
+  const L=st(),al=allowedSet();
+  if(L.a){
+   if(!q.ladDesc)return;                       // 내려와 있는 동안엔 사다리 문제만 세요
+   const a=L.a;
+   if(ok){a.right++;a.wrong=0;
+    if(a.right>=NEED_RIGHT){a.right=0;a.path.pop();
+     const top=a.path[a.path.length-1];
+     if(a.path.length<=1){L.next=a.path[0];L.a=null;L.w={l:'',n:0};try{toast('🎉 기초를 다졌어요! 원래 단계 문제로 돌아가요');}catch(e){}}
+     else{a.fresh=1;try{toast(`⬆ 한 단계 올라가요: ${rungOf(top).t}`);}catch(e){}}}}
+   else{a.right=0;a.wrong++;
+    if(a.wrong>=NEED_WRONG){const low=lower(a.path[a.path.length-1],al);a.wrong=0;
+     if(low){a.path.push(low);a.fresh=1;try{toast(`⬇ 한 단계 더 쉽게: ${rungOf(low).t}`);}catch(e){}}}}
+  }else{
+   const w=L.w||(L.w={l:'',n:0});
+   if(ok){w.n=0;}
+   else{if(w.l===info.l)w.n++;else{w.l=info.l;w.n=1;}
+    if(w.n>=NEED_WRONG){const low=lower(info,al);w.n=0;
+     if(low){L.a={path:[{l:info.l,r:info.r},low],right:0,wrong:0,fresh:1};try{toast(`⬇ 두 번 틀려서 한 단계 쉬운 문제로 내려가요: ${rungOf(low).t}`);}catch(e){}}}}
+  }
+  try{autoSave();}catch(e){}
+ }
+ window.LADX={pick,tick,LAD,MAP};
+ const __ra=recordAnswer;
+ recordAnswer=function(q,ok,ms,opt){const r=__ra.apply(this,arguments);try{if(q&&!q.iq&&!q.ko&&!q.en)tick(q,ok,opt||{});}catch(e){console.warn('ladder',e);}return r;};
 })();
 </script>
 </body></html>
