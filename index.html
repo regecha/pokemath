@@ -4259,9 +4259,9 @@ function carefulPopup(){return new Promise(res=>{S.carefulMsg=0;sfx('heal');let 
   <p class=mut style="font-size:13px">다음 몇 문제는 생각할 시간이 지난 뒤에 고를 수 있어요.</p>
   <div class=mbtns><button class="btn gold big" data-a=x disabled id=cfOk>숨 고르기… 3</button></div></div>`,{x:()=>{closeM();res();},_close:()=>{}});
  const iv=setInterval(()=>{t--;const b=$('#cfOk');if(!b){clearInterval(iv);return;}if(t<=0){clearInterval(iv);b.disabled=false;b.textContent='천천히 해 볼게요!';}else b.textContent='숨 고르기… '+t;},1000);});}
-function askQ(host,q,opt={}){return new Promise(async res0=>{const res=v=>{try{window.PADX&&PADX.end(host);}catch(e){}res0(v);};
+function askQ(host,q,opt={}){return new Promise(async res0=>{let hinted=false;const res=v=>{try{window.PADX&&PADX.end(host);}catch(e){}if(v&&typeof v==='object')v.hint=hinted?1:0;res0(v);};
  if(S.carefulMsg&&!window.__sim)await carefulPopup();
- S.curQ=q;host.innerHTML=qHTML(q,opt.head||'');const t0=performance.now();let done=false;try{window.PADX&&PADX.start(host,q);}catch(e){}
+ S.curQ=q;host.innerHTML=qHTML(q,opt.head||'');const t0=performance.now();let done=false;try{window.PADX&&PADX.start(host,q,opt.hint?{mode:opt.hint,onUse:()=>{hinted=true;}}:null);}catch(e){}
  // 모든 문제: 0.5초는 고를 수 없어요(연타 방지). 천천히 모드: 읽는 시간만큼 기다려요.
  const lock=S.careful?thinkMs(q):500;if(S.careful)S.careful--;
  const chs=host.querySelectorAll('.ch');chs.forEach(b=>{b.classList.add('wait');b.style.setProperty('--lk',lock+'ms');});
@@ -5095,8 +5095,8 @@ function bindBattle(){const me=B.me;
   if(!u){if(B.pick>=0){const selected=(B.coop?B.coop.players[BC.localIndex].hand:me.hand)[B.pick];if(isItemCard(selected)){toast('돌 아이템은 설명 창의 「사용하기」로 사용해요');return;}closeInfo();if(B.coop&&!BC.host){bossSubmit({type:'summon',h:B.pick,s:i});return;}if(B.pvp)pvpSend({t:'sum',h:B.pick,s:i});summon(me,B.pick,i);}return;}
   closeInfo();if(u.att>0&&!u.frozen&&(!B.coop||Number(u.coopOwner??0)===B.coop.active)){sfx('tap');B.sel=B.sel===i?-1:i;B.pick=-1;renderBattle();}
   else{sfx('tap');showInfo(u.id,{unit:u,why:u.frozen?(u.moon?'달의 돌로 기절해서 이번 차례는 쉬어요':'얼어서 이번 차례는 쉬어요'):u.fresh?'방금 나온 포켓몬은 다음 차례부터 공격해요':'이번 차례에 이미 공격했어요'});}});
- $('#foeLane').querySelectorAll('.slot').forEach(s=>s.onclick=()=>{if(B.busy||(B.coop&&B.coop.active!==BC.localIndex))return;const i=+s.dataset.i;if(B.trainerSkillTarget){resolveTrainerSkillTarget('foe',i);return;}if(B.moonTargetMode){if(!B.foe.board[i]){toast('포켓몬이 있는 칸을 골라 주세요');return;}if(B.coop&&!BC.host){bossSubmit({type:'item',h:B.moonTargetMode.hand,target:i});B.moonTargetMode=null;B.pick=-1;return;}playItem(B.me,B.moonTargetMode.hand,i);return;}if(B.sel<0){if(B.foe.board[i]){sfx('tap');showInfo(B.foe.board[i].id,{unit:B.foe.board[i],foe:1});}return;}closeInfo();if(!targetsFor(B.sel).units.includes(i)){if(B.foe.board[i])toast('바위 벽(테두리) 포켓몬부터 공격해야 해요');return;}if(B.coop&&!BC.host){const si=B.sel;B.busy=true;const q=pickQ({cyc:1});(async()=>{let ok=true,crit=false;if(q){const r=await battleQ(q,{who:me.board[si].id,what:`${esc(MON[B.foe.board[i].id].name)}에게 공격!`});ok=r.ok;crit=!!(ok&&q.tier==='H');}bossSubmit({type:'attack',si,tg:{u:i},ok,crit});B.busy=false;})();return;}playerAttack(B.sel,{u:i});});
- const hf=$('#heroFoe');if(hf)hf.onclick=()=>{if(B.busy||B.sel<0||(B.coop&&B.coop.active!==BC.localIndex))return;closeInfo();if(!targetsFor(B.sel).hero){toast('바위 벽 포켓몬이 막고 있어요');return;}if(B.coop&&!BC.host){const si=B.sel;B.busy=true;const q=pickQ({cyc:1});(async()=>{let ok=true,crit=false;if(q){const r=await battleQ(q,{who:me.board[si].id,what:`${esc(B.foe.name)}에게 공격!`});ok=r.ok;crit=!!(ok&&q.tier==='H');}bossSubmit({type:'attack',si,tg:{hero:1},ok,crit});B.busy=false;})();return;}playerAttack(B.sel,{hero:1});};if(B.coop&&!BC.host){} }
+ $('#foeLane').querySelectorAll('.slot').forEach(s=>s.onclick=()=>{if(B.busy||(B.coop&&B.coop.active!==BC.localIndex))return;const i=+s.dataset.i;if(B.trainerSkillTarget){resolveTrainerSkillTarget('foe',i);return;}if(B.moonTargetMode){if(!B.foe.board[i]){toast('포켓몬이 있는 칸을 골라 주세요');return;}if(B.coop&&!BC.host){bossSubmit({type:'item',h:B.moonTargetMode.hand,target:i});B.moonTargetMode=null;B.pick=-1;return;}playItem(B.me,B.moonTargetMode.hand,i);return;}if(B.sel<0){if(B.foe.board[i]){sfx('tap');showInfo(B.foe.board[i].id,{unit:B.foe.board[i],foe:1});}return;}closeInfo();if(!targetsFor(B.sel).units.includes(i)){if(B.foe.board[i])toast('바위 벽(테두리) 포켓몬부터 공격해야 해요');return;}if(B.coop&&!BC.host){const si=B.sel;B.busy=true;const q=pickQ({cyc:1});(async()=>{let ok=true,crit=false,hint=0;if(q){const r=await battleQ(q,{who:me.board[si].id,what:`${esc(MON[B.foe.board[i].id].name)}에게 공격!`,hint:'atk'});ok=r.ok;crit=!!(ok&&q.tier==='H');hint=r.hint?1:0;}bossSubmit({type:'attack',si,tg:{u:i},ok,crit,hint});B.busy=false;})();return;}playerAttack(B.sel,{u:i});});
+ const hf=$('#heroFoe');if(hf)hf.onclick=()=>{if(B.busy||B.sel<0||(B.coop&&B.coop.active!==BC.localIndex))return;closeInfo();if(!targetsFor(B.sel).hero){toast('바위 벽 포켓몬이 막고 있어요');return;}if(B.coop&&!BC.host){const si=B.sel;B.busy=true;const q=pickQ({cyc:1});(async()=>{let ok=true,crit=false,hint=0;if(q){const r=await battleQ(q,{who:me.board[si].id,what:`${esc(B.foe.name)}에게 공격!`,hint:'atk'});ok=r.ok;crit=!!(ok&&q.tier==='H');hint=r.hint?1:0;}bossSubmit({type:'attack',si,tg:{hero:1},ok,crit,hint});B.busy=false;})();return;}playerAttack(B.sel,{hero:1});};if(B.coop&&!BC.host){} }
 // ---- 카드 정보 창: 효과·타입·이 판의 상성을 크게 보여 줘요(휴대폰에서도 읽기 쉽게) ----
 function typesStrong(t){return TYPE_EN.map((_,x)=>x).filter(x=>TYPE_CHART[t][x]>=2);}
 function typesWeak(t){return TYPE_EN.map((_,x)=>x).filter(x=>TYPE_CHART[t][x]<1);}
@@ -6616,24 +6616,24 @@ async function skillMove(A,si,toEl,ok,cb,ov){const a=ov?{id:ov.id}:A.board[si];c
  skBurst(k,toEl,pw,cb);if(epic&&ok)skEpicBurst(k,toEl);}
 function shakeBoard(){const b=$('#battle');if(S.meta.settings.lowfx||window.__sim)return;b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');}
 // 내 공격: 문제 → 결과
-async function playerAttack(si,tg,coopAnswer=null,coopCrit=false){const me=B.me,fo=B.foe;const a=me.board[si];if(!a)return;B.busy=true;B.sel=-1;renderBattle();
+async function playerAttack(si,tg,coopAnswer=null,coopCrit=false,coopHint=0){const me=B.me,fo=B.foe;const a=me.board[si];if(!a)return;B.busy=true;B.sel=-1;renderBattle();
  let ok=coopAnswer==null?true:!!coopAnswer;const q=coopAnswer==null?pickQ({cyc:1}):null;if(B.coop&&coopAnswer!=null)B.qn++;
- let crit=!!coopCrit&&ok;if(q){const r=await battleQ(q,{who:a.id,what:tg.hero?`${esc(fo.name)}에게 공격!`:`${esc(MON[fo.board[tg.u].id].name)}에게 공격!`});ok=r.ok;crit=!!(ok&&q.tier==='H');}
+ let crit=!!coopCrit&&ok,hint=coopHint?1:0;if(q){const r=await battleQ(q,{who:a.id,what:tg.hero?`${esc(fo.name)}에게 공격!`:`${esc(MON[fo.board[tg.u].id].name)}에게 공격!`,hint:'atk'});ok=r.ok;crit=!!(ok&&q.tier==='H');hint=r.hint?1:0;}
  if(!B)return;
  let cb=false;if(ok){B.combo++;B.qc++;cb=B.combo>=3;}else B.combo=0;
- if(B.pvp){pvpSend({t:'atk',si,tg,ok,cb,crit});if(tg.hero){B.pendingAttack={si,tg,ok,cb,crit};msg('상대 트레이너가 방어 문제를 푸는 중…');renderBattle();return;}}
- await resolveAttack(me,fo,si,tg,ok,cb,0,crit);B.busy=false;renderBattle();}
+ if(B.pvp){pvpSend({t:'atk',si,tg,ok,cb,crit,hint});if(tg.hero){B.pendingAttack={si,tg,ok,cb,crit,hint};msg('상대 트레이너가 방어 문제를 푸는 중…');renderBattle();return;}}
+ await resolveAttack(me,fo,si,tg,ok,cb,0,crit,hint);B.busy=false;renderBattle();}
 
 // 공격 결과 (내 공격·친구의 공격이 같은 규칙) — ok: 문제를 맞혔나, cb: 3연속 콤보
-async function resolveAttack(A,D,si,tg,ok,cb,defReduce=0,crit=false){const a=A.board[si];if(!a)return;
+async function resolveAttack(A,D,si,tg,ok,cb,defReduce=0,crit=false,hint=0,defHint=0){const a=A.board[si];if(!a)return;hint=hint>0?1:0;defHint=defHint>0?1:0;
  let dmg=a.atk;let note='';
  if(ok){if(cb){dmg+=1;note='콤보 +1! ';}if(crit){dmg+=1;S.meta.stats.heavyCrit=(S.meta.stats.heavyCrit||0)+(A===B.me?1:0);}}else{dmg=Math.ceil(dmg/2);note='약한 공격… ';}
  const dm=dragonMod(a);if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);a.att--;a.fresh=0;
  await preAtkFx(A,si,a,tg);acAtk(A,D,a,tg,ok,crit);
  if(crit&&ok){fx(unitEl(A,si),'크리티컬! +1','crit');sfx('crit');}
- if(tg.hero){dmg+=quakeB(a);if(defReduce>0){dmg=Math.max(0,dmg-defReduce);note+=`방어 문제 정답 -${defReduce}! `;}const el=heroEl(D);window.__sd=dmg;await skillMove(A,si,el,ok,cb);window.__sd=null;if(quakeB(a)>0)await quakeFx(el);D.hp-=dmg;acHero(dmg,D);if(dmg>0){impact(el,dmg,{hero:1,col:'#ff5a5f'});fx(el,'-'+dmg,ok?'crit big':'');}else fx(el,'공격을 막았다!','txt');if(ok&&dmg>0)sfx('crit');if(note)fx(unitEl(A,si),note,'txt');}
+ if(tg.hero){dmg+=quakeB(a);if(defReduce>0){dmg=Math.max(0,dmg-defReduce);note+=`방어 문제 정답 -${defReduce}! `;}if(hint>0){dmg=Math.max(0,dmg-hint);note+=`💡힌트 사용 -${hint} `;}if(defHint>0){dmg+=defHint;note+=`💡방어 힌트 +${defHint} `;}const el=heroEl(D);window.__sd=dmg;await skillMove(A,si,el,ok,cb);window.__sd=null;if(quakeB(a)>0)await quakeFx(el);D.hp-=dmg;acHero(dmg,D);if(dmg>0){impact(el,dmg,{hero:1,col:'#ff5a5f'});fx(el,'-'+dmg,ok?'crit big':'');}else fx(el,'공격을 막았다!','txt');if(ok&&dmg>0)sfx('crit');if(note)fx(unitEl(A,si),note,'txt');}
  else{const d=D.board[tg.u];if(!d){return;}
-  dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=Math.max(1,applyType(dmg,k));
+  dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=Math.max(1,applyType(dmg,k));if(hint>0){dmg=Math.max(0,dmg-hint);fx(unitEl(A,si),`💡힌트 사용 -${hint}`,'txt');}
   await skillMove(A,si,unitEl(D,tg.u),ok,cb);
   if(k>=2){fx(unitEl(D,tg.u),'효과가 굉장했다!','txt super');if(A===B.me)S.meta.stats.superEff=(S.meta.stats.superEff||0)+1;}else if(k<1)fx(unitEl(D,tg.u),'효과가 별로인 듯…','txt');
   acUnit(D,tg.u,await dealUnit(D,tg.u,dmg,undefined,a.kw==='sneak'&&isLeg(a)),k);
@@ -6652,7 +6652,7 @@ async function usePower(){const me=B.me;if(B.busy||(me.powerUses||0)<=0)return;B
  B.busy=false;renderBattle();}
 // 배틀 문제 창
 async function battleQ(q,opt){B.qn++;if(q&&q.tier==='H')opt=Object.assign({},opt,{what:opt.what+(opt.power?' <b style="color:#ffb300">🔥 맞히면 카드 +1 더</b>':opt.defense?' <b style="color:#ffb300">🔥 맞히면 슈퍼세이브 +1</b>':' <b style="color:#ffb300">🔥 맞히면 크리티컬 +1</b>')});if(window.__sim)return{ok:rnd()<SIM.p,ms:3000};const box=$('#bq');box.innerHTML=`<div class="sheet${opt.defense?' defense':''}${q&&q.tier==='H'?' heavy':''}"><div class=bqHead><span class=who>${monImg(opt.who,'front')}${esc(MON[opt.who]?MON[opt.who].name:'')}</span><span>${opt.what}</span></div><div id=bqHost></div></div>`;box.classList.add('on');
- const r=await askQ($('#bqHost'),q,{fast:true,noRetry:true});recordAnswer(q,r.ok,r.ms,{choice:r.choice,guess:r.guess});box.classList.remove('on');box.innerHTML='';
+ const r=await askQ($('#bqHost'),q,{fast:true,noRetry:true,hint:opt.hint});recordAnswer(q,r.ok,r.ms,{choice:r.choice,guess:r.guess});box.classList.remove('on');box.innerHTML='';
  if(!r.ok){B.retryQ=q;}return r;}
 function cleanup(){[B.me,B.foe].forEach(P=>P.board.forEach((u,i)=>{if(u&&u.hp<=0){P.board[i]=null;}}));if(B&&B.wildMode)syncWildPrimary();}
 function checkEnd(){if(!B||B.over)return false;if(B.wildMode){const live=syncWildPrimary();if(!live.length){if(B.coop){if(BC.host)bossFinish('win');return true;}B.over=true;const caught=(B.wildState.caughtIds||[]).length>0;const note=caught?'야생 포켓몬 전투가 끝났어요. 포획한 포켓몬은 도감에 등록됐어요.':'야생 포켓몬이 모두 쓰러져 포획하지 못했어요.';if(!window.__sim)setTimeout(()=>finishEndlessWild(caught?'caught':'knockout',note),650);return true;}if(B.coop&&B.coop.players.some(p=>p.hp<=0)){if(BC.host)bossFinish('lost');return true;}if(B.me.hp<=0&&!B.coop){B.over=true;if(!window.__sim)setTimeout(()=>finishEndlessWild('lost','트레이너 체력이 0이 되어 야생 전투를 마쳤어요.'),650);return true;}const weak=live.filter(i=>B.foe.board[i].hp<=B.foe.board[i].max*.3).sort((a,b)=>B.foe.board[a].hp/B.foe.board[a].max-B.foe.board[b].hp/B.foe.board[b].max);if(weak.length&&!B.capturePrompted&&!(B.wildState&&B.wildState.scenarioMode)){B.capturePrompted=true;B.wildCaptureTargetSlot=weak[0];if(!window.__sim)setTimeout(scheduleWildCapturePrompt,180);}return false;}if(B.foe.hp<=0||B.me.hp<=0){B.over=true;if(window.__sim)return true;const _win=B.foe.hp<=0&&B.me.hp>0||(B.foe.hp<=0&&B.me.hp>=B.foe.hp);if(B.pvp)pvpSend({t:'over',w:_win});setTimeout(()=>endBattle(_win),600);return true;}return false;}
@@ -6812,8 +6812,8 @@ async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)
  if(tg.hero){dmg+=quakeB(a);
   // 막기 문제: 내 트레이너가 피해 2 이상을 받을 때마다 방어 문제를 표시
   const tp=(B.coop&&tg.p!=null&&B.coop.players[tg.p])?B.coop.players[tg.p]:me;const remoteDef=!!B.coop&&tp!==B.coop.players[0];
-   if(S.meta.settings.defq&&dmg>=2){renderBattle();bossMarkTarget(tp);let r=null,dq=null;if(remoteDef){r=await bossAskDefense(tp,a);}else{const q=pickQ({cyc:1});dq=q;if(q)r=await battleQ(q,{who:tp.av,what:`막기! ${esc(MON[a.id].name)}의 공격을 막아요`,defense:true});}
-    if(r){if(r.ok){B.qc++;B.combo++;if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;{const hv=!!((dq&&dq.tier==='H')||(r&&r.sv));dmg=Math.max(0,dmg-2-(hv?1:0));acDef(tp,hv);fx(heroEl(tp),hv?'슈퍼세이브! -3':'막았다!',hv?'crit':'txt');if(hv)sfx('crit');}heroBlockFx(heroEl(tp));if(B.counterActive>0){await trainerAtkFx(heroEl(tp),unitEl(fo,i),Math.min(5,B.counterActive),'counter');await dealUnit(fo,i,B.counterActive);fx(heroEl(tp),`반격 -${B.counterActive}`,'txt');}}else{B.combo=0;if(acOn()){AC.cur=null;acSay('방어 실패…','sv');}}}}
+   if(S.meta.settings.defq&&dmg>=2){renderBattle();bossMarkTarget(tp);let r=null,dq=null;if(remoteDef){r=await bossAskDefense(tp,a);}else{const q=pickQ({cyc:1});dq=q;if(q)r=await battleQ(q,{who:tp.av,what:`막기! ${esc(MON[a.id].name)}의 공격을 막아요`,defense:true,hint:'def'});}
+    if(r){if(r.ok){B.qc++;B.combo++;if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;{const hv=!!((dq&&dq.tier==='H')||(r&&r.sv));dmg=Math.max(0,dmg-2-(hv?1:0));acDef(tp,hv);fx(heroEl(tp),hv?'슈퍼세이브! -3':'막았다!',hv?'crit':'txt');if(hv)sfx('crit');}heroBlockFx(heroEl(tp));if(B.counterActive>0){await trainerAtkFx(heroEl(tp),unitEl(fo,i),Math.min(5,B.counterActive),'counter');await dealUnit(fo,i,B.counterActive);fx(heroEl(tp),`반격 -${B.counterActive}`,'txt');}}else{B.combo=0;if(acOn()){AC.cur=null;acSay('방어 실패…','sv');}}if(r.hint){dmg+=1;fx(heroEl(tp),'💡힌트 사용 +1','txt');}}}
   bossMarkTarget(tp);window.__sd=dmg;await skillMove(fo,i,heroEl(tp),true,false);window.__sd=null;if(quakeB(a)>0)await quakeFx(heroEl(tp));tp.hp-=dmg;acHero(dmg,tp);if(dmg){impact(heroEl(tp),dmg,{hero:1,col:'#ff5a5f'});fx(heroEl(tp),'-'+dmg,dmg>=4?'big':'');}}
  else{const d=me.board[tg.u];if(!d)return;dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=Math.max(1,applyType(dmg,k));
   await skillMove(fo,i,unitEl(me,tg.u),true,false);if(k>=2)fx(unitEl(me,tg.u),'효과가 굉장했다!','txt');
@@ -6946,7 +6946,7 @@ function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:v
   else if(d.t==='boss-banner'&&!BC.host){banner(d.b1,d.b2,d.ms);}
   else if(d.t==='boss-turn'&&!BC.host){if(B&&B.coop&&B.coop.players[d.a])banner(d.a===BC.localIndex?'내 차례!':`${esc(B.coop.players[d.a].name)}의 차례!`,'',d.ms||1000);}
   else if(d.t==='boss-defq'&&!BC.host){bossAnswerDefense(d);}
-  else if(d.t==='boss-defa'&&BC.host){if(BC.defWait&&BC.defWait.id===d.id){const w=BC.defWait;BC.defWait=null;w.res(d.skip?null:{ok:!!d.ok,sv:!!d.sv&&!!d.ok});}}
+  else if(d.t==='boss-defa'&&BC.host){if(BC.defWait&&BC.defWait.id===d.id){const w=BC.defWait;BC.defWait=null;w.res(d.skip?null:{ok:!!d.ok,sv:!!d.sv&&!!d.ok,hint:!!d.hint});}}
  });c.on('close',()=>{if(BC.defWait){const w=BC.defWait;BC.defWait=null;w.res(null);}if(S.screen==='bosscoop'&&!BC.left&&!BC.resultHandled&&!(B&&B.coop&&B.coop.result))bossBox(`<p>연결이 끊어졌어요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);else if(B&&B.coop){bossPeerLeft();}});}
 // 친구가 나가거나 연결이 끊기면 전투를 정리하고 협동 보스전 화면으로 돌아가요(이미 결과가 나온 뒤에는 건드리지 않아요)
 function bossPeerLeft(){if(BC.left||BC.resultHandled||!B||!B.coop||B.coop.result)return;BC.left=true;B.over=true;
@@ -6972,7 +6972,7 @@ function bossSubmit(a){if(!B||!B.coop||BC.host)return;if(!BC.conn||!BC.conn.open
 async function bossHandleAction(d){if(!B||!B.coop||!BC.host||BC.processing||B.over)return;const idx=Number(d.player);if((idx!==0&&idx!==1)||idx!==B.coop.active||B.side!=='me')return;BC.lastSeqByPlayer=BC.lastSeqByPlayer||{};if(!Number.isFinite(Number(d.seq))||Number(d.seq)<=(BC.lastSeqByPlayer[idx]||0))return;BC.lastSeqByPlayer[idx]=Number(d.seq);const incoming=d.a||{};BC.processing=true;B.coop.processing=true;B.busy=true;try{bossSetActive(idx);const P=B.me;if(incoming.type==='attack'&&(!P.board[Number(incoming.si)]||Number(P.board[Number(incoming.si)].coopOwner??0)!==idx))return;renderBattle();const a=incoming;if(a.type==='end'){B.busy=false;B.sel=-1;B.pick=-1;endTurn();}
  else if(a.type==='summon'){if(!Number.isInteger(Number(a.s))||Number(a.s)<0||Number(a.s)>=8||!Number.isInteger(Number(a.h))||Number(a.h)<0||Number(a.h)>=P.hand.length||P.board[Number(a.s)]||(!MON[P.hand[Number(a.h)]]&&!isRandomMonCard(P.hand[Number(a.h)])))return;B.busy=false;await summon(P,Number(a.h),Number(a.s));}
  else if(a.type==='item'){if(!Number.isInteger(Number(a.h))||Number(a.h)<0||Number(a.h)>=P.hand.length)return;const card=P.hand[Number(a.h)];if(card&&card.item==='thunder'&&(!P.board[Number(a.target)]||Number(P.board[Number(a.target)].coopOwner??0)!==idx))return;B.busy=false;await playItem(P,Number(a.h),Number(a.target??-1),true);}
- else if(a.type==='attack'){B.busy=false;await playerAttack(Number(a.si),a.tg,!!a.ok,!!a.ok&&!!a.crit);}
+ else if(a.type==='attack'){B.busy=false;await playerAttack(Number(a.si),a.tg,!!a.ok,!!a.ok&&!!a.crit,a.hint?1:0);}
  else if(a.type==='power'){B.busy=false;await bossApplyPower(!!a.ok,!!a.ok&&!!a.crit);}
  else if(a.type==='trainerSkill'){const sk=String(a.skill||''),lv=Math.max(1,Math.min(5,Number(a.level)||1)),slot=Number(a.slot);B.trainerSkillUsed=B.trainerSkillUsed||{};if(!['heal','counter','attack','cheer'].includes(sk)||B.trainerSkillUsed[sk])return;if(sk==='heal'){P.hp=Math.min(P.max||15,P.hp+lv);B.trainerSkillUsed.heal=true;fx(heroEl(P),`+${lv} 회복`,'txt');}else if(sk==='counter'){B.counterActive=lv;B.trainerSkillUsed.counter=true;}else if(sk==='attack'){const u=B.foe.board[slot];if(!u||u.hp<=0)return;B.trainerSkillUsed.attack=true;await dealUnit(B.foe,slot,lv);checkEnd();}else if(sk==='cheer'){const u=P.board[slot];if(!u||u.hp<=0||Number(u.coopOwner??0)!==idx)return;const ca=CHEER_ATK[lv]||0,cs=CHEER_SHIELD[lv]||0;u.atk+=ca;u.shield=(u.shield||0)+cs;B.trainerSkillUsed.cheer=true;fx(unitEl(P,slot),`공격 +${ca} · 방어막 +${cs}`,'txt');}B.busy=false;renderBattle();}
  else if(a.type==='catch'){B.busy=false;B.wildState.captureModalOpen=false;tryCatchWildPokemon(Number(a.slot));}
@@ -7106,7 +7106,7 @@ function bossPickTrainer(faceDmg){if(!B||!B.coop)return{hero:1};const l=bossLeth
 function bossMarkTarget(tp){const el=heroEl(tp);if(el)el.classList.add('tgt');}
 // 방장이 아닌 친구 트레이너가 공격받을 때: 친구 화면에 막기 문제를 띄우고 결과만 받아요
 function bossAskDefense(tp,a){return new Promise(res=>{if(!BC.conn||!BC.conn.open){res(null);return;}const id=++BC.defSeq;BC.defWait={id,res};msg(`${esc(tp.name)}: 막기 문제를 푸는 중…`);bossSend({t:'boss-defq',id,who:tp.av,what:`막기! ${esc(MON[a.id].name)}의 공격을 막아요`});setTimeout(()=>{if(BC.defWait&&BC.defWait.id===id){BC.defWait=null;res(null);}},90000);});}
-async function bossAnswerDefense(d){if(!B||!B.coop)return;const q=pickQ({cyc:1});if(!q){bossSend({t:'boss-defa',id:d.id,skip:1});return;}let ok=false,sv=false;try{const r=await battleQ(q,{who:d.who,what:d.what,defense:true});ok=!!(r&&r.ok);sv=ok&&q.tier==='H';}catch(e){console.error('coop defense',e);}bossSend({t:'boss-defa',id:d.id,ok,sv});}
+async function bossAnswerDefense(d){if(!B||!B.coop)return;const q=pickQ({cyc:1});if(!q){bossSend({t:'boss-defa',id:d.id,skip:1});return;}let ok=false,sv=false,hint=false;try{const r=await battleQ(q,{who:d.who,what:d.what,defense:true,hint:'def'});ok=!!(r&&r.ok);sv=ok&&q.tier==='H';hint=!!(r&&r.hint);}catch(e){console.error('coop defense',e);}bossSend({t:'boss-defa',id:d.id,ok,sv,hint});}
 
 // ===== 친구 대전 (같은 와이파이 · 방 번호 4자리) =====
 // 두 기기가 같은 규칙으로 배틀을 돌리고, 행동(카드 내기·공격·차례 끝)만 주고받아요.
@@ -7169,10 +7169,10 @@ async function pvpPump(){if(PV.busy)return;PV.busy=true;
   if(d.t==='sum'){PV.q.shift();B.busy=true;await summon(B.foe,d.h,d.s);B.busy=false;continue;}
   if(d.t==='item'){PV.q.shift();B.busy=true;await playItem(B.foe,d.h,d.target,true);B.busy=false;continue;}
   if(d.t==='atk'){PV.q.shift();B.busy=true;const a=B.foe.board[d.si];msg(`${esc(PV.foe.name)}의 ${a?esc(MON[a.id].name):''} 공격! ${d.ok?'(문제 정답!)':'(문제를 틀려서 약하게)'}`);await wait(500);
-   let reduce=0,ctr=0;if(d.tg&&d.tg.hero){const q=pickQ({cyc:1});const r=q?await battleQ(q,{who:B.me.av,what:`방어 문제! 맞히면 ${esc(PV.foe.name)}의 트레이너 공격 피해가 1 줄어요`,defense:true }):{ok:false};if(r.ok){reduce=(q&&q.tier==='H')?2:1;B.qc++;S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;fx(heroEl(B.me),reduce>1?'슈퍼세이브! -2':'방어 성공! -1',reduce>1?'crit':'txt');heroBlockFx(heroEl(B.me));if(B.counterActive>0)ctr=B.counterActive;}else fx(heroEl(B.me),'방어 실패','txt');pvpSend({t:'defres',reduce,ok:r.ok,ctr});}
-   await resolveAttack(B.foe,B.me,d.si,d.tg,d.ok,d.cb,reduce,!!d.crit&&!!d.ok);
+   let reduce=0,ctr=0,dh=0;if(d.tg&&d.tg.hero){const q=pickQ({cyc:1});const r=q?await battleQ(q,{who:B.me.av,what:`방어 문제! 맞히면 ${esc(PV.foe.name)}의 트레이너 공격 피해가 1 줄어요`,defense:true,hint:'def' }):{ok:false};dh=r.hint?1:0;if(r.ok){reduce=(q&&q.tier==='H')?2:1;B.qc++;S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;fx(heroEl(B.me),reduce>1?'슈퍼세이브! -2':'방어 성공! -1',reduce>1?'crit':'txt');heroBlockFx(heroEl(B.me));if(B.counterActive>0)ctr=B.counterActive;}else fx(heroEl(B.me),'방어 실패','txt');pvpSend({t:'defres',reduce,ok:r.ok,ctr,dh});}
+   await resolveAttack(B.foe,B.me,d.si,d.tg,d.ok,d.cb,reduce,!!d.crit&&!!d.ok,d.hint?1:0,dh);
    if(ctr>0&&!B.over&&B.foe.board[d.si]){fx(heroEl(B.me),`반격 -${ctr}`,'txt');await trainerAtkFx(heroEl(B.me),unitEl(B.foe,d.si),Math.min(5,ctr),'counter');await dealUnit(B.foe,d.si,ctr);checkEnd();}B.busy=false;continue;}
-  if(d.t==='defres'){PV.q.shift();const p=B.pendingAttack;if(p){B.pendingAttack=null;B.busy=true;if((d.reduce||0)>0&&p.tg&&p.tg.hero)heroBlockFx(heroEl(B.foe));await resolveAttack(B.me,B.foe,p.si,p.tg,p.ok,p.cb,d.reduce||0,!!p.crit);
+  if(d.t==='defres'){PV.q.shift();const p=B.pendingAttack;if(p){B.pendingAttack=null;B.busy=true;if((d.reduce||0)>0&&p.tg&&p.tg.hero)heroBlockFx(heroEl(B.foe));await resolveAttack(B.me,B.foe,p.si,p.tg,p.ok,p.cb,d.reduce||0,!!p.crit,p.hint?1:0,d.dh?1:0);
    const ct=Math.max(0,Math.min(5,Number(d.ctr)||0));if(ct>0&&!B.over&&B.me.board[p.si]){fx(heroEl(B.foe),`반격 -${ct}`,'txt');await trainerAtkFx(heroEl(B.foe),unitEl(B.me,p.si),Math.min(5,ct),'counter');await dealUnit(B.me,p.si,ct);checkEnd();}B.busy=false;renderBattle();}continue;}
   if(d.t==='pow'){PV.q.shift();B.foe.powerUses=Math.max(0,(B.foe.powerUses||0)-1);let xb=false;if(d.ok){draw(B.foe);xb=studyBonusDraw(B.foe);if(d.crit)draw(B.foe);}fx(heroEl(B.foe),d.ok?(xb?'공부 강화! 카드 +2':'공부 기술 성공!'):'공부 기술','txt');renderBattle();continue;}
   if(d.t==='end'){PV.q.shift();await startTurn('me');continue;}
@@ -12239,7 +12239,17 @@ function gdPetFx(b){try{if(b.__fx)return;b.__fx=1;setTimeout(()=>{b.__fx=0;},650
 #padPop canvas{position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none;cursor:crosshair;display:block}
 html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px))!important}
 @media (max-width:420px){#padPop .padTtl{display:none}#padPop .padBar button{width:32px;height:32px}}
-</style>
+/* ---- 힌트: 연습장 툴바 버튼 + 종이 위 메모지 ---- */
+#padPop .padBar button[hidden]{display:none!important}
+#padPop canvas.hintCv{pointer-events:none;cursor:default}
+#padPop .padBar button.hintB{width:auto;min-width:0;height:30px;padding:0 9px;gap:4px;border:2px solid #d9a521;background:#fff3c4;color:#6b4e12;font:700 12px/1 'Jua','Noto Sans KR',sans-serif;white-space:nowrap}
+#padPop .padBar button.hintB i{font-style:normal;font-size:15px;line-height:1}
+#padPop .padBar button.hintB .hc{color:#c2255c}
+#padPop .padBar button.hintB.arm{background:#ffd43b;border-color:#e67700;animation:padHintArm .5s ease-in-out infinite alternate}
+#padPop .padBar button.hintB.used{background:#eee9d5;border-color:#c9bd95;color:#8a7a50;cursor:default}
+#padPop .padBar button.hintB.used .hc{color:#8a7a50}
+@keyframes padHintArm{from{transform:scale(1)}to{transform:scale(1.07)}}
+@media (max-width:420px){#padPop .padBar button.hintB .ht{display:none}</style>
 <script id="scratch-pad-js">
 (function(){
  const SVG={
@@ -12252,8 +12262,8 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
  const ic=n=>`<svg viewBox="0 0 24 24" aria-hidden="true">${SVG[n]}</svg>`;
  const COLORS=['#2b2b2b','#e53935','#1e66f5'];
  const SIZES=[{w:2.2,d:5},{w:3.6,d:9},{w:6,d:14}];
- const P={want:false,on:false,mode:'bottom',host:null,strokes:[],undone:null,cur:null,tool:'pen',color:0,size:1,big:false,penSeen:false,pid:null};
- let el,cv,ctx,paper,dpr=1,rect=null,iv=0,ro=null,btn=null;
+ const P={want:false,on:false,mode:'bottom',host:null,strokes:[],undone:null,cur:null,tool:'pen',color:0,size:1,big:false,penSeen:false,pid:null,hint:null};
+ let el,cv,hcv,ctx,paper,dpr=1,rect=null,iv=0,ro=null,btn=null;
 
  function zm(){const z=parseFloat(document.documentElement.style.zoom);return z>0?z:1;}
  function vh(){const v=parseFloat(document.documentElement.style.getPropertyValue('--vh'));return v>0?v:window.innerHeight;}
@@ -12263,6 +12273,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   if(el)return;
   el=document.createElement('div');el.id='padPop';
   el.innerHTML=`<div class=padBar><span class=padTtl>연습장</span>
+   <button type=button data-hint class=hintB hidden><i>💡</i><span class=ht>힌트</span><span class=hc></span></button>
    <button type=button data-t=pen class=on title="펜" aria-label="펜">${ic('pen')}</button>
    <button type=button data-t=eraser title="지우개" aria-label="지우개">${ic('eraser')}</button><i class=sep></i>
    ${COLORS.map((c,i)=>`<button type=button class="col${i?'':' on'}" data-c=${i} style="--c:${c}" aria-label="색 ${i+1}"><i></i></button>`).join('')}<i class=sep></i>
@@ -12273,15 +12284,16 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
    <button type=button data-clear title="모두 지우기" aria-label="모두 지우기">${ic('trash')}</button>
    <button type=button data-big title="크게/작게" aria-label="크게/작게">${ic('big')}</button>
    <button type=button data-x title="닫기" aria-label="닫기">${ic('close')}</button></div>
-   <div class=padPaper><canvas></canvas></div>`;
+   <div class=padPaper><canvas class=hintCv></canvas><canvas class=mainCv></canvas></div>`;
   document.body.appendChild(el);
-  paper=el.querySelector('.padPaper');cv=el.querySelector('canvas');
+  paper=el.querySelector('.padPaper');cv=el.querySelector('canvas.mainCv');hcv=el.querySelector('canvas.hintCv');
   try{ctx=cv.getContext('2d',{desynchronized:true});}catch(e){}
   if(!ctx)ctx=cv.getContext('2d');
   const $=s=>el.querySelector(s);
   el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{P.tool=b.dataset.t;sync();});
   el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{P.color=+b.dataset.c;P.tool='pen';sync();});
   $('[data-sz]').onclick=()=>{P.size=(P.size+1)%SIZES.length;sync();};
+  $('[data-hint]').onclick=useHint;
   $('[data-undo]').onclick=undo;$('[data-zr]').onclick=resetView;
   $('[data-clear]').onclick=clearAll;
   $('[data-big]').onclick=()=>{P.big=!P.big;layout();};
@@ -12295,6 +12307,11 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   sync();
  }
  function sync(){
+  if(!el)return;
+  const hb=el.querySelector('[data-hint]'),h=P.hint;
+  if(hb){hb.hidden=!h;if(h){hb.classList.toggle('arm',!!h.armed&&!h.used);hb.classList.toggle('used',!!h.used);hb.disabled=!!h.used;
+   const cost=h.mode==='def'?'받는 피해 +1':'내 공격 −1';
+   hb.querySelector('.hc').textContent=h.used?'사용함':cost;hb.title=h.used?'이 문제의 힌트를 이미 썼어요':'힌트 보기 ('+cost+')';hb.setAttribute('aria-label',hb.title);}}
   el.querySelectorAll('[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===P.tool));
   el.querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('on',P.tool==='pen'&&+b.dataset.c===P.color));
   const s=el.querySelector('[data-sz]');s.style.setProperty('--d',SIZES[P.size].d+'px');
@@ -12359,6 +12376,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   if(!ctx)return;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);setT();
   for(const s of P.strokes){s.lm=null;for(let i=0;i<s.p.length;i++)addPt(s,i);endStroke(s);}
   ctx.globalCompositeOperation='source-over';
+  drawHint();
  }
  function applyView(){ // 모눈종이도 같이 움직이고, 그림은 다음 프레임에 한 번만 다시 그려요
   if(paper){const g=26*V.s;paper.style.backgroundSize=g+'px '+g+'px';paper.style.backgroundPosition=(V.tx-1)+'px '+(V.ty-1)+'px';}
@@ -12470,10 +12488,272 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   sync();
  }
  function toggle(){if(P.on){P.want=false;hide();}else{P.want=true;show();}}
+ // ================= 힌트: 풀이 과정의 "일부"만 보여 주고 정답은 가려요 =================
+ const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a),lcm=(a,b)=>a/gcd(a,b)*b;
+ const divs=n=>{const r=[];for(let d=1;d<=n;d++)if(n%d===0)r.push(d);return r;};
+ const NUM=s=>(String(s).match(/\d+(?:\.\d+)?/g)||[]).map(Number);
+ const dec=s=>(String(s).split('.')[1]||'').length;
+ const isD=c=>c>='0'&&c<='9';
+ const TERM=/(\d+) (\d+)\/(\d+)|(\d+)\/(\d+)|(\d+(?:\.\d+)?)/g;
+ function terms(s){const r=[];let m;TERM.lastIndex=0;while((m=TERM.exec(s))){if(m[1]!=null)r.push({k:'m',A:+m[1],a:+m[2],b:+m[3]});else if(m[4]!=null)r.push({k:'f',a:+m[4],b:+m[5]});else r.push({k:'n',v:+m[6]});}return r;}
+ const imp=t=>t.k==='m'?{a:t.A*t.b+t.a,b:t.b}:{a:t.a,b:t.b};
+ const tstr=t=>t.k==='m'?`${t.A} ${t.a}/${t.b}`:t.k==='f'?`${t.a}/${t.b}`:String(t.v);
+ const CIR='①②③④⑤';
+ const jp=(v,p)=>{v=String(v);return typeof josa==='function'?josa(v,p).slice(v.length):p[0];}; // 받침에 맞는 조사
+ const fmtn=v=>String(+v.toFixed(8));
+ // 정답 글자를 □로 가려요 (숫자 일부와 겹치는 경우는 건드리지 않아요)
+ function mask(s,ans){
+  let out='',found=false;
+  String(s).split(/(<[^>]*>)/).forEach(part=>{
+   if(part[0]==='<'&&part.slice(-1)==='>'){out+=part;return;}
+   let i=0;
+   while(ans){
+    const k=part.indexOf(ans,i);if(k<0)break;
+    const pv=part[k-1]||'',pv2=part[k-2]||'',nx=part[k+ans.length]||'',nx2=part[k+ans.length+1]||'';
+    const bad=(isD(ans[0])&&(isD(pv)||((pv==='.'||pv===','||pv==='/')&&isD(pv2))))||(isD(ans[ans.length-1])&&(isD(nx)||((nx==='.'||nx===','||nx==='/')&&isD(nx2))));
+    if(bad){out+=part.slice(i,k+1);i=k+1;continue;}
+    out+=part.slice(i,k)+'□';i=k+ans.length;found=true;
+   }
+   out+=part.slice(i);
+  });
+  return{s:out,found};
+ }
+ // 풀이(q.e)가 있는 문제: 정답이 나오는 문장까지만, 정답은 □로 가려서 보여 줘요
+ function fromE(q){
+  const S=String(q.e).replace(/<br\s*\/?>/gi,'\u0001').replace(/([.!?。])\s+/g,'$1\u0001').split('\u0001').map(x=>x.trim()).filter(Boolean);
+  if(!S.length)return null;
+  const ans=String(q.a);let idx=-1,line='';
+  for(let i=0;i<S.length;i++){const m=mask(S[i],ans);if(m.found){idx=i;line=m.s;break;}}
+  if(idx<0){if(S.length>1)return S.slice(0,-1);const t=S[0],k=Math.max(t.lastIndexOf('='),t.lastIndexOf('→'));return k>0?[t.slice(0,k+1)+' □']:[t];}
+  return[...S.slice(0,idx),line];
+ }
+ // 혼합 계산: 계산 순서대로 한 단계씩 (마지막 계산은 남겨요)
+ function arith(expr){
+  const tk=expr.match(/\d+(?:\.\d+)?|[+−\-×÷()]/g);if(!tk)return null;
+  let a=tk.map(x=>/\d/.test(x)?+x:x);const steps=[];
+  const txt=v=>v.join(' ').replace(/\( /g,'(').replace(/ \)/g,')').replace(/\((\d+)\)/g,'$1');
+  const once=v=>{
+   const i=v.indexOf(')');
+   if(i>=0){const o=v.lastIndexOf('(',i),inner=v.slice(o+1,i);
+    if(inner.length===1)return{a:[...v.slice(0,o),inner[0],...v.slice(i+1)],silent:1};
+    const r=once(inner);if(!r)return null;
+    return{a:[...v.slice(0,o+1),...r.a,...v.slice(i)],d:r.d,silent:r.silent};}
+   let k=v.findIndex(x=>x==='×'||x==='÷');
+   if(k<0)k=v.findIndex(x=>x==='+'||x==='−'||x==='-');
+   if(k<1)return null;
+   const x=v[k-1],y=v[k+1],op=v[k],r=op==='+'?x+y:op==='×'?x*y:op==='÷'?x/y:x-y;
+   if(!Number.isInteger(r)||r<0)return null;
+   return{a:[...v.slice(0,k-1),r,...v.slice(k+2)],d:`${x} ${op==='-'?'−':op} ${y} = ${r}`};
+  };
+  for(let g=0;g<12&&a.length>1;g++){const r=once(a);if(!r)return null;a=r.a;if(!r.silent)steps.push({d:r.d,rest:txt(a)});}
+  return steps;
+ }
+ const ES={};
+ // ----- 01 혼합 계산 -----
+ for(let i=1;i<=6;i++)ES['01-0'+i]=s=>{
+  const ex=s.split('=')[0],st=arith(ex);if(!st||st.length<2)return null;
+  const L=[/\(/.test(ex)?'<b>괄호 안</b>을 가장 먼저 계산해요.':/[×÷]/.test(ex)&&/[+−-]/.test(ex.replace(/^\s*\d+/,''))?'<b>곱셈·나눗셈</b>을 덧셈·뺄셈보다 먼저 계산해요.':'<b>앞에서부터</b> 차례로 계산해요.'];
+  const show=st.slice(0,st.length-1);show.forEach((x,i)=>L.push(`${CIR[i]} ${x.d}`));
+  L.push(`남은 식: ${show[show.length-1].rest} = □`);return L;};
+ // ----- 02 수의 범위 -----
+ ES['02-01']=s=>{const[a,b]=NUM(s);return[`<b>이상·이하</b>는 그 수도 <b>포함</b>해요. ${a}도 ${b}도 세어요.`,`${a}, ${a+1}, ${a+2}, … , ${b}`,`개수 = (${b} − ${a}) + 1 = □`];};
+ ES['02-02']=s=>{const[a,b]=NUM(s);return[`<b>초과·미만</b>은 그 수를 <b>포함하지 않아요</b>.`,`${a} 초과 → ${a}${jp(a,'은는')} 빼고 <b>${a+1}</b>부터`,`${b} 미만 → ${b}${jp(b,'은는')} 빼고 <b>${b-1}</b>까지`,`${a+1}부터 ${b-1}까지 모두 몇 개일까요?`];};
+ ES['02-03']=()=>['<b>○ (빈 점)</b>은 그 수를 <b>포함하지 않아요</b> → 초과 · 미만','<b>● (색칠한 점)</b>은 그 수를 <b>포함해요</b> → 이상 · 이하','작은 수 쪽 점과 큰 수 쪽 점이 각각 ○인지 ●인지 살펴봐요.'];
+ ES['02-04']=s=>/정원/.test(s)?['<b>정원</b>은 한 번에 <b>가장 많이</b> 탈 수 있는 사람 수예요.','정원 수 자체도 탈 수 있는지(포함) 생각해 보세요.']:['문제에 쓰인 말(이상·이하·초과·미만)을 찾아 보세요.','<b>탈 수 있는</b> 쪽의 범위를 묻고 있어요. 그 키도 포함될까요?'];
+ ES['02-05']=s=>{const[a,b]=NUM(s);return[`${a} <b>이상</b> → ${a}도 포함 → 가장 작은 수는 <b>${a}</b>`,`${b} <b>미만</b> → ${b}${jp(b,'은는')} 포함하지 않아요 → 가장 큰 수는 <b>${b-1}</b>`,`${a} + ${b-1} = □`];};
+ // ----- 03 올림·버림·반올림 -----
+ ES['03-01']=ES['03-02']=ES['03-03']=ES['03-05']=s=>{
+  const n=NUM(s)[0],pl=/천의 자리/.test(s)?1000:100,nm=pl===1000?'천':'백',lo=pl/10,ln=lo===100?'백':'십',d=Math.floor(n/lo)%10;
+  const kind=/반올림/.test(s)?'반올림':/올림/.test(s)?'올림':'버림';
+  return[`${nm}의 자리까지 나타내려면 바로 아래 자리인 <b>${ln}의 자리</b>를 봐요.`,`${n}의 ${ln}의 자리 숫자는 <b>${d}</b>`,
+   kind==='올림'?`<b>올림</b>: ${nm}의 자리 아래에 0이 아닌 수가 있으면 ${nm}의 자리를 1 올리고, 아래는 모두 0으로!`:kind==='버림'?`<b>버림</b>: ${nm}의 자리 아래를 모두 0으로 바꿔요.`:`<b>반올림</b>: ${ln}의 자리 숫자가 5 이상이면 올리고, 4 이하면 버려요.`];};
+ ES['03-04']=s=>{const[n,c]=NUM(s);return[`${n} ÷ ${c} = ${Math.floor(n/c)} … ${n%c}`,`남은 ${n%c}${jp(n%c,'은는')} 어떻게 해야 할까요? 문제를 다시 읽어 봐요.`,'· 남은 것도 <b>모두 옮겨야</b> 하면 한 번 더 필요해요 (올림)','· 남은 것으로 <b>한 묶음을 못 채우면</b> 세지 않아요 (버림)'];};
+ // ----- 04 약수·공약수·최대공약수 -----
+ ES['04-01']=s=>{const n=NUM(s)[0],pairs=[];for(let d=1;d*d<=n;d++)if(n%d===0)pairs.push([d,n/d]);
+  const sh=pairs.slice(0,Math.max(1,Math.ceil(pairs.length/2)));
+  return[`${n}의 약수는 <b>곱해서 ${n}이 되는 두 수</b>를 짝지어 찾아요.`,sh.map(p=>`${p[0]} × ${p[1]}`).join(',  ')+(sh.length<pairs.length?',  …':''),'짝을 모두 찾은 뒤 약수의 개수를 세어요. (같은 수끼리의 짝은 한 번만!)'];};
+ ES['04-02']=(s,q)=>{const[x,y]=NUM(s),w=(q.ch||[]).map(Number).find(v=>v>1&&v<=Math.min(x,y)&&String(v)!==String(q.a)&&(x%v||y%v));
+  const L=[`<b>공약수</b>는 두 수를 <b>모두</b> 나누어떨어지게 하는 수예요.`,`보기를 하나씩 ${x}${jp(x,'도')||'도'} ${y}도 나누어떨어지는지 확인해 봐요.`];
+  if(w){const t=x%w?x:y;L.push(`예) ${w}: ${t} ÷ ${w} = ${Math.floor(t/w)} … ${t%w} → 나머지가 있으니 공약수가 아니에요`);}return L;};
+ ES['04-03']=s=>{const[x,y]=NUM(s),sm=Math.min(x,y),lg=Math.max(x,y),d=divs(sm);
+  return[`<b>최대공약수</b> = 두 수의 공약수 중 가장 큰 수`,`${sm}의 약수: ${d.slice(0,10).join(', ')}${d.length>10?', …':''}`,`이 중에서 ${lg}도 나누어떨어지는 수를 찾아 가장 큰 것을 골라요.`];};
+ ES['04-04']=s=>{const g=NUM(s)[0];return[`두 수의 <b>공약수</b>는 <b>최대공약수 ${g}의 약수</b>와 같아요.`,`${g}의 약수를 모두 찾아 개수를 세어 보세요.`];};
+ ES['04-05']=s=>{const[x,y]=NUM(s),g=gcd(x,y);return[`공약수는 <b>최대공약수의 약수</b>예요.`,`① ${x}${jp(x,'와과')} ${y}의 최대공약수 = <b>${g}</b>`,`② ${g}의 약수를 모두 찾아 더해요: □`];};
+ // ----- 05 배수·공배수·최소공배수 -----
+ ES['05-01']=s=>{const[n,k]=NUM(s);return[`${n}의 배수: ${n} × 1, ${n} × 2, ${n} × 3, …`,`${k}번째 수 = ${n} × ${k} = □`];};
+ ES['05-02']=s=>{const[a,b,N]=NUM(s),L=lcm(a,b);return[`① ${a}${jp(a,'와과')} ${b}의 <b>최소공배수</b> = <b>${L}</b>`,`② 공배수는 ${L}의 배수예요: ${L}, ${L*2}, ${L*3}, …`,`③ 이 중 ${N}보다 작은 수가 몇 개인지 세어요.`];};
+ ES['05-03']=s=>{const[a,b]=NUM(s),lg=Math.max(a,b),sm=Math.min(a,b),L=lcm(a,b),ms=[];for(let m=lg;m<L&&ms.length<4;m+=lg)ms.push(m);
+  return[`<b>큰 수 ${lg}의 배수</b>를 차례로 쓰면서 ${sm}(으)로도 나누어떨어지는 첫 수를 찾아요.`,ms.length?ms.join(', ')+', …':`${lg}이(가) ${sm}(으)로 나누어떨어지는지 먼저 확인해 봐요.`];};
+ ES['05-04']=s=>{const[l,k]=NUM(s);return[`두 수의 <b>공배수</b>는 <b>최소공배수 ${l}의 배수</b>예요.`,`${l} × 1, ${l} × 2, … → ${k}번째는 ${l} × ${k} = □`];};
+ ES['05-05']=s=>{const[a,b]=NUM(s),L=lcm(a,b);return[`① ${a}${jp(a,'와과')} ${b}의 <b>최소공배수</b> = <b>${L}</b>`,`② ${L}의 배수를 차례로 쓰다가 처음으로 <b>세 자리 수(100 이상)</b>가 되는 수를 찾아요.`];};
+ // ----- 06 크기가 같은 분수·약분·통분 -----
+ const eqf=s=>{const m=s.match(/(\d+)\/(\d+)\s*=\s*□\/(\d+)/);if(!m)return null;const a=+m[1],b=+m[2],c=+m[3],up=c>b,k=up?c/b:b/c;
+  return[up?`분모 ${b} → ${c}: 분모에 <b>${k}</b>${jp(k,'을를')} 곱했어요.`:`분모 ${b} → ${c}: 분모를 <b>${k}</b>${jp(k,'이로')} 나눴어요.`,`크기가 같으려면 분자에도 똑같이! ${a} ${up?'×':'÷'} ${k} = □`];};
+ ES['06-01']=ES['06-02']=eqf;
+ ES['06-03']=ES['06-04']=s=>{const[a,b]=NUM(s),g=gcd(a,b);if(g<2)return null;let p=2;while(g%p)p++;const a2=a/p,b2=b/p,more=gcd(a2,b2)>1;
+  return[`분자 ${a}와 분모 ${b}를 <b>둘 다 나눌 수 있는 수</b>(공약수)로 나눠요.`,`둘 다 <b>${p}</b>${jp(p,'이로')} 나누어떨어져요.`,more?`${a}/${b} = ${a2}/${b2}  → 더 약분할 수 있는지 살펴봐요.`:`${p}${jp(p,'이로')} 나눈 뒤, 더 약분되는지 확인해 봐요.`];};
+ ES['06-05']=s=>{const[a,b,c,d]=NUM(s),L=lcm(b,d);return[`① 두 분모 ${b}${jp(b,'와과')} ${d}의 <b>최소공배수</b>를 공통분모로 해요 → <b>${L}</b>`,`② ${a}/${b} = □/${L},  ${c}/${d} = □/${L}  (분자에도 똑같이 곱해요)`];};
+ ES['06-06']=s=>{const[a,b,c,d]=NUM(s),g=gcd(a,b),r1=a/g,r2=b/g;return[`① ${a}/${b}${jp(a,'을를')} 기약분수로: 분자·분모를 ${g}${jp(g,'이로')} 나누면 <b>${r1}/${r2}</b>`,`② 공통분모는 ${r2}와 ${d}의 공배수 중 가장 작은 수(최소공배수)예요.`];};
+ // ----- 07 분수의 크기 비교 -----
+ ES['07-01']=ES['07-04']=s=>{const[a,b,c,d]=NUM(s);return b===d?['분모가 같으면 분자가 클수록 큰 수예요.']:[`분모가 달라요 → <b>통분</b>해서 비교해요. 공통분모: <b>${lcm(b,d)}</b>`,a===c?`분자가 ${a}${jp(a,'이로')} 같아요. 분자가 같으면 분모가 <b>작을수록</b> 큰 수예요.`:`통분한 뒤 분자끼리 비교해요.`];};
+ ES['07-02']=s=>{const T=terms(s);return T.length<2?null:['<b>대분수</b>는 <b>자연수 부분</b>부터 비교해요.',`자연수 부분 ${T[0].A ?? ''}, ${T[1].A ?? ''} 중 어느 쪽이 큰가요?`,'자연수 부분이 같을 때만 분수 부분을 비교해요.'];};
+ ES['07-03']=s=>{const T=terms(s).filter(t=>t.k==='f');if(T.length<3)return null;return T.every(t=>t.a===T[0].a)?[`분자가 모두 <b>${T[0].a}</b>${jp(T[0].a,'이로')} 같아요.`,'분자가 같을 땐 <b>분모가 작을수록 큰 수</b>예요.']:[`분모 ${T.map(t=>t.b).join(', ')}의 최소공배수로 통분해요: <b>${T.map(t=>t.b).reduce(lcm)}</b>`,'통분한 뒤 분자끼리 비교해요.'];};
+ // ----- 08 분수의 덧셈·뺄셈 -----
+ ES['08-01']=ES['08-02']=ES['08-03']=ES['08-04']=ES['08-05']=ES['08-06']=ES['08-07']=ES['08-08']=s=>{
+  const T=terms(s);if(T.length<2)return null;const x=T[0],y=T[1],b=x.b,d=y.b,op=s.indexOf('−')>=0?'−':'+',L=lcm(b,d),A=x.a*L/b,C=y.a*L/d,R=[];
+  if(b===d)R.push('분모가 같으니 분자끼리 계산해요.');
+  else{R.push(`분모 ${b}${jp(b,'와과')} ${d}${jp(d,'이가')} 달라요 → <b>통분</b>! 최소공배수 <b>${L}</b>${jp(L,'을를')} 공통분모로 해요.`);R.push(`${x.k==='m'?'분수 부분 ':''}${x.a}/${b} = ${A}/${L},   ${y.k==='m'?'분수 부분 ':''}${y.a}/${d} = ${C}/${L}`);}
+  if(x.k==='m'||y.k==='m')R.push(op==='−'&&A<C?`분수 부분끼리 뺄 수 없으면 자연수에서 <b>1을 받아내림</b>해요. (1 = ${L}/${L})`:'자연수끼리, 분수끼리 계산한 뒤 마지막에 정리해요.');
+  return R;};
+ // ----- 09 분수의 곱셈 -----
+ ES['09-02']=ES['09-04']=s=>{const T=terms(s),f=T.find(t=>t.k==='f'),n=T.find(t=>t.k==='n');if(!f||!n)return null;return['분수에 자연수를 곱할 땐 <b>분자에</b> 곱해요.',`${f.a}/${f.b} × ${n.v} = (${f.a} × ${n.v})/${f.b}`,'계산한 뒤 약분하거나 대분수로 고쳐요.'];};
+ ES['09-03']=s=>{const T=terms(s),m=T.find(t=>t.k==='m'),n=T.filter(t=>t.k==='n').pop();if(!m||!n)return null;const p=imp(m);return[`① 대분수를 가분수로: ${tstr(m)} = (${m.A} × ${m.b} + ${m.a})/${m.b} = <b>${p.a}/${p.b}</b>`,`② ${p.a}/${p.b} × ${n.v}: 분자에 ${n.v}${jp(n.v,'을를')} 곱한 뒤 약분·대분수로 정리해요.`];};
+ ES['09-05']=ES['09-06']=ES['09-07']=ES['09-08']=ES['09-09']=s=>{
+  if(/보다 (클|작)/.test(s)){const f=terms(s).find(t=>t.k==='f');return f?['곱하는 수가 <b>1보다 작으면</b> 곱은 원래 수보다 작아지고, <b>1보다 크면</b> 커져요.',`${f.a}/${f.b}은(는) 1보다 클까요, 작을까요?`]:null;}
+  const T=terms(s);if(T.length<2)return null;const x=T[0],y=T[1],px=imp(x),py=imp(y),R=[];
+  const cv=[x,y].filter(t=>t.k==='m');if(cv.length)R.push('① 대분수는 먼저 <b>가분수</b>로: '+cv.map(t=>`${tstr(t)} = ${imp(t).a}/${imp(t).b}`).join(',  '));
+  R.push(`${cv.length?'② ':''}분자끼리, 분모끼리 곱해요: (${px.a} × ${py.a})/(${px.b} × ${py.b})`);R.push('곱하기 전에 약분할 수 있으면 먼저 약분하면 편해요.');return R;};
+ // ----- 10 (자연수)÷(자연수) = 분수 -----
+ ES['10-01']=ES['10-02']=ES['10-03']=ES['10-04']=s=>{const[a,b]=NUM(s);
+  return/대분수/.test(s)?[`${a} ÷ ${b}의 <b>몫과 나머지</b>를 먼저 구해요.`,'몫 → 자연수 부분, 나머지 → 분자, 나누는 수 → 분모']:a===1?[`1을 똑같이 ${b}로 나눈 <b>한 조각</b>이 몫이에요.`,'한 조각을 분수로 나타내면 분자와 분모는 각각 얼마일까요?']:[`1 ÷ ${b} = 1/${b} 이에요.`,`그러면 ${a} ÷ ${b}는 1/${b}이 몇 개 모인 것일까요?`,/기약|가분수|대분수/.test(s)||gcd(a,b)>1?'마지막에 약분하거나 대분수로 고쳐야 하는지 확인해요.':'더 약분할 수 있는지도 확인해요.'];};
+ // ----- 11 분수의 나눗셈 -----
+ ES['11-01']=s=>{const m=s.match(/(\d+) 안에 (\d+)\/(\d+)/);if(!m)return null;const n=+m[1],b=+m[3];return[`1 안에는 1/${b}이 <b>${b}번</b> 들어가요.`,`${n} 안에는 1이 ${n}개 있으니까 → ${b} × ${n} = □`];};
+ ES['11-02']=s=>{const T=terms(s),f=T[0],n=T.find((t,i)=>i>0&&t.k==='n');if(!f||!n)return null;return['분수를 자연수로 나누면 <b>분모에</b> 곱해요.',`${f.a}/${f.b} ÷ ${n.v} = ${f.a}/(${f.b} × ${n.v})`,'계산한 뒤 약분해요.'];};
+ ES['11-03']=s=>{const T=terms(s),m=T[0],n=T.filter(t=>t.k==='n').pop();if(!m||m.k!=='m'||!n)return null;const p=imp(m);return[`① 대분수를 가분수로: ${tstr(m)} = <b>${p.a}/${p.b}</b>`,`② ${p.a}/${p.b} ÷ ${n.v} = ${p.a}/(${p.b} × ${n.v}) → 약분`];};
+ ES['11-04']=s=>{const m=s.match(/(\d+)\/(\d+) 안에 (\d+)\/(\d+)/);if(!m)return null;const a=+m[1],b=+m[2],c=+m[3],d=+m[4],L=lcm(b,d);return[`띠를 <b>${L}칸</b>으로 똑같이 나눠요. (분모 ${b}${jp(b,'와과')} ${d}의 최소공배수)`,`${a}/${b}은(는) ${a*L/b}칸, ${c}/${d}은(는) ${c*L/d}칸이에요.`,`${a*L/b}칸 안에 ${c*L/d}칸이 몇 번 들어갈까요?`];};
+ ES['11-05']=s=>{const[a,b,c,d]=NUM(s);return b===d?['<b>분모가 같으면</b> 분자끼리 나누면 돼요.',`${a} ÷ ${c} = □`]:null;};
+ ES['11-06']=ES['11-10']=ES['11-07']=s=>{const T=terms(s);if(T.length<2)return null;const x=imp(T[0].k==='n'?{k:'f',a:T[0].v,b:1}:T[0]),y=T[1].k==='f'?T[1]:null;if(!y)return null;return['나누기 분수는 <b>나누는 분수의 분자와 분모를 바꿔서 곱해요</b>.',`${T[0].k==='n'?T[0].v:x.a+'/'+x.b} ÷ ${y.a}/${y.b} = ${T[0].k==='n'?T[0].v:x.a+'/'+x.b} × ${y.b}/${y.a}`,'곱하기 전에 약분되는지 살펴봐요.'];};
+ ES['11-08']=s=>{const T=terms(s);if(T.length<2||T[0].k!=='m')return null;const p=imp(T[0]),y=T[1];return[`① 대분수를 가분수로: ${tstr(T[0])} = <b>${p.a}/${p.b}</b>`,`② ${p.a}/${p.b} ÷ ${y.a}/${y.b} = ${p.a}/${p.b} × ${y.b}/${y.a}`];};
+ ES['11-09']=()=>['나눗셈을 곱셈으로 바꿀 땐 <b>나누는 분수의 분자와 분모의 자리를 바꿔요</b>.','나누어지는 분수는 그대로 두고, ÷를 ×로 바꿔요.'];
+ // ----- 12 분수와 소수 -----
+ ES['12-01']=s=>{const[n,m]=NUM(s),k=String(m).length-1;return[`분모가 ${m}이니까 소수 <b>${k}자리</b> 수예요.`,`분자 ${n}${jp(n,'을를')} 소수점 아래 ${k}자리에 맞춰 써요. (자리가 모자라면 0을 채워요)`];};
+ ES['12-02']=ES['12-05']=s=>{const m=s.match(/\d+\.\d+/);if(!m)return null;const k=dec(m[0]);return[`${m[0]}${jp(m[0],'은는')} 소수 <b>${k}자리</b> 수 → 분모는 <b>${10**k}</b>, 분자는 소수점을 뺀 수`,'기약분수로 나타내려면 분자와 분모를 공약수로 약분해요.'];};
+ ES['12-03']=s=>{const[a,b]=NUM(s);let m=10;while(m<1e6&&m%b)m*=10;if(m%b)return null;const k=m/b;return[`분모 ${b}에 <b>${k}</b>${jp(k,'을를')} 곱하면 ${m}${jp(m,'이가')} 돼요.`,`분자에도 똑같이 ${k}${jp(k,'을를')} 곱해서 분모가 ${m}인 분수로 만든 뒤 소수로 나타내요.`];};
+ ES['12-04']=()=>['분수와 소수는 <b>한쪽을 다른 쪽 꼴로 바꿔서</b> 비교해요.','분모가 10, 100인 분수는 소수로 쉽게 바꿀 수 있어요.'];
+ // ----- 13 소수의 곱셈 -----
+ ES['13-01']=ES['13-02']=ES['13-03']=ES['13-04']=ES['13-06']=s=>{const m=s.match(/(\d+(?:\.\d+)?) × (\d+(?:\.\d+)?)/);if(!m)return null;const dx=dec(m[1]),dy=dec(m[2]),X=Math.round(m[1]*10**dx),Y=Math.round(m[2]*10**dy);
+  return[`① 소수점을 없애고 자연수처럼 곱해요: ${m[1]} → ${X},  ${m[2]} → ${Y}`,`② ${X} × ${Y} = □`,`③ 곱의 소수점 아래 숫자가 (${dx} + ${dy}) = <b>${dx+dy}개</b>가 되도록 소수점을 찍어요.`];};
+ ES['13-05']=s=>{const m=s.match(/(\d+) × (\d+) = (\d+)\D+?(\d+(?:\.\d+)?) × (\d+(?:\.\d+)?)/);if(!m)return null;const dx=dec(m[4]),dy=dec(m[5]);return[`${m[4]}${jp(m[4],'은는')} ${m[1]}의 <b>${10**dx}분의 1</b>, ${m[5]}${jp(m[5],'은는')} ${m[2]}의 <b>${10**dy}분의 1</b>이에요.`,`그러면 곱은 ${m[3]}의 몇 분의 1이 될까요?`];};
+ // ----- 14·15 소수의 나눗셈 -----
+ ES['14-01']=ES['14-02']=ES['14-04']=s=>{const[a,b]=NUM(s);return[`${a} ÷ ${b} = ${Math.floor(a/b)} … ${a%b}`,'나머지가 있으면 <b>소수점을 찍고 0을 내려</b> 계속 나눠요.'];};
+ ES['14-03']=ES['15-07']=s=>{const[a,b]=NUM(s);return[`몫을 <b>소수 둘째 자리까지</b> 구해요. (나머지에 0을 내려 계속 나누기)`,'둘째 자리 숫자가 5 이상이면 첫째 자리를 올리고, 4 이하면 버려요. (반올림)'];};
+ ES['15-01']=ES['15-02']=ES['15-03']=ES['15-09']=s=>{const m=s.match(/(\d+(?:\.\d+)?) ÷ (\d+)/);if(!m)return null;const X=Math.round(m[1]*10**dec(m[1]));return[`① 소수점이 없는 것처럼 ${X} ÷ ${m[2]}을(를) 계산해요.`,'② 몫의 소수점은 <b>나누어지는 수의 소수점 위치</b>에 맞춰 찍어요.','나누어떨어지지 않으면 0을 내려 계속 나눠요.'];};
+ ES['15-04']=ES['15-05']=ES['15-06']=s=>{const m=s.match(/(\d+(?:\.\d+)?) ÷ (\d+(?:\.\d+)?)/);if(!m)return null;const k=10**dec(m[2]);return[`나누는 수 ${m[2]}${jp(m[2],'을를')} 자연수로 만들려고 <b>${k}배</b> 해요. 나누어지는 수 ${m[1]}도 똑같이 ${k}배!`,`→ ${fmtn(m[1]*k)} ÷ ${fmtn(m[2]*k)} = □`];};
+ ES['15-08']=s=>{const m=s.match(/(\d+(?:\.\d+)?) m를 (\d+) m씩/);if(!m)return null;return['도막 수는 <b>자연수</b>예요.',`${m[1]} ÷ ${m[2]}에서 몫(자연수 부분)이 도막 수, 남는 끈 = ${m[1]} − (도막 수 × ${m[2]})`];};
+ function esHint(q){
+  const code=String(q.sk).replace(/^es:6수01-/,''),con=(typeof ES_CON!=='undefined'&&ES_CON['6수01-'+code])||null;
+  const s=String(q.q).replace(/<small>.*?<\/small>/g,'').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ');
+  let L=null;try{L=ES[code]?ES[code](s,q):null;}catch(e){L=null;}
+  if(!L||!L.length)L=[`「${con?con.t:'이 문제'}」 문제예요.`,'구하려는 것에 밑줄을 긋고, 주어진 수를 연습장에 옮겨 적어 봐요.'];
+  try{const mi=q.mis&&(q.ch||[]).map(c=>q.mis[c]).find(id=>id&&typeof ES_MIS!=='undefined'&&ES_MIS[id]);if(mi)L=[...L,`⚠ 조심! 이런 실수가 많아요 → <b>${ES_MIS[mi].l}</b>`];}catch(e){}
+  return L;
+ }
+ function makeHint(q){
+  let L=null;
+  try{L=q.e?fromE(q):(q.es?esHint(q):null);}catch(e){L=null;}
+  if(!L||!L.length){const k=(typeof SKM!=='undefined'&&SKM[q.sk])||{};L=[`「${k.n||'이 문제'}」 문제예요.`,'구하려는 것에 밑줄을 긋고, 주어진 수를 연습장에 옮겨 적어 봐요.'];}
+  return L;
+ }
+ const fm=s=>typeof fmtMath==='function'?fmtMath(s):s;
+ const hintCost=h=>h.mode==='def'?'받는 피해 +1':'내 공격 −1';
+ // 힌트는 연습장 종이에 쓰인 글씨처럼 그려요 (아래층 캔버스 → 지우개로 지워지지 않고, 확대·이동에도 같이 움직여요)
+ // 처음 디자인 그대로: 노란 메모 바탕 · Noto Sans KR · 굵은 강조 · 세로 분수/대분수 · 도트 아이콘
+ const HIMG={};
+ function hIcon(ch){
+  if(ch in HIMG)return HIMG[ch];
+  HIMG[ch]=null;
+  try{const u=(typeof PXI!=='undefined'&&PXI.gen)?PXI.gen(ch):null;if(u){const im=new Image();im.onload=()=>{HIMG[ch]=im;drawHint();};im.src=u;}}catch(e){}
+  return null;
+ }
+ const HEMO=/\p{Extended_Pictographic}/u;
+ function hTokens(html){
+  const out=[];let bold=false,i=0;
+  const re=/<span class="mx">(\d+)<span class="fr"><i>(\d+)<\/i><i>(\d+)<\/i><\/span><\/span>|<span class="fr"><i>(\d+)<\/i><i>(\d+)<\/i><\/span>|<(\/?)b>|<[^>]+>|([^<]+)/g;let m;
+  const dec=t=>t.replace(/&nbsp;/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+  while((m=re.exec(html))){
+   if(m[1]!=null)out.push({k:'mx',A:m[1],n:m[2],d:m[3],b:bold});
+   else if(m[4]!=null)out.push({k:'fr',n:m[4],d:m[5],b:bold});
+   else if(m[7]!=null){for(const ch of dec(m[7]).replace(/️/g,''))out.push(HEMO.test(ch)&&ch.charCodeAt(0)>255?{k:'emo',c:ch}:{k:'t',c:ch,b:bold});}
+   else if(m[0].slice(0,2)==='<b')bold=true;else if(m[0]==='</b>')bold=false;
+  }
+  return out;
+ }
+ function drawHint(){
+  if(!hcv||!cv)return;
+  if(hcv.width!==cv.width||hcv.height!==cv.height){hcv.width=cv.width;hcv.height=cv.height;}
+  const g=hcv.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,hcv.width,hcv.height);
+  const h=P.hint;if(!h||!h.used||!h.lines)return;
+  g.setTransform(dpr*V.s,0,0,dpr*V.s,dpr*V.tx,dpr*V.ty);
+  const FS=15,FF="'Noto Sans KR',sans-serif",PAD=10,BX=6,BY=6,W=Math.max(140,cv.clientWidth-BX*2-PAD*2-4);
+  const font=(b,sz)=>`${b?700:500} ${sz}px ${FF}`;
+  const tw=(t,b,sz)=>{g.font=font(b,sz||FS);return g.measureText(t).width;};
+  // 1) 줄 배치
+  const rows=[];
+  h.lines.forEach(l=>{
+   let row={x:0,items:[],fr:false};rows.push(row);
+   const nl=()=>{row={x:0,items:[],fr:false,ind:1};rows.push(row);};
+   hTokens(fm(l)).forEach(t=>{
+    let w;
+    if(t.k==='t'){w=tw(t.c,t.b);}
+    else if(t.k==='emo')w=FS+3;
+    else{const fs=FS*.84;const fw=Math.max(tw(t.n,t.b,fs),tw(t.d,t.b,fs))+8;w=fw+(t.k==='mx'?tw(t.A,t.b)+2:0)+4;t.fw=fw;t.fs=fs;}
+    if(row.x+w>W&&row.items.length&&!(t.k==='t'&&t.c===' '))nl();
+    if(row.items.length===0&&t.k==='t'&&t.c===' '&&row.ind)return;
+    t.w=w;t.x=row.x+(row.ind?14:0);row.x+=w;row.items.push(t);if(t.k!=='t'&&t.k!=='emo')row.fr=true;
+   });
+  });
+  const HEAD=30;let H=HEAD+PAD;rows.forEach(r=>{r.h=r.fr?42:25;H+=r.h;});H+=PAD-2;
+  // 2) 메모 바탕
+  const bw=W+PAD*2+4;
+  g.save();g.fillStyle='rgba(255,236,140,.07)';g.strokeStyle='#e0b93b';g.lineWidth=2;
+  g.beginPath();if(g.roundRect)g.roundRect(BX,BY,bw,H,12);else g.rect(BX,BY,bw,H);g.fill();g.stroke();g.restore();
+  // 3) 제목
+  g.textBaseline='middle';let hx=BX+PAD,hy=BY+HEAD/2+3;
+  const ic=hIcon('💡');if(ic)g.drawImage(ic,hx,hy-9,18,18);hx+=22;
+  g.font="700 15px 'Jua',"+FF;g.fillStyle='#7a5a00';g.fillText('힌트',hx,hy);hx+=g.measureText('힌트').width+8;
+  const cost=hintCost(h);g.font="700 11px "+FF;const cw=g.measureText(cost).width+12;
+  g.fillStyle='#fff';g.beginPath();if(g.roundRect)g.roundRect(hx,hy-9,cw,18,9);else g.rect(hx,hy-9,cw,18);g.fill();
+  g.fillStyle='#c2255c';g.fillText(cost,hx+6,hy+.5);
+  // 4) 본문
+  let y=BY+HEAD+PAD-2;const x0=BX+PAD+2;
+  rows.forEach(r=>{
+   const cy=y+r.h/2;
+   r.items.forEach(t=>{
+    const x=x0+t.x;g.fillStyle='#4a3a00';g.textBaseline='middle';
+    if(t.k==='t'){g.font=font(t.b,FS);g.fillText(t.c,x,cy+1);}
+    else if(t.k==='emo'){const im=hIcon(t.c);if(im)g.drawImage(im,x,cy-9,FS+1,FS+1);}
+    else{
+     let fx=x;
+     if(t.k==='mx'){g.font=font(t.b,FS+2);g.fillText(t.A,fx,cy+1);fx+=tw(t.A,t.b,FS+2)+2;}
+     g.font=font(t.b,t.fs);g.textAlign='center';
+     g.fillText(t.n,fx+t.fw/2,cy-9);g.fillText(t.d,fx+t.fw/2,cy+10);
+     g.fillRect(fx+1,cy-1,t.fw-2,1.8);g.textAlign='left';
+    }
+   });
+   y+=r.h;
+  });
+ }
+ function renderHint(){drawHint();}
+ // 힌트 버튼: 실수로 누르지 않게 두 번 눌러야 해요
+ function useHint(){
+  const h=P.hint;if(!h||h.used)return;
+  if(!h.armed){
+   h.armed=true;sync();clearTimeout(h.t);
+   h.t=setTimeout(()=>{if(P.hint===h&&!h.used){h.armed=false;sync();}},3500);
+   try{toast('💡 한 번 더 누르면 힌트를 써요 · '+hintCost(h));}catch(e){}
+   return;
+  }
+  clearTimeout(h.t);h.used=true;h.armed=false;h.lines=makeHint(h.q);
+  try{h.cb&&h.cb();}catch(e){}
+  try{sfx('tap');}catch(e){}
+  renderHint();sync();
+ }
  const SVGBTN=ic('pen');
  window.PADX={
-  start(host,q){
+  start(host,q,o){
+   if(P.hint)clearTimeout(P.hint.t);P.hint=null;
    if(!host||(q&&q.en))return;
+   if(o&&o.mode&&q&&q.sk&&!q.ko&&!q.iq)P.hint={mode:o.mode==='def'?'def':'atk',q,cb:o.onUse,used:false,armed:false,min:false,lines:null,t:0}; // 힌트: 수학 문제의 공격·방어 전투 문제에서만
    P.host=host;P.mode=host.id==='bqHost'?'top':'bottom';
    P.strokes=[];P.undone=null;P.cur=null;P.pid=null;
    if(ctx&&cv){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);}
@@ -12481,16 +12761,19 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
    const card=host.querySelector('.qCard');
    if(card){
     card.classList.add('hasPad');
-    btn=document.createElement('button');btn.type='button';btn.className='padBtn';btn.innerHTML=SVGBTN+'연습장';
+    btn=document.createElement('button');btn.type='button';btn.className='padBtn';btn.innerHTML=SVGBTN+'연습장'+(P.hint?' 💡':'');
     btn.onclick=e=>{e.stopPropagation();toggle();};card.appendChild(btn);
    }
    P.want=false;hide(true);   // 새 문제에서는 연습장이 닫힌 채로 시작, 필요하면 버튼으로 켜요
+   renderHint();sync();
    if(btn)btn.classList.toggle('on',P.on);
   },
   end(host){
    if(P.host!==host)return;
    hide(true);P.host=null;btn=null;
-  }
+   if(P.hint)clearTimeout(P.hint.t);P.hint=null;renderHint();sync();
+  },
+  hintFor:makeHint
  };
 })();
 </script>
