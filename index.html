@@ -485,15 +485,20 @@ html.lowfx .card .holo{animation:none;mix-blend-mode:normal;opacity:.25}
 .mbtns{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
 #toast{position:fixed;left:50%;top:calc(var(--vt) + 12px);transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;width:min(520px,94vw)}
 .tst{background:#3a2e3f;color:#fff;padding:9px 16px;border-radius:14px;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.25);animation:popIn .25s;text-align:center}
-#autoCast{position:fixed;left:50%;top:calc(var(--vt) + var(--vh) * .46);transform:translate(-50%,-50%);z-index:120;width:min(560px,92vw);display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
-#autoCast .acl{background:rgba(20,24,40,.84);color:#fff;border-radius:14px;padding:8px 14px;font-weight:800;font-size:clamp(14px,3.5vw,18px);line-height:1.45;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.35);border:2px solid #6aa7ff;animation:acIn .25s ease-out;transition:opacity .4s}
-#autoCast .acl.f{border-color:#ff6a6a}
-#autoCast .acl.sv{border-color:#ffd23f}
-#autoCast .acl.out{opacity:0}
+#autoCast{position:fixed;left:50%;top:calc(var(--vt) + var(--vh) * .5);transform:translate(-50%,-50%);z-index:120;width:min(560px,92vw);display:none;flex-direction:column;pointer-events:none;background:rgba(20,24,40,.92);border:2px solid #6aa7ff;border-radius:16px;box-shadow:0 6px 22px rgba(0,0,0,.45);overflow:hidden}
+#autoCast.on{display:flex}
+#autoCast .acH{flex:0 0 auto;padding:5px 12px;font-size:12px;font-weight:800;color:#9cc4ff;background:rgba(106,167,255,.16);letter-spacing:.5px}
+#autoCast .acB{flex:1 1 auto;max-height:calc(var(--vh) * .3);overflow-y:auto;padding:6px 8px;display:flex;flex-direction:column;gap:4px;scrollbar-width:none}
+#autoCast .acB::-webkit-scrollbar{display:none}
+#autoCast .acl{color:#fff;border-left:4px solid #6aa7ff;border-radius:6px;padding:4px 10px;font-weight:800;font-size:clamp(14px,3.5vw,17px);line-height:1.45;text-align:left;background:rgba(255,255,255,.06);opacity:.55;transition:opacity .25s}
+#autoCast .acl:last-child{opacity:1;background:rgba(255,255,255,.13)}
+#autoCast .acl.f{border-left-color:#ff6a6a}
+#autoCast .acl.sv{border-left-color:#ffd23f}
 #autoCast .acl b{color:#ffd23f}
 #autoCast .acl .sup{color:#ff9d6e}
 #autoCast .acl .weak{color:#b8c2d6}
-body:has(#bq.on) #autoCast{opacity:0}
+body:has(#autoCast.on) #banner{top:calc(var(--vt) + var(--vh) * .14)}
+body:has(#bq.on) #autoCast{opacity:0;visibility:hidden}
 @keyframes acIn{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:none}}
 #banner{position:fixed;left:50%;top:calc(var(--vt) + var(--vh) * .38);transform:translate(-50%,-50%) scale(.6);z-index:250;pointer-events:none;opacity:0;text-align:center;white-space:nowrap}
 #banner.on{animation:bnr 2.2s ease forwards}
@@ -5120,6 +5125,8 @@ function showInfo(id,o={}){if(window.__sim)return;const m=MON[id],kw=kwOf(m),t=k
  const x=$('#biX');x.onclick=()=>{sfx('tap');closeInfo();if(o.hand!=null){B.pick=-1;renderBattle();}};
  const pl=$('#biPlay');if(pl)pl.onclick=()=>{const me=B.me;closeInfo();const sl=me.board.indexOf(null);if(sl<0||B.busy)return;if(B.coop){if(B.side!=='me'||B.coop.active!==BC.localIndex)return;if(!BC.host){B.pick=-1;bossSubmit({type:'summon',h:o.hand,s:sl});return;}}if(B.pvp)pvpSend({t:'sum',h:o.hand,s:sl});summon(me,o.hand,sl);};}
 // ---- 타격감: 뒤로 젖혔다 돌진 → 멈칫(히트스톱) → 번쩍 · 파편 · 흔들림 · 큰 숫자 ----
+// 칸 안에서 가장 큰 그림(포켓몬)의 영역. 작은 포켓몬도 몸에서 기술이 나가게 해요.
+function spriteRect(el){try{let best=null,ba=0;el.querySelectorAll('img,canvas').forEach(n=>{const r=zRect(n),a=r.width*r.height;if(a>ba&&r.width>8&&r.height>8){ba=a;best=r;}});if(best)return best;}catch(e){}return zRect(el);}
 function center(el){const r=zRect(el);return[r.left+r.width/2,r.top+r.height/2];}
 function particles(el,col,n){if(!el||S.meta.settings.lowfx||window.__sim)return;const[x,y]=center(el);PXF.hit(x,y,col,n);}
 function shakeEl(el,amp){if(!el||S.meta.settings.lowfx||window.__sim)return;const a=Math.max(2,Math.round(amp/2)*2);try{el.animate([{transform:'translate3d(0,0,0)'},{transform:`translate3d(${-a}px,${a/2}px,0)`,offset:.18},{transform:`translate3d(${a*.85}px,${-a/2}px,0)`,offset:.42},{transform:`translate3d(${-a*.5}px,${a*.25}px,0)`,offset:.66},{transform:`translate3d(${a*.2}px,0,0)`,offset:.84},{transform:'translate3d(0,0,0)'}],{duration:280,easing:'ease-out'});}catch(e){}}
@@ -6597,7 +6604,7 @@ async function skillMove(A,si,toEl,ok,cb,ov){const a=ov?{id:ov.id}:A.board[si];c
  try{fromEl.animate([{transform:'none'},{transform:`translateY(${A===B.me?6:-6}px) scale(${epic&&ok?1.12:.94})`,offset:.5},{transform:'none'}],{duration:260});}catch(e){}
  await wait(170);
  const[bx,by]=center(toEl);
- if(k.m==='proj'){let sp=center(fromEl);if(k.fx==='dragon'||k.fx==='fire'||k.fx==='water'){const r=zRect(fromEl);sp=[sp[0]+Math.sign(bx-sp[0])*r.width*.16,r.top+r.height*.3];}await skShoot(k,sp,[bx,by],pw);}
+ if(k.m==='proj'){let sp=center(fromEl);if(k.fx==='dragon'||k.fx==='fire'||k.fx==='water'){const r=spriteRect(fromEl);sp=[r.left+r.width/2+Math.sign(bx-(r.left+r.width/2))*r.width*.16,r.top+r.height*.32];}await skShoot(k,sp,[bx,by],pw);}
  else if(k.m==='sky'){if(k.fx==='bolt'){skBolt(k,bx,by,pw);await wait(90);}else{skRockFall(k,bx,by,pw);await wait(pw>=1?260+3*45:260+45);}}
  else if(k.m==='ground'){const r=zRect(toEl);skUpheave(k,bx,by,Math.max(24,Math.min(r.width,r.height)/2),pw);await wait(200);}
  skBurst(k,toEl,pw,cb);if(epic&&ok)skEpicBurst(k,toEl);}
@@ -6673,18 +6680,20 @@ const AUTO={on:false,running:false};
 // ===== 자동전투 중계: 공격·막기 상황을 화면 가운데에 한 줄씩 보여줘요 =====
 const CAST_MV=['몸통박치기','화염 방사','물대포','덩굴 채찍','백만 볼트','냉동 빔','인파이트','오물 폭탄','지진','공중 날기','사이코키네시스','벌레의 야단법석','스톤 에지','섀도 볼','용의 파동','어둠의 파동','아이언 헤드','문 포스'];
 const AC={cur:null};
+setInterval(()=>{try{const b=document.getElementById('autoCast');if(b&&b.classList.contains('on')&&!(AUTO.on&&B&&!B.over))acClear();}catch(e){}},700);
 function acOn(){try{return !!(AUTO.on&&B&&!B.over&&!B.pvp&&!B.coop&&!window.__sim);}catch(e){return false;}}
-function acClear(){try{const b=document.getElementById('autoCast');if(b)b.innerHTML='';AC.cur=null;}catch(e){}}
-function acSay(html,cls,ms=3600){try{if(!acOn())return null;let b=document.getElementById('autoCast');if(!b){b=document.createElement('div');b.id='autoCast';document.body.appendChild(b);}
- const d=document.createElement('div');d.className='acl'+(cls?' '+cls:'');d.innerHTML=html;b.appendChild(d);while(b.children.length>4)b.removeChild(b.firstChild);
- setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),450);},ms);return d;}catch(e){return null;}}
-function acAdd(html){try{if(!acOn())return;const d=AC.cur;if(d&&d.isConnected&&!d.classList.contains('out'))d.insertAdjacentHTML('beforeend',html);else AC.cur=acSay(html.trim());}catch(e){}}
+function acBox(){let b=document.getElementById('autoCast');if(!b){b=document.createElement('div');b.id='autoCast';b.innerHTML='<div class=acH>자동전투 중계</div><div class=acB></div>';document.body.appendChild(b);}return b;}
+function acClear(){try{const b=document.getElementById('autoCast');if(b){b.classList.remove('on');const c=b.querySelector('.acB');if(c)c.innerHTML='';}AC.cur=null;}catch(e){}}
+function acSay(html,cls,ms=3600){try{if(!acOn())return null;const b=acBox(),c=b.querySelector('.acB');
+ const d=document.createElement('div');d.className='acl'+(cls?' '+cls:'');d.innerHTML=html;c.appendChild(d);while(c.children.length>40)c.removeChild(c.firstChild);
+ b.classList.add('on');c.scrollTop=c.scrollHeight;d._t=Date.now();return d;}catch(e){return null;}}
+function acAdd(html){try{if(!acOn())return;const d=AC.cur;if(d&&d.isConnected&&Date.now()-(d._t||0)<3600){d.insertAdjacentHTML('beforeend',html);const c=d.parentNode;if(c)c.scrollTop=c.scrollHeight;}else AC.cur=acSay(html.trim());}catch(e){}}
 function acAtk(A,D,a,tg,ok,crit){try{if(!acOn()||!a||!MON[a.id])return;let tn;if(tg.hero)tn=D.name||'트레이너';else{const d=D.board[tg.u];if(!d||!MON[d.id])return;tn=MON[d.id].name;}
  const mv=CAST_MV[kwType(MON[a.id])]||CAST_MV[0];
  let h=`${esc(josa(MON[a.id].name,'이가'))} ${esc(josa(mv,'이로'))} ${esc(josa(tn,'을를'))} 공격!`;
  if(A===B.me){if(!ok)h+=' <span class=weak>약한 공격…</span>';else if(crit)h+=' <b>크리티컬!</b>';}
  AC.cur=acSay(h,A===B.me?'':'f');}catch(e){}}
-function acHero(dmg,P){try{if(!acOn())return;const d=AC.cur,alive=d&&d.isConnected&&!d.classList.contains('out');const pre=alive?' ':`${esc((P&&P.name)||'트레이너')} `;acAdd(dmg>0?`${pre}<b>-${dmg}</b>`:`${pre}<span class=weak>공격을 막았다!</span>`);}catch(e){}}
+function acHero(dmg,P){try{if(!acOn())return;const d=AC.cur,alive=d&&d.isConnected&&Date.now()-(d._t||0)<3600;const pre=alive?' ':`${esc((P&&P.name)||'트레이너')} `;acAdd(dmg>0?`${pre}<b>-${dmg}</b>`:`${pre}<span class=weak>공격을 막았다!</span>`);}catch(e){}}
 function acUnit(P,i,dealt,k){try{if(!acOn())return;if(!dealt){acAdd(' <span class=weak>피했다!</span>');return;}
  let h=` <b>-${dealt}</b>`;if(k>=2)h+=' <span class=sup>효과는 굉장했다!</span>';else if(k<1)h+=' <span class=weak>효과는 별로였다.</span>';
  const u=P.board[i];if(!u||u.hp<=0)h+=' 쓰러졌다!';acAdd(h);}catch(e){}}
@@ -12391,7 +12400,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
     btn=document.createElement('button');btn.type='button';btn.className='padBtn';btn.innerHTML=SVGBTN+'연습장';
     btn.onclick=e=>{e.stopPropagation();toggle();};card.appendChild(btn);
    }
-   if(P.want){show();}else{hide(true);}
+   P.want=false;hide(true);   // 새 문제에서는 연습장이 닫힌 채로 시작, 필요하면 버튼으로 켜요
    if(btn)btn.classList.toggle('on',P.on);
   },
   end(host){
