@@ -166,6 +166,12 @@ h2{font-size:26px;margin-bottom:8px}h3{font-size:19px;margin:12px 0 6px}
 .gdPet{position:absolute;width:calc(var(--s,44) * var(--k,1) * 1px);height:calc(var(--s,44) * var(--k,1) * 1px);transform:translate(-50%,-100%);transition:left 3.6s linear,top 3.6s linear;cursor:pointer;z-index:3;display:flex;align-items:flex-end;justify-content:center}
 .gdPet img{max-width:100%;max-height:100%;image-rendering:pixelated;transition:transform .3s;filter:drop-shadow(0 1px 0 rgba(255,255,255,.35))}
 .gdPet.gdFlip img{transform:scaleX(-1)}
+.gdBub{position:absolute;left:50%;top:calc(56% - 50px * var(--k,1));transform:translate(-50%,-100%) scale(.92);transform-origin:50% 100%;z-index:150;width:max-content;max-width:94%;box-sizing:border-box;background:#fffdf0;border:2.5px solid #d8a82e;border-radius:14px;padding:6px 9px;font-size:12px;line-height:1.45;color:#5a4220;box-shadow:0 3px 0 rgba(138,100,32,.35);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;display:flex;align-items:center;gap:6px;word-break:keep-all}
+.gdBub:after{content:"";position:absolute;left:50%;bottom:-9px;width:14px;height:14px;background:#fffdf0;border-right:2.5px solid #d8a82e;border-bottom:2.5px solid #d8a82e;transform:translateX(-50%) rotate(45deg)}
+.gdBub.on{opacity:1;transform:translate(-50%,-100%) scale(1)}
+.gdBub .gdBubTxt{flex:1;min-width:0}.gdBub .gdBubTag{display:block;font-family:'Jua';font-size:11px;color:#b07a00}
+.gdBubGo{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid #c99a2e;background:linear-gradient(#ffe58a,#f4c542);color:#6b4a10;font-size:16px;font-weight:900;line-height:1;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
+.gdBub.on .gdBubGo{pointer-events:auto}
 .gdPet.fly:after{display:none}
 .gdPet:after{content:"";position:absolute;bottom:-3px;left:14%;right:14%;height:7px;border-radius:50%;background:rgba(20,60,20,.22);z-index:-1}
 .gdHatch{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%) scale(var(--k,1));z-index:2;display:flex;flex-direction:column;align-items:center;pointer-events:none}
@@ -4131,7 +4137,7 @@ function iqScore(m){const z=m&&m.iq;if(!z||!z.r||z.r.length<10)return null;const
  const sp=Math.max(0,Math.min(1,(40-med)/30)),perf=.7*acc+.3*sp,iq=Math.round(70+60*perf);
  const lab=iq>=130?'천재 두뇌!':iq>=115?'척척 두뇌':iq>=100?'반짝반짝 두뇌':iq>=85?'생각이 쑥쑥 자라는 중':'차근차근 생각하는 중';
  return{iq,acc:Math.round(acc*100),med:Math.round(med*10)/10,n:z.n,lab};}
-function iqPanelHTML(m){const z=m.iq,sc=iqScore(m);const n=z?z.n:0;
+function iqPanelHTML(m){const z=m.iq||{n:0,c:0,r:[]},sc=iqScore(m);const n=z?z.n:0;
  return `<div class=panel><h3 style="margin:0 0 6px">🧠 나의 IQ 지수</h3>`+(sc?`<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><div style="font-size:46px;font-weight:900;color:#e08a00;line-height:1">${sc.iq}</div><div><b>${sc.lab}</b><br><span class=mut style="font-size:13px">최근 IQ 문제 ${Math.min(30,(z.r||[]).length)}개 · 정답률 <b>${sc.acc}%</b> · 맞힌 문제 풀이 시간 중간값 <b>${sc.med}초</b><br>지금까지 푼 IQ 문제 ${sc.n}개</span></div></div>`:`<p class=mut style="font-size:14px;margin:4px 0">IQ 문제를 <b>10개</b> 풀면 IQ 지수가 나와요! (지금 ${Math.min(10,(z.r||[]).length)}/10) 전투에서 가끔 나오는 🧠 문제를 풀어 보세요.</p>`)+`<p class=mut style="font-size:12px;margin:8px 0 0">※ 게임 속 퀴즈로 계산한 재미용 지수예요. 진짜 지능검사 결과가 아니에요.${S.meta.settings.iq===false?' (지금은 설정에서 IQ 문제가 꺼져 있어요)':''}</p></div>`;}
 let IQ_LAST=[]; // 최근에 나온 IQ 유형(연달아·자주 같은 유형이 나오지 않게)
 function iqQ(){
@@ -7750,7 +7756,7 @@ function domTrainPool(m,st,keys){const seen=new Set(),pool=[];const add=sk=>{if(
 function domTabHTML(m){const st=domStats(m),tot=DOMS.reduce((a,d)=>a+st[d.k].n,0);
  const ranked=DOMS.map(d=>st[d.k]).filter(o=>o.n>=10&&o.racc!=null).sort((a,b)=>a.racc-b.racc);
  const need=ranked.filter(o=>o.racc<.85).slice(0,2).map(o=>o.d.k);
- let h=`<div class=panel><h3 style="margin-top:0">🧭 수학 영역 진단 <span class=mut style="font-size:13px">(2022 개정 교육과정 4개 영역 · 수학 문제만 분석해요)</span></h3>`;
+ let h=`<div class=panel><h3 style="margin-top:0">🧭 수학 영역 진단 <span class=mut style="font-size:13px">(2022 개정 교육과정 4개 영역 · 수학 문제만 분석해요)</span></h3><p class=mut style="font-size:12px;margin:2px 0 6px">이번 학기와 지난 학년에서 배운 개념을 모두 포함해요.</p>`;
  if(tot<10){h+=`<p class=mut style="font-size:14px;margin:6px 0">수학 문제를 <b>10개</b> 이상 풀면 영역별로 분석해 줘요! (지금 ${tot}개) 훈련이나 전투에서 문제를 풀어 보세요.</p></div>`;}
  else{h+=`${domRadar(st)}<p class=mut style="font-size:12px;text-align:center;margin:2px 0 0">그래프는 영역별 <b>최근 정답률</b>이에요. 영역마다 10문제 이상 풀면 그려져요.</p></div>`;
   if(need.length){const nm=need.map(k=>DOM_BY[k].n).join(' · ');h+=`<div class=panel style="background:#fff6e6;border-color:#f0b35a"><h3 style="margin-top:0">🎯 맞춤 처방</h3><p style="font-size:15px;line-height:1.6;margin:4px 0">지금은 <b>${nm}</b> 쪽을 조금 더 다지면 좋아요. 약한 개념과 그 바탕이 되는 개념으로 8문제를 골라 드릴게요.</p><div class=mbtns style="margin-top:6px"><button class="btn red" id=domGo data-doms="${need.join(',')}">맞춤 훈련 시작</button></div></div>`;}
@@ -7765,7 +7771,7 @@ function domTabHTML(m){const st=domStats(m),tot=DOMS.reduce((a,d)=>a+st[d.k].n,0
    ${o.weak.length?`<h4 style="margin:10px 0 4px">💡 먼저 다질 개념</h4><div class=skList>${o.weak.slice(0,3).map(x=>`<div class=skRow><span class=sn><b>${esc(x.sk.n)}</b> <span class=mut style="font-size:12px">(${esc(semName(x.sk.s))} · ${esc((UNITS[x.sk.s]||[])[x.sk.u-1]||'')})</span></span><span class=mut style="font-size:12px">${x.v.c}/${x.t}</span>${starsHTML(x.v.st)}</div>`).join('')}</div>`:(o.n>=10?'<p class=mut style="font-size:13px;margin:8px 0 0">지금은 눈에 띄는 약한 개념이 없어요. 잘하고 있어요!</p>':'')}
    <div class=mbtns style="margin-top:8px;justify-content:flex-start">${o.skills.length?`<button class="btn blue sm" data-domgo="${d.k}">${d.n} 집중 연습</button>`:''}</div>
    ${ul.length?`<details style="margin-top:6px"><summary class=mut style="cursor:pointer;font-size:13px">단원별로 보기</summary><div class=skList>${ul.map(u=>`<div class=skRow><span class=sn>${esc(semName(u.sk.s))} ${u.sk.u}. ${esc((UNITS[u.sk.s]||[])[u.sk.u-1]||'')}</span><span class=mut style="font-size:12px">${Math.round(u.c/u.n*100)}% (${u.n}문제)</span><span class=mut style="font-size:12px">★ ${u.st}/${u.cnt*5}</span></div>`).join('')}</div></details>`:''}</div>`;});
- h+=`<p class=mut style="font-size:12px;text-align:center">영역은 교과서 단원과 성취기준 코드로 나눴어요. 지난주 대비 변화는 이 기능이 켜진 뒤부터 쌓여요.</p>`;
+ h+=`<div class=explain style="font-size:13px;line-height:1.7"><b>용어 설명</b><br>• <b>최근 정답률</b>: 개념별 최근 10문제를 영역별로 합친 정답률이에요.<br>• <b>배운 개념</b>: 한 번이라도 푼 개념 / 전체 개념 수예요.<br>• <b>익힌 개념</b>: 별이 3개 이상이거나 최근 3문제를 연속으로 맞힌 개념이에요.<br>• 상태: 85% 이상 <b>튼튼해요</b> · 65~84% <b>보통이에요</b> · 65% 미만 <b>보강이 필요해요</b> (10문제 미만이면 아직 판단하지 않아요).<br>• 지난주와의 비교는 영역 진단이 켜진 뒤의 기록부터 쌓여요.</div>`;
  return h;}
 // ===== 주간 리포트: 이번 주(최근 7일)와 지난주를 비교해 칭찬·다음 주 목표를 알려 줘요 =====
 function wkSum(m,back){let n=0,c=0,days=0,tt=0;for(let i=back*7;i<back*7+7;i++){const d=new Date();d.setDate(d.getDate()-i);const e=(m.days||{})[today(d)];if(e&&e.n>0){n+=e.n;c+=e.c||0;days++;tt+=e.tt||0;}}return{n,c,days,min:Math.round(tt/60000)};}
@@ -7992,7 +7998,7 @@ function classSummaryHTML(metas){const R=classRows(metas);if(!R.length)return ''
   ${measured.length&&measured[0].avg<.85?`<div class=explain style="margin-top:10px;background:#fff6e6;border-color:#f0b35a;font-size:14px;line-height:1.6">🎯 학급 전체로 보면 <b>${measured[0].d.n}</b>의 평균 최근 정답률이 <b>${Math.round(measured[0].avg*100)}%</b>로 가장 낮아요${measured[0].low?` (보강 필요 ${measured[0].low}명)`:''}. 수업이나 복습 과제에서 먼저 다뤄 보세요.</div>`:''}
   <h3 style="margin:12px 0 6px">영역별 학급 현황</h3>
   <div style="display:grid;gap:8px">${dm.map(x=>{const a=x.avg==null?null:Math.round(x.avg*100);return `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b style="min-width:108px">${x.d.ic} ${x.d.n}</b><div style="flex:1;min-width:120px;height:16px;background:#f0e8d8;border-radius:8px;overflow:hidden"><i style="display:block;height:100%;width:${a==null?0:a}%;background:${x.d.c}"></i></div><span style="min-width:48px;text-align:right;font-weight:700">${a==null?'-':a+'%'}</span><span class=mut style="font-size:12px;min-width:210px">측정 ${x.cnt}명 · 튼튼 ${x.ok} · 보통 ${x.mid} · 보강 ${x.low}</span></div>`;}).join('')}</div>
-  <p class=mut style="font-size:12px;margin:6px 0 0">영역별로 10문제 이상 푼 학생만 평균에 넣어요. 정답률은 학생별 최근 기록 기준이에요.</p></div>`;
+  <p class=mut style="font-size:12px;margin:6px 0 0">영역별로 10문제 이상 푼 학생만 평균에 넣어요. '측정 0명'이면 아직 그 영역을 10문제 이상 푼 학생이 없다는 뜻이에요. 정답률은 학생별 최근 기록 기준이에요.</p></div>`;
  h+=`<div class=panel><h3 style="margin-top:0">학생 × 영역 (최근 정답률)</h3><div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%"><tr><th ${th}>닉네임</th><th ${th}>학기</th><th ${th}>푼 문제</th>${DOMS.map(d=>`<th ${th}>${d.n}</th>`).join('')}<th ${th}>이번 주</th></tr>${R.map(r=>`<tr><td ${td}><b>${esc(r.name)}</b></td><td ${td}>${esc(r.sem)}</td><td ${td}>${r.q}</td>${DOMS.map(d=>{const o=r.st[d.k],c=classHeat(o);return `<td ${td.replace('text-align:center','text-align:center;background:'+c[0]+';color:'+c[1]+';font-weight:700')}>${c[2]}</td>`;}).join('')}<td ${td}>${r.wk}문제</td></tr>`).join('')}</table></div>
   <p class=mut style="font-size:12px;margin:6px 0 0"><span style="background:#cfeeda;padding:0 6px">85%↑ 튼튼</span> <span style="background:#fff0b8;padding:0 6px">65~84% 보통</span> <span style="background:#ffd0cd;padding:0 6px">65%↓ 보강</span> <span style="background:#eee;padding:0 6px">10문제 미만</span> · '이번 주' 칸은 이 기능이 포함된 버전부터 쌓여요.</p>
   <div class=row style="margin-top:8px"><button class="btn ghost sm" id=tcCsv>${I('disk')} 표를 CSV로 저장</button></div></div>`;
@@ -8003,7 +8009,16 @@ function classSummaryHTML(metas){const R=classRows(metas);if(!R.length)return ''
   <p class=mut style="font-size:12px;margin:6px 0 0">처방 훈련 기록은 이 기능이 포함된 버전부터 쌓여요. 7일 동안 한 번도 안 한 학생은 '없음'으로 표시돼요.</p></div>
  <div class=panel><h3 style="margin-top:0">💡 학급 공통 약한 개념 <span class=mut style="font-size:13px">(학생들의 약한 개념 상위 3개를 모아 센 결과)</span></h3>${weakList.length?`<div class=skList>${weakList.map(w=>`<div class=skRow style="flex-wrap:wrap"><span class=sn><b>${esc(w.sk.n)}</b> <span class=mut style="font-size:12px">(${esc(semName(w.sk.s))} · ${esc((UNITS[w.sk.s]||[])[w.sk.u-1]||'')} · ${w.dom.n})</span><br><span class=mut style="font-size:12px">${esc(w.names.slice(0,8).join(', '))}${w.names.length>8?' 외':''}</span></span><span class=pill>${w.names.length}명</span><span class=mut style="font-size:12px">평균 ${Math.round(w.accS/w.names.length*100)}%</span></div>`).join('')}</div>`:'<p class=mut style="font-size:13px;margin:0">아직 뚜렷한 약한 개념이 모이지 않았어요.</p>'}</div>`;
  h+=`<div class=panel><h3 style="margin-top:0">⚠️ 학급 공통 오개념</h3>${misList.length?`<div class=skList>${misList.map(x=>`<div class=skRow style="flex-wrap:wrap"><span class=sn><b>${esc(ES_MIS[x.id].l)}</b><br><span class=mut style="font-size:12px">${esc(ES_MIS[x.id].n)}</span></span><span class=pill>${x.n}번</span><span class=mut style="font-size:12px">${x.names.length}명</span></div>`).join('')}</div>`:'<p class=mut style="font-size:13px;margin:0">기록된 오개념이 아직 없어요.</p>'}</div>`;
- h+=`<div class=panel><h3 style="margin-top:0">🧑‍🏫 먼저 살펴볼 학생</h3>${prio.length?`<div class=skList>${prio.map(({r,low})=>{const dd=low.d;const wk=low.weak.slice(0,2).map(x=>x.sk.n).join(', ');return `<div class=skRow style="flex-wrap:wrap"><span class=sn><b>${esc(r.name)}</b> <span class=mut style="font-size:12px">${esc(r.sem)}</span><br><span class=mut style="font-size:12px">${dd.ic} ${dd.n} 최근 ${Math.round(low.racc*100)}%${wk?' · '+esc(wk):''}</span></span></div>`;}).join('')}</div>`:'<p class=mut style="font-size:13px;margin:0">모든 학생이 영역별로 튼튼해요!</p>'}</div>`;
+ const none=R.filter(r=>!DOMS.some(d=>r.st[d.k].n>=10));
+ h+=`<div class=panel><h3 style="margin-top:0">🧑‍🏫 먼저 살펴볼 학생 <span class=mut style="font-size:13px">(85% 미만인 영역이 있는 학생 · 낮은 순)</span></h3>${none.length?`<div class=explain style="font-size:13px;background:#f3f3f3;border-color:#ccc"><b>아직 판단하기 어려운 학생</b>: ${esc(none.map(r=>r.name).join(', '))} — 영역별로 10문제 이상 푼 기록이 없어요.</div>`:''}${prio.length?`<div class=skList>${prio.map(({r,low})=>{const dd=low.d;const wk=low.weak.slice(0,2).map(x=>x.sk.n).join(', ');return `<div class=skRow style="flex-wrap:wrap"><span class=sn><b>${esc(r.name)}</b> <span class=mut style="font-size:12px">${esc(r.sem)}</span><br><span class=mut style="font-size:12px">${dd.ic} ${dd.n} 최근 ${Math.round(low.racc*100)}%${wk?' · '+esc(wk):''}</span></span></div>`;}).join('')}</div>`:'<p class=mut style="font-size:13px;margin:0">모든 학생이 영역별로 튼튼해요!</p>'}</div>`;
+ h+=`<details class=panel style="font-size:13px;line-height:1.7"><summary style="cursor:pointer;font-weight:700">📖 이 요약을 읽는 방법 (처음이라면 펼쳐 보세요)</summary>
+  <p><b>영역</b>: 2022 개정 수학의 4개 영역(수와 연산 · 변화와 관계 · 도형과 측정 · 자료와 가능성)이에요. 학생이 푼 문제를 교과서 단원과 성취기준 코드로 영역에 나눴어요. 이번 학기뿐 아니라 지난 학년에서 푼 문제도 포함돼요.</p>
+  <p><b>최근 정답률</b>: 학생이 푼 개념별 최근 10문제 기록을 영역별로 합친 값이에요. 지난 학기 실력이 아니라 <b>요즘 실력</b>을 보여 줘요.</p>
+  <p><b>튼튼 · 보통 · 보강</b>: 85% 이상 / 65~84% / 65% 미만이에요. 영역별로 10문제 미만 푼 학생은 판단하지 않고 '-'로 둬요(문제가 적으면 우연의 영향이 커서요).</p>
+  <p><b>처방 훈련</b>: 학생의 '오늘의 훈련'은 영역 진단에서 약한 개념을 골라 먼저 내 줘요. 이 표는 그 훈련을 얼마나 했는지, 약한 개념을 얼마나 맞혔는지 보여 줘요. '변화'는 처음 3회와 최근 3회의 약한 개념 정답률 차이로, 6회 이상일 때만 나와요.</p>
+  <p><b>공통 약한 개념</b>: 학생마다 약한 개념 상위 3개를 모아 몇 명에게서 겹치는지 센 거예요. 수업에서 함께 다시 다룰 후보로 쓰세요.</p>
+  <p><b>공통 오개념</b>: 틀린 보기에서 읽은 흔한 실수 유형이에요. 오개념 기록은 일부 문항에만 붙어 있어요.</p>
+  <p><b>알아 두기</b>: 영어·국어·IQ 문제는 이 요약에 들어가지 않아요(학생별 표의 '푼 문제(전 과목)'에만 포함). 이 요약은 참고 자료이고 성적이 아니에요. 이 화면의 내용은 어디에도 전송되지 않고, 새로 고침하면 사라져요.</p></details>`;
  return h;}
 function classCsv(metas){const R=classRows(metas);const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
  const head=['닉네임','학기','푼 문제(수학)','수학 정답률',...DOMS.map(d=>d.n+' 최근정답률'),...DOMS.map(d=>d.n+' 푼 문제'),'처방 훈련(7일)','처방 훈련(누적)','약한 개념 정답률','먼저 다질 개념'];
@@ -8014,7 +8029,7 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
   <p style="font-size:14px;line-height:1.6;margin-top:8px">학생은 <b>학년·학기 코드</b>가 있어야 시작할 수 있어요. 코드의 학기보다 뒤 학년 문제는 나오지 않아요. 코드는 <b>${y}학년도(${y}.3~${y+1}.2)</b>에만 쓸 수 있고, 3월이 되면 새 코드를 나눠 주면 돼요. 학급 글자를 바꾸면 반마다 다른 코드가 돼요.</p>
   <div class=setRow><b>학급 글자 (3자)</b><input class="inp codeIn" id=tcCls maxlength=3 style="width:140px;font-size:22px" value="${esc(S.tcCls||'SSC')}"></div>
   <div id=tcList style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:10px"></div></div>
- <div class=panel><h2>${I('chart')} 학생 기록 모아 보기</h2><p class=mut style="font-size:13px">학생들이 보낸 <b>저장 코드(PKMT…)</b>를 한 줄에 하나씩 붙여 넣거나 .md 파일을 여러 개 고르면 표로 보여 줘요. 이 표는 이 화면에만 보이고 어디에도 보내지 않아요. 학생은 실명 대신 <b>닉네임</b>을 써요 — 누가 누구인지는 선생님만 따로 적어 두세요.</p>
+ <div class=panel><h2>${I('chart')} 학생 기록 모아 보기</h2><div class=explain style="font-size:14px;line-height:1.7;text-align:left"><b>사용 순서</b><br>① 학생이 게임에서 <b>설정 → 저장 · 불러오기 → 코드 만들고 복사</b>를 눌러 저장 코드(PKMT…)를 선생님께 보내요. 닉네임이 같이 보이게 해 주세요.<br>② 받은 코드를 <b>아래 칸에 한 줄에 하나씩</b> 붙여 넣고 <b>표 만들기</b>를 눌러요.<br>③ 학생별 표 아래에 <b>학급 영역 요약</b>(영역별 현황 · 학생×영역 표 · 처방 훈련 현황 · 공통 약한 개념 · 공통 오개념 · 먼저 살펴볼 학생)이 이어서 나와요.<br><span class=mut>※ 저장 코드는 코드를 만든 그 시점의 기록이에요. 변화를 보려면 학생들에게 주마다 새 코드를 받아 주세요.</span></div><p class=mut style="font-size:13px">학생들이 보낸 <b>저장 코드(PKMT…)</b>를 한 줄에 하나씩 붙여 넣거나 .md 파일을 여러 개 고르면 표로 보여 줘요. 이 표는 이 화면에만 보이고 어디에도 보내지 않아요. 학생은 실명 대신 <b>닉네임</b>을 써요 — 누가 누구인지는 선생님만 따로 적어 두세요.</p>
   <textarea class="inp code" id=tcIn style="height:120px" placeholder="PKMTZ:...&#10;PKMTZ:..."></textarea><div class=row style="margin-top:8px"><button class="btn blue" id=tcGo>표 만들기</button><button class="btn ghost" id=tcFiles>${I('folder')} .md 파일 여러 개</button></div>
   <input type=file id=tcF multiple accept=".md,.txt" class=hidden><div id=tcRep style="overflow-x:auto;margin-top:10px"></div></div>
  <div id=tcDom></div>
@@ -8026,16 +8041,17 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
  const rows=[],metas=[];const add=o=>{const m=upgradeMeta(mergeMeta(o.meta));metas.push(m);for(const a of ACH){const t=achTier(a,m);if(t>((m.ach[a.k]&&m.ach[a.k].t)||0))m.ach[a.k]={t,d:[]};}const sk=Object.entries(m.sk);const weak=sk.filter(([id,v])=>SKM[id]&&v.x>=2&&v.x>=v.c/2).map(([id])=>SKM[id].n).slice(0,3);
   const last7=Object.keys(m.days).filter(k=>dayDiff(k,today())<7).reduce((s,k)=>s+m.days[k].n,0);
   rows.push(`<tr><td>${esc(m.name)}</td><td>${esc(semName(m.gs))}</td><td>${lvOf(m.xp).lv}</td><td>${m.stats.q}</td><td>${m.stats.q?Math.round(m.stats.c/m.stats.q*100):0}%</td><td>${(m.enStats&&m.enStats.q)?m.enStats.q+'문제 · '+Math.round(m.enStats.c/m.enStats.q*100)+'%':'-'}</td><td>${last7}</td><td>${Object.keys(m.days).length}</td><td>${Object.keys(m.badges).length}</td><td>${(()=>{const h=m.hist||[];if(h.length<40&&!m.first20)return '-';const p=(m.first20||h.slice(0,20)).reduce((a,x)=>a+x,0),r=h.slice(-20).reduce((a,x)=>a+x,0);return `${p} → <b>${r}</b>`;})()}</td><td style="text-align:left">${esc(Object.keys(m.found||{}).map(F=>SKM[F]?SKM[F].n:'').filter(Boolean).concat(enFoundList(m)).join(', ')||'-')}</td><td style="text-align:left">${esc(weak.concat(enWeakList(m)).slice(0,4).join(', ')||'-')}</td><td>${m.stats.guessWrong||0}회${m.stats.guessAlert?` (천천히 안내 ${m.stats.guessAlert})`:''}</td><td>${ACH.reduce((s,a)=>s+((m.ach[a.k]&&m.ach[a.k].t)||0),0)}</td><td style="text-align:left">${esc(strengths(m).slice(0,2).map(x=>STR[x.k].n).join(', ')||'-')}${playStyle(m).length?'<br><span class=mut>'+esc(playStyle(m).map(t=>'#'+t[0]).join(' '))+'</span>':''}</td></tr>`);};
+ const tcStatus=(ok,bad,total)=>{const el=$('#tcRep');if(!el)return;const msg=!total?'<p class=mut>코드를 붙여 넣은 뒤 눌러 주세요.</p>':`<div class=explain style="font-size:14px;margin:0 0 8px;background:${bad.length?'#fff0f0':'#eaf8ee'};border-color:${bad.length?'#e8a0a0':'#8fd3a0'}"><b>${ok}명</b>의 기록을 읽었어요.${bad.length?` <b style="color:#b3261e">${bad.length}줄은 읽지 못했어요</b> (${bad.slice(0,6).join(', ')}번째 줄). 코드가 중간에 잘렸거나 다른 게임 코드는 아닌지 확인해 주세요.`:''}${ok?` 표 아래에 <b>학급 영역 요약</b>이 있어요 ↓`:''}</div>`;el.insertAdjacentHTML('afterbegin',msg);};
  const classPanel=()=>{const box=$('#tcDom');if(!box)return;box.innerHTML=classSummaryHTML(metas);const b=$('#tcCsv');if(b)b.onclick=()=>{const blob=new Blob([classCsv(metas)],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`학급_영역요약_${today()}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);};};
- const show=()=>{$('#tcRep').innerHTML=rows.length?`<table class=rep><tr><th>닉네임</th><th>학기</th><th>Lv</th><th>푼 문제(수학+영어)</th><th>정답률</th><th>영어</th><th>최근 7일</th><th>공부한 날</th><th>단원 배지</th><th>처음 20 → 최근 20</th><th>좌삼 쌓는 중</th><th>더 연습할 개념</th><th>찍기 의심</th><th>도전 배지</th><th>강점 · 스타일</th></tr>${rows.join('')}</table>`:'<p class=mut>읽을 수 있는 기록이 없어요</p>';try{classPanel();}catch(e){console.warn('classPanel',e);}};
- $('#tcGo').onclick=async()=>{rows.length=0;metas.length=0;for(const line of $('#tcIn').value.split(/\n+/)){if(!line.trim())continue;try{add(await readAny(line));}catch(e){}}show();};
+ const show=()=>{$('#tcRep').innerHTML=rows.length?`<table class=rep><tr><th>닉네임</th><th>학기</th><th>Lv</th><th>푼 문제(전 과목)</th><th>정답률(전 과목)</th><th>영어</th><th>최근 7일</th><th>공부한 날</th><th>단원 배지</th><th>처음 20 → 최근 20</th><th>좌삼 쌓는 중</th><th>더 연습할 개념</th><th>찍기 의심</th><th>도전 배지</th><th>강점 · 스타일</th></tr>${rows.join('')}</table>`:'<p class=mut>읽을 수 있는 기록이 없어요</p>';try{classPanel();}catch(e){console.warn('classPanel',e);}};
+ $('#tcGo').onclick=async()=>{rows.length=0;metas.length=0;const bad=[];let ln=0;for(const line of $('#tcIn').value.split(/\n+/)){if(!line.trim())continue;ln++;try{add(await readAny(line));}catch(e){bad.push(ln);}}show();tcStatus(rows.length,bad,ln);};
  $('#tcFiles').onclick=()=>$('#tcF').click();
  const cards=[];$('#tcCards').onclick=async()=>{cards.length=0;const box=$('#tcCardBox');box.innerHTML='';const keep=S.meta;
   for(const line of $('#tcIn').value.split(/\n+/)){if(!line.trim())continue;let o;try{o=await readAny(line);}catch(e){continue;}const m=upgradeMeta(mergeMeta(o.meta));S.meta=m;const T=cardTier(m);if(!T){box.insertAdjacentHTML('beforeend',`<div class=skRow>${esc(m.name)} — 아직 카드 등급 전(돌 ${stoneList(m).length}개)</div>`);continue;}const sp=cardSpec();await cardPreload(m,sp);const cv=renderCard(m,sp,T);S.meta=keep;cards.push(cv);
    const w=document.createElement('div');w.style.cssText='text-align:center';cv.style.cssText='width:300px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.2)';w.appendChild(cv);const b=document.createElement('div');b.innerHTML=`<div style="font-size:13px">${esc(m.name)} · ${T.n}</div><button class="btn sm blue">이 카드 인쇄</button> <button class="btn sm ghost">PNG</button>`;b.querySelectorAll('button')[0].onclick=()=>cardPrint(cv);b.querySelectorAll('button')[1].onclick=()=>cardDownload(cv,`트레이너카드_${m.name}_${T.n}`);w.appendChild(b);box.appendChild(w);}
   S.meta=keep;if(!cards.length&&!box.innerHTML)box.innerHTML='<p class=mut>읽을 수 있는 저장 코드가 없어요</p>';};
  $('#tcCardsA4').onclick=()=>{if(!cards.length){toast('먼저 「카드 만들기」를 눌러 주세요');return;}cardPrint(cards);};
- $('#tcF').onchange=async e=>{rows.length=0;metas.length=0;for(const f of e.target.files){try{add(await readAny(await f.text()));}catch(er){}}show();e.target.value='';};}
+ $('#tcF').onchange=async e=>{rows.length=0;metas.length=0;const bad=[];let ln=0;for(const f of e.target.files){ln++;try{add(await readAny(await f.text()));}catch(er){bad.push(ln);}}show();tcStatus(rows.length,bad,ln);e.target.value='';};}
 
 // ===== 화면마다 배경 그림 =====
 const BGMAP={title:'title',gate:'title',name:'title',starter:'title',hub:'title',train:'sunny',result:'sunny',dex:'lab',deck:'lab',grow:'lab',ach:'lab',map:'lab',teacher:'lab',season:'stadium',league:'stadium',pvp:'stadium',battle:'battle'};
@@ -12102,17 +12118,40 @@ function gardenPanel(m){setTimeout(gdScale,0);setTimeout(gdScale,300);const g=gd
   return `<div class="gdPet${P.fly?' fly':''}${P.fl?' gdFlip':''}" data-gd="pet" data-id="${id}" style="--s:${sz};left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;z-index:${3+Math.round(y)}">${monImg(id,'anim')}</div>`;}).join('');
  const html=`<div class="panel gardenPanel" id=gardenPanel><div class=gdHead><b class=jua>나의 좌삼</b><span class=motto>포켓몬 정원</span><span class=hudSp></span><span class=pill title="개념을 3번 연속 맞히면 에너지 1개">⚡ 에너지 ${en}</span><button class="btn ghost sm" data-gd=info>ⓘ</button></div>
   <div class=gdField id=gdField><div class=gdBg></div>${pos}${!pets.length?`<div style="position:absolute;left:0;right:0;top:10px;text-align:center;font-size:12px;color:#3f5a3a;padding:0 10px">파트너로 <b>100문제</b> 이상 함께 푼 포켓몬을 정원에 풀어놓을 수 있어요 (최대 ${GD_MAX}마리)</div>`:''}
-   <div class=gdHatch>${gdIncHTML(egg)}<span class=gdLbl>${egg?`${TYPE_KO[egg.t]} 알 · ${egg.fed}/${GD_NEED}`:'알 부화기 (비어 있음)'}</span></div></div>
+   ${gdBubHTML()}<div class=gdHatch>${gdIncHTML(egg)}<span class=gdLbl>${egg?`${TYPE_KO[egg.t]} 알 · ${egg.fed}/${GD_NEED}`:'알 부화기 (비어 있음)'}</span></div></div>
   ${egg?`<div class=gdBar><i style="width:${Math.min(100,egg.fed/GD_NEED*100)}%"></i><span>${egg.fed} / ${GD_NEED}</span></div>`:''}
   <div class=gdBtns>${egg?`<button class="gdB feed" data-gd=feed1 title="에너지 1개 주기"><span class=zp>⚡</span></button><button class="gdB feed2" data-gd=feed10 title="에너지 10개 주기"><span class=zp>⚡</span>×10</button>`:`<button class="gdB pick" data-gd=pick title="알 고르기">🥚<small>🪙${GD_EGG_COST}</small></button>`}<button class="gdB pets" data-gd=pets title="정원 꾸리기">${I('ball')}<small>${pets.length}/${GD_MAX}</small></button></div></div>`;
  if(all>seen){m.stoneSeen=all;autoSave();setTimeout(()=>{sfx('summon');toast(`⚡ 에너지가 <b>${all-seen}개</b> 더 모였어요!`);},600);}
  else if(m.stoneSeen==null){m.stoneSeen=all;}
  return html;}
+// 정원 안내: 전설 포켓몬을 얻을 수 있는 콘텐츠를 돌아가며 알려 줘요 (눌러도 다음 안내로 넘어가요)
+const GD_TIPS=[
+ {ic:'🥚',b:'정원의 알에 에너지 <b>100개</b>를 주면 <b>전설 포켓몬</b>이 부화해요!',t:'정원의 알에 에너지 <b>100개</b>를 주면 알 속성에 맞는 <b>전설 포켓몬</b>이 부화해요!'},
+ {ic:'📖',b:'<b>시나리오</b>를 깨면 카드팩을 최대 15개! <b>전설 포켓몬</b>을 만나는 시나리오도 있어요!',t:'<b>시나리오</b>를 깨면 카드팩을 <b>최대 15개</b>까지 받아요. 디아루가·기라티나처럼 <b>전설 포켓몬을 만나는</b> 시나리오도 있어요!',go:'scenario'},
+ {ic:'🗡️',b:'<b>로그라이크</b> 층 보스를 잡으면 <b>전설 포켓몬</b>이 나올 수 있어요!',t:'<b>로그라이크 모험</b>에서 층 보스를 쓰러뜨리면 보상 카드로 <b>전설 포켓몬</b>이 나올 수 있어요. 높은 층일수록 확률이 올라가요!',go:'rogue'},
+ {ic:'🌿',b:'<b>야생 포켓몬 포획</b>에서 <b>전설 포켓몬</b>도 가끔 나타나요!',t:'<b>야생 포켓몬 포획</b>에서도 전설 포켓몬이 가끔 나타나요. 체력을 깎아서 잡아 봐요!',go:'endless'},
+ {ic:'🤝',b:'<b>친구와 보스전</b>에는 <b>전설 포켓몬</b> 보스가 40% 확률로 나와요!',t:'<b>친구와 보스전</b>에는 전설 포켓몬 보스가 <b>40%</b> 확률로 나와요. 함께 공략해 봐요!',go:'bosscoop'},
+ {ic:'🎴',b:'<b>카드팩</b>에서 <b>전설 조각</b> 8개를 모으면 카드가 완성돼요!',t:'<b>카드팩</b>에서 전설 <b>조각</b>을 모아 보세요. 조각 8개를 모으면 전설 카드가 완성돼요. 40팩 안에는 꼭 한 장 나와요!',go:'pack'},
+ {ic:'🏆',b:'<b>배틀 리그</b> 챔피언을 처음 이기면 <b>전설 카드</b>를 받아요!',t:'<b>배틀 리그</b> 챔피언(9번째 관장)을 처음 이기면 <b>전설 카드</b>를 선물로 받아요!',go:'league'},
+ {ic:'📅',b:'<b>시즌</b> 레벨을 끝까지 올리면 <b>전설 카드</b>를 받아요!',t:'<b>시즌</b> 레벨을 끝까지 올리면 마지막 보상으로 <b>전설 카드</b>를 받아요!',go:'season'},
+ {ic:'💪',b:'<b>전설 포켓몬</b>은 특성이 강화돼서 훨씬 강력해요!',t:'<b>전설 포켓몬</b>은 특성이 강화돼서 훨씬 강력해요! 얻으면 꼭 덱에 넣어 보세요.'}];
+const GD_BUB={on:false,i:-1};
+function gdBubInner(){const t=GD_TIPS[GD_BUB.i];if(!t)return '';return `<span class=gdBubTxt>${t.ic} ${t.b}</span>${t.go?`<button class=gdBubGo data-gdgo="${t.go}" aria-label="바로 가기" title="바로 가기">→</button>`:''}`;}
+function gdBubHTML(){return `<div class="gdBub${GD_BUB.on?' on':''}" id=gdBub>${GD_BUB.on?gdBubInner():''}</div>`;}
+// 8초 보이고 2초 쉬고, 다시 랜덤 안내 (방금 본 안내는 바로 다시 나오지 않아요)
+function gdBubStep(){try{const el=document.getElementById('gdBub');
+ if(!GD_BUB.on){if(document.hidden||S.screen!=='hub'){setTimeout(gdBubStep,1500);return;}
+  let n;do{n=Math.floor(Math.random()*GD_TIPS.length);}while(n===GD_BUB.i&&GD_TIPS.length>1);GD_BUB.i=n;GD_BUB.on=true;if(el){el.innerHTML=gdBubInner();void el.offsetWidth;el.classList.add('on');}setTimeout(gdBubStep,8000);}
+ else{GD_BUB.on=false;if(el)el.classList.remove('on');setTimeout(gdBubStep,2000);}}catch(e){setTimeout(gdBubStep,3000);}}
+setTimeout(gdBubStep,2500);
+document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('[data-gdgo]');if(!g)return;
+ const k=g.dataset.gdgo,f=FEAT.find(x=>x.k===k);if(f&&!featOn(k)){toast('아직 열리지 않았어요 ('+f.how+')');return;}sfx('tap');try{closeM();}catch(e){}if(NAV[k])NAV[k]();});
+NAV.scenario=()=>{try{ac();}catch(e){}scLaunch();};NAV.rogue=()=>rlLaunch();
 function gdInfo(){M(`<h2>⚡ 에너지와 알 부화기</h2><div style="line-height:1.8;font-size:15px">
   <b>에너지</b>는 수학·영어·국어·IQ 문제의 개념(유형) 하나를 <b>3번 연속</b> 맞히면 1개씩 모여요. 쉽게 모이지 않아요!<br>
   <b>알</b>은 부화기가 비어 있을 때 🪙${GD_EGG_COST}코인으로 18가지 속성 중에서 골라요.<br>
   알에게 에너지를 <b>${GD_NEED}번</b> 주면 그 속성의 <b>전설 포켓몬</b>이 랜덤으로 태어나요!<br>
-  <b>정원</b>에는 파트너로 <b>${GD_BOND}문제</b> 이상 함께 푼 포켓몬을 ${GD_MAX}마리까지 풀어놓을 수 있어요.</div><div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,{x:()=>closeM(),_close:()=>closeM()});}
+  <b>정원</b>에는 파트너로 <b>${GD_BOND}문제</b> 이상 함께 푼 포켓몬을 ${GD_MAX}마리까지 풀어놓을 수 있어요.<h3 style="margin:12px 0 4px">🌟 전설 포켓몬을 얻는 방법</h3>${GD_TIPS.map(t=>`<div style="font-size:14px;line-height:1.6;margin:3px 0">${t.ic} ${t.t}${t.go?` <button class=gdBubGo data-gdgo="${t.go}" aria-label="바로 가기" title="바로 가기" style="display:inline-flex;vertical-align:middle;margin-left:4px;pointer-events:auto">→</button>`:''}</div>`).join('')}</div><div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,{x:()=>closeM(),_close:()=>closeM()});}
 function gdPick(){const m=S.meta,g=gd(m);if(g.egg)return;
  M(`<h2>🥚 알 고르기</h2><p class=mut style="font-size:13px;text-align:center">속성을 골라요. 🪙${GD_EGG_COST}코인이 들어요. (내 코인 🪙${m.coins})</p><div class=gdTypes>${TYPE_KO.map((n,i)=>`<button data-a="t${i}" style="background:${TYPE_COL[i]}">${n}</button>`).join('')}</div><div class=mbtns><button class="btn ghost" data-a=x>닫기</button></div>`,
   Object.assign({x:()=>closeM(),_close:()=>closeM()},Object.fromEntries(TYPE_KO.map((n,i)=>['t'+i,()=>{if(m.coins<GD_EGG_COST){toast(`코인이 부족해요 (🪙${GD_EGG_COST} 필요)`);return;}if(g.egg){closeM();return;}m.coins-=GD_EGG_COST;g.egg={t:i,fed:0};autoSave();closeM();sfx('level');toast(`${TYPE_KO[i]} 속성 알을 부화기에 넣었어요!`);renderHub();}]))));}
@@ -12159,7 +12198,7 @@ setInterval(()=>{try{const f=document.getElementById('gdField');if(!f||document.
  f.querySelectorAll('.gdPet').forEach(p=>{const id=+p.dataset.id,P=gdFixedPos(S.meta,id);gdSettle(P);if(P.t0||Math.random()<.5)return;
   const Z=gdZone(id),dx=(Math.random()-.5)*36,dy=(Math.random()-.5)*(gdFly(id)?18:12),tx=Math.max(8,Math.min(92,P.x+dx)),ty=Math.max(Z.y0,Math.min(Z.y1,P.y+dy));
   if(Math.abs(tx-P.x)<4&&Math.abs(ty-P.y)<2.5)return;
-  P.tx=+tx.toFixed(1);P.ty=+ty.toFixed(1);P.t0=Date.now();P.fl=tx<P.x?1:0;moved=1;
+  P.tx=+tx.toFixed(1);P.ty=+ty.toFixed(1);P.t0=Date.now();P.fl=tx>P.x?1:0;moved=1;
   p.classList.toggle('gdFlip',!!P.fl);p.style.transitionDuration=GD_WALK+'s';p.style.left=P.tx+'%';p.style.top=P.ty+'%';p.style.zIndex=3+Math.round(ty);});
  if(moved)gdSaveSoon();}catch(e){}},4200);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)gdSaveSoon(true);});window.addEventListener('pagehide',()=>gdSaveSoon(true));
