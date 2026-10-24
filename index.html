@@ -8122,12 +8122,13 @@ const SC_STORY=[{"id":"prologue","title":"프롤로그","sub":"도감에 기록�
 // ===== 시나리오 모드 3.0 · 최종 대본판 「별의 종언과 여섯 개의 맹세」 =====
 // 프롤로그 → 제1~6장(지역마다 일반 전투 4 + 보스 1) → 에필로그. 이야기 본문은 SC_STORY(최종 대본 한글 파일에서 변환)에 들어 있어요.
 const SC_VER=3;
-const SC_SIDE_UNLOCK=3; // 외전 〈8시 15분의 등대〉는 제2장을 마치면 열려요
+const SC_MAIN_N=8; // 0~7 = 메인 스토리, 8번부터는 사이드 스토리(외전). 외전은 항상 열려 있어요
+const SC_SIDE_UNLOCK=0; // 외전 〈8시 15분의 등대〉는 제2장을 마치면 열려요
 // 난이도 조절표: 야생 포켓몬 체력 배수(지역별), 보스 체력 배수·공격력 보너스, 최종 보스 페이즈별 값
 const SC_TUNE={wild:[1,1,1.05,1.1,1.15,1.2],boss:1.3,bossAtk:1,final:[{hp:1,atk:0},{hp:1.05,atk:2}]};
 const SC_ALIAS={};          // 대본의 이름 → 게임 카드 번호(대로트, 메테노)
 const SC_ALIAS_SHOW={};
-const SC_KEYMONS=['나무지기','아차모','물짱이','캐터피','페이검','네이티','이상해씨','크랩','왕눈해','갈모매','라프라스','타타륜','꼬마돌','둔타','마그마그','파이리','마그마번','코일','찌리리공','폴리곤','로토무','메타그로스','안농','동탁군','네이티오','앱솔','디아루가','루나톤','솔록','벰크','기라티나','지라치','루카리오','라티오스','대로트','메테노'];
+const SC_KEYMONS=['나무지기','아차모','물짱이','캐터피','페이검','네이티','이상해씨','크랩','왕눈해','갈모매','라프라스','타타륜','꼬마돌','둔타','마그마그','파이리','마그마번','코일','찌리리공','폴리곤','로토무','메타그로스','안농','동탁군','네이티오','앱솔','디아루가','루나톤','솔록','벰크','기라티나','지라치','루카리오','라티오스','대로트','메테노','고오스','고우스트','토네로스'];  // 뒤의 셋은 외전 〈8시 15분의 등대〉의 전투 상대
 const SC_REGIONS=[
  {name:'유리숲의 역행',place:'유리숲',icon:'🌿',theme:'수정 나무와 검은 덩굴이 시간을 묶은 숲',tag:'CHAPTER 01 · 첫 번째 맹세',short:'같은 행동을 되풀이하는 포켓몬들. 숲의 중심에서 검은 덩굴이 시간을 뒤틀고 있다.',mood:'수정 나무와 초록빛 숲길',wild:['캐터피','페이검','네이티','이상해씨'],boss:'대로트',accent:'#62d5a1',reward:{packs:5,coins:120,candy:45}},
  {name:'밀물의 무덤',place:'조석연안',icon:'🌊',theme:'바다가 숨을 멈춘 난파선 해안',tag:'CHAPTER 02 · 두 번째 맹세',short:'밀물도 썰물도 멈춘 바다. 난파선의 닻이 바다의 흐름을 붙잡고 있다.',mood:'푸른 해안과 기울어진 난파선',wild:['크랩','왕눈해','갈모매','라프라스'],boss:'타타륜',accent:'#52c8f2',reward:{packs:7,coins:180,candy:60}},
@@ -8186,7 +8187,7 @@ function scEnsureDeck(fill=true){const p=scState(),cnt={};let d=(p.deck||[]).fil
  p.deck=d;return d.length===DECK_N;}
 function scAvatar(){const p=scState(),d=p.deck&&p.deck.length?p.deck:scOwned();return d.slice().sort((a,b)=>MON[b].rar-MON[a].rar||MON[b].cost-MON[a].cost)[0]||252;}
 const scBeaten=(u,pos)=>!!scState().beat[u+':'+pos];
-function scCurrentUnit(){const p=scState();for(let u=0;u<SC_UNITS.length;u++){if(u<=p.unlocked&&!p.done[u])return u;}return SC_UNITS.length-1;}
+function scCurrentUnit(){const p=scState();for(let u=0;u<SC_MAIN_N;u++){if(u<=p.unlocked&&!p.done[u])return u;}return SC_MAIN_N-1;}
 // ----- 배경·음악 -----
 // ===== 시나리오 배경 (벡터 그림 · 화면 크기와 상관없이 선명해요) =====
 function scRng(seed){let s=(seed>>>0)||1;return()=>((s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296);}
@@ -8243,7 +8244,7 @@ function scNavFor(u,pos,pg){
   if(u===0){label='제1장으로 ▶';fn=()=>scGoUnit(1);}
   else if(u>=1&&u<=5){label='다음 지역으로 출발 ▶';fn=()=>scGoUnit(u+1);}
   else if(u===6){label='에필로그로 ▶';fn=()=>scGoUnit(7);}
-   else if(u===8){label='지도로 ▶';fn=()=>scRenderMap();}
+   else if(u>=SC_MAIN_N){label='사이드 스토리 목록으로 ▶';fn=()=>scRenderSide();}
   else{label='여정 마무리 ▶';fn=()=>scRenderEnding();}
  }
  if(pg.k==='bt'&&!scBeaten(u,pos)){dis=true;label='전투에서 이겨야 해요';}
@@ -8356,7 +8357,7 @@ function scBtHTML(u,pos,pg){
  return `<div class="scv-card scv-bt"><span class="sc-tag ${pg.kind==='wild'?'':'sc-tag-hot'}">⚔ ${scBtHeader(pg)}</span><div class="scv-vs"><div class="side">${heroImg}<b>${esc(scNick())}</b></div><div class="mid">VS</div><div class="side">${foeImg}<b>${esc(pg.who)}</b>${official}</div></div><p class="scv-btlabel">${esc(pg.label)}${pg.ph?`<br><em>${esc(pg.ph)}</em>`:''}</p><div class="sc-battle-rules"><b>전투 방식:</b> 덱에서 카드를 내고, 공격할 때 문제를 풀어요. ${duel?'이안의 체력을 모두 깎으면 승리!':'상대 체력을 모두 줄이면 묶여 있던 굴레가 풀리고 천공의 도감에 기록돼요.'}</div>${scDeckThumbs()}<div class="mbtns"><button class="btn red big" id="scGoBattle">${beaten?'⚔ 다시 싸우기':'⚔ 전투 시작'}</button><button class="btn blue" id="scBtDeck">🃏 덱 편성</button>${(beaten||SC.replay)?`<button class="btn ghost" id="scBtSkip">전투 건너뛰기 ▶</button>`:''}</div>${(duel&&!beaten)?`<p class="sc-note" style="margin-top:8px">져도 이야기는 이어갈 수 있어요. 마음껏 도전해 보세요!</p>`:''}</div>`;
 }
 function scShow(u,pos){
- const pages=scPages(u);if(!pages.length){scRenderMap();return;}
+ const pages=scPages(u);if(!pages.length){u>=SC_MAIN_N?scRenderSide():scRenderMap();return;}
  pos=Math.max(0,Math.min(pages.length-1,pos));const pg=pages[pos],p=scState();
  document.querySelectorAll('body>.scv-fxlay').forEach(e=>e.remove());
  SC.unit=u;SC.pos=pos;SC.index=SC_UNITS[u].art;SC.bgKey=scUnitBgKey(u);SC.bgVar=scSceneVariant(u,pos);S.screen='scenarioStory';scMusicStart(SC_UNITS[u].bgm);scApplyBackdrop(SC.index,false,SC.bgKey,SC.bgVar);
@@ -8373,8 +8374,8 @@ function scShow(u,pos){
  autoSave();
  const nav=scNavFor(u,pos,pg),stage=scStageHTML(u,pos,pg,grant),pct=Math.round((pos+1)/pages.length*100);
  const lab=scSceneLabel(u,pos);
- $('#view').innerHTML=`<div class="sc-page scv scv-k-${pg.k}"><div class="scv-bar"><button class="btn ghost sm" id="scMapBtn">지도</button><h2>${esc(SC_UNITS[u].name)}${lab?` <span>· ${esc(lab)}</span>`:''}</h2><button class="btn ${S.meta.settings.bgm?'blue':'ghost'} sm" id="scMusicBtn">${S.meta.settings.bgm?'♪ ON':'♪ OFF'}</button></div><div class="scv-stage" id="scStage">${stage}</div><div class="scv-nav"><button class="btn ghost" id="scPrev" ${pos===0?'disabled':''}>◀ 이전</button><div class="scv-prog" title="${pct}%"><i style="width:${pct}%"></i><span>${pos+1} / ${pages.length}</span></div><button class="btn purple big" id="scNext" ${nav.dis?'disabled':''}>${nav.label}</button></div></div>`;
- $('#scMapBtn').onclick=()=>{sfx('tap');scRenderMap();};
+ $('#view').innerHTML=`<div class="sc-page scv scv-k-${pg.k}"><div class="scv-bar"><button class="btn ghost sm" id="scMapBtn">${u>=SC_MAIN_N?'목록':'지도'}</button><h2>${esc(SC_UNITS[u].name)}${lab?` <span>· ${esc(lab)}</span>`:''}</h2><button class="btn ${S.meta.settings.bgm?'blue':'ghost'} sm" id="scMusicBtn">${S.meta.settings.bgm?'♪ ON':'♪ OFF'}</button></div><div class="scv-stage" id="scStage">${stage}</div><div class="scv-nav"><button class="btn ghost" id="scPrev" ${pos===0?'disabled':''}>◀ 이전</button><div class="scv-prog" title="${pct}%"><i style="width:${pct}%"></i><span>${pos+1} / ${pages.length}</span></div><button class="btn purple big" id="scNext" ${nav.dis?'disabled':''}>${nav.label}</button></div></div>`;
+ $('#scMapBtn').onclick=()=>{sfx('tap');u>=SC_MAIN_N?scRenderSide():scRenderMap();};
  if(pg.k==='fx')scFxRun(pg);
  $('#scMusicBtn').onclick=()=>{sfx('tap');S.meta.settings.bgm=!S.meta.settings.bgm;autoSave();startBgm();scShow(u,pos);};
  $('#scPrev').onclick=()=>{if(pos>0){sfx('tap');let q=pos-1;while(q>0&&pages[q].k==='bt')q--;scShow(u,q);}};
@@ -8395,7 +8396,7 @@ function scGrantClear(r){
  if(r===6&&!m.col[385]){addCard(385);ji=true;}
  sfx('rare');confetti(r===6?110:70);autoSave();return{r,packs:rw.packs,coins:rw.coins,candy:rw.candy,ji};
 }
-function scGoUnit(n){const p=scState();n=Math.max(0,Math.min(SC_UNITS.length-1,n));p.unlocked=Math.max(p.unlocked,n);SC.replay=!!p.done[n];scShow(n,SC.replay?0:(p.pos[n]||0));}
+function scGoUnit(n){const p=scState();n=Math.max(0,Math.min(SC_UNITS.length-1,n));if(n<SC_MAIN_N)p.unlocked=Math.max(p.unlocked,n);SC.replay=!!p.done[n];scShow(n,SC.replay?0:(p.pos[n]||0));}
 function scEnterUnit(u,fromStart){const p=scState();SC.replay=!!p.done[u]&&true;scShow(u,(fromStart||p.done[u])?0:(p.pos[u]||0));}
 // 방향키·스페이스로도 넘길 수 있어요
 document.addEventListener('keydown',e=>{if(S.screen!=='scenarioStory'||modalOpen())return;if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
@@ -8437,7 +8438,7 @@ function scRenderBtFail(u,pos,res){
  S.screen='scenarioStory';SC.index=SC_UNITS[u].art;SC.bgKey=scUnitBgKey(u);SC.bgVar=scSceneVariant(u,pos);scApplyBackdrop(SC.index,false,SC.bgKey,SC.bgVar);scMusicStart(SC_UNITS[u].bgm);
  const pg=scPages(u)[pos],id=scMonId(pg.who)||scMonId(pg.label),fled=res&&res.outcome==='fled';
  $('#view').innerHTML=`<div class="sc-page scv"><div class="scv-bar"><button class="btn ghost sm" id="scFMap">지도</button><h2>${esc(SC_UNITS[u].name)} <span>· 잠시 후퇴</span></h2></div><div class="scv-stage"><div class="scv-card scv-fail"><div class="scv-vsmon">${monImg(id,'front')}</div><h3>${fled?'전투를 멈췄어요':'아직 굴레를 끊지 못했어요'}</h3><p class="sc-line">${fled?'언제든 다시 도전할 수 있어요.':'파트너들이 지쳤다. 덱과 전략을 다시 살펴보고 같은 자리에서 다시 도전하자. 지금까지의 기록은 그대로 남아 있다.'}</p><div class="mbtns"><button class="btn red big" id="scFRetry">⚔ 다시 도전</button><button class="btn blue" id="scFDeck">🃏 덱 편성</button><button class="btn ghost" id="scFBack">이야기로</button></div></div></div></div>`;
- $('#scFMap').onclick=()=>scRenderMap();$('#scFRetry').onclick=()=>scStartBattle(u,pos);$('#scFDeck').onclick=()=>scRenderDeck(()=>scShow(u,pos));$('#scFBack').onclick=()=>scShow(u,pos);
+ $('#scFMap').onclick=()=>u>=SC_MAIN_N?scRenderSide():scRenderMap();$('#scFRetry').onclick=()=>scStartBattle(u,pos);$('#scFDeck').onclick=()=>scRenderDeck(()=>scShow(u,pos));$('#scFBack').onclick=()=>scShow(u,pos);
 }
 function scStartDuel(u,pos){
  const p=scState();scEnsureDeck();
@@ -8478,38 +8479,82 @@ battleMenu=function(){
 const ORD=['첫','두','세','네','다섯','여섯'];
 function scVowText(r){const pg=scPages(r);const v=pg.find(x=>x.k==='vow'&&!x.final);return v?v.t.replace(/^[^:]+:\s*/,''):'';}
 function scLaunch(){const m=S.meta;if(!codeValid()||!m.name||!m.starter){M(`<h2>시나리오를 시작하기 전에</h2><p style="line-height:1.75">시나리오 모드는 기존 게임의 학년 코드, 닉네임, 파트너 설정을 그대로 사용해요.<br><b>먼저 「시작하기」에서 기본 설정을 마치면</b> 바로 이야기를 시작할 수 있어요.</p><div class="mbtns"><button class="btn red big" data-a="go">설정하러 가기</button><button class="btn ghost" data-a="x">취소</button></div>`,{go:()=>{closeM();goStart();},x:()=>closeM(),_close:()=>closeM()});return;}
- scState();scRenderMap();}
-function scRenderMap(){
- const p=scState(),cur=scCurrentUnit();S.screen='scenarioMap';SC.index=SC_UNITS[cur].art;SC.bgKey=scUnitBgKey(cur);SC.bgVar='';scMusicStart(SC_UNITS[cur].bgm);scApplyBackdrop(SC.index,false,SC.bgKey,'');
- const doneN=SC_UNITS.reduce((s,_,u)=>s+(p.done[u]?1:0),0),prog=Math.round(doneN/SC_UNITS.length*100),own=scOwned().length;
- const started=(p.pos[cur]||0)>0&&!p.done[cur],ctaTxt=doneN===SC_UNITS.length?'이야기 다시 보기':started?`이어하기 · ${SC_UNITS[cur].name}`:cur===0&&!p.pos[0]?'▶ 이야기 시작하기':`▶ ${SC_UNITS[cur].name} 시작`;
- const cards=SC_UNITS.map((un,u)=>{const done=!!p.done[u],open=(u===8?p.unlocked>=SC_SIDE_UNLOCK:u<=p.unlocked),act=u===cur&&!done,inprog=!done&&(p.pos[u]||0)>0;
+ scState();scRenderSelect();}
+function scBackTo(){const f=SC.from;if(f==='select')scRenderSelect();else if(f==='side')scRenderSide();else scRenderMap();}
+function scBindStageClicks(){
+ $('#view').querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const u=+b.dataset.u;if(u<SC_MAIN_N&&u>scState().unlocked)return;sfx('tap');const pp=scState();
+  if(!pp.done[u]&&(pp.pos[u]||0)>0){M(`<h2>${esc(SC_UNITS[u].name)}</h2><p style="line-height:1.7">저장된 장면이 있어요. 어디서부터 볼까요?</p><div class="mbtns"><button class="btn gold big" data-a="c">이어서 보기</button><button class="btn ghost" data-a="s">처음부터</button></div>`,{c:()=>{closeM();scEnterUnit(u,false);},s:()=>{closeM();scEnterUnit(u,true);},_close:()=>closeM()});}
+  else scEnterUnit(u,true);});
+}
+function scCardHTML(un,u,p,cur){const done=!!p.done[u],open=(u>=SC_MAIN_N?true:u<=p.unlocked),act=u===cur&&!done,inprog=!done&&(p.pos[u]||0)>0;
   const st=done?'완료':open?(act?(inprog?'진행 중':'진행 가능'):'열림'):'잠김';
-  return `<button class="sc-stage ${done?'done':''} ${act?'next':''}" data-u="${u}" ${open?'':'disabled'}><div class="sc-stage-art"><span class="sc-stage-number">${u===0?'PROLOGUE':u===7?'EPILOGUE':u===8?'SIDE STORY':'CHAPTER '+String(u).padStart(2,'0')}</span><span class="sc-stage-status">${st}</span><img class="scv-thumb" src="${scBgSVG(scUnitBgKey(u),'')}" alt=""></div><div class="sc-stage-info"><b>${un.icon} ${esc(un.name)}</b><span>${esc(u>=1&&u<=6?SC_REGIONS[u-1].short:un.sub)}</span><small>${done?'✓ 이야기 완료 · 다시 보기':open?(inprog?'▶ 이어하기 가능':'▶ 시작할 수 있어요'):'🔒 앞 이야기를 먼저 마쳐요'}</small></div></button>`;}).join('');
- $('#view').innerHTML=`<div class="sc-page scv"><div class="scv-bar"><button class="btn ghost sm" id="scHubBack">트레이너 방</button><h2>별의 종언과 여섯 개의 맹세</h2><button class="btn ${S.meta.settings.bgm?'blue':'ghost'} sm" id="scMusic">${S.meta.settings.bgm?'♪ ON':'♪ OFF'}</button></div>
+  return `<button class="sc-stage ${done?'done':''} ${act?'next':''}" data-u="${u}" ${open?'':'disabled'}><div class="sc-stage-art"><span class="sc-stage-number">${u===0?'PROLOGUE':u===7?'EPILOGUE':u>=SC_MAIN_N?'SIDE STORY':'CHAPTER '+String(u).padStart(2,'0')}</span><span class="sc-stage-status">${st}</span><img class="scv-thumb" src="${scBgSVG(scUnitBgKey(u),'')}" alt=""></div><div class="sc-stage-info"><b>${un.icon} ${esc(un.name)}</b><span>${esc(u>=1&&u<=6?SC_REGIONS[u-1].short:un.sub)}</span><small>${done?'✓ 이야기 완료 · 다시 보기':open?(inprog?'▶ 이어하기 가능':'▶ 시작할 수 있어요'):'🔒 앞 이야기를 먼저 마쳐요'}</small></div></button>`;}
+function scRenderMap(){
+ const p=scState(),cur=scCurrentUnit();S.screen='scenarioMap';SC.from='map';SC.index=SC_UNITS[cur].art;SC.bgKey=scUnitBgKey(cur);SC.bgVar='';scMusicStart(SC_UNITS[cur].bgm);scApplyBackdrop(SC.index,false,SC.bgKey,'');
+ const doneN=SC_UNITS.reduce((s,_,u)=>s+(u<SC_MAIN_N&&p.done[u]?1:0),0),prog=Math.round(doneN/SC_MAIN_N*100),own=scOwned().length;
+ const started=(p.pos[cur]||0)>0&&!p.done[cur],ctaTxt=doneN===SC_MAIN_N?'이야기 다시 보기':started?`이어하기 · ${SC_UNITS[cur].name}`:cur===0&&!p.pos[0]?'▶ 이야기 시작하기':`▶ ${SC_UNITS[cur].name} 시작`;
+ const cards=SC_UNITS.map((un,u)=>u<SC_MAIN_N?scCardHTML(un,u,p,cur):'').join('');
+ $('#view').innerHTML=`<div class="sc-page scv"><div class="scv-bar"><button class="btn ghost sm" id="scHubBack">← 선택</button><h2>메인 스토리 · 별의 종언과 여섯 개의 맹세</h2><button class="btn ${S.meta.settings.bgm?'blue':'ghost'} sm" id="scMusic">${S.meta.settings.bgm?'♪ ON':'♪ OFF'}</button></div>
  <div class="scv-card scv-mapintro"><div class="scv-mapintro-top"><div><span class="sc-tag">✦ 시나리오 모드</span><h3>${esc(SC_UNITS[cur].icon)} ${esc(SC_UNITS[cur].name)}</h3><p class="sc-note">${cur>=1&&cur<=6?esc(SC_REGIONS[cur-1].theme):esc(SC_UNITS[cur].sub)}</p></div><button class="btn gold big" id="scCta">${ctaTxt}</button></div>
  <div class="sc-progress" style="margin:10px 0 8px"><i style="width:${prog}%"></i></div>
- <div class="sc-reward-list" style="margin-top:6px"><div class="sc-reward"><strong>${doneN}/${SC_UNITS.length}</strong>이야기</div><div class="sc-reward"><strong>${p.vows.length}/6</strong>여섯 개의 맹세</div><div class="sc-reward"><strong>${own}/33</strong>시나리오 보유 카드</div><div class="sc-reward"><strong>${p.ianWin?'승리':'-'}</strong>이안과의 배틀</div></div>
+ <div class="sc-reward-list" style="margin-top:6px"><div class="sc-reward"><strong>${doneN}/${SC_MAIN_N}</strong>이야기</div><div class="sc-reward"><strong>${p.vows.length}/6</strong>여섯 개의 맹세</div><div class="sc-reward"><strong>${own}/33</strong>시나리오 보유 카드</div><div class="sc-reward"><strong>${p.ianWin?'승리':'-'}</strong>이안과의 배틀</div></div>
  <div class="mbtns"><button class="btn blue" id="scMapDeck">🃏 시나리오 덱 편성</button><button class="btn purple" id="scMapDex">📘 천공의 도감</button></div>
  <p class="sc-note" style="margin-top:8px">시나리오에서는 <b>처음 받은 스타팅 포켓몬 3장</b>(나무지기·아차모·물짱이)으로 시작해요. 각 지역에서 일반 포켓몬 4마리와 보스를 쓰러뜨릴 때마다 시나리오 전용 보유 카드가 늘어나고, 지역을 마치면 덱을 다시 짤 수 있어요. 전투 중 문제는 평소 좌삼몬과 같은 학년·학기 범위에서 나와요.</p></div>
  <div class="sc-map-grid">${cards}</div>
  <div class="nextFeat">진행 상황은 자동 저장돼요. 이야기 도중에 지도로 나가도 그 장면부터 이어서 볼 수 있어요. <button class="btn ghost sm" id="scReset" style="margin-left:6px">시나리오 처음부터 다시 시작</button></div></div>`;
- $('#scHubBack').onclick=()=>{sfx('tap');scBackToHub();};
+ $('#scHubBack').onclick=()=>{sfx('tap');scRenderSelect();};
  $('#scMusic').onclick=()=>{sfx('tap');S.meta.settings.bgm=!S.meta.settings.bgm;autoSave();startBgm();scRenderMap();};
- $('#scCta').onclick=()=>{sfx('tap');if(doneN===SC_UNITS.length)scEnterUnit(0,true);else scEnterUnit(cur,false);};
+ $('#scCta').onclick=()=>{sfx('tap');if(doneN===SC_MAIN_N)scEnterUnit(0,true);else scEnterUnit(cur,false);};
  $('#scMapDeck').onclick=()=>{sfx('tap');scRenderDeck(()=>scRenderMap());};
  $('#scMapDex').onclick=()=>{sfx('tap');scRenderDex();};
  $('#scReset').onclick=async()=>{if(await confirmBox('시나리오 진행 기록(보유 카드·덱·진행 위치)을 모두 지우고 처음부터 시작할까요? 일반 게임 기록은 그대로 남아요.','처음부터','취소')){S.meta.scenario=scFresh(scState());autoSave();toast('시나리오를 처음 상태로 되돌렸어요');scRenderMap();}};
- $('#view').querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const u=+b.dataset.u;if(u>scState().unlocked)return;sfx('tap');const pp=scState();
-  if(!pp.done[u]&&(pp.pos[u]||0)>0){M(`<h2>${esc(SC_UNITS[u].name)}</h2><p style="line-height:1.7">저장된 장면이 있어요. 어디서부터 볼까요?</p><div class="mbtns"><button class="btn gold big" data-a="c">이어서 보기</button><button class="btn ghost" data-a="s">처음부터</button></div>`,{c:()=>{closeM();scEnterUnit(u,false);},s:()=>{closeM();scEnterUnit(u,true);},_close:()=>closeM()});}
-  else scEnterUnit(u,true);});
+ scBindStageClicks();
+}
+
+// ===== 시나리오 선택: 메인 스토리 / 사이드 스토리 =====
+function scSideIdx(){const a=[];for(let u=SC_MAIN_N;u<SC_UNITS.length;u++)a.push(u);return a;}
+function scRenderSelect(){
+ const p=scState(),cur=scCurrentUnit(),sides=scSideIdx();S.screen='scenarioSelect';SC.from='select';
+ SC.index=SC_UNITS[cur].art;SC.bgKey=scUnitBgKey(cur);SC.bgVar='';scMusicStart(SC_UNITS[cur].bgm);scApplyBackdrop(SC.index,false,SC.bgKey,'');
+ const mainDone=SC_UNITS.reduce((n,_,u)=>n+(u<SC_MAIN_N&&p.done[u]?1:0),0),sideDone=sides.filter(u=>p.done[u]).length,sideStarted=sides.some(u=>(p.pos[u]||0)>0||p.done[u]);
+ const last=(typeof p.unit==='number'&&p.unit>=0&&p.unit<SC_UNITS.length&&!p.done[p.unit]&&(p.pos[p.unit]||0)>0)?p.unit:-1;
+ const card=(kind,num,status,thumb,title,sub,small)=>`<button class="sc-stage ${status==='NEW'?'next':''}" data-go="${kind}"><div class="sc-stage-art"><span class="sc-stage-number">${num}</span><span class="sc-stage-status">${status}</span><img class="scv-thumb" src="${thumb}" alt=""></div><div class="sc-stage-info"><b>${title}</b><span>${sub}</span><small>${small}</small></div></button>`;
+ const mainSt=mainDone===SC_MAIN_N?'완료':(mainDone>0||(p.pos[cur]||0)>0)?'진행 중':'시작 전';
+ const sideSt=!sides.length?'준비 중':sideDone===sides.length?'완료':sideStarted?'진행 중':'NEW';
+ const sideThumb=sides.length?scBgSVG(scUnitBgKey(sides[0]),''):scBgSVG(scUnitBgKey(0),'');
+ $('#view').innerHTML=`<div class="sc-page scv"><div class="scv-bar"><button class="btn ghost sm" id="scHubBack">트레이너 방</button><h2>시나리오 모드</h2><button class="btn ${S.meta.settings.bgm?'blue':'ghost'} sm" id="scMusic">${S.meta.settings.bgm?'♪ ON':'♪ OFF'}</button></div>
+ ${last>=0?`<div class="scv-card scv-mapintro"><div class="scv-mapintro-top"><div><span class="sc-tag">▶ 이어하기</span><h3>${esc(SC_UNITS[last].icon)} ${esc(SC_UNITS[last].name)}</h3><p class="sc-note">${last>=SC_MAIN_N?'사이드 스토리':'메인 스토리'} · 저장된 장면부터 이어서 봐요</p></div><button class="btn gold big" id="scResume">이어서 보기</button></div></div>`:''}
+ <div class="sc-map-grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))">
+  ${card('main','MAIN STORY',mainSt,scBgSVG(scUnitBgKey(cur),''),'✦ 메인 스토리','별의 종언과 여섯 개의 맹세',`${mainDone}/${SC_MAIN_N} 이야기 · 맹세 ${p.vows.length}/6`)}
+  ${card('side','SIDE STORY',sideSt,sideThumb,'✧ 사이드 스토리','외전 · 또 다른 이야기들',sides.length?`${sideDone}/${sides.length} 이야기 완료${sideSt==='NEW'?' · 새 이야기가 기다려요':''}`:'곧 열려요')}
+ </div>
+ <div class="mbtns"><button class="btn blue" id="scSelDeck">🃏 시나리오 덱 편성</button><button class="btn purple" id="scSelDex">📘 천공의 도감</button></div>
+ <div class="nextFeat">진행 상황은 자동 저장돼요. 이야기 도중에 나가도 그 장면부터 이어서 볼 수 있어요.</div></div>`;
+ $('#scHubBack').onclick=()=>{sfx('tap');scBackToHub();};
+ $('#scMusic').onclick=()=>{sfx('tap');S.meta.settings.bgm=!S.meta.settings.bgm;autoSave();startBgm();scRenderSelect();};
+ const rs=$('#scResume');if(rs)rs.onclick=()=>{sfx('tap');scEnterUnit(last,false);};
+ $('#scSelDeck').onclick=()=>{sfx('tap');scRenderDeck(()=>scRenderSelect());};
+ $('#scSelDex').onclick=()=>{sfx('tap');scRenderDex();};
+ $('#view').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{sfx('tap');if(b.dataset.go==='main')scRenderMap();else scRenderSide();});
+}
+function scRenderSide(){
+ const p=scState(),sides=scSideIdx(),first=sides[0]||0,cur=sides.find(u=>!p.done[u]);S.screen='scenarioSide';SC.from='side';
+ SC.index=SC_UNITS[first].art;SC.bgKey=scUnitBgKey(first);SC.bgVar='';scMusicStart(SC_UNITS[first].bgm);scApplyBackdrop(SC.index,false,SC.bgKey,'');
+ const doneN=sides.filter(u=>p.done[u]).length,prog=sides.length?Math.round(doneN/sides.length*100):0;
+ const cards=sides.map(u=>scCardHTML(SC_UNITS[u],u,p,cur===undefined?-1:cur)).join('');
+ $('#view').innerHTML=`<div class="sc-page scv"><div class="scv-bar"><button class="btn ghost sm" id="scHubBack">← 선택</button><h2>사이드 스토리</h2><button class="btn ${S.meta.settings.bgm?'blue':'ghost'} sm" id="scMusic">${S.meta.settings.bgm?'♪ ON':'♪ OFF'}</button></div>
+ <div class="scv-card scv-mapintro"><span class="sc-tag">✧ 외전</span><p class="sc-note" style="margin:6px 0">메인 스토리와 별개로, 언제든 골라서 즐길 수 있는 또 다른 이야기들이에요.</p><div class="sc-progress" style="margin:10px 0 8px"><i style="width:${prog}%"></i></div><div class="sc-reward-list"><div class="sc-reward"><strong>${doneN}/${sides.length}</strong>이야기</div></div></div>
+ <div class="sc-map-grid">${cards}</div></div>`;
+ $('#scHubBack').onclick=()=>{sfx('tap');scRenderSelect();};
+ $('#scMusic').onclick=()=>{sfx('tap');S.meta.settings.bgm=!S.meta.settings.bgm;autoSave();startBgm();scRenderSide();};
+ scBindStageClicks();
 }
 function scRenderDex(){
  const p=scState();S.screen='scenarioDex';SC.index=SC.index>=0?SC.index:0;SC.bgKey=undefined;SC.bgVar='';scApplyBackdrop(SC.index);
  const slot=(id,boss)=>{const on=!!p.col[id];return `<div class="scv-slot ${on?'on':''} ${boss?'boss':''}" data-id="${id}"><div>${monImg(id,'front')}</div><span>${on?esc(scMonName(id)):'???'}</span><small>${boss?'보스':'일반'}</small></div>`;};
  const regs=SC_REGIONS.map((reg,r)=>{const ids=scRegionIds(r),vow=p.vows.indexOf(r+1)>=0;return `<div class="scv-card scv-dexreg" style="--ac:${reg.accent}"><div class="row" style="align-items:center"><b class="scv-dexname">${reg.icon} ${esc(reg.name)}</b><span class="hudSp"></span><span class="sc-tag">${ids.filter(id=>p.col[id]).length}/5</span></div><div class="scv-slots">${ids.map((id,i)=>slot(id,i===4)).join('')}</div><div class="scv-dexvow ${vow?'on':''}">${vow?`「${ORD[r]} 번째 맹세: ${esc(scVowText(r+1))}」`:`${ORD[r]} 번째 맹세는 아직 새겨지지 않았어요`}</div></div></div>`;}).join('');
- $('#view').innerHTML=`<div class="sc-page scv"><div class="scv-bar"><button class="btn ghost sm" id="scDexBack">← 지도</button><h2>천공의 도감</h2><span class="sc-tag">${scOwned().length} / 33장</span></div><div class="scv-card"><b class="scv-dexname">✦ 처음 함께한 동료</b><div class="scv-slots three">${[252,255,258].map(id=>slot(id,false)).join('')}</div><p class="sc-note">여섯 개의 빈 페이지에는 지역에서 만난 포켓몬의 기록과 함께 깨달은 맹세가 하나씩 새겨져요.</p></div>${regs}</div>`;
- $('#scDexBack').onclick=()=>{sfx('tap');scRenderMap();};
+ $('#view').innerHTML=`<div class="sc-page scv"><div class="scv-bar"><button class="btn ghost sm" id="scDexBack">← 돌아가기</button><h2>천공의 도감</h2><span class="sc-tag">${scOwned().length} / 33장</span></div><div class="scv-card"><b class="scv-dexname">✦ 처음 함께한 동료</b><div class="scv-slots three">${[252,255,258].map(id=>slot(id,false)).join('')}</div><p class="sc-note">여섯 개의 빈 페이지에는 지역에서 만난 포켓몬의 기록과 함께 깨달은 맹세가 하나씩 새겨져요.</p></div>${regs}</div>`;
+ $('#scDexBack').onclick=()=>{sfx('tap');scBackTo();};
  $('#view').querySelectorAll('.scv-slot.on[data-id]').forEach(s=>s.onclick=()=>{sfx('tap');const id=+s.dataset.id;M(`<div style="text-align:center"><div style="display:flex;justify-content:center"><div style="width:190px">${cardHTML(id,{size:'lg'})}</div></div><p class="mut" style="font-size:13px;margin-top:8px">${esc(scMonName(id))}${SC_ALIAS_SHOW[id]?` (게임 카드 이름: ${esc(MON[id].name)})`:''}</p><div class="mbtns"><button class="btn gold" data-a="x">닫기</button></div></div>`,{x:()=>closeM(),_close:()=>closeM()});});
 }
 function scRenderDeck(back){
