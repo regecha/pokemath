@@ -493,6 +493,7 @@ html.lowfx .card .holo{animation:none;mix-blend-mode:normal;opacity:.25}
 .tst{background:#3a2e3f;color:#fff;padding:9px 16px;border-radius:14px;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.25);animation:popIn .25s;text-align:center}
 #autoCast{position:fixed;left:50%;top:calc(var(--vt) + var(--vh) * .4);transform:translate(-50%,-50%);z-index:120;width:min(440px,86vw);opacity:.94;display:none;flex-direction:column;pointer-events:none;background:rgba(20,24,40,.92);border:2px solid #6aa7ff;border-radius:16px;box-shadow:0 6px 22px rgba(0,0,0,.45);overflow:hidden}
 #autoCast.on{display:flex}
+body:has(.modal.on) #autoCast{z-index:90}
 #autoCast .acH{display:none;flex:0 0 auto;padding:5px 12px;font-size:12px;font-weight:800;color:#9cc4ff;background:rgba(106,167,255,.16);letter-spacing:.5px}
 #autoCast .acB{flex:1 1 auto;max-height:84px;overflow-y:auto;padding:6px 8px;display:flex;flex-direction:column;gap:4px;scrollbar-width:none}
 #autoCast .acB::-webkit-scrollbar{display:none}
@@ -4507,7 +4508,7 @@ function praise(res,gh){const msgs=[];const rtm=res.rt?`틀렸던 문제 <b>${re
  if(rtm)msgs.push(rtm);
  if(!msgs.length||(msgs.length===1&&rtm))msgs.push('오늘은 조금 어려웠어요. 그래도 끝까지 해낸 것, 그게 바로 성장이에요!');
  return msgs;}
-async function showTrainResult(res,gh,rw){const m=S.meta;S.screen='result';sfx('win');if(res.c>=res.n*.8)confetti();
+async function showTrainResult(res,gh,rw){const m=S.meta;S.screen='result';setTimeout(tsAuto,2500);sfx('win');if(res.c>=res.n*.8)confetti();
  const ns=[...new Set(S.newStars||[])];const nb=S.newBadges||[];const sec=v=>secTxt(v).replace('초','').replace('약 ','');
  const fd=Object.keys(m.found||{});const rxh=S.rxResult||'';S.rxResult=null;
  $('#view').innerHTML=`<div class=wrap><div class="panel" style="text-align:center">
@@ -6767,19 +6768,19 @@ function acPace(base){try{if(!acOn())return wait(base);const d=AC.last,n=d&&d.is
 // 차례가 바뀔 때: 방금 끝난 차례를 한 줄로 정리하고, 새 차례를 알려요
 function acTurn(side){try{if(AC.b!==B){acReset();AC.b=B;}if(!acOn()){AC.side=side;return;}
  if(AC.side&&AC.side!==side){const took=AC.side==='me'?'foe':'me',x=AC.sum[took],lab=AC.side==='me'?'내 차례':'상대 차례',who=AC.side==='me'?'상대':'내';
-  if(x.dmg||x.hero)acSay(`<b>${lab} 정리</b> · ${who} 포켓몬 −${x.dmg}${x.ko?` (${x.ko}마리 쓰러짐)`:''}${x.hero?` · ${who} 트레이너 −${x.hero}`:''}`,'sm',6500);
+  if(x.dmg||x.hero)acSay(`<b>${lab} 정리</b> · ${x.ko?`${who} 포켓몬 ${x.ko}마리 쓰러짐`:`${who} 포켓몬이 모두 버텼어요`}${x.hero?` · ${who} 트레이너도 맞았어요`:''}`,'sm',6500);
   AC.sum={me:{dmg:0,ko:0,hero:0},foe:{dmg:0,ko:0,hero:0}};}
  AC.side=side;AC.cur=null;acSay(side==='me'?'▶ 내 차례':'▶ 상대 차례',side==='me'?'hd':'hd f',2200);}catch(e){}}
 function acAtk(A,D,a,tg,ok,crit){try{if(!acOn()||!a||!MON[a.id])return;let tn;if(tg.hero)tn=D.name||'트레이너';else{const d=D.board[tg.u];if(!d||!MON[d.id])return;tn=MON[d.id].name;}
  const mine=A===B.me;let h=`<span class=who>${mine?'내':'상대'}</span>${esc(MON[a.id].name)} ▶ ${esc(tn)}`;
  if(mine){if(!ok)h+=' <span class=weak>약함</span>';else if(crit)h+=' <b>크리!</b>';}
  AC.cur=acSay(h,mine?'':'f');if(!tg.hero)acHit(D,tg.u);}catch(e){}}
-function acHero(dmg,P){try{if(!acOn())return;const k=P===B.me?'me':'foe';if(dmg>0)AC.sum[k].hero+=dmg;const d=AC.cur,alive=d&&d.isConnected&&Date.now()-(d._t||0)<3600;const pre=alive?' ':`${esc((P&&P.name)||'트레이너')} `;acAdd(dmg>0?`${pre}<b>−${dmg}</b>`:`${pre}<span class=weak>막음</span>`);}catch(e){}}
+function acHero(dmg,P){try{if(!acOn())return;const k=P===B.me?'me':'foe';if(dmg>0)AC.sum[k].hero+=dmg;const d=AC.cur,alive=d&&d.isConnected&&Date.now()-(d._t||0)<3600;const pre=alive?' ':`${esc((P&&P.name)||'트레이너')} `;acAdd(dmg>0?`${pre}<b>${dmg>=((P&&P.max)||20)*.2?'큰 피해!':'명중!'}</b>`:`${pre}<span class=weak>막음</span>`);}catch(e){}}
 function acUnit(P,i,dealt,k){try{if(!acOn())return;if(dealt)acHit(P,i);if(!dealt){acAdd(' <span class=weak>회피!</span>');return;}
  const u=P.board[i],dead=!u||u.hp<=0,key=P===B.me?'me':'foe';AC.sum[key].dmg+=dealt;if(dead)AC.sum[key].ko++;
- let h=` <b>−${dealt}</b>`;if(k>=2)h+=' <span class=sup>효과 굉장!</span>';else if(k<1)h+=' <span class=weak>효과 별로</span>';
+ let h=dead?'':(u.hp<=(u.max||u.mhp||u.hp)/3?' <b>겨우 버텼다!</b>':' <b>명중!</b>');if(k>=2)h+=' <span class=sup>효과 굉장!</span>';else if(k<1)h+=' <span class=weak>효과 별로</span>';
  if(dead)h+=' <span class=ko>쓰러짐</span>';acAdd(h);}catch(e){}}
-function acDef(P,hv){try{if(!acOn())return;AC.cur=null;acSay(`🛡 ${esc(P.name||'트레이너')} ${hv?'슈퍼세이브 −3':'막기 −2'}`,'sv');}catch(e){}}
+function acDef(P,hv){try{if(!acOn())return;AC.cur=null;acSay(`🛡 ${esc(P.name||'트레이너')} ${hv?'슈퍼세이브로 크게 막았다!':'공격을 막았다!'}`,'sv');}catch(e){}}
 function autoBind(){try{const bt=$('#bAuto'),bat=$('#battle');if(bat)bat.classList.toggle('autoOn',!!(AUTO.on&&bt));
  if(bt)bt.onclick=()=>{sfx('tap');AUTO.on=!AUTO.on;if(!AUTO.on)acClear();toast(AUTO.on?'자동전투 시작! 공격 문제는 직접 풀어 주세요':'자동전투를 껐어요');renderBattle();};
  if(AUTO.on&&bt)autoKick();}catch(e){}}
@@ -7824,6 +7825,30 @@ function packTile(){const m=S.meta;if(m.packs>1)return packCountMenu();if(m.pack
  toast('카드팩이 없어요. 오늘의 훈련을 하거나 코인 100개를 모으면 받을 수 있어요!');}
 
 // ---- 트레이너 방(허브) ----
+
+// ===== 오늘의 추천 + 주간 목표 =====
+const WG_NEED=5,WG_COINS=100;
+function wgMonday(d=new Date()){const x=new Date(d);const k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);return today(x);}
+function wgCount(m,k){let n=0;const mon=new Date(wgMonday()+'T00:00:00');for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);const e=(m.domDay||{})[today(d)];if(e&&e[k])n+=e[k][0];}return n;}
+function wgDay(m,k){const e=(m.domDay||{})[today()];return e&&e[k]?e[k][0]:0;}
+// 이번 주 영역 3개: 최근 정답률이 낮은 영역부터(아직 측정 전인 영역은 뒤로) 골라요. 주가 바뀔 때만 새로 정해요.
+function wgEnsure(m){const w=wgMonday();if(m.wg&&m.wg.w===w&&Array.isArray(m.wg.doms)&&m.wg.doms.length===3)return m.wg;
+ let st=null;try{st=domStats(m);}catch(e){}
+ const ranked=DOMS.map((d,i)=>({k:d.k,i,r:st&&st[d.k]&&st[d.k].n>=10&&st[d.k].racc!=null?st[d.k].racc:1.5})).sort((a,b)=>a.r-b.r||a.i-b.i);
+ m.wg={w,doms:ranked.slice(0,3).map(x=>x.k),claimed:false};autoSave();return m.wg;}
+function wgTrain(k){const m=S.meta,st=domStats(m),pool=domTrainPool(m,st,[k]);const all=st[k].skills;const use=pool.length>=4?pool.concat(all.filter(x=>!pool.includes(x)).slice(0,4)):all;if(!use.length){toast('연습할 문제가 아직 없어요');return;}startTraining({pool:use,n:8});}
+function wgPanel(m){if(!m.train||!m.train.count)return '';let g;try{g=wgEnsure(m);}catch(e){return '';}
+ const rows=g.doms.map(k=>({d:DOM_BY[k],n:wgCount(m,k),t:wgDay(m,k)}));
+ const allDone=rows.every(r=>r.n>=WG_NEED);
+ // 오늘의 추천: 이번 주 목표 중 아직 덜 채운 영역 하나(오늘 푼 문제가 적은 것 먼저), 다 채웠으면 가장 약한 영역
+ const todo=rows.filter(r=>r.n<WG_NEED).sort((a,b)=>a.t-b.t||a.n-b.n);
+ const rec=todo[0]||rows[0];const recDone=rec.t>=WG_NEED&&!todo.length;
+ return `<div class=panel id=wgBox style="border-left:6px solid ${rec.d.c}"><div class=row style="align-items:center;gap:8px"><h3 style="margin:0">🎯 오늘의 추천</h3><span class=hudSp></span><span class=mut style="font-size:12px">이번 주 목표</span></div>
+  <div class=row style="margin-top:8px;align-items:center;gap:10px;flex-wrap:wrap"><div style="flex:1;min-width:160px;font-size:15px;line-height:1.5">${allDone?'이번 주 목표를 모두 채웠어요! 🎉':`오늘은 <b>${rec.d.ic} ${rec.d.n}</b> 어때요?`}</div><button class="btn red" id=wgGo data-k="${rec.d.k}">${rec.d.n} 8문제</button></div>
+  <div style="display:grid;gap:6px;margin-top:10px">${rows.map(r=>{const p=Math.min(100,Math.round(r.n/WG_NEED*100));return `<div style="display:flex;align-items:center;gap:8px"><span style="min-width:112px;font-size:13px"><b>${r.d.ic} ${r.d.n}</b></span><div style="flex:1;height:14px;background:#f0e8d8;border-radius:7px;overflow:hidden"><i style="display:block;height:100%;width:${p}%;background:${r.d.c}"></i></div><span style="min-width:44px;text-align:right;font-size:13px;font-weight:700">${r.n>=WG_NEED?'✓':r.n+'/'+WG_NEED}</span></div>`;}).join('')}</div>
+  <div class=row style="margin-top:8px;align-items:center;gap:8px"><span class=mut style="font-size:12px;flex:1">세 영역을 각각 ${WG_NEED}문제 이상 풀면 ${I('coin')} 코인 ${WG_COINS}개 + 카드팩 1개! (훈련·전투·포획 문제 모두 세요)</span>${g.claimed?'<span class=pill>받았어요 ✓</span>':allDone?'<button class="btn gold" id=wgClaim>보상 받기!</button>':''}</div></div>`;}
+function wgBind(m){const go=$('#wgGo');if(go)go.onclick=()=>{sfx('tap');wgTrain(go.dataset.k);};
+ const cl=$('#wgClaim');if(cl)cl.onclick=()=>{const g=m.wg;if(!g||g.claimed)return;if(!g.doms.every(k=>wgCount(m,k)>=WG_NEED))return;g.claimed=true;m.coins+=WG_COINS;m.packs+=1;autoSave();sfx('win');confetti(50);toast(`이번 주 목표 달성! 코인 ${WG_COINS}개와 카드팩 1개를 받았어요`);renderHub();};}
 function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return renderGate();ensureSeason();
  const done=m.train.daily===today();const gh=lastTrain();const partner=bestPartner();
  const tiles=FEAT.filter(f=>m.unl[f.k]).map(f=>{const extra=f.k==='pack'&&m.packs>0?`<span class=badgeDot>${m.packs}</span>`:'';
@@ -7833,13 +7858,14 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
  $('#view').innerHTML=hudHTML()+`<div class=wrap>
   <div class="panel hubTop" style="display:flex;gap:12px;align-items:center"><div class=htMon>${monImg(partner,'anim')}</div><div class=htBody><div class=htRow><div class="jua htName">${esc(m.name)}</div><button class="btn ghost sm" id=hPartner>${I('heart')} 파트너 바꾸기</button></div><div class="mut htSub">${esc(lvOf(m.xp).title)} · ${josa(esc(MON[partner].name),'와과')} 함께해요${shinyOn(partner)?' ✨':''}</div><div class="mut htBond">${shinyOn(partner)?'✨ 이로치 파트너!':`이로치까지 함께 푼 문제 ${Math.min(bondOf(partner),SHINY_AT)} / ${SHINY_AT}`}</div><div class=htLine>${hubLine()}</div></div></div>
   ${gardenPanel(m)}
+  ${wgPanel(m)}
   <div class=panel style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="font-size:30px">🛡️</div><div style="flex:1"><b class=jua style="font-size:19px">트레이너 스킬</b><div class=mut style="font-size:13px">레벨 포인트 ${m.lp||0}개 · 스킬을 배우고 전투에서 사용해요</div></div><button class="btn purple" id="hTrainerSkills">스킬 관리</button></div>
   <div class=tiles>
    <button class="tile main" id=tTrain>${done?'':'<i class=newTag>오늘!</i>'}<span class=ti>${I('flame','ti')}</span><span><span class=tn>오늘의 훈련</span><br><span class=td>${done?'오늘 훈련 완료! 한 번 더 하면 사탕을 더 받아요.':`문제 ${trainN()}개 · 오늘의 카드팩 받기`}${gh?`<br>어제의 나: ${gh.n}문제 중 ${gh.c}개 정답`:''}</span></span></button>
    ${tiles}</div>
   ${next?`<div class=nextFeat>${I('lock')} 다음에 열릴 기능: <b>${next.n}</b> — ${next.how}</div>`:''}
   <div class=nextFeat>${esc(semName(m.gs))}${m.uMax&&m.uMax<20?` ${m.uMax}단원`:''}까지의 문제가 나와요 (약한 개념은 아래 학년 기초도 나와요) · <a href="#" id=hUnit style="color:inherit">배운 단원 바꾸기</a> · <a href="#" id=hCode style="color:inherit">코드 바꾸기</a></div></div>`;
- bindHud();
+ bindHud();wgBind(m);
  $('#hTrainerSkills').onclick=()=>{sfx('tap');renderTrainerSkills();};
  $('#tTrain').onclick=()=>{sfx('tap');startTraining();};
  $('#hCode').onclick=e=>{e.preventDefault();renderGate(true);};
@@ -8118,6 +8144,32 @@ function renderMap(){S.screen='map';const m=S.meta;const map=unitsWithSkills();c
  $('#view').querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{sfx('tap');startTraining({pool:map[b.dataset.pk],n:8});});}
 
 // ---- 설정 ----
+
+// ===== 선생님께 기록 자동 전송 (학생 → 선생님 '실시간으로 받기' 방) =====
+const TSEND_VER=1,tsId=r=>'pkclass-'+TSEND_VER+'-'+r;
+let _tsBusy=false,_tsLast=0;
+function tsSend(room,silent){return new Promise(async res=>{
+ if(_tsBusy){res(false);return;}_tsBusy=true;let peer=null,done=false;
+ const fin=(ok,why)=>{if(done)return;done=true;_tsBusy=false;try{peer&&peer.destroy();}catch(e){}if(ok)_tsLast=Date.now();if(!silent)toast(ok?'선생님께 기록을 보냈어요!':why);res(ok);};
+ try{if(!/^\d{4}$/.test(String(room||''))){fin(false,'방 번호 4자리를 넣어 주세요');return;}
+  if(!S.meta.name){fin(false,'닉네임이 있어야 보낼 수 있어요');return;}
+  await loadPeer();saveLocal();const code=await makeCode();
+  peer=new Peer();const to=setTimeout(()=>fin(false,'선생님 방을 찾지 못했어요. 방 번호와 선생님 화면이 열려 있는지 확인해 주세요'),15000);
+  peer.on('error',e=>{clearTimeout(to);const t=String(e&&e.type||'');fin(false,t==='peer-unavailable'?'그 번호의 방이 없어요. 선생님 화면에서 방이 열려 있는지 확인해 주세요':'연결하지 못했어요. 인터넷이나 학교 네트워크를 확인해 주세요');});
+  peer.on('open',()=>{const c=peer.connect(tsId(room),{reliable:true});
+   c.on('open',()=>{try{c.send({t:'rec',code});}catch(e){clearTimeout(to);fin(false,'보내지 못했어요');}});
+   c.on('data',d=>{if(d&&d.t==='ok'){clearTimeout(to);fin(true);}});
+   c.on('error',()=>{clearTimeout(to);fin(false,'연결하지 못했어요');});});
+ }catch(e){fin(false,'보내지 못했어요 ('+((e&&e.message)||'오류')+')');}});}
+// 훈련 결과가 나올 때, 자동 전송이 켜져 있으면 조용히 한 번 보내요(3분에 한 번까지만)
+function tsAuto(){try{const st=S.meta&&S.meta.settings;if(!st||!st.tAuto||!st.tRoom||Date.now()-_tsLast<180000)return;tsSend(st.tRoom,true);}catch(e){}}
+function showTsend(){const st=S.meta.settings;
+ M(`<h2>📡 선생님께 기록 보내기</h2><p class=mut style="font-size:14px;line-height:1.6;text-align:left">선생님 화면에서 <b>실시간으로 받기</b>를 열면 나오는 <b>방 번호 4자리</b>를 넣어 주세요. 닉네임과 공부 기록이 선생님께 전달돼요. (내 저장 코드와 같은 내용이에요)</p>
+  <input class="inp codeIn" id=tsRoom inputmode=numeric maxlength=4 style="width:150px;font-size:26px;text-align:center" value="${esc(st.tRoom||'')}" placeholder="0000">
+  <div class=setRow style="margin-top:8px"><span><b>훈련이 끝나면 자동 전송</b><br><span class=mut style="font-size:12px">켜 두면 훈련 결과가 나올 때 조용히 보내요</span></span><div class=seg><button class="${st.tAuto?'on':''}" data-v=1>켜기</button><button class="${st.tAuto?'':'on'}" data-v=0>끄기</button></div></div>
+  <div class=mbtns><button class="btn blue" data-a=send>지금 보내기</button><button class="btn gold" data-a=x>닫기</button></div>`,
+  {send:async b=>{const r=($('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();toast('보내는 중…');await tsSend(r,false);},x:()=>{const r=($('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();closeM();},_close:()=>{const r=($('#tsRoom')&&$('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();closeM();}});
+ $('#mbox').querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{st.tAuto=b.dataset.v==='1';st.tRoom=($('#tsRoom').value||'').replace(/\D/g,'');autoSave();sfx('tap');$('#mbox').querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));});}
 function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.easy=false;if(st.enTts===undefined)st.enTts=true;if(st.iq===undefined)st.iq=true;const seg=(k,opts)=>`<div class=seg>${opts.map(([v,n])=>`<button class="${String(st[k])===String(v)?'on':''}" data-s="${k}" data-v="${v}">${n}</button>`).join('')}</div>`;
  M(`<h2>${I('gear')} 설정</h2>
   <div class=setRow><span><b>쉬운 전투</b><br><span class=mut style="font-size:12px">켜면 야생 포켓몬과 시나리오 포켓몬이 한 차례에 1번만 공격해요. 끄면 1마리와 싸울 때 2번 공격해요</span></span>${seg('easy',[[true,'켜기'],[false,'끄기']])}</div>
@@ -8132,10 +8184,10 @@ function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.eas
   <div class=setRow><span><b>포켓몬 이미지</b><br><span class=mut style="font-size:12px">끄면 포켓몬 그림을 불러오지 않아요. 인터넷이 막힌 곳에서는 '끄기'</span></span>${seg('imgs',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>왼쪽 아래 버튼 피하기</b><br><span class=mut style="font-size:12px">구글 사이트 등 다른 페이지 안에서 열었을 때, 왼쪽 아래 ⓘ 버튼이 내 카드·버튼을 가리면 켜세요. 자동은 사이트 안에서 열면 켜져요</span></span>${seg('safe',[['auto','자동'],['on','켜기'],['off','끄기']])}</div>
   <div class=setRow><span><b>보이는 영역에 화면 맞추기</b><br><span class=mut style="font-size:12px">주소창·사이트 머리글 때문에 화면이 일부만 보일 때, 게임을 보이는 영역 안에 딱 맞춰요. 화면이 잘려 보이면 '자동', 맞춤이 어색하면 '끄기'</span></span>${seg('fit',[['auto','자동'],['off','끄기']])}</div>
-  <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>선생님 코드 바꾸기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=unit>배운 단원 바꾸기</button><button class="btn ghost" data-a=tutor>튜토리얼 다시 보기</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
+  <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>선생님 코드 바꾸기</button><button class="btn ghost" data-a=tsend>📡 선생님께 기록 보내기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=unit>배운 단원 바꾸기</button><button class="btn ghost" data-a=tutor>튜토리얼 다시 보기</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>
   <p class=mut style="font-size:11px;margin-top:10px;line-height:1.5">${GAME.title} v${GAME.ver} · 좌삼초. 수업용 비영리 팬 제작 학습 도구예요. 포켓몬 이름·그림의 권리는 Nintendo·Creatures·GAME FREAK·The Pokémon Company에 있어요. 그림은 PokeAPI 공개 저장소에서 불러와요.</p>`,
-  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);renderGate(true);},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);if(window.TUT_A)TUT_A.begin({replay:true});}},{layer2:!!l2});
+  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);renderGate(true);},tsend:()=>{closeM(l2);showTsend();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);if(window.TUT_A)TUT_A.begin({replay:true});}},{layer2:!!l2});
  {const sb=$('#sfxVol');if(sb){sb.oninput=()=>{st.sfxVol=+sb.value;$('#sfxVolN').textContent=sb.value+'%';};sb.onchange=()=>{autoSave();if(st.sound)sfx('ok');};}}
  {const vb=$('#bgmVol');if(vb){vb.oninput=()=>{st.bgmVol=+vb.value;$('#bgmVolN').textContent=vb.value+'%';applyBgmVol();};vb.onchange=()=>{autoSave();};}}
  $(l2?'#mbox2':'#mbox').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;st[k]=v;if(k==='bgm'){if(v)startBgm();else stopBgm();}autoSave();applySafe();refit();sfx('tap');showSettings(l2);if(k==='imgs'&&S.screen==='hub')renderHub();});}
@@ -8252,7 +8304,7 @@ function classSummaryHTML(metas){const R=classRows(metas);if(!R.length)return ''
   <p><b>처방 훈련</b>: 학생의 '오늘의 훈련'은 영역 진단에서 약한 개념을 골라 먼저 내 줘요. 이 표는 그 훈련을 얼마나 했는지, 약한 개념을 얼마나 맞혔는지 보여 줘요. '변화'는 처음 3회와 최근 3회의 약한 개념 정답률 차이로, 6회 이상일 때만 나와요.</p>
   <p><b>공통 약한 개념</b>: 학생마다 약한 개념 상위 3개를 모아 몇 명에게서 겹치는지 센 거예요. 수업에서 함께 다시 다룰 후보로 쓰세요.</p>
   <p><b>공통 오개념</b>: 틀린 보기에서 읽은 흔한 실수 유형이에요. 오개념 기록은 일부 문항에만 붙어 있어요.</p>
-  <p><b>알아 두기</b>: 영어·국어·IQ 문제는 이 요약에 들어가지 않아요(학생별 표의 '푼 문제(전 과목)'에만 포함). 이 요약은 참고 자료이고 성적이 아니에요. 이 화면의 내용은 어디에도 전송되지 않고, 새로 고침하면 사라져요.</p></details>`;
+  <p><b>알아 두기</b>: 영어·국어·IQ 문제는 이 요약에 들어가지 않아요(학생별 표의 '푼 문제(전 과목)'에만 포함). 이 요약은 참고 자료이고 성적이 아니에요. 이 화면의 내용은 다른 곳으로 전송되지 않아요(실시간으로 받은 기록은 이 기기에 저장돼 있어요).</p></details>`;
  return h;}
 function classCsv(metas){const R=classRows(metas);const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
  const head=['닉네임','학기','푼 문제(수학)','수학 정답률',...DOMS.map(d=>d.n+' 최근정답률'),...DOMS.map(d=>d.n+' 푼 문제'),'처방 훈련(7일)','처방 훈련(누적)','약한 개념 정답률','먼저 다질 개념'];
@@ -8263,7 +8315,13 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
   <p style="font-size:14px;line-height:1.6;margin-top:8px">학생은 <b>학년·학기 코드</b>가 있어야 시작할 수 있어요. 코드의 학기보다 뒤 학년 문제는 나오지 않아요. 코드는 <b>${y}학년도(${y}.3~${y+1}.2)</b>에만 쓸 수 있고, 3월이 되면 새 코드를 나눠 주면 돼요. 학급 글자를 바꾸면 반마다 다른 코드가 돼요.</p>
   <div class=setRow><b>학급 글자 (3자)</b><input class="inp codeIn" id=tcCls maxlength=3 style="width:140px;font-size:22px" value="${esc(S.tcCls||'SSC')}"></div>
   <div id=tcList style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:10px"></div></div>
- <div class=panel><h2>${I('chart')} 학생 기록 모아 보기</h2><div class=explain style="font-size:14px;line-height:1.7;text-align:left"><b>사용 순서</b><br>① 학생이 게임에서 <b>설정 → 저장 · 불러오기 → 코드 만들고 복사</b>를 눌러 저장 코드(PKMT…)를 선생님께 보내요. 닉네임이 같이 보이게 해 주세요.<br>② 받은 코드를 <b>아래 칸에 한 줄에 하나씩</b> 붙여 넣고 <b>표 만들기</b>를 눌러요.<br>③ 학생별 표 아래에 <b>학급 영역 요약</b>(영역별 현황 · 학생×영역 표 · 처방 훈련 현황 · 공통 약한 개념 · 공통 오개념 · 먼저 살펴볼 학생)이 이어서 나와요.<br><span class=mut>※ 저장 코드는 코드를 만든 그 시점의 기록이에요. 변화를 보려면 학생들에게 주마다 새 코드를 받아 주세요.</span></div><p class=mut style="font-size:13px">학생들이 보낸 <b>저장 코드(PKMT…)</b>를 한 줄에 하나씩 붙여 넣거나 .md 파일을 여러 개 고르면 표로 보여 줘요. 이 표는 이 화면에만 보이고 어디에도 보내지 않아요. 학생은 실명 대신 <b>닉네임</b>을 써요 — 누가 누구인지는 선생님만 따로 적어 두세요.</p>
+
+ <div class=panel><h2>📡 실시간으로 받기 <span class=mut style="font-size:13px">(학생이 보내면 아래 표가 자동으로 바뀌어요)</span></h2>
+  <div class=explain style="font-size:14px;line-height:1.7;text-align:left">① <b>방 열기</b>를 누르면 방 번호 4자리가 나와요. ② 학생은 게임 <b>설정 → 📡 선생님께 기록 보내기</b>에서 그 번호를 넣고 <b>지금 보내기</b>(또는 자동 전송 켜기)를 해요. ③ 받은 기록은 이 기기에 저장돼서 화면을 닫았다 열어도 남아 있어요. 방을 열어 둔 동안에만 받을 수 있어요.</div>
+  <div class=row style="margin-top:8px;align-items:center;gap:10px"><button class="btn blue" id=trOpen>방 열기</button><span id=trCode class=tcode style="font-size:34px"></span><span id=trSt class=mut style="font-size:13px"></span></div>
+  <div id=trList style="margin-top:8px;font-size:13px"></div>
+  <div class=row style="margin-top:6px"><button class="btn ghost sm" id=trClear>받은 기록 모두 지우기</button></div></div>
+ <div class=panel><h2>${I('chart')} 학생 기록 모아 보기</h2><div class=explain style="font-size:14px;line-height:1.7;text-align:left"><b>사용 순서</b><br>① 학생이 게임에서 <b>설정 → 저장 · 불러오기 → 코드 만들고 복사</b>를 눌러 저장 코드(PKMT…)를 선생님께 보내요. 닉네임이 같이 보이게 해 주세요.<br>② 받은 코드를 <b>아래 칸에 한 줄에 하나씩</b> 붙여 넣고 <b>표 만들기</b>를 눌러요.<br>③ 학생별 표 아래에 <b>학급 영역 요약</b>(영역별 현황 · 학생×영역 표 · 처방 훈련 현황 · 공통 약한 개념 · 공통 오개념 · 먼저 살펴볼 학생)이 이어서 나와요.<br><span class=mut>※ 저장 코드는 코드를 만든 그 시점의 기록이에요. 변화를 보려면 학생들에게 주마다 새 코드를 받아 주세요.</span></div><p class=mut style="font-size:13px">학생들이 보낸 <b>저장 코드(PKMT…)</b>를 한 줄에 하나씩 붙여 넣거나 .md 파일을 여러 개 고르면 표로 보여 줘요. 이 표는 이 기기 화면에만 보이고 다른 곳으로 보내지 않아요(학생이 보낸 기록만 받아요). 학생은 실명 대신 <b>닉네임</b>을 써요 — 누가 누구인지는 선생님만 따로 적어 두세요.</p>
   <textarea class="inp code" id=tcIn style="height:120px" placeholder="PKMTZ:...&#10;PKMTZ:..."></textarea><div class=row style="margin-top:8px"><button class="btn blue" id=tcGo>표 만들기</button><button class="btn ghost" id=tcFiles>${I('folder')} .md 파일 여러 개</button></div>
   <input type=file id=tcF multiple accept=".md,.txt" class=hidden><div id=tcRep style="overflow-x:auto;margin-top:10px"></div></div>
  <div id=tcDom></div>
@@ -8285,6 +8343,24 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
    const w=document.createElement('div');w.style.cssText='text-align:center';cv.style.cssText='width:300px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.2)';w.appendChild(cv);const b=document.createElement('div');b.innerHTML=`<div style="font-size:13px">${esc(m.name)} · ${T.n}</div><button class="btn sm blue">이 카드 인쇄</button> <button class="btn sm ghost">PNG</button>`;b.querySelectorAll('button')[0].onclick=()=>cardPrint(cv);b.querySelectorAll('button')[1].onclick=()=>cardDownload(cv,`트레이너카드_${m.name}_${T.n}`);w.appendChild(b);box.appendChild(w);}
   S.meta=keep;if(!cards.length&&!box.innerHTML)box.innerHTML='<p class=mut>읽을 수 있는 저장 코드가 없어요</p>';};
  $('#tcCardsA4').onclick=()=>{if(!cards.length){toast('먼저 「카드 만들기」를 눌러 주세요');return;}cardPrint(cards);};
+
+ // ---- 실시간으로 받기 ----
+ {const KEY='zsm_tcRecs',load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){return {};}},save=o=>{try{localStorage.setItem(KEY,JSON.stringify(o));}catch(e){toast('이 기기에 저장하지 못했어요(저장 공간 부족)');}};
+  let recs=load();let tPeer=null;
+  const fmt=t=>{const d=new Date(t);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;};
+  const draw=()=>{const k=Object.keys(recs);$('#trList').innerHTML=k.length?`받은 기록 <b>${k.length}명</b>: `+k.map(n=>`<span class=pill>${esc(n)} <span class=mut>${fmt(recs[n].t)}</span></span>`).join(' '):'<span class=mut>아직 받은 기록이 없어요.</span>';};
+  const refresh=()=>{const k=Object.keys(recs);$('#tcIn').value=k.map(n=>recs[n].code).join('\n');if(k.length)$('#tcGo').click();draw();};
+  const bindConn=c=>{c.on('data',async d=>{if(!d||d.t!=='rec'||typeof d.code!=='string')return;try{const o=await readAny(d.code);const nm=String((o.meta&&o.meta.name)||'').trim()||'(이름 없음)';recs[nm]={code:d.code,t:Date.now()};save(recs);try{c.send({t:'ok',name:nm});}catch(e){}$('#trSt').textContent=`${nm} 기록을 받았어요 (${fmt(Date.now())})`;refresh();sfx('ok');}catch(e){try{c.send({t:'bad'});}catch(_){}}});};
+  $('#trOpen').onclick=async()=>{sfx('tap');if(tPeer){try{tPeer.destroy();}catch(e){}tPeer=null;}const room=S.tRoom||String(1000+Math.floor(Math.random()*9000));S.tRoom=room;$('#trSt').textContent='방을 여는 중…';
+   try{await loadPeer();}catch(e){$('#trSt').textContent=e.message;return;}
+   const p=new Peer(tsId(room));tPeer=p;S.trPeer=p;
+   p.on('open',()=>{$('#trCode').textContent=room;$('#trSt').textContent='방이 열려 있어요. 이 화면을 닫지 마세요.';$('#trOpen').textContent='방 다시 열기';});
+   p.on('connection',bindConn);
+   p.on('error',e=>{const t=String(e&&e.type||'');if(t==='unavailable-id'){S.tRoom=String(1000+Math.floor(Math.random()*9000));$('#trSt').textContent='이미 쓰는 번호예요. 방 열기를 다시 눌러 주세요.';}else $('#trSt').textContent='연결에 문제가 있어요('+t+'). 인터넷을 확인하고 방 열기를 다시 눌러 주세요.';});};
+  $('#trClear').onclick=()=>{if(!Object.keys(recs).length)return;if(!confirm('받은 기록을 모두 지울까요? (학생 기기의 기록은 그대로예요)'))return;recs={};save(recs);$('#tcIn').value='';$('#tcRep').innerHTML='';$('#tcDom').innerHTML='';draw();};
+  draw();if(Object.keys(recs).length)setTimeout(()=>{try{refresh();}catch(e){}},50);
+  // 선생님 화면을 나가면 방을 닫아요
+  const bk=$('#tcBack');if(bk){const o=bk.onclick;bk.onclick=()=>{try{S.trPeer&&S.trPeer.destroy();}catch(e){}S.trPeer=null;o&&o();};}}
  $('#tcF').onchange=async e=>{rows.length=0;metas.length=0;const bad=[];let ln=0;for(const f of e.target.files){ln++;try{add(await readAny(await f.text()));}catch(er){bad.push(ln);}}show();tcStatus(rows.length,bad,ln);e.target.value='';};}
 
 // ===== 화면마다 배경 그림 =====
@@ -10700,7 +10776,7 @@ init();
   const logo=t.querySelector('.logo');if(!logo)return;
   const text='좌삼몬스터디',sub='<small>지식의 경계를 넘어</small>';
   const vw=Math.min(window.innerWidth,900),vh=window.innerHeight;
-  const maxW=Math.min(vw*.92-12,760),maxH=Math.max(70,vh*.2);
+  const maxW=Math.min(vw*.74-12,600),maxH=Math.max(60,vh*.15);
   const probe=document.createElement('canvas').getContext('2d');probe.font=LOGO_FONT.replace('{F}',20);
   const test=(lines)=>{const w20=Math.max(...lines.map(l=>probe.measureText(l).width))/20;let best=null;
    for(const s of [5,4,3,2]){const F=Math.floor((maxW/s-10)/w20);if(F<18)continue;const h=(F*1.12*lines.length+14)*s;if(h>maxH&&s>2)continue;best={s,F};break;}return best;};
