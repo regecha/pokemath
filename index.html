@@ -166,8 +166,8 @@ h2{font-size:26px;margin-bottom:8px}h3{font-size:19px;margin:12px 0 6px}
 .gdPet{position:absolute;width:calc(var(--s,44) * var(--k,1) * 1px);height:calc(var(--s,44) * var(--k,1) * 1px);transform:translate(-50%,-100%);transition:left 3.6s linear,top 3.6s linear;cursor:pointer;z-index:3;display:flex;align-items:flex-end;justify-content:center}
 .gdPet img{max-width:100%;max-height:100%;image-rendering:pixelated;transition:transform .3s;filter:drop-shadow(0 1px 0 rgba(255,255,255,.35))}
 .gdPet.gdFlip img{transform:scaleX(-1)}
-.gdBub{position:absolute;left:50%;top:calc(56% - 50px * var(--k,1));transform:translate(-50%,-100%) scale(.92);transform-origin:50% 100%;z-index:150;width:max-content;max-width:94%;box-sizing:border-box;background:#fffdf0;border:2.5px solid #d8a82e;border-radius:14px;padding:6px 9px;font-size:12px;line-height:1.45;color:#5a4220;box-shadow:0 3px 0 rgba(138,100,32,.35);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;display:flex;align-items:center;gap:6px;word-break:keep-all}
-.gdBub:after{content:"";position:absolute;left:50%;bottom:-9px;width:14px;height:14px;background:#fffdf0;border-right:2.5px solid #d8a82e;border-bottom:2.5px solid #d8a82e;transform:translateX(-50%) rotate(45deg)}
+.gdBub{position:absolute;left:50%;top:calc(56% - 50px * var(--k,1));transform:translate(-50%,-100%) scale(.92);transform-origin:50% 100%;z-index:150;width:max-content;max-width:94%;box-sizing:border-box;background:rgba(255,253,240,.7);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);border:2.5px solid rgba(216,168,46,.85);border-radius:14px;padding:6px 9px;font-size:12px;line-height:1.45;color:#5a4220;box-shadow:0 3px 0 rgba(138,100,32,.35);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;display:flex;align-items:center;gap:6px;word-break:keep-all}
+.gdBub:after{content:"";position:absolute;left:50%;bottom:-9px;width:14px;height:14px;background:linear-gradient(to bottom right,transparent 50%,rgba(255,253,240,.7) 50%);border-right:2.5px solid rgba(216,168,46,.85);border-bottom:2.5px solid rgba(216,168,46,.85);transform:translateX(-50%) rotate(45deg)}
 .gdBub.on{opacity:1;transform:translate(-50%,-100%) scale(1)}
 .gdBub .gdBubTxt{flex:1;min-width:0}.gdBub .gdBubTag{display:block;font-family:'Jua';font-size:11px;color:#b07a00}
 .gdBubGo{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid #c99a2e;background:linear-gradient(#ffe58a,#f4c542);color:#6b4a10;font-size:16px;font-weight:900;line-height:1;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
@@ -4192,7 +4192,7 @@ function recordAnswer(q,ok,ms,opt={}){const m=S.meta,v=(q.iq||q.ko)?{c:0,x:0,st:
  if(!opt.retry){m.stats.q++;d.n++;v.c+=ok?1:0;v.x+=ok?0:1;}
  if((q.ko||q.iq)&&!opt.retry){try{xsTick(q,ok);}catch(e){console.warn('xsTick',e);}} // 국어·IQ도 개념(유형)을 3번 연속 맞히면 별 = 돌(정원 에너지)
  if(!opt.retry&&!q.ko&&!q.iq){try{domTick(q.sk,ok);}catch(e){}} // 영역별 하루 기록(진단 탭의 지난주 대비 변화용)
- if(!q.ko&&!q.iq){try{wbAdd(q,ok,opt);}catch(e){console.warn('wbAdd',e);}} // 오답 노트: 틀린 수학 문제 저장·해결 확인
+ try{wbAdd(q,ok,opt);}catch(e){console.warn('wbAdd',e);} // 오답 노트: 틀린 문제(수학·국어·IQ) 저장·해결 확인
  d.tt=(d.tt||0)+Math.min(ms,90000);
  if(ok){m.stats.c+=opt.retry?0:1;if(!opt.retry){d.c++;d.ms+=Math.min(ms,60000);}v.run++;v.w=Math.max(0,v.w-1);
   if(v.run>=3&&v.st<5){v.run=0;v.st++;S.newStars=(S.newStars||[]);S.newStars.push(q.sk);
@@ -4317,7 +4317,7 @@ async function startTraining(opt={}){
  const endless=!!opt.endless;S.trainEndless=endless;const N=endless?Infinity:(opt.n||trainN());const ghost=(opt.pool||endless)?null:lastTrain();
  const rx=(!opt.pool&&!endless)?buildRx():null;
  const v=$('#view');
- let idx=0,correct=0,combo=0,maxCombo=0,candy=0,rt=0,gw=0;let wRars=endless?rollEndlessSet():[],wBase=0;const wNeed=()=>Math.max(0,...wRars);const retryQ=[];const wbPool=endless?shuffle(wbList(m).filter(e=>!e.d)):[];
+ let idx=0,correct=0,combo=0,maxCombo=0,candy=0,rt=0,gw=0;let wRars=endless?rollEndlessSet():[],wBase=0;const wNeed=()=>Math.max(0,...wRars);const retryQ=[];const wbPool=endless?shuffle(wbList(m).filter(e=>!e.d&&wbKindOf(e)==='math')):[];
  const startT=performance.now();let ghT=0;let stop=null;const stopP=new Promise(r=>stop=r);
  v.innerHTML=`<div class=qWrap><div class=qTop><button class="btn ghost sm" id=tQuit>${endless?'그만하기':'그만'}</button><button class="btn green sm" id=tSave>${I('disk')} 저장·쉬기</button><div class=prog title="맞힌 문제"><div class=me style="width:0%;background:linear-gradient(90deg,#8be08b,#3cc47c)"></div>${ghost?`<div class=gh style="left:${ghost.c/ghost.n*100}%"><img src="${spriteURL(partnerId(),'front')}" alt=""><div class=gl>어제의 나 ${ghost.c}개</div></div>`:''}</div><div class=comboTag id=tCombo>${endless?'정답 0':''}</div></div><div class=buddy><div class=bimg>${monImg(partnerId(),'anim')}</div><div class=bubble id=tBub>${esc(MON[partnerId()].name)}: ${endless?'끝까지 같이 가자!':rx?`${rx.mode==='hard'?`오늘은 ${josa(rx.names.join('·'),'을를')} 기초부터 천천히 다져 보자!`:rx.mode==='strong'?`오늘은 ${rx.names.join('·')}도 챙기고 새 도전도 해 보자!`:`오늘은 ${josa(rx.names.join('·'),'을를')} 다져 보자!`}`:'같이 해 보자!'}</div></div><div id=qHost></div></div>`;
  v.scrollTop=0;if(endless)setTimeout(()=>prog(),0);
@@ -4331,7 +4331,7 @@ async function startTraining(opt={}){
   {h:'틀려도 괜찮아요',ic:'heart',t:'틀리면 원리 그림과 설명이 나오고, <b>조금 뒤에 같은 문제를 다시</b> 풀어요. 자꾸 틀리는 개념은 <b>아래 학년 기초부터 좌삼을 쌓아요</b>. 틀린 문제는 <b>나의 학습 기록 → 오답 노트</b>에 모여요. 다시 풀어서 2번 맞히면 해결!'}]);}
  if(endless&&!m.seen.c_endless)await coachOnce('c_endless',[{h:'야생 포켓몬 포획',ic:'flame',t:'끝이 없는 연습이에요! 문제를 풀다 보면 <b>야생 포켓몬이 불쑥</b> 나타나요. 언제 나올지는 비밀! 아직 도감에 없는 포켓몬이 먼저 나와요. 그만하고 싶을 때 언제든 <b>그만하기</b>를 눌러요.'}]);
  if(endless){await new Promise(res=>{const L=['오늘은 어떤 포켓몬이 모습을 드러낼까?<br>어쩌면 전설의 포켓몬이 나타날지도 몰라!','풀숲이 바스락거려요…<br>오늘 만날 야생 포켓몬은 누구일까요? 전설의 포켓몬이 숨어 있을지도 몰라요!','어떤 포켓몬이 나타날지는 아무도 몰라요.<br>문제를 풀다 보면 전설의 포켓몬을 만나게 될지도 몰라!'];
-  M(`<div style="text-align:center"><h2>야생 포켓몬 포획</h2><div style="display:flex;justify-content:center;height:90px">${monImg(partnerId(),'anim')}</div><p style="font-size:17px;line-height:1.7;margin:8px 0 4px"><b>${rpick(L)}</b></p><p class=mut style="font-size:13px">언제 나타날지는 비밀! 문제를 풀면서 기다려 봐요.</p>${wbOpenN(m)?`<p style="font-size:14px;margin:6px 0;color:#a8445e"><b>📝 오답 노트 문제 ${wbOpenN(m)}개가 먼저 나와요.</b><br>오답 문제를 풀다 보면 전설 포켓몬도 만날 수 있어요!</p>`:''}<div class=mbtns><button class="btn gold big" data-a=go>도전 시작!</button></div></div>`,{go:()=>{closeM();res();},_close:()=>{closeM();res();}});});}
+  M(`<div style="text-align:center"><h2>야생 포켓몬 포획</h2><div style="display:flex;justify-content:center;height:90px">${monImg(partnerId(),'anim')}</div><p style="font-size:17px;line-height:1.7;margin:8px 0 4px"><b>${rpick(L)}</b></p><p class=mut style="font-size:13px">언제 나타날지는 비밀! 문제를 풀면서 기다려 봐요.</p>${wbOpenN(m,'math')?`<p style="font-size:14px;margin:6px 0;color:#a8445e"><b>📝 오답 노트 문제 ${wbOpenN(m,'math')}개가 먼저 나와요.</b><br>오답 문제를 풀다 보면 전설 포켓몬도 만날 수 있어요!</p>`:''}<div class=mbtns><button class="btn gold big" data-a=go>도전 시작!</button></div></div>`,{go:()=>{closeM();res();},_close:()=>{closeM();res();}});});}
  let quit=false;
  while(idx<N||retryQ.length){
   let q,retry=false;
@@ -4547,7 +4547,7 @@ function kwOf(mon){let t=mon.types[0];if(t===0&&mon.types[1]!=null)t=mon.types[1
 const SPR_BASE='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
 // ===== 이로치: 파트너로 정한 포켓몬과 함께 문제를 100개 풀면 이로치로 변해요. 파트너를 바꾸면 원래 모습으로 돌아와요 =====
 const SHINY_AT=100;
-function shinyOn(id){try{const m=S.meta;return !!(m&&m.col&&id&&id===partnerId()&&((m.bond&&m.bond[id])||0)>=SHINY_AT);}catch(e){return false;}}
+function shinyOn(id){try{const m=S.meta;if(!(m&&m.col&&id&&((m.bond&&m.bond[id])||0)>=SHINY_AT))return false;if(id===partnerId())return true;return gdPets(m).indexOf(id)>=0;}catch(e){return false;}} // 정원에 풀어놓은 포켓몬은 파트너가 아니어도 계속 이로치
 function bondTick(pid){const m=S.meta;m.bond=m.bond||{};const b=(m.bond[pid]||0)+1;m.bond[pid]=b;
  if(b===SHINY_AT){try{setTimeout(()=>{sfx('win');confetti(60);toast(`✨ ${josa(esc(MON[pid].name),'이가')} 이로치로 변했어요! 파트너로 함께 있는 동안 반짝여요!`);},900);}catch(e){}}}
 function spriteURL(id,kind='front',ns){if(!S.meta.settings.imgs)return fallbackSprite(id);const sh=!ns&&shinyOn(id)?'shiny/':'';
@@ -4676,7 +4676,7 @@ function partnerId(){const m=S.meta;if(m.partner&&m.col[m.partner])return m.part
 function setPartner(id){S.meta.partner=id;autoSave();sfx('level');toast(`${josa(esc(MON[id].name),'와과')} 함께 공부해요!`);}
 const bondOf=id=>(S.meta.bond&&S.meta.bond[id])||0;
 function partnerPicker(after){const m=S.meta;const ids=Object.keys(m.col).map(Number).sort((a,b)=>bondOf(b)-bondOf(a)||a-b);const cur=partnerId();
- M(`<h2>${I('heart')} 함께 공부할 파트너</h2><p class=mut style="font-size:13px">가진 포켓몬 누구와도 함께 공부할 수 있어요. 함께 푼 문제가 쌓이면 단짝이 돼요!<br>✨ 파트너와 함께 <b>100문제</b>를 풀면 <b>이로치</b>로 변해요! 파트너를 바꾸면 원래 모습으로 돌아와요.${shinyOn(cur)?'<br><b style="color:#d6336c">✨ 지금 파트너는 이로치예요! 다른 포켓몬을 고르면 원래 모습으로 돌아가요.</b>':''}</p>
+ M(`<h2>${I('heart')} 함께 공부할 파트너</h2><p class=mut style="font-size:13px">가진 포켓몬 누구와도 함께 공부할 수 있어요. 함께 푼 문제가 쌓이면 단짝이 돼요!<br>✨ 파트너와 함께 <b>100문제</b>를 풀면 <b>이로치</b>로 변해요! 파트너를 바꾸면 원래 모습으로 돌아와요. (<b>포켓몬 정원</b>에 풀어놓은 포켓몬은 계속 이로치예요!)${shinyOn(cur)?'<br><b style="color:#d6336c">✨ 지금 파트너는 이로치예요! 다른 포켓몬을 고르면 원래 모습으로 돌아가요. (정원에 있으면 계속 이로치)</b>':''}</p>
   <div class=dexGrid style="margin-top:8px;max-height:56vh;overflow-y:auto">${ids.map(id=>`<div class="dexCell" data-pid="${id}" style="${id===cur?'border-color:#ff5a8a;border-width:3px':''}">${bondOf(id)?`<span class=n2>${bondOf(id)}</span>`:''}${monImg(id,'front','',id!==cur)}<span class=nm>${esc(MON[id].name)}${id===cur&&shinyOn(id)?' ✨':''}</span></div>`).join('')}</div>
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,{x:()=>closeM(),_close:()=>closeM()},{wide:1});
  $('#mbox').querySelectorAll('[data-pid]').forEach(c=>c.onclick=()=>{setPartner(+c.dataset.pid);closeM();if(after)after();});}
@@ -7975,46 +7975,59 @@ function renderGrowth(){S.screen='grow';const m=S.meta,L=lvOf(m.xp);
 // ===== 오답 노트: 틀린 수학 문제를 모아 두고, 다시 풀어서 2번 맞히면 '해결' =====
 const WB_MAX=60;
 function wbList(m=S.meta){return Array.isArray(m.wb)?m.wb.filter(e=>e&&e.k&&e.q&&e.a&&Array.isArray(e.ch)&&SKM[e.sk]):[];}
-function wbOpenN(m=S.meta){try{return wbList(m).filter(e=>!e.d).length;}catch(e){return 0;}}
+function wbKindOf(e){return(e&&e.kd)||'math';}
+function wbOpenN(m=S.meta,kd){try{return wbList(m).filter(e=>!e.d&&(!kd||wbKindOf(e)===kd)).length;}catch(e){return 0;}}
+function wbKind(q){return q.iq?'iq':q.ko?'ko':q.en?'en':'math';}
+function wbKey(q){return(q.ko&&q.iid)?'ko|'+q.iid:q.key;}
+const WB_EX=['ko','iq','en','type','iid','iqType','keep','ref','rv','say','tier'];
+const WB_KINDS=[['math','➗','수학'],['ko','📖','국어'],['en','🔤','영어'],['iq','🧠','IQ']];
+const WB_KO_T={pick:'빈칸',dict:'소리와 표기',space:'띄어쓰기',vocab:'낱말',proverb:'속담',idiom:'관용 표현',hanja:'한자어',fix:'바르게 고치기'},WB_EN_T={vocabulary:'단어',grammar:'문법',translation:'문장 해석',reading:'독해'};
+function wbNm(e){const kd=wbKindOf(e),x=e.x||{};if(kd==='ko')return '국어 · '+(WB_KO_T[x.type]||'');if(kd==='en')return '영어 · '+(WB_EN_T[x.type]||'');if(kd==='iq')return 'IQ · '+(x.iqType||'퀴즈');return (SKM[e.sk]||{}).n||'';}
 function wbSafe(h){return String(h==null?'':h).replace(/<\s*script[\s\S]*?(<\/\s*script\s*>|$)/gi,'').replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi,'').replace(/javascript:/gi,'');}
 function wbAdd(q,ok,opt){
- if(!q||!q.key||!q.sk||!SKM[q.sk]||q.iq||q.ko||q.en||!Array.isArray(q.ch))return;
- opt=opt||{};const m=S.meta;const L=m.wb=Array.isArray(m.wb)?m.wb:[];const e=L.find(x=>x&&x.k===q.key);
+ if(!q||!q.key||!q.sk||!SKM[q.sk]||!Array.isArray(q.ch))return;
+ opt=opt||{};const m=S.meta;const L=m.wb=Array.isArray(m.wb)?m.wb:[];const kd=wbKind(q),qk=wbKey(q);const e=L.find(x=>x&&x.k===qk);
  if(ok){if(e&&!e.d){e.ok=(e.ok||0)+1;if(e.ok>=2)e.d=today();}return;}
  const c=opt.choice!=null?String(opt.choice):'';const mi=(q.mis&&c&&q.mis[c])||'';
  if(e){e.n=(e.n||1)+1;e.ok=0;e.d=0;e.t=today();e.c=c;e.mi=mi;return;}
  if(opt.retry)return;
- const pic=q.pic||'';if(pic.length>6000)return; // 아주 큰 그림 문제는 저장하지 않아요(저장 코드가 커져요)
- L.push({k:q.key,sk:q.sk,q:q.q,a:q.a,ch:q.ch.slice(),e:q.e||'',pic,m:(q.m&&!pic&&q.m.length<=3000)?q.m:'',c,mi,t:today(),n:1,ok:0,d:0});
- while(L.length>WB_MAX){let i=L.findIndex(x=>x&&x.d);if(i<0)i=0;L.splice(i,1);}
+ const pic=q.pic||'';if(pic.length>(kd==='math'?6000:8000))return; // 아주 큰 그림 문제는 저장하지 않아요(저장 코드가 커져요)
+ const it={k:qk,sk:q.sk,q:q.q,a:q.a,ch:q.ch.slice(),e:q.e||'',pic,m:(q.m&&!pic&&q.m.length<=3000)?q.m:'',c,mi,t:today(),n:1,ok:0,d:0};
+ if(kd!=='math'){it.kd=kd;it.x={};WB_EX.forEach(f=>{if(q[f]!=null)it.x[f]=q[f];});}
+ L.push(it);
+ const cap=kd==='math'?WB_MAX:40,same=()=>L.filter(x=>x&&wbKindOf(x)===kd);
+ while(same().length>cap){let i=L.findIndex(x=>x&&x.d&&wbKindOf(x)===kd);if(i<0)i=L.findIndex(x=>x&&wbKindOf(x)===kd);L.splice(i,1);}
 }
-function wbMakeQ(e,retry){return{sk:e.sk,q:e.q,a:e.a,ch:shuffle(e.ch.slice()),e:e.e||'',pic:e.pic||undefined,m:e.m||undefined,key:e.k,retry:!!retry};}
-let WBF='all';
+function wbMakeQ(e,retry){const x=e.x||{};const q={sk:e.sk,q:e.q,a:e.a,ch:x.keep?e.ch.slice():shuffle(e.ch.slice()),e:e.e||'',pic:e.pic||undefined,m:e.m||undefined,key:e.k,retry:!!retry};Object.assign(q,x);return q;}
+let WBF='all',WBK='math';
 function wbDomOf(e){try{return domOf(SKM[e.sk]);}catch(x){return 'num';}}
-function wbItemHTML(e){const sk=SKM[e.sk],mi=e.mi&&ES_MIS[e.mi];const t=stripTags(e.q),tt=t.length>40?t.slice(0,40)+'…':t;
+function wbItemHTML(e){const kd=wbKindOf(e),mi=kd==='math'&&e.mi&&ES_MIS[e.mi];const t=stripTags(e.q),tt=t.length>40?t.slice(0,40)+'…':t;const FM=kd==='math'?fmtMath:(h=>h);
  const st=e.d?`<span class=pill style="border-color:#2f9e6e;color:#2f9e6e">해결!</span>`:`<span class=pill>맞힘 ${e.ok||0}/2</span>`;
- return `<details style="margin-bottom:6px"><summary style="cursor:pointer;display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:150px"><b>${esc(tt)}</b><br><span class=mut style="font-size:12px">${esc(sk.n)} · ${esc(String(e.t||'').slice(5).replace('-','/'))} · ${e.n||1}번 틀렸어요</span></span>${st}</summary>
-  <div class=explain style="margin-top:6px;text-align:left"><div class=qText style="font-size:16px">${fmtMath(wbSafe(e.q))}</div>${e.pic?`<div class=qPic>${wbSafe(e.pic)}</div>`:''}
-  ${e.c?`<div style="margin-top:6px">내가 고른 답: <b style="color:#c0392b">${fmtMath(esc(e.c))}</b></div>`:''}<div>정답: <b style="color:#2f9e6e">${fmtMath(esc(e.a))}</b></div>
-  ${mi?`<div style="margin-top:4px">혹시 <b>「${esc(mi.l)}」</b> 실수를 했나요?</div>`:''}${e.e?`<div style="margin-top:4px">${fmtMath(wbSafe(e.e))}</div>`:''}${e.m?`<div class=mdlBox>${wbSafe(e.m)}</div>`:''}</div></details>`;}
+ return `<details style="margin-bottom:6px"><summary style="cursor:pointer;display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:150px"><b>${esc(tt)}</b><br><span class=mut style="font-size:12px">${esc(wbNm(e))} · ${esc(String(e.t||'').slice(5).replace('-','/'))} · ${e.n||1}번 틀렸어요</span></span>${st}</summary>
+  <div class=explain style="margin-top:6px;text-align:left"><div class=qText style="font-size:16px">${FM(wbSafe(e.q))}</div>${e.pic?`<div class=qPic>${wbSafe(e.pic)}</div>`:''}
+  ${e.c?`<div style="margin-top:6px">내가 고른 답: <b style="color:#c0392b">${FM(esc(e.c))}</b></div>`:''}<div>정답: <b style="color:#2f9e6e">${FM(esc(e.a))}</b></div>
+  ${mi?`<div style="margin-top:4px">혹시 <b>「${esc(mi.l)}」</b> 실수를 했나요?</div>`:''}${e.e?`<div style="margin-top:4px">${FM(wbSafe(e.e))}</div>`:''}${e.m?`<div class=mdlBox>${wbSafe(e.m)}</div>`:''}</div></details>`;}
 function wbTabHTML(m){
- const all=wbList(m),open=all.filter(e=>!e.d).sort((a,b)=>(String(b.t)>String(a.t)?1:String(b.t)<String(a.t)?-1:0)),done=all.filter(e=>e.d);
+ const every=wbList(m),all=every.filter(e=>wbKindOf(e)===WBK),open=all.filter(e=>!e.d).sort((a,b)=>(String(b.t)>String(a.t)?1:String(b.t)<String(a.t)?-1:0)),done=all.filter(e=>e.d);
  const cnt={};DOMS.forEach(d=>cnt[d.k]=open.filter(e=>wbDomOf(e)===d.k).length);
- if(WBF!=='all'&&!cnt[WBF])WBF='all';
+ if(WBK!=='math'||(WBF!=='all'&&!cnt[WBF]))WBF='all';
  const shown=WBF==='all'?open:open.filter(e=>wbDomOf(e)===WBF);
- const head=`<div class=panel><h3 style="margin-top:0">📝 오답 노트 <span class=mut style="font-size:13px">(수학 문제 · 틀린 문제가 자동으로 모여요)</span></h3>
-  <div class=explain style="font-size:13px;line-height:1.7">• 훈련·연습·배틀에서 <b>틀린 수학 문제</b>가 자동으로 저장돼요.<br>• 다시 풀어서 <b>2번 맞히면 '해결'</b>이에요. 해결한 문제는 아래 '해결한 문제'로 옮겨져요.<br>• 같은 문제를 훈련 중에 다시 만나 맞혀도 해결에 포함돼요. 최대 ${WB_MAX}문제까지 보관해요.</div>
+ const kt=`<div class=filters style="margin-bottom:8px">${WB_KINDS.map(([k,ic,n])=>{const c=every.filter(e=>!e.d&&wbKindOf(e)===k).length;return `<button class="fbtn${WBK===k?' on':''}" data-wbk="${k}">${ic} ${n}${c?' '+c:''}</button>`;}).join('')}</div>`;
+ const head=`<div class=panel><h3 style="margin-top:0">📝 오답 노트 <span class=mut style="font-size:13px">(수학·국어·영어·IQ · 틀린 문제가 자동으로 모여요)</span></h3>
+  ${kt}
+  <div class=explain style="font-size:13px;line-height:1.7">• 훈련·연습·배틀에서 <b>틀린 문제</b>가 과목별로 자동 저장돼요.<br>• 다시 풀어서 <b>2번 맞히면 '해결'</b>이에요. 해결한 문제는 아래 '해결한 문제'로 옮겨져요.<br>• 같은 문제를 훈련 중에 다시 만나 맞혀도 해결에 포함돼요. 과목마다 수학 ${WB_MAX}문제, 국어·영어·IQ는 40문제까지 보관해요.</div>
   <div class=row style="gap:8px;margin-top:8px"><span class=pill>다시 풀 문제 ${open.length}개</span><span class=pill style="border-color:#2f9e6e;color:#2f9e6e">해결한 문제 ${done.length}개</span></div></div>`;
- if(!all.length)return head+`<div class=panel style="text-align:center"><p style="font-size:16px;margin:6px 0">아직 틀린 문제가 없어요.<br>훈련하다가 틀린 문제는 여기에 자동으로 모여요!</p><p class=mut style="font-size:12px">틀리는 건 나쁜 게 아니에요. 다시 풀어서 내 것으로 만들면 돼요.</p></div>`;
- const chips=`<div class=filters style="margin-bottom:8px"><button class="fbtn${WBF==='all'?' on':''}" data-wbf="all">전체 ${open.length}</button>${DOMS.filter(d=>cnt[d.k]).map(d=>`<button class="fbtn${WBF===d.k?' on':''}" data-wbf="${d.k}">${d.ic} ${d.n} ${cnt[d.k]}</button>`).join('')}</div>`;
+ if(!all.length)return head+`<div class=panel style="text-align:center"><p style="font-size:16px;margin:6px 0">아직 ${(WB_KINDS.find(x=>x[0]===WBK)||[])[2]||''} 틀린 문제가 없어요.<br>훈련하다가 틀린 문제는 여기에 자동으로 모여요!</p><p class=mut style="font-size:12px">틀리는 건 나쁜 게 아니에요. 다시 풀어서 내 것으로 만들면 돼요.</p></div>`;
+ const chips=WBK!=='math'?'':`<div class=filters style="margin-bottom:8px"><button class="fbtn${WBF==='all'?' on':''}" data-wbf="all">전체 ${open.length}</button>${DOMS.filter(d=>cnt[d.k]).map(d=>`<button class="fbtn${WBF===d.k?' on':''}" data-wbf="${d.k}">${d.ic} ${d.n} ${cnt[d.k]}</button>`).join('')}</div>`;
  const list=open.length?`<div class=panel><h3 style="margin-top:0">다시 풀 문제 <span class=mut style="font-size:13px">(눌러서 정답과 설명을 봐요)</span></h3>${chips}
   <div class=mbtns style="margin:6px 0 10px"><button class="btn gold big" id=wbGo>${I('flame')} 오답 다시 풀기 (${Math.min(8,shown.length)}문제)</button></div>${shown.map(wbItemHTML).join('')}</div>`
   :`<div class=panel style="text-align:center"><p style="font-size:16px;margin:6px 0">🎉 다시 풀 문제를 모두 해결했어요!<br>정말 대단해요.</p></div>`;
  const dn=done.length?`<div class=panel><details><summary style="cursor:pointer"><b>해결한 문제 ${done.length}개</b> <span class=mut style="font-size:12px">(눌러서 펼치기)</span></summary><div style="margin-top:8px">${done.map(wbItemHTML).join('')}</div><div class=mbtns style="margin:8px 0 0"><button class="btn ghost sm" id=wbClr>해결한 문제 지우기</button></div></details></div>`:'';
  return head+list+dn;}
 function wbBind(m){
+ $('#view').querySelectorAll('[data-wbk]').forEach(b=>b.onclick=()=>{sfx('tap');WBK=b.dataset.wbk;WBF='all';renderGrowth();});
  $('#view').querySelectorAll('[data-wbf]').forEach(b=>b.onclick=()=>{sfx('tap');WBF=b.dataset.wbf;renderGrowth();});
- const go=$('#wbGo');if(go)go.onclick=()=>{sfx('tap');const open=wbList(m).filter(e=>!e.d&&(WBF==='all'||wbDomOf(e)===WBF));
+ const go=$('#wbGo');if(go)go.onclick=()=>{sfx('tap');const open=wbList(m).filter(e=>!e.d&&wbKindOf(e)===WBK&&(WBK!=='math'||WBF==='all'||wbDomOf(e)===WBF));
   const pick=open.sort((a,b)=>((b.n||1)-(a.n||1))||(rnd()-.5)).slice(0,8);if(!pick.length){toast('다시 풀 문제가 없어요');return;}startWrongBook(shuffle(pick).map(e=>e.k));};
  const cl=$('#wbClr');if(cl)cl.onclick=async()=>{if(await confirmBox('해결한 문제를 오답 노트에서 지울까요?','지우기','아니요')){m.wb=wbList(m).filter(e=>!e.d);autoSave();sfx('tap');renderGrowth();}};}
 async function startWrongBook(keys){
@@ -9550,6 +9563,7 @@ recordAnswer=function(q,ok,ms,opt={}){
  {const h=new Date().getHours();m.tod=m.tod||{m:0,a:0,e:0};m.tod[h<12?'m':h<18?'a':'e']++;}
  m.stats.bestStreak=Math.max(m.stats.bestStreak||0,streakDays());z.lastLevel=+m.enLevel||1;z.lastAt=today();
  if(!opt.retry&&q.ref){const W=m.enWrong=m.enWrong||[],ix=W.findIndex(x=>x.k===q.ref.k);if(ok){if(ix>=0){W[ix].n=(W[ix].n||0)+1;if(W[ix].n>=2)W.splice(ix,1);}}else{const it={t:q.ref.t,i:q.ref.i,j:q.ref.j,d:q.ref.d,l:q.ref.l,k:q.ref.k,n:0};if(ix>=0)W[ix]=it;else W.push(it);if(W.length>80)W.shift();}}
+ try{wbAdd(q,ok,opt);}catch(e){console.warn('wbAdd',e);} // 오답 노트: 영어도 저장
  gainXP(ok?10:opt.guess?0:3);autoSave();};
 const __qHTMLBeforeEnglish=qHTML;
 qHTML=function(q,head=''){if(!q||!q.en)return __qHTMLBeforeEnglish(q,head);const two=q.ch.length===2;return `${head}<div class=qCard><span class="qSk">영어 · ${esc(EN_LEVELS[(S.meta.enLevel||1)-1].n)} · ${{vocabulary:'단어',grammar:'문법',translation:'문장 해석',reading:'독해'}[q.type]||'영어'}${q.rv?' · 복습':''}</span><div class=qText>${q.q}</div></div><div class="choices${two?' two':''}">${q.ch.map((c,i)=>`<button class=ch data-i="${i}">${esc(c)}</button>`).join('')}</div><div class=qAfter></div>`;};
