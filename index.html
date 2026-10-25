@@ -4842,12 +4842,47 @@ function renderDex(){S.screen='dex';const me=S.meta;const own=ownCount();
 // ---- 덱 ----
 const DECK_N=12;
 function deckValid(d){return d.length===DECK_N&&d.every(id=>MON[id]);}
-function autoDeck(){const me=S.meta;const list=[];Object.keys(me.col).map(Number).sort((a,b)=>{const A=MON[a],B=MON[b];return (B.atk+B.hp)/(B.cost+1)-(A.atk+A.hp)/(A.cost+1);}).forEach(id=>{for(let k=0;k<deckLim(id);k++)list.push(id);});
- // 비용이 고르게: 1~2비용 6장, 3~4비용 4장, 5~6비용 2장을 목표로
- const pick=[];const want={a:6,b:4,c:2};const band=id=>MON[id].cost<=2?'a':MON[id].cost<=4?'b':'c';
- for(const id of list){if(pick.length>=DECK_N)break;const b=band(id);if(want[b]>0){want[b]--;pick.push(id);}}
- for(const id of list){if(pick.length>=DECK_N)break;const used=pick.filter(x=>x===id).length;if(used<deckLim(id))pick.push(id);}
- return pick.slice(0,DECK_N);}
+// ---- 카드 평가 AI: 덱 자동 구성과 로그라이크 자동 선택이 같이 써요 ----
+const AI_KW={tough:1,ember:2.2,wave:1.4,heal:.8,rush:2.2,freeze:2.6,fight:1,poison:1.8,quake:1,wing:2,draw:1.8,grow:2.2,taunt:1.6,dodge:2,double:2.6,sneak:1.2,armor:1.8,fairy:1.2};
+const AI_AVG=[0,5,7,9,11,13.2,15.7],AI_ATK=[0,2.2,3.2,4,5,6,7.3],AI_TARGET=[0,2,3,3,2,1,1]; // 비용별 평균 능력치 합·공격, 12장 덱의 목표 비용 곡선
+const aiCache={};
+const aiCost=m=>Math.max(1,Math.min(6,m.cost));
+function aiScore(id){if(aiCache[id]!=null)return aiCache[id];
+ const m=MON[id],c=aiCost(m),k=kwOf(m).k;
+ const eff=1.15*m.atk+m.hp-(AI_AVG[c]+.15*AI_ATK[c]); // 같은 비용 평균보다 능력치가 얼마나 높은가
+ let kv=AI_KW[k]||1;if(m.rar>=5)kv*=1.5;else if(m.rar>=4)kv*=1.25; // 4~5성은 특성도 더 강해요
+ if(k==='double')kv*=Math.max(.6,Math.min(1.5,m.atk/4)); // 두 번 공격은 공격력이 높을수록 좋아요
+ if((k==='rush'||k==='draw')&&c<=3)kv*=1.2; // 빠른 효과는 싼 카드일수록 좋아요
+ if((k==='grow'||k==='tough')&&c<=3)kv*=1.15;
+ return aiCache[id]=eff+kv+(m.atk+m.hp)*.22;} // 마지막 항: 비싼 카드의 묵직함
+function aiDeckScore(deck){let s=0;const cc=[0,0,0,0,0,0,0],types=new Set(),kws={};let cost=0;
+ deck.forEach(id=>{const m=MON[id];s+=aiScore(id);cc[aiCost(m)]++;cost+=m.cost;types.add(m.types[0]);const k=kwOf(m).k;kws[k]=(kws[k]||0)+1;});
+ for(let c=1;c<=6;c++)s-=1.6*Math.abs(cc[c]-AI_TARGET[c]); // 비용이 고르게
+ const early=cc[1]+cc[2];if(early<5)s-=(5-early)*3; // 처음부터 낼 수 있는 카드
+ if(cc[5]+cc[6]>3)s-=(cc[5]+cc[6]-3)*4; // 무거운 카드가 너무 많으면 손이 막혀요
+ s-=3*Math.abs(cost/Math.max(1,deck.length)-3.1);
+ s+=Math.min(types.size,7)*.9+Math.min(Object.keys(kws).length,8)*.4; // 속성·특성이 다양할수록 여러 상대에 강해요
+ const STACK=['ember','rush','wave','freeze','poison','grow'];STACK.forEach(k=>{if(kws[k]>1)s+=Math.min(2,kws[k]-1)*.8;}); // 겹칠수록 강한 특성
+ for(const k in kws){if(STACK.indexOf(k)<0&&kws[k]>2)s-=(kws[k]-2)*1.5;} // 겹쳐도 더 세지지 않는 특성은 2장까지만
+ const def=(kws.taunt||0)+(kws.armor||0);if(def>=1)s+=1;if(def>3)s-=(def-3)*1.5; // 방어 카드는 1~3장
+ return s;}
+function autoDeck(){const me=S.meta;
+ const ids=Object.keys(me.col).map(Number).filter(id=>MON[id]&&deckLim(id)>0).sort((a,b)=>aiScore(b)-aiScore(a)||a-b);
+ if(!ids.length)return[];
+ const lim={},cnt={},deck=[];ids.forEach(id=>lim[id]=deckLim(id));
+ const add=id=>{deck.push(id);cnt[id]=(cnt[id]||0)+1;};
+ // 1) 목표 비용 곡선에 맞춰 비용마다 가장 강한 카드부터 채워요
+ for(let c=1;c<=6;c++){let need=AI_TARGET[c];for(const id of ids){if(need<=0||deck.length>=DECK_N)break;if(aiCost(MON[id])!==c)continue;while(need>0&&(cnt[id]||0)<lim[id]&&deck.length<DECK_N){add(id);need--;}}}
+ // 2) 비는 자리는 가장 강한 카드로
+ for(const id of ids){while(deck.length<DECK_N&&(cnt[id]||0)<lim[id])add(id);}
+ // 3) 카드를 하나씩 바꿔 보며 덱 전체 점수가 오르면 교체해요 (더 못 오를 때까지)
+ let best=aiDeckScore(deck),improved=true,guard=0;
+ while(improved&&guard++<40){improved=false;
+  for(let i=0;i<deck.length;i++){const old=deck[i];let bi=-1,bs=best;
+   for(const id of ids){if(id===old||(cnt[id]||0)>=lim[id])continue;deck[i]=id;const sc=aiDeckScore(deck);if(sc>bs+1e-9){bs=sc;bi=id;}}
+   deck[i]=old;
+   if(bi>=0){cnt[old]--;deck[i]=bi;cnt[bi]=(cnt[bi]||0)+1;best=bs;improved=true;}}}
+ return deck.sort((a,b)=>MON[a].cost-MON[b].cost||a-b).slice(0,DECK_N);}
 function ensureDeck(){const me=S.meta;const cnt={};const ok=me.deck.filter(id=>{cnt[id]=(cnt[id]||0)+1;return me.col[id]&&cnt[id]<=deckLim(id);});
  if(ok.length>DECK_N)ok.length=DECK_N;
  if(ok.length<DECK_N){for(const id of autoDeck()){if(ok.length>=DECK_N)break;const n=ok.filter(x=>x===id).length;if(n<deckLim(id))ok.push(id);}}
@@ -4864,7 +4899,7 @@ function renderDeck(keep){S.screen='deck';const me=S.meta;if(!keep)ensureDeck();
   <h3>가진 카드</h3>${(()=>{const names=[];owned.forEach(id=>{const n=kwOf(MON[id]).n;if(!names.includes(n))names.push(n);});if(DECKKW&&!names.includes(DECKKW))DECKKW='';const cnt=n=>owned.filter(id=>kwOf(MON[id]).n===n).length;const sel=DECKKW?Object.values(KW).find(k=>k.n===DECKKW):null;return `<div class=filters style="margin:6px 0"><button class="fbtn${DECKKW?'':' on'}" data-kw="">전체 특성 <small>${owned.length}</small></button>${names.map(n=>{const k=Object.values(KW).find(v=>v.n===n);return `<button class="fbtn${DECKKW===n?' on':''}" data-kw="${esc(n)}">${I(k.ic)} ${esc(n)} <small>${cnt(n)}</small></button>`;}).join('')}</div>${sel?`<div class=mut style="font-size:13px;margin-bottom:8px">${I(sel.ic)} <b>${esc(sel.n)}</b> · ${esc(sel.d)}</div>`:''}`;})()}<div class=colGrid>${owned.filter(id=>!DECKKW||kwOf(MON[id]).n===DECKKW).map(id=>{const inD=counts[id]||0,lim=deckLim(id);return cardHTML(id,{size:'deck',cnt:me.col[id],cls:inD>=lim?'locked':''});}).join('')}</div></div></div>`;
  bindHud();
  $('#view').querySelectorAll('[data-kw]').forEach(b=>b.onclick=()=>{sfx('tap');DECKKW=b.dataset.kw;renderDeckKeep();});
- $('#dAuto').onclick=()=>{sfx('tap');me.deck=autoDeck();autoSave();renderDeck();};
+ $('#dAuto').onclick=()=>{sfx('tap');me.deck=autoDeck();autoSave();renderDeck();try{const d=me.deck,av=(d.reduce((x,id)=>x+MON[id].cost,0)/Math.max(1,d.length)).toFixed(1),tn=new Set(d.map(id=>MON[id].types[0])).size;toast(`가진 카드로 가장 강한 조합을 짰어요! 평균 비용 ${av} · 속성 ${tn}종`);}catch(e){}};
  $('#deckBar').querySelectorAll('.card').forEach(c=>c.onclick=()=>{sfx('tap');me.deck.splice(+c.dataset.di,1);autoSave();renderDeckKeep();});
  $('.colGrid').querySelectorAll('.card').forEach(c=>c.onclick=()=>{const id=+c.dataset.id;const inD=me.deck.filter(x=>x===id).length;if(me.deck.length>=DECK_N){toast('덱이 꽉 찼어요. 위에서 한 장을 빼 주세요');return;}if(inD>=deckLim(id)){toast('같은 카드는 가진 만큼, 최대 2장까지예요');return;}sfx('tap');me.deck.push(id);autoSave();renderDeckKeep();});}
 function renderDeckKeep(){const y=$('#view').scrollTop;renderDeck(true);$('#view').scrollTop=y;}
@@ -9707,6 +9742,18 @@ function rlRandMon(w,ban){const b=new Set(ban||[]);for(let k=0;k<20;k++){const r
 function rlFoeStats(kind,id){const b=MON[id],run=RUN(),F=RL_FLOOR[(run&&run.floor)||1]||RL_FLOOR[1],c=F.foe[kind==='boss'?'boss':'normal'];
  return{hp:Math.max(1,Math.round(b.hp*c.hp)),atk:Math.max(1,b.atk+c.atk),att:kind==='elite'?Math.max(2,c.att):c.att};} // 엘리트는 1층에서도 한 차례에 2번 공격해요
 function rlStarterIds(){const set=new Set();const walk=id=>{if(!MON[id]||set.has(id))return;set.add(id);MON[id].to.forEach(walk);};Object.keys(STARTERS).forEach(k=>STARTERS[k].forEach(walk));const col=S.meta.col||{};return [...set].filter(id=>col[id]).sort((a,b)=>a-b);}
+// 로그라이크 자동 선택: 나머지 5장은 완전 랜덤이라, 내가 고르는 카드는 강하면서 초반·중반·후반을 받쳐 주는 조합이 좋아요
+function rlSetScore(p,sc){let s=0;const types=new Set(),ks=new Set();let heavy=0,cheap=0;
+ p.forEach(id=>{const m=MON[id];s+=sc[id];types.add(m.types[0]);ks.add(kwOf(m).k);if(m.cost>=5)heavy++;if(m.cost<=3)cheap++;});
+ s+=types.size*1.2+ks.size*.8;if(heavy>1)s-=(heavy-1)*9;if(cheap<1)s-=5; // 비싼 카드(5~6비용)는 1장까지만
+ if(p.some(id=>MON[id].cost<=2))s+=2;if(p.some(id=>MON[id].cost>=4))s+=1.5;return s;}
+function rlAutoPick(owned,need){const ids=owned.filter(id=>MON[id]);if(ids.length<=need)return ids.slice();
+ const sc={};ids.forEach(id=>sc[id]=aiScore(id)*(.9+rnd()*.2)+Math.max(0,MON[id].rar-1)*.5); // 살짝 흔들어서 누를 때마다 조금씩 다른 강한 조합이 나와요
+ const byS=ids.slice().sort((a,b)=>sc[b]-sc[a]),pool=new Set(byS.slice(0,need>4?12:16));
+ byS.filter(id=>MON[id].cost<=3).slice(0,need>4?5:8).forEach(id=>pool.add(id));byS.filter(id=>MON[id].cost<=2).slice(0,need>4?3:6).forEach(id=>pool.add(id)); // 싼 카드도 후보에 꼭 넣어요
+ const top=Array.from(pool);let best=null,bs=-1e9;
+ const rec=(st,pk)=>{if(pk.length===need){const v=rlSetScore(pk,sc);if(v>bs){bs=v;best=pk.slice();}return;}for(let i=st;i<top.length;i++){pk.push(top[i]);rec(i+1,pk);pk.pop();}};
+ rec(0,[]);return best||top.slice(0,need);}
 function rlDeal(picked){ // 내가 고른 3장 + 전체 도감에서 완전 랜덤 5장
  const used=new Set(),deck=[],pairs=[];
  picked.slice(0,RL.pick).forEach(id=>{if(MON[id]&&!used.has(id)){used.add(id);deck.push(id);pairs.push([1,id]);}});
@@ -10334,12 +10381,12 @@ function rlRenderEntry(){
  rlSetBg('',run?run.bg:(rl.lastBg!=null?rl.lastBg:4));
  const stats=`<div class="sc-reward-list"><div class="sc-reward"><strong>${rl.runs}</strong>도전</div><div class="sc-reward"><strong>${rl.clears}</strong>클리어</div><div class="sc-reward"><strong>${Math.min(rl.best||0,RL.floors*(RL.steps+1))} / ${RL.floors*(RL.steps+1)}</strong>최고 단계</div><div class="sc-reward"><strong>${Object.keys(rl.relicSeen).length}/${Object.keys(RL_RELICS).length}</strong>유물 도감</div></div>`;
  const rules=`<div class="rl-rules"><div>🃏 <b>내 카드 ${RL.pick}장 + 완전 랜덤 ${RL.rand}장</b> = ${RL.pick+RL.rand}장으로 출발! 카드 수 제한은 없어요.</div><div>🗺️ 분기점을 골라 ${RL.steps}번 나아가면 <b>보스</b>가 기다려요. 보스를 쓰러뜨리면 <b>포켓몬 카드</b>를 받고, <b>그만둘지 다음 층(최대 ${RL.floors}층)</b>으로 갈지 골라요. 층이 오를수록 적이 강해져요!</div><div>⚔️ 전투 · 💀 엘리트 · 🏟️ 관장 · 🏺 유물 · ⛺ 휴식 · 🛒 상점 · 🎲 랜덤 · 🎓 시련</div><div>💰 모험 중 얻은 <b>포켓몬·유물·골드</b>는 모험 안에서만 써요. (가져간 내 카드도 사라지지 않아요!)</div><div>🎁 보스를 쓰러뜨리면 경험치·코인·사탕·별가루와 함께 <b>지워진 도감 기록(포켓몬 카드 1장)</b>을 되찾아요!</div><div>💔 트레이너 체력이 0이 되면 모험이 끝나요.</div></div>`;
- let body;
+ let body,owned=[],need=0;
  if(run){const reg=SC_REGIONS[run.bg];
   body=`<div class="scv-card"><span class="sc-tag">▶ 진행 중인 모험</span><h3>${reg.icon} ${esc(reg.name)}</h3><div class="sc-reward-list"><div class="sc-reward"><strong>${run.floor||1}층 ${Math.min(run.step+1,RL.steps+1)} / ${RL.steps+1}</strong>단계</div><div class="sc-reward"><strong>${run.hp}/${run.max}</strong>체력</div><div class="sc-reward"><strong>${run.gold}</strong>골드</div><div class="sc-reward"><strong>${run.deck.length}</strong>덱 카드</div><div class="sc-reward"><strong>${run.relics.length}</strong>유물</div></div><div class="mbtns"><button class="btn gold big" id="rlResume">▶ 이어하기</button><button class="btn ghost" id="rlAbandon">포기하기</button></div></div>`;}
  else{
-  const col=S.meta.col||{},owned=Object.keys(col).map(Number).filter(id=>MON[id]).sort((a,b)=>MON[a].cost-MON[b].cost||a-b);
-  const need=Math.min(RL.pick,owned.length);
+  const col=S.meta.col||{};owned=Object.keys(col).map(Number).filter(id=>MON[id]).sort((a,b)=>MON[a].cost-MON[b].cost||a-b);
+  need=Math.min(RL.pick,owned.length);
   RL_SEL=RL_SEL.filter(id=>col[id]).slice(0,RL.pick);
   const names=[];owned.forEach(id=>{const n=kwOf(MON[id]).n;if(names.indexOf(n)<0)names.push(n);});if(RL_KW&&names.indexOf(RL_KW)<0)RL_KW='';
   const cnt=n=>owned.filter(id=>kwOf(MON[id]).n===n).length;
@@ -10355,7 +10402,7 @@ function rlRenderEntry(){
  $('#view').querySelectorAll('[data-kw]').forEach(b=>b.onclick=()=>{sfx('tap');RL_KW=b.dataset.kw;keep();});
  $('#view').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{sfx('tap');RL_SEL=RL_SEL.filter(x=>x!==+b.dataset.rm);keep();});
  const g=$('#rlStGrid');if(g)g.querySelectorAll('.card').forEach(c=>c.onclick=()=>{const id=+c.dataset.id,i=RL_SEL.indexOf(id);if(i>=0)RL_SEL.splice(i,1);else if(RL_SEL.length<RL.pick)RL_SEL.push(id);else{toast(`최대 ${RL.pick}장까지 고를 수 있어요. 위 칸을 눌러 빼거나 카드를 다시 눌러요`);return;}sfx('tap');keep();});
- $('#rlAutoSel').onclick=()=>{sfx('tap');RL_SEL=shuffle(owned.slice()).slice(0,need);keep();};
+ $('#rlAutoSel').onclick=()=>{sfx('tap');if(!owned.length){toast('가진 포켓몬이 없어서 모두 랜덤으로 시작해요');return;}RL_SEL=rlAutoPick(owned,need);keep();toast('강하고 균형 잡힌 조합으로 골랐어요! 다시 누르면 다른 조합도 나와요');};
  $('#rlClrSel').onclick=()=>{sfx('tap');RL_SEL=[];keep();};
  $('#rlStart').onclick=()=>{if($('#rlStart').disabled){toast(`내 카드를 ${need}장 골라 주세요`);return;}sfx('tap');RL_SEL=RL_SEL.filter(id=>S.meta.col[id]);rlStart();};}
 function rlLaunch(){const m=S.meta;if(!codeValid()||!m.name||!m.starter)return scLaunch();rlMeta();RL_SEL=[];rlRenderEntry();}
