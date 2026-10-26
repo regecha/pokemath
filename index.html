@@ -212,8 +212,23 @@ h2{font-size:26px;margin-bottom:8px}h3{font-size:19px;margin:12px 0 6px}
 .gdB.feed2{--bd:#e0568a;--sh:#b83a6b;--fg:#7a1f45;--bg:linear-gradient(#ffe0ee,#ff9ec4)}
 .gdB.pick{--bd:#3aa66a;--sh:#237a49;--fg:#124a2a;--bg:linear-gradient(#e2ffd8,#8fe3a0)}
 .gdB.pets{--bd:#4f93d8;--sh:#2f68a8;--fg:#123e6e;--bg:linear-gradient(#e6f4ff,#a6d4fb)}
-.gdTypes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-.gdTypes button{border:3px solid #3a2e3f;border-radius:12px;padding:10px 4px;font-family:'Jua';font-size:16px;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.35);cursor:pointer}
+.gdPk{text-align:center}.gdPk h2{margin:0 0 2px}
+.gdPkSub{margin:0 0 8px;font-size:13px;color:#7a6a58;word-break:keep-all}
+.gdPkCost{display:inline-flex;align-items:center;gap:8px;margin:0 0 10px;padding:5px 14px;border-radius:999px;border:2px solid #d8a82e;background:linear-gradient(#fff8d8,#ffe9a2);color:#6b4a10;font-family:'Jua';font-size:15px;box-shadow:inset 0 1px 0 #fff,0 2px 0 rgba(138,100,32,.3)}
+.gdPkCost small{font-family:inherit;font-size:12px;color:#8a6b2a}
+.gdPkCost.low{border-color:#d9534f;background:linear-gradient(#fff0ee,#ffd9d4);color:#8a2a24}
+.gdTypes{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-height:50vh;overflow-y:auto;padding:4px 3px 8px;-webkit-overflow-scrolling:touch}
+.gdTypes button.gdTy{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px 7px;border:2.5px solid transparent;border-radius:16px;overflow:hidden;cursor:pointer;color:#4a3a28;text-shadow:none;font-family:'Jua';
+ background:linear-gradient(#fffdf6,#f9eed6) padding-box,linear-gradient(145deg,var(--c1),var(--c) 55%,var(--c2)) border-box;
+ box-shadow:0 3px 0 rgba(90,60,20,.18),0 8px 16px -8px var(--c);transition:transform .15s,box-shadow .15s}
+.gdTypes button.gdTy::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 32%,var(--c3),transparent 66%);opacity:.9;pointer-events:none}
+.gdTypes button.gdTy:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(90,60,20,.18),0 4px 10px -6px var(--c)}
+@media (hover:hover){.gdTypes button.gdTy:hover{transform:translateY(-2px);box-shadow:0 5px 0 rgba(90,60,20,.18),0 12px 20px -8px var(--c)}.gdTypes button.gdTy:hover .gdEgg{animation:gdWob .5s ease-in-out}}
+.gdTyEgg{position:relative;display:block;width:36px;height:45px}
+.gdTyEgg .gdEgg{width:100%;height:100%;filter:drop-shadow(0 2px 3px rgba(0,0,0,.28));animation:none}
+.gdTyNm{position:relative;font-size:15px;margin-top:2px}
+.gdTyCnt{position:relative;font-family:'Noto Sans KR',sans-serif;font-size:10.5px;color:#8a7a60;line-height:1.2}
+.gdTypes button.gdTy.poor{filter:saturate(.45);opacity:.72}
 .stonePanel{background:rgba(255,250,241,.82);padding:10px 14px}
 .stoneHead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.stoneHead b{font-size:20px}.motto{font-family:'Jua';color:#8a6a3c;background:#eee9d5;border-radius:10px;padding:2px 10px;font-size:15px}
 .stoneBox{display:flex;justify-content:center;cursor:pointer}.stoneSvg{width:min(100%,420px);height:auto;max-height:240px;overflow:visible}
@@ -367,6 +382,16 @@ html.lowfx .card .holo{animation:none;mix-blend-mode:normal;opacity:.25}
 .dexCell.none img{filter:brightness(0);opacity:.08}
 .dexCell .nm{font-family:'Jua';font-size:13px;white-space:nowrap;overflow:hidden;max-width:100%}
 .dexCell .n2{position:absolute;right:5px;top:3px;font-family:'Jua';font-size:12px;color:var(--red2)}
+.mgNote{font-size:13px;margin-bottom:8px;background:#eef6ff;border-color:#9fc3ff;line-height:1.5;word-break:keep-all}
+.mgGrid .dexCell{aspect-ratio:1/1.22;gap:1px}
+.mgCell .mgImg{width:80%;aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+.mgCell .mgImg img{width:100%;height:100%;object-fit:contain;image-rendering:auto}
+.mgCell.on{border-color:#7ab4ff;background:linear-gradient(#f6faff,#e2eeff);box-shadow:inset 0 0 0 2px #cfe3ff}
+.mgCell.ready .mgImg img{filter:brightness(0);opacity:.38}
+.mgCell.lock{opacity:.55}.mgCell.lock .mgImg img{filter:brightness(0);opacity:.15}
+.mgCell .mgBd{position:absolute;right:5px;top:3px;font-size:13px;line-height:1}
+.mgCell .mgSt{display:inline-flex;align-items:center;gap:2px;font-family:'Jua';font-size:11px;color:#2f62b5}
+.mgCell.lock .mgSt{color:var(--mut)}
 .filters{display:flex;gap:6px;flex-wrap:wrap}
 .filters .btn{flex:0 0 auto}
 .fbtn{font-family:'Jua';font-size:14px;background:#fff;border:2px solid var(--line);border-radius:999px;padding:4px 12px}
@@ -2085,6 +2110,17 @@ html.lowfx .lgsFx u,html.lowfx .lgsFx em,html.lowfx .lgsFx i{display:none}
 .btn.red:not(.pxb):hover,.btn.gold:not(.pxb):hover,.btn.green:not(.pxb):hover,.btn.blue:not(.pxb):hover,.btn.purple:not(.pxb):hover{--fr:#fff}
 /* 필터 칩: 선택되면 보라 도트 */
 .fbtn.on{--a:#6b7bd8;--b:#3a479e;--fr:#d6dcff;--fg:#fff;--ts:0 1px 0 rgba(0,0,0,.28);background:var(--fr);border:0}
+
+#bMega,#bMega.btn:not(.pxb){clip-path:none;overflow:visible;border-radius:9px;animation:mgRainbow 2.2s linear infinite}
+#bMega.btn:not(.pxb)::before{clip-path:none;border-radius:7px}
+#bMega::after{content:"";position:absolute;inset:-4px;border-radius:13px;padding:3px;pointer-events:none;z-index:2;background:linear-gradient(90deg,#ff4d4d,#ffa63d,#ffe74d,#4ddc6a,#4da6ff,#b05cff,#ff4d4d,#ffa63d,#ffe74d,#4ddc6a) 0 0/300% 100%;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);animation:mgRing 1.6s linear infinite}
+@keyframes mgRing{to{background-position:200% 0}}
+@keyframes mgRainbow{0%{filter:drop-shadow(0 0 3px #ff4d4d) drop-shadow(0 0 9px #ff4d4d) drop-shadow(0 0 14px #ff4d4d)}17%{filter:drop-shadow(0 0 3px #ffa63d) drop-shadow(0 0 9px #ffa63d) drop-shadow(0 0 14px #ffa63d)}33%{filter:drop-shadow(0 0 3px #ffe74d) drop-shadow(0 0 9px #ffe74d) drop-shadow(0 0 14px #ffe74d)}50%{filter:drop-shadow(0 0 3px #4ddc6a) drop-shadow(0 0 9px #4ddc6a) drop-shadow(0 0 14px #4ddc6a)}67%{filter:drop-shadow(0 0 3px #4da6ff) drop-shadow(0 0 9px #4da6ff) drop-shadow(0 0 14px #4da6ff)}83%{filter:drop-shadow(0 0 3px #b05cff) drop-shadow(0 0 9px #b05cff) drop-shadow(0 0 14px #b05cff)}100%{filter:drop-shadow(0 0 3px #ff4d4d) drop-shadow(0 0 9px #ff4d4d) drop-shadow(0 0 14px #ff4d4d)}}
+/* 도감 탭 색 구분: 등급(금색) · 지역(초록) · 보기(파랑) · 메가(보라) · 속성(속성색) */
+.fbtn.gR{--a:#fff6d6;--b:#f2d886;--fr:#d4b04a;--fg:#6b4a00}.fbtn.gR.on{--a:#ffcf3f;--b:#e09a00;--fr:#8a5a00;--fg:#fff}
+.fbtn.gG{--a:#e6f7de;--b:#b7dfa6;--fr:#78b263;--fg:#2f5a24}.fbtn.gG.on{--a:#5fcb6a;--b:#2c9a4a;--fr:#1d6a33;--fg:#fff}
+.fbtn.gB{--a:#e4eeff;--b:#b4cbf4;--fr:#7597db;--fg:#274a8a}.fbtn.gB.on{--a:#5d8cf0;--b:#2f5fc4;--fr:#1d3f8c;--fg:#fff}
+.fbtn.gM{--a:#f1e6ff;--b:#d2b8f6;--fr:#9a72d6;--fg:#4a2a86}.fbtn.gM.on{--a:#a46cf0;--b:#6c3bc4;--fr:#44218a;--fg:#fff}
 /* 퀴즈 보기 */
 .ch{--n:4px;border:0;box-shadow:none}
 .ch:active{box-shadow:none}
@@ -2368,7 +2404,7 @@ f.innerHTML=h;})();</script>
   <div class="menuCol"><button class="btn red big" id="tGo"><img class="ic px " src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAmklEQVR42mNgoBAw4pKw0rP/j8w/dukgVrUsuDQe1VFAEbdmYPiPzSBGdM3oGtGB9ZUHKIYwYmiODEGoXr6GoCFMGLIwTTg0w7wH8yoTVqdDNVtfecBgfeUBXi+xIDsLw6aLByBy+g44DWCiNB2woNuGElhQm/HJoUQhKQAlEEkF1voO2FMmMa5AT+IkGYJNMyMxGYlQhqIIAACNUKccQMqsyAAAAABJRU5ErkJggg==" alt="" draggable="false"> 시작하기</button>
    <button class="btn green" id="tSave"><img class="ic px " src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAjElEQVR42mNkQAJWevb/GQiAY5cOMlrp2f8/dukgIwO65qiV/wkCmDqYZUwwzQrVB/DaHL0KQsPUKVQfYLDSs//PRIxmfICJgUJAtAFLw7CLs+Dy6+DzAi6A4YUeT8KaSrYPJi8MAgOOXTrI+KDVgYGBgYEBRhMDHrQ6MBy7dJCRETk3wrIqMQbAsjMAl/5T+xZpijwAAAAASUVORK5CYII=" alt="" draggable="false"> 저장 · 불러오기</button>
    <div class="row"><button class="btn ghost" id="tSet"><img class="ic px " src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA00lEQVR42qWTPQ6CQBCFv91wBs9gRaxpOIUewMSKysKWwpaCiooEem24go21MRSewUusFWSyDIvRV032zbz52RkIIIlTl8Sp4xckcerarndt1wdFIj8I4P68GU1wsCVvpMPhXAFQ5xnV5TrJ9ni9R34QsVpZWjDAZr2avFlZVp1nqlNIxMpp+5mLsqEom9khAxjZu1T3A0/HvToLy58wshytBT87QLbbjnOLBkNbFj9QQv3GobcQfB+75LDEmbl1BZCbqZU/uQVJ+GLafXx1kUvn/AHNX2qN2Vlm0QAAAABJRU5ErkJggg==" alt="" draggable="false"> 설정</button><button class="btn ghost" id="tTeach"><svg class="ic " viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="#ffd8b5" stroke="#8a5a3c" stroke-width="1.6"></circle><path d="M4 21c0-5 3.6-7.5 8-7.5s8 2.5 8 7.5z" fill="#7fb4ff" stroke="#2f62b5" stroke-width="1.6"></path></svg> 선생님</button></div></div>
-  <p class="notice">본 앱은 <b>교육용 앱</b>입니다. 선생님께 받은 <b>학년·학기 코드</b>가 필요합니다.<br>실명 대신 <b>닉네임</b>을 사용해 주세요.<br>비영리 교육용 팬 콘텐츠이며, 포켓몬 관련 권리는 각 권리자에게 있습니다.</p>
+  <p class="notice">본 앱은 <b>교육용 앱</b>입니다. 처음에 <b>학년·학기·단원</b>을 직접 고르고, 기본 학기를 바꾸려면 <b>선생님 코드</b>가 필요합니다.<br>실명 대신 <b>닉네임</b>을 사용해 주세요.<br>비영리 교육용 팬 콘텐츠이며, 포켓몬 관련 권리는 각 권리자에게 있습니다.</p>
   <p class="notice" style="font-family:'Jua';font-size:14px;color:#2f5aa8">좌삼초.</p>
   </div></div>
 <div id="battle" class="art" style="background-image: url(&quot;data:image/png;base64,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&quot;);"></div>
@@ -4896,17 +4932,22 @@ function showCard(id){const m=MON[id],me=S.meta,own=me.col[id]||0;const kw=kwOf(
  tiltOn($('#mbox .card.lg'));}
 
 // ---- 도감 ----
-let DEXF='all',DEXR=0,DEXRAR=0;
+let DEXF='all',DEXR=-1,DEXRAR=0;
+// 메가 진화 탭의 칸: 메가 모습을 보여 줘요 (연구 전에는 그림자, 카드가 없으면 더 흐리게)
+function mgCell(id,n,seen){const has=megaHas(id),st=has?'on':n?'ready':'lock';
+ return `<div class="dexCell mgCell ${st}" data-id="${id}"><span class=no>${id}</span><span class=mgBd>${has?'🔷':n?'🔒':''}</span><div class=mgImg>${monImg(MEGA[id],'front')}</div><span class=nm>${n||seen?esc(MON[id].name):'???'}</span><span class=mgSt>${has?(PRIMAL[id]?'원시회귀':'메가 해금'):n?`${I('candy')} ${megaCost(id)}`:'카드 없음'}</span></div>`;}
 function renderDex(){S.screen='dex';const me=S.meta;const own=ownCount();
  const inR=id=>DEXR<0||(id>=REGIONS[DEXR][1]&&id<=REGIONS[DEXR][2]);
- const rarBase=(DEXF==='all'?MON_IDS.filter(inR):DEXF==='own'?MON_IDS.filter(id=>me.col[id]):DEXF==='evo'?MON_IDS.filter(id=>me.col[id]&&MON[id].to.length):MON_IDS.filter(id=>inR(id)&&MON[id].types.includes(+DEXF)));
+ const rarBase=(DEXF==='all'?MON_IDS.filter(inR):DEXF==='own'?MON_IDS.filter(id=>me.col[id]):DEXF==='evo'?MON_IDS.filter(id=>me.col[id]&&MON[id].to.length):DEXF==='mega'?MON_IDS.filter(id=>MEGA[id]):MON_IDS.filter(id=>inR(id)&&MON[id].types.includes(+DEXF)));
  const fl=DEXRAR?rarBase.filter(id=>MON[id].rar===DEXRAR):rarBase;
+ const mgList=MON_IDS.filter(id=>MEGA[id]),mgOn=mgList.filter(megaHas).length,mgAll=mgList.length;
+ const MGNOTE=`<div class="explain mgNote">🔷 <b>메가 진화</b>(그리고 <b>원시회귀</b>: 그란돈·가이오가)는 카드를 가진 포켓몬에게 사탕으로 <b>메가스톤(원시 구슬)을 연구</b>하면 열려요. 연구한 포켓몬은 전투에서 정답을 ${MEGA_NEED}개 맞히면 한 판에 한 마리가 변신해요! 카드를 눌러 연구해 보세요. <b>(${mgOn} / ${mgAll} 해금)</b></div>`;
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('book')} 도감</h2><span class=hudSp></span><span class=pill>${own} / ${MON_IDS.length}</span><span class=pill title="별가루">${I('star')} 별가루 ${me.dust||0}</span></div>
-  <div class=filters style="margin:8px 0">${[0,1,2,3,4,5].map(k=>{const tot=k?rarBase.filter(id=>MON[id].rar===k):rarBase,have=tot.filter(id=>me.col[id]).length,on=DEXRAR===k;return `<button class="fbtn${on?' on':''}" data-rar="${k}" style="${on&&k?`background:var(--r${k});border-color:var(--r${k});${k===5?'color:#5a3b00':''}`:''}">${k?'★'.repeat(k)+' '+RAR_NAME[k]:'전체 등급'} <small>${have}/${tot.length}</small></button>`;}).join('')}</div>
-  <div class=filters style="margin:8px 0">${REGIONS.map((r,i)=>`<button class="fbtn${DEXR===i?' on':''}" data-r="${i}">${r[0]} <small>${MON_IDS.filter(id=>id>=r[1]&&id<=r[2]&&me.col[id]).length}/${r[2]-r[1]+1}</small></button>`).join('')}<button class="fbtn${DEXR<0?' on':''}" data-r="-1">모든 지역</button></div>
-  <div class=filters style="margin:8px 0">${[['all','전체'],['own','가진 카드'],['evo','진화 가능']].map(([k,n])=>`<button class="fbtn${DEXF===k?' on':''}" data-f="${k}">${n}</button>`).join('')}${TYPE_KO.map((n,i)=>`<button class="fbtn${DEXF===String(i)?' on':''}" data-f="${i}" style="${DEXF===String(i)?`background:${TYPE_COL[i]};border-color:${TYPE_COL[i]}`:''}">${n}</button>`).join('')}</div>
-  <div class=mut style="font-size:12px;margin-bottom:8px">일반·고급은 한 번에, 희귀는 조각 3개·영웅 5개·전설 8개를 모아야 내 카드가 돼요. 본 적 있는 포켓몬은 별가루로 조각을 만들 수 있어요. 카드팩에서 전설 조각이 나올 확률은 장마다 ${PACK_W[5]}%예요. 카드팩 40개 안에는 꼭 1장 나와요(지금 ${me.pity.p5}/40). 영웅 이상은 10팩 안에 꼭(지금 ${me.pity.p4}/10).</div>
-  <div class=dexGrid>${fl.map(id=>{const n=me.col[id]||0,seen=me.dexSeen[id];return `<div class="dexCell ${n?'':seen?'seen':'none'}" data-id="${id}"><span class=no>${id}</span>${!n&&me.shard&&me.shard[id]?`<span class=n2 style="color:#9a6bff">${me.shard[id]}/${SHARD_NEED[MON[id].rar]}</span>`:''}${monImg(id)}<span class=nm>${n||seen?esc(MON[id].name):'???'}</span></div>`;}).join('')||'<p class=mut>아직 없어요</p>'}</div></div></div>`;
+  <div class=filters style="margin:8px 0">${[0,1,2,3,4,5].map(k=>{const tot=k?rarBase.filter(id=>MON[id].rar===k):rarBase,have=tot.filter(id=>me.col[id]).length,on=DEXRAR===k;return `<button class="fbtn gR${on?' on':''}" data-rar="${k}" style="${k?(on?`--a:color-mix(in srgb,var(--r${k}) 70%,#fff);--b:var(--r${k});--fr:color-mix(in srgb,var(--r${k}) 65%,#000);--fg:${k===5?'#5a3b00':'#fff'}`:`--a:color-mix(in srgb,var(--r${k}) 14%,#fff);--b:color-mix(in srgb,var(--r${k}) 34%,#fff);--fr:color-mix(in srgb,var(--r${k}) 65%,#fff)`):''}">${k?'★'.repeat(k)+' '+RAR_NAME[k]:'전체 등급'} <small>${have}/${tot.length}</small></button>`;}).join('')}</div>
+  <div class=filters style="margin:8px 0"><button class="fbtn gG${DEXR<0?' on':''}" data-r="-1">모든 지역</button>${REGIONS.map((r,i)=>`<button class="fbtn gG${DEXR===i?' on':''}" data-r="${i}">${r[0]} <small>${MON_IDS.filter(id=>id>=r[1]&&id<=r[2]&&me.col[id]).length}/${r[2]-r[1]+1}</small></button>`).join('')}</div>
+  <div class=filters style="margin:8px 0">${[['all','전체'],['own','가진 카드'],['evo','진화 가능'],['mega','🔷 메가·원시회귀']].map(([k,n])=>`<button class="fbtn ${k==='mega'?'gM':'gB'}${DEXF===k?' on':''}" data-f="${k}">${n}${k==='mega'?` <small>${mgOn}/${mgAll}</small>`:''}</button>`).join('')}${TYPE_KO.map((n,i)=>{const c=TYPE_COL[i],on=DEXF===String(i);return `<button class="fbtn${on?' on':''}" data-f="${i}" style="${on?`--a:color-mix(in srgb,${c} 70%,#fff);--b:${c};--fr:color-mix(in srgb,${c} 65%,#000);--fg:#fff`:`--a:color-mix(in srgb,${c} 14%,#fff);--b:color-mix(in srgb,${c} 36%,#fff);--fr:color-mix(in srgb,${c} 70%,#fff);--fg:color-mix(in srgb,${c} 60%,#000)`}">${n}</button>`;}).join('')}</div>
+  ${DEXF==='mega'?MGNOTE:`<div class=mut style="font-size:12px;margin-bottom:8px">일반·고급은 한 번에, 희귀는 조각 3개·영웅 5개·전설 8개를 모아야 내 카드가 돼요. 본 적 있는 포켓몬은 별가루로 조각을 만들 수 있어요. 카드팩에서 전설 조각이 나올 확률은 장마다 ${PACK_W[5]}%예요. 카드팩 40개 안에는 꼭 1장 나와요(지금 ${me.pity.p5}/40). 영웅 이상은 10팩 안에 꼭(지금 ${me.pity.p4}/10).</div>`}
+  <div class="dexGrid${DEXF==='mega'?' mgGrid':''}">${fl.map(id=>{const n=me.col[id]||0,seen=me.dexSeen[id];if(DEXF==='mega')return mgCell(id,n,seen);return `<div class="dexCell ${n?'':seen?'seen':'none'}" data-id="${id}"><span class=no>${id}</span>${!n&&me.shard&&me.shard[id]?`<span class=n2 style="color:#9a6bff">${me.shard[id]}/${SHARD_NEED[MON[id].rar]}</span>`:''}${monImg(id)}<span class=nm>${n||seen?esc(MON[id].name):'???'}</span></div>`;}).join('')||'<p class=mut>아직 없어요</p>'}</div></div></div>`;
  bindHud();
  $('#view').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{sfx('tap');DEXF=b.dataset.f;renderDex();});
  $('#view').querySelectorAll('[data-rar]').forEach(b=>b.onclick=()=>{sfx('tap');DEXRAR=+b.dataset.rar;renderDex();});
@@ -7980,7 +8021,8 @@ function wgEnsure(m){const w=wgMonday();if(m.wg&&m.wg.w===w&&Array.isArray(m.wg.
  const ranked=DOMS.map((d,i)=>({k:d.k,i,r:st&&st[d.k]&&st[d.k].n>=10&&st[d.k].racc!=null?st[d.k].racc:1.5})).sort((a,b)=>a.r-b.r||a.i-b.i);
  m.wg={w,doms:ranked.slice(0,3).map(x=>x.k),claimed:false};autoSave();return m.wg;}
 function wgTrain(k){const m=S.meta,st=domStats(m),pool=domTrainPool(m,st,[k]);const all=st[k].skills;const use=pool.length>=4?pool.concat(all.filter(x=>!pool.includes(x)).slice(0,4)):all;if(!use.length){toast('연습할 문제가 아직 없어요');return;}startTraining({pool:use,n:8});}
-function wgPanel(m){if(!m.train||!m.train.count)return '';let g;try{g=wgEnsure(m);}catch(e){return '';}
+function wgPanel(m){if(!m.train||!m.train.count)return '';if((m.questionMode||'math')!=='math')return '';   // 영어·국어 모드에서는 수학 추천을 보여 주지 않아요
+ let g;try{g=wgEnsure(m);}catch(e){return '';}
  const rows=g.doms.map(k=>({d:DOM_BY[k],n:wgCount(m,k),t:wgDay(m,k)}));
  const allDone=rows.every(r=>r.n>=WG_NEED);
  // 오늘의 추천: 이번 주 목표 중 아직 덜 채운 영역 하나(오늘 푼 문제가 적은 것 먼저), 다 채웠으면 가장 약한 영역
@@ -7992,7 +8034,7 @@ function wgPanel(m){if(!m.train||!m.train.count)return '';let g;try{g=wgEnsure(m
   <div class=row style="margin-top:8px;align-items:center;gap:8px"><span class=mut style="font-size:12px;flex:1">세 영역을 각각 ${WG_NEED}문제 이상 풀면 ${I('coin')} 코인 ${WG_COINS}개 + 카드팩 1개! (훈련·전투·포획 문제 모두 세요)</span>${g.claimed?'<span class=pill>받았어요 ✓</span>':allDone?'<button class="btn gold" id=wgClaim>보상 받기!</button>':''}</div></div>`;}
 function wgBind(m){const go=$('#wgGo');if(go)go.onclick=()=>{sfx('tap');wgTrain(go.dataset.k);};
  const cl=$('#wgClaim');if(cl)cl.onclick=()=>{const g=m.wg;if(!g||g.claimed)return;if(!g.doms.every(k=>wgCount(m,k)>=WG_NEED))return;g.claimed=true;m.coins+=WG_COINS;m.packs+=1;autoSave();sfx('win');confetti(50);toast(`이번 주 목표 달성! 코인 ${WG_COINS}개와 카드팩 1개를 받았어요`);renderHub();};}
-function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return renderGate();ensureSeason();
+function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return renderEntry();ensureSeason();
  const done=m.train.daily===today();const gh=lastTrain();const partner=bestPartner();
  const tiles=FEAT.filter(f=>m.unl[f.k]).map(f=>{const extra=f.k==='pack'&&m.packs>0?`<span class=badgeDot>${m.packs}</span>`:'';
   const td={pack:m.packs>0?'눌러서 열기!':`코인 100개 = 카드팩 1개 (지금 ${m.coins})`,dex:`${ownCount()} / ${MON_IDS.length}마리`,league:`배지 ${Object.keys(m.gyms).length}/9`,grow:`${streakDays()>0?streakDays()+'일째 공부 중':'오늘 첫 기록을 남겨 봐요'}${wbOpenN(m)?` · 📝 오답 ${wbOpenN(m)}`:''}`,endless:`포획 ${(m.endless&&m.endless.caught)||0}마리<br>(오답 문제를 풀며 전설 포켓몬도 만나 보세요!)`,season:m.season?`시즌 Lv.${seasonLv(m.season)}${(()=>{let n=0;for(let l=1;l<=seasonLv(m.season);l++)if(!m.season.claimed[l])n++;return n?` · 보상 ${n}개!`:'';})()}`:'',pvp:`한 판 ${PVP_COST}코인 · ${(m.pvp&&m.pvp.n)||0}판`,bosscoop:'친구와 함께 보스 공략',map:`${Object.keys(m.badges).length}개 단원 배지`,deck:`${m.deck.length}장`,card:(()=>{const t=cardTier(m);return t?`${t.n} 카드`:`돌 ${stoneList(m).length}/5`;})(),ach:`배지 ${ACH.reduce((s,a)=>s+((m.ach[a.k]&&m.ach[a.k].t)||0),0)}/${ACH.length*3}${strengths(m)[0]?' · '+STR[strengths(m)[0].k].n:''}`}[f.k];
@@ -8312,6 +8354,7 @@ function showTsend(){const st=S.meta.settings;
   <div class=mbtns><button class="btn blue" data-a=send>지금 보내기</button><button class="btn gold" data-a=x>닫기</button></div>`,
   {send:async b=>{const r=($('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();toast('보내는 중…');await tsSend(r,false);},x:()=>{const r=($('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();closeM();},_close:()=>{const r=($('#tsRoom')&&$('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();closeM();}});
  $('#mbox').querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{st.tAuto=b.dataset.v==='1';st.tRoom=($('#tsRoom').value||'').replace(/\D/g,'');autoSave();sfx('tap');$('#mbox').querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));});}
+function tutBtnLabel(){try{const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(!sk)return '튜토리얼 다시 보기';const d=m.tutDone||0;return d>0?`튜토리얼 이어하기 (파트 ${Math.min(4,d+1)}/4부터)`:'튜토리얼 이어하기';}catch(e){return '튜토리얼 다시 보기';}}
 function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.easy=false;if(st.enTts===undefined)st.enTts=true;if(st.iq===undefined)st.iq=true;const seg=(k,opts)=>`<div class=seg>${opts.map(([v,n])=>`<button class="${String(st[k])===String(v)?'on':''}" data-s="${k}" data-v="${v}">${n}</button>`).join('')}</div>`;
  M(`<h2>${I('gear')} 설정</h2>
   <div class=setRow><span><b>쉬운 전투</b><br><span class=mut style="font-size:12px">켜면 야생 포켓몬과 시나리오 포켓몬이 한 차례에 1번만 공격해요. 끄면 1마리와 싸울 때 2번 공격해요</span></span>${seg('easy',[[true,'켜기'],[false,'끄기']])}</div>
@@ -8326,10 +8369,10 @@ function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.eas
   <div class=setRow><span><b>포켓몬 이미지</b><br><span class=mut style="font-size:12px">끄면 포켓몬 그림을 불러오지 않아요. 인터넷이 막힌 곳에서는 '끄기'</span></span>${seg('imgs',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>왼쪽 아래 버튼 피하기</b><br><span class=mut style="font-size:12px">구글 사이트 등 다른 페이지 안에서 열었을 때, 왼쪽 아래 ⓘ 버튼이 내 카드·버튼을 가리면 켜세요. 자동은 사이트 안에서 열면 켜져요</span></span>${seg('safe',[['auto','자동'],['on','켜기'],['off','끄기']])}</div>
   <div class=setRow><span><b>보이는 영역에 화면 맞추기</b><br><span class=mut style="font-size:12px">주소창·사이트 머리글 때문에 화면이 일부만 보일 때, 게임을 보이는 영역 안에 딱 맞춰요. 화면이 잘려 보이면 '자동', 맞춤이 어색하면 '끄기'</span></span>${seg('fit',[['auto','자동'],['off','끄기']])}</div>
-  <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>🎓 학년 변경</button><button class="btn ghost" data-a=tsend>📡 선생님께 기록 보내기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=tutor>튜토리얼 다시 보기</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
+  <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>🎓 학년 변경</button><button class="btn ghost" data-a=tsend>📡 선생님께 기록 보내기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=tutor>${tutBtnLabel()}</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>
   <p class=mut style="font-size:11px;margin-top:10px;line-height:1.5">${GAME.title} v${GAME.ver} · 좌삼초. 수업용 비영리 팬 제작 학습 도구예요. 포켓몬 이름·그림의 권리는 Nintendo·Creatures·GAME FREAK·The Pokémon Company에 있어요. 그림은 PokeAPI 공개 저장소에서 불러와요.</p>`,
-  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);if(window.TUT_A)TUT_A.begin({replay:true});}},{layer2:!!l2});
+  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);if(window.TUT_A){const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(sk){const k=Math.min(3,m.tutDone||0);try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});}}},{layer2:!!l2});
  {const sb=$('#sfxVol');if(sb){sb.oninput=()=>{st.sfxVol=+sb.value;$('#sfxVolN').textContent=sb.value+'%';};sb.onchange=()=>{autoSave();if(st.sound)sfx('ok');};}}
  {const vb=$('#bgmVol');if(vb){vb.oninput=()=>{st.bgmVol=+vb.value;$('#bgmVolN').textContent=vb.value+'%';applyBgmVol();};vb.onchange=()=>{autoSave();};}}
  $(l2?'#mbox2':'#mbox').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;st[k]=v;if(k==='bgm'){if(v)startBgm();else stopBgm();}autoSave();applySafe();refit();sfx('tap');showSettings(l2);if(k==='imgs'&&S.screen==='hub')renderHub();});}
@@ -8342,14 +8385,14 @@ function renderTitle(){S.screen='title';const m=S.meta;$('#battle').classList.re
   <div class=menuCol>${m.name?`<button class="btn red big" id=tGo>${I('ball')} 이어하기 <small style="font-size:13px">${esc(m.name)} · Lv.${lvOf(m.xp).lv}</small></button>`:`<button class="btn red big" id=tGo>${I('ball')} 시작하기</button>`}
    <button class="btn green" id=tSave>${I('disk')} 저장 · 불러오기</button>
    <div class=row><button class="btn ghost" id=tSet>${I('gear')} 설정</button><button class="btn ghost" id=tTeach>${I('teacher')} 선생님</button></div></div>
-  <p class=notice>본 앱은 <b>교육용 앱</b>입니다. 선생님께 받은 <b>학년·학기 코드</b>가 필요합니다.<br>실명 대신 <b>닉네임</b>을 사용해 주세요.<br>비영리 교육용 팬 콘텐츠이며, 포켓몬 관련 권리는 각 권리자에게 있습니다.</p>
+  <p class=notice>본 앱은 <b>교육용 앱</b>입니다. 처음에 <b>학년·학기·단원</b>을 직접 고르고, 기본 학기를 바꾸려면 <b>선생님 코드</b>가 필요합니다.<br>실명 대신 <b>닉네임</b>을 사용해 주세요.<br>비영리 교육용 팬 콘텐츠이며, 포켓몬 관련 권리는 각 권리자에게 있습니다.</p>
   
   <p class=notice style="font-family:'Jua';font-size:14px;color:#2f5aa8">좌삼초.</p>
   ${!STORE_OK?`<p class=notice style="color:#d9393f">이 화면에서는 자동 저장이 막혀 있어요. 저장 코드를 꼭 만들어 두세요.</p>`:''}</div>`;
  $('#tGo').onclick=()=>{sfx('tap');ac();goStart();};
  $('#tSave').onclick=()=>{sfx('tap');showSaveBox();};$('#tSet').onclick=()=>{sfx('tap');showSettings();};$('#tTeach').onclick=()=>{sfx('tap');teacherLogin();};}
 function goStart(){const m=S.meta;$('#pack').classList.remove('on');$('#battle').classList.remove('on');B=null;
- if(!codeValid())return renderGate();if(!m.name)return renderName();if(!m.starter)return renderStarter();renderHub();}
+ if(!codeValid())return renderEntry();if(!m.name)return renderName();if(!m.starter)return renderStarter();renderHub();}
 // 위 학년 열기: 처음 코드의 학년은 두 학기 모두 열려 있고, 그 위 학기는 '지금 가장 높은 학기'의 개념 별(★1개 이상)이 60% 이상이면 한 학기씩 열려요 (선생님이 준 더 높은 코드를 넣으면 바로 열려요)
 const GRADE_UP_RATE=.6;
 function gradeTopIdx(m=S.meta){const fl=+m.gFloor||(m.gs?+m.gs[0]:1);const base=Math.max(semIdx(m.gs),(fl-1)*2+1);if(m.gTop==null||m.gTop<base)m.gTop=base;return m.gTop;}
@@ -8360,20 +8403,38 @@ function gradeUnlockCheck(){try{const m=S.meta;if(!m||!m.gs)return;let t=gradeTo
 function gradeNext(m){const top=gradeTopIdx(m);if(top>=SEMS.length-1)return `<p class=mut style="font-size:13px">모든 학기가 열렸어요! 🎉</p>`;
  const g=gradeStarRate(SEMS[top],m),pct=Math.round(g.r*100),need=Math.round(GRADE_UP_RATE*100);
  return `<div class=explain style="text-align:left;font-size:13px;line-height:1.7;margin:8px 0"><b>⭐ ${esc(semName(SEMS[top+1]))} 열기</b><br>${esc(semName(SEMS[top]))}의 개념 중 <b>별을 1개 이상 얻은 개념 ${g.k}/${g.n}개 (${pct}%)</b><div style="height:10px;border-radius:6px;background:#e8e2d0;overflow:hidden;margin:4px 0"><div style="height:100%;width:${Math.min(100,Math.round(g.r/GRADE_UP_RATE*100))}%;background:linear-gradient(90deg,#ffd23f,#ff9f1c)"></div></div>${need}%가 되면 자동으로 열려요. 개념을 <b>3번 연속</b> 맞히면 별이 생겨요!</div>`;}
+function floorIdx(m=S.meta){const fl=+m.gFloor||(m.gs?+m.gs[0]:1);return (fl-1)*2;}
 function showGradePick(l2){const m=S.meta;gradeUnlockCheck();const fl=+m.gFloor||(m.gs?+m.gs[0]:1),top=gradeTopIdx(m),cur=m.gs?+m.gs[0]:0;
- const acts={x:()=>closeM(l2),_close:()=>closeM(l2)};let rows='';
+ const acts={x:()=>closeM(l2),_close:()=>closeM(l2),tcode:()=>{closeM(l2);renderGate(true);}};let rows='';
  for(let g=1;g<=6;g++){const lowLock=g<fl,hiLock=semIdx(`${g}-1`)>top,lock=lowLock||hiLock;
   rows+=`<button class="btn ${g===cur?'gold':'ghost'}" style="width:100%;margin:4px 0;${lock?'opacity:.35':''}" data-a="G${g}" ${lock?'disabled':''}>${g}학년${lock?' 🔒':''}${g===cur?' ✔':''}</button>`;
   if(!lock)acts['G'+g]=()=>{closeM(l2);showSemPick(g,l2);};}
- M(`<h2>🎓 ① 학년 고르기</h2><p class=mut style="font-size:13px;line-height:1.6;text-align:left">처음 코드의 <b>${fl}학년</b>부터 고를 수 있어요. 그 아래 학년(🔒)으로는 내려갈 수 없고, 위 학년은 별을 모으면 열려요. 모은 카드와 기록은 그대로예요.</p>${gradeNext(m)}<div style="width:100%">${rows}</div><div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,acts);}
+ M(`<h2>🎓 ① 학년 고르기</h2><p class=mut style="font-size:13px;line-height:1.6;text-align:left">처음 정한 <b>${fl}학년</b>의 두 학기는 오갈 수 있어요. 그 아래 학년(🔒)으로는 내려갈 수 없고, 위 학기는 별을 모으면 열려요. 기본 학기를 바꾸려면 <b>선생님 코드</b>가 필요해요. 모은 카드와 기록은 그대로예요.</p>${gradeNext(m)}<div style="width:100%">${rows}</div><div class=mbtns><button class="btn ghost" data-a=tcode>🔑 선생님 코드로 바꾸기</button><button class="btn gold" data-a=x>닫기</button></div>`,acts);}
 function showSemPick(g,l2){const m=S.meta,top=gradeTopIdx(m);const acts={x:()=>closeM(l2),_close:()=>closeM(l2),back:()=>{closeM(l2);showGradePick(l2);}};let rows='';
- for(const s2 of [1,2]){const id=`${g}-${s2}`,lock=semIdx(id)>top,on=id===m.gs;
+ for(const s2 of [1,2]){const id=`${g}-${s2}`,lock=semIdx(id)>top||semIdx(id)<floorIdx(m),on=id===m.gs;
   rows+=`<button class="btn ${on?'gold':'ghost'}" style="width:100%;margin:4px 0;${lock?'opacity:.35':''}" data-a="S${s2}" ${lock?'disabled':''}>${g}학년 ${s2}학기${lock?' 🔒':''}${on?' ✔':''}</button>`;
   if(!lock)acts['S'+s2]=()=>{const prev=m.gs;if(id!==prev){m.gs=id;m.code=`${g}${s2}-${CODE_CLASS}`;m.cls=CODE_CLASS;m.uMax=null;m.focus=null;sfx('ok');autoSave();toast(`${semName(id)}로 바꿨어요`);}
    closeM(l2);askUnit(()=>{if(S.screen==='hub')renderHub();},id===prev);};}
  M(`<h2>🎓 ② ${g}학년 학기 고르기</h2><div style="width:100%">${rows}</div><div class=mbtns><button class="btn ghost" data-a=back>← 학년 다시 고르기</button><button class="btn gold" data-a=x>닫기</button></div>`,acts);}
+function renderEntry(){return S.meta.code?renderGate():renderSelfPick();}
+// 처음 시작: 학년 → 학기 → 단원을 스스로 골라요 (정한 뒤 기본 학기를 바꾸려면 선생님 코드가 필요해요)
+let SP_G=0;
+function renderSelfPick(){S.screen='gate';const m=S.meta;
+ $('#view').innerHTML=`<div class=title><div class=panel style="width:min(460px,100%);display:flex;flex-direction:column;gap:12px;align-items:center">
+  <h2 style="margin:0">🎓 내 학년·학기 고르기</h2>
+  <p class=mut style="font-size:14px;text-align:center;line-height:1.6">지금 배우고 있는 <b>학년과 학기</b>를 골라요.<br>한 번 정하면 바꿀 때 <b>선생님 코드</b>가 필요해요. 별을 모으면 위 학기는 저절로 열려요!</p>
+  <div style="width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:6px">${[1,2,3,4,5,6].map(g=>`<button class="btn ${SP_G===g?'gold':'ghost'}" data-g="${g}">${g}학년</button>`).join('')}</div>
+  ${SP_G?`<div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:6px">${[1,2].map(x=>`<button class="btn blue" data-s="${x}">${SP_G}학년 ${x}학기</button>`).join('')}</div>`:'<p class=mut style="font-size:13px">학년을 먼저 눌러 주세요</p>'}
+  <div class=row style="width:100%"><button class="btn ghost" id=gBack>뒤로</button><button class="btn ghost" id=gLoad>${I('disk')} 저장 불러오기</button></div>
+  <button class="btn ghost sm" id=gTc>🔑 선생님 코드가 있어요</button></div></div>`;
+ $('#view').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{sfx('tap');SP_G=+b.dataset.g;renderSelfPick();});
+ $('#view').querySelectorAll('[data-s]').forEach(b=>b.onclick=async()=>{const id=`${SP_G}-${b.dataset.s}`;sfx('tap');
+  if(!(await confirmBox(`<b>${esc(semName(id))}</b>로 시작할까요?<br><span style="font-size:14px">정한 뒤에는 <b>선생님 코드</b>가 있어야 바꿀 수 있어요.</span>`,'이걸로 시작','다시 고를래요')))return;
+  m.gs=id;m.code=`${id.replace('-','')}-${CODE_CLASS}`;m.cls=CODE_CLASS;m.gFloor=+id[0];m.gBase=id;m.gTop=Math.max(semIdx(id),(+id[0]-1)*2+1);m.uMax=null;m.focus=null;autoSave();sfx('ok');
+  askUnit(()=>goStart());});
+ $('#gBack').onclick=()=>{sfx('tap');renderTitle();};$('#gLoad').onclick=()=>{sfx('tap');showSaveBox();};$('#gTc').onclick=()=>{sfx('tap');renderGate();};}
 function renderGate(change){S.screen='gate';const m=S.meta;const old=m.code&&parseCode(m.code);
- const why=old&&old.bad?(old.old?'새 학년도가 되어 코드가 바뀌었어요. 선생님께 새 코드를 받아 주세요. (모은 카드와 기록은 그대로예요!)':'코드가 맞지 않아요. 선생님께 다시 확인해 주세요.'):change?'코드를 넣으면 그 학년·학기 문제로 바뀌어요. 모은 카드와 기록은 그대로예요.':'선생님께 받은 코드를 넣어 주세요.';
+ const why=old&&old.bad?(old.old?'새 학년도가 되어 코드가 바뀌었어요. 선생님께 새 코드를 받아 주세요. (모은 카드와 기록은 그대로예요!)':'코드가 맞지 않아요. 선생님께 다시 확인해 주세요.'):change?'선생님 코드를 넣으면 기본 학년·학기가 바뀌어요. 모은 카드와 기록은 그대로예요.':'선생님께 받은 코드를 넣어 주세요.';
  $('#view').innerHTML=`<div class=title><div class=panel style="width:min(460px,100%);display:flex;flex-direction:column;gap:12px;align-items:center">
   ${I('lock')}<h2 style="margin:0">선생님 코드</h2><p class=mut style="font-size:14px;text-align:center">${why}</p>
   <input class="inp codeIn" id=gCode maxlength=8 placeholder="11-LJC" autocomplete="off" autocapitalize="characters" spellcheck="false">
@@ -8381,8 +8442,7 @@ function renderGate(change){S.screen='gate';const m=S.meta;const old=m.code&&par
   <p class=mut style="font-size:12px;text-align:center">코드에는 학년과 학기가 들어 있어요. 배우지 않은 학년의 문제는 나오지 않아요(선행 방지).</p></div></div>`;
  const inp=$('#gCode');setTimeout(()=>inp.focus(),100);
  const ok=()=>{const c=parseCode(inp.value);if(!c){toast('코드 모양이 아니에요. 예: 11-LJC');return;}if(c.bad){toast(c.old?'지난 학년도 코드예요. 새 코드를 받아 주세요':'코드가 맞지 않아요');sfx('wrong');return;}
-  if(m.gFloor&&+c.gs[0]<m.gFloor){toast(`${m.gFloor}학년보다 아래 학년으로는 내려갈 수 없어요`);sfx('wrong');return;}
-  if(!m.gFloor)m.gFloor=+c.gs[0];
+  m.gFloor=+c.gs[0];m.gBase=c.gs;   // 선생님 코드는 기본 학기를 새로 정해요(아래로도 가능)
   m.gTop=Math.max(gradeTopIdx(m),semIdx(c.gs)); // 선생님이 준 코드는 그 학기까지 바로 열어요
   const prev=m.gs;m.code=c.code;m.gs=c.gs;m.cls=c.cls;if(prev!==c.gs){m.uMax=null;m.focus=null;}sfx('ok');autoSave();toast(`${semName(c.gs)} 코드 확인!`);
   if(m.name&&m.starter&&prev!==c.gs)return askUnit(()=>renderHub());goStart();};
@@ -8412,7 +8472,7 @@ function renderStarter(){S.screen='starter';$('#view').innerHTML=`<div class=wra
  $('#view').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{sfx('tap');STR_R=b.dataset.r;renderStarter();});
  $('#view').querySelectorAll('.card').forEach(c=>c.onclick=async()=>{const id=+c.dataset.id;sfx('tap');if(!(await confirmBox(`<b>${josa(esc(MON[id].name),'와과')}</b> 함께할까요?<div style="display:flex;justify-content:center">${monImg(id,'anim')}</div>`,'함께할래요!','다시 고를래요')))return;
   const m=S.meta;m.starter=id;m.partner=id;addCard(id,2);STARTER_DECK.forEach(x=>addCard(x,2));m.deck=[id,id,...STARTER_DECK.flatMap(x=>[x,x])];autoSave();sfx('win');confetti(40);
-  askUnit(()=>{if(window.TUT_A)TUT_A.afterStarter();else renderHub();});});}
+  {const nx=()=>{if(window.TUT_A)TUT_A.afterStarter();else renderHub();};if(m.uMax)nx();else askUnit(nx);}});}
 function askUnit(next,again){const m=S.meta;const us=UNITS[m.gs]||[];const set=v=>{m.uMax=v;m.uMaxAt=today();autoSave();closeM();next();};
  M(`<h2>${again?'진도가 나갔나요?':'지금 몇 단원을 배우고 있나요?'}</h2>${again&&m.uMax?`<p style="font-size:15px">지금은 <b>${m.uMax>=20?'전체':m.uMax+'단원까지'}</b> 문제가 나와요.</p>`:''}<p class=mut style="font-size:14px">${esc(semName(m.gs))}에서 <b>배운 단원까지만</b> 문제가 나와요. 잘 모르면 선생님께 물어보거나 '전체'를 골라요. 나중에 학습 지도에서 바꿀 수 있어요.</p>
   <div class=menuCol style="width:100%;margin-top:8px">${us.map((n,i)=>`<button class="btn ${m.uMax===i+1?'gold':'ghost'}" data-a="u${i+1}">${i+1}단원 ${esc(n)}까지</button>`).join('')}<button class="btn blue" data-a=u99>전체</button>${again?'<button class="btn ghost" data-a=keep>그대로 할래요</button>':''}</div>`,
@@ -8479,7 +8539,7 @@ function classCsv(metas){const R=classRows(metas);const q=v=>'"'+String(v).repla
  return '﻿'+[head,...rows].map(r=>r.map(q).join(',')).join('\r\n');}
 function renderTeacher(){S.screen='teacher';const y=schoolYear();
  $('#view').innerHTML=`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('teacher')} 선생님 화면</h2><span class=hudSp></span><button class="btn ghost sm" id=tcBack>나가기</button></div>
-  <p style="font-size:14px;line-height:1.6;margin-top:8px">학생은 <b>학년·학기 코드</b>가 있어야 시작할 수 있어요. 코드의 학기보다 뒤 학년 문제는 나오지 않아요. 코드는 <b>학년+학기 숫자 두 자리 + -LJC</b> 모양이에요. 예: 1학년 1학기 <b>11-LJC</b>, 1학년 2학기 <b>12-LJC</b>.</p>
+  <p style="font-size:14px;line-height:1.6;margin-top:8px">학생은 처음에 <b>학년·학기·단원을 직접 골라</b> 시작해요. 그 뒤로 기본 학기를 바꾸려면 <b>선생님 코드</b>가 있어야 해요. 별을 모으면 위 학기는 학생이 직접 열 수 있어요. 코드는 <b>학년+학기 숫자 두 자리 + -LJC</b> 모양이에요. 예: 1학년 1학기 <b>11-LJC</b>, 1학년 2학기 <b>12-LJC</b>.</p>
   <div id=tcList style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:10px"></div></div>
 
  <div class=panel><h2>📡 실시간으로 받기 <span class=mut style="font-size:13px">(학생이 보내면 아래 표가 자동으로 바뀌어요)</span></h2>
@@ -8970,7 +9030,7 @@ battleMenu=function(){
 // ----- 지도 · 도감 · 덱 편성 · 엔딩 -----
 const ORD=['첫','두','세','네','다섯','여섯'];
 function scVowText(r){const pg=scPages(r);const v=pg.find(x=>x.k==='vow'&&!x.final);return v?v.t.replace(/^[^:]+:\s*/,''):'';}
-function scLaunch(){const m=S.meta;if(!codeValid()||!m.name||!m.starter){M(`<h2>시나리오를 시작하기 전에</h2><p style="line-height:1.75">시나리오 모드는 기존 게임의 학년 코드, 닉네임, 파트너 설정을 그대로 사용해요.<br><b>먼저 「시작하기」에서 기본 설정을 마치면</b> 바로 이야기를 시작할 수 있어요.</p><div class="mbtns"><button class="btn red big" data-a="go">설정하러 가기</button><button class="btn ghost" data-a="x">취소</button></div>`,{go:()=>{closeM();goStart();},x:()=>closeM(),_close:()=>closeM()});return;}
+function scLaunch(){const m=S.meta;if(!codeValid()||!m.name||!m.starter){M(`<h2>시나리오를 시작하기 전에</h2><p style="line-height:1.75">시나리오 모드는 기존 게임의 학년·학기, 닉네임, 파트너 설정을 그대로 사용해요.<br><b>먼저 「시작하기」에서 기본 설정을 마치면</b> 바로 이야기를 시작할 수 있어요.</p><div class="mbtns"><button class="btn red big" data-a="go">설정하러 가기</button><button class="btn ghost" data-a="x">취소</button></div>`,{go:()=>{closeM();goStart();},x:()=>closeM(),_close:()=>closeM()});return;}
  scState();scRenderSelect();}
 function scBackTo(){const f=SC.from;if(f==='select')scRenderSelect();else if(f==='side')scRenderSide();else scRenderMap();}
 function scBindStageClicks(){
@@ -10971,7 +11031,7 @@ init();
    skin(t.querySelector('#tSet'),'pxw pxk','gear','설정');
    skin(t.querySelector('#tTeach'),'pxw pxt','teacher','선생님');
    const nt=t.querySelector('.notice');
-   if(nt&&nt.innerHTML.indexOf('학년·학기 코드')>=0)nt.innerHTML='<span class="nl">본 앱은 <b>교육용 앱</b>입니다. 선생님께 받은 <b>학년·학기 코드</b>가 필요합니다.</span><span class="nl nick">실명 대신 <b>닉네임</b>을 사용해 주세요.</span><span class="nl">비영리 교육용 팬 콘텐츠이며, 포켓몬 관련 권리는 각 권리자에게 있습니다.</span>';
+   if(nt&&nt.innerHTML.indexOf('학년·학기 코드')>=0)nt.innerHTML='<span class="nl">본 앱은 <b>교육용 앱</b>입니다. 처음에 <b>학년·학기·단원</b>을 직접 고르고, 기본 학기를 바꾸려면 <b>선생님 코드</b>가 필요합니다.</span><span class="nl nick">실명 대신 <b>닉네임</b>을 사용해 주세요.</span><span class="nl">비영리 교육용 팬 콘텐츠이며, 포켓몬 관련 권리는 각 권리자에게 있습니다.</span>';
    (function(){const all=t.querySelectorAll('.notice');const last=all[all.length-1];if(last&&last.textContent.trim()==='좌삼초.'){last.replaceWith(studioEl());}})();
    drawLogo(t);
    try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(t.isConnected){t.querySelector('.logo').dataset.k='';drawLogo(t);}});}catch(e){}
@@ -11431,6 +11491,7 @@ new MutationObserver(sync).observe(document.getElementById('view'),{childList:tr
 #battle.tutOn .bTop .pill,#battle.tutOn .bTop .mana{display:none}
 #battle.tutOn #bPower{display:none}
 
+#tutSkip{position:fixed;z-index:36;display:none;padding:5px 10px;font-size:13px;white-space:nowrap}
 #tutFade{position:fixed;inset:0;z-index:260;background:#000;opacity:1;transition:opacity .9s ease}
 #tutFade.out{opacity:0;pointer-events:none}
 
@@ -11541,8 +11602,9 @@ function ui(){
   mk('div','tutHL2','','');
   mk('div','tutBoss','','<div class=tbL><b>BOSS</b> 레지드래고 <span class=tbStar>★★★★★</span> · <span>용의 기세</span><small>도감에는 등록되지 않는 상대예요</small></div><div class=tbR>특성 <b id=tutProg>0</b>/'+TOTAL+'</div>');
   mk('div','tutFade','','');
+  {const sk=mk('button','tutSkip','btn ghost sm','튜토리얼 건너뛰기');sk.type='button';sk.onclick=()=>{try{sfx('tap');}catch(e){}tutSkipAsk();};}
 }
-function removeUi(){document.body.classList.remove('aimOn');['tutBox','tutHL','tutHL2','tutDim','tutBoss','tutFade','tutAim'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove();});}
+function removeUi(){document.body.classList.remove('aimOn');['tutBox','tutHL','tutHL2','tutDim','tutBoss','tutFade','tutAim','tutSkip'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove();});}
 function setProg(n){const e=document.getElementById('tutProg');if(e)e.textContent=n;}
 
 function say(html,o={}){
@@ -11613,7 +11675,12 @@ function placeBox(c){
   sm.bxT=Math.max(top0,Math.min(y,vh-H-8));
 }
 /* 목표값 갱신(느슨한 주기) — 실제 화면 반영은 아래 애니메이션 루프가 부드럽게 따라가요 */
+function placeSkip(){const sk=document.getElementById('tutSkip'),mb=document.getElementById('bMenu');if(!sk)return;
+  if(!mb||!cur||cur.done){sk.style.display='none';return;}
+  const r=mb.getBoundingClientRect();if(!r.width){sk.style.display='none';return;}
+  sk.style.display='block';sk.style.top=Math.round(r.bottom+6)+'px';sk.style.right=Math.max(4,Math.round(innerWidth-r.right))+'px';sk.style.left='auto';}
 function updateFrames(){
+  try{placeSkip();}catch(e){}
   const hl=document.getElementById('tutHL');if(!hl)return;
   const T=cur;
   const c=calcBoxes(),covered=c.covered,els=c.els,boxes=c.boxes;
@@ -12689,11 +12756,19 @@ async function partD(){
 }
 
 /* ---------- 진행 · 마무리 ---------- */
+function prepResume(T,k){                       // 앞 파트를 건너뛰고 이어 할 때: 파트 A가 끝난 모습으로 무대를 맞춰요
+  const f=document.getElementById('tutFade');if(f)f.classList.add('out');
+  B.side='me';B.turn=1;B.round=1;B.busy=false;
+  const b=mkUnit(BOSS_ID);b.fresh=0;B.foe.board[BOSS_SLOT]=b;
+  setProg(k>=2?TOTAL:2);renderBattle();
+}
 const parts=[partA,partB,partC,partD];
 
 async function run(T){
   try{
-    for(const p of parts){await p();chk();}
+    const from=T.from||0;
+    if(from>0)prepResume(T,from);
+    for(let i=from;i<parts.length;i++){await parts[i]();chk();if(!T.replay){const m=S.meta;m.tutDone=i+1;autoSave();}}
     await finish(T);
   }catch(e){
     if(e!==ABORT)console.warn('tutorial',e);
@@ -12707,7 +12782,7 @@ async function finish(T){
   const ids=[FIRE_ID,WATER_ID].concat(Object.keys(EXP).map(k=>EXP[k]));
   const had={};ids.forEach(id=>{had[id]=!!(S.meta.col&&S.meta.col[id]);});
   if(!T.replay){
-    S.meta.seen.tutA=1;
+    S.meta.seen.tutA=1;delete S.meta.seen.tutSkip;S.meta.tutDone=0;
     try{ids.forEach(id=>{if(!S.meta.col[id])addCard(id,1);else S.meta.dexSeen[id]=1;});}catch(e){console.warn('tutorial dex',e);}
   }
   autoSave();
@@ -12740,10 +12815,18 @@ function abort(){
   setTimeout(()=>{if(cur===T&&!T.done)exit(T);},1800);
 }
 function tutMenu(){
-  M('<h2>튜토리얼</h2><p style="font-size:15px;line-height:1.6">지금은 처음 배우는 전투 연습 중이에요. 건너뛰어도 <b>설정 → 튜토리얼 다시 보기</b>에서 언제든 다시 할 수 있어요.</p><div class=mbtns><button class="btn gold" data-a=x>계속하기</button><button class="btn ghost" data-a=skip>튜토리얼 건너뛰기</button></div>',{
+  M('<h2>튜토리얼</h2><p style="font-size:15px;line-height:1.6">지금은 처음 배우는 전투 연습 중이에요. 건너뛰어도 <b>설정 → 튜토리얼</b>에서 끝낸 파트 다음부터 이어서 할 수 있어요.</p><div class=mbtns><button class="btn gold" data-a=x>계속하기</button><button class="btn ghost" data-a=skip>튜토리얼 건너뛰기</button></div>',{
     x:()=>closeM(),_close:()=>closeM(),
-    skip:async()=>{if(await confirmBox('튜토리얼을 건너뛸까요?','건너뛰기','계속하기')){closeM();if(!(cur&&cur.replay)){S.meta.seen=S.meta.seen||{};S.meta.seen.tutA=1;autoSave();}abort();}}
+    skip:()=>{tutSkipAsk();}
   });
+}
+async function tutSkipAsk(){
+  if(!cur||cur.done||cur.skipAsk)return;cur.skipAsk=1;
+  let ok=false;try{ok=await confirmBox('튜토리얼을 완료하면 <b>특성별 포켓몬 18마리</b>를 획득할 수 있습니다.<br>정말로 건너뛰시겠습니까?<br><span style="font-size:14px">건너뛰어도 <b>설정</b>에서 언제든 튜토리얼을 다시 할 수 있어요.</span>','건너뛰기','계속하기');}finally{if(cur)cur.skipAsk=0;}
+  if(!ok)return;
+  try{closeM();}catch(e){}
+  if(cur&&!cur.replay){const m=S.meta;m.seen=m.seen||{};m.seen.tutA=1;m.seen.tutSkip=1;autoSave();}   // 어디까지 끝냈는지는 tutDone에 남아 있어요
+  abort();
 }
 
 /* ---------- 시작 ---------- */
@@ -12754,7 +12837,7 @@ function begin(o={}){
   const meta=S.meta;let pid=25;try{pid=partnerId()||25;}catch(e){}
   const me=mkPlayer(meta.name||'나',[],heroHpMax(),pid,true,[],false);
   const foe=mkPlayer('보스',[],20,BOSS_ID,true,[],false);
-  const T={w:null,lock:false,allow:A.none,hi:()=>[],q1done:false,done:false,abort:false,replay:!!o.replay,back:S.screen==='title'?'title':'hub'};
+  const T={w:null,lock:false,allow:A.none,hi:()=>[],q1done:false,done:false,abort:false,replay:!!o.replay,from:o.from||0,back:S.screen==='title'?'title':'hub'};
   cur=T;
   B={gi:-1,g:{n:'튜토리얼',ldr:'보스',types:[14],c:'#e9e2ff'},diff:1,turn:0,round:0,side:'me',me,foe,sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:false,over:false,tut:T};
   S.screen='battle';
@@ -12822,7 +12905,7 @@ goStart=function(){
     const m=S.meta;
     if(codeValid()&&m.name&&m.starter&&m.seen&&m.seen.tutNew&&!m.seen.tutA){   // 튜토리얼 도중에 나갔다면 이어서 시작
       const pk=document.getElementById('pack');if(pk)pk.classList.remove('on');
-      B=null;return begin();
+      B=null;return begin({from:m.tutDone||0});
     }
   }catch(e){}
   return _goStart.apply(this,arguments);
@@ -12880,7 +12963,7 @@ function gdPos(id,n){const H=267,k=1,sp=gdSize(id)*k/H*100,R=gdRng(id,n||0);
  // 비행 포켓몬: 몸 전체가 정원 절반 위쪽 / 걷는 포켓몬: 발은 물론 몸도 대부분 정원 절반 아래쪽 (y = 발 위치 %)
  if(gdFly(id)){const lo=Math.min(46,Math.max(14,Math.ceil(sp)+3));return {x:8+R()*84,y:lo+R()*Math.max(0,47-lo),fly:1};}
  const lo=Math.min(92,Math.max(56,Math.ceil(50+sp*.85)));return {x:8+R()*84,y:lo+R()*Math.max(0,97-lo),fly:0};}
-function gdSize(id){const h=(MON[id]&&+MON[id].ht)||1;return Math.round(Math.max(40,Math.min(115,32+26*Math.sqrt(h))));}
+function gdSize(id){const h=(MON[id]&&+MON[id].ht)||1;return Math.round(Math.max(48,Math.min(124,38+30*Math.sqrt(h))));}
 const GD_WALK=3.6; // 한 번 걷는 시간(초) — CSS transition 시간과 같아요
 // 걷는 도중이면 지금 어디쯤인지 계산해요 (화면이 다시 그려져도 순간이동하지 않고 이어서 걸어가요)
 function gdSettle(P){if(P.t0&&Date.now()-P.t0>=GD_WALK*1000){P.x=P.tx;P.y=P.ty;delete P.t0;delete P.tx;delete P.ty;}return P;}
@@ -12939,7 +13022,8 @@ const GD_TIPS=[
  {ic:'🎴',b:'<b>카드팩</b>에서 <b>전설 조각</b> 8개를 모으면 카드가 완성돼요!',t:'<b>카드팩</b>에서 전설 <b>조각</b>을 모아 보세요. 조각 8개를 모으면 전설 카드가 완성돼요. 40팩 안에는 꼭 한 장 나와요!',go:'pack'},
  {ic:'🏆',b:'<b>배틀 리그</b> 챔피언을 처음 이기면 <b>전설 카드</b>를 받아요!',t:'<b>배틀 리그</b> 챔피언(9번째 관장)을 처음 이기면 <b>전설 카드</b>를 선물로 받아요!',go:'league'},
  {ic:'📅',b:'<b>시즌</b> 레벨을 끝까지 올리면 <b>전설 카드</b>를 받아요!',t:'<b>시즌</b> 레벨을 끝까지 올리면 마지막 보상으로 <b>전설 카드</b>를 받아요!',go:'season'},
- {ic:'💪',b:'<b>전설 포켓몬</b>은 특성이 강화돼서 훨씬 강력해요!',t:'<b>전설 포켓몬</b>은 특성이 강화돼서 훨씬 강력해요! 얻으면 꼭 덱에 넣어 보세요.'}];
+ {ic:'💪',b:'<b>전설 포켓몬</b>은 특성이 강화돼서 훨씬 강력해요!',t:'<b>전설 포켓몬</b>은 특성이 강화돼서 훨씬 강력해요! 얻으면 꼭 덱에 넣어 보세요.'},
+ {ic:'🔷',mg:1,b:'<b>도감</b>에서 <b>메가스톤 연구</b>를 하면 <b>메가진화</b>를 할 수 있어요!',t:'<b>도감</b>에서 포켓몬 카드를 열어 <b>메가스톤 연구</b>를 하면 전투에서 <b>메가진화</b>를 할 수 있어요! 도감의 <b>메가 진화</b> 탭에서 가능한 포켓몬을 한눈에 볼 수 있어요.',go:'dexmega'}];
 const GD_BUB={on:false,i:-1};
 function gdBubInner(){const t=GD_TIPS[GD_BUB.i];if(!t)return '';return `<span class=gdBubTxt>${t.ic} ${t.b}</span>${t.go?`<button class=gdBubGo data-gdgo="${t.go}" aria-label="바로 가기" title="바로 가기">→</button>`:''}`;}
 function gdBubHTML(){return `<div class="gdBub${GD_BUB.on?' on':''}" id=gdBub>${GD_BUB.on?gdBubInner():''}</div>`;}
@@ -12952,13 +13036,19 @@ setTimeout(gdBubStep,2500);
 document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('[data-gdgo]');if(!g)return;
  const k=g.dataset.gdgo,f=FEAT.find(x=>x.k===k);if(f&&!featOn(k)){toast('아직 열리지 않았어요 ('+f.how+')');return;}sfx('tap');try{closeM();}catch(e){}if(NAV[k])NAV[k]();});
 NAV.scenario=()=>{try{ac();}catch(e){}scLaunch();};NAV.rogue=()=>rlLaunch();
+NAV.dexmega=()=>{if(!featOn('dex')){toast('아직 열리지 않았어요 (카드팩을 처음 열면)');return;}DEXF='mega';DEXRAR=0;renderDex();};
+function gdTipRow(t){return `<div style="font-size:14px;line-height:1.6;margin:3px 0">${t.ic} ${t.t}${t.go?` <button class=gdBubGo data-gdgo="${t.go}" aria-label="바로 가기" title="바로 가기" style="display:inline-flex;vertical-align:middle;margin-left:4px;pointer-events:auto">→</button>`:''}</div>`;}
 function gdInfo(){M(`<h2>⚡ 에너지와 알 부화기</h2><div style="line-height:1.8;font-size:15px">
   <b>에너지</b>는 수학·영어·국어·IQ 문제의 개념(유형) 하나를 <b>3번 연속</b> 맞히면 1개씩 모여요. 쉽게 모이지 않아요!<br>
   <b>알</b>은 부화기가 비어 있을 때 🪙${GD_EGG_COST}코인으로 18가지 속성 중에서 골라요.<br>
   알에게 에너지를 <b>${GD_NEED}번</b> 주면 그 속성의 <b>전설 포켓몬</b>이 랜덤으로 태어나요!<br>
-  <b>정원</b>에는 파트너로 <b>${GD_BOND}문제</b> 이상 함께 푼 포켓몬을 ${GD_MAX}마리까지 풀어놓을 수 있어요.<h3 style="margin:12px 0 4px">🌟 전설 포켓몬을 얻는 방법</h3>${GD_TIPS.map(t=>`<div style="font-size:14px;line-height:1.6;margin:3px 0">${t.ic} ${t.t}${t.go?` <button class=gdBubGo data-gdgo="${t.go}" aria-label="바로 가기" title="바로 가기" style="display:inline-flex;vertical-align:middle;margin-left:4px;pointer-events:auto">→</button>`:''}</div>`).join('')}</div><div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,{x:()=>closeM(),_close:()=>closeM()});}
+  <b>정원</b>에는 파트너로 <b>${GD_BOND}문제</b> 이상 함께 푼 포켓몬을 ${GD_MAX}마리까지 풀어놓을 수 있어요.<h3 style="margin:12px 0 4px">🔷 메가진화</h3>${GD_TIPS.filter(t=>t.mg).map(gdTipRow).join('')}<h3 style="margin:12px 0 4px">🌟 전설 포켓몬을 얻는 방법</h3>${GD_TIPS.filter(t=>!t.mg).map(gdTipRow).join('')}</div><div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,{x:()=>closeM(),_close:()=>closeM()});}
 function gdPick(){const m=S.meta,g=gd(m);if(g.egg)return;
- M(`<h2>🥚 알 고르기</h2><p class=mut style="font-size:13px;text-align:center">속성을 골라요. 🪙${GD_EGG_COST}코인이 들어요. (내 코인 🪙${m.coins})</p><div class=gdTypes>${TYPE_KO.map((n,i)=>`<button data-a="t${i}" style="background:${TYPE_COL[i]}">${n}</button>`).join('')}</div><div class=mbtns><button class="btn ghost" data-a=x>닫기</button></div>`,
+ const poor=m.coins<GD_EGG_COST;
+ M(`<div class=gdPk><h2>🥚 알 고르기</h2><p class=gdPkSub>고른 속성의 <b>전설 포켓몬</b>이 태어나요</p><div class="gdPkCost${poor?' low':''}"><span>🪙 ${GD_EGG_COST}</span><small>내 코인 🪙 ${m.coins}</small></div>
+  <div class=gdTypes>${TYPE_KO.map((n,i)=>{const c=TYPE_COL[i],pool=MON_IDS.filter(id=>MON[id].rar===5&&MON[id].types.includes(i)),have=pool.filter(id=>m.col[id]).length;
+   return `<button data-a="t${i}" class="gdTy${poor?' poor':''}" style="--c:${c};--c1:${gdShade(c,.55)};--c2:${gdShade(c,-.35)};--c3:${gdShade(c,.82)}"><span class=gdTyEgg>${gdEggSVG(i,0,false)}</span><span class=gdTyNm>${n}</span><small class=gdTyCnt>${pool.length?`전설 ${have}/${pool.length}`:'&nbsp;'}</small></button>`;}).join('')}</div>
+  <div class=mbtns><button class="btn ghost" data-a=x>닫기</button></div></div>`,
   Object.assign({x:()=>closeM(),_close:()=>closeM()},Object.fromEntries(TYPE_KO.map((n,i)=>['t'+i,()=>{if(m.coins<GD_EGG_COST){toast(`코인이 부족해요 (🪙${GD_EGG_COST} 필요)`);return;}if(g.egg){closeM();return;}m.coins-=GD_EGG_COST;g.egg={t:i,fed:0};autoSave();closeM();sfx('level');toast(`${TYPE_KO[i]} 속성 알을 부화기에 넣었어요!`);renderHub();}]))));}
 function gdFeedFx(k,t){try{const el=document.querySelector('#gardenPanel .gdEgg')||document.querySelector('#gardenPanel .gdInc');if(!el)return;
  const r=zRect(el),cx=r.left+r.width/2,cy=r.top+r.height*.55,col=(typeof TYPE_COL!=='undefined'&&TYPE_COL[t])||'#ffd23f',big=k>=5,n=big?22:9,W=Math.max(60,r.width);
@@ -13092,7 +13182,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
    <div class=padPaper><canvas class=hintCv></canvas><canvas class=mainCv></canvas></div>`;
   document.body.appendChild(el);
   paper=el.querySelector('.padPaper');cv=el.querySelector('canvas.mainCv');hcv=el.querySelector('canvas.hintCv');
-  try{ctx=cv.getContext('2d',{desynchronized:true});}catch(e){}
+  /* desynchronized(저지연) 옵션은 일부 컴퓨터(Chrome)에서 캔버스 배경이 검정으로 나와서 쓰지 않아요 */
   if(!ctx)ctx=cv.getContext('2d');
   const $=s=>el.querySelector(s);
   el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{P.tool=b.dataset.t;sync();});
@@ -13763,5 +13853,20 @@ const R=(t,ids)=>({t,ids:ids.split(' ')});
  const __ra=recordAnswer;
  recordAnswer=function(q,ok,ms,opt){const r=__ra.apply(this,arguments);try{if(q&&!q.iq&&!q.ko&&!q.en)tick(q,ok,opt||{});}catch(e){console.warn('ladder',e);}return r;};
 })();
+</script>
+<script>
+// 홈 화면: 트레이너 스킬 · 학습 모드 선택 칸은 맨 아래(트레이너 카드 타일 아래)로 보내요
+(function(){const __rh=renderHub;renderHub=function(){const r=__rh.apply(this,arguments);try{const wrap=document.querySelector('#view .wrap');if(wrap){
+ const btn=document.getElementById('hTrainerSkills');const sk=btn&&btn.closest('.panel');
+ const hc=document.getElementById('hCode'),gn=hc&&hc.closest('.nextFeat'),ref=gn&&gn.parentNode===wrap?gn:null;
+ if(sk&&sk.parentNode===wrap)wrap.insertBefore(sk,ref);
+ const md=document.getElementById('englishModePanel');if(md&&md.parentNode===wrap)wrap.insertBefore(md,ref);}}catch(e){console.warn('hub order',e);}return r;};})();
+</script>
+<script>
+// 화면이 바뀌면(홈 → 도감 등) 항상 맨 위에서 시작해요. 같은 화면 안에서 다시 그릴 때는 스크롤을 그대로 둬요
+(function(){let last=null;const top=()=>{try{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;const v=document.getElementById('view');if(v)v.scrollTop=0;}catch(e){}};
+ function start(){const v=document.getElementById('view');if(!v)return;last=S.screen;
+  new MutationObserver(()=>{if(S.screen!==last){last=S.screen;top();requestAnimationFrame(top);}}).observe(v,{childList:true});}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();})();
 </script>
 </body></html>
