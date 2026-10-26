@@ -2389,7 +2389,7 @@ const ART={"bg": {"title": "data:image/webp;base64,UklGRkqqAQBXRUJQVlA4TD6qAQAvv
 const GAME={id:'poke-math',title:'좌삼몬스터디',file:'좌삼몬스터디',ver:'1.0'};
 // 교사 코드: 학년도마다 바뀌어요. 아래 SECRET을 바꾸면 우리 학교만의 코드가 돼요(README 참고).
 const CODE_SECRET='hada-pokemath-2026';
-const TEACHER_PW='선생님2026'; // 교사 화면 비밀번호(README에서 바꾸는 법 안내)
+const TEACHER_PW='teacher'; // 교사 화면 비밀번호(README에서 바꾸는 법 안내)
 
 // ===== 유틸 =====
 const $=s=>document.querySelector(s);
@@ -2844,11 +2844,11 @@ function coachOnce(key,steps){if(S.meta.seen[key])return Promise.resolve();S.met
 const CA='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function schoolYear(d=new Date()){return d.getMonth()>=2?d.getFullYear():d.getFullYear()-1;}
 function codeCheck(gs,cls,y){let h=hashStr(CODE_SECRET+'|'+y+'|'+gs+'|'+cls);let s='';for(let i=0;i<3;i++){s+=CA[h%32];h=Math.floor(h/32)^hashStr(s+i);h>>>=0;}return s;}
-function makeTeacherCode(g,sem,cls,y=schoolYear()){const gs=`${g}${sem}`;cls=(cls||'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/[IO01]/g,'').slice(0,3);while(cls.length<3)cls+=CA[Math.floor(Math.random()*32)];return `${gs}-${cls}-${codeCheck(gs,cls,y)}`;}
-function parseCode(t){t=String(t||'').toUpperCase().replace(/[^A-Z0-9]/g,'');const m=t.match(/^([1-6])([12])([A-Z2-9]{3})([A-Z2-9]{3})$/);if(!m)return null;const gs=m[1]+m[2],cls=m[3];
- const y=schoolYear();if(codeCheck(gs,cls,y)!==m[4])return {bad:1,old:codeCheck(gs,cls,y-1)===m[4]};
- return{gs:`${m[1]}-${m[2]}`,cls,y,code:`${gs}-${cls}-${m[4]}`};}
-function codeValid(){const c=S.meta.code&&parseCode(S.meta.code);return !!(c&&!c.bad);}
+const CODE_CLASS='LJC'; // 학년·학기 코드 모양: 11-LJC (1학년 1학기), 12-LJC (1학년 2학기) … 62-LJC
+function makeTeacherCode(g,sem){return `${g}${sem}-${CODE_CLASS}`;}
+function parseCode(t){t=String(t||'').toUpperCase().replace(/[^A-Z0-9]/g,'');const m=t.match(/^([1-6])([12])([A-Z0-9]{3})$/);if(!m||m[3]!==CODE_CLASS)return null;
+ return{gs:`${m[1]}-${m[2]}`,cls:m[3],y:schoolYear(),code:`${m[1]}${m[2]}-${m[3]}`};}
+function codeValid(){try{const o=String(S.meta.code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(/^[1-6][12][A-Z2-9]{6}$/.test(o)){S.meta.code=o.slice(0,2)+'-'+CODE_CLASS;} /* 예전 긴 코드(31-ABC-XYZ)는 학년·학기만 남겨 새 코드로 바꿔요 */}catch(e){}const c=S.meta.code&&parseCode(S.meta.code);if(c&&!S.meta.gFloor)S.meta.gFloor=+c.gs[0]; /* 시작할 때 넣은 코드의 학년이 '내려갈 수 없는 바닥' */return !!(c&&!c.bad);}
 
 // ===== 상태 =====
 const SAVE_KEY=GAME.id+'-v1';
@@ -3974,7 +3974,13 @@ function tierPool(pool,tier){const n=pool.length;if(n<3)return pool;const T=skTi
  const arr=pool.slice().sort((a,b)=>T(a.id)-T(b.id)||(a.id<b.id?-1:1));
  const nl=Math.max(1,Math.round(n*.4)),nm=Math.max(1,Math.round(n*.3));
  return tier==='L'?arr.slice(0,nl):tier==='M'?arr.slice(nl,nl+nm):arr.slice(nl+nm);}
-function nextCyc(){const r=rnd();if(S.meta.settings.iq===false)return r<.5?'L':r<.8?'M':'H';return r<.4?'L':r<.7?'M':r<.9?'H':'I';} // 켬: 가벼움 40·중간 30·무거움 20·IQ 10 / 끔: 50·30·20
+// 도움이 필요한 학생: 최근 20문제(다시 풀기 제외) 정답률이 낮으면 쉬운 문제를 더 많이 섞어요 (1단계 60% 미만, 2단계 40% 미만)
+function struggleLv(){try{const h=(S.meta.hist||[]).slice(-20);if(h.length<10)return 0;const a=h.reduce((x,y)=>x+y,0)/h.length;const lv=a<.4?2:a<.6?1:0;
+ if(lv>S._strLv&&lv>0)setTimeout(()=>{try{toast('💪 천천히 가요! 쉬운 문제를 조금 더 섞어 줄게요');}catch(e){}},600);S._strLv=lv;return lv;}catch(e){return 0;}}
+function nextCyc(){const r=rnd(),lv=struggleLv(),iq=S.meta.settings.iq!==false;
+ if(lv===2)return r<.7?'L':r<.95?'M':'H';            // 많이 어려워할 때: 가벼움 70 · 중간 25 · 무거움 5 (IQ 없음)
+ if(lv===1){if(!iq)return r<.6?'L':r<.3+.6?'M':'H';return r<.55?'L':r<.85?'M':r<.95?'H':'I';} // 가벼움 55 · 중간 30 · 무거움 10 · IQ 5
+ if(!iq)return r<.5?'L':r<.8?'M':'H';return r<.4?'L':r<.7?'M':r<.9?'H':'I';} // 평소 켬: 가벼움 40·중간 30·무거움 20·IQ 10 / 끔: 50·30·20
 // ---- 🧠 IQ 문제: 수 규칙·논리·도형 패턴 (전투에서 10% 확률, 정답이면 크리티컬/슈퍼세이브/카드 보너스) ----
 const IQ_RECENT=[];
 const IQ_NAMES=['지호','서아','민준','하린','도윤','수아','예준','지안','유나','시우','하준','채원'];
@@ -4233,7 +4239,7 @@ SKM['iq']={id:'iq',s:'',u:0,n:'🧠 IQ 퀴즈',es:[]};
 
 function pickQ(opt={}){let pool=opt.pool,found=null;let tier=opt.cyc?(opt.tier||nextCyc()):null;if(tier==='I'){const iq=iqQ();if(iq)return iq;tier='H';}
  if((!opt.pool||opt.lad)&&window.LADX){const lq=LADX.pick(tier);if(lq)return lq;}
- if(!pool){const fp=foundPool();if(fp.length&&rnd()<.35){pool=fp;found=1;}else pool=rnd()<.7?focusSkills():reviewSkills();}
+ if(!pool){const fp=foundPool();if(fp.length&&rnd()<(struggleLv()>=1?.5:.35)){pool=fp;found=1;}else pool=rnd()<.7?focusSkills():reviewSkills();}
  if(!pool.length)return null;
  if(tier)pool=tierPool(pool,tier);
  for(let k=0;k<12;k++){const s=wpick(pool);const q=makeQ(s,rnd);if(!q)continue;if(RECENT.includes(q.key)&&k<10)continue;RECENT.push(q.key);if(RECENT.length>8)RECENT.shift();balanceAns(q);q.tier=tier;
@@ -4261,6 +4267,7 @@ function recordAnswer(q,ok,ms,opt={}){const m=S.meta,v=(q.iq||q.ko)?{c:0,x:0,st:
  if((q.ko||q.iq)&&!opt.retry){try{xsTick(q,ok);}catch(e){console.warn('xsTick',e);}} // 국어·IQ도 개념(유형)을 3번 연속 맞히면 별 = 돌(정원 에너지)
  if(!opt.retry&&!q.ko&&!q.iq){try{domTick(q.sk,ok);}catch(e){}} // 영역별 하루 기록(진단 탭의 지난주 대비 변화용)
  try{wbAdd(q,ok,opt);}catch(e){console.warn('wbAdd',e);} // 오답 노트: 틀린 문제(수학·국어·IQ) 저장·해결 확인
+ if(ok&&!q.ko&&!q.iq&&!q.en)gradeUnlockCheck();
  d.tt=(d.tt||0)+Math.min(ms,90000);
  if(ok){m.stats.c+=opt.retry?0:1;if(!opt.retry){d.c++;d.ms+=Math.min(ms,60000);}v.run++;v.w=Math.max(0,v.w-1);
   if(v.run>=3&&v.st<5){v.run=0;v.st++;S.newStars=(S.newStars||[]);S.newStars.push(q.sk);
@@ -8000,12 +8007,11 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
    <button class="tile main" id=tTrain>${done?'':'<i class=newTag>오늘!</i>'}<span class=ti>${I('flame','ti')}</span><span><span class=tn>오늘의 훈련</span><br><span class=td>${done?'오늘 훈련 완료! 한 번 더 하면 사탕을 더 받아요.':`문제 ${trainN()}개 · 오늘의 카드팩 받기`}${gh?`<br>어제의 나: ${gh.n}문제 중 ${gh.c}개 정답`:''}</span></span></button>
    ${tiles}</div>
   ${next?`<div class=nextFeat>${I('lock')} 다음에 열릴 기능: <b>${next.n}</b> — ${next.how}</div>`:''}
-  <div class=nextFeat>${esc(semName(m.gs))}${m.uMax&&m.uMax<20?` ${m.uMax}단원`:''}까지의 문제가 나와요 (약한 개념은 아래 학년 기초도 나와요) · <a href="#" id=hUnit style="color:inherit">배운 단원 바꾸기</a> · <a href="#" id=hCode style="color:inherit">코드 바꾸기</a></div></div>`;
+  <div class=nextFeat>${esc(semName(m.gs))}${m.uMax&&m.uMax<20?` ${m.uMax}단원`:''}까지의 문제가 나와요 (약한 개념은 아래 학년 기초도 나와요) · <a href="#" id=hCode style="color:inherit">학년 변경</a></div></div>`;
  bindHud();wgBind(m);
  $('#hTrainerSkills').onclick=()=>{sfx('tap');renderTrainerSkills();};
  $('#tTrain').onclick=()=>{sfx('tap');startTraining();};
- $('#hCode').onclick=e=>{e.preventDefault();renderGate(true);};
- $('#hUnit').onclick=e=>{e.preventDefault();sfx('tap');askUnit(()=>renderHub(),true);};
+ $('#hCode').onclick=e=>{e.preventDefault();sfx('tap');showGradePick();};
  // 진도는 계속 나가요: 단원을 고른 지 2주가 지나면 한 번 물어봐요
  if(m.uMax&&m.uMax<20&&m.uMaxAt&&dayDiff(m.uMaxAt,today())>=14&&!CO&&!modalOpen())setTimeout(()=>{if(S.screen==='hub'&&!modalOpen())askUnit(()=>renderHub(),true);},900);
  if(m.uMax&&!m.uMaxAt){m.uMaxAt=today();autoSave();}
@@ -8320,10 +8326,10 @@ function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.eas
   <div class=setRow><span><b>포켓몬 이미지</b><br><span class=mut style="font-size:12px">끄면 포켓몬 그림을 불러오지 않아요. 인터넷이 막힌 곳에서는 '끄기'</span></span>${seg('imgs',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>왼쪽 아래 버튼 피하기</b><br><span class=mut style="font-size:12px">구글 사이트 등 다른 페이지 안에서 열었을 때, 왼쪽 아래 ⓘ 버튼이 내 카드·버튼을 가리면 켜세요. 자동은 사이트 안에서 열면 켜져요</span></span>${seg('safe',[['auto','자동'],['on','켜기'],['off','끄기']])}</div>
   <div class=setRow><span><b>보이는 영역에 화면 맞추기</b><br><span class=mut style="font-size:12px">주소창·사이트 머리글 때문에 화면이 일부만 보일 때, 게임을 보이는 영역 안에 딱 맞춰요. 화면이 잘려 보이면 '자동', 맞춤이 어색하면 '끄기'</span></span>${seg('fit',[['auto','자동'],['off','끄기']])}</div>
-  <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>선생님 코드 바꾸기</button><button class="btn ghost" data-a=tsend>📡 선생님께 기록 보내기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=unit>배운 단원 바꾸기</button><button class="btn ghost" data-a=tutor>튜토리얼 다시 보기</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
+  <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>🎓 학년 변경</button><button class="btn ghost" data-a=tsend>📡 선생님께 기록 보내기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=tutor>튜토리얼 다시 보기</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>
   <p class=mut style="font-size:11px;margin-top:10px;line-height:1.5">${GAME.title} v${GAME.ver} · 좌삼초. 수업용 비영리 팬 제작 학습 도구예요. 포켓몬 이름·그림의 권리는 Nintendo·Creatures·GAME FREAK·The Pokémon Company에 있어요. 그림은 PokeAPI 공개 저장소에서 불러와요.</p>`,
-  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);renderGate(true);},tsend:()=>{closeM(l2);showTsend();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);if(window.TUT_A)TUT_A.begin({replay:true});}},{layer2:!!l2});
+  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);if(window.TUT_A)TUT_A.begin({replay:true});}},{layer2:!!l2});
  {const sb=$('#sfxVol');if(sb){sb.oninput=()=>{st.sfxVol=+sb.value;$('#sfxVolN').textContent=sb.value+'%';};sb.onchange=()=>{autoSave();if(st.sound)sfx('ok');};}}
  {const vb=$('#bgmVol');if(vb){vb.oninput=()=>{st.bgmVol=+vb.value;$('#bgmVolN').textContent=vb.value+'%';applyBgmVol();};vb.onchange=()=>{autoSave();};}}
  $(l2?'#mbox2':'#mbox').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;st[k]=v;if(k==='bgm'){if(v)startBgm();else stopBgm();}autoSave();applySafe();refit();sfx('tap');showSettings(l2);if(k==='imgs'&&S.screen==='hub')renderHub();});}
@@ -8344,15 +8350,40 @@ function renderTitle(){S.screen='title';const m=S.meta;$('#battle').classList.re
  $('#tSave').onclick=()=>{sfx('tap');showSaveBox();};$('#tSet').onclick=()=>{sfx('tap');showSettings();};$('#tTeach').onclick=()=>{sfx('tap');teacherLogin();};}
 function goStart(){const m=S.meta;$('#pack').classList.remove('on');$('#battle').classList.remove('on');B=null;
  if(!codeValid())return renderGate();if(!m.name)return renderName();if(!m.starter)return renderStarter();renderHub();}
+// 위 학년 열기: 처음 코드의 학년은 두 학기 모두 열려 있고, 그 위 학기는 '지금 가장 높은 학기'의 개념 별(★1개 이상)이 60% 이상이면 한 학기씩 열려요 (선생님이 준 더 높은 코드를 넣으면 바로 열려요)
+const GRADE_UP_RATE=.6;
+function gradeTopIdx(m=S.meta){const fl=+m.gFloor||(m.gs?+m.gs[0]:1);const base=Math.max(semIdx(m.gs),(fl-1)*2+1);if(m.gTop==null||m.gTop<base)m.gTop=base;return m.gTop;}
+function gradeStarRate(sem,m=S.meta){const L=SK.filter(x=>x.s===sem),k=L.filter(x=>((m.sk&&m.sk[x.id])||{}).st>=1).length;return{n:L.length,k,r:L.length?k/L.length:1};}
+function gradeUnlockCheck(){try{const m=S.meta;if(!m||!m.gs)return;let t=gradeTopIdx(m),moved=false;while(t<SEMS.length-1&&gradeStarRate(SEMS[t],m).r>=GRADE_UP_RATE){t++;moved=true;}
+ if(moved){m.gTop=t;autoSave();setTimeout(()=>{try{toast(`🎉 별을 많이 모아서 ${semName(SEMS[t])}가 열렸어요! 설정 → 🎓 학년 변경에서 올라갈 수 있어요`);}catch(e){}},500);}}catch(e){}}
+// 학년 변경: ① 학년 고르기 → ② 학기 고르기 → ③ 단원 고르기
+function gradeNext(m){const top=gradeTopIdx(m);if(top>=SEMS.length-1)return `<p class=mut style="font-size:13px">모든 학기가 열렸어요! 🎉</p>`;
+ const g=gradeStarRate(SEMS[top],m),pct=Math.round(g.r*100),need=Math.round(GRADE_UP_RATE*100);
+ return `<div class=explain style="text-align:left;font-size:13px;line-height:1.7;margin:8px 0"><b>⭐ ${esc(semName(SEMS[top+1]))} 열기</b><br>${esc(semName(SEMS[top]))}의 개념 중 <b>별을 1개 이상 얻은 개념 ${g.k}/${g.n}개 (${pct}%)</b><div style="height:10px;border-radius:6px;background:#e8e2d0;overflow:hidden;margin:4px 0"><div style="height:100%;width:${Math.min(100,Math.round(g.r/GRADE_UP_RATE*100))}%;background:linear-gradient(90deg,#ffd23f,#ff9f1c)"></div></div>${need}%가 되면 자동으로 열려요. 개념을 <b>3번 연속</b> 맞히면 별이 생겨요!</div>`;}
+function showGradePick(l2){const m=S.meta;gradeUnlockCheck();const fl=+m.gFloor||(m.gs?+m.gs[0]:1),top=gradeTopIdx(m),cur=m.gs?+m.gs[0]:0;
+ const acts={x:()=>closeM(l2),_close:()=>closeM(l2)};let rows='';
+ for(let g=1;g<=6;g++){const lowLock=g<fl,hiLock=semIdx(`${g}-1`)>top,lock=lowLock||hiLock;
+  rows+=`<button class="btn ${g===cur?'gold':'ghost'}" style="width:100%;margin:4px 0;${lock?'opacity:.35':''}" data-a="G${g}" ${lock?'disabled':''}>${g}학년${lock?' 🔒':''}${g===cur?' ✔':''}</button>`;
+  if(!lock)acts['G'+g]=()=>{closeM(l2);showSemPick(g,l2);};}
+ M(`<h2>🎓 ① 학년 고르기</h2><p class=mut style="font-size:13px;line-height:1.6;text-align:left">처음 코드의 <b>${fl}학년</b>부터 고를 수 있어요. 그 아래 학년(🔒)으로는 내려갈 수 없고, 위 학년은 별을 모으면 열려요. 모은 카드와 기록은 그대로예요.</p>${gradeNext(m)}<div style="width:100%">${rows}</div><div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,acts);}
+function showSemPick(g,l2){const m=S.meta,top=gradeTopIdx(m);const acts={x:()=>closeM(l2),_close:()=>closeM(l2),back:()=>{closeM(l2);showGradePick(l2);}};let rows='';
+ for(const s2 of [1,2]){const id=`${g}-${s2}`,lock=semIdx(id)>top,on=id===m.gs;
+  rows+=`<button class="btn ${on?'gold':'ghost'}" style="width:100%;margin:4px 0;${lock?'opacity:.35':''}" data-a="S${s2}" ${lock?'disabled':''}>${g}학년 ${s2}학기${lock?' 🔒':''}${on?' ✔':''}</button>`;
+  if(!lock)acts['S'+s2]=()=>{const prev=m.gs;if(id!==prev){m.gs=id;m.code=`${g}${s2}-${CODE_CLASS}`;m.cls=CODE_CLASS;m.uMax=null;m.focus=null;sfx('ok');autoSave();toast(`${semName(id)}로 바꿨어요`);}
+   closeM(l2);askUnit(()=>{if(S.screen==='hub')renderHub();},id===prev);};}
+ M(`<h2>🎓 ② ${g}학년 학기 고르기</h2><div style="width:100%">${rows}</div><div class=mbtns><button class="btn ghost" data-a=back>← 학년 다시 고르기</button><button class="btn gold" data-a=x>닫기</button></div>`,acts);}
 function renderGate(change){S.screen='gate';const m=S.meta;const old=m.code&&parseCode(m.code);
- const why=old&&old.bad?(old.old?'새 학년도가 되어 코드가 바뀌었어요. 선생님께 새 코드를 받아 주세요. (모은 카드와 기록은 그대로예요!)':'코드가 맞지 않아요. 선생님께 다시 확인해 주세요.'):change?'새 코드를 넣으면 그 학년·학기 문제로 바뀌어요. 모은 카드와 기록은 그대로예요.':'선생님께 받은 코드를 넣어 주세요.';
+ const why=old&&old.bad?(old.old?'새 학년도가 되어 코드가 바뀌었어요. 선생님께 새 코드를 받아 주세요. (모은 카드와 기록은 그대로예요!)':'코드가 맞지 않아요. 선생님께 다시 확인해 주세요.'):change?'코드를 넣으면 그 학년·학기 문제로 바뀌어요. 모은 카드와 기록은 그대로예요.':'선생님께 받은 코드를 넣어 주세요.';
  $('#view').innerHTML=`<div class=title><div class=panel style="width:min(460px,100%);display:flex;flex-direction:column;gap:12px;align-items:center">
   ${I('lock')}<h2 style="margin:0">선생님 코드</h2><p class=mut style="font-size:14px;text-align:center">${why}</p>
-  <input class="inp codeIn" id=gCode maxlength=14 placeholder="31-ABC-XYZ" autocomplete="off" autocapitalize="characters" spellcheck="false">
+  <input class="inp codeIn" id=gCode maxlength=8 placeholder="11-LJC" autocomplete="off" autocapitalize="characters" spellcheck="false">
   <button class="btn red big" id=gOk style="width:100%">확인</button><div class=row style="width:100%"><button class="btn ghost" id=gBack>뒤로</button><button class="btn ghost" id=gLoad>${I('disk')} 저장 불러오기</button></div>
   <p class=mut style="font-size:12px;text-align:center">코드에는 학년과 학기가 들어 있어요. 배우지 않은 학년의 문제는 나오지 않아요(선행 방지).</p></div></div>`;
  const inp=$('#gCode');setTimeout(()=>inp.focus(),100);
- const ok=()=>{const c=parseCode(inp.value);if(!c){toast('코드 모양이 아니에요. 예: 31-ABC-XYZ');return;}if(c.bad){toast(c.old?'지난 학년도 코드예요. 새 코드를 받아 주세요':'코드가 맞지 않아요');sfx('wrong');return;}
+ const ok=()=>{const c=parseCode(inp.value);if(!c){toast('코드 모양이 아니에요. 예: 11-LJC');return;}if(c.bad){toast(c.old?'지난 학년도 코드예요. 새 코드를 받아 주세요':'코드가 맞지 않아요');sfx('wrong');return;}
+  if(m.gFloor&&+c.gs[0]<m.gFloor){toast(`${m.gFloor}학년보다 아래 학년으로는 내려갈 수 없어요`);sfx('wrong');return;}
+  if(!m.gFloor)m.gFloor=+c.gs[0];
+  m.gTop=Math.max(gradeTopIdx(m),semIdx(c.gs)); // 선생님이 준 코드는 그 학기까지 바로 열어요
   const prev=m.gs;m.code=c.code;m.gs=c.gs;m.cls=c.cls;if(prev!==c.gs){m.uMax=null;m.focus=null;}sfx('ok');autoSave();toast(`${semName(c.gs)} 코드 확인!`);
   if(m.name&&m.starter&&prev!==c.gs)return askUnit(()=>renderHub());goStart();};
  $('#gOk').onclick=ok;inp.onkeydown=e=>{if(e.key==='Enter')ok();};$('#gBack').onclick=()=>{sfx('tap');m.name&&codeValid()?renderHub():renderTitle();};$('#gLoad').onclick=()=>{sfx('tap');showSaveBox();};}
@@ -8448,8 +8479,7 @@ function classCsv(metas){const R=classRows(metas);const q=v=>'"'+String(v).repla
  return '﻿'+[head,...rows].map(r=>r.map(q).join(',')).join('\r\n');}
 function renderTeacher(){S.screen='teacher';const y=schoolYear();
  $('#view').innerHTML=`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('teacher')} 선생님 화면</h2><span class=hudSp></span><button class="btn ghost sm" id=tcBack>나가기</button></div>
-  <p style="font-size:14px;line-height:1.6;margin-top:8px">학생은 <b>학년·학기 코드</b>가 있어야 시작할 수 있어요. 코드의 학기보다 뒤 학년 문제는 나오지 않아요. 코드는 <b>${y}학년도(${y}.3~${y+1}.2)</b>에만 쓸 수 있고, 3월이 되면 새 코드를 나눠 주면 돼요. 학급 글자를 바꾸면 반마다 다른 코드가 돼요.</p>
-  <div class=setRow><b>학급 글자 (3자)</b><input class="inp codeIn" id=tcCls maxlength=3 style="width:140px;font-size:22px" value="${esc(S.tcCls||'SSC')}"></div>
+  <p style="font-size:14px;line-height:1.6;margin-top:8px">학생은 <b>학년·학기 코드</b>가 있어야 시작할 수 있어요. 코드의 학기보다 뒤 학년 문제는 나오지 않아요. 코드는 <b>학년+학기 숫자 두 자리 + -LJC</b> 모양이에요. 예: 1학년 1학기 <b>11-LJC</b>, 1학년 2학기 <b>12-LJC</b>.</p>
   <div id=tcList style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:10px"></div></div>
 
  <div class=panel><h2>📡 실시간으로 받기 <span class=mut style="font-size:13px">(학생이 보내면 아래 표가 자동으로 바뀌어요)</span></h2>
@@ -8463,8 +8493,8 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
  <div id=tcDom></div>
  <div class=panel><h2>${I('medal')} 학생 트레이너 카드 인쇄</h2><p class=mut style="font-size:13px">위 칸에 학생 저장 코드를 넣고 「카드 만들기」를 누르면, 학생이 꾸민 배지와 기록으로 카드(85.5×54mm, 300dpi)를 만들어요. <b>포켓몬 그림·이름은 들어가지 않아요.</b> 카드 등급(첫 돌 5 · 돌탑 20 · 좌삼 50 · 공든 좌삼 100 돌)에 오른 학생만 만들어져요.</p>
   <div class=row><button class="btn blue" id=tcCards>카드 만들기</button><button class="btn ghost" id=tcCardsA4>모두 A4로 인쇄</button></div><div id=tcCardBox style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px"></div></div></div>`;
- const list=()=>{const c=($('#tcCls').value||'').toUpperCase();S.tcCls=c;let h='';for(let g=1;g<=6;g++)for(let s=1;s<=2;s++){const code=makeTeacherCode(g,s,c.length===3?c:'SSC',y);h+=`<div style="text-align:center;background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px"><div class=jua>${g}학년 ${s}학기</div><div class=tcode style="font-size:24px">${code}</div></div>`;}$('#tcList').innerHTML=h;};
- list();$('#tcCls').oninput=list;
+ const list=()=>{let h='';for(let g=1;g<=6;g++)for(let s=1;s<=2;s++){const code=makeTeacherCode(g,s);h+=`<div style="text-align:center;background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px"><div class=jua>${g}학년 ${s}학기</div><div class=tcode style="font-size:24px">${code}</div></div>`;}$('#tcList').innerHTML=h;};
+ list();
  $('#tcBack').onclick=()=>{sfx('tap');renderTitle();};
  const rows=[],metas=[];const add=o=>{const m=upgradeMeta(mergeMeta(o.meta));metas.push(m);for(const a of ACH){const t=achTier(a,m);if(t>((m.ach[a.k]&&m.ach[a.k].t)||0))m.ach[a.k]={t,d:[]};}const sk=Object.entries(m.sk);const weak=sk.filter(([id,v])=>SKM[id]&&v.x>=2&&v.x>=v.c/2).map(([id])=>SKM[id].n).slice(0,3);
   const last7=Object.keys(m.days).filter(k=>dayDiff(k,today())<7).reduce((s,k)=>s+m.days[k].n,0);
@@ -13656,12 +13686,32 @@ const R=(t,ids)=>({t,ids:ids.split(' ')});
  });
  LAD.place={n:'수 읽기와 자릿값',rungs:[R('9까지의 수 · 50까지의 수','1a 1b 1f 1g 1h 1m 1n'),R('100까지의 수 · 짝수와 홀수','2a 2h 2i 2j'),R('세 자리 수','3a 3e 3f 3g 3h'),R('네 자리 수','4a 4f 4g 4h'),R('큰 수 · 10배·100배','7a 7b 7g 7h 7i 7j')]};
  const AD=(l,r,ids)=>{LAD[l].rungs[r].ids.push(...ids.split(' '));};
+ // ---- 5~6학년 개념도 사다리에 넣어요 ----
+ const ES=(a)=>a.split(' ').map(es);
+ const RE=(t,a)=>({t,ids:ES(a)});
+ LAD.mix={n:'혼합 계산',base:'mul',rungs:[RE('덧셈·뺄셈 / 곱셈·나눗셈이 섞인 식','01-01 01-02'),RE('세 가지 계산이 섞인 식','01-03 01-04'),RE('괄호가 있는 혼합 계산','01-05 01-06')]};
+ LAD.fm={n:'약수와 배수',base:'div',rungs:[RE('약수 · 배수 구하기','04-01 05-01'),RE('공약수 · 공배수','04-02 05-02'),RE('최대공약수 · 최소공배수','04-03 04-04 05-03'),RE('총괄','04-05 05-04 05-05')]};
+ LAD.range={n:'수의 범위와 어림하기',base:'place',rungs:[RE('이상·이하 · 초과·미만','02-01 02-02'),RE('올림 · 버림 · 반올림','03-01 03-02 03-03'),RE('수직선 · 실생활 수의 범위','02-03 02-04 02-05'),RE('상황에 맞는 어림','03-04 03-05')]};
+
  AD('add',0,'1i 1j 1k 1l');AD('add',1,'2k 2n 2o 2p');AD('add',2,'2d 2e 2s 2t');AD('add',3,'3i 3j 3k 3l');AD('add',4,'5j 5k');
  AD('mul',0,'3d 3o 3p 3q 4i 4j');AD('mul',1,'5o 6i');AD('mul',3,'7s');
  AD('div',0,'5m');AD('div',1,'6k 6l');AD('div',3,'7q 7r');
  AD('frac',0,'6g');AD('frac',3,'8j');
  AD('dec',1,'8k 8l 8m');AD('dec',2,'8n 8o 8p');
  AD('plane',0,'13c');AD('place',0,'1c 1o');
+ // 분수·소수 단계를 더 촘촘하게 (5~6학년 개념도 단계마다 모두 들어가게)
+ const RG=(l,t)=>LAD[l].rungs.find(r=>r.t===t),AT=(l,t,a)=>RG(l,t).ids.push(...ES(a)),IB=(l,t,rung)=>LAD[l].rungs.splice(LAD[l].rungs.indexOf(RG(l,t)),0,rung);
+ AT('frac','분수와 자연수의 곱셈','09-01 09-03');AT('frac','(진분수)×(진분수)','09-05 09-07 09-08 09-09');AT('frac','분수의 나눗셈','11-01 11-03');
+ AT('frac','분모가 다른 분수의 덧셈·뺄셈','08-02');
+ IB('frac','분수의 나눗셈',RE('몫을 분수로 나타내기','10-01 10-02 10-03 10-04'));
+ IB('frac','분모가 다른 분수의 덧셈·뺄셈',RE('크기가 같은 분수 · 약분 · 통분','06-01 06-02 06-03 06-04 06-05 06-06'));
+ IB('frac','분모가 다른 분수의 덧셈·뺄셈',RE('분수의 크기 비교','07-01 07-02 07-03 07-04'));
+ IB('frac','분수와 자연수의 곱셈',RE('분모가 다른 대분수의 덧셈·뺄셈','08-03 08-04 08-06 08-07 08-08'));
+ LAD.frac.rungs.push(RE('(분수)÷(분수)','11-04 11-05 11-06'),RE('역수 · (자연수)÷(분수) · (대분수)÷(분수)','11-07 11-08 11-09 11-10'));
+ AT('dec','분수와 소수, 소수의 크기','12-01 12-02 12-03 12-04 12-05');AT('dec','(소수)×(소수)','13-04 13-05 13-06');AT('dec','(소수)÷(자연수)','15-02 15-03');
+ LAD.dec.rungs.push(RE('몫을 소수로 나타내기','14-01 14-02 14-03 14-04'),RE('(소수)÷(소수)','15-04 15-05 15-06'),RE('몫 반올림 · 남는 양 구하기','15-07 15-08 15-09'));
+ // 쉬운 단계가 없는 사다리는 바탕이 되는 사다리의 맨 아래 단계로 내려가요
+ Object.entries({angle:'plane',circle:'plane',move:'plane',area:'mul',solid:'area',round:'solid',stack:'solid',avg:'div',graph:'add',pat:'mul',time:'add',unit:'place',prob:'frac',dec:'place'}).forEach(([k,v])=>{if(LAD[k]&&!LAD[k].base)LAD[k].base=v;});
  const MAP={};for(const l in LAD)LAD[l].rungs.forEach((r,i)=>r.ids.forEach(id=>{if(!MAP[id])MAP[id]={l,r:i};}));
  const st=()=>{const m=S.meta;return m.lad||(m.lad={w:{l:'',n:0},a:null,next:null});};
  const allowedSet=()=>new Set(allowedSkills().map(s=>s.id));
@@ -13669,7 +13719,7 @@ const R=(t,ids)=>({t,ids:ids.split(' ')});
  // 한 단계 아래: 같은 사다리에서 먼저, 없으면 바탕이 되는 사다리(나눗셈→곱셈)의 맨 아래 단계
  function lower(ref,al){
   const e=eff(ref.l,al).filter(x=>x.r<ref.r);if(e.length){const x=e[e.length-1];return{l:x.l,r:x.r};}
-  const b=LAD[ref.l].base;if(b){const f=eff(b,al);if(f.length){const x=f[f.length-1];return{l:x.l,r:x.r};}}
+  const b=LAD[ref.l].base;if(b){const f=eff(b,al);if(f.length){const x=f[0];return{l:x.l,r:x.r};}}
   return null;}
  const rungOf=ref=>LAD[ref.l].rungs[ref.r];
  function mk(ref,tag,desc){
@@ -13702,8 +13752,8 @@ const R=(t,ids)=>({t,ids:ids.split(' ')});
      if(low){a.path.push(low);a.fresh=1;try{toast(`⬇ 한 단계 더 쉽게: ${rungOf(low).t}`);}catch(e){}}}}
   }else{
    const w=L.w||(L.w={l:'',n:0});
-   if(ok){w.n=0;}
-   else{if(w.l===info.l)w.n++;else{w.l=info.l;w.n=1;}
+   if(ok){w.g=(w.g||0)+1;if(!struggleLv()||w.g>=2)w.n=0;} // 힘들어하는 학생은 '틀림-맞힘-틀림'도 같은 영역의 어려움으로 세요
+   else{w.g=0;if(w.l===info.l)w.n++;else{w.l=info.l;w.n=1;}
     if(w.n>=NEED_WRONG){const low=lower(info,al);w.n=0;
      if(low){L.a={path:[{l:info.l,r:info.r},low],right:0,wrong:0,fresh:1};try{toast(`⬇ 두 번 틀려서 한 단계 쉬운 문제로 내려가요: ${rungOf(low).t}`);}catch(e){}}}}
   }
