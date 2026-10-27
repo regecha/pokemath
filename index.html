@@ -5332,21 +5332,23 @@ function megaCine(baseId,megaId,name,onFlash,title){return new Promise(res=>{
  setTimeout(()=>{o.classList.add('out');},3000);
  setTimeout(()=>{o.remove();res();},3450);});}
 async function megaDo(P,i,fromRemote){const u=P&&P.board[i];if(!B||!u||!MEGA[u.id]||u.mg||P.mgUsed)return false;
- P.mgUsed=true;if(!B.coop&&!B.pvp&&P===B.me)B.mgBase=B.qc||0;u.mg=MEGA[u.id];u.atk+=MEGA_ATK;u.max+=MEGA_HP;u.hp+=MEGA_HP;u.att=0;B.sel=-1;B.pick=-1;
+ P.mgUsed=true;if(B.coop)P.mgBase=P.qc||0;else if(P===B.me)B.mgBase=B.qc||0;u.mg=MEGA[u.id];u.atk+=MEGA_ATK;u.max+=MEGA_HP;u.hp+=MEGA_HP;u.att=0;B.sel=-1;B.pick=-1;
  B.busy=true;try{try{if(BC&&BC.host&&B.coop)bossSend({t:'boss-megafx',b:u.id,m:u.mg,n:megaName(u.id)});}catch(e){}await megaCine(u.id,u.mg,megaName(u.id),()=>{renderBattle();});renderBattle();const el=unitEl(P,i);if(el){el.classList.add('megaGo');fx(el,`공격 +${MEGA_ATK} · 체력 +${MEGA_HP}`,'txt');}if(!window.__sim)confetti(50);await wait(500);}catch(e){}
  B.busy=false;renderBattle();return true;}
 // ===== 거다이맥스 =====
 // 메가진화처럼 포켓몬마다 사탕 1000개로 해금하고, 정답 10개를 맞히면 한 판에 한 번 쓸 수 있어요(메가진화·거다이맥스를 쓰면 정답 카운트는 처음부터).
 // 쓰면: 체력 3배 · 다른 아군은 잠시 전투에서 빠짐(칸 1개, 야생처럼 큰 모습) · 그 차례는 쉬고, 이후 2번의 내 차례 동안 상대 포켓몬 전체를 공격(피해 -2, 최소 1).
-// 풀리거나 쓰러지면 아군이 돌아와요. 친구 대전·함께 하기(보스)에서는 쓰지 않아요.
+// 풀리거나 쓰러지면 아군이 돌아와요. 친구 대전에서는 쓸 수 있고, 협동 보스전에서는 쓸 수 없어요.
 const GMAX_NEED=10,GMAX_COST=1000;
 const gmaxHas=id=>!!(GMAX[id]&&S.meta&&S.meta.gmax&&S.meta.gmax[id]);
-const mgProg=()=>{try{return (B.coop||B.pvp)?(B.qc||0):((B.qc||0)-(B.mgBase||0));}catch(e){return 0;}};
-const gmaxOff=()=>!B||B.coop||B.pvp||B.tut||B.tutReal;
-function gmaxCan(P,i){try{const u=P&&P.board[i];if(gmaxOff()||!u||u.gm||u.mg||u.hp<=0||P.gmUsed||P.gmx||!gmaxHas(u.id)||!(u.att>0)||u.frozen)return false;return mgProg()>=GMAX_NEED;}catch(e){return false;}}
+// 정답 개수(진화 문제수): 혼자·친구 대전은 내 개수, 협동 보스전은 플레이어마다 따로 세요(친구와 공유하지 않아요)
+const qcUp=P=>{B.qc=(B.qc||0)+1;if(B.coop&&P)P.qc=(P.qc||0)+1;};
+const mgProg=()=>{try{if(B.coop&&B.coop.players){const L=B.coop.players[BC.localIndex];if(L)return Math.max(0,(L.qc||0)-(L.mgBase||0));}return Math.max(0,(B.qc||0)-(B.mgBase||0));}catch(e){return 0;}};
+const gmaxOff=()=>!B||B.tut||B.tutReal;
+function gmaxCan(P,i,show){try{const u=P&&P.board[i];if(gmaxOff()||!u||u.gm||u.mg||u.hp<=0||P.gmUsed||P.gmx||!gmaxHas(u.id)||!(u.att>0)||u.frozen)return false;if(B.coop){if(!show)return false;if(Number(u.coopOwner??0)!==BC.localIndex)return false;}return mgProg()>=GMAX_NEED;}catch(e){return false;}}
 function gmaxCand(P){try{if(gmaxOff()||P.gmx||P.gmUsed)return false;return P.board.some(u=>u&&!u.gm&&!u.mg&&u.hp>0&&gmaxHas(u.id));}catch(e){return false;}}
 async function gmaxDo(P,i){const u=P&&P.board[i];if(!B||!u||!GMAX[u.id]||u.gm||u.mg||P.gmUsed||P.gmx)return false;
- P.gmUsed=true;if(!B.coop&&!B.pvp&&P===B.me)B.mgBase=B.qc||0;B.sel=-1;B.pick=-1;B.busy=true;
+ P.gmUsed=true;if(B.coop)P.mgBase=P.qc||0;else if(P===B.me)B.mgBase=B.qc||0;B.sel=-1;B.pick=-1;B.busy=true;
  let done=false;const flip=()=>{if(done)return;done=true;const orig=P.board,max0=u.max;u.gm=1;u.max=max0*3;u.hp=u.hp*3;u.att=0;P.gmx={board:orig,si:i,turns:3,max0};P.board=[u];};
  try{await megaCine(u.id,GM_BASE+u.id,gmWord(u.id)+' '+MON[u.id].name,()=>{flip();renderBattle();},u.id===890?'ETERNAMAX!':'GIGANTAMAX!');}catch(e){}
  flip();renderBattle();
@@ -5516,7 +5518,7 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
  $('#battle').innerHTML=`
   <div class=bTop>${B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:-12px"><b class=dmgp>-${(u=>Math.max(1,Math.ceil(u.atk*rlBoost(u))+quakeB(u)+dragonMod(u)))(me.board[B.sel])}</b></div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front','',true)}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill title="상대 손에 든 카드 수">${I('cards')} ${fo.hand.length}</span><span class=pill title="상대 남은 덱 카드 수">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<button class="btn ghost sm" id=bMenu>메뉴</button></div>
   <div class="lane${B.wildMode?` wildLane wildCount${fo.board.filter(Boolean).length}`:''}${fo.gmx?' gmaxLane':''}" id=foeLane>${fo.board.map((u,i)=>B.wildMode&&!u?'':`<div class=slot data-i="${i}">${unitH(u,fo,i)}</div>`).join('')}</div>
-  <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class=pill style="color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}${(!B.tut&&!B.tutReal)?`<span class=pill id=evoPill title="정답을 ${MEGA_NEED}개 모으면 메가 진화·원시회귀·거다이맥스를 쓸 수 있어요. 쓰면 처음부터 다시 모아요" style="color:${mgProg()>=MEGA_NEED?'#d97800':'#2f62b5'};${mgProg()>=MEGA_NEED?'border-color:#ffb100;background:#fff3d6':''}">${mgProg()>=MEGA_NEED?'✨':'🔷'} 진화 ${Math.min(Math.max(0,mgProg()),MEGA_NEED)}/${MEGA_NEED}</span>`:''}${my&&B.sel>=0&&megaCan(B.me,B.sel)?`<button class="btn gold sm" id=bMega>🔷 ${PRIMAL[B.me.board[B.sel].id]?'원시':'메가'}</button>`:''}${my&&B.sel>=0&&gmaxCan(B.me,B.sel)?`<button class="btn red sm" id=bGmax>🌋 맥스</button>`:''}</div>
+  <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class=pill style="color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}${(!B.tut&&!B.tutReal)?`<span class=pill id=evoPill title="정답을 ${MEGA_NEED}개 모으면 메가 진화·원시회귀·거다이맥스를 쓸 수 있어요. 쓰면 처음부터 다시 모아요" style="color:${mgProg()>=MEGA_NEED?'#d97800':'#2f62b5'};${mgProg()>=MEGA_NEED?'border-color:#ffb100;background:#fff3d6':''}">${mgProg()>=MEGA_NEED?'✨':'🔷'} 진화 ${Math.min(Math.max(0,mgProg()),MEGA_NEED)}/${MEGA_NEED}</span>`:''}${my&&B.sel>=0&&megaCan(B.me,B.sel)?`<button class="btn gold sm" id=bMega>🔷 ${PRIMAL[B.me.board[B.sel].id]?'원시':'메가'}</button>`:''}${my&&B.sel>=0&&gmaxCan(B.me,B.sel,1)?`<button class="btn red sm" id=bGmax>🌋 맥스</button>`:''}</div>
   <div class="lane${B.coop?' coopLane':''}${me.gmx?' gmaxLane':''}" id=myLane>${me.board.map((u,i)=>`<div class="slot${B.pick>=0&&!u&&!isItemCard(me.hand[B.pick])?' can':''}" data-i="${i}">${unitH(u,me,i)}</div>`).join('')}</div>
   ${B.coop?`<div class="bBot coopHeroes">${heroH(loc,'heroMe',B.side==='me'&&B.coop.active===BC.localIndex)}${ally?heroH(ally,'heroAlly',B.side==='me'&&B.coop.active!==BC.localIndex):''}</div>`:''}<div class=bBot>${B.coop?'':heroH(me,'heroMe',false)}${mana(loc)}
    <button class="btn purple sm" id=bPower ${my&&(loc.powerUses||0)>0?'':'disabled'} title="남은 사용 횟수 ${Math.max(0,loc.powerUses||0)}회: 문제를 맞히면 카드 1장">${I('book')} 공부 기술 <small style="font-size:11px">${Math.max(0,loc.powerUses||0)}회</small></button>
@@ -5537,7 +5539,7 @@ function bindBattle(){const me=B.me;
  autoBind();$('#bEnd').onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;sfx('tap');B.sel=-1;B.pick=-1;B.trainerSkillTarget=null;if(B.coop&&!BC.host){bossSubmit({type:'end'});return;}if(B.pvp)pvpSend({t:'end'});endTurn();};
  $('#bPower').onclick=()=>{if(B&&B.coop&&!BC.host){if(B.busy||B.side!=='me'||B.coop.active!==BC.localIndex)return;const q=pickQ({cyc:1});(async()=>{if(!q){bossSubmit({type:'power',ok:true});return;}const r=await battleQ(q,{who:B.me.av,what:'공부 기술: 맞히면 카드 1장!',power:true});bossSubmit({type:'power',ok:r.ok,crit:!!(r.ok&&q.tier==='H')});})();return;}usePower();};
  fitHandCrowd();
- {const gb=$('#bGmax');if(gb)gb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0||!gmaxCan(B.me,B.sel))return;const si=B.sel;sfx('tap');gmaxDo(B.me,si);};}{const mb=$('#bMega');if(mb)mb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0||!megaCan(B.me,B.sel))return;const si=B.sel;sfx('tap');if(B.coop&&!BC.host){bossSubmit({type:'mega',si});B.sel=-1;return;}if(B.pvp)pvpSend({t:'mega',si});megaDo(B.me,si);};}
+ {const gb=$('#bGmax');if(gb)gb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0)return;if(B.coop){sfx('tap');toast('협동 보스전에서는 사용이 불가능해요.');return;}if(!gmaxCan(B.me,B.sel))return;const si=B.sel;sfx('tap');if(B.pvp)pvpSend({t:'gmax',si});gmaxDo(B.me,si);};}{const mb=$('#bMega');if(mb)mb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0||!megaCan(B.me,B.sel))return;const si=B.sel;sfx('tap');if(B.coop&&!BC.host){bossSubmit({type:'mega',si});B.sel=-1;return;}if(B.pvp)pvpSend({t:'mega',si});megaDo(B.me,si);};}
  $('#battle').querySelectorAll('.hand .card').forEach(c=>c.onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;const i=+c.dataset.h,v=(B.coop?B.coop.players[BC.localIndex].hand:me.hand)[i];
   if(B.itemTargetMode){if(i===B.itemTargetMode.hand){B.itemTargetMode=null;B.pick=-1;renderBattle();toast('전기의 돌 사용을 취소했어요');}else toast('먼저 전기의 돌을 사용할 포켓몬을 골라 주세요');return;}
   if(B.moonTargetMode){if(i===B.moonTargetMode.hand){B.moonTargetMode=null;B.pick=-1;renderBattle();toast('달의 돌 사용을 취소했어요');}else toast('먼저 달의 돌로 기절시킬 상대 포켓몬을 골라 주세요');return;}
@@ -7109,7 +7111,7 @@ if(a.gm&&!tg.hero)tg={all:1};B.busy=true;B.sel=-1;renderBattle();
  let ok=coopAnswer==null?true:!!coopAnswer;const q=coopAnswer==null?pickQ({cyc:1}):null;if(B.coop&&coopAnswer!=null)B.qn++;
  let crit=!!coopCrit&&ok,hint=coopHint?1:0;if(q){const r=await battleQ(q,{who:a.id,what:tg.all?'상대 포켓몬 전체에게 거다이맥스 공격!':tg.hero?`${esc(fo.name)}에게 공격!`:`${esc(MON[fo.board[tg.u].id].name)}에게 공격!`,hint:'atk'});ok=r.ok;crit=!!(ok&&q.tier==='H');hint=r.hint?1:0;}
  if(!B)return;
- let cb=false;if(ok){B.combo++;B.qc++;cb=B.combo>=3;}else B.combo=0;
+ let cb=false;if(ok){B.combo++;qcUp(B.me);cb=B.combo>=3;}else B.combo=0;
  if(B.pvp){pvpSend({t:'atk',si,tg,ok,cb,crit,hint});if(tg.hero){B.pendingAttack={si,tg,ok,cb,crit,hint};msg('상대 트레이너가 방어 문제를 푸는 중…');renderBattle();return;}}
  await resolveAttack(me,fo,si,tg,ok,cb,0,crit,hint);B.busy=false;renderBattle();}
 
@@ -7296,7 +7298,7 @@ async function resolveGmaxAll(A,D,si,ok,cb,crit,hint){const a=A.board[si];if(!a)
 // 공부 기술: 에너지 2 → 문제 맞히면 카드 1장, 틀려도 설명을 보고 다시
 async function usePower(){const me=B.me;if(B.busy||(me.powerUses||0)<=0)return;B.busy=true;me.powerUses=Math.max(0,(me.powerUses||0)-1);renderBattle();
  const q=pickQ({cyc:1});const r=q?await battleQ(q,{who:me.av,what:'공부 기술: 맞히면 카드 1장!',power:true}):{ok:true};const pc=!!(r.ok&&q&&q.tier==='H');
- if(r.ok){B.qc++;B.combo++;draw(me);const xb=studyBonusDraw(me);if(pc){draw(me);fx(heroEl(me),'크리티컬! 카드 +1 더','crit');sfx('crit');}fx($('.hand'),xb?'공부 강화! 카드 +2':'카드 +1','txt');}else{B.combo=0;}
+ if(r.ok){qcUp(me);B.combo++;draw(me);const xb=studyBonusDraw(me);if(pc){draw(me);fx(heroEl(me),'크리티컬! 카드 +1 더','crit');sfx('crit');}fx($('.hand'),xb?'공부 강화! 카드 +2':'카드 +1','txt');}else{B.combo=0;}
  if(B.pvp)pvpSend({t:'pow',ok:r.ok,crit:pc});
  B.busy=false;renderBattle();}
 // 배틀 문제 창
@@ -7514,7 +7516,7 @@ async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)
   // 막기 문제: 내 트레이너가 피해 2 이상을 받을 때마다 방어 문제를 표시
   const tp=(B.coop&&tg.p!=null&&B.coop.players[tg.p])?B.coop.players[tg.p]:me;const remoteDef=!!B.coop&&tp!==B.coop.players[0];
    if(S.meta.settings.defq&&dmg>=2){renderBattle();bossMarkTarget(tp);let r=null,dq=null;if(remoteDef){r=await bossAskDefense(tp,a);}else{const q=pickQ({cyc:1});dq=q;if(q)r=await battleQ(q,{who:tp.av,what:`막기! ${esc(MON[a.id].name)}의 공격을 막아요`,defense:true,hint:'def'});}
-    if(r){if(r.ok){B.qc++;B.combo++;if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;{const hv=!!((dq&&dq.tier==='H')||(r&&r.sv));dmg=Math.max(0,dmg-2-(hv?1:0));acDef(tp,hv);fx(heroEl(tp),hv?'슈퍼세이브! -3':'막았다!',hv?'crit':'txt');if(hv)sfx('crit');}heroBlockFx(heroEl(tp));if(B.counterActive>0){await trainerAtkFx(heroEl(tp),unitEl(fo,i),Math.min(5,B.counterActive),'counter');await dealUnit(fo,i,B.counterActive);fx(heroEl(tp),`반격 -${B.counterActive}`,'txt');}}else{B.combo=0;if(acOn()){AC.cur=null;acSay('방어 실패…','sv');}}if(r.hint){dmg+=1;fx(heroEl(tp),'💡힌트 사용 +1','txt');}}}
+    if(r){if(r.ok){qcUp(tp);B.combo++;if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;{const hv=!!((dq&&dq.tier==='H')||(r&&r.sv));dmg=Math.max(0,dmg-2-(hv?1:0));acDef(tp,hv);fx(heroEl(tp),hv?'슈퍼세이브! -3':'막았다!',hv?'crit':'txt');if(hv)sfx('crit');}heroBlockFx(heroEl(tp));if(B.counterActive>0){await trainerAtkFx(heroEl(tp),unitEl(fo,i),Math.min(5,B.counterActive),'counter');await dealUnit(fo,i,B.counterActive);fx(heroEl(tp),`반격 -${B.counterActive}`,'txt');}}else{B.combo=0;if(acOn()){AC.cur=null;acSay('방어 실패…','sv');}}if(r.hint){dmg+=1;fx(heroEl(tp),'💡힌트 사용 +1','txt');}}}
   bossMarkTarget(tp);window.__sd=dmg;await skillMove(fo,i,heroEl(tp),true,false);window.__sd=null;if(quakeB(a)>0)await quakeFx(heroEl(tp));tp.hp-=dmg;acHero(dmg,tp);if(dmg){impact(heroEl(tp),dmg,{hero:1,col:'#ff5a5f'});fx(heroEl(tp),'-'+dmg,dmg>=4?'big':'');}}
  else{const d=me.board[tg.u];if(!d)return;dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=Math.max(1,applyType(dmg,k));
   await skillMove(fo,i,unitEl(me,tg.u),true,false);if(k>=2)fx(unitEl(me,tg.u),'효과가 굉장했다!','txt');
@@ -7646,7 +7648,7 @@ const SIM={p:.8,deck:null,
     if(!best)break;let pj=-1,pv=-1e9;for(let j=0;j<n;j++)if(best&(1<<j)&&val(cand[j].id)>pv){pv=val(cand[j].id);pj=j;}
     const hi=B.me.hand.indexOf(cand[pj].id);const sl=B.me.board.indexOf(null);await summon(B.me,hi,sl);}
    for(let g=0;g<6;g++){const i=B.me.hand.findIndex(v=>typeof v!=='number'&&battleCost(v)<=B.me.mana&&(isItemCard(v)?(v.item!=='thunder'||B.me.board.some(u=>u&&!u.frozen)):B.me.board.includes(null)));if(i<0)break;const v=B.me.hand[i];if(isItemCard(v)){const ti=v.item==='thunder'?B.me.board.findIndex(u=>u&&!u.frozen):-1;await playItem(B.me,i,ti);}else{const sl=B.me.board.indexOf(null);if(sl<0)break;await summon(B.me,i,sl);}}
-   if((B.qc||0)>=MEGA_NEED&&!B.me.mgUsed){let bi=-1,bs=-1;B.me.board.forEach((u,i)=>{if(u&&u.hp>0&&MEGA[u.id]&&!u.mg&&(u.atk+u.hp)>bs){bs=u.atk+u.hp;bi=i;}});if(bi>=0)await megaDo(B.me,bi);}
+   if(mgProg()>=MEGA_NEED&&!B.me.mgUsed){let bi=-1,bs=-1;B.me.board.forEach((u,i)=>{if(u&&u.hp>0&&MEGA[u.id]&&!u.mg&&(u.atk+u.hp)>bs){bs=u.atk+u.hp;bi=i;}});if(bi>=0)await megaDo(B.me,bi);}
    const totalFace=()=>B.me.board.reduce((s,x)=>s+(x&&x.att>0&&!x.frozen?remDmg(x):0),0);
    for(let i=0;i<B.me.board.length&&!B.over;i++){let u=B.me.board[i],k=0;while(u&&u.att>0&&!u.frozen&&!B.over&&k++<3){const t=targetsFor(i);let tg=null;
      if(t.hero&&totalFace()>=B.foe.hp)tg={hero:1};
@@ -7826,11 +7828,11 @@ async function bossHandleAction(d){if(!B||!B.coop||!BC.host||BC.processing||B.ov
  else if(a.type==='item'){if(!Number.isInteger(Number(a.h))||Number(a.h)<0||Number(a.h)>=P.hand.length)return;const card=P.hand[Number(a.h)];if(card&&card.item==='thunder'&&(!P.board[Number(a.target)]||Number(P.board[Number(a.target)].coopOwner??0)!==idx))return;B.busy=false;await playItem(P,Number(a.h),Number(a.target??-1),true);}
  else if(a.type==='attack'){B.busy=false;await playerAttack(Number(a.si),a.tg,!!a.ok,!!a.ok&&!!a.crit,a.hint?1:0);}
  else if(a.type==='power'){B.busy=false;await bossApplyPower(!!a.ok,!!a.ok&&!!a.crit);}
- else if(a.type==='mega'){const si=Number(a.si);const u=P.board[si];if(!u||Number(u.coopOwner??0)!==idx||(B.qc||0)<MEGA_NEED)return;B.busy=false;await megaDo(P,si);}
+ else if(a.type==='mega'){const si=Number(a.si);const u=P.board[si];if(!u||Number(u.coopOwner??0)!==idx||((P.qc||0)-(P.mgBase||0))<MEGA_NEED)return;B.busy=false;await megaDo(P,si);}
  else if(a.type==='trainerSkill'){const sk=String(a.skill||''),lv=Math.max(1,Math.min(5,Number(a.level)||1)),slot=Number(a.slot);B.trainerSkillUsed=B.trainerSkillUsed||{};if(!['heal','counter','attack','cheer'].includes(sk)||B.trainerSkillUsed[sk])return;if(sk==='heal'){P.hp=Math.min(P.max||15,P.hp+lv);B.trainerSkillUsed.heal=true;fx(heroEl(P),`+${lv} 회복`,'txt');}else if(sk==='counter'){B.counterActive=lv;B.trainerSkillUsed.counter=true;}else if(sk==='attack'){const u=B.foe.board[slot];if(!u||u.hp<=0)return;B.trainerSkillUsed.attack=true;await dealUnit(B.foe,slot,lv);checkEnd();}else if(sk==='cheer'){const u=P.board[slot];if(!u||u.hp<=0||Number(u.coopOwner??0)!==idx)return;const ca=CHEER_ATK[lv]||0,cs=CHEER_SHIELD[lv]||0;u.atk+=ca;u.shield=(u.shield||0)+cs;B.trainerSkillUsed.cheer=true;fx(unitEl(P,slot),`공격 +${ca} · 방어막 +${cs}`,'txt');}B.busy=false;renderBattle();}
  else if(a.type==='catch'){B.busy=false;B.wildState.captureModalOpen=false;tryCatchWildPokemon(Number(a.slot));}
  }catch(e){console.error('coop action',e)}finally{BC.processing=false;if(B&&B.coop){B.coop.processing=false;B.busy=false;bossRewire();renderBattle();bossBroadcast(true);}}}
-async function bossApplyPower(ok,crit=false){const me=B.me;if((me.powerUses||0)<=0)return;B.qn++;B.busy=true;me.powerUses=Math.max(0,(me.powerUses||0)-1);if(ok){B.qc++;B.combo++;draw(me);const xb=studyBonusDraw(me);if(crit){draw(me);fx(heroEl(me),'크리티컬! 카드 +1 더','crit');}fx($('.hand'),xb?'공부 강화! 카드 +2':'카드 +1','txt')}else B.combo=0;B.busy=false;renderBattle();}
+async function bossApplyPower(ok,crit=false){const me=B.me;if((me.powerUses||0)<=0)return;B.qn++;B.busy=true;me.powerUses=Math.max(0,(me.powerUses||0)-1);if(ok){qcUp(me);B.combo++;draw(me);const xb=studyBonusDraw(me);if(crit){draw(me);fx(heroEl(me),'크리티컬! 카드 +1 더','crit');}fx($('.hand'),xb?'공부 강화! 카드 +2':'카드 +1','txt')}else B.combo=0;B.busy=false;renderBattle();}
 function bossClientResult(d){if(!d||!d.outcome||BC.resultHandled)return;BC.resultHandled=true;BC.pendingSnap=null;const rids=(Array.isArray(d.ids)&&d.ids.length?d.ids:(d.id!=null?[d.id]:[])).filter(x=>MON[x]);
  let g=null,gs=[];if(d.outcome==='win'&&rids.length){gs=rids.map(x=>gainCard(x,true));g=gs[0];S.meta.coins=(S.meta.coins||0)+100;S.meta.dust=(S.meta.dust||0)+10;S.meta.candy=(S.meta.candy||0)+10;}
  autoSave();
@@ -8065,9 +8067,10 @@ async function pvpPump(){if(PV.busy)return;PV.busy=true;
    renderBattle();B.busy=false;checkEnd();continue;}
   if(d.t==='sum'){PV.q.shift();B.busy=true;await summon(B.foe,d.h,d.s);B.busy=false;continue;}
   if(d.t==='mega'){PV.q.shift();B.busy=true;await megaDo(B.foe,Number(d.si),true);B.busy=false;continue;}
+  if(d.t==='gmax'){PV.q.shift();B.busy=true;await gmaxDo(B.foe,Number(d.si),true);B.busy=false;continue;}
   if(d.t==='item'){PV.q.shift();B.busy=true;await playItem(B.foe,d.h,d.target,true);B.busy=false;continue;}
   if(d.t==='atk'){PV.q.shift();B.busy=true;const a=B.foe.board[d.si];msg(`${esc(PV.foe.name)}의 ${a?esc(MON[a.id].name):''} 공격! ${d.ok?'(문제 정답!)':'(문제를 틀려서 약하게)'}`);await wait(500);
-   let reduce=0,ctr=0,dh=0;if(d.tg&&d.tg.hero){const q=pickQ({cyc:1});const r=q?await battleQ(q,{who:B.me.av,what:`방어 문제! 맞히면 ${esc(PV.foe.name)}의 트레이너 공격 피해가 1 줄어요`,defense:true,hint:'def' }):{ok:false};dh=r.hint?1:0;if(r.ok){reduce=(q&&q.tier==='H')?2:1;B.qc++;S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;fx(heroEl(B.me),reduce>1?'슈퍼세이브! -2':'방어 성공! -1',reduce>1?'crit':'txt');heroBlockFx(heroEl(B.me));if(B.counterActive>0)ctr=B.counterActive;}else fx(heroEl(B.me),'방어 실패','txt');pvpSend({t:'defres',reduce,ok:r.ok,ctr,dh});}
+   let reduce=0,ctr=0,dh=0;if(d.tg&&d.tg.hero){const q=pickQ({cyc:1});const r=q?await battleQ(q,{who:B.me.av,what:`방어 문제! 맞히면 ${esc(PV.foe.name)}의 트레이너 공격 피해가 1 줄어요`,defense:true,hint:'def' }):{ok:false};dh=r.hint?1:0;if(r.ok){reduce=(q&&q.tier==='H')?2:1;qcUp(B.me);S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;fx(heroEl(B.me),reduce>1?'슈퍼세이브! -2':'방어 성공! -1',reduce>1?'crit':'txt');heroBlockFx(heroEl(B.me));if(B.counterActive>0)ctr=B.counterActive;}else fx(heroEl(B.me),'방어 실패','txt');pvpSend({t:'defres',reduce,ok:r.ok,ctr,dh});}
    await resolveAttack(B.foe,B.me,d.si,d.tg,d.ok,d.cb,reduce,!!d.crit&&!!d.ok,d.hint?1:0,dh);
    if(ctr>0&&!B.over&&B.foe.board[d.si]){fx(heroEl(B.me),`반격 -${ctr}`,'txt');await trainerAtkFx(heroEl(B.me),unitEl(B.foe,d.si),Math.min(5,ctr),'counter');await dealUnit(B.foe,d.si,ctr);checkEnd();}B.busy=false;continue;}
   if(d.t==='defres'){PV.q.shift();const p=B.pendingAttack;if(p){B.pendingAttack=null;B.busy=true;if((d.reduce||0)>0&&p.tg&&p.tg.hero)heroBlockFx(heroEl(B.foe));await resolveAttack(B.me,B.foe,p.si,p.tg,p.ok,p.cb,d.reduce||0,!!p.crit,p.hint?1:0,d.dh?1:0);
