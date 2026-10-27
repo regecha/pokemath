@@ -3011,7 +3011,7 @@ function showSaveBox(){saveLocal();
   mk:async()=>{const c=await makeCode();const ta=$('#codeOut');ta.value=c;copyText(c,ta);},
   share:async()=>{const c=await makeCode();$('#codeOut').value=c;try{await navigator.share({title:GAME.title+' 저장 코드',text:c});}catch(e){copyText(c,$('#codeOut'));}},
   ld:async()=>{try{const o=await readAny($('#codeIn').value);if(S.meta.name&&!(await confirmBox('지금 기록이 코드의 기록으로 바뀌어요. 불러올까요?','불러오기','취소')))return;applyLoaded(o,'저장 코드로 불러왔어요!');}catch(e){toast(esc(e.message||'불러오지 못했어요'));}},
-  mdS:()=>saveMD(),mdL:()=>$('#fileIn').click(),win:()=>{saveLocal();window.open(location.href,'_blank');}};
+  mdS:()=>saveMD(),mdL:()=>$('#fileIn').click(),win:()=>{saveLocal();window.open(location.href,'_blank');},xRcv:()=>{closeM();xferReceive();},xSnd:()=>{closeM();xferSend();}};
  [1,2,3].forEach(i=>{acts['s'+i]=async()=>{const o=slotGet(i);if(o&&!(await confirmBox(`저장 칸 ${i}의 기록을 지금 기록으로 덮어쓸까요?`,'덮어쓰기','취소')))return;if(slotSave(i)){sfx('coin');toast(`저장 칸 ${i}에 저장했어요`);showSaveBox();}else toast('저장하지 못했어요');};
   acts['l'+i]=async()=>{const o=slotGet(i);if(!o)return;if(!(await confirmBox(`지금 기록 대신 저장 칸 ${i}의 기록을 불러올까요?`,'불러오기','취소')))return;applyLoaded(o,`저장 칸 ${i}을 불러왔어요!`);};});
  M(`<h2>${I('disk')} 저장 · 불러오기</h2>${status}${slots}
@@ -3020,9 +3020,70 @@ function showSaveBox(){saveLocal();
   <textarea class="inp code" id=codeOut readonly placeholder="'코드 만들고 복사'를 누르면 여기에 저장 코드가 나와요"></textarea>
   <textarea class="inp code" id=codeIn placeholder="저장해 둔 코드(PKMT로 시작)나 .md 파일 내용을 여기에 붙여 넣으세요"></textarea>
   <div class=row style="margin-top:8px"><button class="btn blue" data-a=ld>코드로 불러오기</button></div>
+  <h3>기기 간 옮기기 <span class=mut style="font-size:12px">(숫자 4자리로 바로 옮겨요 · 두 기기 모두 인터넷이 필요해요)</span></h3>
+  <div class=row><button class="btn purple" data-a=xRcv>📥 받기</button><button class="btn blue" data-a=xSnd>📤 보내기</button></div>
+  <p class=mut style="font-size:12px;margin:4px 0 0;line-height:1.5">새 기기에서 <b>받기</b>를 누르면 숫자 4자리가 나와요. 옛 기기에서 <b>보내기</b>를 누르고 그 숫자를 넣으면 저장 데이터가 넘어가요.</p>
   <h3>파일</h3><div class=row><button class="btn ghost" data-a=mdS>${I('disk')} .md 파일로 저장</button><button class="btn ghost" data-a=mdL>${I('folder')} .md 파일 불러오기</button></div>
   ${canNewWin()?`<h3>새 창</h3><div class=row><button class="btn ghost" data-a=win>새 창에서 크게 열기</button></div>`:''}
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,acts,{wide:1});}
+
+
+// ===== 기기 간 저장 데이터 옮기기: 받는 기기가 4자리 번호를 만들고, 보내는 기기가 그 번호를 넣어요 (PeerJS · 기기끼리 바로 전달) =====
+const XFER_VER=1,xferId=c=>'zwasam-xfer-'+XFER_VER+'-'+c;
+let _xfPeer=null;
+function xferStop(){try{_xfPeer&&_xfPeer.destroy();}catch(e){}_xfPeer=null;}
+async function xferReceive(){
+ try{await loadPeer();}catch(e){toast(esc(e.message||'연결 도구를 불러오지 못했어요'));showSaveBox();return;}
+ xferStop();let tries=0,got=false,code='';
+ const view=(msg)=>{M(`<h2>📥 저장 데이터 받기</h2><p class=mut style="font-size:14px;line-height:1.6">옛 기기에서 <b>저장 · 불러오기 → 보내기</b>를 누르고 아래 번호를 넣어 주세요.</p>
+  <div style="font-size:54px;font-family:'Jua';letter-spacing:10px;text-align:center;margin:8px 0;color:#2f5aa8">${code||'····'}</div>
+  <p class=mut id=xfMsg style="text-align:center;font-size:14px">${msg||'기다리는 중… 이 창을 열어 둔 채로 있어 주세요'}</p>
+  <div class=mbtns><button class="btn ghost" data-a=x>그만두기</button></div>`,{x:()=>{xferStop();closeM();showSaveBox();},_close:()=>{xferStop();closeM();}});};
+ const open=()=>{
+  code=String(Math.floor(Math.random()*10000)).padStart(4,'0');
+  let p;try{p=new Peer(xferId(code));}catch(e){toast('연결을 시작하지 못했어요');return;}
+  _xfPeer=p;
+  p.on('error',e=>{const t=String(e&&e.type||'');if(t==='unavailable-id'&&tries++<6){try{p.destroy();}catch(_){}open();return;}toast('연결하지 못했어요. 인터넷을 확인해 주세요');xferStop();closeM();});
+  p.on('open',()=>view());
+  p.on('connection',c=>{
+   c.on('data',async d=>{
+    if(got||!d||d.t!=='save'||typeof d.code!=='string'||d.code.length>6e6)return;
+    let o;try{o=await readAny(d.code);}catch(e){try{c.send({t:'no',why:'bad'});}catch(_){}return;}
+    got=true;
+    let nm='이름 없음',sm='';try{nm=esc(String(o.meta.name||'이름 없음').slice(0,20));sm=`${semName(o.meta.gs)} · Lv.${lvOf(o.meta.xp).lv} · 카드 ${Object.keys(o.meta.col||{}).length}종`;}catch(_){}
+    const yes=await confirmBox(`<b>${nm}</b>의 저장 데이터가 왔어요.<br><span class=mut style="font-size:14px">${esc(sm)}</span><br>받으면 <b>이 기기의 기록이 바뀌어요.</b> 받을까요?`,'받기','받지 않기');
+    if(!yes){try{c.send({t:'no'});}catch(_){}got=false;view('받지 않았어요. 다시 기다리는 중…');return;}
+    try{c.send({t:'ok'});}catch(_){}
+    xferStop();applyLoaded(o,'저장 데이터를 받았어요!');
+   });
+  });
+ };
+ view('번호를 만드는 중…');open();
+}
+function xferSend(){
+ const dlg=(msg)=>{M(`<h2>📤 저장 데이터 보내기</h2><p class=mut style="font-size:14px;line-height:1.6;text-align:left">받는 기기에서 <b>저장 · 불러오기 → 받기</b>를 누르면 나오는 <b>숫자 4자리</b>를 넣어 주세요. 내 닉네임과 모든 기록이 그 기기로 넘어가요.</p>
+  <input class="inp codeIn" id=xfCode inputmode=numeric maxlength=4 style="width:170px;font-size:30px;text-align:center" placeholder="0000">
+  <p class=mut id=xfMsg style="text-align:center;font-size:13px;min-height:18px">${msg||''}</p>
+  <div class=mbtns><button class="btn blue" data-a=go>보내기</button><button class="btn ghost" data-a=x>뒤로</button></div>`,{go:()=>run(),x:()=>{xferStop();closeM();showSaveBox();},_close:()=>{xferStop();closeM();}});setTimeout(()=>{const i=$('#xfCode');if(i){i.focus();i.onkeydown=e=>{if(e.key==='Enter')run();};}},100);};
+ let busy=false;
+ const say=t=>{const e=$('#xfMsg');if(e)e.textContent=t;};
+ const run=async()=>{
+  if(busy)return;const room=(($('#xfCode')||{}).value||'').replace(/\D/g,'');
+  if(room.length!==4){toast('숫자 4자리를 넣어 주세요');return;}
+  if(!S.meta.name){toast('닉네임을 만든 뒤에 보낼 수 있어요');return;}
+  busy=true;say('연결하는 중…');let done=false,to=0;
+  const fin=(ok,why)=>{if(done)return;done=true;busy=false;clearTimeout(to);xferStop();if(ok){closeM();sfx('win');toast('저장 데이터를 보냈어요! 받는 기기에서 이어서 하세요');}else{say(why||'보내지 못했어요');}};
+  try{await loadPeer();saveLocal();const code=await makeCode();
+   xferStop();const p=new Peer();_xfPeer=p;
+   to=setTimeout(()=>fin(false,'받는 기기를 찾지 못했어요. 번호와 받는 화면이 열려 있는지 확인해 주세요'),15000);
+   p.on('error',e=>{const t=String(e&&e.type||'');fin(false,t==='peer-unavailable'?'그 번호로 기다리는 기기가 없어요. 받는 기기에서 「받기」 화면이 열려 있는지 확인해 주세요':'연결하지 못했어요. 인터넷을 확인해 주세요');});
+   p.on('open',()=>{const c=p.connect(xferId(room),{reliable:true});
+    c.on('open',()=>{try{c.send({t:'save',code});say('보냈어요! 받는 기기에서 「받기」를 눌러 주세요…');clearTimeout(to);to=setTimeout(()=>fin(false,'받는 기기에서 응답이 없어요. 다시 시도해 주세요'),90000);}catch(e){fin(false,'보내지 못했어요');}});
+    c.on('data',d=>{if(d&&d.t==='ok')fin(true);else if(d&&d.t==='no')fin(false,d.why==='bad'?'받는 기기가 이 데이터를 읽지 못했어요':'받는 기기에서 받지 않았어요');});
+    c.on('error',()=>fin(false,'연결하지 못했어요'));});
+  }catch(e){fin(false,'보내지 못했어요 ('+esc((e&&e.message)||'오류')+')');}};
+ dlg();
+}
 
 // ===== 당겨서 새로고침 막기 =====
 (function(){let sx=0,sy=0;window.__edge={top:true,bot:true};
