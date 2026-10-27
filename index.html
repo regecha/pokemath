@@ -2922,6 +2922,12 @@ function coachNext(){if(!CO)return;const st=CO.q.shift();if(!st)return coachEnd(
  const sk=bub.querySelector('[data-c=skip]');if(!CO.q.length)sk.style.visibility='hidden';
  sk.onclick=e=>{e.stopPropagation();if(!CO||CO.busy)return;sfx('tap');CO.q=[];coachNext();};
  bub.querySelector('[data-c=next]').onclick=e=>{e.stopPropagation();if(!CO||CO.busy)return;sfx('tap');coachNext();};}
+function evoCoachSteps(){return [
+   {h:'진화',ic:'candy',pic:evoPic([4,5,6]),t:'<b>사탕</b>을 모으면 도감에서 카드를 눌러 <b>진화</b>시킬 수 있어요. 더 강한 포켓몬 카드가 돼요!'},
+   {h:'메가진화',ic:'flame',pic:evoPic([6,MEGA[6]]),t:'전투에서 정답을 <b>10개</b> 맞히면 <b>진화 게이지</b>가 가득 차요. 도감에서 사탕으로 <b>연구</b>한 포켓몬을 누르고 <b>메가</b> 버튼! 공격 +5, 체력 +5 (변신한 차례는 쉬어요).'},
+   {h:'원시회귀',ic:'flame',pic:evoPic([382,MEGA[382],383,MEGA[383]]),t:'<b>가이오가·그란돈</b>은 메가 대신 <b>원시회귀</b>! 같은 방법으로 쓰고, 공격 +5, 체력 +5예요. 버튼에는 <b>원시</b>라고 나와요.'},
+   {h:'거다이맥스',ic:'sword',pic:evoPic([6,GM_BASE+6]),t:'<b>맥스</b> 버튼은 한 판에 한 번! 체력이 <b>3배</b>가 되고, 동료는 잠시 빠지고, 2번의 내 차례 동안 상대 포켓몬 <b>전체</b>를 공격해요.'},
+   {h:'무한다이맥스',ic:'sword',pic:evoPic([890,GM_BASE+890]),t:'<b>무한다이노</b>는 특별한 <b>무한다이맥스</b>! 쓰는 방법은 거다이맥스와 같아요. 쓰고 나면 진화 게이지는 처음부터 다시 모아요.'}];}
 function evoPic(ids){return ids.map((id,i)=>(i&&!(ids.length===4&&i===2)?'<span class=arr>➜</span>':(i?'<span class=arr>·</span>':''))+monImg(id,'front')).join('');}
 function coachInit(){const c=$('#coach');c.onclick=e=>{if(e.target.closest('#coBub')||!CO||CO.busy)return;coachNext();};}
 function coachOnce(key,steps){if(S.meta.seen[key])return Promise.resolve();S.meta.seen[key]=1;autoSave();return coach(steps);}
@@ -4837,9 +4843,25 @@ function gmaxResolve(b){if(gmaxBusy[b])return gmaxBusy[b];const name=GMAX[b];
 // 이미지 후보: [GIF 모드] 움직이는 그림 → 도트 움직이는 그림 → 도트 / [도트 모드] 도트 → 움직이는 그림 → 도트 움직이는 그림. 모두 실패하면 PokeAPI에서 이름으로 찾고, 그래도 없으면 원래 모습을 크게 보여줘요.
 const gmaxSD=b=>(GMAX[b]||'').replace('-amped','').replace('urshifu-single-strike','urshifu');
 const gmaxDot=()=>!!(S.meta&&S.meta.settings&&S.meta.settings.anim!=='gif');
-function gmaxCands(b){const n=gmaxSD(b),U='https://play.pokemonshowdown.com/sprites/',ani=U+'ani/'+n+'.gif',dot=U+'gen5/'+n+'.png',dotAni=U+'gen5ani/'+n+'.gif';return gmaxDot()?[dot,ani,dotAni]:[ani,dotAni,dot];}
-function gmaxURL(b){return gmaxCands(b)[0];}
-function gmaxImgFail(el,b){const c=gmaxCands(b),k=(+el.dataset.gm||0)+1;el.dataset.gm=String(k);
+function gmaxCands(b){const n=gmaxSD(b),U='https://play.pokemonshowdown.com/sprites/',ani=U+'ani/'+n+'.gif',dot=U+'gen5/'+n+'.png',dotAni=U+'gen5ani/'+n+'.gif',dex=U+'dex/'+n+'.png';return gmaxDot()?[dot,dex,ani,dotAni]:[ani,dotAni,dex,dot];}
+/* 거다이맥스 그림: 후보를 한꺼번에 확인해서(병렬) 되는 걸 기억해 둬요 → 다음부터는 바로 떠요 */
+const gmaxBK=b=>(gmaxDot()?'d':'g')+b;
+function gmaxBestMap(){try{return JSON.parse(localStorage.getItem('gmaxBest')||'{}');}catch(e){return {};}}
+function gmaxURL(b){const v=gmaxBestMap()[gmaxBK(b)];return v||gmaxCands(b)[0];}
+const gmaxWarmBusy={};
+function gmaxProbe(u){return new Promise(r=>{const im=new Image();let t=setTimeout(()=>{t=0;im.src='';r(false);},6000);im.onload=()=>{if(t)clearTimeout(t);r(true);};im.onerror=()=>{if(t)clearTimeout(t);r(false);};im.src=u;});}
+async function gmaxWarm(ids){
+  const todo=ids.filter(b=>GMAX[b]&&!gmaxBestMap()[gmaxBK(b)]&&!gmaxWarmBusy[gmaxBK(b)]);
+  let next=0;
+  const one=async b=>{const key=gmaxBK(b);gmaxWarmBusy[key]=1;
+    try{const c=gmaxCands(b);const ok=await Promise.all(c.map(gmaxProbe));const k=ok.indexOf(true);
+      if(k>=0){const m=gmaxBestMap();m[key]=c[k];try{localStorage.setItem('gmaxBest',JSON.stringify(m));}catch(e){}
+        document.querySelectorAll('img[data-id="'+(GM_BASE+b)+'"]').forEach(el=>{if(el.getAttribute('src')!==c[k]){el.classList.remove('gmFb');el.dataset.gm='0';el.src=c[k];}});}
+    }catch(e){}finally{gmaxWarmBusy[key]=0;}};
+  const worker=async()=>{while(next<todo.length){const b=todo[next++];await one(b);}};
+  await Promise.all([worker(),worker(),worker(),worker(),worker(),worker()]);
+}
+function gmaxImgFail(el,b){try{const m=gmaxBestMap();if(m[gmaxBK(b)]){delete m[gmaxBK(b)];localStorage.setItem('gmaxBest',JSON.stringify(m));}}catch(e){}const c=gmaxCands(b),k=(+el.dataset.gm||0)+1;el.dataset.gm=String(k);
  if(k<c.length){el.src=c[k];return;}
  const fb=()=>{el.dataset.gm='99';el.classList.add('gmFb');el.removeAttribute('onerror');el.src=SPR_BASE+'other/official-artwork/'+b+'.png';};
  if(k===c.length){gmaxResolve(b).then(u=>{if(u&&u!=='-')el.src=u;else fb();});return;}
@@ -5160,6 +5182,7 @@ function renderDex(){S.screen='dex';const me=S.meta;const own=ownCount();
   <div class="dexGrid${DEXF==='mega'||DEXF==='gmax'?' mgGrid':''}">${fl.map(id=>{const n=me.col[id]||0,seen=me.dexSeen[id];if(DEXF==='mega')return mgCell(id,n,seen);if(DEXF==='gmax')return gmCell(id,n,seen);return `<div class="dexCell ${n?'':seen?'seen':'none'}" data-id="${id}"><span class=no>${id}</span>${!n&&me.shard&&me.shard[id]?`<span class=n2 style="color:#9a6bff">${me.shard[id]}/${SHARD_NEED[MON[id].rar]}</span>`:''}${monImg(id)}<span class=nm>${n||seen?esc(MON[id].name):'???'}</span></div>`;}).join('')||'<p class=mut>아직 없어요</p>'}</div></div></div>`;
  bindHud();
  $('#view').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{sfx('tap');DEXF=b.dataset.f;renderDex();});
+ try{if(DEXF==='gmax'&&me.settings.imgs)gmaxWarm(MON_IDS.filter(id=>GMAX[id]));}catch(e){}
  $('#view').querySelectorAll('[data-rar]').forEach(b=>b.onclick=()=>{sfx('tap');DEXRAR=+b.dataset.rar;renderDex();});
  $('#view').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{sfx('tap');DEXR=+b.dataset.r;renderDex();});
  $('#view').querySelectorAll('.dexCell').forEach(c=>c.onclick=()=>{sfx('tap');showCard(+c.dataset.id);});
@@ -5404,12 +5427,7 @@ function startBattle(gi,hi){const me=S.meta;const H=hi!=null?HARD[hi]:null;if(gi
    {el:'.hand',h:'손에 든 카드',ic:'cards',t:'카드를 <b>한 번 누르면 고르고</b>, 한 번 더 누르면 필드에 나가요.'},
    {el:'#myLane',h:'공격',ic:'sword',t:'초록빛 포켓몬을 누른 뒤 상대 포켓몬이나 트레이너를 누르면 <b>문제</b>가 나와요. <b>맞히면 제대로 공격</b>, 틀리면 약하게 공격해요.'},
    {el:'#bEnd',h:'차례 끝',ic:'check',t:'할 일을 다 했으면 차례 끝을 눌러요. 상대 차례가 시작돼요.'}]);
-  await coachOnce('c_evo6',[
-   {h:'진화',ic:'candy',pic:evoPic([4,5,6]),t:'<b>사탕</b>을 모으면 도감에서 카드를 눌러 <b>진화</b>시킬 수 있어요. 더 강한 포켓몬 카드가 돼요!'},
-   {h:'메가진화',ic:'flame',pic:evoPic([6,MEGA[6]]),t:'전투에서 정답을 <b>10개</b> 맞히면 <b>진화 게이지</b>가 가득 차요. 도감에서 사탕으로 <b>연구</b>한 포켓몬을 누르고 <b>메가</b> 버튼! 공격 +5, 체력 +5 (변신한 차례는 쉬어요).'},
-   {h:'원시회귀',ic:'flame',pic:evoPic([382,MEGA[382],383,MEGA[383]]),t:'<b>가이오가·그란돈</b>은 메가 대신 <b>원시회귀</b>! 같은 방법으로 쓰고, 공격 +5, 체력 +5예요. 버튼에는 <b>원시</b>라고 나와요.'},
-   {h:'거다이맥스',ic:'sword',pic:evoPic([6,GM_BASE+6]),t:'<b>맥스</b> 버튼은 한 판에 한 번! 체력이 <b>3배</b>가 되고, 동료는 잠시 빠지고, 2번의 내 차례 동안 상대 포켓몬 <b>전체</b>를 공격해요.'},
-   {h:'무한다이맥스',ic:'sword',pic:evoPic([890,GM_BASE+890]),t:'<b>무한다이노</b>는 특별한 <b>무한다이맥스</b>! 쓰는 방법은 거다이맥스와 같아요. 쓰고 나면 진화 게이지는 처음부터 다시 모아요.'}]);
+  await coachOnce('c_evo6',evoCoachSteps());
   startTurn('me');})();}
 // 뽑을 수 있는 카드가 돌 카드뿐일 때(덱이 비었거나 손에 포켓몬·랜덤 카드가 하나도 없을 때)는
 // 돌 카드 대신 랜덤 카드나 포켓몬 카드가 나와요.
@@ -8747,8 +8765,35 @@ function wkReportFile(m){const w=wkData(m),pc=v=>v==null?'-':Math.round(v*100)+'
 let GTAB='sum';
 function lineChart(vals,maxV,col,fmtv=v=>v){if(vals.length<2)return '<p class=mut style="font-size:13px">기록이 2개 넘게 쌓이면 그래프가 보여요</p>';const W=300,H=90,n=vals.length;const x=i=>10+i*(W-20)/(n-1),y=v=>H-12-(v/maxV)*(H-26);
  return `<svg viewBox="0 0 ${W} ${H}" class=mdl style="max-width:420px"><polyline points="${vals.map((v,i)=>x(i)+','+y(v)).join(' ')}" fill="none" stroke="${col}" stroke-width="3" stroke-linejoin="round"/>${vals.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="#fff" stroke="${col}" stroke-width="2.5"/>${i===n-1||i===0?`<text x="${x(i)}" y="${y(v)-8}" font-size="11" text-anchor="middle" fill="#3a2e3f">${fmtv(v)}</text>`:''}`).join('')}</svg>`;}
-function renderGrowth(){S.screen='grow';const m=S.meta,L=lvOf(m.xp);
- const tabs=[['sum','요약'],['wk','주간 리포트'],['dom','영역 진단'],['wb','오답 노트'+(wbOpenN(m)?' '+wbOpenN(m):'')],['unit','단원 지도'],['cal','공부 달력'],['me','나의 강점']];
+function calTabHTML(m){
+  const cells=[];const d0=new Date();d0.setDate(d0.getDate()-34-d0.getDay());for(let i=0;i<35+d0.getDay()&&cells.length<42;i++){const d=new Date(d0);d.setDate(d0.getDate()+i);if(d>new Date())break;cells.push(d);}
+  const mxn=Math.max(10,...cells.map(d=>(m.days[today(d)]||{n:0}).n));
+  return `<div class=panel><h3 style="margin-top:0">${I('calendar')} 공부 달력 <span class=mut style="font-size:13px">진할수록 많이 공부한 날</span></h3>
+   <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:420px">${['일','월','화','수','목','금','토'].map(x=>`<div class=mut style="text-align:center;font-size:12px">${x}</div>`).join('')}${cells.map(d=>{const v=m.days[today(d)];const n=v?v.n:0;const a=n?.25+.75*n/mxn:0;return `<div title="${today(d)} · ${n}문제" style="aspect-ratio:1;border-radius:8px;background:${n?`rgba(255,138,61,${a.toFixed(2)})`:'#f1e9dc'};display:flex;align-items:center;justify-content:center;font-size:11px;${today(d)===today()?'outline:3px solid #ff5a5f;':''}">${d.getDate()}</div>`;}).join('')}</div>
+   <div class=row style="gap:8px;margin-top:12px"><span class=pill>${I('calendar')} 공부한 날 ${daysOf(m)}일</span><span class=pill>${I('flame')} 지금 ${streakDays()}일 연속</span><span class=pill>${I('star')} 가장 긴 연속 ${m.stats.bestStreak||0}일</span><span class=pill>${I('check')} 도전한 문제 ${fmt(m.stats.q)}개</span></div></div>`}
+function meTabHTML(m){return `<div class=panel><h3 style="margin-top:0">${I('medal')} 나의 강점</h3>${strengthHTML(m,true)}${featOn('ach')?`<div class=mbtns><button class="btn gold" id=gAch>배지 모두 보기</button></div>`:''}</div>`;}
+
+/* ---------- 학습 튜토리얼: 문제 · 틀리면 · 오답 노트 · 기록 보는 법 ---------- */
+function stPic(a){return '<div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-size:34px;line-height:1.1">'+a.map((x,i)=>(i?'<span style="font-size:22px;color:#e0a000">➜</span>':'')+'<span style="text-align:center">'+x[0]+(x[1]?'<small style="display:block;font-size:12px;font-weight:700;margin-top:2px">'+x[1]+'</small>':'')+'</span>').join('')+'</div>';}
+function studyCoachSteps(onGrow){
+  const a=[
+   {h:'문제를 풀어요',ic:'flame',pic:stPic([['✏️','문제'],['⭕','정답!'],['🍬','사탕']]),t:'전투나 훈련에서 <b>문제를 풀어요</b>. 맞히면 공격이 제대로 들어가고 <b>사탕</b>도 생겨요.'},
+   {h:'틀리면 어떻게 될까?',ic:'heart',pic:stPic([['❌','틀렸어요'],['💡','설명이 나와요'],['🔁','조금 뒤 다시']]),t:'<b>괜찮아요!</b> 틀리면 <b>그림과 설명</b>을 보여 줘요. 그리고 조금 뒤에 <b>같은 문제를 한 번 더</b> 풀어요. 공격은 약하게 들어가요.'},
+   {h:'틀린 문제는 모아 둬요',ic:'book',pic:stPic([['❌','틀린 문제'],['📝','오답 노트']]),t:'틀린 문제는 자동으로 <b>오답 노트</b>에 모여요. 따로 적지 않아도 돼요.'},
+   {h:'다시 풀면 졸업!',ic:'check',pic:stPic([['📝','오답 노트'],['⭕','1번 맞힘'],['⭕','2번 맞힘'],['🎓','해결!']]),t:'오답 노트에서 <b>다시 풀기</b>를 눌러서 <b>2번 맞히면 해결</b>이에요. 해결하면 사탕도 받아요!'},
+   {h:'자꾸 틀리면?',ic:'star',pic:stPic([['🧱','아래 학년 기초'],['🧱','조금 더 어려운 것'],['🏠','목표 개념']]),t:'같은 개념을 자꾸 틀리면 <b>아래 학년 기초부터</b> 차근차근 다시 쌓아 줘요. 어려워서 그런 게 아니에요!'}];
+  if(onGrow)a.push(
+   {el:'.filters',h:'학습 기록 탭',ic:'chart',t:'<b>요약</b>: 나의 성장 · 공부 달력 · 강점<br><b>오답 노트</b>: 틀린 문제 다시 풀기<br><b>단원 지도</b>: 개념별 별<br><b>영역 진단</b>·<b>주간 리포트</b>: 선생님·보호자용'},
+   {el:'[data-gt=wb]',h:'여기서 오답 노트!',ic:'book',t:'틀린 문제를 다시 풀고 싶으면 <b>오답 노트</b>를 눌러요. 처음엔 이것만 알면 충분해요!'});
+  return a;
+}
+async function studyTutorial(){
+  try{GTAB='sum';renderGrowth();}catch(e){console.warn('study tut',e);}
+  await wait(250);
+  return coach(studyCoachSteps(true));
+}
+function renderGrowth(){S.screen='grow';if(GTAB==='cal'||GTAB==='me')GTAB='sum';const m=S.meta,L=lvOf(m.xp);
+ const tabs=[['sum','요약'],['wb','오답 노트'+(wbOpenN(m)?' '+wbOpenN(m):'')],['unit','단원 지도'],['dom','영역 진단'],['wk','주간 리포트']];
  let body='';
  if(GTAB==='sum'){
   const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=today(d);days.push({k,v:m.days[k]||{n:0,c:0,ms:0},lab:i===0?'오늘':`${d.getMonth()+1}/${d.getDate()}`});}
@@ -8775,18 +8820,14 @@ function renderGrowth(){S.screen='grow';const m=S.meta,L=lvOf(m.xp);
     return `<details ${tried&&!m.badges[k]?'open':''} style="margin-bottom:6px"><summary class=unitHead style="cursor:pointer">${m.badges[k]?I('medal','uBadge'):''}${semName(s)} ${u}. ${esc(UNITS[s][u-1])} <span class=xpBar style="max-width:120px;display:inline-block;vertical-align:middle;margin-left:6px"><i style="width:${st/mx*100}%"></i></span> <span class=mut style="font-size:12px">${st}/${mx}</span></summary>
      <div class=skList>${sks.map(x=>{const v=m.sk[x.id];return `<div class=skRow><span class=sn>${esc(x.n)}${m.found&&m.found[x.id]?' <span class=pill style="font-size:11px">좌삼 쌓는 중</span>':''}</span>${v?`<span class=mut style="font-size:12px">${v.c}/${v.c+v.x}</span>`:''}${starsHTML(v?v.st:0)}</div>`;}).join('')}</div></details>`;}).join('')}</div>
    ${Object.keys(m.enSk||{}).length?`<div class=panel><h3 style="margin-top:0">📘 영어 단원 <span class=mut style="font-size:13px">(레벨·유형별 · 3번 연속 맞히면 별 하나)</span></h3><p class=mut style="font-size:13px;margin:0 0 6px">영어 ${fmt((m.enStats||{}).q||0)}문제 · 정답률 ${(m.enStats||{}).q?Math.round(m.enStats.c/m.enStats.q*100):0}%</p><div class=skList>${Object.entries(m.enSk).sort((a,b)=>a[0].localeCompare(b[0])).map(([id,v])=>`<div class=skRow><span class=sn>${esc(enSkName(id))}${m.enFound&&m.enFound[(id.split(':')[1])+':'+id.split(':')[2]]?' <span class=pill style="font-size:11px">좌삼 쌓는 중</span>':''}</span><span class=mut style="font-size:12px">${v.c||0}/${(v.c||0)+(v.x||0)}</span>${starsHTML(v.st||0)}</div>`).join('')}</div></div>`:''}${xsPanelsHTML(m,false)}`;}
- else if(GTAB==='cal'){
-  const cells=[];const d0=new Date();d0.setDate(d0.getDate()-34-d0.getDay());for(let i=0;i<35+d0.getDay()&&cells.length<42;i++){const d=new Date(d0);d.setDate(d0.getDate()+i);if(d>new Date())break;cells.push(d);}
-  const mxn=Math.max(10,...cells.map(d=>(m.days[today(d)]||{n:0}).n));
-  body=`<div class=panel><h3 style="margin-top:0">${I('calendar')} 공부 달력 <span class=mut style="font-size:13px">진할수록 많이 공부한 날</span></h3>
-   <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:420px">${['일','월','화','수','목','금','토'].map(x=>`<div class=mut style="text-align:center;font-size:12px">${x}</div>`).join('')}${cells.map(d=>{const v=m.days[today(d)];const n=v?v.n:0;const a=n?.25+.75*n/mxn:0;return `<div title="${today(d)} · ${n}문제" style="aspect-ratio:1;border-radius:8px;background:${n?`rgba(255,138,61,${a.toFixed(2)})`:'#f1e9dc'};display:flex;align-items:center;justify-content:center;font-size:11px;${today(d)===today()?'outline:3px solid #ff5a5f;':''}">${d.getDate()}</div>`;}).join('')}</div>
-   <div class=row style="gap:8px;margin-top:12px"><span class=pill>${I('calendar')} 공부한 날 ${daysOf(m)}일</span><span class=pill>${I('flame')} 지금 ${streakDays()}일 연속</span><span class=pill>${I('star')} 가장 긴 연속 ${m.stats.bestStreak||0}일</span><span class=pill>${I('check')} 도전한 문제 ${fmt(m.stats.q)}개</span></div></div>`;}
- else body=`<div class=panel><h3 style="margin-top:0">${I('medal')} 나의 강점</h3>${strengthHTML(m,true)}${featOn('ach')?`<div class=mbtns><button class="btn gold" id=gAch>배지 모두 보기</button></div>`:''}</div>`;
+ if(GTAB==='sum')body+=calTabHTML(m)+meTabHTML(m);
  $('#view').innerHTML=hudHTML()+`<div class=wrap>
- <div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('chart')} 나의 학습 기록</h2><span class=hudSp></span><span class=pill>${I('star')} Lv.${L.lv} ${esc(L.title)}</span></div>
+ <div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('chart')} 나의 학습 기록</h2><span class=hudSp></span><button class="btn ghost sm" id=gHelp style="white-space:nowrap;padding:4px 8px">❓ 사용법</button><span class=pill>${I('star')} Lv.${L.lv} ${esc(L.title)}</span></div>
   <div class=filters style="margin-top:10px">${tabs.map(([k,n])=>`<button class="fbtn${GTAB===k?' on':''}" data-gt="${k}">${n}</button>`).join('')}</div></div>
  ${body}</div>`;
  bindHud();$('#view').querySelectorAll('[data-gt]').forEach(b=>b.onclick=()=>{sfx('tap');GTAB=b.dataset.gt;renderGrowth();});
+ {const gh=$('#gHelp');if(gh)gh.onclick=()=>{sfx('tap');studyTutorial();};}
+ try{if(!m.seen.c_study1)setTimeout(()=>{if(S.screen==='grow')coachOnce('c_study1',studyCoachSteps(true));},500);}catch(e){}
  const ga=$('#gAch');if(ga)ga.onclick=()=>{sfx('tap');renderAch();};
  {const wg=$('#wkGo');if(wg)wg.onclick=()=>{sfx('tap');startTraining();};const ws=$('#wkSave');if(ws)ws.onclick=()=>{sfx('coin');const blob=new Blob([wkReportFile(m)],{type:'text/html;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`주간리포트_${m.name||'학생'}_${today()}.html`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);};}
  {const dg=$('#domGo');if(dg)dg.onclick=()=>{sfx('tap');const st=domStats(m),pool=domTrainPool(m,st,dg.dataset.doms.split(','));if(!pool.length){toast('연습할 문제가 아직 없어요');return;}startTraining({pool,n:8});};
@@ -8883,9 +8924,18 @@ async function startWrongBook(keys){
  if(S.lvUp){await wait(500);levelUpFx();}}
 
 // ---- 학습 지도 (단원 고르기 · 연습) ----
+
+/* ---------- 학습 지도 튜토리얼 ---------- */
+function mapCoachSteps(){return [
+ {h:'학습 지도',ic:'map',pic:stPic([['🗺️','학습 지도'],['📖','단원 고르기'],['✏️','연습']]),t:'여기는 <b>무엇을 공부할지 고르는 곳</b>이에요. 어렵지 않아요, 하나씩 볼게요!'},
+ {el:'#uSeg',h:'지금 배우는 단원',ic:'book',t:'학교에서 <b>지금 배우는 단원 번호</b>를 눌러요. 그 단원까지만 문제가 나와서 아직 안 배운 문제는 안 나와요. <b>전체</b>를 누르면 모든 단원이 나와요.'},
+ {el:'#fClr',h:'집중과 연습',ic:'flame',pic:stPic([['🎯','집중'],['🍬','오늘 훈련에서 먼저']]),t:'단원 옆 <b>집중</b>을 누르면 오늘 훈련에서 그 단원을 먼저 풀어요. <b>연습</b>을 누르면 그 단원 문제를 <b>바로</b> 풀어요. 집중은 여기 <b>집중 해제</b>로 풀 수 있어요.'},
+ {h:'아래 학년도 보물!',ic:'coin',pic:stPic([['🧱','아래 학년'],['⭐','별 얻기'],['🪙','코인·사탕']]),t:'지난 학년 단원에서 별을 얻으면 <b>코인 15 · 사탕 5</b>, 단원 배지를 받으면 <b>코인 100</b>을 더 줘요. 기초를 탄탄하게 쌓아 봐요!'},
+ {el:'#mpKo',h:'국어·영어 모드',ic:'book',t:'<b>국어</b>나 <b>영어</b> 문제도 풀 수 있어요. 하루 <b>100문제</b>씩만 풀 수 있고, 다 풀면 수학으로 돌아가요.'}];}
+function mapTutorial(){try{renderMap();}catch(e){console.warn('map tut',e);return;}return wait(250).then(()=>coach(mapCoachSteps()));}
 function renderMap(){S.screen='map';const m=S.meta;const map=unitsWithSkills();const gi=semIdx(m.gs);
  const sems=SEMS.slice(0,gi+1).reverse();
- $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><h2>${I('map')} 학습 지도</h2>
+ $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('map')} 학습 지도</h2><span class=hudSp></span><button class="btn ghost sm" id=mHelp style="white-space:nowrap;padding:4px 8px">❓ 사용법</button></div>
   <p class=mut style="font-size:13px">선생님 코드는 <b>${esc(semName(m.gs))}</b>이에요. 그보다 뒤 학년의 단원은 나오지 않아요.</p>
   <div class=explain style="font-size:14px;margin-top:6px">${I('coin')} <b>아래 학년 단원도 보물이에요!</b> 아래 학년 개념에서 별을 얻으면 <b>코인 15 · 사탕 5</b>, 아래 학년 단원 배지를 받으면 <b>코인 100</b>을 더 받아요. 좌삼을 탄탄하게 쌓아 봐요.</div>
   <div class=setRow><span><b>지금 배우는 단원</b><br><span class=mut style="font-size:12px">${esc(semName(m.gs))}에서 이 단원까지만 문제가 나와요</span></span><div class=seg id=uSeg>${UNITS[m.gs].map((n,i)=>`<button class="${m.uMax===i+1?'on':''}" data-u="${i+1}">${i+1}</button>`).join('')}<button class="${!m.uMax||m.uMax>=99?'on':''}" data-u="99">전체</button></div></div>
@@ -8894,6 +8944,7 @@ function renderMap(){S.screen='map';const m=S.meta;const map=unitsWithSkills();c
   ${sems.map(s=>{const us=UNITS[s].map((n,i)=>({n,u:i+1,k:unitKey(s,i+1)})).filter(x=>map[x.k]);if(!us.length)return '';return `<div class=panel><h3 style="margin-top:0">${semName(s)}</h3>${us.map(x=>{const sks=map[x.k];const st=sks.reduce((a,sk)=>a+(m.sk[sk.id]?m.sk[sk.id].st:0),0);const foc=(m.focus||[]).includes(x.k);
    return `<div class=skRow style="flex-wrap:wrap">${m.badges[x.k]?I('medal','uBadge'):''}<span class=sn><b>${x.u}. ${esc(x.n)}</b><br><span class=mut style="font-size:12px">개념 ${sks.length}개 · 별 ${st}/${sks.length*5}</span></span><button class="fbtn${foc?' on':''}" data-fk="${x.k}">${foc?'집중 중':'집중'}</button><button class="btn blue sm" data-pk="${x.k}">연습</button></div>`;}).join('')}</div>`;}).join('')}${xsPanelsHTML(m,true)}<div class=panel><div class=mbtns style="margin:0"><button class="btn ghost" id=mpKo>📖 국어 모드로 바꾸기</button><button class="btn ghost" id=mpEn>📘 영어 모드 설정</button></div><p class=mut style="font-size:12px;margin:6px 0 0">국어·영어는 하루 100문제씩만 풀 수 있고, 다 풀면 수학 모드로 돌아가요.</p></div></div>`;
  bindHud();
+ {const mh=$('#mHelp');if(mh)mh.onclick=()=>{sfx('tap');mapTutorial();};} try{if(!S.meta.seen.c_map1)setTimeout(()=>{if(S.screen==='map')coachOnce('c_map1',mapCoachSteps());},500);}catch(e){}
  {const a=$('#mpKo');if(a)a.onclick=()=>{sfx('tap');if(nkLeft('ko')<=0){toast('오늘 국어 문제 100개를 다 풀었어요. 내일 또 만나요!');return;}S.meta.questionMode='korean';autoSave();chooseKoreanMode(true);};const b=$('#mpEn');if(b)b.onclick=()=>{sfx('tap');if(nkLeft('en')<=0){toast('오늘 영어 문제 100개를 다 풀었어요. 내일 또 만나요!');return;}chooseEnglishMode(true,'english');};}
  $('#uSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{sfx('tap');m.uMax=+b.dataset.u;m.uMaxAt=today();autoSave();renderMap();});
  $('#fClr').onclick=()=>{m.focus=null;autoSave();renderMap();};
@@ -8927,6 +8978,28 @@ function showTsend(){const st=S.meta.settings;
   <div class=mbtns><button class="btn blue" data-a=send>지금 보내기</button><button class="btn gold" data-a=x>닫기</button></div>`,
   {send:async b=>{const r=($('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();toast('보내는 중…');await tsSend(r,false);},x:()=>{const r=($('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();closeM();},_close:()=>{const r=($('#tsRoom')&&$('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();closeM();}});
  $('#mbox').querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{st.tAuto=b.dataset.v==='1';st.tRoom=($('#tsRoom').value||'').replace(/\D/g,'');autoSave();sfx('tap');$('#mbox').querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));});}
+function tutPicker(){
+  const m=S.meta,sk=m.seen&&m.seen.tutSkip,k=Math.min(4,m.tutDone||0);
+  const row=(a,ic,t,d)=>'<button class="btn ghost" data-a='+a+' style="width:100%;text-align:left;margin:4px 0;padding:10px 12px;line-height:1.35"><b>'+ic+' '+t+'</b><br><span style="font-size:13px;font-weight:500">'+d+'</span></button>';
+  const go=(o)=>()=>{closeM();if(window.TUT_A)TUT_A.begin(Object.assign({replay:true},o));};
+  M('<h2>튜토리얼 선택</h2><p style="font-size:14px;margin:2px 0 6px">보고 싶은 것만 골라서 연습해요. 보상은 없어요.</p>'+
+    row('trait','✨','특성 튜토리얼','끈기, 도발 등 특성 체험')+
+    row('stone','🪨','돌 카드 튜토리얼','화염·물·전기·달·태양의 돌')+
+    row('ball','🎲','랜덤카드 튜토리얼','포켓볼·파워볼·마스터볼')+
+    row('skill','🎓','트레이너 스킬 튜토리얼','체력 회복·공격·응원·반격')+
+    row('evo','🧬','진화 튜토리얼','진화·메가·원시회귀·거다이맥스 안내')+
+    row('study','📚','학습 튜토리얼','문제를 틀리면? 오답 노트는? 학습 기록 보는 법')+
+    row('map','🗺️','학습 지도 튜토리얼','단원 고르기 · 집중 · 연습')+
+    '<div style="border-top:1px solid #ddd;margin:8px 0 4px"></div>'+
+    row('all','📖',sk&&k>0?'전체 이어하기 (파트 '+(k+1)+'/5부터)':'전체 처음부터','처음부터 끝까지 한 번에')+
+    '<div class=mbtns><button class="btn ghost" data-a=x>닫기</button></div>',{
+    trait:go({only:'trait'}),stone:go({only:'stone'}),ball:go({only:'ball'}),skill:go({only:'skill'}),
+    evo:()=>{closeM();try{coach(evoCoachSteps());}catch(e){}},
+    study:()=>{closeM();studyTutorial();},
+    map:()=>{closeM();mapTutorial();},
+    all:()=>{closeM();if(!window.TUT_A)return;if(sk){try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});},
+    x:()=>closeM(),_close:()=>closeM()});
+}
 function tutBtnLabel(){try{const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(!sk)return '튜토리얼 다시 보기';const d=m.tutDone||0;return d>0?`튜토리얼 이어하기 (파트 ${Math.min(5,d+1)}/5부터)`:'튜토리얼 이어하기';}catch(e){return '튜토리얼 다시 보기';}}
 function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.easy=false;if(st.enTts===undefined)st.enTts=true;if(st.iq===undefined)st.iq=true;const seg=(k,opts)=>`<div class=seg>${opts.map(([v,n])=>`<button class="${String(st[k])===String(v)?'on':''}" data-s="${k}" data-v="${v}">${n}</button>`).join('')}</div>`;
  M(`<h2>${I('gear')} 설정</h2>
@@ -8945,7 +9018,7 @@ function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.eas
   <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>🎓 학년 변경</button><button class="btn ghost" data-a=tsend>📡 선생님께 기록 보내기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=netdiag>🌐 연결 진단</button><button class="btn ghost" data-a=tutor>${tutBtnLabel()}</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>
   <p class=mut style="font-size:11px;margin-top:10px;line-height:1.5">${GAME.title} v${GAME.ver} · 좌삼초. 수업용 비영리 팬 제작 학습 도구예요. 포켓몬 이름·그림의 권리는 Nintendo·Creatures·GAME FREAK·The Pokémon Company에 있어요. 그림은 PokeAPI 공개 저장소에서 불러와요.</p>`,
-  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},netdiag:()=>{closeM(l2);netDiag();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);if(window.TUT_A){const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(sk){const k=Math.min(4,m.tutDone||0);try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});}}},{layer2:!!l2});
+  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},netdiag:()=>{closeM(l2);netDiag();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);tutPicker();return;if(window.TUT_A){const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(sk){const k=Math.min(4,m.tutDone||0);try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});}}},{layer2:!!l2});
  {const sb=$('#sfxVol');if(sb){sb.oninput=()=>{st.sfxVol=+sb.value;$('#sfxVolN').textContent=sb.value+'%';};sb.onchange=()=>{autoSave();if(st.sound)sfx('ok');};}}
  {const vb=$('#bgmVol');if(vb){vb.oninput=()=>{st.bgmVol=+vb.value;$('#bgmVolN').textContent=vb.value+'%';applyBgmVol();};vb.onchange=()=>{autoSave();};}}
  $(l2?'#mbox2':'#mbox').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;st[k]=v;if(k==='bgm'){if(v)startBgm();else stopBgm();}autoSave();applySafe();refit();sfx('tap');showSettings(l2);if(k==='imgs'&&S.screen==='hub')renderHub();});}
@@ -13124,8 +13197,10 @@ async function partC(){
   setHand([]);grant(0);
   T.allow=A.none;T.hi=()=>[];
   setTh('카드 소개','ball');cur.sc=0;
-  await note('이제 <b>포켓몬이 아닌 카드</b>를 써 볼까? 손패에는 포켓몬 카드 말고도 <b>돌 카드</b>와 <b>몬스터볼</b>이 들어올 수 있어. 먼저 돌 카드부터 해 보자!');
+  const cp=T.cpart||'';
+  await note(cp==='ball'?'이번엔 <b>몬스터볼</b>(랜덤 카드)을 써 볼까? 손패에는 <b>랜덤으로 포켓몬이 나오는 카드</b>가 들어올 수 있어!':cp==='stone'?'<b>돌 카드</b>를 하나씩 써 보자! 손패에는 포켓몬 카드 말고도 특별한 효과의 카드가 들어올 수 있어.':'이제 <b>포켓몬이 아닌 카드</b>를 써 볼까? 손패에는 포켓몬 카드 말고도 <b>돌 카드</b>와 <b>몬스터볼</b>이 들어올 수 있어. 먼저 돌 카드부터 해 보자!');
   await myTurn();
+  if(cp!=='ball'){
 
   /* C-1 화염의 돌 */
   setHand([ST('fire')]);grant(3);
@@ -13199,7 +13274,9 @@ async function partC(){
   await sweep({strikers:[BOSS_SLOT,ROCK_SLOT]});
   resetRock(3);
   setTh('정리','check');cur.sc=0;
-  await note('돌 카드 <b>다섯 종류</b>를 모두 써 봤어! 다음은 <b>몬스터볼</b>이야.');
+  await note(cp==='stone'?'돌 카드 <b>다섯 종류</b>를 모두 써 봤어!':'돌 카드 <b>다섯 종류</b>를 모두 써 봤어! 다음은 <b>몬스터볼</b>이야.');
+  }
+  if(cp!=='stone'){
 
   /* 몬스터볼: 연습용으로 전체 포켓몬에서 뽑아요(도감 등록 없음) */
   me.owned=Object.keys(MON).map(Number);
@@ -13213,6 +13290,7 @@ async function partC(){
 
   /* C-10 정리 */
   await sweep({strikers:[BOSS_SLOT,ROCK_SLOT]});
+  }
   try{const ds=S.meta.dexSeen||{};Object.keys(ds).forEach(k=>{if(!dexSnap[k])delete ds[k];});}catch(e){}
   me.owned=[];
   setTh('정리','check');cur.sc=0;
@@ -13410,6 +13488,13 @@ const parts=[partA,partB,partC,partTS,partD];
 async function run(T){
   try{
     const from=T.from||0;
+    if(T.only){
+      prepResume(T,2);
+      const SEC={trait:[partB],stone:[partC],ball:[partC],skill:[partTS]};
+      if(T.only==='stone'||T.only==='ball')T.cpart=T.only;
+      for(const f of SEC[T.only]||[]){await f();chk();}
+      await finish(T);return;
+    }
     if(from>0)prepResume(T,from);
     for(let i=from;i<parts.length;i++){await parts[i]();chk();if(!T.replay){const m=S.meta;m.tutDone=i+1;autoSave();}}
     await finish(T);
@@ -13421,6 +13506,10 @@ async function run(T){
 }
 async function finish(T){
   hideSay();T.hi=()=>[];T.allow=A.none;
+  if(T.only){
+    await new Promise(res=>{M('<div style="text-align:center"><h2 style="font-size:24px">연습 끝!</h2><p style="margin:6px 0 10px;line-height:1.6">선택한 튜토리얼을 마쳤어요.<br><span style="font-size:14px">다시 하기라 보상은 없어요.</span></p><div class=mbtns><button class="btn gold" data-a=ok>확인</button></div></div>',{ok:()=>{closeM();res();},_close:()=>{closeM();res();}});});
+    return;
+  }
   S.meta.seen=S.meta.seen||{};
   const ids=[FIRE_ID,WATER_ID].concat(Object.keys(EXP).map(k=>EXP[k]));
   const had={};ids.forEach(id=>{had[id]=!!(S.meta.col&&S.meta.col[id]);});
@@ -13465,7 +13554,7 @@ function tutMenu(){
 }
 async function tutSkipAsk(){
   if(!cur||cur.done||cur.skipAsk)return;cur.skipAsk=1;
-  let ok=false;try{ok=await confirmBox('튜토리얼을 완료하면 <b>특성별 포켓몬 18마리</b>를 획득할 수 있습니다.<br>정말로 건너뛰시겠습니까?<br><span style="font-size:14px">건너뛰어도 <b>설정</b>에서 언제든 튜토리얼을 다시 할 수 있어요.</span>','건너뛰기','계속하기');}finally{if(cur)cur.skipAsk=0;}
+  let ok=false;try{ok=await confirmBox((cur&&cur.replay)?'연습을 그만하고 나갈까요?<br><span style="font-size:14px">다시 하기라 보상은 없어요.</span>':'튜토리얼을 완료하면 <b>특성별 포켓몬 18마리</b>를 획득할 수 있습니다.<br>정말로 건너뛰시겠습니까?<br><span style="font-size:14px">건너뛰어도 <b>설정</b>에서 언제든 튜토리얼을 다시 할 수 있어요.</span>','건너뛰기','계속하기');}finally{if(cur)cur.skipAsk=0;}
   if(!ok)return;
   try{closeM();}catch(e){}
   if(cur&&!cur.replay){const m=S.meta;m.seen=m.seen||{};m.seen.tutA=1;m.seen.tutSkip=1;autoSave();}   // 어디까지 끝냈는지는 tutDone에 남아 있어요
@@ -13480,7 +13569,7 @@ function begin(o={}){
   const meta=S.meta;let pid=25;try{pid=partnerId()||25;}catch(e){}
   const me=mkPlayer(meta.name||'나',[],heroHpMax(),pid,true,[],false);
   const foe=mkPlayer('보스',[],20,BOSS_ID,true,[],false);
-  const T={w:null,lock:false,allow:A.none,hi:()=>[],q1done:false,done:false,abort:false,replay:!!o.replay,from:o.from||0,back:S.screen==='title'?'title':'hub'};
+  const T={w:null,lock:false,allow:A.none,hi:()=>[],q1done:false,done:false,abort:false,replay:!!o.replay,from:o.from||0,only:o.only||'',back:S.screen==='title'?'title':'hub'};
   cur=T;
   B={gi:-1,g:{n:'튜토리얼',ldr:'보스',types:[14],c:'#e9e2ff'},diff:1,turn:0,round:0,side:'me',me,foe,sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:false,over:false,tut:T};
   S.screen='battle';
