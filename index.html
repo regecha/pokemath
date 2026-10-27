@@ -2750,10 +2750,10 @@ const MUS=(()=>{
   }}
  function sched(){
   if(!cur||!ctx)return;const s=cur,sd=s.sd,stepDur=60/sd.bpm/4;
-  if(ctx.state==='suspended')return;
-  if(ctx.currentTime>s.next+.6){s.next=ctx.currentTime+.06;}
+  if(ctx.state!=='running'){try{ctx.resume();}catch(e){}return;}
+  if(ctx.currentTime>s.next+1.2){s.next=ctx.currentTime+.06;}
   let guard=0;
-  const ahead=(typeof document!=='undefined'&&document.hidden)?1.3:.22;while(s.next<ctx.currentTime+ahead&&guard++<40){
+  const ahead=(typeof document!=='undefined'&&document.hidden)?1.6:.9;while(s.next<ctx.currentTime+ahead&&guard++<64){
    const idx=s.step%sd.steps,sw=(idx&1)?(sd.def.swing||0)*stepDur:0,t=s.next+sw;
    const list=sd.ev[idx];for(let i=0;i<list.length;i++){try{play(list[i],t,sd,s);}catch(e){}}
    s.step++;s.next+=stepDur;}}
@@ -3011,7 +3011,7 @@ function showSaveBox(){saveLocal();
   mk:async()=>{const c=await makeCode();const ta=$('#codeOut');ta.value=c;copyText(c,ta);},
   share:async()=>{const c=await makeCode();$('#codeOut').value=c;try{await navigator.share({title:GAME.title+' 저장 코드',text:c});}catch(e){copyText(c,$('#codeOut'));}},
   ld:async()=>{try{const o=await readAny($('#codeIn').value);if(S.meta.name&&!(await confirmBox('지금 기록이 코드의 기록으로 바뀌어요. 불러올까요?','불러오기','취소')))return;applyLoaded(o,'저장 코드로 불러왔어요!');}catch(e){toast(esc(e.message||'불러오지 못했어요'));}},
-  mdS:()=>saveMD(),mdL:()=>$('#fileIn').click(),win:()=>{saveLocal();window.open(location.href,'_blank');},xRcv:()=>{closeM();xferReceive();},xSnd:()=>{closeM();xferSend();}};
+  mdS:()=>saveMD(),mdL:()=>$('#fileIn').click(),win:()=>{saveLocal();window.open(location.href,'_blank');},xRcv:()=>{closeM();xferReceive();},netdiag:()=>{closeM();netDiag();},xSnd:()=>{closeM();xferSend();}};
  [1,2,3].forEach(i=>{acts['s'+i]=async()=>{const o=slotGet(i);if(o&&!(await confirmBox(`저장 칸 ${i}의 기록을 지금 기록으로 덮어쓸까요?`,'덮어쓰기','취소')))return;if(slotSave(i)){sfx('coin');toast(`저장 칸 ${i}에 저장했어요`);showSaveBox();}else toast('저장하지 못했어요');};
   acts['l'+i]=async()=>{const o=slotGet(i);if(!o)return;if(!(await confirmBox(`지금 기록 대신 저장 칸 ${i}의 기록을 불러올까요?`,'불러오기','취소')))return;applyLoaded(o,`저장 칸 ${i}을 불러왔어요!`);};});
  M(`<h2>${I('disk')} 저장 · 불러오기</h2>${status}${slots}
@@ -3021,13 +3021,57 @@ function showSaveBox(){saveLocal();
   <textarea class="inp code" id=codeIn placeholder="저장해 둔 코드(PKMT로 시작)나 .md 파일 내용을 여기에 붙여 넣으세요"></textarea>
   <div class=row style="margin-top:8px"><button class="btn blue" data-a=ld>코드로 불러오기</button></div>
   <h3>기기 간 옮기기 <span class=mut style="font-size:12px">(숫자 4자리로 바로 옮겨요 · 두 기기 모두 인터넷이 필요해요)</span></h3>
-  <div class=row><button class="btn purple" data-a=xRcv>📥 받기</button><button class="btn blue" data-a=xSnd>📤 보내기</button></div>
+  <p class=mut style="font-size:12px;margin:0 0 6px"><b>학교 와이파이는 작동하지 않을 수 있어요.</b></p>
+  <div class=row><button class="btn purple" data-a=xRcv>📥 받기</button><button class="btn blue" data-a=xSnd>📤 보내기</button><button class="btn ghost" data-a=netdiag>🌐 연결 진단</button></div>
   <p class=mut style="font-size:12px;margin:4px 0 0;line-height:1.5">새 기기에서 <b>받기</b>를 누르면 숫자 4자리가 나와요. 옛 기기에서 <b>보내기</b>를 누르고 그 숫자를 넣으면 저장 데이터가 넘어가요.</p>
   <h3>파일</h3><div class=row><button class="btn ghost" data-a=mdS>${I('disk')} .md 파일로 저장</button><button class="btn ghost" data-a=mdL>${I('folder')} .md 파일 불러오기</button></div>
   ${canNewWin()?`<h3>새 창</h3><div class=row><button class="btn ghost" data-a=win>새 창에서 크게 열기</button></div>`:''}
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,acts,{wide:1});}
 
 
+
+// ===== 연결 진단: 학교 와이파이에서 친구 대전·보스전·기기 간 옮기기가 어디서 막히는지 단계별로 알려줘요 =====
+async function netDiag(){
+ const rows=[
+  ['web','일반 웹사이트 접속','인터넷(HTTPS)이 열려 있나요?'],
+  ['lib','연결 도구 불러오기','PeerJS 프로그램을 내려받을 수 있나요?'],
+  ['sig','연결 중개 서버 접속','PeerJS 서버(0.peerjs.com)에 접속되나요?'],
+  ['ice','기기끼리 직접 연결 길','공인 주소를 알아내는 통신(STUN)이 열려 있나요?']];
+ const R={};let done=false;
+ const ic=v=>v==null?'⏳':v==='ok'?'✅':v==='bad'?'❌':'➖';
+ const draw=(sum)=>{M(`<h2>🌐 연결 진단</h2><p class=mut style="font-size:13px;line-height:1.5">친구 대전·보스전·기기 간 옮기기가 되는지 확인해요. 학교에서 눌러 보세요. (약 10~20초)</p>
+  ${rows.map(r=>`<div class=setRow><span><b>${ic(R[r[0]])} ${r[1]}</b><br><span class=mut style="font-size:12px">${r[2]}</span></span></div>`).join('')}
+  ${sum?`<div class=explain style="font-size:14px;line-height:1.6;margin-top:8px">${sum}</div>`:''}
+  <div class=mbtns>${done?'<button class="btn blue" data-a=again>다시 검사</button>':''}<button class="btn gold" data-a=x>닫기</button></div>`,{x:()=>{done=true;closeM();},_close:()=>{done=true;closeM();},again:()=>netDiag()});};
+ draw();
+ const to=(p,ms)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j(new Error('timeout')),ms))]);
+ // 1) 일반 HTTPS
+ try{await to(fetch('https://www.gstatic.com/generate_204',{mode:'no-cors',cache:'no-store'}),7000);R.web='ok';}catch(e){R.web='bad';}
+ draw();
+ // 2) PeerJS 프로그램
+ try{await to(loadPeer(),9000);R.lib='ok';}catch(e){R.lib='bad';}
+ draw();
+ // 3) 중개 서버
+ if(R.lib==='ok'){
+  await new Promise(res=>{let pr;const fin=v=>{R.sig=v;try{pr&&pr.destroy();}catch(e){}res();};
+   try{pr=new Peer();pr.on('open',()=>fin('ok'));pr.on('error',()=>fin('bad'));setTimeout(()=>fin('bad'),9000);}catch(e){fin('bad');}});
+ }else R.sig='skip';
+ draw();
+ // 4) STUN
+ await new Promise(res=>{let pc,got=false,fin=v=>{if(R.ice)return;R.ice=v;try{pc&&pc.close();}catch(e){}res();};
+  try{pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]});
+   pc.createDataChannel('d');
+   pc.onicecandidate=e=>{if(e.candidate&&/ typ srflx /.test(e.candidate.candidate))fin('ok');};
+   pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>fin('bad'));
+   setTimeout(()=>fin('bad'),7000);}catch(e){fin('bad');}});
+ done=true;
+ let sum;
+ if(R.web==='bad')sum='<b>인터넷이 거의 막혀 있어요.</b> 이 와이파이에서는 온라인 기능이 어려워요. 휴대폰 핫스팟이나 다른 와이파이를 써 보세요.';
+ else if(R.lib==='bad'||R.sig==='bad')sum='<b>연결 중개 서버가 막혀 있어요.</b> 학교 와이파이에서는 친구 대전·보스전·기기 간 옮기기를 쓸 수 없어요. 대신 <b>저장 코드(복사·붙여넣기)</b>나 <b>.md 파일</b>로 옮기고, 대전은 핫스팟이나 집에서 해 주세요.';
+ else if(R.ice==='bad')sum='<b>중개 서버는 열려 있지만 기기끼리 직접 연결이 막혔을 수 있어요.</b> 연결이 안 되면 선생님께 이 화면을 보여 주세요. (TURN 중계 서버를 추가하면 해결될 수 있어요.)';
+ else sum='<b>모두 열려 있어요!</b> 이 와이파이에서 친구 대전·보스전·기기 간 옮기기가 될 가능성이 높아요. 그래도 안 되면 양쪽 기기가 같은 조건인지 확인해 보세요.';
+ draw(sum);
+}
 // ===== 기기 간 저장 데이터 옮기기: 받는 기기가 4자리 번호를 만들고, 보내는 기기가 그 번호를 넣어요 (PeerJS · 기기끼리 바로 전달) =====
 const XFER_VER=1,xferId=c=>'zwasam-xfer-'+XFER_VER+'-'+c;
 let _xfPeer=null;
@@ -3038,6 +3082,7 @@ async function xferReceive(){
  const view=(msg)=>{M(`<h2>📥 저장 데이터 받기</h2><p class=mut style="font-size:14px;line-height:1.6">옛 기기에서 <b>저장 · 불러오기 → 보내기</b>를 누르고 아래 번호를 넣어 주세요.</p>
   <div style="font-size:54px;font-family:'Jua';letter-spacing:10px;text-align:center;margin:8px 0;color:#2f5aa8">${code||'····'}</div>
   <p class=mut id=xfMsg style="text-align:center;font-size:14px">${msg||'기다리는 중… 이 창을 열어 둔 채로 있어 주세요'}</p>
+  <p class=mut style="text-align:center;font-size:12px"><b>학교 와이파이는 작동하지 않을 수 있어요.</b></p>
   <div class=mbtns><button class="btn ghost" data-a=x>그만두기</button></div>`,{x:()=>{xferStop();closeM();showSaveBox();},_close:()=>{xferStop();closeM();}});};
  const open=()=>{
   code=String(Math.floor(Math.random()*10000)).padStart(4,'0');
@@ -3064,6 +3109,7 @@ function xferSend(){
  const dlg=(msg)=>{M(`<h2>📤 저장 데이터 보내기</h2><p class=mut style="font-size:14px;line-height:1.6;text-align:left">받는 기기에서 <b>저장 · 불러오기 → 받기</b>를 누르면 나오는 <b>숫자 4자리</b>를 넣어 주세요. 내 닉네임과 모든 기록이 그 기기로 넘어가요.</p>
   <input class="inp codeIn" id=xfCode inputmode=numeric maxlength=4 style="width:170px;font-size:30px;text-align:center" placeholder="0000">
   <p class=mut id=xfMsg style="text-align:center;font-size:13px;min-height:18px">${msg||''}</p>
+  <p class=mut style="text-align:center;font-size:12px"><b>학교 와이파이는 작동하지 않을 수 있어요.</b></p>
   <div class=mbtns><button class="btn blue" data-a=go>보내기</button><button class="btn ghost" data-a=x>뒤로</button></div>`,{go:()=>run(),x:()=>{xferStop();closeM();showSaveBox();},_close:()=>{xferStop();closeM();}});setTimeout(()=>{const i=$('#xfCode');if(i){i.focus();i.onkeydown=e=>{if(e.key==='Enter')run();};}},100);};
  let busy=false;
  const say=t=>{const e=$('#xfMsg');if(e)e.textContent=t;};
@@ -7622,7 +7668,7 @@ function renderBossCoop(keep){S.screen='bosscoop';if(!keep)bossClose();const m=S
  <div class=tiles style="margin-top:12px"><div class=tile><span class=ti>🌈</span><span class=tn>4성 보스 60%</span><span class=td>희귀한 보스 포켓몬</span></div><div class=tile><span class=ti>✨</span><span class=tn>5성 보스 40%</span><span class=td>최상위 보스 포켓몬</span></div></div>
  <div class=explain style="margin-top:12px;font-size:14px;line-height:1.7">보스 체력은 기본의 <b>15배</b>, 공격력은 그대로이며 기본 공격은 턴마다 <b>2회</b>예요. 단, 우리 포켓몬이 <b>3마리 늘 때마다 공격이 1회씩 늘어요</b>(최대 4회). 보스 체력이 <b>절반 이하면 공격력 +1</b>, <b>25% 이하면 공격 +1회</b>로 더 강해져요. 또 <b>3번째 보스 턴마다</b> 우리 포켓몬 모두에게 <b>1 피해</b>(분노한 뒤에는 2)를 주는 전체 공격이 와요. 한 턴 전에 예고가 떠요. 10% 확률로 보스 2마리가 등장하며, 이때는 각 보스가 턴마다 1회 공격해요. 보스전에서는 쉬운 전투가 적용되지 않아요. 보스를 쓰러뜨리거나 포획하면 보스 1마리당 조각 1개를 획득합니다. 보스는 아직 카드가 없는 포켓몬 위주로 나와요(나와 친구 둘 다 없는 포켓몬을 가장 먼저 찾아요). 두 플레이어는 8칸의 공유 출전 필드를 함께 사용합니다. 보스는 <b>내 트레이너와 친구 트레이너 중 한 명을 골라</b> 공격해요. 둘 중 한 명이라도 체력이 0이 되면 전투가 끝나요.</div>
  <div class=row style="margin-top:14px"><button class="btn red big" id=bcHost>방 만들기</button><button class="btn blue big" id=bcJoin>코드로 접속</button></div><input class="inp codeIn" id=bcCode maxlength=4 inputmode=numeric placeholder="방 코드 4자리" style="margin-top:10px">
- <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요합니다. 두 사람 모두 같은 버전의 게임 파일을 사용해 주세요. <a href="#" id=bcNet style="color:inherit">📶 연결 시험</a></p></div><div class=panel id=bcBox style="display:none;text-align:center"></div><div class=panel><h3>협동 규칙</h3><ul style="line-height:1.8;padding-left:20px"><li>턴 순서: 방장 → 친구 → 보스</li><li>각자 자기 손패와 덱으로 행동</li><li>8칸 공유 필드의 체력·상태·공격 횟수 동기화</li><li>문제는 행동한 플레이어가 풀고, 결과를 호스트가 판정·반영</li><li>보스 행동과 포획 결과는 호스트가 한 번만 처리해 두 화면에 전파</li></ul></div></div>`;
+ <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요합니다. <b>학교 와이파이는 작동하지 않을 수 있어요.</b> 두 사람 모두 같은 버전의 게임 파일을 사용해 주세요. <a href="#" id=bcNet style="color:inherit">📶 연결 시험</a></p></div><div class=panel id=bcBox style="display:none;text-align:center"></div><div class=panel><h3>협동 규칙</h3><ul style="line-height:1.8;padding-left:20px"><li>턴 순서: 방장 → 친구 → 보스</li><li>각자 자기 손패와 덱으로 행동</li><li>8칸 공유 필드의 체력·상태·공격 횟수 동기화</li><li>문제는 행동한 플레이어가 풀고, 결과를 호스트가 판정·반영</li><li>보스 행동과 포획 결과는 호스트가 한 번만 처리해 두 화면에 전파</li></ul></div></div>`;
  bindHud();$('#bcNet').onclick=e=>{e.preventDefault();sfx('tap');showNetTest();};$('#bcHost').onclick=()=>bossConnect(true,String(rint(1000,9999)));$('#bcJoin').onclick=()=>{const c=($('#bcCode').value||'').replace(/\D/g,'');if(c.length!==4){toast('방 코드 4자리를 입력해 주세요');return;}bossConnect(false,c);};}
 function bossBox(h){const b=$('#bcBox');if(!b)return;b.style.display='block';b.innerHTML=h;{const t=b.querySelector('#netTest');if(t)t.onclick=()=>{sfx('tap');showNetTest();};}const c=$('#bcCancel');if(c)c.onclick=()=>{bossClose();if(B&&B.coop){B=null;$('#battle').classList.remove('on');}renderBossCoop()};const st=$('#bcStart');if(st)st.onclick=()=>bossStartBattle();}
 async function bossConnect(host,code){bossClose();BC.host=host;BC.localIndex=host?0:1;BC.code=code;bossBox(`<p>연결 준비 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);
@@ -7927,7 +7973,7 @@ function renderPvp(){S.screen='pvp';pvpClose();const m=S.meta;ensureDeck();const
   ${can?'':`<p style="color:#d9393f;margin-top:8px">코인이 ${PVP_COST-m.coins}개 모자라요. 공부해서 코인을 모아 와요!</p>`}
   <div class=row style="margin-top:12px"><button class="btn red big" id=pvHost ${can?'':'disabled'}>방 만들기</button><button class="btn blue big" id=pvJoin ${can?'':'disabled'}>방 들어가기</button></div>
   <div class=row style="margin-top:8px;align-items:center"><input class="inp codeIn" id=pvCode maxlength=4 inputmode=numeric placeholder="방 번호 4자리" style="flex:1"></div>
-  <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요해요. 두 사람 모두 같은 버전의 게임 파일을 써 주세요. <a href="#" id=pvNet style="color:inherit">📶 연결 시험</a><br>친구 대전 기록: ${(m.pvp&&m.pvp.n)||0}판 · ${(m.pvp&&m.pvp.w)||0}승 · 함께한 친구 ${Object.keys((m.pvp&&m.pvp.foes)||{}).length}명 · 내 덱 ${m.deck.length}장 <a href="#" id=pvDeck style="color:inherit">덱 고치기</a></p></div>
+  <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요해요. <b>학교 와이파이는 작동하지 않을 수 있어요.</b> 두 사람 모두 같은 버전의 게임 파일을 써 주세요. <a href="#" id=pvNet style="color:inherit">📶 연결 시험</a><br>친구 대전 기록: ${(m.pvp&&m.pvp.n)||0}판 · ${(m.pvp&&m.pvp.w)||0}승 · 함께한 친구 ${Object.keys((m.pvp&&m.pvp.foes)||{}).length}명 · 내 덱 ${m.deck.length}장 <a href="#" id=pvDeck style="color:inherit">덱 고치기</a></p></div>
   <div class=panel id=pvBox style="display:none;text-align:center"></div></div>`;
  bindHud();
  $('#pvDeck').onclick=e=>{e.preventDefault();renderDeck();};
@@ -8856,7 +8902,7 @@ function tsSend(room,silent){return new Promise(async res=>{
 // 훈련 결과가 나올 때, 자동 전송이 켜져 있으면 조용히 한 번 보내요(3분에 한 번까지만)
 function tsAuto(){try{const st=S.meta&&S.meta.settings;if(!st||!st.tAuto||!st.tRoom||Date.now()-_tsLast<180000)return;tsSend(st.tRoom,true);}catch(e){}}
 function showTsend(){const st=S.meta.settings;
- M(`<h2>📡 선생님께 기록 보내기</h2><p class=mut style="font-size:14px;line-height:1.6;text-align:left">선생님 화면에서 <b>실시간으로 받기</b>를 열면 나오는 <b>방 번호 4자리</b>를 넣어 주세요. 닉네임과 공부 기록이 선생님께 전달돼요. (내 저장 코드와 같은 내용이에요)</p>
+ M(`<h2>📡 선생님께 기록 보내기</h2><p class=mut style="font-size:14px;line-height:1.6;text-align:left">선생님 화면에서 <b>실시간으로 받기</b>를 열면 나오는 <b>방 번호 4자리</b>를 넣어 주세요. 닉네임과 공부 기록이 선생님께 전달돼요. (내 저장 코드와 같은 내용이에요) <b>학교 와이파이는 작동하지 않을 수 있어요.</b></p>
   <input class="inp codeIn" id=tsRoom inputmode=numeric maxlength=4 style="width:150px;font-size:26px;text-align:center" value="${esc(st.tRoom||'')}" placeholder="0000">
   <div class=setRow style="margin-top:8px"><span><b>훈련이 끝나면 자동 전송</b><br><span class=mut style="font-size:12px">켜 두면 훈련 결과가 나올 때 조용히 보내요</span></span><div class=seg><button class="${st.tAuto?'on':''}" data-v=1>켜기</button><button class="${st.tAuto?'':'on'}" data-v=0>끄기</button></div></div>
   <div class=mbtns><button class="btn blue" data-a=send>지금 보내기</button><button class="btn gold" data-a=x>닫기</button></div>`,
@@ -8877,10 +8923,10 @@ function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.eas
   <div class=setRow><span><b>포켓몬 이미지</b><br><span class=mut style="font-size:12px">끄면 포켓몬 그림을 불러오지 않아요. 인터넷이 막힌 곳에서는 '끄기'</span></span>${seg('imgs',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>왼쪽 아래 버튼 피하기</b><br><span class=mut style="font-size:12px">구글 사이트 등 다른 페이지 안에서 열었을 때, 왼쪽 아래 ⓘ 버튼이 내 카드·버튼을 가리면 켜세요. 자동은 사이트 안에서 열면 켜져요</span></span>${seg('safe',[['auto','자동'],['on','켜기'],['off','끄기']])}</div>
   <div class=setRow><span><b>보이는 영역에 화면 맞추기</b><br><span class=mut style="font-size:12px">주소창·사이트 머리글 때문에 화면이 일부만 보일 때, 게임을 보이는 영역 안에 딱 맞춰요. 화면이 잘려 보이면 '자동', 맞춤이 어색하면 '끄기'</span></span>${seg('fit',[['auto','자동'],['off','끄기']])}</div>
-  <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>🎓 학년 변경</button><button class="btn ghost" data-a=tsend>📡 선생님께 기록 보내기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=tutor>${tutBtnLabel()}</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
+  <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>🎓 학년 변경</button><button class="btn ghost" data-a=tsend>📡 선생님께 기록 보내기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=netdiag>🌐 연결 진단</button><button class="btn ghost" data-a=tutor>${tutBtnLabel()}</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>
   <p class=mut style="font-size:11px;margin-top:10px;line-height:1.5">${GAME.title} v${GAME.ver} · 좌삼초. 수업용 비영리 팬 제작 학습 도구예요. 포켓몬 이름·그림의 권리는 Nintendo·Creatures·GAME FREAK·The Pokémon Company에 있어요. 그림은 PokeAPI 공개 저장소에서 불러와요.</p>`,
-  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);if(window.TUT_A){const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(sk){const k=Math.min(4,m.tutDone||0);try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});}}},{layer2:!!l2});
+  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},netdiag:()=>{closeM(l2);netDiag();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);if(window.TUT_A){const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(sk){const k=Math.min(4,m.tutDone||0);try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});}}},{layer2:!!l2});
  {const sb=$('#sfxVol');if(sb){sb.oninput=()=>{st.sfxVol=+sb.value;$('#sfxVolN').textContent=sb.value+'%';};sb.onchange=()=>{autoSave();if(st.sound)sfx('ok');};}}
  {const vb=$('#bgmVol');if(vb){vb.oninput=()=>{st.bgmVol=+vb.value;$('#bgmVolN').textContent=vb.value+'%';applyBgmVol();};vb.onchange=()=>{autoSave();};}}
  $(l2?'#mbox2':'#mbox').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;st[k]=v;if(k==='bgm'){if(v)startBgm();else stopBgm();}autoSave();applySafe();refit();sfx('tap');showSettings(l2);if(k==='imgs'&&S.screen==='hub')renderHub();});}
