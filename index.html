@@ -3036,7 +3036,8 @@ async function netDiag(){
   ['web','일반 웹사이트 접속','인터넷(HTTPS)이 열려 있나요?'],
   ['lib','연결 도구 불러오기','PeerJS 프로그램을 내려받을 수 있나요?'],
   ['sig','연결 중개 서버 접속','PeerJS 서버(0.peerjs.com)에 접속되나요?'],
-  ['ice','기기끼리 직접 연결 길','공인 주소를 알아내는 통신(STUN)이 열려 있나요?']];
+  ['ice','기기끼리 직접 연결 길','공인 주소를 알아내는 통신(STUN)이 열려 있나요?'],
+  ['turn','중계 서버(TURN) 연결','직접 연결이 막혔을 때 쓰는 우회 길이 열려 있나요?']];
  const R={};let done=false;
  const ic=v=>v==null?'⏳':v==='ok'?'✅':v==='bad'?'❌':'➖';
  const draw=(sum)=>{M(`<h2>🌐 연결 진단</h2><p class=mut style="font-size:13px;line-height:1.5">친구 대전·보스전·기기 간 옮기기가 되는지 확인해요. 학교에서 눌러 보세요. (약 10~20초)</p>
@@ -3054,7 +3055,7 @@ async function netDiag(){
  // 3) 중개 서버
  if(R.lib==='ok'){
   await new Promise(res=>{let pr;const fin=v=>{R.sig=v;try{pr&&pr.destroy();}catch(e){}res();};
-   try{pr=new Peer();pr.on('open',()=>fin('ok'));pr.on('error',()=>fin('bad'));setTimeout(()=>fin('bad'),9000);}catch(e){fin('bad');}});
+   try{pr=new Peer(PO());pr.on('open',()=>fin('ok'));pr.on('error',()=>fin('bad'));setTimeout(()=>fin('bad'),9000);}catch(e){fin('bad');}});
  }else R.sig='skip';
  draw();
  // 4) STUN
@@ -3064,10 +3065,16 @@ async function netDiag(){
    pc.onicecandidate=e=>{if(e.candidate&&/ typ srflx /.test(e.candidate.candidate))fin('ok');};
    pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>fin('bad'));
    setTimeout(()=>fin('bad'),7000);}catch(e){fin('bad');}});
+ await turnPrep();
+ await new Promise(res=>{let pc,fin=v=>{if(R.turn)return;R.turn=v;try{pc&&pc.close();}catch(e){}res();};
+  try{pc=new RTCPeerConnection({iceServers:iceList().filter(x=>/turn/.test(JSON.stringify(x.urls)))});pc.createDataChannel('d');
+   pc.onicecandidate=e=>{if(e.candidate&&/ typ relay /.test(e.candidate.candidate))fin('ok');};
+   pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>fin('bad'));setTimeout(()=>fin('bad'),9000);}catch(e){fin('bad');}});
  done=true;
  let sum;
  if(R.web==='bad')sum='<b>인터넷이 거의 막혀 있어요.</b> 이 와이파이에서는 온라인 기능이 어려워요. 휴대폰 핫스팟이나 다른 와이파이를 써 보세요.';
  else if(R.lib==='bad'||R.sig==='bad')sum='<b>연결 중개 서버가 막혀 있어요.</b> 학교 와이파이에서는 친구 대전·보스전·기기 간 옮기기를 쓸 수 없어요. 대신 <b>저장 코드(복사·붙여넣기)</b>나 <b>.md 파일</b>로 옮기고, 대전은 핫스팟이나 집에서 해 주세요.';
+ else if(R.turn==='bad'&&R.ice==='bad')sum='<b>직접 연결과 중계 서버가 모두 막혀 있어요.</b> 이 와이파이에서는 온라인 기능이 어려워요. 핫스팟이나 집에서 해 주세요.';
  else if(R.ice==='bad')sum='<b>중개 서버는 열려 있지만 기기끼리 직접 연결이 막혔을 수 있어요.</b> 연결이 안 되면 선생님께 이 화면을 보여 주세요. (TURN 중계 서버를 추가하면 해결될 수 있어요.)';
  else sum='<b>모두 열려 있어요!</b> 이 와이파이에서 친구 대전·보스전·기기 간 옮기기가 될 가능성이 높아요. 그래도 안 되면 양쪽 기기가 같은 조건인지 확인해 보세요.';
  draw(sum);
@@ -3086,7 +3093,7 @@ async function xferReceive(){
   <div class=mbtns><button class="btn ghost" data-a=x>그만두기</button></div>`,{x:()=>{xferStop();closeM();showSaveBox();},_close:()=>{xferStop();closeM();}});};
  const open=()=>{
   code=String(Math.floor(Math.random()*10000)).padStart(4,'0');
-  let p;try{p=new Peer(xferId(code));}catch(e){toast('연결을 시작하지 못했어요');return;}
+  let p;try{p=new Peer(xferId(code),PO());}catch(e){toast('연결을 시작하지 못했어요');return;}
   _xfPeer=p;
   p.on('error',e=>{const t=String(e&&e.type||'');if(t==='unavailable-id'&&tries++<6){try{p.destroy();}catch(_){}open();return;}toast('연결하지 못했어요. 인터넷을 확인해 주세요');xferStop();closeM();});
   p.on('open',()=>view());
@@ -3120,7 +3127,7 @@ function xferSend(){
   busy=true;say('연결하는 중…');let done=false,to=0;
   const fin=(ok,why)=>{if(done)return;done=true;busy=false;clearTimeout(to);xferStop();if(ok){closeM();sfx('win');toast('저장 데이터를 보냈어요! 받는 기기에서 이어서 하세요');}else{say(why||'보내지 못했어요');}};
   try{await loadPeer();saveLocal();const code=await makeCode();
-   xferStop();const p=new Peer();_xfPeer=p;
+   xferStop();const p=new Peer(PO());_xfPeer=p;
    to=setTimeout(()=>fin(false,'받는 기기를 찾지 못했어요. 번호와 받는 화면이 열려 있는지 확인해 주세요'),15000);
    p.on('error',e=>{const t=String(e&&e.type||'');fin(false,t==='peer-unavailable'?'그 번호로 기다리는 기기가 없어요. 받는 기기에서 「받기」 화면이 열려 있는지 확인해 주세요':'연결하지 못했어요. 인터넷을 확인해 주세요');});
    p.on('open',()=>{const c=p.connect(xferId(room),{reliable:true});
@@ -7673,7 +7680,7 @@ function renderBossCoop(keep){S.screen='bosscoop';if(!keep)bossClose();const m=S
 function bossBox(h){const b=$('#bcBox');if(!b)return;b.style.display='block';b.innerHTML=h;{const t=b.querySelector('#netTest');if(t)t.onclick=()=>{sfx('tap');showNetTest();};}const c=$('#bcCancel');if(c)c.onclick=()=>{bossClose();if(B&&B.coop){B=null;$('#battle').classList.remove('on');}renderBossCoop()};const st=$('#bcStart');if(st)st.onclick=()=>bossStartBattle();}
 async function bossConnect(host,code){bossClose();BC.host=host;BC.localIndex=host?0:1;BC.code=code;bossBox(`<p>연결 준비 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);
  try{await loadPeer()}catch(e){bossBox(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}
- const id='pkboss-coop-v1-'+code;const peer=host?new Peer(id):new Peer();BC.peer=peer;
+ const id='pkboss-coop-v1-'+code;const peer=host?new Peer(id,PO()):new Peer(PO());BC.peer=peer;
  peer.on('error',e=>{const t=String(e&&e.type||'');bossBox(netErrHTML(t==='unavailable-id'?'이미 사용 중인 코드예요. 새 방을 만들어 주세요.':t==='peer-unavailable'?'해당 방을 찾을 수 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결에 실패했어요 ('+t+')',t,'bcCancel'))});
  peer.on('open',()=>{if(host){bossBox(`<p>친구에게 아래 코드를 알려 주세요.</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구 접속 대기 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);peer.on('connection',c=>{if(BC.conn){c.close();return}BC.conn=c;bossBind(c)});}else{bossBox(`<p>방 ${code}에 접속 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);{const cc=peer.connect(id,{reliable:true});BC.conn=cc;bossBind(cc);setTimeout(()=>{try{if(BC.conn===cc&&!cc.open&&!BC.ready&&S.screen==='bosscoop')bossBox(netErrHTML('친구와 연결되지 않았어요','timeout','bcCancel'));}catch(e){}},20000);}}});}
 const BOSS_NET_VER=3;
@@ -7961,7 +7968,16 @@ const PVP_COST=60;       // 한 판에 드는 코인 (훈련 정답 12개쯤) �
 const PVP_WIN=30,PVP_LOSE=10;
 const PVP_VER=6; // 마나 연구·공부 강화·카드 보유량 패시브가 대전에도 적용되는 버전
 const PV={peer:null,conn:null,host:false,code:'',q:[],busy:false,foe:null,started:false,charged:false};
-function loadPeer(){return new Promise((res,rej)=>{if(window.Peer)return res();const s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';s.onload=()=>res();s.onerror=()=>rej(new Error('연결 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'));document.head.appendChild(s);});}
+const TURN_SECRET='openrelayprojectsecret';let _turnCred=null;
+async function turnPrep(){if(_turnCred&&_turnCred.exp>Date.now()/1000+600)return;
+ try{const u=String(Math.floor(Date.now()/1000)+86400),k=await crypto.subtle.importKey('raw',new TextEncoder().encode(TURN_SECRET),{name:'HMAC',hash:'SHA-1'},false,['sign']);
+  const sg=new Uint8Array(await crypto.subtle.sign('HMAC',k,new TextEncoder().encode(u)));let b='';sg.forEach(x=>b+=String.fromCharCode(x));_turnCred={u,c:btoa(b),exp:+u};}catch(e){_turnCred=null;}}
+// 학교 방화벽 대비: 직접 연결이 막히면 80·443 포트로 TURN 중계 서버를 거쳐요
+function iceList(){const l=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}];
+ if(_turnCred)l.push({urls:['turn:staticauth.openrelay.metered.ca:80','turn:staticauth.openrelay.metered.ca:80?transport=tcp','turn:staticauth.openrelay.metered.ca:443','turns:staticauth.openrelay.metered.ca:443?transport=tcp'],username:_turnCred.u,credential:_turnCred.c});
+ l.push({urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turns:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'});return l;}
+const PO=()=>({config:{iceServers:iceList()}});
+function loadPeer(){return new Promise((res,rej)=>{const go=()=>turnPrep().then(()=>res(),()=>res());if(window.Peer)return go();const s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';s.onload=()=>go();s.onerror=()=>rej(new Error('연결 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'));document.head.appendChild(s);});}
 function pvpClose(){try{PV.conn&&PV.conn.close();}catch(e){}try{PV.peer&&PV.peer.destroy();}catch(e){}PV.peer=null;PV.conn=null;PV.q=[];PV.busy=false;PV.started=false;}
 // 상대가 '대전 끝!'을 알려 오면, 내 화면 계산이 늦거나 달라도 종료 화면을 꼭 띄워요(친구에게 종료 화면이 안 뜨던 문제 방지)
 function pvpPeerOver(d){setTimeout(()=>{try{if(!B||!B.pvp||B.__pvDone)return;B.over=true;endBattle(!d.w);}catch(e){}},1400);}
@@ -8003,7 +8019,7 @@ async function showNetTest(){
  draw();
  try{await loadPeer();st.lib=['✓','불러왔어요'];}catch(e){st.lib=['✗','연결 도구를 불러오지 못했어요. 인터넷이 막혀 있을 수 있어요.'];draw('<b>인터넷에서 연결 도구를 받아 오지 못했어요.</b> 와이파이를 확인하거나 휴대폰 데이터로 바꿔서 다시 해 보세요.');return;}
  st.srv=['…',''];draw();
- const srv=await new Promise(res=>{let p,done=false;const fin=r=>{if(done)return;done=true;try{p&&p.destroy();}catch(e){}res(r);};try{p=new Peer();p.on('open',()=>fin({ok:1}));p.on('error',e=>fin({ok:0,t:String(e&&e.type||'')}));setTimeout(()=>fin({ok:0,t:'timeout'}),9000);}catch(e){fin({ok:0,t:'error'});}});
+ const srv=await new Promise(res=>{let p,done=false;const fin=r=>{if(done)return;done=true;try{p&&p.destroy();}catch(e){}res(r);};try{p=new Peer(PO());p.on('open',()=>fin({ok:1}));p.on('error',e=>fin({ok:0,t:String(e&&e.type||'')}));setTimeout(()=>fin({ok:0,t:'timeout'}),9000);}catch(e){fin({ok:0,t:'error'});}});
  st.srv=srv.ok?['✓','연결됐어요']:['✗',NET_HINT[srv.t]||'서버에 닿지 못했어요.'];draw();
  if(!srv.ok){draw('<b>연결 도우미 서버에 닿지 못했어요.</b> 이 와이파이가 막고 있을 가능성이 커요. 휴대폰 데이터(핫스팟)로 바꿔서 다시 시험해 보세요.');return;}
  st.p2p=['…',''];draw();
@@ -8021,7 +8037,7 @@ async function pvpStart(host,code){const m=S.meta;if(m.coins<PVP_COST){toast('�
  pvBox(`<p>연결 준비 중…</p><button class="btn ghost" id=pvCancel>취소</button>`);
  try{await loadPeer();}catch(e){pvBox(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);return;}
  const id='pkmath-'+PVP_VER+'-'+code;
- const peer=host?new Peer(id):new Peer();PV.peer=peer;
+ const peer=host?new Peer(id,PO()):new Peer(PO());PV.peer=peer;
  peer.on('error',e=>{const t=String(e&&e.type||'');pvBox(netErrHTML(t==='unavailable-id'?'이미 쓰는 방 번호예요. 다시 만들어 주세요.':t==='peer-unavailable'?'그 번호의 방이 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결하지 못했어요 ('+t+')',t,'pvCancel'));});
  peer.on('open',()=>{
   if(host){pvBox(`<p>친구에게 이 방 번호를 알려 주세요</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구를 기다리는 중…</p><button class="btn ghost" id=pvCancel>취소</button>`);
@@ -8892,7 +8908,7 @@ function tsSend(room,silent){return new Promise(async res=>{
  try{if(!/^\d{4}$/.test(String(room||''))){fin(false,'방 번호 4자리를 넣어 주세요');return;}
   if(!S.meta.name){fin(false,'닉네임이 있어야 보낼 수 있어요');return;}
   await loadPeer();saveLocal();const code=await makeCode();
-  peer=new Peer();const to=setTimeout(()=>fin(false,'선생님 방을 찾지 못했어요. 방 번호와 선생님 화면이 열려 있는지 확인해 주세요'),15000);
+  peer=new Peer(PO());const to=setTimeout(()=>fin(false,'선생님 방을 찾지 못했어요. 방 번호와 선생님 화면이 열려 있는지 확인해 주세요'),15000);
   peer.on('error',e=>{clearTimeout(to);const t=String(e&&e.type||'');fin(false,t==='peer-unavailable'?'그 번호의 방이 없어요. 선생님 화면에서 방이 열려 있는지 확인해 주세요':'연결하지 못했어요. 인터넷이나 학교 네트워크를 확인해 주세요');});
   peer.on('open',()=>{const c=peer.connect(tsId(room),{reliable:true});
    c.on('open',()=>{try{c.send({t:'rec',code});}catch(e){clearTimeout(to);fin(false,'보내지 못했어요');}});
@@ -9133,7 +9149,7 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
   const bindConn=c=>{c.on('data',async d=>{if(!d||d.t!=='rec'||typeof d.code!=='string')return;try{const o=await readAny(d.code);const nm=String((o.meta&&o.meta.name)||'').trim()||'(이름 없음)';recs[nm]={code:d.code,t:Date.now()};save(recs);try{c.send({t:'ok',name:nm});}catch(e){}$('#trSt').textContent=`${nm} 기록을 받았어요 (${fmt(Date.now())})`;refresh();sfx('ok');}catch(e){try{c.send({t:'bad'});}catch(_){}}});};
   $('#trOpen').onclick=async()=>{sfx('tap');if(tPeer){try{tPeer.destroy();}catch(e){}tPeer=null;}const room=S.tRoom||String(1000+Math.floor(Math.random()*9000));S.tRoom=room;$('#trSt').textContent='방을 여는 중…';
    try{await loadPeer();}catch(e){$('#trSt').textContent=e.message;return;}
-   const p=new Peer(tsId(room));tPeer=p;S.trPeer=p;
+   const p=new Peer(tsId(room),PO());tPeer=p;S.trPeer=p;
    p.on('open',()=>{$('#trCode').textContent=room;$('#trSt').textContent='방이 열려 있어요. 이 화면을 닫지 마세요.';$('#trOpen').textContent='방 다시 열기';});
    p.on('connection',bindConn);
    p.on('error',e=>{const t=String(e&&e.type||'');if(t==='unavailable-id'){S.tRoom=String(1000+Math.floor(Math.random()*9000));$('#trSt').textContent='이미 쓰는 번호예요. 방 열기를 다시 눌러 주세요.';}else $('#trSt').textContent='연결에 문제가 있어요('+t+'). 인터넷을 확인하고 방 열기를 다시 눌러 주세요.';});};
