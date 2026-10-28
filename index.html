@@ -2350,7 +2350,6 @@ html body #rlHubTile.tile.main{--ta:#d4a321;background-image:linear-gradient(120
 #view .qWrap .thinkBar{border:2px solid var(--qg2)!important;background:#fefdfc;color:#8c6d2f}
 #view .qWrap .thinkBar i{background:#f3dc94}
 </style>
-<script src="turn-config.js"></script><!-- 연결 중계 서버(TURN) 설정 파일: 없어도 게임은 열려요. index.html을 새로 바꿔도 이 파일은 그대로 유지돼요 -->
 <script id="cream-accent-js">(function(){var T={title:'hub',gate:'hub',name:'hub',starter:'hub',teacher:'tskills',hub:'hub',grow:'grow',map:'map',deck:'deck',dex:'dex',league:'league',ach:'ach',season:'season',trainerSkills:'tskills',pvp:'pvp',bosscoop:'boss',card:'deck',train:'deck',result:'league',battle:'battle'};
 function th(){try{var s=S.screen||'hub',t=T[s];if(!t){t=/^scenarioRL/.test(s)?'rl':/^scenario/.test(s)?'sc':'hub';}
 var r=document.documentElement;if(r.getAttribute('data-th')!==t)r.setAttribute('data-th',t);}catch(e){}}
@@ -2440,6 +2439,62 @@ html body .hud .hudR .lgPill b{font-size:12px}
  body:has(.coopLane) #foeLane.wildLane.wildCount1 .unit .sp img,body:has(.coopLane) #foeLane.wildLane.wildCount2 .unit .sp img{height:min(15vh,130px)!important}
  #myLane.coopLane .slot{aspect-ratio:auto!important;height:100%!important;max-height:100%!important;min-height:0!important}
 }
+</style>
+<style id=evoFx>
+/* ===== 메가진화 · 원시회귀 · 거다이맥스 · 무한다이맥스: 부드러운 오라와 빛무리 ===== */
+.unit.mega,.unit.gmax{--ea:var(--mc,#8ad0ff);--eb:#ff9bd6}
+.unit.primal{--eb:#ffd27a}
+.unit.gmax{--ea:#ff4d6d;--eb:#ffc23a}
+.unit.gmax.eterna{--ea:#b84dff;--eb:#ff5ce0}
+@keyframes evoSpin{from{transform:translate(-50%,-52%) rotate(0)}to{transform:translate(-50%,-52%) rotate(360deg)}}
+@keyframes evoSpinR{from{transform:translate(-50%,-52%) rotate(360deg)}to{transform:translate(-50%,-52%) rotate(0)}}
+@keyframes evoBloom{0%,100%{transform:translate(-50%,-50%) scale(.94);opacity:.72}50%{transform:translate(-50%,-50%) scale(1.07);opacity:1}}
+@keyframes evoRip{0%{transform:translate(-50%,-50%) scale(.45);opacity:.85}100%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
+@keyframes evoGround{0%,100%{opacity:.7}50%{opacity:1}}
+/* ① 몸 뒤의 부드러운 빛무리(숨 쉬듯 커졌다 작아져요) */
+.unit.mega:not(.frozen) .sp::after,.unit.gmax:not(.frozen) .sp::after{display:block!important;content:'';position:absolute;left:50%;top:54%;width:150%;aspect-ratio:1/1;height:auto;right:auto;bottom:auto;z-index:-2;pointer-events:none;border-radius:50%;border:0;box-shadow:none;
+ background:radial-gradient(circle,rgba(255,255,255,.75) 0,color-mix(in srgb,var(--ea) 62%,transparent) 22%,color-mix(in srgb,var(--eb) 26%,transparent) 44%,transparent 66%);
+ filter:blur(7px);animation:evoBloom 3.4s ease-in-out infinite}
+/* ② 천천히 도는 부드러운 빛줄기(끝이 흐려져요) */
+.unit.mega:not(.frozen) .sp::before,.unit.gmax:not(.frozen) .sp::before{content:'';position:absolute;left:50%;top:52%;width:185%;aspect-ratio:1/1;height:auto;right:auto;bottom:auto;z-index:-1;pointer-events:none;border-radius:50%;border:0;box-shadow:none;
+ background:repeating-conic-gradient(from 0deg,transparent 0deg,color-mix(in srgb,var(--ea) 55%,transparent) 5deg,transparent 12deg,transparent 30deg);
+ -webkit-mask-image:radial-gradient(circle,#000 6%,rgba(0,0,0,.55) 30%,transparent 62%);mask-image:radial-gradient(circle,#000 6%,rgba(0,0,0,.55) 30%,transparent 62%);
+ filter:blur(1.5px);transform:translate(-50%,-52%);animation:evoSpin 22s linear infinite;opacity:.9}
+.unit.primal:not(.frozen) .sp::before{background:repeating-conic-gradient(from 0deg,transparent 0deg,color-mix(in srgb,var(--ea) 62%,transparent) 4deg,transparent 10deg,transparent 22deg);animation-duration:16s}
+.unit.gmax:not(.frozen) .sp::before{width:130%;opacity:.8;background:
+  repeating-conic-gradient(from 0deg,transparent 0deg,color-mix(in srgb,var(--eb) 70%,transparent) 4deg,transparent 9deg,transparent 24deg),
+  repeating-conic-gradient(from 12deg,transparent 0deg,color-mix(in srgb,var(--ea) 60%,transparent) 5deg,transparent 11deg,transparent 24deg);animation-duration:18s}
+/* ③ 발밑: 부드러운 빛 웅덩이 + 퍼져 나가는 물결 */
+.unit.mega .shadow,.unit.gmax .shadow{left:2%;right:2%;height:24px;bottom:22px;border:0;border-radius:50%;box-shadow:none;z-index:0;
+ background:radial-gradient(ellipse,color-mix(in srgb,var(--ea) 70%,transparent) 0,color-mix(in srgb,var(--ea) 28%,transparent) 48%,transparent 74%);filter:blur(2px);animation:evoGround 2.8s ease-in-out infinite}
+.unit.mega .shadow::before,.unit.mega .shadow::after,.unit.gmax .shadow::before,.unit.gmax .shadow::after{content:'';position:absolute;left:50%;top:50%;width:90%;height:70%;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--eb) 85%,#fff);pointer-events:none;transform:translate(-50%,-50%) scale(.45);opacity:0;animation:evoRip 3.2s ease-out infinite}
+.unit.mega .shadow::after,.unit.gmax .shadow::after{animation-delay:1.6s}
+/* ④ 몸에 두르는 빛 · 이름표 */
+.unit.mega .sp img{filter:drop-shadow(0 0 2px rgba(255,255,255,.9)) drop-shadow(0 0 9px var(--ea)) drop-shadow(0 0 20px color-mix(in srgb,var(--eb) 70%,transparent))}
+.unit.mega .un,.unit.gmax .un{background:linear-gradient(90deg,var(--ea),var(--eb),var(--ea));color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6);border:1.5px solid rgba(255,255,255,.85);box-shadow:0 0 8px color-mix(in srgb,var(--ea) 70%,transparent)}
+.unit.gmax .un{font-weight:900;letter-spacing:.5px}
+/* ⑤ 거다이맥스: 칸 전체를 감싸는 큰 빛무리 + 화면 가장자리 빛 */
+#myLane.gmaxLane .unit::before,#foeLane.gmaxLane .unit::before{width:100%;height:96%;bottom:2%;border-radius:50%;filter:blur(4px);
+ background:radial-gradient(ellipse at 50% 58%,color-mix(in srgb,var(--eb) 42%,transparent) 0,color-mix(in srgb,var(--ea) 34%,transparent) 36%,transparent 70%);
+ -webkit-mask-image:none;mask-image:none;animation:gmPulse 2.6s ease-in-out infinite}
+.unit.gmax .sp img{filter:drop-shadow(0 0 3px rgba(255,255,255,.95)) drop-shadow(0 0 14px var(--ea)) drop-shadow(0 0 30px color-mix(in srgb,var(--eb) 80%,transparent))!important}
+.unit.gmax .sp img.gmDot{filter:drop-shadow(0 0 3px rgba(255,255,255,.95)) drop-shadow(0 0 12px var(--ea)) drop-shadow(0 0 26px color-mix(in srgb,var(--eb) 80%,transparent))!important}
+#battle:has(.gmaxLane){box-shadow:inset 0 0 70px 6px rgba(255,60,90,.5),inset 0 0 160px 20px rgba(255,170,40,.28)}
+#battle:has(.gmaxLane .unit.eterna){box-shadow:inset 0 0 70px 6px rgba(184,77,255,.55),inset 0 0 160px 20px rgba(255,92,224,.3)}
+#battle:has(.unit.mega:not(.gmax)):not(:has(.gmaxLane)){box-shadow:inset 0 0 60px 2px rgba(130,150,255,.34),inset 0 0 130px 10px rgba(255,150,230,.18)}
+html.lowfx .unit.mega .sp::before,html.lowfx .unit.gmax .sp::before,html.lowfx .unit.mega .sp::after,html.lowfx .unit.gmax .sp::after,html.lowfx .unit.mega .shadow,html.lowfx .unit.gmax .shadow,html.lowfx #myLane.gmaxLane .unit::before,html.lowfx #foeLane.gmaxLane .unit::before{animation:none!important}
+html.lowfx .unit.mega .sp::after,html.lowfx .unit.gmax .sp::after{filter:none}
+html.lowfx .unit.mega .shadow::before,html.lowfx .unit.mega .shadow::after,html.lowfx .unit.gmax .shadow::before,html.lowfx .unit.gmax .shadow::after{display:none}
+@media (prefers-reduced-motion:reduce){.unit.mega .sp::before,.unit.gmax .sp::before,.unit.mega .sp::after,.unit.gmax .sp::after,.unit.mega .shadow,.unit.gmax .shadow,.unit.mega .shadow::before,.unit.mega .shadow::after,.unit.gmax .shadow::before,.unit.gmax .shadow::after{animation:none!important}}
+</style>
+<style id=evoFx2>
+.evoFxEl{position:fixed;z-index:480;pointer-events:none;transform:translate(-50%,-50%);border-radius:50%}
+@keyframes evoShockA{0%{transform:translate(-50%,-50%) scale(.15);opacity:.95;border-width:8px}70%{opacity:.55}100%{transform:translate(-50%,-50%) scale(1);opacity:0;border-width:1px}}
+@keyframes evoFlashA{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}25%{opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
+@keyframes evoSpokeA{0%{transform:translate(-50%,-50%) scale(.2) rotate(0);opacity:0}25%{opacity:.9}100%{transform:translate(-50%,-50%) scale(1) rotate(35deg);opacity:0}}
+.evoShock{border:6px solid var(--c);box-shadow:0 0 22px var(--c),0 0 46px color-mix(in srgb,var(--c) 60%,transparent),inset 0 0 22px color-mix(in srgb,var(--c2) 70%,transparent);opacity:0;animation:evoShockA var(--t) cubic-bezier(.15,.7,.3,1) both}
+.evoFlash{background:radial-gradient(circle,#fff 0,color-mix(in srgb,var(--c2) 75%,transparent) 22%,color-mix(in srgb,var(--c) 45%,transparent) 48%,transparent 70%);opacity:0;animation:evoFlashA var(--t) ease-out both}
+.evoSpokes{background:repeating-conic-gradient(from 0deg,transparent 0deg,color-mix(in srgb,var(--c2) 85%,transparent) 2.5deg,transparent 6deg,transparent 22.5deg);-webkit-mask-image:radial-gradient(circle,#000 8%,rgba(0,0,0,.6) 36%,transparent 66%);mask-image:radial-gradient(circle,#000 8%,rgba(0,0,0,.6) 36%,transparent 66%);opacity:0;animation:evoSpokeA var(--t) ease-out both}
 </style>
 </head>
 <body>
@@ -2754,7 +2809,7 @@ const MUS=(()=>{
   if(ctx.state!=='running'){try{ctx.resume();}catch(e){}return;}
   if(ctx.currentTime>s.next+1.2){s.next=ctx.currentTime+.06;}
   let guard=0;
-  const ahead=(typeof document!=='undefined'&&document.hidden)?4:2.5; /* 미리 예약해 두는 길이: 느린 기기에서 화면이 잠깐 멈춰도(약 2초) 음악이 끊기지 않게 넉넉히 */while(s.next<ctx.currentTime+ahead&&guard++<64){
+  const ahead=(typeof document!=='undefined'&&document.hidden)?4:2.5;while(s.next<ctx.currentTime+ahead&&guard++<64){
    const idx=s.step%sd.steps,sw=(idx&1)?(sd.def.swing||0)*stepDur:0,t=s.next+sw;
    const list=sd.ev[idx];for(let i=0;i<list.length;i++){try{play(list[i],t,sd,s);}catch(e){}}
    s.step++;s.next+=stepDur;}}
@@ -2923,6 +2978,12 @@ function coachNext(){if(!CO)return;const st=CO.q.shift();if(!st)return coachEnd(
  const sk=bub.querySelector('[data-c=skip]');if(!CO.q.length)sk.style.visibility='hidden';
  sk.onclick=e=>{e.stopPropagation();if(!CO||CO.busy)return;sfx('tap');CO.q=[];coachNext();};
  bub.querySelector('[data-c=next]').onclick=e=>{e.stopPropagation();if(!CO||CO.busy)return;sfx('tap');coachNext();};}
+function evoCoachSteps(){return [
+   {h:'진화',ic:'candy',pic:evoPic([4,5,6]),t:'<b>사탕</b>을 모으면 도감에서 카드를 눌러 <b>진화</b>시킬 수 있어요. 더 강한 포켓몬 카드가 돼요!'},
+   {h:'메가진화',ic:'flame',pic:evoPic([6,MEGA[6]]),t:'전투에서 정답을 <b>10개</b> 맞히면 <b>진화 게이지</b>가 가득 차요. 도감에서 사탕으로 <b>연구</b>한 포켓몬을 누르고 <b>메가</b> 버튼! 공격 +5, 체력 +5 (변신한 차례는 쉬어요).'},
+   {h:'원시회귀',ic:'flame',pic:evoPic([382,MEGA[382],383,MEGA[383]]),t:'<b>가이오가·그란돈</b>은 메가 대신 <b>원시회귀</b>! 같은 방법으로 쓰고, 공격 +5, 체력 +5예요. 버튼에는 <b>원시</b>라고 나와요.'},
+   {h:'거다이맥스',ic:'sword',pic:evoPic([6,GM_BASE+6]),t:'<b>맥스</b> 버튼은 한 판에 한 번! 체력이 <b>3배</b>가 되고, 동료는 잠시 빠지고, 2번의 내 차례 동안 상대 포켓몬 <b>전체</b>를 공격해요.'},
+   {h:'무한다이맥스',ic:'sword',pic:evoPic([890,GM_BASE+890]),t:'<b>무한다이노</b>는 특별한 <b>무한다이맥스</b>! 쓰는 방법은 거다이맥스와 같아요. 쓰고 나면 진화 게이지는 처음부터 다시 모아요.'}];}
 function evoPic(ids){return ids.map((id,i)=>(i&&!(ids.length===4&&i===2)?'<span class=arr>➜</span>':(i?'<span class=arr>·</span>':''))+monImg(id,'front')).join('');}
 function coachInit(){const c=$('#coach');c.onclick=e=>{if(e.target.closest('#coBub')||!CO||CO.busy)return;coachNext();};}
 function coachOnce(key,steps){if(S.meta.seen[key])return Promise.resolve();S.meta.seen[key]=1;autoSave();return coach(steps);}
@@ -3055,7 +3116,7 @@ async function netDiag(){
  draw();
  // 3) 중개 서버
  if(R.lib==='ok'){
-  await new Promise(res=>{let pr;const fin=v=>{if(R.sig)return;R.sig=v;try{pr&&pr.destroy();}catch(e){}res();}; // 이미 결과가 나왔으면 9초 타이머가 '실패'로 덮어쓰지 않게 막아요
+  await new Promise(res=>{let pr;const fin=v=>{R.sig=v;try{pr&&pr.destroy();}catch(e){}res();};
    try{pr=new Peer(PO());pr.on('open',()=>fin('ok'));pr.on('error',()=>fin('bad'));setTimeout(()=>fin('bad'),9000);}catch(e){fin('bad');}});
  }else R.sig='skip';
  draw();
@@ -3077,7 +3138,6 @@ async function netDiag(){
  else if(R.lib==='bad'||R.sig==='bad')sum='<b>연결 중개 서버가 막혀 있어요.</b> 학교 와이파이에서는 친구 대전·보스전·기기 간 옮기기를 쓸 수 없어요. 대신 <b>저장 코드(복사·붙여넣기)</b>나 <b>.md 파일</b>로 옮기고, 대전은 핫스팟이나 집에서 해 주세요.';
  else if(R.turn==='bad'&&R.ice==='bad')sum='<b>직접 연결과 중계 서버가 모두 막혀 있어요.</b> 이 와이파이에서는 온라인 기능이 어려워요. 핫스팟이나 집에서 해 주세요.';
  else if(R.ice==='bad')sum='<b>중개 서버는 열려 있지만 기기끼리 직접 연결이 막혔을 수 있어요.</b> 연결이 안 되면 선생님께 이 화면을 보여 주세요. (TURN 중계 서버를 추가하면 해결될 수 있어요.)';
- else if(R.turn==='bad')sum=turnOwn()?'<b>설정해 둔 중계 서버(TURN)에 닿지 못했어요.</b> 아이디·비밀번호(API Key)와 주소가 맞는지 확인해 주세요. 지금은 <b>같은 와이파이의 다른 기기끼리 · 핫스팟 · 학교↔휴대폰 데이터</b> 연결이 안 될 수 있어요.':'<b>중계 서버(TURN)가 열려 있지 않아요.</b> 지금은 <b>같은 와이파이의 다른 기기끼리 · 핫스팟 · 학교↔휴대폰 데이터</b> 연결이 안 될 수 있어요. (같은 컴퓨터의 다른 브라우저나, 각자 다른 데이터를 쓰는 휴대폰끼리는 될 수 있어요.) 선생님이 <b>중계 서버 계정을 한 번만 설정</b>하면 해결돼요. 파일 안의 「연결 중계 서버(TURN) 설정」 부분을 확인해 주세요.';
  else sum='<b>모두 열려 있어요!</b> 이 와이파이에서 친구 대전·보스전·기기 간 옮기기가 될 가능성이 높아요. 그래도 안 되면 양쪽 기기가 같은 조건인지 확인해 보세요.';
  draw(sum);
 }
@@ -3130,7 +3190,7 @@ function xferSend(){
   const fin=(ok,why)=>{if(done)return;done=true;busy=false;clearTimeout(to);xferStop();if(ok){closeM();sfx('win');toast('저장 데이터를 보냈어요! 받는 기기에서 이어서 하세요');}else{say(why||'보내지 못했어요');}};
   try{await loadPeer();saveLocal();const code=await makeCode();
    xferStop();const p=new Peer(PO());_xfPeer=p;
-   to=setTimeout(()=>fin(false,'받는 기기를 찾지 못했어요. 번호와 받는 화면이 열려 있는지 확인해 주세요'),30000);
+   to=setTimeout(()=>fin(false,'받는 기기를 찾지 못했어요. 번호와 받는 화면이 열려 있는지 확인해 주세요'),15000);
    p.on('error',e=>{const t=String(e&&e.type||'');fin(false,t==='peer-unavailable'?'그 번호로 기다리는 기기가 없어요. 받는 기기에서 「받기」 화면이 열려 있는지 확인해 주세요':'연결하지 못했어요. 인터넷을 확인해 주세요');});
    p.on('open',()=>{const c=p.connect(xferId(room),{reliable:true});
     c.on('open',()=>{try{c.send({t:'save',code});say('보냈어요! 받는 기기에서 「받기」를 눌러 주세요…');clearTimeout(to);to=setTimeout(()=>fin(false,'받는 기기에서 응답이 없어요. 다시 시도해 주세요'),90000);}catch(e){fin(false,'보내지 못했어요');}});
@@ -4839,9 +4899,25 @@ function gmaxResolve(b){if(gmaxBusy[b])return gmaxBusy[b];const name=GMAX[b];
 // 이미지 후보: [GIF 모드] 움직이는 그림 → 도트 움직이는 그림 → 도트 / [도트 모드] 도트 → 움직이는 그림 → 도트 움직이는 그림. 모두 실패하면 PokeAPI에서 이름으로 찾고, 그래도 없으면 원래 모습을 크게 보여줘요.
 const gmaxSD=b=>(GMAX[b]||'').replace('-amped','').replace('urshifu-single-strike','urshifu');
 const gmaxDot=()=>!!(S.meta&&S.meta.settings&&S.meta.settings.anim!=='gif');
-function gmaxCands(b){const n=gmaxSD(b),U='https://play.pokemonshowdown.com/sprites/',ani=U+'ani/'+n+'.gif',dot=U+'gen5/'+n+'.png',dotAni=U+'gen5ani/'+n+'.gif';return gmaxDot()?[dot,ani,dotAni]:[ani,dotAni,dot];}
-function gmaxURL(b){return gmaxCands(b)[0];}
-function gmaxImgFail(el,b){const c=gmaxCands(b),k=(+el.dataset.gm||0)+1;el.dataset.gm=String(k);
+function gmaxCands(b){const n=gmaxSD(b),U='https://play.pokemonshowdown.com/sprites/',ani=U+'ani/'+n+'.gif',dot=U+'gen5/'+n+'.png',dotAni=U+'gen5ani/'+n+'.gif',dex=U+'dex/'+n+'.png';return gmaxDot()?[dot,dex,ani,dotAni]:[ani,dotAni,dex,dot];}
+/* 거다이맥스 그림: 후보를 한꺼번에 확인해서(병렬) 되는 걸 기억해 둬요 → 다음부터는 바로 떠요 */
+const gmaxBK=b=>(gmaxDot()?'d':'g')+b;
+function gmaxBestMap(){try{return JSON.parse(localStorage.getItem('gmaxBest')||'{}');}catch(e){return {};}}
+function gmaxURL(b){const v=gmaxBestMap()[gmaxBK(b)];return v||gmaxCands(b)[0];}
+const gmaxWarmBusy={};
+function gmaxProbe(u){return new Promise(r=>{const im=new Image();let t=setTimeout(()=>{t=0;im.src='';r(false);},6000);im.onload=()=>{if(t)clearTimeout(t);r(true);};im.onerror=()=>{if(t)clearTimeout(t);r(false);};im.src=u;});}
+async function gmaxWarm(ids){
+  const todo=ids.filter(b=>GMAX[b]&&!gmaxBestMap()[gmaxBK(b)]&&!gmaxWarmBusy[gmaxBK(b)]);
+  let next=0;
+  const one=async b=>{const key=gmaxBK(b);gmaxWarmBusy[key]=1;
+    try{const c=gmaxCands(b);const ok=await Promise.all(c.map(gmaxProbe));const k=ok.indexOf(true);
+      if(k>=0){const m=gmaxBestMap();m[key]=c[k];try{localStorage.setItem('gmaxBest',JSON.stringify(m));}catch(e){}
+        document.querySelectorAll('img[data-id="'+(GM_BASE+b)+'"]').forEach(el=>{if(el.getAttribute('src')!==c[k]){el.classList.remove('gmFb');el.dataset.gm='0';el.src=c[k];}});}
+    }catch(e){}finally{gmaxWarmBusy[key]=0;}};
+  const worker=async()=>{while(next<todo.length){const b=todo[next++];await one(b);}};
+  await Promise.all([worker(),worker(),worker(),worker(),worker(),worker()]);
+}
+function gmaxImgFail(el,b){try{const m=gmaxBestMap();if(m[gmaxBK(b)]){delete m[gmaxBK(b)];localStorage.setItem('gmaxBest',JSON.stringify(m));}}catch(e){}const c=gmaxCands(b),k=(+el.dataset.gm||0)+1;el.dataset.gm=String(k);
  if(k<c.length){el.src=c[k];return;}
  const fb=()=>{el.dataset.gm='99';el.classList.add('gmFb');el.removeAttribute('onerror');el.src=SPR_BASE+'other/official-artwork/'+b+'.png';};
  if(k===c.length){gmaxResolve(b).then(u=>{if(u&&u!=='-')el.src=u;else fb();});return;}
@@ -4871,13 +4947,45 @@ const SPR_SHIFT=new Map();
 function monImgU(id,kind,ns){let h=monImg(id,kind,'',ns);try{const u=spriteURL(id,kind,ns),c=SPR_SHIFT.get(u);if(c&&c!==u)h=h.replace('src="'+u+'"','src="'+c+'" data-shifted="1"');}catch(e){}return h;}
 function shiftSpriteDown(src){return new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';
  im.onload=()=>{try{const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h||w>600||h>600)return res(src);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(im,0,0);
-  const d=cx.getImageData(0,0,w,h).data;let maxY=-1;for(let y=h-1;y>=0&&maxY<0;y--){for(let x=0;x<w;x++){if(d[(y*w+x)*4+3]>24){maxY=y;break;}}}
-  const pad=h-1-maxY;if(maxY<0||pad<2)return res(src);const c2=document.createElement('canvas');c2.width=w;c2.height=h;const c2x=c2.getContext('2d');c2x.imageSmoothingEnabled=false;c2x.drawImage(im,0,pad);res(c2.toDataURL('image/png'));}catch(e){res(src);}};
+  const d=cx.getImageData(0,0,w,h).data;let minX=w,maxX=-1,minY=h,maxY=-1;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){if(d[(y*w+x)*4+3]>24){if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;}}
+  if(maxY<0)return res(src);
+  /* 몸집에 비해 그림이 작게 나오는 포켓몬(그림 파일에 투명 여백이 큰 경우)은 몸 부분만 잘라 키워서 칸에 알맞게 채워요. 이미 큰 포켓몬은 그대로 둬요 */
+  const bw=maxX-minX+1,bh=maxY-minY+1,fill=Math.max(bw/w,bh/h),pad=h-1-maxY;
+  let k=fill<0.8?Math.min(1.6,0.8/fill):1;k=Math.max(1,Math.min(k,w/bw*0.98,h/bh*0.98));
+  if(k<1.06&&pad<2)return res(src);
+  const c2=document.createElement('canvas');c2.width=w;c2.height=h;const c2x=c2.getContext('2d');c2x.imageSmoothingEnabled=false;
+  if(k<1.06){c2x.drawImage(im,0,pad);}
+  else{const sw=Math.round(bw*k),sh=Math.round(bh*k);c2x.drawImage(im,minX,minY,bw,bh,Math.round((w-sw)/2),h-sh,sw,sh);}
+  res(c2.toDataURL('image/png'));}catch(e){res(src);}};
  im.onerror=()=>res(src);im.src=src;}catch(e){res(src);}});}
 document.addEventListener('load',e=>{const im=e.target;if(!im||im.tagName!=='IMG'||im.dataset.shifted||!im.closest||!im.closest('#myLane .unit .sp,#foeLane:not(.wildLane) .unit .sp'))return;
  const src=im.currentSrc||im.src;if(!src||src.startsWith('data:')||/\.gif(\?|$)/i.test(src))return;
  if(SPR_SHIFT.has(src)){const c=SPR_SHIFT.get(src);if(c!==src){im.dataset.shifted='1';im.src=c;}return;}
  shiftSpriteDown(src).then(c=>{SPR_SHIFT.set(src,c);if(c!==src&&im.isConnected&&(im.currentSrc||im.src)===src){im.dataset.shifted='1';im.src=c;}});},true);
+/* GIF 그림: 움직임은 그대로 두고, 그림 안의 투명 여백이 커서 작아 보이는 포켓몬만 CSS로 키워서 칸을 채워요 */
+const GIF_FIT=new Map();
+function gifBBox(src){if(GIF_FIT.has(src))return GIF_FIT.get(src);
+ const p=new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>{try{const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h||w>800||h>800)return res(null);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(im,0,0);const d=cx.getImageData(0,0,w,h).data;let a=w,b=-1,c=h,e=-1;for(let y=0;y<h;y++)for(let x=0;x<w;x++){if(d[(y*w+x)*4+3]>24){if(x<a)a=x;if(x>b)b=x;if(y<c)c=y;if(y>e)e=y;}}res(b<0?null:{w,h,x0:a,x1:b,y0:c,y1:e});}catch(err){res(null);}};im.onerror=()=>res(null);im.src=src;}catch(err){res(null);}});
+ GIF_FIT.set(src,p);return p;}
+function gifFit(im){try{
+ if(!im.isConnected||im.dataset.gfit)return;const src=im.currentSrc||im.src;
+ if(!src||!/\.gif(\?|$)/i.test(src)||im.closest('.unit.gmax,.gmaxLane'))return;
+ gifBBox(src).then(bb=>{try{
+  if(!bb||!im.isConnected||(im.currentSrc||im.src)!==src)return;
+  const r=im.getBoundingClientRect(),W=r.width,H=r.height;if(!W||!H)return;
+  const f=Math.min(W/bb.w,H/bb.h),cw=bb.w*f,ch=bb.h*f,left=(W-cw)/2,top=H-ch;
+  const bx0=left+bb.x0*f,bx1=left+(bb.x1+1)*f,by1=top+(bb.y1+1)*f,bwid=bx1-bx0,bhei=(bb.y1-bb.y0+1)*f;
+  const fill=Math.max(bwid/W,bhei/H);
+  let k=fill<0.8?Math.min(1.6,0.8/fill):1;k=Math.max(1,Math.min(k,W/bwid*0.98,H/bhei*0.98));
+  const cxp=(bx0+bx1)/2;
+  if(k<1.06&&by1>=H-2)return;
+  im.dataset.gfit='1';
+  im.style.transformOrigin=(cxp/W*100).toFixed(2)+'% '+(by1/H*100).toFixed(2)+'%';
+  im.style.translate=((W/2-cxp)/W*100).toFixed(2)+'% '+((H-by1)/H*100).toFixed(2)+'%';
+  if(k>=1.06)im.style.scale=k.toFixed(3);
+ }catch(err){}});}catch(err){}}
+document.addEventListener('load',e=>{const im=e.target;if(im&&im.tagName==='IMG'&&im.closest&&im.closest('#myLane .unit .sp,#foeLane:not(.wildLane) .unit .sp'))gifFit(im);},true);
 function typeChips(m){return m.types.map(t=>{const dark=[0,4,5,8,11,12,16,17].includes(t);return `<span class=tchip style="background:${TYPE_COL[t]};color:${dark?'#201a2a':'#fff'};text-shadow:${dark?'0 1px 0 rgba(255,255,255,.22)':'0 1px 0 rgba(0,0,0,.28)'}">${TYPE_KO[t]}</span>`;}).join('');}
 function cardHTML(id,opt={}){const m=MON[id];const kw=kwOf(m);const t=m.types[0],t2=m.types[1]!=null?m.types[1]:t;
  const lg=opt.size==='lg';
@@ -5162,6 +5270,7 @@ function renderDex(){S.screen='dex';const me=S.meta;const own=ownCount();
   <div class="dexGrid${DEXF==='mega'||DEXF==='gmax'?' mgGrid':''}">${fl.map(id=>{const n=me.col[id]||0,seen=me.dexSeen[id];if(DEXF==='mega')return mgCell(id,n,seen);if(DEXF==='gmax')return gmCell(id,n,seen);return `<div class="dexCell ${n?'':seen?'seen':'none'}" data-id="${id}"><span class=no>${id}</span>${!n&&me.shard&&me.shard[id]?`<span class=n2 style="color:#9a6bff">${me.shard[id]}/${SHARD_NEED[MON[id].rar]}</span>`:''}${monImg(id)}<span class=nm>${n||seen?esc(MON[id].name):'???'}</span></div>`;}).join('')||'<p class=mut>아직 없어요</p>'}</div></div></div>`;
  bindHud();
  $('#view').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{sfx('tap');DEXF=b.dataset.f;renderDex();});
+ try{if(DEXF==='gmax'&&me.settings.imgs)gmaxWarm(MON_IDS.filter(id=>GMAX[id]));}catch(e){}
  $('#view').querySelectorAll('[data-rar]').forEach(b=>b.onclick=()=>{sfx('tap');DEXRAR=+b.dataset.rar;renderDex();});
  $('#view').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{sfx('tap');DEXR=+b.dataset.r;renderDex();});
  $('#view').querySelectorAll('.dexCell').forEach(c=>c.onclick=()=>{sfx('tap');showCard(+c.dataset.id);});
@@ -5309,11 +5418,13 @@ const MEGAB={};Object.keys(MEGA).forEach(b=>MEGAB[MEGA[b]]=+b);
 const MEGA_NEED=10,MEGA_ATK=5,MEGA_HP=5,MEGA_COST={1:200,2:300,3:400,4:500,5:600};
 const megaCost=id=>MEGA_COST[(MON[id]&&MON[id].rar)||3]||70;
 const megaHas=id=>!!(MEGA[id]&&S.meta&&S.meta.mega&&S.meta.mega[id]);
+/* 로그라이크 모험: 메가스톤 유물이 있으면 메가진화(원시회귀)할 수 있는 모든 포켓몬이 쓸 수 있어요 */
+const megaOk=id=>megaHas(id)||!!(MEGA[id]&&B&&B.rl&&B.me&&rlHas('megastone'));
 const PRIMAL={382:1,383:1};const megaName=id=>(PRIMAL[id]?'원시 ':'메가 ')+((MON[id]&&MON[id].name)||'');
 const mgWord=id=>PRIMAL[id]?'원시회귀':'메가 진화',mgStone=id=>PRIMAL[id]?'원시 구슬':'메가스톤';
 // 지금 이 칸의 포켓몬이 변신할 수 있는지(내 기기에서 해금한 포켓몬만)
-function megaCan(P,i){try{const u=P&&P.board[i];if(!u||u.mg||u.gm||u.hp<=0||P.mgUsed||!megaHas(u.id))return false;if(B.coop&&Number(u.coopOwner??0)!==BC.localIndex)return false;return mgProg()>=MEGA_NEED;}catch(e){return false;}}
-function megaCand(P){try{return P.board.some((u,i)=>u&&!u.mg&&u.hp>0&&megaHas(u.id)&&(!B.coop||Number(u.coopOwner??0)===BC.localIndex));}catch(e){return false;}}
+function megaCan(P,i){try{const u=P&&P.board[i];if(!u||u.mg||u.gm||u.hp<=0||P.mgUsed||!megaOk(u.id))return false;if(B.coop&&Number(u.coopOwner??0)!==BC.localIndex)return false;return mgProg()>=MEGA_NEED;}catch(e){return false;}}
+function megaCand(P){try{return P.board.some((u,i)=>u&&!u.mg&&u.hp>0&&megaOk(u.id)&&(!B.coop||Number(u.coopOwner??0)===BC.localIndex));}catch(e){return false;}}
 
 // 메가 진화 연출: 화면이 어두워지고 빛줄기가 돌다가, 하얗게 번쩍인 뒤 메가 모습이 나타나요(약 3초)
 function megaCine(baseId,megaId,name,onFlash,title){return new Promise(res=>{
@@ -5343,12 +5454,14 @@ async function megaDo(P,i,fromRemote){const u=P&&P.board[i];if(!B||!u||!MEGA[u.i
 // 풀리거나 쓰러지면 아군이 돌아와요. 친구 대전에서는 쓸 수 있고, 협동 보스전에서는 쓸 수 없어요.
 const GMAX_NEED=10,GMAX_COST=1000;
 const gmaxHas=id=>!!(GMAX[id]&&S.meta&&S.meta.gmax&&S.meta.gmax[id]);
+/* 로그라이크 모험: 다이맥스 밴드 유물이 있으면 거다이맥스(무한다이맥스)할 수 있는 모든 포켓몬이 쓸 수 있어요 */
+const gmaxOk=id=>gmaxHas(id)||!!(GMAX[id]&&B&&B.rl&&B.me&&rlHas('dynaband'));
 // 정답 개수(진화 문제수): 혼자·친구 대전은 내 개수, 협동 보스전은 플레이어마다 따로 세요(친구와 공유하지 않아요)
 const qcUp=P=>{B.qc=(B.qc||0)+1;if(B.coop&&P)P.qc=(P.qc||0)+1;};
 const mgProg=()=>{try{if(B.coop&&B.coop.players){const L=B.coop.players[BC.localIndex];if(L)return Math.max(0,(L.qc||0)-(L.mgBase||0));}return Math.max(0,(B.qc||0)-(B.mgBase||0));}catch(e){return 0;}};
 const gmaxOff=()=>!B||B.tut||B.tutReal;
-function gmaxCan(P,i,show){try{const u=P&&P.board[i];if(gmaxOff()||!u||u.gm||u.mg||u.hp<=0||P.gmUsed||P.gmx||!gmaxHas(u.id)||!(u.att>0)||u.frozen)return false;if(B.coop){if(!show)return false;if(Number(u.coopOwner??0)!==BC.localIndex)return false;}return mgProg()>=GMAX_NEED;}catch(e){return false;}}
-function gmaxCand(P){try{if(gmaxOff()||P.gmx||P.gmUsed)return false;return P.board.some(u=>u&&!u.gm&&!u.mg&&u.hp>0&&gmaxHas(u.id));}catch(e){return false;}}
+function gmaxCan(P,i,show){try{const u=P&&P.board[i];if(gmaxOff()||!u||u.gm||u.mg||u.hp<=0||P.gmUsed||P.gmx||!gmaxOk(u.id)||!(u.att>0)||u.frozen)return false;if(B.coop){if(!show)return false;if(Number(u.coopOwner??0)!==BC.localIndex)return false;}return mgProg()>=GMAX_NEED;}catch(e){return false;}}
+function gmaxCand(P){try{if(gmaxOff()||P.gmx||P.gmUsed)return false;return P.board.some(u=>u&&!u.gm&&!u.mg&&u.hp>0&&gmaxOk(u.id));}catch(e){return false;}}
 async function gmaxDo(P,i){const u=P&&P.board[i];if(!B||!u||!GMAX[u.id]||u.gm||u.mg||P.gmUsed||P.gmx)return false;
  P.gmUsed=true;if(B.coop)P.mgBase=P.qc||0;else if(P===B.me)B.mgBase=B.qc||0;B.sel=-1;B.pick=-1;B.busy=true;
  let done=false;const flip=()=>{if(done)return;done=true;const orig=P.board,max0=u.max;u.gm=1;u.max=max0*3;u.hp=u.hp*3;u.att=0;P.gmx={board:orig,si:i,turns:3,max0};P.board=[u];};
@@ -5406,17 +5519,14 @@ function startBattle(gi,hi){const me=S.meta;const H=hi!=null?HARD[hi]:null;if(gi
    {el:'.hand',h:'손에 든 카드',ic:'cards',t:'카드를 <b>한 번 누르면 고르고</b>, 한 번 더 누르면 필드에 나가요.'},
    {el:'#myLane',h:'공격',ic:'sword',t:'초록빛 포켓몬을 누른 뒤 상대 포켓몬이나 트레이너를 누르면 <b>문제</b>가 나와요. <b>맞히면 제대로 공격</b>, 틀리면 약하게 공격해요.'},
    {el:'#bEnd',h:'차례 끝',ic:'check',t:'할 일을 다 했으면 차례 끝을 눌러요. 상대 차례가 시작돼요.'}]);
-  await coachOnce('c_evo6',[
-   {h:'진화',ic:'candy',pic:evoPic([4,5,6]),t:'<b>사탕</b>을 모으면 도감에서 카드를 눌러 <b>진화</b>시킬 수 있어요. 더 강한 포켓몬 카드가 돼요!'},
-   {h:'메가진화',ic:'flame',pic:evoPic([6,MEGA[6]]),t:'전투에서 정답을 <b>10개</b> 맞히면 <b>진화 게이지</b>가 가득 차요. 도감에서 사탕으로 <b>연구</b>한 포켓몬을 누르고 <b>메가</b> 버튼! 공격 +5, 체력 +5 (변신한 차례는 쉬어요).'},
-   {h:'원시회귀',ic:'flame',pic:evoPic([382,MEGA[382],383,MEGA[383]]),t:'<b>가이오가·그란돈</b>은 메가 대신 <b>원시회귀</b>! 같은 방법으로 쓰고, 공격 +5, 체력 +5예요. 버튼에는 <b>원시</b>라고 나와요.'},
-   {h:'거다이맥스',ic:'sword',pic:evoPic([6,GM_BASE+6]),t:'<b>맥스</b> 버튼은 한 판에 한 번! 체력이 <b>3배</b>가 되고, 동료는 잠시 빠지고, 2번의 내 차례 동안 상대 포켓몬 <b>전체</b>를 공격해요.'},
-   {h:'무한다이맥스',ic:'sword',pic:evoPic([890,GM_BASE+890]),t:'<b>무한다이노</b>는 특별한 <b>무한다이맥스</b>! 쓰는 방법은 거다이맥스와 같아요. 쓰고 나면 진화 게이지는 처음부터 다시 모아요.'}]);
+  await coachOnce('c_evo6',evoCoachSteps());
   startTurn('me');})();}
 // 뽑을 수 있는 카드가 돌 카드뿐일 때(덱이 비었거나 손에 포켓몬·랜덤 카드가 하나도 없을 때)는
 // 돌 카드 대신 랜덤 카드나 포켓몬 카드가 나와요.
 function anyRandomCard(P){const av=['master','power','poke'].filter(b=>{const rc=randomBandCard(b);return rc&&ownedBand(P,rc.band).length>0;});
  if(!av.length)return null;return randomBandCard(av[Math.floor(playerRoll(P)*av.length)]);}
+/* 쉬운 전투(야생·시나리오): 덱이 비어도, 10라운드가 지나도 트레이너 체력이 깎이지 않아요 */
+function easyNoFatigue(){try{return !!(B&&B.wildMode&&!B.coop&&S.meta&&S.meta.settings&&S.meta.settings.easy);}catch(e){return false;}}
 function draw(P,quiet){if(P.hand.length>=handMax(P)){if(!quiet)toast('손이 꽉 차서 카드 한 장이 사라졌어요');return;}
  let special=drawSpecial(P);
  if(special&&isItemCard(special)){
@@ -5427,7 +5537,7 @@ function draw(P,quiet){if(P.hand.length>=handMax(P)){if(!quiet)toast('손이 꽉
   }else if(handNoMon){special=null;} // 손이 돌 카드뿐이면 덱의 포켓몬 카드를 뽑아요
  }
  if(special){P.hand.push(special);if(!quiet&&B)fx(heroEl(P),`${special.name}!`,'txt');return;}
- if(!P.deck.length){P.fat++;P.hp-=P.fat;if(!quiet&&B)fx(heroEl(P),`-${P.fat}`,'');return;}P.hand.push(P.deck.pop());}
+ if(!P.deck.length){if(easyNoFatigue())return;P.fat++;P.hp-=P.fat;if(!quiet&&B)fx(heroEl(P),`-${P.fat}`,'');return;}P.hand.push(P.deck.pop());}
 const meP=()=>B.me,foeP=()=>B.foe;
 function heroEl(P){if(B&&B.coop&&B.coop.players&&B.coop.players.includes(P)){return P===B.coop.players[BC.localIndex]?$('#heroMe'):$('#heroAlly');}return P===B.me?$('#heroMe'):(B&&B.wildMode?$('#wildStatus'):$('#heroFoe'));}
 function unitEl(P,i){return $(`#${P===B.me?'myLane':'foeLane'} .slot[data-i="${i}"] .unit`)||$(`#${P===B.me?'myLane':'foeLane'} .slot[data-i="${i}"]`);}
@@ -5512,7 +5622,7 @@ function fitUnitNames(){fitLaneSprites();try{document.querySelectorAll('#battle 
 function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGuard();B.trainerSkillUsed=B.trainerSkillUsed||{};const me=B.me,fo=B.foe;const my=B.side==='me'&&!B.busy&&!B.over&&(!B.coop||B.coop.active===BC.localIndex);
  const valid=targetsFor(B.sel);
  const unitH=(u,P,i)=>{if(!u)return '';const friendly=P===me;const mine=friendly&&(!B.coop||Number(u.coopOwner??0)===B.coop.active);const m=MON[u.id];const ready=mine&&my&&u.att>0&&!u.frozen;
-  return `<div class="unit${u.mg?' mega':''}${u.gm?' gmax':''}${ready?' ready':''}${mine&&B.sel===i?' sel':''}${!friendly&&valid.units.includes(i)?' tgt':''}${isTaunt(u)?' taunt':''}${u.frozen?' frozen':''}${u.frozen&&u.moon?' moonstun':''}${u.shield?' shielded':''}${mine&&B.itemTargetMode&&!u.frozen?' itemTarget':''}${!friendly&&B.moonTargetMode?' itemTarget':''}${mine&&!ready&&my?' zz':''}" data-i="${i}"${u.mg?` style="--mc:${TYPE_COL[kwType(m)]||'#8ad0ff'}"`:''}>
+  return `<div class="unit${u.mg?' mega':''}${u.mg&&PRIMAL[u.id]?' primal':''}${u.gm?' gmax':''}${u.gm&&u.id===890?' eterna':''}${ready?' ready':''}${mine&&B.sel===i?' sel':''}${!friendly&&valid.units.includes(i)?' tgt':''}${isTaunt(u)?' taunt':''}${u.frozen?' frozen':''}${u.frozen&&u.moon?' moonstun':''}${u.shield?' shielded':''}${mine&&B.itemTargetMode&&!u.frozen?' itemTarget':''}${!friendly&&B.moonTargetMode?' itemTarget':''}${mine&&!ready&&my?' zz':''}" data-i="${i}"${u.mg?` style="--mc:${TYPE_COL[kwType(m)]||'#8ad0ff'}"`:''}>
    ${B.coop?(()=>{const ow=Number(u.coopOwner??0)===1?1:0;const nm=String((B.coop.players[ow]&&B.coop.players[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${u.gm?monImgU(GM_BASE+u.id,'front',true).replace('<img class="','<img class="'+(gmaxDot()?'gmDot ':'')):monImgU(u.mg||u.id,mine?'back':'anim',!mine)}</div><div class=un>${esc(m.name)}</div><div class=tdots>${m.types.map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
    <div class=us><span class="st atk">${u.atk}</span><span class="st hp"${u.hp<u.max?' style="background:#d9393f"':''}>${u.hp}</span></div></div>`;};
  const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=B.coop?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front','',P===B.foe)}</div><div><div class=hn>${esc(P.name)}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
@@ -7077,6 +7187,22 @@ function skName(k,el,pw,cb){if(!el)return;const r=zRect(el);const d=document.cre
 // 스킬 입자와 발사체는 skEl에서 기본 크기를 2배로 만들어요.
 
 // 메가 포켓몬의 스킬 이펙트: 그 포켓몬 속성에 어울리는 색의 빛무리가 공격하는 쪽과 맞는 쪽에서 피어올라요
+/* 메가진화·원시회귀·거다이맥스 공격이 맞는 순간: 충격파 고리 · 빛 번쩍임 · 방사 빛줄기 · 화면 흔들림 */
+function evoImpact(toEl,id,t,pw,ok,cb,gmax){try{
+ if(window.__sim||!toEl||!document.body||(S.meta.settings&&S.meta.settings.lowfx))return;
+ let c=(typeof TYPE_COL!=='undefined'&&TYPE_COL[t])||'#8ad0ff',c2='#ffffff';
+ if(id===382){c='#3aa0ff';c2='#9fe8ff';}else if(id===383){c='#ff5a2a';c2='#ffd27a';}else if(gmax){c2='#ffd27a';}
+ const delay=gmax?0:430,power=ok?(cb?1.35:1):.55;
+ setTimeout(()=>{try{
+  const [x,y]=center(toEl),r=spriteRect(toEl),S0=Math.max(80,Math.max(r.width,r.height));
+  const mk=(cls,sz,dur,dl)=>{const e=document.createElement('div');e.className='evoFxEl '+cls;e.style.cssText=`left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;--c:${c};--c2:${c2};--t:${dur}ms;animation-delay:${dl||0}ms`;document.body.appendChild(e);setTimeout(()=>e.remove(),dur+(dl||0)+60);};
+  mk('evoFlash',S0*2.4*power,420,0);
+  mk('evoShock',S0*2.6*power,780,0);
+  if(ok){mk('evoShock',S0*2.6*power,780,140);}
+  if(ok&&(cb||gmax)){mk('evoShock',S0*3*power,900,280);}
+  if(ok)mk('evoSpokes',S0*3.2*power,700,0);
+  if(ok&&(cb||gmax||pw>=1.5))shakeBoard();
+ }catch(e){}},delay);}catch(e){}}
 function megaGlow(fromEl,toEl,t,pw){try{if(window.__sim||!fromEl||(S.meta.settings&&S.meta.settings.lowfx))return;
  const c=(typeof TYPE_COL!=='undefined'&&TYPE_COL[t])||'#8ad0ff';
  const mk=(el,sz,dur,orb)=>{const [x,y]=center(el),r=spriteRect(el),S0=Math.max(70,Math.max(r.width,r.height))*sz;
@@ -7088,7 +7214,7 @@ function megaGlow(fromEl,toEl,t,pw){try{if(window.__sim||!fromEl||(S.meta.settin
 async function skillMove(A,si,toEl,ok,cb,ov){const a=ov?{id:ov.id}:A.board[si];const fromEl=unitEl(A,si);if(!ov&&a&&fromEl&&toEl)bossFxSend({k:'sk',id:a.id,si,f:bossFxDesc(fromEl),e:bossFxDesc(toEl),ok,cb,lf:A===B.me?'m':'f'});
  if(!a||!fromEl||!toEl||window.__sim)return lunge(fromEl,toEl);
  const k=skillOf(a.id),epic=(MON[a.id]&&MON[a.id].cost>=5),basePw=ok?(cb?1.25:1):.6,pw=epic&&ok?(cb?1.8:1.55):basePw;
- if(a.mg)megaGlow(fromEl,toEl,k.t,pw);
+ if(a.mg){megaGlow(fromEl,toEl,k.t,pw);evoImpact(toEl,a.id,k.t,pw,ok,cb,false);}
  if(S.meta.settings.lowfx){skName(k,fromEl,pw,cb);window.SKSND&&SKSND.cast(k.t,pw,cb,epic&&ok,0,center(fromEl)[0]);await lunge(fromEl,toEl);window.SKSND&&SKSND.hit(k.t,pw,cb,epic&&ok,0,center(toEl)[0]);return;}
  skName(k,fromEl,pw,cb);
  const trainerTarget=toEl.classList&&toEl.classList.contains('hero');
@@ -7287,7 +7413,7 @@ async function resolveGmaxAll(A,D,si,ok,cb,crit,hint){const a=A.board[si];if(!a)
  if(crit&&ok){fx(unitEl(A,si),'크리티컬! +1','crit');sfx('crit');}
  fx(unitEl(A,si),'🌋 전체 공격!','txt');
  {let fin=null;try{fin=gmaxFinisherFx(unitEl(A,si),idx.map(j=>unitEl(D,j)).filter(Boolean),skillOf(a.id),ok?(cb?1.8:1.55):.6);}catch(e){fin=null;}
-  if(fin){try{await fin;}catch(e){}}else{try{await Promise.all(idx.map(j=>skillMove(A,si,unitEl(D,j),ok,cb)));}catch(e){}}}
+  if(fin){try{await fin;}catch(e){}try{idx.forEach(j=>evoImpact(unitEl(D,j),a.id,skillOf(a.id).t,ok?(cb?1.8:1.55):.6,ok,cb,true));}catch(e){}}else{try{await Promise.all(idx.map(j=>skillMove(A,si,unitEl(D,j),ok,cb)));}catch(e){}}}
  for(const j of idx){const d=D.board[j];if(!d||d.hp<=0)continue;
   const k=typeMul(a.id,d.id);let d1=Math.max(1,applyType(dmg+fightB(a)+sneakB(a,d),k)-2);if(hint>0)d1=Math.max(0,d1-hint);
   if(k>=2){fx(unitEl(D,j),'효과가 굉장했다!','txt super');if(A===B.me)S.meta.stats.superEff=(S.meta.stats.superEff||0)+1;}else if(k<1)fx(unitEl(D,j),'효과가 별로인 듯…','txt');
@@ -7329,7 +7455,7 @@ async function startTurn(side){if(!B||B.over)return;closeInfo();try{acTurn(side)
   lgs.filter(u=>u.kw==='wave').forEach(()=>{const pool=P.board.map((x,i)=>x&&x.hp>0?i:-1).filter(i=>i>=0);const n=Math.min(2,pool.length);for(let k=0;k<n;k++){const j=Math.floor(brand()*pool.length);const ti=pool.splice(j,1)[0],x=P.board[ti];if(x.hp<x.max){x.hp++;fx(unitEl(P,ti),'물결 +1','heal');kwFx('wave',unitEl(P,ti),k);}}});
   if(!(B.wildMode&&P===B.foe))lgs.filter(u=>u.kw==='heal').forEach(()=>{if(P.hp<P.max){P.hp++;fx(heroEl(P),'+1','heal');const hi=P.board.findIndex(x=>x&&x.kw==='heal'&&isLeg(x));sunFx(unitEl(P,hi),heroEl(P));}});}
  const rd=B.pvp?Math.ceil(B.turn/2):B.round;
- if(rd>=10&&!(B.wildMode&&P===B.foe)){const sd=rd-9;P.hp-=sd;renderBattle();fx(heroEl(P),`지쳤다 -${sd}`,'');if(checkEnd())return;}
+ if(rd>=10&&!(B.wildMode&&P===B.foe)&&!easyNoFatigue()){const sd=rd-9;P.hp-=sd;renderBattle();fx(heroEl(P),`지쳤다 -${sd}`,'');if(checkEnd())return;}
  renderBattle();
  if(B.manaBonusFx){B.manaBonusFx=0;fx(heroEl(P),'마나 연구! 에너지 +1','heal');trainerManaFx(heroEl(P));}
  if(side==='me'){if(B.coop){const act=B.coop.active;banner.local=1;banner(act===BC.localIndex?'내 차례!':`${esc(B.coop.players[act].name)}의 차례!`,'',1000);banner.local=0;bossSend({t:'boss-turn',a:act,ms:1000});}else banner('내 차례!','',1000);}
@@ -7686,7 +7812,7 @@ async function bossConnect(host,code){bossClose();BC.host=host;BC.localIndex=hos
  try{await loadPeer()}catch(e){bossBox(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}
  const id='pkboss-coop-v1-'+code;const peer=host?new Peer(id,PO()):new Peer(PO());BC.peer=peer;
  peer.on('error',e=>{const t=String(e&&e.type||'');bossBox(netErrHTML(t==='unavailable-id'?'이미 사용 중인 코드예요. 새 방을 만들어 주세요.':t==='peer-unavailable'?'해당 방을 찾을 수 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결에 실패했어요 ('+t+')',t,'bcCancel'))});
- peer.on('open',()=>{if(host){bossBox(`<p>친구에게 아래 코드를 알려 주세요.</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구 접속 대기 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);peer.on('connection',c=>{if(BC.conn){c.close();return}BC.conn=c;bossBind(c)});}else{bossBox(`<p>방 ${code}에 접속 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);{const cc=peer.connect(id,{reliable:true});BC.conn=cc;bossBind(cc);setTimeout(()=>{try{if(BC.conn===cc&&!cc.open&&!BC.ready&&S.screen==='bosscoop')bossBox(netErrHTML('친구와 연결되지 않았어요','timeout','bcCancel'));}catch(e){}},35000);}}});}
+ peer.on('open',()=>{if(host){bossBox(`<p>친구에게 아래 코드를 알려 주세요.</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구 접속 대기 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);peer.on('connection',c=>{if(BC.conn){c.close();return}BC.conn=c;bossBind(c)});}else{bossBox(`<p>방 ${code}에 접속 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);{const cc=peer.connect(id,{reliable:true});BC.conn=cc;bossBind(cc);setTimeout(()=>{try{if(BC.conn===cc&&!cc.open&&!BC.ready&&S.screen==='bosscoop')bossBox(netErrHTML('친구와 연결되지 않았어요','timeout','bcCancel'));}catch(e){}},20000);}}});}
 const BOSS_NET_VER=3;
 function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:vitBonus(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,name:S.meta.name,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number),avatar:partnerId()});});c.on('data',d=>{if(!d||typeof d!=='object')return;
  if(d.t==='boss-hi'){if(d.v!==BOSS_NET_VER){BC.ready=false;BC.foe=null;bossBox(`<p style="color:#d9393f">친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}BC.foe=d;BC.ready=true;bossBox(`<h2>친구와 연결됐어요!</h2><p>${esc(d.name||'친구')}와 협동 보스전에 입장할 준비가 됐어요.</p><div class=explain>4성 60% · 5성 40% · 공유 필드 8칸</div>${BC.host?'<button class="btn red big" id=bcStart>보스전 시작</button>':'<p class=mut>방장이 보스전을 시작하기를 기다리는 중…</p>'}<button class="btn ghost" id=bcCancel>나가기</button>`);if(BC.host)bossSend({t:'boss-wait',name:S.meta.name});}
@@ -7977,17 +8103,11 @@ async function turnPrepStatic(){if(_turnCred&&_turnCred.exp>Date.now()/1000+600)
  try{const u=String(Math.floor(Date.now()/1000)+86400),k=await crypto.subtle.importKey('raw',new TextEncoder().encode(TURN_SECRET),{name:'HMAC',hash:'SHA-1'},false,['sign']);
   const sg=new Uint8Array(await crypto.subtle.sign('HMAC',k,new TextEncoder().encode(u)));let b='';sg.forEach(x=>b+=String.fromCharCode(x));_turnCred={u,c:btoa(b),exp:+u};}catch(e){_turnCred=null;}}
 // ================= ★ 연결 중계 서버(TURN) 설정 ★ =================
-// 같은 학교 와이파이의 다른 기기끼리 · 휴대폰 핫스팟 · '학교 와이파이 ↔ 휴대폰 데이터' 연결은
-// 기기끼리 직접 이을 수 없어서 반드시 '중계 서버(TURN)'를 거쳐야 해요. (친구 대전·보스전·저장 보내기·선생님께 기록 보내기 모두 해당)
-// 설정은 index.html 옆에 있는 'turn-config.js' 파일에 넣어요. (index.html을 새 버전으로 바꿔도 설정이 지워지지 않아요)
-//   - Metered(metered.ca) 무료 TURN: 앱 이름과 API Key   /   다른 TURN 서비스: 주소·아이디·비밀번호
-//   - 자세한 예시는 turn-config.js 안에 적혀 있어요.
-// (turn-config.js가 없으면 아래 기본값(비어 있음)이 쓰여요. 급하면 아래 값을 직접 고쳐도 되지만, 새 버전으로 바꾸면 지워져요.)
-const TURN_FILE=window.TURN_SETTINGS||{};
-const TURN_METERED=Object.assign({app:'',key:''},TURN_FILE.metered||{});
-const TURN_CUSTOM=Array.isArray(TURN_FILE.custom)?TURN_FILE.custom.slice():[];
+// 같은 학교 와이파이의 다른 기기끼리 · 휴대폰 핫스팟 · '학교 와이파이 ↔ 휴대폰 데이터' 연결은 중계 서버(TURN)를 거쳐야 해요.
+// Metered(metered.ca)에서 받은 앱 이름과 API Key를 아래에 넣어요. (다른 TURN 서비스는 TURN_CUSTOM에 주소·아이디·비밀번호를 넣어요)
+const TURN_METERED={app:'monstudy',key:'312912282248ebb8d30d6fe1279419ea0994'};
+const TURN_CUSTOM=[]; // 예: [{urls:['turn:서버주소:3478','turns:서버주소:443?transport=tcp'],username:'아이디',credential:'비밀번호'}]
 let _turnList=null;
-const turnOwn=()=>!!((TURN_METERED.app&&TURN_METERED.key)||TURN_CUSTOM.length);
 async function turnPrep(){
  await turnPrepStatic();
  if(TURN_METERED.app&&TURN_METERED.key&&!(_turnList&&_turnList.exp>Date.now())){
@@ -8028,14 +8148,14 @@ const NET_HINT={
  'server-error':'연결을 도와주는 서버에 닿지 못했어요. 잠시 뒤에 다시 해 보세요.',
  'socket-error':'연결을 도와주는 서버에 닿지 못했어요. 학교 인터넷이 막고 있을 수 있어요.',
  'socket-closed':'서버와의 연결이 끊겼어요. 다시 시도해 주세요.',
- 'webrtc':'두 기기 사이를 직접 이을 수 없어요. 학교·공공 와이파이나 핫스팟이 막고 있을 수 있어요. (중계 서버가 열려 있어야 해요 — 선생님께 알려 주세요)',
- 'timeout':'시간이 오래 지나도 연결되지 않았어요. 방 번호가 맞는지 확인해 주세요. 학교 와이파이·핫스팟·와이파이↔휴대폰 데이터처럼 서로 다른 망끼리는 중계 서버(TURN)가 열려 있어야 해요.'};
+ 'webrtc':'두 기기 사이를 직접 이을 수 없어요. 학교·공공 와이파이가 막고 있을 수 있어요.',
+ 'timeout':'시간이 오래 지나도 연결되지 않았어요. 두 기기가 같은 와이파이인지, 방 번호가 맞는지 확인해 주세요.'};
 function netErrHTML(msg,type,cancelId){const h=NET_HINT[type]||'';
  return `<p style="color:#d9393f;margin:0 0 6px"><b>${esc(msg)}</b></p>${h?`<p class=mut style="font-size:13px;line-height:1.6;margin:0 0 6px">${esc(h)}</p>`:''}<div class=explain style="font-size:13px;text-align:left;line-height:1.7"><b>이렇게 해 보세요</b><br>① 두 기기가 <b>같은 와이파이</b>인지 확인해요<br>② 한 명만 <b>휴대폰 데이터(핫스팟)</b>로 바꿔서 해 봐요<br>③ 두 기기 모두 <b>같은 버전의 게임 파일</b>을 열었는지 확인해요<br>④ 아래 <b>연결 시험</b>으로 이 기기가 연결될 수 있는지 먼저 확인해요</div><div class=row style="justify-content:center;margin-top:8px"><button class="btn ghost" id=${cancelId}>돌아가기</button><button class="btn blue" id=netTest>📶 연결 시험</button></div>`;}
 // 이 기기에서 친구와 연결이 될 수 있는지 단계별로 확인해요
 async function showNetTest(){
- const steps=[['lib','연결 도구 불러오기'],['srv','연결 도우미 서버 접속'],['p2p','기기끼리 직접 연결 가능성'],['turn','중계 서버(TURN)']];
- const st={lib:['…',''],srv:['',''],p2p:['',''],turn:['','']};
+ const steps=[['lib','연결 도구 불러오기'],['srv','연결 도우미 서버 접속'],['p2p','기기끼리 직접 연결 가능성']];
+ const st={lib:['…',''],srv:['',''],p2p:['','']};
  const draw=(sum)=>{const el=document.getElementById('ntBox');if(!el)return;el.innerHTML=steps.map(([k,n])=>{const [i,t]=st[k];const c=i==='✓'?'#2f9e6e':i==='✗'?'#d9393f':i==='△'?'#b8860b':'#8a7d8f';return `<div style="display:flex;gap:8px;align-items:flex-start;margin:6px 0;text-align:left"><b style="min-width:22px;color:${c};font-size:18px">${i||'·'}</b><div><b>${n}</b>${t?`<br><span class=mut style="font-size:13px">${esc(t)}</span>`:''}</div></div>`;}).join('')+(sum?`<div class=explain style="margin-top:10px;font-size:14px;line-height:1.7;text-align:left">${sum}</div>`:'');};
  M(`<h2>📶 연결 시험</h2><p class=mut style="font-size:13px">이 기기에서 친구와 연결할 수 있는지 확인해요. 10~15초쯤 걸려요.</p><div id=ntBox></div><div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,{x:()=>closeM(),_close:()=>closeM()});
  draw();
@@ -8052,15 +8172,7 @@ async function showNetTest(){
  if(p2p.srflx>0){st.p2p=['✓','학교·집 네트워크 밖으로 나가는 길이 열려 있어요'];}
  else if(p2p.host>0){st.p2p=['△','같은 와이파이 안에서는 될 수 있지만, 다른 네트워크의 친구와는 안 될 수 있어요'];}
  else st.p2p=['✗','기기끼리 직접 연결하는 길이 막혀 있어요'];
- st.turn=['…',''];draw();
- try{await turnPrep();}catch(e){}
- const rly=await new Promise(res=>{let pc,done=false;const fin=v=>{if(done)return;done=true;try{pc&&pc.close();}catch(e){}res(v);};
-  try{pc=new RTCPeerConnection({iceServers:iceList().filter(x=>/turn/.test(JSON.stringify(x.urls)))});pc.createDataChannel('t');
-   pc.onicecandidate=e=>{if(e.candidate&&/ typ relay /.test(e.candidate.candidate))fin(true);};
-   pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(()=>fin(false));setTimeout(()=>fin(false),9000);}catch(e){fin(false);}});
- st.turn=rly?['✓','막힌 망에서도 중계 서버로 우회할 수 있어요']:['✗','중계 서버를 쓸 수 없어요'+(turnOwn()?' (설정한 주소·계정을 확인해 주세요)':' (선생님이 중계 서버를 설정해야 해요)')];
- const WARN=rly?'':'<br><br><b>⚠ 중계 서버가 열려 있지 않아요.</b> 같은 학교 와이파이의 다른 기기끼리 · 핫스팟 · 학교↔휴대폰 데이터 연결은 <b>안 될 수 있어요</b>.';
- draw((p2p.srflx>0?'<b>연결할 수 있을 것 같아요!</b> 방 만들기와 방 들어가기를 눌러 보세요. 그래도 안 되면 한 명을 휴대폰 데이터로 바꿔 보세요.':p2p.host>0?'<b>같은 와이파이의 친구와는 될 수 있어요.</b> 다른 곳에 있는 친구와 할 때 안 되면 한 명을 휴대폰 데이터로 바꿔 보세요.':'<b>이 네트워크에서는 연결이 어려울 수 있어요.</b> 휴대폰 데이터(핫스팟)로 바꿔서 다시 시험해 보세요. 수업 전에 선생님이 미리 확인해 두면 좋아요.')+WARN);}
+ draw(p2p.srflx>0?'<b>연결할 수 있을 것 같아요!</b> 방 만들기와 방 들어가기를 눌러 보세요. 그래도 안 되면 한 명을 휴대폰 데이터로 바꿔 보세요.':p2p.host>0?'<b>같은 와이파이의 친구와는 될 수 있어요.</b> 다른 곳에 있는 친구와 할 때 안 되면 한 명을 휴대폰 데이터로 바꿔 보세요.':'<b>이 네트워크에서는 연결이 어려울 수 있어요.</b> 휴대폰 데이터(핫스팟)로 바꿔서 다시 시험해 보세요. 수업 전에 선생님이 미리 확인해 두면 좋아요.');}
 function pvBox(html){const b=$('#pvBox');if(!b)return;b.style.display='block';b.innerHTML=html;{const t=b.querySelector('#netTest');if(t)t.onclick=()=>{sfx('tap');showNetTest();};}const c=b.querySelector('#pvCancel');if(c)c.onclick=()=>{sfx('tap');pvpClose();renderPvp();};}
 async function pvpStart(host,code){const m=S.meta;if(m.coins<PVP_COST){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 12장이어야 해요');return;}
  PV.host=host;PV.code=code;PV.q=[];PV.started=false;PV.charged=false;PV.peerOver=false;
@@ -8072,7 +8184,7 @@ async function pvpStart(host,code){const m=S.meta;if(m.coins<PVP_COST){toast('�
  peer.on('open',()=>{
   if(host){pvBox(`<p>친구에게 이 방 번호를 알려 주세요</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구를 기다리는 중…</p><button class="btn ghost" id=pvCancel>취소</button>`);
    peer.on('connection',c=>{if(PV.conn){c.close();return;}PV.conn=c;pvBind(c);});}
-  else{pvBox(`<p>방 ${code}에 들어가는 중…</p><button class="btn ghost" id=pvCancel>취소</button>`);const c=peer.connect(id,{reliable:true});PV.conn=c;pvBind(c);setTimeout(()=>{try{if(PV.conn===c&&!c.open&&!PV.started&&S.screen==='pvp')pvBox(netErrHTML('친구와 연결되지 않았어요','timeout','pvCancel'));}catch(e){}},35000);}});}
+  else{pvBox(`<p>방 ${code}에 들어가는 중…</p><button class="btn ghost" id=pvCancel>취소</button>`);const c=peer.connect(id,{reliable:true});PV.conn=c;pvBind(c);setTimeout(()=>{try{if(PV.conn===c&&!c.open&&!PV.started&&S.screen==='pvp')pvBox(netErrHTML('친구와 연결되지 않았어요','timeout','pvCancel'));}catch(e){}},20000);}});}
 function pvBind(c){
  c.on('open',()=>{const me=S.meta;const deck=shuffle(me.deck.slice());PV.myDeck=deck;PV.myOwned=Object.keys(me.col).map(Number).filter(id=>MON[id]);
   pvpSend({t:'hi',v:PVP_VER,name:me.name,deck,col:PV.myOwned,av:partnerId(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,seed:PV.host?(Math.random()*1e9|0):0});});
@@ -8775,8 +8887,35 @@ function wkReportFile(m){const w=wkData(m),pc=v=>v==null?'-':Math.round(v*100)+'
 let GTAB='sum';
 function lineChart(vals,maxV,col,fmtv=v=>v){if(vals.length<2)return '<p class=mut style="font-size:13px">기록이 2개 넘게 쌓이면 그래프가 보여요</p>';const W=300,H=90,n=vals.length;const x=i=>10+i*(W-20)/(n-1),y=v=>H-12-(v/maxV)*(H-26);
  return `<svg viewBox="0 0 ${W} ${H}" class=mdl style="max-width:420px"><polyline points="${vals.map((v,i)=>x(i)+','+y(v)).join(' ')}" fill="none" stroke="${col}" stroke-width="3" stroke-linejoin="round"/>${vals.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="#fff" stroke="${col}" stroke-width="2.5"/>${i===n-1||i===0?`<text x="${x(i)}" y="${y(v)-8}" font-size="11" text-anchor="middle" fill="#3a2e3f">${fmtv(v)}</text>`:''}`).join('')}</svg>`;}
-function renderGrowth(){S.screen='grow';const m=S.meta,L=lvOf(m.xp);
- const tabs=[['sum','요약'],['wk','주간 리포트'],['dom','영역 진단'],['wb','오답 노트'+(wbOpenN(m)?' '+wbOpenN(m):'')],['unit','단원 지도'],['cal','공부 달력'],['me','나의 강점']];
+function calTabHTML(m){
+  const cells=[];const d0=new Date();d0.setDate(d0.getDate()-34-d0.getDay());for(let i=0;i<35+d0.getDay()&&cells.length<42;i++){const d=new Date(d0);d.setDate(d0.getDate()+i);if(d>new Date())break;cells.push(d);}
+  const mxn=Math.max(10,...cells.map(d=>(m.days[today(d)]||{n:0}).n));
+  return `<div class=panel><h3 style="margin-top:0">${I('calendar')} 공부 달력 <span class=mut style="font-size:13px">진할수록 많이 공부한 날</span></h3>
+   <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:420px">${['일','월','화','수','목','금','토'].map(x=>`<div class=mut style="text-align:center;font-size:12px">${x}</div>`).join('')}${cells.map(d=>{const v=m.days[today(d)];const n=v?v.n:0;const a=n?.25+.75*n/mxn:0;return `<div title="${today(d)} · ${n}문제" style="aspect-ratio:1;border-radius:8px;background:${n?`rgba(255,138,61,${a.toFixed(2)})`:'#f1e9dc'};display:flex;align-items:center;justify-content:center;font-size:11px;${today(d)===today()?'outline:3px solid #ff5a5f;':''}">${d.getDate()}</div>`;}).join('')}</div>
+   <div class=row style="gap:8px;margin-top:12px"><span class=pill>${I('calendar')} 공부한 날 ${daysOf(m)}일</span><span class=pill>${I('flame')} 지금 ${streakDays()}일 연속</span><span class=pill>${I('star')} 가장 긴 연속 ${m.stats.bestStreak||0}일</span><span class=pill>${I('check')} 도전한 문제 ${fmt(m.stats.q)}개</span></div></div>`}
+function meTabHTML(m){return `<div class=panel><h3 style="margin-top:0">${I('medal')} 나의 강점</h3>${strengthHTML(m,true)}${featOn('ach')?`<div class=mbtns><button class="btn gold" id=gAch>배지 모두 보기</button></div>`:''}</div>`;}
+
+/* ---------- 학습 튜토리얼: 문제 · 틀리면 · 오답 노트 · 기록 보는 법 ---------- */
+function stPic(a){return '<div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-size:34px;line-height:1.1">'+a.map((x,i)=>(i?'<span style="font-size:22px;color:#e0a000">➜</span>':'')+'<span style="text-align:center">'+x[0]+(x[1]?'<small style="display:block;font-size:12px;font-weight:700;margin-top:2px">'+x[1]+'</small>':'')+'</span>').join('')+'</div>';}
+function studyCoachSteps(onGrow){
+  const a=[
+   {h:'문제를 풀어요',ic:'flame',pic:stPic([['✏️','문제'],['⭕','정답!'],['🍬','사탕']]),t:'전투나 훈련에서 <b>문제를 풀어요</b>. 맞히면 공격이 제대로 들어가고 <b>사탕</b>도 생겨요.'},
+   {h:'틀리면 어떻게 될까?',ic:'heart',pic:stPic([['❌','틀렸어요'],['💡','설명이 나와요'],['🔁','조금 뒤 다시']]),t:'<b>괜찮아요!</b> 틀리면 <b>그림과 설명</b>을 보여 줘요. 그리고 조금 뒤에 <b>같은 문제를 한 번 더</b> 풀어요. 공격은 약하게 들어가요.'},
+   {h:'틀린 문제는 모아 둬요',ic:'book',pic:stPic([['❌','틀린 문제'],['📝','오답 노트']]),t:'틀린 문제는 자동으로 <b>오답 노트</b>에 모여요. 따로 적지 않아도 돼요.'},
+   {h:'다시 풀면 졸업!',ic:'check',pic:stPic([['📝','오답 노트'],['⭕','1번 맞힘'],['⭕','2번 맞힘'],['🎓','해결!']]),t:'오답 노트에서 <b>다시 풀기</b>를 눌러서 <b>2번 맞히면 해결</b>이에요. 해결하면 사탕도 받아요!'},
+   {h:'자꾸 틀리면?',ic:'star',pic:stPic([['🧱','아래 학년 기초'],['🧱','조금 더 어려운 것'],['🏠','목표 개념']]),t:'같은 개념을 자꾸 틀리면 <b>아래 학년 기초부터</b> 차근차근 다시 쌓아 줘요. 어려워서 그런 게 아니에요!'}];
+  if(onGrow)a.push(
+   {el:'.filters',h:'학습 기록 탭',ic:'chart',t:'<b>요약</b>: 나의 성장 · 공부 달력 · 강점<br><b>오답 노트</b>: 틀린 문제 다시 풀기<br><b>단원 지도</b>: 개념별 별<br><b>영역 진단</b>·<b>주간 리포트</b>: 선생님·보호자용'},
+   {el:'[data-gt=wb]',h:'여기서 오답 노트!',ic:'book',t:'틀린 문제를 다시 풀고 싶으면 <b>오답 노트</b>를 눌러요. 처음엔 이것만 알면 충분해요!'});
+  return a;
+}
+async function studyTutorial(){
+  try{GTAB='sum';renderGrowth();}catch(e){console.warn('study tut',e);}
+  await wait(250);
+  return coach(studyCoachSteps(true));
+}
+function renderGrowth(){S.screen='grow';if(GTAB==='cal'||GTAB==='me')GTAB='sum';const m=S.meta,L=lvOf(m.xp);
+ const tabs=[['sum','요약'],['wb','오답 노트'+(wbOpenN(m)?' '+wbOpenN(m):'')],['unit','단원 지도'],['dom','영역 진단'],['wk','주간 리포트']];
  let body='';
  if(GTAB==='sum'){
   const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=today(d);days.push({k,v:m.days[k]||{n:0,c:0,ms:0},lab:i===0?'오늘':`${d.getMonth()+1}/${d.getDate()}`});}
@@ -8803,18 +8942,14 @@ function renderGrowth(){S.screen='grow';const m=S.meta,L=lvOf(m.xp);
     return `<details ${tried&&!m.badges[k]?'open':''} style="margin-bottom:6px"><summary class=unitHead style="cursor:pointer">${m.badges[k]?I('medal','uBadge'):''}${semName(s)} ${u}. ${esc(UNITS[s][u-1])} <span class=xpBar style="max-width:120px;display:inline-block;vertical-align:middle;margin-left:6px"><i style="width:${st/mx*100}%"></i></span> <span class=mut style="font-size:12px">${st}/${mx}</span></summary>
      <div class=skList>${sks.map(x=>{const v=m.sk[x.id];return `<div class=skRow><span class=sn>${esc(x.n)}${m.found&&m.found[x.id]?' <span class=pill style="font-size:11px">좌삼 쌓는 중</span>':''}</span>${v?`<span class=mut style="font-size:12px">${v.c}/${v.c+v.x}</span>`:''}${starsHTML(v?v.st:0)}</div>`;}).join('')}</div></details>`;}).join('')}</div>
    ${Object.keys(m.enSk||{}).length?`<div class=panel><h3 style="margin-top:0">📘 영어 단원 <span class=mut style="font-size:13px">(레벨·유형별 · 3번 연속 맞히면 별 하나)</span></h3><p class=mut style="font-size:13px;margin:0 0 6px">영어 ${fmt((m.enStats||{}).q||0)}문제 · 정답률 ${(m.enStats||{}).q?Math.round(m.enStats.c/m.enStats.q*100):0}%</p><div class=skList>${Object.entries(m.enSk).sort((a,b)=>a[0].localeCompare(b[0])).map(([id,v])=>`<div class=skRow><span class=sn>${esc(enSkName(id))}${m.enFound&&m.enFound[(id.split(':')[1])+':'+id.split(':')[2]]?' <span class=pill style="font-size:11px">좌삼 쌓는 중</span>':''}</span><span class=mut style="font-size:12px">${v.c||0}/${(v.c||0)+(v.x||0)}</span>${starsHTML(v.st||0)}</div>`).join('')}</div></div>`:''}${xsPanelsHTML(m,false)}`;}
- else if(GTAB==='cal'){
-  const cells=[];const d0=new Date();d0.setDate(d0.getDate()-34-d0.getDay());for(let i=0;i<35+d0.getDay()&&cells.length<42;i++){const d=new Date(d0);d.setDate(d0.getDate()+i);if(d>new Date())break;cells.push(d);}
-  const mxn=Math.max(10,...cells.map(d=>(m.days[today(d)]||{n:0}).n));
-  body=`<div class=panel><h3 style="margin-top:0">${I('calendar')} 공부 달력 <span class=mut style="font-size:13px">진할수록 많이 공부한 날</span></h3>
-   <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:420px">${['일','월','화','수','목','금','토'].map(x=>`<div class=mut style="text-align:center;font-size:12px">${x}</div>`).join('')}${cells.map(d=>{const v=m.days[today(d)];const n=v?v.n:0;const a=n?.25+.75*n/mxn:0;return `<div title="${today(d)} · ${n}문제" style="aspect-ratio:1;border-radius:8px;background:${n?`rgba(255,138,61,${a.toFixed(2)})`:'#f1e9dc'};display:flex;align-items:center;justify-content:center;font-size:11px;${today(d)===today()?'outline:3px solid #ff5a5f;':''}">${d.getDate()}</div>`;}).join('')}</div>
-   <div class=row style="gap:8px;margin-top:12px"><span class=pill>${I('calendar')} 공부한 날 ${daysOf(m)}일</span><span class=pill>${I('flame')} 지금 ${streakDays()}일 연속</span><span class=pill>${I('star')} 가장 긴 연속 ${m.stats.bestStreak||0}일</span><span class=pill>${I('check')} 도전한 문제 ${fmt(m.stats.q)}개</span></div></div>`;}
- else body=`<div class=panel><h3 style="margin-top:0">${I('medal')} 나의 강점</h3>${strengthHTML(m,true)}${featOn('ach')?`<div class=mbtns><button class="btn gold" id=gAch>배지 모두 보기</button></div>`:''}</div>`;
+ if(GTAB==='sum')body+=calTabHTML(m)+meTabHTML(m);
  $('#view').innerHTML=hudHTML()+`<div class=wrap>
- <div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('chart')} 나의 학습 기록</h2><span class=hudSp></span><span class=pill>${I('star')} Lv.${L.lv} ${esc(L.title)}</span></div>
+ <div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('chart')} 나의 학습 기록</h2><span class=hudSp></span><button class="btn ghost sm" id=gHelp style="white-space:nowrap;padding:4px 8px">❓ 사용법</button><span class=pill>${I('star')} Lv.${L.lv} ${esc(L.title)}</span></div>
   <div class=filters style="margin-top:10px">${tabs.map(([k,n])=>`<button class="fbtn${GTAB===k?' on':''}" data-gt="${k}">${n}</button>`).join('')}</div></div>
  ${body}</div>`;
  bindHud();$('#view').querySelectorAll('[data-gt]').forEach(b=>b.onclick=()=>{sfx('tap');GTAB=b.dataset.gt;renderGrowth();});
+ {const gh=$('#gHelp');if(gh)gh.onclick=()=>{sfx('tap');studyTutorial();};}
+ try{if(!m.seen.c_study1)setTimeout(()=>{if(S.screen==='grow')coachOnce('c_study1',studyCoachSteps(true));},500);}catch(e){}
  const ga=$('#gAch');if(ga)ga.onclick=()=>{sfx('tap');renderAch();};
  {const wg=$('#wkGo');if(wg)wg.onclick=()=>{sfx('tap');startTraining();};const ws=$('#wkSave');if(ws)ws.onclick=()=>{sfx('coin');const blob=new Blob([wkReportFile(m)],{type:'text/html;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`주간리포트_${m.name||'학생'}_${today()}.html`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);};}
  {const dg=$('#domGo');if(dg)dg.onclick=()=>{sfx('tap');const st=domStats(m),pool=domTrainPool(m,st,dg.dataset.doms.split(','));if(!pool.length){toast('연습할 문제가 아직 없어요');return;}startTraining({pool,n:8});};
@@ -8911,9 +9046,18 @@ async function startWrongBook(keys){
  if(S.lvUp){await wait(500);levelUpFx();}}
 
 // ---- 학습 지도 (단원 고르기 · 연습) ----
+
+/* ---------- 학습 지도 튜토리얼 ---------- */
+function mapCoachSteps(){return [
+ {h:'학습 지도',ic:'map',pic:stPic([['🗺️','학습 지도'],['📖','단원 고르기'],['✏️','연습']]),t:'여기는 <b>무엇을 공부할지 고르는 곳</b>이에요. 어렵지 않아요, 하나씩 볼게요!'},
+ {el:'#uSeg',h:'지금 배우는 단원',ic:'book',t:'학교에서 <b>지금 배우는 단원 번호</b>를 눌러요. 그 단원까지만 문제가 나와서 아직 안 배운 문제는 안 나와요. <b>전체</b>를 누르면 모든 단원이 나와요.'},
+ {el:'#fClr',h:'집중과 연습',ic:'flame',pic:stPic([['🎯','집중'],['🍬','오늘 훈련에서 먼저']]),t:'단원 옆 <b>집중</b>을 누르면 오늘 훈련에서 그 단원을 먼저 풀어요. <b>연습</b>을 누르면 그 단원 문제를 <b>바로</b> 풀어요. 집중은 여기 <b>집중 해제</b>로 풀 수 있어요.'},
+ {h:'아래 학년도 보물!',ic:'coin',pic:stPic([['🧱','아래 학년'],['⭐','별 얻기'],['🪙','코인·사탕']]),t:'지난 학년 단원에서 별을 얻으면 <b>코인 15 · 사탕 5</b>, 단원 배지를 받으면 <b>코인 100</b>을 더 줘요. 기초를 탄탄하게 쌓아 봐요!'},
+ {el:'#mpKo',h:'국어·영어 모드',ic:'book',t:'<b>국어</b>나 <b>영어</b> 문제도 풀 수 있어요. 하루 <b>100문제</b>씩만 풀 수 있고, 다 풀면 수학으로 돌아가요.'}];}
+function mapTutorial(){try{renderMap();}catch(e){console.warn('map tut',e);return;}return wait(250).then(()=>coach(mapCoachSteps()));}
 function renderMap(){S.screen='map';const m=S.meta;const map=unitsWithSkills();const gi=semIdx(m.gs);
  const sems=SEMS.slice(0,gi+1).reverse();
- $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><h2>${I('map')} 학습 지도</h2>
+ $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('map')} 학습 지도</h2><span class=hudSp></span><button class="btn ghost sm" id=mHelp style="white-space:nowrap;padding:4px 8px">❓ 사용법</button></div>
   <p class=mut style="font-size:13px">선생님 코드는 <b>${esc(semName(m.gs))}</b>이에요. 그보다 뒤 학년의 단원은 나오지 않아요.</p>
   <div class=explain style="font-size:14px;margin-top:6px">${I('coin')} <b>아래 학년 단원도 보물이에요!</b> 아래 학년 개념에서 별을 얻으면 <b>코인 15 · 사탕 5</b>, 아래 학년 단원 배지를 받으면 <b>코인 100</b>을 더 받아요. 좌삼을 탄탄하게 쌓아 봐요.</div>
   <div class=setRow><span><b>지금 배우는 단원</b><br><span class=mut style="font-size:12px">${esc(semName(m.gs))}에서 이 단원까지만 문제가 나와요</span></span><div class=seg id=uSeg>${UNITS[m.gs].map((n,i)=>`<button class="${m.uMax===i+1?'on':''}" data-u="${i+1}">${i+1}</button>`).join('')}<button class="${!m.uMax||m.uMax>=99?'on':''}" data-u="99">전체</button></div></div>
@@ -8922,6 +9066,7 @@ function renderMap(){S.screen='map';const m=S.meta;const map=unitsWithSkills();c
   ${sems.map(s=>{const us=UNITS[s].map((n,i)=>({n,u:i+1,k:unitKey(s,i+1)})).filter(x=>map[x.k]);if(!us.length)return '';return `<div class=panel><h3 style="margin-top:0">${semName(s)}</h3>${us.map(x=>{const sks=map[x.k];const st=sks.reduce((a,sk)=>a+(m.sk[sk.id]?m.sk[sk.id].st:0),0);const foc=(m.focus||[]).includes(x.k);
    return `<div class=skRow style="flex-wrap:wrap">${m.badges[x.k]?I('medal','uBadge'):''}<span class=sn><b>${x.u}. ${esc(x.n)}</b><br><span class=mut style="font-size:12px">개념 ${sks.length}개 · 별 ${st}/${sks.length*5}</span></span><button class="fbtn${foc?' on':''}" data-fk="${x.k}">${foc?'집중 중':'집중'}</button><button class="btn blue sm" data-pk="${x.k}">연습</button></div>`;}).join('')}</div>`;}).join('')}${xsPanelsHTML(m,true)}<div class=panel><div class=mbtns style="margin:0"><button class="btn ghost" id=mpKo>📖 국어 모드로 바꾸기</button><button class="btn ghost" id=mpEn>📘 영어 모드 설정</button></div><p class=mut style="font-size:12px;margin:6px 0 0">국어·영어는 하루 100문제씩만 풀 수 있고, 다 풀면 수학 모드로 돌아가요.</p></div></div>`;
  bindHud();
+ {const mh=$('#mHelp');if(mh)mh.onclick=()=>{sfx('tap');mapTutorial();};} try{if(!S.meta.seen.c_map1)setTimeout(()=>{if(S.screen==='map')coachOnce('c_map1',mapCoachSteps());},500);}catch(e){}
  {const a=$('#mpKo');if(a)a.onclick=()=>{sfx('tap');if(nkLeft('ko')<=0){toast('오늘 국어 문제 100개를 다 풀었어요. 내일 또 만나요!');return;}S.meta.questionMode='korean';autoSave();chooseKoreanMode(true);};const b=$('#mpEn');if(b)b.onclick=()=>{sfx('tap');if(nkLeft('en')<=0){toast('오늘 영어 문제 100개를 다 풀었어요. 내일 또 만나요!');return;}chooseEnglishMode(true,'english');};}
  $('#uSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{sfx('tap');m.uMax=+b.dataset.u;m.uMaxAt=today();autoSave();renderMap();});
  $('#fClr').onclick=()=>{m.focus=null;autoSave();renderMap();};
@@ -8939,7 +9084,7 @@ function tsSend(room,silent){return new Promise(async res=>{
  try{if(!/^\d{4}$/.test(String(room||''))){fin(false,'방 번호 4자리를 넣어 주세요');return;}
   if(!S.meta.name){fin(false,'닉네임이 있어야 보낼 수 있어요');return;}
   await loadPeer();saveLocal();const code=await makeCode();
-  peer=new Peer(PO());const to=setTimeout(()=>fin(false,'선생님 방을 찾지 못했어요. 방 번호와 선생님 화면이 열려 있는지 확인해 주세요'),30000);
+  peer=new Peer(PO());const to=setTimeout(()=>fin(false,'선생님 방을 찾지 못했어요. 방 번호와 선생님 화면이 열려 있는지 확인해 주세요'),15000);
   peer.on('error',e=>{clearTimeout(to);const t=String(e&&e.type||'');fin(false,t==='peer-unavailable'?'그 번호의 방이 없어요. 선생님 화면에서 방이 열려 있는지 확인해 주세요':'연결하지 못했어요. 인터넷이나 학교 네트워크를 확인해 주세요');});
   peer.on('open',()=>{const c=peer.connect(tsId(room),{reliable:true});
    c.on('open',()=>{try{c.send({t:'rec',code});}catch(e){clearTimeout(to);fin(false,'보내지 못했어요');}});
@@ -8955,6 +9100,30 @@ function showTsend(){const st=S.meta.settings;
   <div class=mbtns><button class="btn blue" data-a=send>지금 보내기</button><button class="btn gold" data-a=x>닫기</button></div>`,
   {send:async b=>{const r=($('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();toast('보내는 중…');await tsSend(r,false);},x:()=>{const r=($('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();closeM();},_close:()=>{const r=($('#tsRoom')&&$('#tsRoom').value||'').replace(/\D/g,'');st.tRoom=r;autoSave();closeM();}});
  $('#mbox').querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{st.tAuto=b.dataset.v==='1';st.tRoom=($('#tsRoom').value||'').replace(/\D/g,'');autoSave();sfx('tap');$('#mbox').querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));});}
+function tutPicker(){
+  const m=S.meta,sk=m.seen&&m.seen.tutSkip,k=Math.min(4,m.tutDone||0);
+  const row=(a,ic,t,d)=>'<button class="btn ghost" data-a='+a+' style="width:100%;text-align:left;margin:4px 0;padding:10px 12px;line-height:1.35"><b>'+ic+' '+t+'</b><br><span style="font-size:13px;font-weight:500">'+d+'</span></button>';
+  const go=(o)=>()=>{closeM();if(window.TUT_A)TUT_A.begin(Object.assign({replay:true},o));};
+  M('<h2>튜토리얼 선택</h2><p style="font-size:14px;margin:2px 0 6px">보고 싶은 것만 골라서 연습해요. 보상은 없어요.</p>'+
+    row('trait','✨','특성 튜토리얼','끈기, 도발 등 특성 체험')+
+    row('stone','🪨','돌 카드 튜토리얼','화염·물·전기·달·태양의 돌')+
+    row('ball','🎲','랜덤카드 튜토리얼','포켓볼·파워볼·마스터볼')+
+    row('skill','🎓','트레이너 스킬 튜토리얼','체력 회복·공격·응원·반격')+
+    row('evo','🧬','진화 튜토리얼','진화·메가·원시회귀·거다이맥스 안내')+
+    row('study','📚','학습 튜토리얼','문제를 틀리면? 오답 노트는? 학습 기록 보는 법')+
+    row('map','🗺️','학습 지도 튜토리얼','단원 고르기 · 집중 · 연습')+
+    row('rl','🧭','모험(로그라이크) 튜토리얼','길 고르기 · 칸 종류 · 체력 · 보스와 보상')+
+    '<div style="border-top:1px solid #ddd;margin:8px 0 4px"></div>'+
+    row('all','📖',sk&&k>0?'전체 이어하기 (파트 '+(k+1)+'/5부터)':'전체 처음부터','처음부터 끝까지 한 번에')+
+    '<div class=mbtns><button class="btn ghost" data-a=x>닫기</button></div>',{
+    trait:go({only:'trait'}),stone:go({only:'stone'}),ball:go({only:'ball'}),skill:go({only:'skill'}),
+    evo:()=>{closeM();try{coach(evoCoachSteps());}catch(e){}},
+    study:()=>{closeM();studyTutorial();},
+    map:()=>{closeM();mapTutorial();},
+    rl:()=>{closeM();rlTutorial();},
+    all:()=>{closeM();if(!window.TUT_A)return;if(sk){try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});},
+    x:()=>closeM(),_close:()=>closeM()});
+}
 function tutBtnLabel(){try{const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(!sk)return '튜토리얼 다시 보기';const d=m.tutDone||0;return d>0?`튜토리얼 이어하기 (파트 ${Math.min(5,d+1)}/5부터)`:'튜토리얼 이어하기';}catch(e){return '튜토리얼 다시 보기';}}
 function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.easy=false;if(st.enTts===undefined)st.enTts=true;if(st.iq===undefined)st.iq=true;const seg=(k,opts)=>`<div class=seg>${opts.map(([v,n])=>`<button class="${String(st[k])===String(v)?'on':''}" data-s="${k}" data-v="${v}">${n}</button>`).join('')}</div>`;
  M(`<h2>${I('gear')} 설정</h2>
@@ -8973,7 +9142,7 @@ function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.eas
   <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>🎓 학년 변경</button><button class="btn ghost" data-a=tsend>📡 선생님께 기록 보내기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=netdiag>🌐 연결 진단</button><button class="btn ghost" data-a=tutor>${tutBtnLabel()}</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>
   <p class=mut style="font-size:11px;margin-top:10px;line-height:1.5">${GAME.title} v${GAME.ver} · 좌삼초. 수업용 비영리 팬 제작 학습 도구예요. 포켓몬 이름·그림의 권리는 Nintendo·Creatures·GAME FREAK·The Pokémon Company에 있어요. 그림은 PokeAPI 공개 저장소에서 불러와요.</p>`,
-  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},netdiag:()=>{closeM(l2);netDiag();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);if(window.TUT_A){const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(sk){const k=Math.min(4,m.tutDone||0);try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});}}},{layer2:!!l2});
+  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},netdiag:()=>{closeM(l2);netDiag();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);tutPicker();return;if(window.TUT_A){const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(sk){const k=Math.min(4,m.tutDone||0);try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});}}},{layer2:!!l2});
  {const sb=$('#sfxVol');if(sb){sb.oninput=()=>{st.sfxVol=+sb.value;$('#sfxVolN').textContent=sb.value+'%';};sb.onchange=()=>{autoSave();if(st.sound)sfx('ok');};}}
  {const vb=$('#bgmVol');if(vb){vb.oninput=()=>{st.bgmVol=+vb.value;$('#bgmVolN').textContent=vb.value+'%';applyBgmVol();};vb.onchange=()=>{autoSave();};}}
  $(l2?'#mbox2':'#mbox').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;st[k]=v;if(k==='bgm'){if(v)startBgm();else stopBgm();}autoSave();applySafe();refit();sfx('tap');showSettings(l2);if(k==='imgs'&&S.screen==='hub')renderHub();});}
@@ -10726,6 +10895,8 @@ rlDef('badge','사냥꾼의 증표','🏅','엘리트를 이기면 유물 3택1�
 rlDef('phoenix','불사조의 깃털','🪶','쓰러질 때 한 번, 체력 절반으로 부활해요',3);
 rlDef('egg','황금 알','🥚','모험 클리어 보상(경험치·코인·사탕·별가루) +25%',2);
 rlDef('prism','오색 찬란한 비늘','🌈','모든 포켓몬의 공격 피해 ×1.2 (속성 유물과 겹쳐서 적용돼요)',3);
+rlDef('megastone','메가스톤','💠','메가진화·원시회귀가 가능한 모든 포켓몬이 이번 모험에서 메가진화할 수 있어요 (정답 10개를 맞히면 쓸 수 있어요)',3);
+rlDef('dynaband','다이맥스 밴드','🔴','거다이맥스·무한다이맥스가 가능한 모든 포켓몬이 이번 모험에서 쓸 수 있어요 (정답 10개를 맞히면 쓸 수 있어요)',3);
 rlDef('golddex','황금 도감','📒','전투로 얻은 동료가 내 도감에 없는 포켓몬이면 골드 +25',2);
 rlDef('noel','노을의 부적','🧿','최대 체력 +8 (그만큼 회복) · 전투 시작 시 방어막 +2 (여행자 노을의 선물)',3,{ex:1,gain:run=>{run.max+=8;run.hp+=8;}});
 const RL_TYPE_RELIC=[[0,'행운의 리본','🎀'],[1,'지옥불','🔥'],[2,'요정의 눈물','💧'],[3,'세계수의 잎','🍃'],[4,'번개 구슬','⚡'],[5,'만년설 조각','❄️'],[6,'검은 띠','🥋'],[7,'맹독 가시','☠️'],[8,'대지의 흙덩이','⛰️'],[9,'폭풍의 깃털','🕊️'],[10,'휘어진 숟가락','🥄'],[11,'은빛 가루','🐛'],[12,'단단한 돌','🪨'],[13,'저주의 부적','👻'],[14,'용의 송곳니','🐉'],[15,'어둠의 안경','🕶️'],[16,'금속 코트','🔩'],[17,'요정의 비늘가루','✨']];
@@ -11403,7 +11574,7 @@ function rlRenderEntry(){
  const rl=rlMeta(),run=rl.run;S.screen='scenarioRLEntry';
  rlSetBg('',run?run.bg:(rl.lastBg!=null?rl.lastBg:4));
  const stats=`<div class="sc-reward-list"><div class="sc-reward"><strong>${rl.runs}</strong>도전</div><div class="sc-reward"><strong>${rl.clears}</strong>클리어</div><div class="sc-reward"><strong>${Math.min(rl.best||0,RL.floors*(RL.steps+1))} / ${RL.floors*(RL.steps+1)}</strong>최고 단계</div><div class="sc-reward"><strong>${Object.keys(rl.relicSeen).length}/${Object.keys(RL_RELICS).length}</strong>유물 도감</div></div>`;
- const rules=`<div class="rl-rules"><div>🃏 <b>내 카드 ${RL.pick}장 + 완전 랜덤 ${RL.rand}장</b> = ${RL.pick+RL.rand}장으로 출발! 카드 수 제한은 없어요.</div><div>🗺️ 분기점을 골라 ${RL.steps}번 나아가면 <b>보스</b>가 기다려요. 보스를 쓰러뜨리면 <b>포켓몬 카드</b>를 받고, <b>그만둘지 다음 층(최대 ${RL.floors}층)</b>으로 갈지 골라요. 층이 오를수록 적이 강해져요!</div><div>⚔️ 전투 · 💀 엘리트 · 🏟️ 관장 · 🏺 유물 · ⛺ 휴식 · 🛒 상점 · 🎲 랜덤 · 🎓 시련</div><div>💰 모험 중 얻은 <b>포켓몬·유물·골드</b>는 모험 안에서만 써요. (가져간 내 카드도 사라지지 않아요!)</div><div>🎁 보스를 쓰러뜨리면 경험치·코인·사탕·별가루와 함께 <b>지워진 도감 기록(포켓몬 카드 1장)</b>을 되찾아요!</div><div>💔 트레이너 체력이 0이 되면 모험이 끝나요.</div></div>`;
+ const rules=`<div class="rl-rules"><div>🃏 <b>내 카드 ${RL.pick}장 + 완전 랜덤 ${RL.rand}장</b> = ${RL.pick+RL.rand}장으로 출발! 카드 수 제한은 없어요.</div><div>🗺️ 분기점을 골라 ${RL.steps}번 나아가면 <b>보스</b>가 기다려요. 보스를 쓰러뜨리면 <b>포켓몬 카드</b>를 받고, <b>그만둘지 다음 층(최대 ${RL.floors}층)</b>으로 갈지 골라요. 층이 오를수록 적이 강해져요!</div><div>⚔️ 전투 · 💀 엘리트 · 🏟️ 관장 · 🏺 유물 · ⛺ 휴식 · 🛒 상점 · 🎲 랜덤 · 🎓 시련</div><div>💰 모험 중 얻은 <b>포켓몬·유물·골드</b>는 모험 안에서만 써요. (가져간 내 카드도 사라지지 않아요!)</div><div>🎁 보스를 쓰러뜨리면 경험치·코인·사탕·별가루와 함께 <b>지워진 도감 기록(포켓몬 카드 1장)</b>을 되찾아요!</div><div>💔 트레이너 체력이 0이 되면 모험이 끝나요. 하지만 <b>전투 중 부활 1회</b>(문제 3개 → 체력 15)와 <b>모험 중 재도전 1회</b>(문제 5개)로 다시 일어설 수 있어요!</div></div>`;
  let body,owned=[],need=0;
  if(run){const reg=SC_REGIONS[run.bg];
   body=`<div class="scv-card"><span class="sc-tag">▶ 진행 중인 모험</span><h3>${reg.icon} ${esc(reg.name)}</h3><div class="sc-reward-list"><div class="sc-reward"><strong>${run.floor||1}층 ${Math.min(run.step+1,RL.steps+1)} / ${RL.steps+1}</strong>단계</div><div class="sc-reward"><strong>${run.hp}/${run.max}</strong>체력</div><div class="sc-reward"><strong>${run.gold}</strong>골드</div><div class="sc-reward"><strong>${run.deck.length}</strong>덱 카드</div><div class="sc-reward"><strong>${run.relics.length}</strong>유물</div></div><div class="mbtns"><button class="btn gold big" id="rlResume">▶ 이어하기</button><button class="btn ghost" id="rlAbandon">포기하기</button></div></div>`;}
@@ -11418,8 +11589,10 @@ function rlRenderEntry(){
   const slots=Array.from({length:RL.pick},(_,i)=>{const id=RL_SEL[i];return `<div class="rl-slot${id!=null?' on':''}" ${id!=null?`data-rm="${id}"`:''} title="${id!=null?'누르면 빼요':''}">${id!=null?monImg(id,'front'):'<span>?</span>'}</div>`;}).join('')+`<div class="rl-plus">+</div>`+Array.from({length:RL.rand},()=>'<div class="rl-slot rnd"><span>🎲</span></div>').join('');
   const ready=RL_SEL.length>=need;
   body=`<div class="scv-card"><span class="sc-tag">🎲 모험 준비</span><h3>데려갈 내 포켓몬 고르기 <small class="mut" style="font-size:.6em">${RL_SEL.length} / ${need}</small></h3><p class="sc-note">내가 가진 포켓몬 중 <b>${RL.pick}장</b>을 골라요. 고른 카드는 모험에서 바로 쓸 수 있고, 시작하면 <b>완전 랜덤 ${RL.rand}장</b>이 더해져 총 ${RL.pick+RL.rand}장으로 출발해요. (같은 카드를 여러 장 가져가진 못해요)</p><div class="rl-slots">${slots}</div>${owned.length?`${filters}<div class="colGrid" id="rlStGrid">${owned.filter(id=>!RL_KW||kwOf(MON[id]).n===RL_KW).map(id=>cardHTML(id,{size:'deck',cnt:col[id],cls:RL_SEL.indexOf(id)>=0?'rl-selected':''})).join('')}</div>`:'<p class="mut" style="text-align:center;margin:12px">아직 가진 포켓몬이 없어요. 그대로 시작하면 덱 8장이 모두 랜덤이에요.</p>'}<div class="mbtns rlBar"><button class="btn blue sm" id="rlAutoSel">자동 선택</button><button class="btn ghost sm" id="rlClrSel">선택 해제</button><button class="btn red big" id="rlStart" ${ready?'':'disabled'}>🎲 모험 시작${ready?'':` (${need-RL_SEL.length}장 더 골라요)`}</button></div></div>`;}
- rlShell(`<div class="scv-card rl-intro"><span class="sc-tag">✦ 로그라이크 모험</span><h3>끝없는 길</h3><p class="sc-line" style="margin:6px 0 10px">📖 도감의 글씨가 하나둘 지워지고 있다. 길 끝의 보스가 우리 기록을 삼키고 있기 때문이다.<br><b>보스를 쓰러뜨릴 때마다 먹힌 포켓몬이 도감으로 돌아온다. 되찾으러 가자!</b></p>${rules}${stats}<div class="mbtns"><button class="btn purple sm" id="rlDex">📖 유물 도감</button></div></div>${body}`,{noRun:true,screen:'scenarioRLEntry'});
+ rlShell(`<div class="scv-card rl-intro"><span class="sc-tag">✦ 로그라이크 모험</span><h3>끝없는 길</h3><p class="sc-line" style="margin:6px 0 10px">📖 도감의 글씨가 하나둘 지워지고 있다. 길 끝의 보스가 우리 기록을 삼키고 있기 때문이다.<br><b>보스를 쓰러뜨릴 때마다 먹힌 포켓몬이 도감으로 돌아온다. 되찾으러 가자!</b></p>${rules}${stats}<div class="mbtns"><button class="btn purple sm" id="rlDex">📖 유물 도감</button><button class="btn ghost sm" id="rlHelp">❓ 쉬운 사용법</button></div></div>${body}`,{noRun:true,screen:'scenarioRLEntry'});
  $('#rlDex').onclick=()=>{sfx('tap');rlRelicDex();};
+ {const hb=$('#rlHelp');if(hb)hb.onclick=()=>{sfx('tap');rlTutorial();};}
+ try{if(!S.meta.seen.c_rl1)setTimeout(()=>{if(S.screen==='scenarioRLEntry')coachOnce('c_rl1',rlCoachSteps());},600);}catch(e){}
  if(run){$('#rlResume').onclick=()=>{sfx('tap');if(run.cur)rlEnter(run.cur);else rlRenderMap();};$('#rlAbandon').onclick=async()=>{sfx('tap');if(await confirmBox('진행 중인 모험을 포기할까요?<br><span class=mut style="font-size:14px">간 만큼의 작은 보상만 받아요.</span>','포기하기','취소'))rlEnd(false,'abandon');};return;}
  const keep=()=>{const y=$('#view').scrollTop;rlRenderEntry();$('#view').scrollTop=y;};
  $('#view').querySelectorAll('[data-kw]').forEach(b=>b.onclick=()=>{sfx('tap');RL_KW=b.dataset.kw;keep();});
@@ -11428,6 +11601,16 @@ function rlRenderEntry(){
  $('#rlAutoSel').onclick=()=>{sfx('tap');if(!owned.length){toast('가진 포켓몬이 없어서 모두 랜덤으로 시작해요');return;}RL_SEL=rlAutoPick(owned,need);keep();toast('강하고 균형 잡힌 조합으로 골랐어요! 다시 누르면 다른 조합도 나와요');};
  $('#rlClrSel').onclick=()=>{sfx('tap');RL_SEL=[];keep();};
  $('#rlStart').onclick=()=>{if($('#rlStart').disabled){toast(`내 카드를 ${need}장 골라 주세요`);return;}sfx('tap');RL_SEL=RL_SEL.filter(id=>S.meta.col[id]);rlStart();};}
+/* ---------- 로그라이크 모험 튜토리얼 ---------- */
+function rlCoachSteps(){return [
+ {h:'끝없는 길 모험',ic:'map',pic:stPic([['🗺️','길을 골라요'],['⚔️','싸우고 모아요'],['👑','보스!']]),t:`갈림길을 골라 <b>${RL.steps}번</b> 나아가면 <b>보스</b>가 기다려요. 한 번 쓰러지면 끝나는 <b>도전 모드</b>예요!`},
+ {h:'덱 만들기',ic:'cards',pic:stPic([['🃏','내 카드 '+RL.pick+'장'],['🎲','랜덤 '+RL.rand+'장'],['📚','시작 덱']]),t:`내 카드 <b>${RL.pick}장</b>을 고르고 <b>랜덤 ${RL.rand}장</b>이 더해져 출발해요. 모험 중에 얻은 카드는 <b>모험 안에서만</b> 써요. 내 도감 카드는 사라지지 않아요.`},
+ {h:'싸우는 칸',ic:'sword',pic:stPic([['⚔️','일반 전투'],['💀','엘리트'],['🏟️','관장']]),t:'<b>⚔️ 일반 전투</b>는 이기면 그 포켓몬이 동료가 돼요. <b>💀 엘리트</b>는 더 강하지만 보상이 커요. <b>🏟️ 관장</b>은 유물을 들고 있는 카드 배틀 상대예요.'},
+ {h:'도움이 되는 칸',ic:'heart',pic:stPic([['🏺','유물'],['⛺','휴식'],['🛒','상점'],['🎓','시련']]),t:'<b>🏺 유물</b>은 3개 중 1개를 골라 강해져요. <b>⛺ 휴식</b>은 체력 회복이나 카드 정리, <b>🛒 상점</b>은 골드로 쇼핑, <b>🎓 시련</b>은 문제 3개로 보상을 받아요. <b>🎲 랜덤</b>과 <b>❓ 사건</b>은 뭐가 나올지 비밀!'},
+ {h:'체력이 중요해요',ic:'heart',pic:stPic([['❤️','체력'],['⚔️','싸우면 줄어요'],['⛺','쉬면 회복']]),t:'트레이너 <b>체력이 0</b>이 되면 모험이 끝나요. 전투에서 이기면 조금 회복하고, 휴식 칸에서 더 회복해요. 체력이 적으면 위험한 칸은 피해 가요!'},
+ {h:'보스와 보상',ic:'star',pic:stPic([['👑','보스'],['🃏','카드 보상'],['🪜','다음 층?']]),t:`보스를 쓰러뜨리면 <b>포켓몬 카드</b>와 보상을 받고, <b>그만둘지 다음 층(최대 ${RL.floors}층)</b>으로 갈지 골라요. 층이 오를수록 적이 강해져요. 중간에 그만둬도 간 만큼 보상을 받아요!`},
+ {h:'문제와 오답 노트',ic:'book',pic:stPic([['✏️','문제'],['❌','틀리면'],['📝','오답 노트']]),t:'전투와 시련에서 문제를 풀어요. <b>틀린 문제는 오답 노트</b>에 자동으로 모여요. 나중에 <b>나의 학습 기록 → 오답 노트</b>에서 다시 풀 수 있어요.'}];}
+function rlTutorial(){try{if(S.screen!=='scenarioRLEntry')rlLaunch();}catch(e){console.warn('rl tut',e);}return wait(250).then(()=>coach(rlCoachSteps()));}
 function rlLaunch(){const m=S.meta;if(!codeValid()||!m.name||!m.starter)return scLaunch();rlMeta();RL_SEL=[];rlRenderEntry();}
 
 // ---------- 전투 효과 연결 (유물) ----------
@@ -11456,6 +11639,7 @@ const __rlCheckEnd=checkEnd;
 checkEnd=function(){const run=RUN();
  if(B&&B.rl&&!B.over&&B.me.hp<=0&&run&&rlHas('phoenix')&&!run.used.phoenix){run.used.phoenix=1;B.me.hp=Math.max(1,Math.ceil(run.max/2));if(B.me.max<B.me.hp)B.me.max=B.me.hp;rlSave();if(!window.__sim){renderBattle();fx(heroEl(B.me),'불사조 부활!','heal');sfx('level');toast('🪶 불사조의 깃털이 빛나며 부활했어요!');}}
  if(B&&B.rl&&B.rl.duel&&!B.over&&B.foe&&B.foe.hp<=0&&B.rl.fr&&B.rl.fr.indexOf('phoenix')>=0&&!B.rl.foePhoenix){B.rl.foePhoenix=1;B.foe.hp=Math.max(1,Math.ceil(B.foe.max/2));if(!window.__sim){renderBattle();fx(heroEl(B.foe),'불사조 부활!','heal');sfx('level');toast('🪶 관장의 불사조 깃털이 빛나며 부활했어요!');}}
+ if(B&&B.rl&&!B.over&&!window.__sim&&!B.coop&&!B.pvp&&B.me.hp<=0&&!B.rl.reviveUsed&&!B.rl.reviveAsk&&rlFoeStanding()){B.over=true;B.rl.reviveAsk=1;rlReviveFlow(B);return true;}
  return __rlCheckEnd.apply(this,arguments);};
 const __rlSummonFoe=summon;
 summon=async function(P,hi,slot){
@@ -11494,7 +11678,7 @@ endBattle=async function(win){
 const __rlBattleMenu=battleMenu;
 battleMenu=function(){
  if(B&&B.rl){const duel=!!B.rl.duel;
-  M(`<h2>모험 중 전투</h2><div class="explain" style="font-size:14px">카드를 내고, 포켓몬으로 공격할 때 문제를 풀어요. 정답이면 제대로 공격하고, 오답이면 약하게 공격해요.<br>이기면 보상을, 트레이너 체력이 0이 되면 모험이 끝나요. 덱 카드가 다 떨어지면 덱을 다시 섞어요.</div><div class="mbtns"><button class="btn gold" data-a="x">계속 싸우기</button><button class="btn ghost" data-a="q">모험 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),q:async()=>{if(await confirmBox('전투를 멈추고 모험을 포기할까요?','포기하기','계속 싸우기')){closeM();if(duel){B.rl.fled=1;B.over=true;endBattle(false);}else finishEndlessWild('fled','모험을 포기했어요.');}}});
+  M(`<h2>모험 중 전투</h2><div class="explain" style="font-size:14px">카드를 내고, 포켓몬으로 공격할 때 문제를 풀어요. 정답이면 제대로 공격하고, 오답이면 약하게 공격해요.<br>이기면 보상을, 트레이너 체력이 0이 되면 모험이 끝나요. 단, 쓰러져도 <b>수학 문제 3개</b>를 맞히면 <b>체력 15로 부활</b>할 수 있어요 (전투마다 1번). 덱 카드가 다 떨어지면 덱을 다시 섞어요.</div><div class="mbtns"><button class="btn gold" data-a="x">계속 싸우기</button><button class="btn ghost" data-a="q">모험 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),q:async()=>{if(await confirmBox('전투를 멈추고 모험을 포기할까요?','포기하기','계속 싸우기')){closeM();if(duel){B.rl.fled=1;B.over=true;endBattle(false);}else finishEndlessWild('fled','모험을 포기했어요.');}}});
   return;}
  return __rlBattleMenu.apply(this,arguments);};
 
@@ -11503,6 +11687,87 @@ const __rlRenderTitle=renderTitle;
 renderTitle=function(){__rlRenderTitle.apply(this,arguments);const menu=$('.menuCol');if(menu&&!$('#tAdventure')){const b=document.createElement('button');b.id='tAdventure';b.className='btn gold big';b.textContent='🗺️ 로그라이크 모험';const sc=$('#tScenario');menu.insertBefore(b,sc?sc.nextSibling:$('#tSave'));b.onclick=()=>{sfx('tap');ac();rlLaunch();};}};
 const __rlRenderHub=renderHub;
 renderHub=function(){__rlRenderHub.apply(this,arguments);const grid=$('#view .tiles');if(grid&&!$('#rlHubTile')){const rl=rlMeta(),run=rl.run;const b=document.createElement('button');b.id='rlHubTile';b.className='tile main';b.style.background='linear-gradient(120deg,#fff4d6,#ffe3c2)';b.style.borderColor='#ffcf7a';b.style.boxShadow='0 5px 0 #ffcf7a';b.innerHTML=`<span class="ti" style="font-size:48px;display:flex;align-items:center;justify-content:center">🗺️</span><span><span class=tn>로그라이크 모험</span><br><span class=td>${run?`진행 중 · ${run.floor||1}층 ${Math.min(run.step+1,RL.steps+1)}/${RL.steps+1}단계 · ❤️ ${run.hp}/${run.max}`:`분기점 · 유물 · 보스 · ${rl.clears}번 클리어`}</span></span>`;const sc=$('#scHubTile');grid.insertBefore(b,sc?sc.nextSibling:grid.firstChild);b.onclick=()=>{sfx('tap');ac();rlLaunch();};}};
+
+// ============================================================================
+// ===== 부활 · 재도전: 쓰러져도 수학 문제를 풀면 다시 일어날 수 있어요 (아이들이 좌절하지 않도록) =====
+//  · 전투 중 부활: 전투마다 1번 · 문제 RL_REVIVE.need개를 맞히면 체력 RL_REVIVE.hp로 부활해 전투를 그대로 이어가요
+//  · 모험 중 재도전: 모험마다 1번 · 문제 RL_RETRY.need개를 맞히면 (분기점 → 분기점 선택지로 / 보스 → 보스전 재도전)
+// ============================================================================
+const RL_REVIVE={need:3,hp:15};
+const RL_RETRY={need:5,minHp:15};
+function rlFoeStanding(){if(!B||!B.foe)return false;if(B.rl&&B.rl.duel)return !(B.foe.hp<=0&&B.me.hp>=B.foe.hp);return B.foe.board.some(u=>u&&u.hp>0);}
+function rlChoiceBox(html,btns){return new Promise(res=>{const acts={_close:()=>{}};let h=html+'<div class=mbtns>';btns.forEach(b=>{h+=`<button class="btn ${b.c}" data-a="${b.k}">${b.l}</button>`;acts[b.k]=()=>{closeM();res(b.k);};});M(h+'</div>',acts);});}
+// 문제 한 개 (그만두기 버튼이 있어요)
+async function rlAskX(what,who){
+ const q=pickQ({cyc:1});if(!q)return{ok:true,ms:0};const box=$('#bq');
+ box.innerHTML=`<div class="sheet"><div class=bqHead><span class=who>${monImg(who,'front')}${esc(MON[who]?MON[who].name:'')}</span><span>${what}</span></div><div id=bqHost></div><div class=mbtns style="margin-top:8px"><button class="btn ghost sm" id="rlQuitQ">그만두기</button></div></div>`;box.classList.add('on');
+ let quit;const qp=new Promise(r=>{quit=r;});$('#rlQuitQ').onclick=()=>{sfx('tap');quit({abort:1});};
+ const r=await Promise.race([askQ($('#bqHost'),q,{fast:true,noRetry:true}),qp]);
+ box.classList.remove('on');box.innerHTML='';
+ if(r&&r.abort)return r;
+ recordAnswer(q,r.ok,r.ms,{choice:r.choice,guess:r.guess});return r;}
+// 문제를 need개 맞힐 때까지 풀어요 (틀리면 정답을 알려 주고 다음 문제로 이어져요). true=성공, false=그만둠
+async function rlQuizGate(need,label){
+ let ok=0;const who=partnerId();
+ while(ok<need){
+  const r=await rlAskX(`${label} · 맞힌 문제 ${ok} / ${need}`,who);
+  if(r.abort)return false;
+  const run=RUN();if(run){run.q++;if(r.ok)run.qc++;}
+  if(r.ok)ok++;}
+ return true;}
+const __rlMkMe0=rlMkMe;
+rlMkMe=function(){const run=RUN();if(run){run.snapPhoenix=!!(run.used&&run.used.phoenix);}return __rlMkMe0.apply(this,arguments);};
+
+// ---------- 전투 중 부활 ----------
+async function rlReviveFlow(b){
+ try{
+  await wait(1000);if(B!==b)return;
+  let revived=false;
+  while(true){
+   sfx('lose');
+   const k=await rlChoiceBox(`<div style="text-align:center"><h2>💔 쓰러졌어요!</h2><p style="font-size:17px;line-height:1.8;margin:10px 0">수학 문제 <b>${RL_REVIVE.need}개</b>를 맞히면<br><b>체력 ${RL_REVIVE.hp}</b>으로 <b>부활</b>해서<br>이 전투를 그대로 이어갈 수 있어요!<br><small class=mut>(부활은 전투마다 1번이에요)</small></p></div>`,[{k:'go',c:'gold big',l:'✏️ 문제 풀고 부활하기'},{k:'no',c:'ghost',l:'포기하기'}]);
+   if(B!==b)return;
+   if(k!=='go')break;
+   if(await rlQuizGate(RL_REVIVE.need,'부활 문제')){revived=true;break;}
+   if(B!==b)return;}
+  b.rl.reviveAsk=0;b.rl.reviveUsed=1;
+  if(!revived){b.over=false;checkEnd();return;}
+  const me=b.me;me.hp=RL_REVIVE.hp;me.max=Math.max(me.max||0,me.hp);me.rlBase=me.hp;me.rlSh=0;
+  b.over=false;b.busy=false;b.sel=-1;b.pick=-1;
+  const run=RUN();if(run)rlSave();
+  sfx('level');confetti(50);renderBattle();fx(heroEl(me),`부활! ❤️ ${RL_REVIVE.hp}`,'heal');toast(`✨ 부활했어요! 체력 ${RL_REVIVE.hp}으로 다시 싸워요!`);
+  if(b.side==='foe'){b.busy=true;renderBattle();await wait(900);if(B!==b||b.over)return;b.busy=false;startTurn('me');}
+  else renderBattle();
+ }catch(e){console.warn('revive',e);if(B===b){b.rl.reviveAsk=0;b.rl.reviveUsed=1;b.over=false;checkEnd();}}}
+
+// ---------- 모험 중 재도전 ----------
+const __rlBattleEnd0=rlBattleEnd;
+rlBattleEnd=async function(m,kind,win,me,fled){
+ const run=RUN();
+ if(run&&!win&&!fled&&!run.retryUsed&&!window.__sim){
+  S.screen='scenarioRLNode';
+  let again=false;try{again=await rlRetryOffer(m,kind,run);}catch(e){console.warn('retry',e);}
+  if(again)return;}
+ return __rlBattleEnd0.apply(this,arguments);};
+function rlRetryOffer(m,kind,run){return new Promise(res=>{
+ const boss=kind==='boss';rlSetBg(boss?'boss':'');sfx('lose');
+ const hpTo=Math.max(run.hp,Math.min(RL_RETRY.minHp,run.max));
+ const go=async()=>{if(RL_BUSY)return;RL_BUSY=true;let ok=false;
+  try{ok=await rlQuizGate(RL_RETRY.need,'재도전 문제');}finally{RL_BUSY=false;}
+  if(!ok)return; // 그만두면 이 화면에 그대로 있어요 (다시 풀거나 모험을 끝낼 수 있어요)
+  run.retryUsed=1;run.hp=hpTo;if(!run.snapPhoenix&&run.used)delete run.used.phoenix;
+  sfx('level');confetti(60);
+  if(boss){run.cur=m;rlSave();toast(`✨ 재도전! 체력 ${run.hp}으로 보스에게 다시 도전해요!`);rlBattleIntro(m,run);}
+  else{run.cur=null;rlSave();toast(`✨ 분기점으로 돌아왔어요! 체력 ${run.hp}으로 다시 길을 골라요!`);rlRenderMap();}
+  res(true);};
+ rlScene(m,{tag:'💔 쓰러졌어요…',ic:'💔',title:boss?'보스에게 졌어요':'전투에서 졌어요',
+  text:`괜찮아요, 아직 끝이 아니에요!<br>수학 문제 <b>${RL_RETRY.need}개</b>를 맞히면 <b>${boss?'보스전에 다시 도전':'분기점 선택지로 돌아가'}</b>할 수 있어요.<br><small class=mut>체력은 ${hpTo}(으)로 돌아와요 · 재도전은 모험마다 1번이에요</small>`,
+  btns:[{l:`✏️ 문제 ${RL_RETRY.need}개 풀고 ${boss?'재도전하기':'분기점으로 돌아가기'}`,c:'gold',big:1,f:go},{l:'모험 끝내기',c:'ghost',f:()=>res(false)}]});
+});}
+
+// 재도전이 남아 있으면 '쉬운 전투' 안내 팝업은 띄우지 않아요 (문제 풀이 화면을 가리지 않게)
+const __rlEasyHint=easyHint;
+easyHint=function(){try{const run=RUN();if(run&&!run.retryUsed&&/^scenarioRL/.test(S.screen||''))return;}catch(e){}return __rlEasyHint.apply(this,arguments);};
 
 init();
 
@@ -13152,8 +13417,10 @@ async function partC(){
   setHand([]);grant(0);
   T.allow=A.none;T.hi=()=>[];
   setTh('카드 소개','ball');cur.sc=0;
-  await note('이제 <b>포켓몬이 아닌 카드</b>를 써 볼까? 손패에는 포켓몬 카드 말고도 <b>돌 카드</b>와 <b>몬스터볼</b>이 들어올 수 있어. 먼저 돌 카드부터 해 보자!');
+  const cp=T.cpart||'';
+  await note(cp==='ball'?'이번엔 <b>몬스터볼</b>(랜덤 카드)을 써 볼까? 손패에는 <b>랜덤으로 포켓몬이 나오는 카드</b>가 들어올 수 있어!':cp==='stone'?'<b>돌 카드</b>를 하나씩 써 보자! 손패에는 포켓몬 카드 말고도 특별한 효과의 카드가 들어올 수 있어.':'이제 <b>포켓몬이 아닌 카드</b>를 써 볼까? 손패에는 포켓몬 카드 말고도 <b>돌 카드</b>와 <b>몬스터볼</b>이 들어올 수 있어. 먼저 돌 카드부터 해 보자!');
   await myTurn();
+  if(cp!=='ball'){
 
   /* C-1 화염의 돌 */
   setHand([ST('fire')]);grant(3);
@@ -13227,7 +13494,9 @@ async function partC(){
   await sweep({strikers:[BOSS_SLOT,ROCK_SLOT]});
   resetRock(3);
   setTh('정리','check');cur.sc=0;
-  await note('돌 카드 <b>다섯 종류</b>를 모두 써 봤어! 다음은 <b>몬스터볼</b>이야.');
+  await note(cp==='stone'?'돌 카드 <b>다섯 종류</b>를 모두 써 봤어!':'돌 카드 <b>다섯 종류</b>를 모두 써 봤어! 다음은 <b>몬스터볼</b>이야.');
+  }
+  if(cp!=='stone'){
 
   /* 몬스터볼: 연습용으로 전체 포켓몬에서 뽑아요(도감 등록 없음) */
   me.owned=Object.keys(MON).map(Number);
@@ -13241,6 +13510,7 @@ async function partC(){
 
   /* C-10 정리 */
   await sweep({strikers:[BOSS_SLOT,ROCK_SLOT]});
+  }
   try{const ds=S.meta.dexSeen||{};Object.keys(ds).forEach(k=>{if(!dexSnap[k])delete ds[k];});}catch(e){}
   me.owned=[];
   setTh('정리','check');cur.sc=0;
@@ -13438,6 +13708,13 @@ const parts=[partA,partB,partC,partTS,partD];
 async function run(T){
   try{
     const from=T.from||0;
+    if(T.only){
+      prepResume(T,2);
+      const SEC={trait:[partB],stone:[partC],ball:[partC],skill:[partTS]};
+      if(T.only==='stone'||T.only==='ball')T.cpart=T.only;
+      for(const f of SEC[T.only]||[]){await f();chk();}
+      await finish(T);return;
+    }
     if(from>0)prepResume(T,from);
     for(let i=from;i<parts.length;i++){await parts[i]();chk();if(!T.replay){const m=S.meta;m.tutDone=i+1;autoSave();}}
     await finish(T);
@@ -13449,6 +13726,10 @@ async function run(T){
 }
 async function finish(T){
   hideSay();T.hi=()=>[];T.allow=A.none;
+  if(T.only){
+    await new Promise(res=>{M('<div style="text-align:center"><h2 style="font-size:24px">연습 끝!</h2><p style="margin:6px 0 10px;line-height:1.6">선택한 튜토리얼을 마쳤어요.<br><span style="font-size:14px">다시 하기라 보상은 없어요.</span></p><div class=mbtns><button class="btn gold" data-a=ok>확인</button></div></div>',{ok:()=>{closeM();res();},_close:()=>{closeM();res();}});});
+    return;
+  }
   S.meta.seen=S.meta.seen||{};
   const ids=[FIRE_ID,WATER_ID].concat(Object.keys(EXP).map(k=>EXP[k]));
   const had={};ids.forEach(id=>{had[id]=!!(S.meta.col&&S.meta.col[id]);});
@@ -13493,7 +13774,7 @@ function tutMenu(){
 }
 async function tutSkipAsk(){
   if(!cur||cur.done||cur.skipAsk)return;cur.skipAsk=1;
-  let ok=false;try{ok=await confirmBox('튜토리얼을 완료하면 <b>특성별 포켓몬 18마리</b>를 획득할 수 있습니다.<br>정말로 건너뛰시겠습니까?<br><span style="font-size:14px">건너뛰어도 <b>설정</b>에서 언제든 튜토리얼을 다시 할 수 있어요.</span>','건너뛰기','계속하기');}finally{if(cur)cur.skipAsk=0;}
+  let ok=false;try{ok=await confirmBox((cur&&cur.replay)?'연습을 그만하고 나갈까요?<br><span style="font-size:14px">다시 하기라 보상은 없어요.</span>':'튜토리얼을 완료하면 <b>특성별 포켓몬 18마리</b>를 획득할 수 있습니다.<br>정말로 건너뛰시겠습니까?<br><span style="font-size:14px">건너뛰어도 <b>설정</b>에서 언제든 튜토리얼을 다시 할 수 있어요.</span>','건너뛰기','계속하기');}finally{if(cur)cur.skipAsk=0;}
   if(!ok)return;
   try{closeM();}catch(e){}
   if(cur&&!cur.replay){const m=S.meta;m.seen=m.seen||{};m.seen.tutA=1;m.seen.tutSkip=1;autoSave();}   // 어디까지 끝냈는지는 tutDone에 남아 있어요
@@ -13508,7 +13789,7 @@ function begin(o={}){
   const meta=S.meta;let pid=25;try{pid=partnerId()||25;}catch(e){}
   const me=mkPlayer(meta.name||'나',[],heroHpMax(),pid,true,[],false);
   const foe=mkPlayer('보스',[],20,BOSS_ID,true,[],false);
-  const T={w:null,lock:false,allow:A.none,hi:()=>[],q1done:false,done:false,abort:false,replay:!!o.replay,from:o.from||0,back:S.screen==='title'?'title':'hub'};
+  const T={w:null,lock:false,allow:A.none,hi:()=>[],q1done:false,done:false,abort:false,replay:!!o.replay,from:o.from||0,only:o.only||'',back:S.screen==='title'?'title':'hub'};
   cur=T;
   B={gi:-1,g:{n:'튜토리얼',ldr:'보스',types:[14],c:'#e9e2ff'},diff:1,turn:0,round:0,side:'me',me,foe,sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:false,over:false,tut:T};
   S.screen='battle';
