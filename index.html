@@ -3064,7 +3064,7 @@ async function saveMD(){const md=buildMD();const nm=(S.meta.name||'트레이너'
  const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);toast(esc(fn)+' 파일로 내려받았어요');}
 function handleFile(f){if(!f)return;const rd=new FileReader();rd.onload=async()=>{try{const o=await readAny(String(rd.result));applyLoaded(o,'파일에서 불러왔어요!');}catch(e){toast(esc(e.message||'불러오지 못했어요'));}};rd.readAsText(f,'utf-8');}
 const canNewWin=()=>EMBED&&/^https?:/.test(location.protocol);
-function quickSave(){if(!STORE_OK){showSaveBox();return;}saveLocal();toast(`${I('check')} 저장했어요! 지금 꺼도 다음에 이어서 할 수 있어요 <button class="btn sm ghost" style="margin-left:6px;pointer-events:auto" onclick="showSaveBox()">저장 코드·파일</button>`);}
+function quickSave(){if(!STORE_OK){showSaveBox();return;}saveLocal();toast(`${I('check')} 저장했어요! 지금 꺼도 다음에 이어서 할 수 있어요 <button class="btn sm ghost" style="margin-left:6px;pointer-events:auto" onclick="showSaveBox()">저장 옮기기</button>`);}
 function showSaveBox(){saveLocal();
  const status=STORE_OK?`<div class=saveStatus>${I('check')} <b>자동 저장 켜짐</b> — 문제를 풀거나 카드를 얻을 때마다 이 브라우저에 저장돼요.<br><span class=mut>지금: ${esc(saveSummary())}</span></div>`
   :`<div class="saveStatus bad">${I('lock')} <b>이 화면에서는 브라우저 저장이 막혀 있어요.</b><br>새로고침되면 기록이 사라지니, 아래 <b>저장 코드</b>를 꼭 만들어 두세요.</div>`;
@@ -3073,19 +3073,30 @@ function showSaveBox(){saveLocal();
   mk:async()=>{const c=await makeCode();const ta=$('#codeOut');ta.value=c;copyText(c,ta);},
   share:async()=>{const c=await makeCode();$('#codeOut').value=c;try{await navigator.share({title:GAME.title+' 저장 코드',text:c});}catch(e){copyText(c,$('#codeOut'));}},
   ld:async()=>{try{const o=await readAny($('#codeIn').value);if(S.meta.name&&!(await confirmBox('지금 기록이 코드의 기록으로 바뀌어요. 불러올까요?','불러오기','취소')))return;applyLoaded(o,'저장 코드로 불러왔어요!');}catch(e){toast(esc(e.message||'불러오지 못했어요'));}},
-  mdS:()=>saveMD(),mdL:()=>$('#fileIn').click(),win:()=>{saveLocal();window.open(location.href,'_blank');},xRcv:()=>{closeM();xferReceive();},netdiag:()=>{closeM();netDiag();},xSnd:()=>{closeM();xferSend();}};
+  mdS:()=>saveMD(),mdL:()=>$('#fileIn').click(),win:()=>{saveLocal();window.open(location.href,'_blank');},xRcv:()=>{closeM();xferReceive();},xSnd:()=>{closeM();xferSend();}};
  [1,2,3].forEach(i=>{acts['s'+i]=async()=>{const o=slotGet(i);if(o&&!(await confirmBox(`저장 칸 ${i}의 기록을 지금 기록으로 덮어쓸까요?`,'덮어쓰기','취소')))return;if(slotSave(i)){sfx('coin');toast(`저장 칸 ${i}에 저장했어요`);showSaveBox();}else toast('저장하지 못했어요');};
   acts['l'+i]=async()=>{const o=slotGet(i);if(!o)return;if(!(await confirmBox(`지금 기록 대신 저장 칸 ${i}의 기록을 불러올까요?`,'불러오기','취소')))return;applyLoaded(o,`저장 칸 ${i}을 불러왔어요!`);};});
  M(`<h2>${I('disk')} 저장 · 불러오기</h2>${status}${slots}
+  <div style="margin:12px 0;padding:14px 12px;border:3px solid #7a5cff;border-radius:16px;background:linear-gradient(180deg,#f3eeff,#fff8e6);box-shadow:0 4px 0 #cdbdff">
+   <h3 style="margin:0 0 4px;font-size:20px;text-align:center">📲 다른 기기로 옮기기 <span style="background:#ff5a5f;color:#fff;border-radius:999px;padding:2px 9px;font-size:12px;vertical-align:middle">쉬워요!</span></h3>
+   <p class=mut style="font-size:13px;text-align:center;margin:0 0 10px">숫자 4자리만 있으면 돼요 · 두 기기 모두 인터넷이 필요해요</p>
+   <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <div style="flex:1 1 220px;background:#fff;border-radius:12px;padding:10px;text-align:center;border:2px solid #d9ccff">
+     <div style="font-size:15px;font-weight:900;margin-bottom:2px">① 새 기기에서</div>
+     <div style="font-size:13px;line-height:1.5;margin-bottom:8px">아래 버튼을 누르면<br><b>숫자 4자리</b>가 나와요</div>
+     <button class="btn purple big" style="width:100%" data-a=xRcv>📥 받기</button></div>
+    <div style="flex:1 1 220px;background:#fff;border-radius:12px;padding:10px;text-align:center;border:2px solid #d9ccff">
+     <div style="font-size:15px;font-weight:900;margin-bottom:2px">② 옛 기기에서</div>
+     <div style="font-size:13px;line-height:1.5;margin-bottom:8px">아래 버튼을 누르고<br>그 <b>숫자 4자리</b>를 넣어요</div>
+     <button class="btn blue big" style="width:100%" data-a=xSnd>📤 보내기</button></div>
+   </div>
+   <p style="font-size:13px;text-align:center;margin:10px 0 0;font-weight:700;color:#5b3fd0">③ 끝! 저장 데이터가 새 기기로 넘어가요 🎉</p>
+  </div>
   <h3>저장 코드 <span class=mut style="font-size:12px">(어디서나 되는 방법 · 다른 기기로 옮길 수 있어요)</span></h3>
   <div class=row><button class="btn green" data-a=mk>코드 만들고 복사</button>${navigator.share?'<button class="btn purple" data-a=share>메신저로 보내기</button>':''}</div>
   <textarea class="inp code" id=codeOut readonly placeholder="'코드 만들고 복사'를 누르면 여기에 저장 코드가 나와요"></textarea>
   <textarea class="inp code" id=codeIn placeholder="저장해 둔 코드(PKMT로 시작)나 .md 파일 내용을 여기에 붙여 넣으세요"></textarea>
   <div class=row style="margin-top:8px"><button class="btn blue" data-a=ld>코드로 불러오기</button></div>
-  <h3>기기 간 옮기기 <span class=mut style="font-size:12px">(숫자 4자리로 바로 옮겨요 · 두 기기 모두 인터넷이 필요해요)</span></h3>
-  <p class=mut style="font-size:12px;margin:0 0 6px"><b>학교 와이파이는 작동하지 않을 수 있어요.</b></p>
-  <div class=row><button class="btn purple" data-a=xRcv>📥 받기</button><button class="btn blue" data-a=xSnd>📤 보내기</button><button class="btn ghost" data-a=netdiag>🌐 연결 진단</button></div>
-  <p class=mut style="font-size:12px;margin:4px 0 0;line-height:1.5">새 기기에서 <b>받기</b>를 누르면 숫자 4자리가 나와요. 옛 기기에서 <b>보내기</b>를 누르고 그 숫자를 넣으면 저장 데이터가 넘어가요.</p>
   <h3>파일</h3><div class=row><button class="btn ghost" data-a=mdS>${I('disk')} .md 파일로 저장</button><button class="btn ghost" data-a=mdL>${I('folder')} .md 파일 불러오기</button></div>
   ${canNewWin()?`<h3>새 창</h3><div class=row><button class="btn ghost" data-a=win>새 창에서 크게 열기</button></div>`:''}
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,acts,{wide:1});}
@@ -8688,7 +8699,7 @@ const gymBadge=(i,won)=>{const c=won===false?'#b8b2a6':GYMS[i].c,mx=(a,b,t)=>{co
  if(won!==false){GYM_SYM[i].forEach((r,y)=>{for(let x=0;x<8;x++)if(r[x]!=='.')rows[4+y][4+x]=r[x];});}else{[[7,5],[8,5],[8,6],[8,7],[7,8],[8,10]].forEach(p=>{rows[p[1]][p[0]]='d';});}
  return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+PXG(rows.map(r=>r.join('')),pal)+'</svg>';};
 function hudHTML(){const m=S.meta,L=lvOf(m.xp);let lgI=-1;try{Object.keys(m.gyms||{}).forEach(k=>{if(+k>lgI)lgI=+k;});}catch(e){}const lgName=lgI>=0?GYMS[lgI].n:'도전 전';
- return `<div class=hud><i class=hudGold></i><div class=hudL><div class=hl1><button class="btn ghost sm" id=hHome>${I('ball')}<span class=bt> 방</span></button><div class=lvBox><span class=lvNum>Lv.${L.lv}</span><div class=xpBar title="${L.cur}/${L.need}"><i style="width:${L.cur/L.need*100}%"></i></div></div></div><div class=hl2><span class=gsTag>${esc(semName(m.gs))}</span><span class=hudSp></span><button class="btn green sm" id=hSave title="누르면 바로 저장돼요. 저장 코드·파일은 길게 누르거나 설정에서">${I('disk')}<span class=bt> 저장</span></button><button class="btn ghost sm" id=hSet>${I('gear')}</button></div></div><div class=hudR><span class=pill title="사탕">${I('candy')}${m.candy}</span><span class=pill title="코인">${I('coin')}${m.coins}</span><span class=pill title="카드팩">${I('ball')}${m.packs}</span><span class=pill title="별가루">${I('star')}${m.dust||0}</span><span class=pill title="정원 에너지 (개념을 3번 연속 맞히면 1개)">⚡${(()=>{try{return gdEnergy(m);}catch(e){return 0;}})()}</span><span class=pill title="레벨 포인트">🔷${m.lp||0}</span><span class="pill lgPill" title="${lgI>=0?'최근 클리어한 체육관: '+lgName:'아직 체육관에 도전하지 않았어요'}" style="--lc:${lgI>=0?GYMS[lgI].c:'#b8b2a6'}">${gymBadge(Math.max(lgI,0),lgI>=0)}<b>${lgName}</b></span></div></div>`;}
+ return `<div class=hud><i class=hudGold></i><div class=hudL><div class=hl1><button class="btn ghost sm" id=hHome>${I('ball')}<span class=bt> 방</span></button><div class=lvBox><span class=lvNum>Lv.${L.lv}</span><div class=xpBar title="${L.cur}/${L.need}"><i style="width:${L.cur/L.need*100}%"></i></div></div></div><div class=hl2><span class=gsTag>${esc(semName(m.gs))}</span><span class=hudSp></span><button class="btn green sm" id=hSave title="누르면 바로 저장돼요. 저장 옮기기는 길게 누르거나 설정에서">${I('disk')}<span class=bt> 저장</span></button><button class="btn ghost sm" id=hSet>${I('gear')}</button></div></div><div class=hudR><span class=pill title="사탕">${I('candy')}${m.candy}</span><span class=pill title="코인">${I('coin')}${m.coins}</span><span class=pill title="카드팩">${I('ball')}${m.packs}</span><span class=pill title="별가루">${I('star')}${m.dust||0}</span><span class=pill title="정원 에너지 (개념을 3번 연속 맞히면 1개)">⚡${(()=>{try{return gdEnergy(m);}catch(e){return 0;}})()}</span><span class=pill title="레벨 포인트">🔷${m.lp||0}</span><span class="pill lgPill" title="${lgI>=0?'최근 클리어한 체육관: '+lgName:'아직 체육관에 도전하지 않았어요'}" style="--lc:${lgI>=0?GYMS[lgI].c:'#b8b2a6'}">${gymBadge(Math.max(lgI,0),lgI>=0)}<b>${lgName}</b></span></div></div>`;}
 function bindHud(){const h=$('#hHome');if(h)h.onclick=()=>{sfx('tap');renderHub();};const s=$('#hSave');if(s){s.onclick=()=>{sfx('coin');quickSave();};s.oncontextmenu=e=>{e.preventDefault();showSaveBox();};}const t=$('#hSet');if(t)t.onclick=()=>{sfx('tap');showSettings();};}
 
 // ---- 기능 단계적 열림 ----
@@ -9139,10 +9150,10 @@ function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.eas
   <div class=setRow><span><b>포켓몬 이미지</b><br><span class=mut style="font-size:12px">끄면 포켓몬 그림을 불러오지 않아요. 인터넷이 막힌 곳에서는 '끄기'</span></span>${seg('imgs',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>왼쪽 아래 버튼 피하기</b><br><span class=mut style="font-size:12px">구글 사이트 등 다른 페이지 안에서 열었을 때, 왼쪽 아래 ⓘ 버튼이 내 카드·버튼을 가리면 켜세요. 자동은 사이트 안에서 열면 켜져요</span></span>${seg('safe',[['auto','자동'],['on','켜기'],['off','끄기']])}</div>
   <div class=setRow><span><b>보이는 영역에 화면 맞추기</b><br><span class=mut style="font-size:12px">주소창·사이트 머리글 때문에 화면이 일부만 보일 때, 게임을 보이는 영역 안에 딱 맞춰요. 화면이 잘려 보이면 '자동', 맞춤이 어색하면 '끄기'</span></span>${seg('fit',[['auto','자동'],['off','끄기']])}</div>
-  <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>🎓 학년 변경</button><button class="btn ghost" data-a=tsend>📡 선생님께 기록 보내기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=netdiag>🌐 연결 진단</button><button class="btn ghost" data-a=tutor>${tutBtnLabel()}</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
+  <div class=mbtns><button class="btn ghost" data-a=full>⛶ 전체 화면</button><button class="btn ghost" data-a=save>${I('disk')} 저장 · 불러오기</button><button class="btn ghost" data-a=code>🎓 학년 변경</button><button class="btn ghost" data-a=tsend>📡 선생님께 기록 보내기</button><button class="btn ghost" data-a=nick>닉네임 바꾸기</button><button class="btn ghost" data-a=tutor>${tutBtnLabel()}</button><button class="btn ghost" data-a=title>처음 화면으로</button></div>
   <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>
   <p class=mut style="font-size:11px;margin-top:10px;line-height:1.5">${GAME.title} v${GAME.ver} · 좌삼초. 수업용 비영리 팬 제작 학습 도구예요. 포켓몬 이름·그림의 권리는 Nintendo·Creatures·GAME FREAK·The Pokémon Company에 있어요. 그림은 PokeAPI 공개 저장소에서 불러와요.</p>`,
-  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},netdiag:()=>{closeM(l2);netDiag();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);tutPicker();return;if(window.TUT_A){const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(sk){const k=Math.min(4,m.tutDone||0);try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});}}},{layer2:!!l2});
+  {x:()=>closeM(l2),_close:()=>closeM(l2),full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);tutPicker();return;if(window.TUT_A){const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(sk){const k=Math.min(4,m.tutDone||0);try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});}}},{layer2:!!l2});
  {const sb=$('#sfxVol');if(sb){sb.oninput=()=>{st.sfxVol=+sb.value;$('#sfxVolN').textContent=sb.value+'%';};sb.onchange=()=>{autoSave();if(st.sound)sfx('ok');};}}
  {const vb=$('#bgmVol');if(vb){vb.oninput=()=>{st.bgmVol=+vb.value;$('#bgmVolN').textContent=vb.value+'%';applyBgmVol();};vb.onchange=()=>{autoSave();};}}
  $(l2?'#mbox2':'#mbox').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;st[k]=v;if(k==='bgm'){if(v)startBgm();else stopBgm();}autoSave();applySafe();refit();sfx('tap');showSettings(l2);if(k==='imgs'&&S.screen==='hub')renderHub();});}
