@@ -182,7 +182,7 @@ h2{font-size:26px;margin-bottom:8px}h3{font-size:19px;margin:12px 0 6px}
 @keyframes gdRain{to{top:105%;margin-left:-14px}}
 @keyframes gdSnow{0%{top:-6%;margin-left:0}50%{margin-left:8px}100%{top:105%;margin-left:-6px}}
 .gdWx{position:absolute;left:6px;top:6px;z-index:30;pointer-events:none;font:700 11px/1 'Jua',sans-serif;background:rgba(255,253,240,.78);border:2px solid rgba(201,154,46,.8);border-radius:999px;padding:3px 9px;color:#5a4220}
-.gdDec{position:absolute;width:calc(var(--w,40) * 2.083px * var(--k,1));height:calc(var(--h,40) * 2.083px * var(--k,1));transform:translate(-50%,-100%);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+.gdDec{position:absolute;width:calc(var(--w,40) * 1.25px * var(--k,1));height:calc(var(--h,40) * 1.25px * var(--k,1));transform:translate(-50%,-100%);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
 .gdDec img{width:100%;height:100%;image-rendering:pixelated;display:block;pointer-events:none}
 .gdShopGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin-top:8px}
 .gdShopItem{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;min-height:112px;padding:8px 4px 6px;border:2px solid #e3c87a;border-radius:14px;background:linear-gradient(#fffdf5,#fbf1d9);box-shadow:0 3px 0 rgba(138,100,32,.3);cursor:pointer;font-family:inherit;color:#5a4220}
@@ -521,6 +521,20 @@ html.lowfx .card .holo{animation:none;mix-blend-mode:normal;opacity:.25}
 @keyframes dmgUp{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}15%{opacity:1;transform:translate(-50%,-60%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-160%) scale(1)}}
 .shake{animation:bShake .25s}
 @keyframes bShake{25%{transform:translate(4px,-3px)}50%{transform:translate(-4px,2px)}75%{transform:translate(2px,3px)}}
+#pvSpec{position:fixed;left:50%;transform:translateX(-50%);width:min(440px,calc(100vw - 16px));top:calc(8px + env(safe-area-inset-top,0px));z-index:60;background:#edf6ff;color:#1d2f4a;border:2px solid #74b6f4;border-radius:16px;padding:8px 10px;box-shadow:inset 0 2px 0 #fff,0 3px 0 #a8d4ff,0 8px 20px rgba(47,98,181,.3);max-height:44vh;overflow:auto;pointer-events:none;font-size:13px}
+#pvSpec .pvsHead{font-size:13px;margin-bottom:5px}#pvSpec .pvsSt{margin-left:4px;padding:1px 8px;border-radius:99px;background:#cfe4fb;color:#2f62b5;font-weight:700;white-space:nowrap}
+#pvSpec .pvsSt.ok{background:#2f9e5b;color:#fff}#pvSpec .pvsSt.no{background:#d9393f;color:#fff}
+#pvSpec .pvsQ{background:#dceeff;border:2px solid #74b6f4;border-radius:12px;padding:6px 8px;box-shadow:0 3px 0 #a8d4ff}#pvSpec .pvsSk{font-size:11px;color:#4f7fb8}#pvSpec .pvsText{font-size:15px;font-weight:700;margin:2px 0}
+#pvSpec .pvsPic{max-height:110px;overflow:hidden}
+#pvSpec .pvsCh{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}#pvSpec .pvsC{padding:3px 10px;border-radius:8px;background:#fff;border:2px solid #a8d4ff}
+#pvSpec .pvsC.ok{background:#2f9e5b;border-color:#1f7a45;color:#fff}#pvSpec .pvsC.no{background:#d9393f;border-color:#a82a30;color:#fff}
+#pvSpec.k-atk{background:#fff0ee;color:#4a1f1f;border-color:#ee8a82;box-shadow:inset 0 2px 0 #fff,0 3px 0 #f7b8b2,0 8px 20px rgba(200,60,50,.3)}
+#pvSpec.k-atk .pvsQ{background:#ffdedb;border-color:#ee8a82;box-shadow:0 3px 0 #f7b8b2}#pvSpec.k-atk .pvsSk{color:#b85a54}
+#pvSpec.k-atk .pvsSt{background:#ffd0cb;color:#c23a31}#pvSpec.k-atk .pvsC{border-color:#f7b8b2}
+#pvSpec.k-pow{background:#fff8e6;color:#4a3a1a;border-color:#e3c98a;box-shadow:inset 0 2px 0 #fff,0 3px 0 #f1e0b0,0 8px 20px rgba(170,130,40,.28)}
+#pvSpec.k-pow .pvsQ{background:#fdf0cc;border-color:#e3c98a;box-shadow:0 3px 0 #f1e0b0}#pvSpec.k-pow .pvsSk{color:#a8883f}
+#pvSpec.k-pow .pvsSt{background:#f8e8b8;color:#8a6a1c}#pvSpec.k-pow .pvsC{border-color:#f1e0b0}
+#pvSpec.k-atk .pvsSt.ok,#pvSpec.k-pow .pvsSt.ok{background:#2f9e5b;color:#fff}#pvSpec.k-atk .pvsSt.no,#pvSpec.k-pow .pvsSt.no{background:#d9393f;color:#fff}
 #bq{position:fixed;left:0;right:0;bottom:0;z-index:40;display:none;padding:0 10px calc(10px + var(--sb))}
 #bq.on{display:block;animation:sheetUp .25s ease-out}
 @keyframes sheetUp{from{transform:translateY(60%);opacity:0}}
@@ -532,7 +546,9 @@ html.lowfx .card .holo{animation:none;mix-blend-mode:normal;opacity:.25}
 #bq .qText{font-size:clamp(22px,5.4vw,30px)}
 #bq .ch{min-height:58px;font-size:clamp(20px,5vw,26px);padding:10px 6px}
 .bqHead{display:flex;align-items:center;gap:8px;font-family:'Jua';font-size:15px;margin-bottom:6px}
-.bqHead .who{display:flex;align-items:center;gap:4px;background:#fff;border-radius:10px;padding:2px 8px}
+.bqHead .who{display:flex;align-items:center;gap:4px;background:#fff;border-radius:10px;padding:2px 8px;flex:0 0 auto;white-space:nowrap}
+.bqHead>span:last-child{min-width:0}
+.bqNote{font-family:'Jua';font-size:14px;font-weight:900;color:#d98300;margin:-2px 0 6px 2px;line-height:1.2}
 .bqHead img{width:28px;height:28px;image-rendering:pixelated}
 /* 리그 */
 .gyms{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
@@ -2545,6 +2561,89 @@ html.lowfx .unit.mega .shadow::before,html.lowfx .unit.mega .shadow::after,html.
 .evoShock{border:6px solid var(--c);box-shadow:0 0 22px var(--c),0 0 46px color-mix(in srgb,var(--c) 60%,transparent),inset 0 0 22px color-mix(in srgb,var(--c2) 70%,transparent);opacity:0;animation:evoShockA var(--t) cubic-bezier(.15,.7,.3,1) both}
 .evoFlash{background:radial-gradient(circle,#fff 0,color-mix(in srgb,var(--c2) 75%,transparent) 22%,color-mix(in srgb,var(--c) 45%,transparent) 48%,transparent 70%);opacity:0;animation:evoFlashA var(--t) ease-out both}
 .evoSpokes{background:repeating-conic-gradient(from 0deg,transparent 0deg,color-mix(in srgb,var(--c2) 85%,transparent) 2.5deg,transparent 6deg,transparent 22.5deg);-webkit-mask-image:radial-gradient(circle,#000 8%,rgba(0,0,0,.6) 36%,transparent 66%);mask-image:radial-gradient(circle,#000 8%,rgba(0,0,0,.6) 36%,transparent 66%);opacity:0;animation:evoSpokeA var(--t) ease-out both}
+</style>
+<style id=tcStyle>
+/* ===== 선생님 화면 가독성 ===== */
+.tcCodeBar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 8px}
+.tcCodeHint{flex:1;min-width:200px;font-size:13.5px;line-height:1.5;color:#7a5a00;background:#fff6dc;border:1.5px solid #f0cf7a;border-radius:10px;padding:6px 10px}
+.tcCodeBox{margin:6px 0 10px;padding:10px 12px;border:2px dashed #cdbf9f;border-radius:12px;background:#fffdf7}
+.tcCodeBox[hidden]{display:none}
+.tcCodeBox .explain{margin:0 0 12px!important}
+.tcCodeBox>p{margin:0 0 8px}
+#tcRep{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid #e0d3b5;border-radius:12px;background:#fff}
+#tcRep:empty{border:0}
+#tcRep .explain{margin:8px}
+#tcRep table.rep{width:100%;min-width:1040px;font-size:14px;border-collapse:separate;border-spacing:0;background:#fff}
+#tcRep table.rep th{position:sticky;top:0;z-index:3;background:#efe6d3;color:#4a3b1e;font-size:13px;font-weight:900;white-space:nowrap;padding:10px 10px;border:0;border-bottom:2px solid #cdbf9f;text-align:center}
+#tcRep table.rep td{padding:10px 10px;border:0;border-bottom:1px solid #eee4d0;vertical-align:middle;line-height:1.55;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+#tcRep table.rep td.tx{white-space:normal;min-width:170px;max-width:240px;text-align:left;font-size:13.5px}
+#tcRep table.rep tr:nth-child(even) td{background:#fbf7ee}
+#tcRep table.rep tr:hover td{background:#fff3cf}
+#tcRep table.rep td:first-child,#tcRep table.rep th:first-child{position:sticky;left:0;z-index:2;text-align:left;font-weight:900;border-right:2px solid #e0d3b5;box-shadow:2px 0 4px -2px rgba(0,0,0,.12)}
+#tcRep table.rep th:first-child{z-index:4}
+#tcRep table.rep td:first-child{background:#fff}
+#tcRep table.rep tr:nth-child(even) td:first-child{background:#fbf7ee}
+#tcRep table.rep tr:hover td:first-child{background:#fff3cf}
+#tcRep table.rep td.hG{background:#cfeeda!important;color:#1f6b3d}
+#tcRep table.rep td.hY{background:#fff0b8!important;color:#7a5a00}
+#tcRep table.rep td.hR{background:#ffd0cd!important;color:#9c1f1f}
+table.tcT th{position:sticky;top:0;white-space:nowrap}
+table.tcT tr:nth-child(even) td:not([style*="background"]){background:#fbf7ee}
+table.tcT td:first-child,table.tcT th:first-child{position:sticky;left:0;z-index:2;text-align:left!important;background:#fff;box-shadow:2px 0 4px -2px rgba(0,0,0,.12)}
+table.tcT th:first-child{background:#f6efe2}
+@media (max-width:520px){#tcRep table.rep{font-size:13px;min-width:960px}#tcRep table.rep td,#tcRep table.rep th{padding:8px 7px}}
+</style>
+<style id=tcWbStyle>
+.tcWbTop{background:#fff4ec;border:1.5px solid #f0b48a;border-radius:12px;padding:10px 12px;margin:0 0 12px;font-size:14px;line-height:1.6}
+.tcWbTopRow{margin-top:6px;background:#fff;border:1px solid #f0cdb0;border-radius:10px}
+.tcWbTopRow>summary{cursor:pointer;padding:7px 10px;line-height:1.5;font-size:14px}
+.wbCh{margin:6px 0;font-size:14px;line-height:1.7}.wbCh .bad{color:#c0392b}
+details.tcWbStu{border:1.5px solid #e0d3b5;border-radius:12px;background:#fff;margin-bottom:8px;overflow:hidden}
+details.tcWbStu.empty{opacity:.75}
+details.tcWbStu>summary{cursor:pointer;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;font-size:15px;list-style:none}
+details.tcWbStu>summary::-webkit-details-marker{display:none}
+details.tcWbStu>summary::before{content:'▸';color:#a08a5a;font-size:14px}
+details.tcWbStu[open]>summary::before{content:'▾'}
+details.tcWbStu[open]>summary{background:#f6efe2;border-bottom:1px solid #e0d3b5}
+.wbName{font-weight:900;font-size:16px;min-width:64px}
+.wbCnt{font-size:14px;color:#6a5a3a}
+.wbKinds{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto}
+.wbList{padding:8px 10px}
+details.tcWbQ{border:1px solid #eadfc8;border-radius:10px;margin-bottom:6px;background:#fffdf8}
+details.tcWbQ>summary{cursor:pointer;display:flex;align-items:center;gap:8px;padding:8px 10px;list-style:none}
+details.tcWbQ>summary::-webkit-details-marker{display:none}
+.wbQt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:14.5px;line-height:1.45}
+.wbMeta{font-size:12.5px;color:#8a7a56}
+.wbN{font-size:13px;font-weight:900;color:#b3261e;background:#ffe3e0;border-radius:99px;padding:2px 9px;white-space:nowrap}
+.wbSt{font-size:12.5px;font-weight:900;color:#7a5a00;background:#fff0b8;border-radius:99px;padding:2px 9px;white-space:nowrap}
+.wbSt.ok{color:#1f6b3d;background:#cfeeda}
+.wbBody{padding:4px 12px 10px;border-top:1px dashed #e0d3b5}
+.wbBody .qText{font-size:16px;line-height:1.6;margin:6px 0}
+.wbAns{display:flex;gap:6px 18px;flex-wrap:wrap;font-size:14.5px;margin:6px 0}
+.wbAns .bad{color:#c0392b}.wbAns .good{color:#2f9e6e}
+.wbMi{margin-top:6px;font-size:13.5px;background:#fff6dc;border-radius:8px;padding:6px 9px;line-height:1.5}
+.wbEx{margin-top:6px;font-size:13.5px;line-height:1.6;color:#4a3b1e}
+details.wbDone{margin-top:8px}
+details.wbDone>summary{cursor:pointer;font-size:13.5px;color:#6a5a3a;padding:4px 2px}
+</style>
+<style id=tcAttnStyle>
+.tcAttnRow{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:10px 12px;margin-bottom:8px;border-radius:12px;border:1.5px solid #e0d3b5;border-left-width:7px;background:#fff}
+.tcAttnRow.aHi{border-color:#e8a0a0;border-left-color:#d6453d;background:#fff4f2}
+.tcAttnRow.aMid{border-color:#f0cf7a;border-left-color:#e0a21a;background:#fffaec}
+.tcAttnRow.aLo{border-left-color:#9aa7b5}
+.tcAttnName{font-weight:900;font-size:16px;flex:0 0 76px;text-align:left}
+.tcAttnChips{display:flex;gap:6px;flex-wrap:wrap}
+.tcAttnChip{font-size:13.5px;background:#fff;border:1px solid #d8cdbb;border-radius:99px;padding:3px 10px;line-height:1.4}
+</style>
+<style id=tcCmpStyle>
+.tcCmpWrap{overflow-x:auto;border:1px solid #e0d3b5;border-radius:12px;background:#fff}
+table.tcCmpT{width:100%;min-width:760px;border-collapse:separate;border-spacing:0;font-size:14px}
+table.tcCmpT th{background:#efe6d3;color:#4a3b1e;font-size:13px;font-weight:900;padding:10px;white-space:nowrap;border-bottom:2px solid #cdbf9f}
+table.tcCmpT td{padding:10px;text-align:center;border-bottom:1px solid #eee4d0;line-height:1.5}
+table.tcCmpT tr:nth-child(even) td{background:#fbf7ee}
+table.tcCmpT td.nm{font-weight:900;text-align:left}
+.tcUp{color:#1f6b3d;font-weight:900}.tcDown{color:#b3261e;font-weight:900}.tcFlat{color:#8a7d8f}
+.tcRptRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;margin-bottom:6px;border:1.5px solid #e0d3b5;border-radius:12px;background:#fff}
 </style>
 </head>
 <body>
@@ -4667,7 +4766,7 @@ function askQ(host,q,opt={}){return new Promise(async res0=>{let hinted=false;co
  const chs=host.querySelectorAll('.ch');chs.forEach(b=>{b.classList.add('wait');b.style.setProperty('--lk',lock+'ms');});
  if(lock>600){const t=document.createElement('div');t.className='thinkBar';t.innerHTML=`<i style="animation-duration:${lock}ms"></i><span>문제를 끝까지 읽어요…</span>`;host.querySelector('.choices').before(t);}
  setTimeout(()=>{chs.forEach(b=>b.classList.remove('wait'));const t=host.querySelector('.thinkBar');if(t)t.remove();},lock);
- host.querySelectorAll('.ch').forEach(b=>b.onclick=async()=>{if(done||b.classList.contains('wait'))return;done=true;const ms=performance.now()-t0;const c=q.ch[+b.dataset.i];const ok=c===q.a;
+ host.querySelectorAll('.ch').forEach(b=>b.onclick=async()=>{if(done||b.classList.contains('wait'))return;done=true;const ms=performance.now()-t0;const c=q.ch[+b.dataset.i];const ok=c===q.a;try{opt.onPick&&opt.onPick(+b.dataset.i,ok);}catch(e){}
   const guess=guessCheck(q,ms,ok,+b.dataset.i)&&!ok;
   host.querySelectorAll('.ch').forEach(x=>{const v=q.ch[+x.dataset.i];if(v===q.a)x.classList.add('ok');else if(x===b)x.classList.add('no');else x.classList.add('dim');});
   if(ok){sfx('ok',Math.min(8,S.meta.stats.streak));await wait(opt.fast?380:560);return res({ok,ms,choice:c,guess:false});}
@@ -5607,9 +5706,9 @@ function msg(t){const m=$('#bMsg');if(m)m.innerHTML=t;}
 
 // 상성: 공격하는 포켓몬(또는 고른 카드)과 상대 포켓몬 사이
 function matchup(aid,did){const k=typeMul(aid,did);return k>=2?{c:'adv',t:'유리 ×1.5'}:k<1?{c:'dis',t:'불리 −1'}:null;}
-function predDmg(a,d){if(d.dodge)return 0;let dmg=a.atk+fightB(a)+sneakB(a,d);const dm=dragonMod(a);if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);dmg=Math.max(1,applyType(dmg,typeMul(a.id,d.id)));if(d.shield>0&&dmg>0&&!(a.kw==='sneak'&&isLeg(a)))dmg=Math.max(1,Math.max(0,dmg-1)-d.shield);if(armorV(d)&&dmg>1)dmg=Math.max(1,dmg-armorV(d));return Math.max(1,dmg);}
+function predDmg(a,d,cbn=0){if(d.dodge)return 0;let dmg=a.atk+cbn+fightB(a)+sneakB(a,d);const dm=dragonMod(a);if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);dmg=Math.max(1,applyType(dmg,typeMul(a.id,d.id)));if(d.shield>0&&dmg>0&&!(a.kw==='sneak'&&isLeg(a)))dmg=Math.max(1,Math.max(0,dmg-1)-d.shield);if(armorV(d)&&dmg>1)dmg=Math.max(1,dmg-armorV(d));return Math.max(1,dmg);}
 function tgtBadge(d,i){if(!B||B.side!=='me')return '';const me=B.me;let out='';
- if(B.sel>=0&&me.board[B.sel]){const a=me.board[B.sel];if(!targetsFor(B.sel).units.includes(i))return '';const mu=matchup(a.id,d.id);const dm=a.gm?Math.max(1,predDmg(a,d)-2):predDmg(a,d);
+ if(B.sel>=0&&me.board[B.sel]){const a=me.board[B.sel];if(!targetsFor(B.sel).units.includes(i))return '';const mu=matchup(a.id,d.id);const cbn=(B.combo>=2&&!a.gm)?1:0;const dm=a.gm?Math.max(1,predDmg(a,d)-2):predDmg(a,d,cbn);
   out=(mu?`<b class=${mu.c}>${mu.t}</b>`:'')+`<b class=dmgp>-${dm}${d.shield>0?' 🛡️':''}</b>`+(dm>=d.hp&&!d.tough?'<b class=ko>처치!</b>':'');}
  else if(B.pick>=0&&me.hand[B.pick]!=null&&!isBattleSpecial(me.hand[B.pick])){const mu=matchup(me.hand[B.pick],d.id);if(mu)out=`<b class=${mu.c}>${mu.t}</b>`;}
  return out?`<div class=tbadge>${out}</div>`:'';}
@@ -5689,7 +5788,7 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
  const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=B.coop?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front','',P===B.foe)}</div><div><div class=hn>${esc(P.name)}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
   const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),sp=Math.max(0,Math.min(P.sunMana||0,P.mana-bp)),bl=P.mana-bp-sp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}${Array.from({length:sp},()=>'<i class="on sun"></i>').join('')}<b>${bl}${bp+sp?`<span class=manaPlus>+${bp+sp}</span>`:''}/${den}</b></div>`;};
  $('#battle').innerHTML=`
-  <div class=bTop>${B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:-12px"><b class=dmgp>-${(u=>Math.max(1,Math.ceil(u.atk*rlBoost(u))+quakeB(u)+dragonMod(u)))(me.board[B.sel])}</b></div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front','',true)}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill title="상대 손에 든 카드 수">${I('cards')} ${fo.hand.length}</span><span class=pill title="상대 남은 덱 카드 수">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<button class="btn ghost sm" id=bMenu>메뉴</button></div>
+  <div class=bTop>${B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:calc(100% + 2px);left:4px;transform:none;flex-direction:column;align-items:flex-start;z-index:50">${(u=>{const n=Math.max(1,Math.ceil(u.atk*rlBoost(u))+(B.combo>=2?1:0)+quakeB(u)+dragonMod(u));return `<b class=dmgp>-${n}</b>`+(B.pvp?`<b class=dmgp style="color:#2f62b5">방어 성공 시 -${Math.max(0,n-1)}</b>`:'');})(me.board[B.sel])}</div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front','',true)}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill title="상대 손에 든 카드 수">${I('cards')} ${fo.hand.length}</span><span class=pill title="상대 남은 덱 카드 수">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<button class="btn ghost sm" id=bMenu>메뉴</button></div>
   <div class="lane${B.wildMode?` wildLane wildCount${fo.board.filter(Boolean).length}`:''}${fo.gmx?' gmaxLane':''}" id=foeLane>${fo.board.map((u,i)=>B.wildMode&&!u?'':`<div class=slot data-i="${i}">${unitH(u,fo,i)}</div>`).join('')}</div>
   <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class=pill style="color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}${(!B.tut&&!B.tutReal)?`<span class=pill id=evoPill title="정답을 ${MEGA_NEED}개 모으면 메가 진화·원시회귀·거다이맥스를 쓸 수 있어요. 쓰면 처음부터 다시 모아요" style="color:${mgProg()>=MEGA_NEED?'#d97800':'#2f62b5'};${mgProg()>=MEGA_NEED?'border-color:#ffb100;background:#fff3d6':''}">${mgProg()>=MEGA_NEED?'✨':'🔷'} 진화 ${Math.min(Math.max(0,mgProg()),MEGA_NEED)}/${MEGA_NEED}</span>`:''}${my&&B.sel>=0&&megaCan(B.me,B.sel)?`<button class="btn gold sm" id=bMega>🔷 ${PRIMAL[B.me.board[B.sel].id]?'원시':'메가'}</button>`:''}${my&&B.sel>=0&&gmaxCan(B.me,B.sel,1)?`<button class="btn red sm" id=bGmax>🌋 맥스</button>`:''}</div>
   <div class="lane${B.coop?' coopLane':''}${me.gmx?' gmaxLane':''}" id=myLane>${me.board.map((u,i)=>`<div class="slot${B.pick>=0&&!u&&!isItemCard(me.hand[B.pick])?' can':''}" data-i="${i}">${unitH(u,me,i)}</div>`).join('')}</div>
@@ -7506,8 +7605,10 @@ async function usePower(){const me=B.me;if(B.busy||(me.powerUses||0)<=0)return;B
  if(B.pvp)pvpSend({t:'pow',ok:r.ok,crit:pc});
  B.busy=false;renderBattle();}
 // 배틀 문제 창
-async function battleQ(q,opt){B.qn++;if(q&&q.tier==='H')opt=Object.assign({},opt,{what:opt.what+(opt.power?' <b style="color:#ffb300">🔥 맞히면 카드 +1 더</b>':opt.defense?' <b style="color:#ffb300">🔥 맞히면 슈퍼세이브 +1</b>':' <b style="color:#ffb300">🔥 맞히면 크리티컬 +1</b>')});if(window.__sim)return{ok:rnd()<SIM.p,ms:3000};const box=$('#bq');box.innerHTML=`<div class="sheet${opt.defense?' defense':''}${q&&q.tier==='H'?' heavy':''}"><div class=bqHead><span class=who>${monImg(opt.who,'front')}${esc(MON[opt.who]?MON[opt.who].name:'')}</span><span>${opt.what}</span></div><div id=bqHost></div></div>`;box.classList.add('on');
- const r=await askQ($('#bqHost'),q,{fast:true,noRetry:true,hint:opt.hint});recordAnswer(q,r.ok,r.ms,{choice:r.choice,guess:r.guess});box.classList.remove('on');box.innerHTML='';
+async function battleQ(q,opt){B.qn++;let bonusNote='';if(q&&q.tier==='H')bonusNote=opt.power?'🔥 맞히면 카드 +1 더':opt.defense?'🔥 맞히면 슈퍼세이브 +1':'🔥 맞히면 크리티컬 +1';if(window.__sim)return{ok:rnd()<SIM.p,ms:3000};const box=$('#bq');box.innerHTML=`<div class="sheet${opt.defense?' defense':''}${q&&q.tier==='H'?' heavy':''}"><div class=bqHead><span class=who>${monImg(opt.who,'front')}${esc(MON[opt.who]?MON[opt.who].name:'')}</span><span>${opt.what}</span></div>${bonusNote?`<div class=bqNote>${bonusNote}</div>`:''}<div id=bqHost></div></div>`;box.classList.add('on');
+ if((opt.defense||opt.power||opt.hint==='atk')&&B&&B.coop&&q){try{bossSend({t:'boss-dq',k:opt.defense?'def':opt.power?'pow':'atk',name:S.meta.name,q:{q:q.q,ch:q.ch,sk:q.sk,pic:q.pic,tier:q.tier}});}catch(e){}}
+ if((opt.defense||opt.power||opt.hint==='atk')&&B&&B.pvp&&q){try{pvpSend({t:'dq',k:opt.defense?'def':opt.power?'pow':'atk',q:{q:q.q,ch:q.ch,sk:q.sk,pic:q.pic,tier:q.tier}});}catch(e){}}
+ const r=await askQ($('#bqHost'),q,{fast:true,noRetry:true,hint:opt.hint,onPick:(i,ok)=>{if((opt.defense||opt.power||opt.hint==='atk')&&B&&B.coop){try{bossSend({t:'boss-dqr',i,ok});}catch(e){}}if((opt.defense||opt.power||opt.hint==='atk')&&B&&B.pvp){try{pvpSend({t:'dqr',i,ok});}catch(e){}}}});recordAnswer(q,r.ok,r.ms,{choice:r.choice,guess:r.guess});box.classList.remove('on');box.innerHTML='';
  if(!r.ok){B.retryQ=q;}return r;}
 function cleanup(){[B.me,B.foe].forEach(P=>P.board.forEach((u,i)=>{if(u&&u.hp<=0){P.board[i]=null;}}));try{if(B){[B.me,B.foe].forEach(P=>{if(P&&P.gmx&&!P.board[0])gmaxEnd(P,'faint');});}}catch(e){}if(B&&B.wildMode)syncWildPrimary();}
 function checkEnd(){if(!B||B.over)return false;if(B.wildMode){const live=syncWildPrimary();if(!live.length){if(B.coop){if(BC.host)bossFinish('win');return true;}B.over=true;const caught=(B.wildState.caughtIds||[]).length>0;const note=caught?'야생 포켓몬 전투가 끝났어요. 포획한 포켓몬은 도감에 등록됐어요.':'야생 포켓몬이 모두 쓰러져 포획하지 못했어요.';if(!window.__sim)setTimeout(()=>finishEndlessWild(caught?'caught':'knockout',note),650);return true;}if(B.coop&&B.coop.players.some(p=>p.hp<=0)){if(BC.host)bossFinish('lost');return true;}if(B.me.hp<=0&&!B.coop){B.over=true;if(!window.__sim)setTimeout(()=>finishEndlessWild('lost','트레이너 체력이 0이 되어 야생 전투를 마쳤어요.'),650);return true;}const weak=live.filter(i=>B.foe.board[i].hp<=B.foe.board[i].max*.3).sort((a,b)=>B.foe.board[a].hp/B.foe.board[a].max-B.foe.board[b].hp/B.foe.board[b].max);if(weak.length&&!B.capturePrompted&&!(B.wildState&&B.wildState.scenarioMode)){B.capturePrompted=true;B.wildCaptureTargetSlot=weak[0];if(!window.__sim)setTimeout(scheduleWildCapturePrompt,180);}return false;}if(B.foe.hp<=0||B.me.hp<=0){B.over=true;if(window.__sim)return true;const _win=B.foe.hp<=0&&B.me.hp>0||(B.foe.hp<=0&&B.me.hp>=B.foe.hp);if(B.pvp)pvpSend({t:'over',w:_win});setTimeout(()=>endBattle(_win),600);return true;}return false;}
@@ -7731,7 +7832,7 @@ async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)
  cleanup();renderBattle();checkEnd();}
 function battleMenu(){if(B&&B.wildMode){M(`<h2>야생 포켓몬 전투</h2><div class=explain style="font-size:14px">기존 배틀과 같은 방식으로 카드를 내고, 문제를 풀어 공격해요. 야생 포켓몬은 트레이너 체력 없이 체력이 30% 이하가 되면 포획을 시도할 수 있어요.</div><div class="mbtns bmBtns"><button class="btn gold" data-a=x>계속 싸우기</button><button class="btn blue" data-a=set>${I('gear')} 설정</button><button class="btn ghost" data-a=q>전투 포기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),set:()=>showSettings(true),q:async()=>{if(await confirmBox('야생 포켓몬과의 전투를 포기할까요? 이번 포획 기회는 사라져요.','포기하기','계속 싸우기')){closeM();finishEndlessWild('fled','야생 포켓몬 전투를 포기했어요.');}}});return;}M(`<h2>배틀 메뉴</h2><div class=explain style="font-size:14px">${Object.values(KW).filter((v,i,a)=>a.findIndex(x=>x.n===v.n)===i).map(k=>`${I(k.ic)} <b>${k.n}</b> ${k.d}${k.l?` <span style="color:#b07a00">★전설: ${k.l}</span>`:''}`).join('<br>')}<br><br><b>타입 상성</b>: 상성이 좋으면 피해 ×1.5(효과가 굉장했다!), 나쁘면 −1. 공격받은 포켓몬은 반격해요.<br>야생·보스·시나리오·모험의 용 포켓몬은 한 번 더 공격해요(3회: 일반 -2/-1/그대로, 전설 -1/그대로/+1).<br>10번째 차례부터는 두 트레이너 모두 조금씩 지쳐요.<br><br><b>특수 카드 뽑기</b>: 일반 덱 카드 50%, 랜덤 포켓몬 카드 20%, 기본 돌 4종 합계 20%(화염의 돌·물의 돌·전기의 돌·달의 돌 각각 5%), 태양의 돌 10%예요. 태양의 돌은 비용 0으로 사용하면 이번 턴 에너지가 1 늘어요. 랜덤 카드 중 마스터볼 20%(5~6코스트·비용 4), 파워볼 30%(3~4코스트·비용 2), 포켓볼 50%(1~2코스트·비용 1) 비율로 나와요.<br><br><b>공부 기술</b>: 전투마다 기본 2회(트레이너 스킬 '공부 강화'로 늘어나요) 사용할 수 있고, 에너지를 소모하지 않아요. 사용할 때마다 남은 횟수가 1씩 줄어요. <b>달의 돌</b>은 3코스트로 상대 포켓몬 하나를 1턴 동안 기절시켜요.</div>
  <div class="mbtns bmBtns"><button class="btn gold" data-a=x>계속하기</button>${B.pvp?'':`<button class="btn green" data-a=sv>${I('disk')} 저장하고 나가기</button>`}<button class="btn blue" data-a=set>${I('gear')} 설정</button><button class="btn ghost" data-a=q>포기하기</button></div>`,{x:()=>closeM(),_close:()=>closeM(),set:()=>showSettings(true),sv:()=>{if(B.busy||B.side!=='me'){toast('내 차례일 때 저장할 수 있어요');return;}const o=Object.assign({},B,{busy:false,sel:-1,pick:-1});delete o.rng;S.meta.bsave=JSON.stringify(o);saveLocal();closeM();B=null;$('#battle').classList.remove('on');$('#battle').innerHTML='';renderLeague();toast('배틀을 저장했어요! 지금 꺼도 다음에 이어서 할 수 있어요');},q:async()=>{if(await confirmBox('배틀을 포기할까요? 푼 문제는 기록에 남아요.','포기','계속')){closeM();if(B.pvp)pvpSend({t:'quit'});B.over=true;endBattle(false);}}});}
-async function endBattle(win){if(B&&B.wildMode){finishEndlessWild('fled','야생 포켓몬 전투를 종료했어요.');return;}if(B&&B.pvp)return pvpEnd(win);startBgm('adventure');if(B&&B.hard!=null)return endHard(win);const me=S.meta,g=B.g,gi=B.gi;const first=gi>=0&&win&&!me.gyms[gi];
+async function endBattle(win){try{pvSpecHide();}catch(e){}if(B&&B.wildMode){finishEndlessWild('fled','야생 포켓몬 전투를 종료했어요.');return;}if(B&&B.pvp)return pvpEnd(win);startBgm('adventure');if(B&&B.hard!=null)return endHard(win);const me=S.meta,g=B.g,gi=B.gi;const first=gi>=0&&win&&!me.gyms[gi];
  let coins=win?30+B.diff*10:10,candy=B.qc,packs=0,legend=0,lgNew=false;
  if(win)me.battles.w++;else me.battles.l++;
  if(win&&B.me.hp<=5)me.stats.comeback=(me.stats.comeback||0)+1;
@@ -7894,6 +7995,8 @@ function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:v
  if(d.t==='boss-hi'){if(d.v!==BOSS_NET_VER){BC.ready=false;BC.foe=null;bossBox(`<p style="color:#d9393f">친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}BC.foe=d;BC.ready=true;bossBox(`<h2>친구와 연결됐어요!</h2><p>${esc(d.name||'친구')}와 협동 보스전에 입장할 준비가 됐어요.</p><div class=explain>4성 60% · 5성 40% · 공유 필드 8칸</div>${BC.host?'<button class="btn red big" id=bcStart>보스전 시작</button>':'<p class=mut>방장이 보스전을 시작하기를 기다리는 중…</p>'}<button class="btn ghost" id=bcCancel>나가기</button>`);if(BC.host)bossSend({t:'boss-wait',name:S.meta.name});}
  else if(d.t==='boss-wait'){toast(`${esc(d.name||'친구')}가 접속했어요`)}
  else if(d.t==='boss-start'){if(!BC.host)bossApplySnapshot(d.state,true);}
+ else if(d.t==='boss-dq'){pvSpecShow(d.q,d.k,d.name);}
+ else if(d.t==='boss-dqr'){pvSpecResult(d.i,!!d.ok);clearTimeout(window.__pvsT);window.__pvsT=setTimeout(pvSpecHide,1800);}
  else if(d.t==='boss-snapshot'){if(!BC.host)bossApplySnapshot(d.state,false);}
  else if(d.t==='coop-action'&&BC.host){bossHandleAction(d);}
  else if(d.t==='boss-result'){bossClientResult(d);}
@@ -8267,6 +8370,12 @@ function pvBind(c){
  c.on('data',d=>{if(d&&d.t==='over'){PV.peerOver=true;pvpPeerOver(d);return;}PV.q.push(d);pvpPump();});
  c.on('close',()=>{if(PV.peerOver||PV.q.some(x=>x&&x.t==='quit'))return;if(B&&B.pvp&&!B.over){B.over=true;toast('친구와 연결이 끊겼어요');pvpEnd(null);}else if(!PV.started&&S.screen==='pvp'){pvBox(`<p>연결이 끊겼어요</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);}});}
 // 받은 행동을 차례대로 하나씩 처리해요(애니메이션이 겹치지 않게)
+function pvSpecShow(q,k,nm0){try{pvSpecHide();clearTimeout(window.__pvsT);window.__pvsT=setTimeout(pvSpecHide,90000);if(!q||!Array.isArray(q.ch))return;const nm=esc(nm0||(PV.foe&&PV.foe.name)||'친구');const el=document.createElement('div');el.id='pvSpec';el.className='k-'+(k||'def');
+ const sk=SKM[q.sk]?esc(SKM[q.sk].n):'';
+ el.innerHTML=`<div class=pvsHead>${k==='atk'?'⚔️':k==='pow'?'📚':'🛡️'} <b>${nm}</b>님이 ${k==='atk'?'공격':k==='pow'?'공부 기술':'방어'} 문제를 푸는 중… <span class=pvsSt>생각하는 중 🤔</span></div><div class=pvsQ>${sk?`<div class=pvsSk>${sk}</div>`:''}<div class=pvsText>${fmtMath(q.q||'')}</div>${q.pic?`<div class=pvsPic>${q.pic}</div>`:''}<div class=pvsCh>${q.ch.map((c,i)=>`<span class=pvsC data-i="${i}">${fmtMath(esc(c))}</span>`).join('')}</div></div>`;
+ document.body.appendChild(el);}catch(e){}}
+function pvSpecResult(i,ok){try{const el=$('#pvSpec');if(!el)return;const c=el.querySelector(`.pvsC[data-i="${i}"]`);if(c)c.classList.add(ok?'ok':'no');const st=el.querySelector('.pvsSt');if(st){const kk=(el.className.match(/k-(\w+)/)||[])[1];st.textContent=ok?(kk==='def'?'정답! ⭕ 방어 성공':kk==='pow'?'정답! ⭕ 카드 +1':'정답! ⭕'):'오답… ❌';st.classList.add(ok?'ok':'no');}ok?sfx('ok',1):sfx('wrong');}catch(e){}}
+function pvSpecHide(){try{const el=$('#pvSpec');if(el)el.remove();}catch(e){}}
 async function pvpPump(){if(PV.busy)return;PV.busy=true;
  try{while(PV.q.length){const d=PV.q[0];
   if(d.t==='hi'){PV.q.shift();if(d.v!==PVP_VER){pvBox(`<p style="color:#d9393f">친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);continue;}PV.foe=d;if(PV.host)PV.seed=d.seed||((Math.random()*1e9)|0);
@@ -8285,15 +8394,17 @@ async function pvpPump(){if(PV.busy)return;PV.busy=true;
   if(d.t==='mega'){PV.q.shift();B.busy=true;await megaDo(B.foe,Number(d.si),true);B.busy=false;continue;}
   if(d.t==='gmax'){PV.q.shift();B.busy=true;await gmaxDo(B.foe,Number(d.si),true);B.busy=false;continue;}
   if(d.t==='item'){PV.q.shift();B.busy=true;await playItem(B.foe,d.h,d.target,true);B.busy=false;continue;}
-  if(d.t==='atk'){PV.q.shift();B.busy=true;const a=B.foe.board[d.si];msg(`${esc(PV.foe.name)}의 ${a?esc(MON[a.id].name):''} 공격! ${d.ok?'(문제 정답!)':'(문제를 틀려서 약하게)'}`);await wait(500);
+  if(d.t==='atk'){PV.q.shift();pvSpecHide();B.busy=true;const a=B.foe.board[d.si];msg(`${esc(PV.foe.name)}의 ${a?esc(MON[a.id].name):''} 공격! ${d.ok?'(문제 정답!)':'(문제를 틀려서 약하게)'}`);await wait(500);
    let reduce=0,ctr=0,dh=0;if(d.tg&&d.tg.hero){const q=pickQ({cyc:1});const r=q?await battleQ(q,{who:B.me.av,what:`방어 문제! 맞히면 ${esc(PV.foe.name)}의 트레이너 공격 피해가 1 줄어요`,defense:true,hint:'def' }):{ok:false};dh=r.hint?1:0;if(r.ok){reduce=(q&&q.tier==='H')?2:1;qcUp(B.me);S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;fx(heroEl(B.me),reduce>1?'슈퍼세이브! -2':'방어 성공! -1',reduce>1?'crit':'txt');heroBlockFx(heroEl(B.me));if(B.counterActive>0)ctr=B.counterActive;}else fx(heroEl(B.me),'방어 실패','txt');pvpSend({t:'defres',reduce,ok:r.ok,ctr,dh});}
    await resolveAttack(B.foe,B.me,d.si,d.tg,d.ok,d.cb,reduce,!!d.crit&&!!d.ok,d.hint?1:0,dh);
    if(ctr>0&&!B.over&&B.foe.board[d.si]){fx(heroEl(B.me),`반격 -${ctr}`,'txt');await trainerAtkFx(heroEl(B.me),unitEl(B.foe,d.si),Math.min(5,ctr),'counter');await dealUnit(B.foe,d.si,ctr);checkEnd();}B.busy=false;continue;}
-  if(d.t==='defres'){PV.q.shift();const p=B.pendingAttack;if(p){B.pendingAttack=null;B.busy=true;if((d.reduce||0)>0&&p.tg&&p.tg.hero)heroBlockFx(heroEl(B.foe));await resolveAttack(B.me,B.foe,p.si,p.tg,p.ok,p.cb,d.reduce||0,!!p.crit,p.hint?1:0,d.dh?1:0);
+  if(d.t==='dq'){PV.q.shift();pvSpecShow(d.q,d.k);continue;}
+  if(d.t==='dqr'){PV.q.shift();pvSpecResult(d.i,!!d.ok);await wait(1300);continue;}
+  if(d.t==='defres'){PV.q.shift();pvSpecHide();const p=B.pendingAttack;if(p){B.pendingAttack=null;B.busy=true;if((d.reduce||0)>0&&p.tg&&p.tg.hero)heroBlockFx(heroEl(B.foe));await resolveAttack(B.me,B.foe,p.si,p.tg,p.ok,p.cb,d.reduce||0,!!p.crit,p.hint?1:0,d.dh?1:0);
    const ct=Math.max(0,Math.min(5,Number(d.ctr)||0));if(ct>0&&!B.over&&B.me.board[p.si]){fx(heroEl(B.foe),`반격 -${ct}`,'txt');await trainerAtkFx(heroEl(B.foe),unitEl(B.me,p.si),Math.min(5,ct),'counter');await dealUnit(B.me,p.si,ct);checkEnd();}B.busy=false;renderBattle();}continue;}
-  if(d.t==='pow'){PV.q.shift();B.foe.powerUses=Math.max(0,(B.foe.powerUses||0)-1);let xb=false;if(d.ok){draw(B.foe);xb=studyBonusDraw(B.foe);if(d.crit)draw(B.foe);}fx(heroEl(B.foe),d.ok?(xb?'공부 강화! 카드 +2':'공부 기술 성공!'):'공부 기술','txt');renderBattle();continue;}
+  if(d.t==='pow'){PV.q.shift();pvSpecHide();B.foe.powerUses=Math.max(0,(B.foe.powerUses||0)-1);let xb=false;if(d.ok){draw(B.foe);xb=studyBonusDraw(B.foe);if(d.crit)draw(B.foe);}fx(heroEl(B.foe),d.ok?(xb?'공부 강화! 카드 +2':'공부 기술 성공!'):'공부 기술','txt');renderBattle();continue;}
   if(d.t==='end'){PV.q.shift();await startTurn('me');continue;}
-  if(d.t==='quit'){PV.q.shift();if(!B.over){B.over=true;toast('친구가 대전을 그만두었어요');setTimeout(()=>endBattle(true),600);}continue;}
+  if(d.t==='quit'){PV.q.shift();pvSpecHide();if(!B.over){B.over=true;toast('친구가 대전을 그만두었어요');setTimeout(()=>endBattle(true),600);}continue;}
   PV.q.shift();}}
  finally{PV.busy=false;}}
 function pvpBegin(seed){if(PV.started)return;PV.started=true;const me=S.meta,f=PV.foe;
@@ -8312,7 +8423,7 @@ function pvpBegin(seed){if(PV.started)return;PV.started=true;const me=S.meta,f=P
  S.screen='battle';$('#view').innerHTML='';$('#battle').classList.add('on');startBgm('battle');renderBattle();
  banner('친구 대전!',`${esc(f.name)}와(과) 대결`,1800);
  setTimeout(()=>{if(!B)return;if(meFirst)startTurn('me');else{B.side='foe';B.turn++;B.foe.maxMana=1;B.foe.mana=1;if(B.foe.manaLv>0&&B.foe.passRng()*100<manaChance(B.foe.manaLv)){B.foe.mana+=1;B.foe.bonusMana=1;}draw(B.foe);B.busy=false;renderBattle();pvpPump();}},1600);}
-async function pvpEnd(win){if(B&&B.pvp){if(B.__pvDone)return;B.__pvDone=true;}try{const q=$('#bq');if(q)q.classList.remove('on');}catch(e){}startBgm('adventure');const me=S.meta;const f=PV.foe||{name:'친구'};
+async function pvpEnd(win){try{pvSpecHide();}catch(e){}if(B&&B.pvp){if(B.__pvDone)return;B.__pvDone=true;}try{const q=$('#bq');if(q)q.classList.remove('on');}catch(e){}startBgm('adventure');const me=S.meta;const f=PV.foe||{name:'친구'};
  if(win!==null){me.pvp=me.pvp||{n:0,w:0,l:0,gg:0,foes:{}};me.pvp.n++;if(win)me.pvp.w++;else me.pvp.l++;me.pvp.foes[f.name]=(me.pvp.foes[f.name]||0)+1;me.pvp.last=Date.now();
   const back=win?PVP_WIN:PVP_LOSE;me.coins+=back;me.candy+=B.qc;me.stats.candyAll=(me.stats.candyAll||0)+B.qc;gainXP(win?30:15);}
  else if(PV.charged){me.coins+=Math.round(PVP_COST/2);}
@@ -9351,25 +9462,25 @@ function classSummaryHTML(metas){const R=classRows(metas);if(!R.length)return ''
  const misList=Object.values(mmap).sort((a,b)=>b.n-a.n).slice(0,6);
  const act=R.filter(r=>r.last7>0).length,avgAcc=R.filter(r=>r.acc!=null);
  const prio=R.map(r=>{const meas=DOMS.map(d=>r.st[d.k]).filter(o=>o.n>=10&&o.racc!=null).sort((a,b)=>a.racc-b.racc);return{r,low:meas[0]||null};}).filter(x=>x.low&&x.low.racc<.85).sort((a,b)=>a.low.racc-b.low.racc).slice(0,8);
- const th='style="padding:5px 8px;border:1px solid #d8cdbb;background:#f6efe2;font-size:13px"',td='style="padding:5px 8px;border:1px solid #e3d9c8;text-align:center;font-size:13px"';
+ const th='style="padding:8px 10px;border:1px solid #d8cdbb;background:#f6efe2;font-size:13px"',td='style="padding:8px 10px;border:1px solid #e3d9c8;text-align:center;font-size:14px"';
  let h=`<div class=panel><h2>🧭 학급 영역 요약 <span class=mut style="font-size:13px">(${N}명 · 수학 문제만)</span></h2>
   <div class=row style="gap:8px;flex-wrap:wrap"><span class=pill>최근 7일 참여 ${act}/${N}명</span><span class=pill>수학 평균 정답률 ${avgAcc.length?Math.round(avgAcc.reduce((a,r)=>a+r.acc,0)/avgAcc.length*100)+'%':'-'}</span><span class=pill>학생 평균 푼 문제 ${Math.round(R.reduce((a,r)=>a+r.q,0)/N)}개</span></div>
   ${measured.length&&measured[0].avg<.85?`<div class=explain style="margin-top:10px;background:#fff6e6;border-color:#f0b35a;font-size:14px;line-height:1.6">🎯 학급 전체로 보면 <b>${measured[0].d.n}</b>의 평균 최근 정답률이 <b>${Math.round(measured[0].avg*100)}%</b>로 가장 낮아요${measured[0].low?` (보강 필요 ${measured[0].low}명)`:''}. 수업이나 복습 과제에서 먼저 다뤄 보세요.</div>`:''}
   <h3 style="margin:12px 0 6px">영역별 학급 현황</h3>
   <div style="display:grid;gap:8px">${dm.map(x=>{const a=x.avg==null?null:Math.round(x.avg*100);return `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b style="min-width:108px">${x.d.ic} ${x.d.n}</b><div style="flex:1;min-width:120px;height:16px;background:#f0e8d8;border-radius:8px;overflow:hidden"><i style="display:block;height:100%;width:${a==null?0:a}%;background:${x.d.c}"></i></div><span style="min-width:48px;text-align:right;font-weight:700">${a==null?'-':a+'%'}</span><span class=mut style="font-size:12px;min-width:210px">측정 ${x.cnt}명 · 튼튼 ${x.ok} · 보통 ${x.mid} · 보강 ${x.low}</span></div>`;}).join('')}</div>
   <p class=mut style="font-size:12px;margin:6px 0 0">영역별로 10문제 이상 푼 학생만 평균에 넣어요. '측정 0명'이면 아직 그 영역을 10문제 이상 푼 학생이 없다는 뜻이에요. 정답률은 학생별 최근 기록 기준이에요.</p></div>`;
- h+=`<div class=panel><h3 style="margin-top:0">학생 × 영역 (최근 정답률)</h3><div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%"><tr><th ${th}>닉네임</th><th ${th}>학기</th><th ${th}>푼 문제</th>${DOMS.map(d=>`<th ${th}>${d.n}</th>`).join('')}<th ${th}>이번 주</th></tr>${R.map(r=>`<tr><td ${td}><b>${esc(r.name)}</b></td><td ${td}>${esc(r.sem)}</td><td ${td}>${r.q}</td>${DOMS.map(d=>{const o=r.st[d.k],c=classHeat(o);return `<td ${td.replace('text-align:center','text-align:center;background:'+c[0]+';color:'+c[1]+';font-weight:700')}>${c[2]}</td>`;}).join('')}<td ${td}>${r.wk}문제</td></tr>`).join('')}</table></div>
+ h+=`<div class=panel><h3 style="margin-top:0">학생 × 영역 (최근 정답률)</h3><div style="overflow-x:auto"><table class=tcT style="border-collapse:separate;border-spacing:0;width:100%"><tr><th ${th}>닉네임</th><th ${th}>학기</th><th ${th}>푼 문제</th>${DOMS.map(d=>`<th ${th}>${d.n}</th>`).join('')}<th ${th}>이번 주</th></tr>${R.map(r=>`<tr><td ${td}><b>${esc(r.name)}</b></td><td ${td}>${esc(r.sem)}</td><td ${td}>${r.q}</td>${DOMS.map(d=>{const o=r.st[d.k],c=classHeat(o);return `<td ${td.replace('text-align:center','text-align:center;background:'+c[0]+';color:'+c[1]+';font-weight:700')}>${c[2]}</td>`;}).join('')}<td ${td}>${r.wk}문제</td></tr>`).join('')}</table></div>
   <p class=mut style="font-size:12px;margin:6px 0 0"><span style="background:#cfeeda;padding:0 6px">85%↑ 튼튼</span> <span style="background:#fff0b8;padding:0 6px">65~84% 보통</span> <span style="background:#ffd0cd;padding:0 6px">65%↓ 보강</span> <span style="background:#eee;padding:0 6px">10문제 미만</span> · '이번 주' 칸은 이 기능이 포함된 버전부터 쌓여요.</p>
   <div class=row style="margin-top:8px"><button class="btn ghost sm" id=tcCsv>${I('disk')} 표를 CSV로 저장</button></div></div>`;
  const rxPart=R.filter(r=>r.rx.week>0),rxN=R.reduce((a,r)=>a+r.rx.wkn,0),rxC=R.reduce((a,r)=>a+r.rx.wkc,0);
  h+=`<div class=panel><h3 style="margin-top:0">🎯 처방 훈련 현황 <span class=mut style="font-size:13px">(오늘의 훈련 맞춤 처방)</span></h3>
   <div class=row style="gap:8px;flex-wrap:wrap"><span class=pill>최근 7일 참여 ${rxPart.length}/${N}명</span><span class=pill>학생 평균 ${(R.reduce((a,r)=>a+r.rx.week,0)/N).toFixed(1)}회</span><span class=pill>약한 개념 정답률 ${rxN?Math.round(rxC/rxN*100)+'%':'-'}${rxN?` (${rxN}문제)`:''}</span></div>
-  <div style="overflow-x:auto;margin-top:8px"><table style="border-collapse:collapse;width:100%"><tr><th ${th}>닉네임</th><th ${th}>7일 횟수</th><th ${th}>누적 횟수</th><th ${th}>약한 개념 정답률</th><th ${th}>변화 (처음 3회→최근 3회)</th></tr>${R.map(r=>{const x=r.rx;return `<tr><td ${td}><b>${esc(r.name)}</b></td><td ${td}>${x.week?x.week+'회':'<span style="color:#9c1f1f">없음</span>'}</td><td ${td}>${x.total}회</td><td ${td}>${x.acc==null?'-':Math.round(x.acc*100)+'% ('+x.wn+'문제)'}</td><td ${td}>${x.trend==null?'<span class=mut>6회 이상 필요</span>':`<b style="color:${x.trend>=0?'#1f6b3d':'#9c1f1f'}">${x.trend>=0?'+':''}${x.trend}%p</b>`}</td></tr>`;}).join('')}</table></div>
+  <div style="overflow-x:auto;margin-top:8px"><table class=tcT style="border-collapse:separate;border-spacing:0;width:100%"><tr><th ${th}>닉네임</th><th ${th}>7일 횟수</th><th ${th}>누적 횟수</th><th ${th}>약한 개념 정답률</th><th ${th}>변화 (처음 3회→최근 3회)</th></tr>${R.map(r=>{const x=r.rx;return `<tr><td ${td}><b>${esc(r.name)}</b></td><td ${td}>${x.week?x.week+'회':'<span style="color:#9c1f1f">없음</span>'}</td><td ${td}>${x.total}회</td><td ${td}>${x.acc==null?'-':Math.round(x.acc*100)+'% ('+x.wn+'문제)'}</td><td ${td}>${x.trend==null?'<span class=mut>6회 이상 필요</span>':`<b style="color:${x.trend>=0?'#1f6b3d':'#9c1f1f'}">${x.trend>=0?'+':''}${x.trend}%p</b>`}</td></tr>`;}).join('')}</table></div>
   <p class=mut style="font-size:12px;margin:6px 0 0">처방 훈련 기록은 이 기능이 포함된 버전부터 쌓여요. 7일 동안 한 번도 안 한 학생은 '없음'으로 표시돼요.</p></div>
  <div class=panel><h3 style="margin-top:0">💡 학급 공통 약한 개념 <span class=mut style="font-size:13px">(학생들의 약한 개념 상위 3개를 모아 센 결과)</span></h3>${weakList.length?`<div class=skList>${weakList.map(w=>`<div class=skRow style="flex-wrap:wrap"><span class=sn><b>${esc(w.sk.n)}</b> <span class=mut style="font-size:12px">(${esc(semName(w.sk.s))} · ${esc((UNITS[w.sk.s]||[])[w.sk.u-1]||'')} · ${w.dom.n})</span><br><span class=mut style="font-size:12px">${esc(w.names.slice(0,8).join(', '))}${w.names.length>8?' 외':''}</span></span><span class=pill>${w.names.length}명</span><span class=mut style="font-size:12px">평균 ${Math.round(w.accS/w.names.length*100)}%</span></div>`).join('')}</div>`:'<p class=mut style="font-size:13px;margin:0">아직 뚜렷한 약한 개념이 모이지 않았어요.</p>'}</div>`;
  h+=`<div class=panel><h3 style="margin-top:0">⚠️ 학급 공통 오개념</h3>${misList.length?`<div class=skList>${misList.map(x=>`<div class=skRow style="flex-wrap:wrap"><span class=sn><b>${esc(ES_MIS[x.id].l)}</b><br><span class=mut style="font-size:12px">${esc(ES_MIS[x.id].n)}</span></span><span class=pill>${x.n}번</span><span class=mut style="font-size:12px">${x.names.length}명</span></div>`).join('')}</div>`:'<p class=mut style="font-size:13px;margin:0">기록된 오개념이 아직 없어요.</p>'}</div>`;
  const none=R.filter(r=>!DOMS.some(d=>r.st[d.k].n>=10));
- h+=`<div class=panel><h3 style="margin-top:0">🧑‍🏫 먼저 살펴볼 학생 <span class=mut style="font-size:13px">(85% 미만인 영역이 있는 학생 · 낮은 순)</span></h3>${none.length?`<div class=explain style="font-size:13px;background:#f3f3f3;border-color:#ccc"><b>아직 판단하기 어려운 학생</b>: ${esc(none.map(r=>r.name).join(', '))} — 영역별로 10문제 이상 푼 기록이 없어요.</div>`:''}${prio.length?`<div class=skList>${prio.map(({r,low})=>{const dd=low.d;const wk=low.weak.slice(0,2).map(x=>x.sk.n).join(', ');return `<div class=skRow style="flex-wrap:wrap"><span class=sn><b>${esc(r.name)}</b> <span class=mut style="font-size:12px">${esc(r.sem)}</span><br><span class=mut style="font-size:12px">${dd.ic} ${dd.n} 최근 ${Math.round(low.racc*100)}%${wk?' · '+esc(wk):''}</span></span></div>`;}).join('')}</div>`:'<p class=mut style="font-size:13px;margin:0">모든 학생이 영역별로 튼튼해요!</p>'}</div>`;
+ h+=`<div class=panel><h3 style="margin-top:0">🧑‍🏫 영역별로 먼저 살펴볼 학생 <span class=mut style="font-size:13px">(85% 미만인 영역이 있는 학생 · 낮은 순)</span></h3>${none.length?`<div class=explain style="font-size:13px;background:#f3f3f3;border-color:#ccc"><b>아직 판단하기 어려운 학생</b>: ${esc(none.map(r=>r.name).join(', '))} — 영역별로 10문제 이상 푼 기록이 없어요.</div>`:''}${prio.length?`<div class=skList>${prio.map(({r,low})=>{const dd=low.d;const wk=low.weak.slice(0,2).map(x=>x.sk.n).join(', ');return `<div class=skRow style="flex-wrap:wrap"><span class=sn><b>${esc(r.name)}</b> <span class=mut style="font-size:12px">${esc(r.sem)}</span><br><span class=mut style="font-size:12px">${dd.ic} ${dd.n} 최근 ${Math.round(low.racc*100)}%${wk?' · '+esc(wk):''}</span></span></div>`;}).join('')}</div>`:'<p class=mut style="font-size:13px;margin:0">모든 학생이 영역별로 튼튼해요!</p>'}</div>`;
  h+=`<details class=panel style="font-size:13px;line-height:1.7"><summary style="cursor:pointer;font-weight:700">📖 이 요약을 읽는 방법 (처음이라면 펼쳐 보세요)</summary>
   <p><b>영역</b>: 2022 개정 수학의 4개 영역(수와 연산 · 변화와 관계 · 도형과 측정 · 자료와 가능성)이에요. 학생이 푼 문제를 교과서 단원과 성취기준 코드로 영역에 나눴어요. 이번 학기뿐 아니라 지난 학년에서 푼 문제도 포함돼요.</p>
   <p><b>최근 정답률</b>: 학생이 푼 개념별 최근 10문제 기록을 영역별로 합친 값이에요. 지난 학기 실력이 아니라 <b>요즘 실력</b>을 보여 줘요.</p>
@@ -9383,6 +9494,127 @@ function classCsv(metas){const R=classRows(metas);const q=v=>'"'+String(v).repla
  const head=['닉네임','학기','푼 문제(수학)','수학 정답률',...DOMS.map(d=>d.n+' 최근정답률'),...DOMS.map(d=>d.n+' 푼 문제'),'처방 훈련(7일)','처방 훈련(누적)','약한 개념 정답률','먼저 다질 개념'];
  const rows=R.map(r=>[r.name,r.sem,r.q,r.acc==null?'':Math.round(r.acc*100)+'%',...DOMS.map(d=>{const o=r.st[d.k];return o.n>=10&&o.racc!=null?Math.round(o.racc*100)+'%':'';}),...DOMS.map(d=>r.st[d.k].n),r.rx.week,r.rx.total,r.rx.acc==null?'':Math.round(r.rx.acc*100)+'%',DOMS.flatMap(d=>r.st[d.k].weak.slice(0,2).map(x=>x.sk.n)).slice(0,4).join(' / ')]);
  return '﻿'+[head,...rows].map(r=>r.map(q).join(',')).join('\r\n');}
+
+// ===== 선생님 화면: 학생별 틀린 문제 =====
+function tcWbItem(e){const kd=wbKindOf(e),mi=kd==='math'&&e.mi&&ES_MIS[e.mi];const FM=kd==='math'?fmtMath:(h=>h);const t=stripTags(e.q),tt=t.length>46?t.slice(0,46)+'…':t;
+ const st=e.d?'<span class="wbSt ok">해결</span>':'<span class="wbSt">미해결</span>';
+ return `<details class=tcWbQ><summary><span class=wbQt><b>${esc(tt)}</b><span class=wbMeta>${esc(wbNm(e))} · ${esc(String(e.t||'').slice(5).replace('-','/'))}</span></span><span class=wbN>${e.n||1}번</span>${st}</summary>
+  <div class=wbBody><div class=qText>${FM(wbSafe(e.q))}</div>${e.pic?`<div class=qPic>${wbSafe(e.pic)}</div>`:''}
+  <div class=wbAns>${e.c?`<div>학생이 고른 답: <b class=bad>${FM(esc(e.c))}</b></div>`:''}<div>정답: <b class=good>${FM(esc(e.a))}</b></div></div>
+  ${mi?`<div class=wbMi>⚠️ 이런 실수일 수 있어요: <b>${esc(mi.l)}</b>${mi.n?`<br><span class=mut>${esc(mi.n)}</span>`:''}</div>`:''}${e.e?`<div class=wbEx>${FM(wbSafe(e.e))}</div>`:''}</div></details>`;}
+function tcWbHTML(metas){
+ const rowsM=metas.map(m=>({m,L:wbList(m)}));
+ const anyWb=rowsM.some(r=>r.L.length);
+ const noData=rowsM.filter(r=>!r.L.length).map(r=>r.m.name);
+ // 학급 공통으로 틀린 문제
+ const common={};rowsM.forEach(({m,L})=>L.forEach(e=>{if(e.d)return;(common[e.k]=common[e.k]||{e,who:[],n:0,ch:{}});const c=common[e.k];if(!c.who.includes(m.name)){c.who.push(m.name);}c.n+=e.n||1;if(e.c){(c.ch[e.c]=c.ch[e.c]||[]).push(m.name);}}));
+ const top=Object.values(common).filter(c=>c.who.length>=2).sort((a,b)=>b.who.length-a.who.length||b.n-a.n).slice(0,10);
+ let h=`<div class=panel id=tcWbPanel><h2>📝 학생별 틀린 문제</h2>`;
+ if(!anyWb){return h+`<p class=mut style="font-size:14px;line-height:1.6">아직 오답 노트가 담긴 기록이 없어요. 학생이 문제를 틀린 뒤 만든 저장 코드·기록을 받으면 여기에 나타나요.</p></div>`;}
+ h+=`<p class=mut style="font-size:13.5px;line-height:1.6;margin:2px 0 10px">학생 이름을 누르면 그 학생이 틀린 문제와 <b>고른 답</b>, 정답이 나와요. 다시 풀어 2번 맞히면 '해결'로 바뀌어요. 문제는 과목마다 최근 것만 보관돼요(수학 ${WB_MAX}개, 국어·영어·IQ 40개).</p>`;
+ if(top.length)h+=`<div class=tcWbTop><b>🔥 여러 학생이 같이 틀린 문제 TOP ${top.length}</b> <span class=mut style="font-size:12.5px">(누르면 학생들이 고른 답이 나와요)</span>${top.map(c=>{const e=c.e,kd=wbKindOf(e),FM=kd==='math'?fmtMath:(x=>x),t=stripTags(e.q);const chs=Object.keys(c.ch).sort((a,b)=>c.ch[b].length-c.ch[a].length);return `<details class=tcWbTopRow><summary><span class=pill>${c.who.length}명</span> <b>${esc(t.slice(0,50))}${t.length>50?'…':''}</b> <span class=mut>(${esc(wbNm(e))})</span></summary><div class=wbBody><div class=qText>${FM(wbSafe(e.q))}</div>${e.pic?`<div class=qPic>${wbSafe(e.pic)}</div>`:''}<div class=wbAns><div>정답: <b class=good>${FM(esc(e.a))}</b></div></div>${chs.length?`<div class=wbCh>${chs.map(a=>`<div>고른 답 <b class=bad>${FM(esc(a))}</b> — ${esc(c.ch[a].join(', '))}</div>`).join('')}</div>`:''}<div class=mut style="font-size:13px">틀린 학생: ${esc(c.who.join(', '))}</div>${e.e?`<div class=wbEx>${FM(wbSafe(e.e))}</div>`:''}</div></details>`;}).join('')}</div>`;
+ rowsM.forEach(({m,L})=>{
+  const open=L.filter(e=>!e.d).sort((a,b)=>String(b.t).localeCompare(String(a.t))||(b.n||1)-(a.n||1)),done=L.filter(e=>e.d);
+  const kinds=WB_KINDS.map(([k,ic,n])=>{const c=open.filter(e=>wbKindOf(e)===k).length;return c?`<span class=pill>${ic} ${n} ${c}</span>`:'';}).join('');
+  h+=`<details class=tcWbStu${open.length?'':' empty'}><summary><span class=wbName>${esc(m.name)}</span><span class=wbCnt>${open.length?`다시 풀 문제 <b>${open.length}</b>개`:'다시 풀 문제 없음'}${done.length?` · 해결 ${done.length}개`:''}</span><span class=wbKinds>${kinds}</span></summary>
+   <div class=wbList>${open.length?open.map(tcWbItem).join(''):'<p class=mut style="margin:6px 2px">남은 틀린 문제가 없어요 👏</p>'}${done.length?`<details class=wbDone><summary>해결한 문제 ${done.length}개 보기</summary>${done.map(tcWbItem).join('')}</details>`:''}</div></details>`;});
+ if(noData.length&&anyWb)h+=`<p class=mut style="font-size:12.5px;margin-top:8px">오답 기록이 없는 학생: ${esc(noData.join(', '))} (틀린 문제가 없거나, 이 기능이 들어가기 전 코드예요)</p>`;
+ return h+'</div>';}
+
+// ===== 선생님 화면: 이번에 챙길 학생 =====
+function tcAttnHTML(metas){
+ const T=today();
+ const R=metas.map(m=>{const fl=[];const q=(m.stats&&m.stats.q)||0,c=(m.stats&&m.stats.c)||0;
+  const last7=Object.keys(m.days||{}).filter(k=>dayDiff(k,T)<7).reduce((a,k)=>a+((m.days[k]&&m.days[k].n)||0),0);
+  const lastDay=Object.keys(m.days||{}).sort().pop();
+  if(!q)fl.push({s:1,ic:'💤',t:'아직 문제를 안 풀었어요'});
+  else if(!last7)fl.push({s:2,ic:'💤',t:'최근 7일 동안 안 했어요'+(lastDay?` (마지막 ${lastDay.slice(5).replace('-','/')})`:'')});
+  if(q>=20&&c/q<.65)fl.push({s:3,ic:'📉',t:`정답률 ${Math.round(c/q*100)}% (${q}문제)`});
+  const gw=(m.stats&&m.stats.guessWrong)||0,ga=(m.stats&&m.stats.guessAlert)||0;
+  if(ga>0||gw>=3)fl.push({s:2,ic:'🎲',t:`찍기 의심 ${gw}회${ga?` · 천천히 안내 ${ga}번`:''}`});
+  const wo=wbOpenN(m);
+  if(wo>=10)fl.push({s:1,ic:'📝',t:`다시 풀 틀린 문제 ${wo}개`});
+  return {m,fl,sc:fl.reduce((a,f)=>a+f.s,0)};});
+ const hit=R.filter(r=>r.fl.length).sort((a,b)=>b.sc-a.sc),ok=R.filter(r=>!r.fl.length);
+ let h=`<div class=panel id=tcAttnPanel><h2>👀 이번에 챙길 학생</h2><p class=mut style="font-size:13.5px;line-height:1.6;margin:2px 0 10px">최근 7일 미참여 · 정답률 65% 미만(20문제 이상) · 찍기 의심 · 틀린 문제 10개 이상 쌓임 중 해당하는 학생이에요. 참고용이고 성적이 아니에요.</p>`;
+ if(!hit.length)h+=`<div class=explain style="background:#eaf8ee;border-color:#8fd3a0">🎉 지금은 특별히 챙길 학생이 없어요.</div>`;
+ else h+=hit.map(({m,fl,sc})=>`<div class="tcAttnRow ${sc>=4?'aHi':sc>=2?'aMid':'aLo'}"><span class=tcAttnName>${esc(m.name)}</span><span class=tcAttnChips>${fl.map(f=>`<span class=tcAttnChip>${f.ic} ${esc(f.t)}</span>`).join('')}</span></div>`).join('');
+ if(ok.length&&hit.length)h+=`<p class=mut style="font-size:13px;margin:8px 0 0">잘하고 있어요 👍 ${esc(ok.map(r=>r.m.name).join(', '))}</p>`;
+ return h+'</div>';}
+
+// ===== 선생님 화면: 지난 기록과 비교 · 학생 개별 요약 =====
+const TC_HK='zsm_tcHist';
+function tcHistLoad(){try{return JSON.parse(localStorage.getItem(TC_HK)||'{}')||{};}catch(e){return {};}}
+function tcHistSave(h){try{localStorage.setItem(TC_HK,JSON.stringify(h));}catch(e){}}
+// 이번 기록을 저장하고, 지난 기록(7일 전쯤)과의 차이를 돌려줘요
+function tcCompare(metas){
+ const h=tcHistLoad(),T=today(),out={};
+ for(const m of metas){const nm=m.name||'(이름 없음)';const cur={d:T,q:(m.stats&&m.stats.q)||0,c:(m.stats&&m.stats.c)||0,wb:wbOpenN(m),dy:Object.keys(m.days||{}).length};
+  let L=Array.isArray(h[nm])?h[nm]:[];
+  const past=L.filter(x=>x&&x.d&&x.d<T);
+  if(past.length){let best=null,bd=1e9;for(const x of past){const dd=dayDiff(x.d,T);const sc=Math.abs(dd-7);if(sc<bd){bd=sc;best=x;}}
+   if(best)out[nm]={b:best,cur,days:dayDiff(best.d,T)};}
+  const same=L.find(x=>x.d===T);
+  if(same){if(same.q<=cur.q)Object.assign(same,cur);}else L.push(cur);
+  L=L.sort((a,b)=>String(a.d).localeCompare(String(b.d))).slice(-12);h[nm]=L;}
+ tcHistSave(h);window.TC_CMP=out;return out;}
+const tcPc=(c,q)=>q>0?Math.round(c/q*100):null;
+function tcArrow(d,goodUp){if(!d)return '<span class=tcFlat>― 그대로</span>';const up=d>0,good=goodUp?up:!up;return `<span class="${good?'tcUp':'tcDown'}">${up?'▲':'▼'} ${Math.abs(d)}</span>`;}
+function tcCmpHTML(metas,cmp){
+ const withB=metas.filter(m=>cmp[m.name||'(이름 없음)']),noB=metas.filter(m=>!cmp[m.name||'(이름 없음)']);
+ let h=`<div class=panel id=tcCmpPanel><h2>📈 지난 기록과 비교</h2><p class=mut style="font-size:13.5px;line-height:1.6;margin:2px 0 10px">코드를 받을 때마다 이 기기에 기록을 저장해 두고, <b>일주일 전쯤 기록</b>과 견줘요. <span class=tcUp>▲ 초록</span>은 좋아진 쪽, <span class=tcDown>▼ 빨강</span>은 신경 쓸 쪽이에요.</p>`;
+ if(!withB.length){return h+`<div class=explain style="font-size:14px">이번 기록을 <b>기준으로 저장</b>했어요. 다음에 학생 코드를 새로 받아 표를 만들면 여기에 변화가 나타나요. (같은 날 여러 번 받으면 기준은 하루에 하나만 저장돼요.)</div><button class="btn ghost sm" id=tcHistClear>비교 기록 지우기</button></div>`;}
+ h+=`<div class=tcCmpWrap><table class=tcCmpT><tr><th>닉네임</th><th>비교 기준</th><th>푼 문제</th><th>정답률(전체)</th><th>새로 푼 문제 정답률</th><th>다시 풀 틀린 문제</th><th>공부한 날</th></tr>`;
+ for(const m of withB){const nm=m.name||'(이름 없음)',{b,cur,days}=cmp[nm];
+  if(cur.q<b.q){h+=`<tr><td class=nm>${esc(nm)}</td><td colspan=6 class=mut style="text-align:left">이전 기록(${b.d.slice(5).replace('-','/')})보다 푼 문제가 적어요. 예전 저장 코드를 받으셨을 수 있어요.</td></tr>`;continue;}
+  const dq=cur.q-b.q,pb=tcPc(b.c,b.q),pn=tcPc(cur.c,cur.q),dp=(pb!=null&&pn!=null)?pn-pb:0,np=tcPc(cur.c-b.c,dq);
+  h+=`<tr><td class=nm>${esc(nm)}</td><td>${days}일 전<br><span class=mut style="font-size:12px">${b.d.slice(5).replace('-','/')}</span></td>
+   <td>${dq>0?`<span class=tcUp>▲ +${dq}문제</span>`:'<span class=tcDown>― 안 풀었어요</span>'}</td>
+   <td>${pb!=null?pb+'% → ':''}<b>${pn!=null?pn+'%':'-'}</b> ${pb!=null&&pn!=null?tcArrow(dp,true).replace(/(\d+)<\/span>/,'$1%p</span>'):''}</td>
+   <td>${np!=null&&dq>=5?`<b>${np}%</b>`:'<span class=mut>5문제 이상 필요</span>'}</td>
+   <td>${b.wb} → <b>${cur.wb}</b> ${tcArrow(cur.wb-b.wb,false)}</td>
+   <td>${tcArrow(cur.dy-b.dy,true).replace(/(\d+)<\/span>/,'$1일</span>')}</td></tr>`;}
+ h+='</table></div>';
+ if(noB.length)h+=`<p class=mut style="font-size:12.5px;margin:8px 0 0">처음 받은 학생(이번 기록이 기준): ${esc(noB.map(m=>m.name).join(', '))}</p>`;
+ return h+`<p class=mut style="font-size:12.5px;margin:6px 0 0">비교 기록은 이 기기에만 저장돼요(다른 곳으로 전송되지 않아요). <button class="btn ghost sm" id=tcHistClear>비교 기록 지우기</button></p></div>`;}
+
+function tcReportDoc(m,cmp){
+ const R=classRows([m])[0],nm=m.name||'(이름 없음)',c=cmp&&cmp[nm];
+ const q=m.stats.q||0,pn=tcPc(m.stats.c||0,q);
+ const last7=Object.keys(m.days||{}).filter(k=>dayDiff(k,today())<7).reduce((a,k)=>a+((m.days[k]&&m.days[k].n)||0),0);
+ const dom=R?DOMS.map(d=>{const o=R.st[d.k],hh=classHeat(o);return `<tr><td>${d.n}</td><td style="background:${hh[0]};color:${hh[1]};font-weight:900">${hh[2]}</td><td>${o.n}문제</td></tr>`;}).join(''):'';
+ const weak=R?DOMS.flatMap(d=>R.st[d.k].weak.map(x=>({d,x}))).sort((a,b)=>a.x.acc-b.x.acc).slice(0,6):[];
+ const wr=wbList(m).filter(e=>!e.d).sort((a,b)=>(b.n||1)-(a.n||1)||String(b.t).localeCompare(String(a.t)));
+ const wrShow=wr.slice(0,12);
+ const st=strengths(m).slice(0,3).map(x=>STR[x.k].n).join(', ');
+ const cm=c&&c.cur.q>=c.b.q?`<div class=box><h3>지난 기록과 비교 <small>(${c.days}일 전 대비)</small></h3><div>푼 문제 <b>${c.cur.q-c.b.q>0?'+'+(c.cur.q-c.b.q):'변화 없음'}</b> · 정답률 ${tcPc(c.b.c,c.b.q)==null?'-':tcPc(c.b.c,c.b.q)+'%'} → <b>${pn==null?'-':pn+'%'}</b> · 다시 풀 틀린 문제 ${c.b.wb} → <b>${c.cur.wb}</b>개 · 공부한 날 ${c.cur.dy-c.b.dy>0?'+':''}${c.cur.dy-c.b.dy}일</div></div>`:'';
+ return `<!doctype html><html lang=ko><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>${esc(nm)} 학습 요약</title><style>
+@page{size:A4;margin:14mm}
+*{box-sizing:border-box}body{font-family:'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:#222;font-size:13px;line-height:1.55;margin:0;padding:14px;max-width:780px;margin:0 auto}
+h1{font-size:22px;margin:0 0 2px}h2{font-size:15px;margin:16px 0 6px;border-bottom:2px solid #333;padding-bottom:3px}h3{font-size:14px;margin:0 0 4px}small{font-weight:400;color:#666}
+.sub{color:#555;font-size:12.5px}.cards{display:flex;gap:8px;margin:10px 0}.cards div{flex:1;border:1.5px solid #bbb;border-radius:8px;padding:8px;text-align:center}.cards b{display:block;font-size:20px}.cards span{font-size:12px;color:#555}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid #bbb;padding:5px 8px;text-align:center}th{background:#eee}
+.box{border:1.5px solid #bbb;border-radius:8px;padding:8px 10px;margin-top:10px}
+.q{border:1px solid #ccc;border-radius:8px;padding:7px 10px;margin-bottom:6px;break-inside:avoid}.q .a{margin-top:3px;font-size:12.5px}.bad{color:#c0392b}.good{color:#1f7a4a}.mi{font-size:12px;color:#7a5a00}
+.memo{height:90px;border:1.5px dashed #aaa;border-radius:8px;margin-top:6px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1;font-size:.82em;margin:0 2px}.fr i{font-style:normal;padding:1px 3px}.fr i:first-child{border-bottom:2px solid currentColor}.mx{white-space:nowrap}
+.qPic svg,.qPic img{max-width:100%;max-height:110px}.foot{margin-top:14px;font-size:11px;color:#777}
+@media print{body{padding:0}}
+</style><body>
+<h1>${esc(nm)} 학습 요약</h1><div class=sub>${esc(semName(m.gs))} · Lv ${lvOf(m.xp).lv} · ${esc(today())} 기준${st?' · 강점: '+esc(st):''}</div>
+<div class=cards><div><b>${q}</b><span>푼 문제(전 과목)</span></div><div><b>${pn==null?'-':pn+'%'}</b><span>정답률(전 과목)</span></div><div><b>${last7}</b><span>최근 7일 푼 문제</span></div><div><b>${Object.keys(m.days||{}).length}</b><span>공부한 날</span></div></div>
+${cm}
+<h2>수학 영역별 최근 정답률</h2>${R?`<table><tr><th>영역</th><th>최근 정답률</th><th>푼 문제</th></tr>${dom}</table><div class=sub style="margin-top:3px">85%↑ 튼튼 · 65~84% 보통 · 65%↓ 보강 · 10문제 미만은 '-'</div>`:'<div class=sub>영역 기록이 아직 없어요.</div>'}
+<h2>더 연습하면 좋은 개념</h2>${weak.length?`<table><tr><th>개념</th><th>영역</th><th>정답률</th></tr>${weak.map(({d,x})=>`<tr><td style="text-align:left">${esc(x.sk.n)}</td><td>${esc(d.n)}</td><td>${Math.round(x.acc*100)}%</td></tr>`).join('')}</table>`:'<div class=sub>뚜렷한 약한 개념이 아직 없어요.</div>'}
+<h2>다시 풀어 볼 틀린 문제 <small>(${wr.length}개${wr.length>wrShow.length?' 중 많이 틀린 '+wrShow.length+'개':''})</small></h2>
+${wrShow.length?wrShow.map((e,i)=>{const kd=wbKindOf(e),FM=kd==='math'?fmtMath:(x=>x),mi=kd==='math'&&e.mi&&ES_MIS[e.mi];return `<div class=q><b>${i+1}.</b> <span class=sub>[${esc(wbNm(e))} · ${e.n||1}번 틀림]</span><div>${FM(wbSafe(e.q))}</div>${e.pic?`<div class=qPic>${wbSafe(e.pic)}</div>`:''}<div class=a>${e.c?`학생 답 <b class=bad>${FM(esc(e.c))}</b> · `:''}정답 <b class=good>${FM(esc(e.a))}</b></div>${mi?`<div class=mi>⚠️ 이런 실수일 수 있어요: ${esc(mi.l)}</div>`:''}</div>`;}).join(''):'<div class=sub>남은 틀린 문제가 없어요 👏</div>'}
+<h2>상담 메모</h2><div class=memo></div>
+<div class=foot>이 요약은 학생이 보낸 저장 코드를 바탕으로 만든 참고 자료이고 성적이 아니에요.</div></body></html>`;}
+function tcPrintDoc(html){const f=document.createElement('iframe');f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';document.body.appendChild(f);f.onload=()=>{setTimeout(()=>{try{f.contentWindow.focus();f.contentWindow.print();}catch(e){}setTimeout(()=>f.remove(),3000);},400);};f.srcdoc=html;}
+function tcRptHTML(metas){
+ let h=`<div class=panel id=tcRptPanel><h2>🧾 학생 개별 요약 (상담용)</h2><p class=mut style="font-size:13.5px;line-height:1.6;margin:2px 0 10px">학생 한 명의 <b>정답률 · 약한 개념 · 틀린 문제</b>를 A4 한 장으로 모아요. 인쇄 창에서 <b>PDF로 저장</b>을 고르면 파일로도 남길 수 있어요.</p><div class=tcRptList>`;
+ h+=metas.map((m,i)=>`<div class=tcRptRow><span class=tcAttnName>${esc(m.name||'(이름 없음)')}</span><span class=mut style="flex:1;font-size:13px">${m.stats.q||0}문제 · ${tcPc(m.stats.c||0,m.stats.q||0)==null?'-':tcPc(m.stats.c||0,m.stats.q||0)+'%'} · 틀린 문제 ${wbOpenN(m)}개</span><button class="btn sm blue" data-rp="${i}">🖨 인쇄·PDF</button><button class="btn sm ghost" data-rd="${i}">💾 .html 저장</button></div>`).join('');
+ return h+`</div></div>`;}
 function renderTeacher(){S.screen='teacher';const y=schoolYear();
  $('#view').innerHTML=`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('teacher')} 선생님 화면</h2><span class=hudSp></span><button class="btn ghost sm" id=tcBack>나가기</button></div>
   <p style="font-size:14px;line-height:1.6;margin-top:8px">학생은 처음에 <b>학년·학기·단원을 직접 골라</b> 시작해요. 그 뒤로 기본 학기를 바꾸려면 <b>선생님 코드</b>가 있어야 해요. 별을 모으면 위 학기는 학생이 직접 열 수 있어요. 코드는 <b>학년+학기 숫자 두 자리 + -LJC</b> 모양이에요. 예: 1학년 1학기 <b>11-LJC</b>, 1학년 2학기 <b>12-LJC</b>.</p>
@@ -9393,9 +9625,13 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
   <div class=row style="margin-top:8px;align-items:center;gap:10px"><button class="btn blue" id=trOpen>방 열기</button><span id=trCode class=tcode style="font-size:34px"></span><span id=trSt class=mut style="font-size:13px"></span></div>
   <div id=trList style="margin-top:8px;font-size:13px"></div>
   <div class=row style="margin-top:6px"><button class="btn ghost sm" id=trClear>받은 기록 모두 지우기</button></div></div>
- <div class=panel><h2>${I('chart')} 학생 기록 모아 보기</h2><div class=explain style="font-size:14px;line-height:1.7;text-align:left"><b>사용 순서</b><br>① 학생이 게임에서 <b>설정 → 저장 · 불러오기 → 코드 만들고 복사</b>를 눌러 저장 코드(PKMT…)를 선생님께 보내요. 닉네임이 같이 보이게 해 주세요.<br>② 받은 코드를 <b>아래 칸에 한 줄에 하나씩</b> 붙여 넣고 <b>표 만들기</b>를 눌러요.<br>③ 학생별 표 아래에 <b>학급 영역 요약</b>(영역별 현황 · 학생×영역 표 · 처방 훈련 현황 · 공통 약한 개념 · 공통 오개념 · 먼저 살펴볼 학생)이 이어서 나와요.<br><span class=mut>※ 저장 코드는 코드를 만든 그 시점의 기록이에요. 변화를 보려면 학생들에게 주마다 새 코드를 받아 주세요.</span></div><p class=mut style="font-size:13px">학생들이 보낸 <b>저장 코드(PKMT…)</b>를 한 줄에 하나씩 붙여 넣거나 .md 파일을 여러 개 고르면 표로 보여 줘요. 이 표는 이 기기 화면에만 보이고 다른 곳으로 보내지 않아요(학생이 보낸 기록만 받아요). 학생은 실명 대신 <b>닉네임</b>을 써요 — 누가 누구인지는 선생님만 따로 적어 두세요.</p>
+ <div class=panel><h2>${I('chart')} 학생 기록 모아 보기</h2><p class=mut style="font-size:14px;line-height:1.6;margin:4px 0 8px">위 <b>📡 실시간으로 받기</b>로 받은 기록이 아래 표에 자동으로 모여요.</p><div class=tcCodeBar><button class="btn ghost" id=tcCodeBtn aria-expanded=false>🔑 학생 코드 보기</button><span class=tcCodeHint>⚠️ <b>인터넷 통신이 불가능한 경우</b>에 사용하세요. 학생이 보낸 저장 코드(PKMT…)를 직접 붙여 넣어 표를 만들 수 있어요.</span></div><div id=tcCodeBox class=tcCodeBox hidden><div class=explain style="font-size:14px;line-height:1.7;text-align:left"><b>사용 순서</b><br>① 학생이 게임에서 <b>설정 → 저장 · 불러오기 → 코드 만들고 복사</b>를 눌러 저장 코드(PKMT…)를 선생님께 보내요. 닉네임이 같이 보이게 해 주세요.<br>② 받은 코드를 <b>아래 칸에 한 줄에 하나씩</b> 붙여 넣고 <b>표 만들기</b>를 눌러요.<br>③ 학생별 표 아래에 <b>학급 영역 요약</b>(영역별 현황 · 학생×영역 표 · 처방 훈련 현황 · 공통 약한 개념 · 공통 오개념 · 먼저 살펴볼 학생)이 이어서 나와요.<br><span class=mut>※ 저장 코드는 코드를 만든 그 시점의 기록이에요. 변화를 보려면 학생들에게 주마다 새 코드를 받아 주세요.</span></div><p class=mut style="font-size:13px">학생들이 보낸 <b>저장 코드(PKMT…)</b>를 한 줄에 하나씩 붙여 넣거나 .md 파일을 여러 개 고르면 표로 보여 줘요. 이 표는 이 기기 화면에만 보이고 다른 곳으로 보내지 않아요(학생이 보낸 기록만 받아요). 학생은 실명 대신 <b>닉네임</b>을 써요 — 누가 누구인지는 선생님만 따로 적어 두세요.</p>
   <textarea class="inp code" id=tcIn style="height:120px" placeholder="PKMTZ:...&#10;PKMTZ:..."></textarea><div class=row style="margin-top:8px"><button class="btn blue" id=tcGo>표 만들기</button><button class="btn ghost" id=tcFiles>${I('folder')} .md 파일 여러 개</button></div>
-  <input type=file id=tcF multiple accept=".md,.txt" class=hidden><div id=tcRep style="overflow-x:auto;margin-top:10px"></div></div>
+  <input type=file id=tcF multiple accept=".md,.txt" class=hidden></div><div id=tcRep style="overflow-x:auto;margin-top:10px"></div></div>
+ <div id=tcAttn></div>
+ <div id=tcCmp></div>
+ <div id=tcRpt></div>
+ <div id=tcWb></div>
  <div id=tcDom></div>
  <div class=panel><h2>${I('medal')} 학생 트레이너 카드 인쇄</h2><p class=mut style="font-size:13px">위 칸에 학생 저장 코드를 넣고 「카드 만들기」를 누르면, 학생이 꾸민 배지와 기록으로 카드(85.5×54mm, 300dpi)를 만들어요. <b>포켓몬 그림·이름은 들어가지 않아요.</b> 카드 등급(첫 돌 5 · 돌탑 20 · 좌삼 50 · 공든 좌삼 100 돌)에 오른 학생만 만들어져요.</p>
   <div class=row><button class="btn blue" id=tcCards>카드 만들기</button><button class="btn ghost" id=tcCardsA4>모두 A4로 인쇄</button></div><div id=tcCardBox style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px"></div></div></div>`;
@@ -9404,10 +9640,11 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
  $('#tcBack').onclick=()=>{sfx('tap');renderTitle();};
  const rows=[],metas=[];const add=o=>{const m=upgradeMeta(mergeMeta(o.meta));metas.push(m);for(const a of ACH){const t=achTier(a,m);if(t>((m.ach[a.k]&&m.ach[a.k].t)||0))m.ach[a.k]={t,d:[]};}const sk=Object.entries(m.sk);const weak=sk.filter(([id,v])=>SKM[id]&&v.x>=2&&v.x>=v.c/2).map(([id])=>SKM[id].n).slice(0,3);
   const last7=Object.keys(m.days).filter(k=>dayDiff(k,today())<7).reduce((s,k)=>s+m.days[k].n,0);
-  rows.push(`<tr><td>${esc(m.name)}</td><td>${esc(semName(m.gs))}</td><td>${lvOf(m.xp).lv}</td><td>${m.stats.q}</td><td>${m.stats.q?Math.round(m.stats.c/m.stats.q*100):0}%</td><td>${(m.enStats&&m.enStats.q)?m.enStats.q+'문제 · '+Math.round(m.enStats.c/m.enStats.q*100)+'%':'-'}</td><td>${last7}</td><td>${Object.keys(m.days).length}</td><td>${Object.keys(m.badges).length}</td><td>${(()=>{const h=m.hist||[];if(h.length<40&&!m.first20)return '-';const p=(m.first20||h.slice(0,20)).reduce((a,x)=>a+x,0),r=h.slice(-20).reduce((a,x)=>a+x,0);return `${p} → <b>${r}</b>`;})()}</td><td style="text-align:left">${esc(Object.keys(m.found||{}).map(F=>SKM[F]?SKM[F].n:'').filter(Boolean).concat(enFoundList(m)).join(', ')||'-')}</td><td style="text-align:left">${esc(weak.concat(enWeakList(m)).slice(0,4).join(', ')||'-')}</td><td>${m.stats.guessWrong||0}회${m.stats.guessAlert?` (천천히 안내 ${m.stats.guessAlert})`:''}</td><td>${ACH.reduce((s,a)=>s+((m.ach[a.k]&&m.ach[a.k].t)||0),0)}</td><td style="text-align:left">${esc(strengths(m).slice(0,2).map(x=>STR[x.k].n).join(', ')||'-')}${playStyle(m).length?'<br><span class=mut>'+esc(playStyle(m).map(t=>'#'+t[0]).join(' '))+'</span>':''}</td></tr>`);};
+  rows.push(`<tr><td>${esc(m.name)}</td><td>${esc(semName(m.gs))}</td><td>${lvOf(m.xp).lv}</td><td>${m.stats.q}</td><td class="${(()=>{if(!m.stats.q)return '';const a=m.stats.c/m.stats.q;return a>=.85?'hG':a>=.65?'hY':'hR';})()}"><b>${m.stats.q?Math.round(m.stats.c/m.stats.q*100):0}%</b></td><td>${(m.enStats&&m.enStats.q)?m.enStats.q+'문제 · '+Math.round(m.enStats.c/m.enStats.q*100)+'%':'-'}</td><td>${last7}</td><td>${Object.keys(m.days).length}</td><td>${Object.keys(m.badges).length}</td><td>${(()=>{const h=m.hist||[];if(h.length<40&&!m.first20)return '-';const p=(m.first20||h.slice(0,20)).reduce((a,x)=>a+x,0),r=h.slice(-20).reduce((a,x)=>a+x,0);return `${p} → <b>${r}</b>`;})()}</td><td class=tx>${esc(Object.keys(m.found||{}).map(F=>SKM[F]?SKM[F].n:'').filter(Boolean).concat(enFoundList(m)).join(', ')||'-')}</td><td class=tx>${esc(weak.concat(enWeakList(m)).slice(0,4).join(', ')||'-')}</td><td>${m.stats.guessWrong||0}회${m.stats.guessAlert?` (천천히 안내 ${m.stats.guessAlert})`:''}</td><td>${ACH.reduce((s,a)=>s+((m.ach[a.k]&&m.ach[a.k].t)||0),0)}</td><td class=tx>${esc(strengths(m).slice(0,2).map(x=>STR[x.k].n).join(', ')||'-')}${playStyle(m).length?'<br><span class=mut>'+esc(playStyle(m).map(t=>'#'+t[0]).join(' '))+'</span>':''}</td></tr>`);};
  const tcStatus=(ok,bad,total)=>{const el=$('#tcRep');if(!el)return;const msg=!total?'<p class=mut>코드를 붙여 넣은 뒤 눌러 주세요.</p>':`<div class=explain style="font-size:14px;margin:0 0 8px;background:${bad.length?'#fff0f0':'#eaf8ee'};border-color:${bad.length?'#e8a0a0':'#8fd3a0'}"><b>${ok}명</b>의 기록을 읽었어요.${bad.length?` <b style="color:#b3261e">${bad.length}줄은 읽지 못했어요</b> (${bad.slice(0,6).join(', ')}번째 줄). 코드가 중간에 잘렸거나 다른 게임 코드는 아닌지 확인해 주세요.`:''}${ok?` 표 아래에 <b>학급 영역 요약</b>이 있어요 ↓`:''}</div>`;el.insertAdjacentHTML('afterbegin',msg);};
  const classPanel=()=>{const box=$('#tcDom');if(!box)return;box.innerHTML=classSummaryHTML(metas);const b=$('#tcCsv');if(b)b.onclick=()=>{const blob=new Blob([classCsv(metas)],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`학급_영역요약_${today()}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);};};
- const show=()=>{$('#tcRep').innerHTML=rows.length?`<table class=rep><tr><th>닉네임</th><th>학기</th><th>Lv</th><th>푼 문제(전 과목)</th><th>정답률(전 과목)</th><th>영어</th><th>최근 7일</th><th>공부한 날</th><th>단원 배지</th><th>처음 20 → 최근 20</th><th>좌삼 쌓는 중</th><th>더 연습할 개념</th><th>찍기 의심</th><th>도전 배지</th><th>강점 · 스타일</th></tr>${rows.join('')}</table>`:'<p class=mut>읽을 수 있는 기록이 없어요</p>';try{classPanel();}catch(e){console.warn('classPanel',e);}};
+ const show=()=>{$('#tcRep').innerHTML=rows.length?`<table class=rep><tr><th>닉네임</th><th>학기</th><th>Lv</th><th>푼 문제(전 과목)</th><th>정답률(전 과목)</th><th>영어</th><th>최근 7일</th><th>공부한 날</th><th>단원 배지</th><th>처음 20 → 최근 20</th><th>좌삼 쌓는 중</th><th>더 연습할 개념</th><th>찍기 의심</th><th>도전 배지</th><th>강점 · 스타일</th></tr>${rows.join('')}</table>`:'<p class=mut>읽을 수 있는 기록이 없어요</p>';try{classPanel();}catch(e){console.warn('classPanel',e);}try{const cm=$('#tcCmp'),rp=$('#tcRpt');let cmp={};if(cm){cmp=rows.length?tcCompare(metas):{};cm.innerHTML=rows.length?tcCmpHTML(metas,cmp):'';const hb=$('#tcHistClear');if(hb)hb.onclick=()=>{if(!confirm('이 기기에 저장된 비교 기록을 모두 지울까요? (학생 기기의 기록은 그대로예요)'))return;try{localStorage.removeItem(TC_HK);}catch(e){}window.TC_CMP={};cm.innerHTML='<div class=panel><p class=mut style="margin:0">비교 기록을 지웠어요. 다음에 표를 만들면 새로 쌓여요.</p></div>';};}if(rp){rp.innerHTML=rows.length?tcRptHTML(metas):'';rp.onclick=ev=>{const b=ev.target.closest('button');if(!b)return;const i=b.dataset.rp!=null?+b.dataset.rp:b.dataset.rd!=null?+b.dataset.rd:-1;const m=metas[i];if(!m)return;const html=tcReportDoc(m,window.TC_CMP||{});if(b.dataset.rp!=null){tcPrintDoc(html);}else{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));a.download=`학습요약_${m.name||'학생'}_${today()}.html`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}};}}catch(e){console.warn('tcCmp',e);}try{const a=$('#tcAttn');if(a)a.innerHTML=rows.length?tcAttnHTML(metas):'';}catch(e){console.warn('tcAttn',e);}try{const w=$('#tcWb');if(w)w.innerHTML=rows.length?tcWbHTML(metas):'';}catch(e){console.warn('tcWb',e);}};
+ {const cb=$('#tcCodeBtn'),box=$('#tcCodeBox');if(cb&&box)cb.onclick=()=>{sfx('tap');const open=box.hasAttribute('hidden');if(open)box.removeAttribute('hidden');else box.setAttribute('hidden','');cb.setAttribute('aria-expanded',open?'true':'false');cb.textContent=open?'🔑 학생 코드 숨기기':'🔑 학생 코드 보기';};}
  $('#tcGo').onclick=async()=>{rows.length=0;metas.length=0;const bad=[];let ln=0;for(const line of $('#tcIn').value.split(/\n+/)){if(!line.trim())continue;ln++;try{add(await readAny(line));}catch(e){bad.push(ln);}}show();tcStatus(rows.length,bad,ln);};
  $('#tcFiles').onclick=()=>$('#tcF').click();
  const cards=[];$('#tcCards').onclick=async()=>{cards.length=0;const box=$('#tcCardBox');box.innerHTML='';const keep=S.meta;
@@ -14376,7 +14613,7 @@ const GD_DEC=[
  {k:'tent',n:'텐트',p:150},{k:'house',n:'오두막',p:300},{k:'fount',n:'분수',p:200},{k:'ball',n:'풍선',p:50,sky:1}];
 const GD_DEC_MAX=10;
 function gdDecImg(def){let sp=null;try{sp=GD_SPR(def.k);}catch(e){}return sp?`<img src="${sp.url}" alt="">`:'';}
-function gdDecHTML(g){return (g.dec||[]).map((d,i)=>{const def=GD_DEC.find(x=>x.k===d.k);if(!def)return '';const sp=GD_SPR(def.k);if(!sp)return '';return `<div class=gdDec data-di="${i}" style="--w:${sp.w};--h:${sp.h};left:${d.x}%;top:${d.y}%;z-index:${2+Math.round(d.y)}">${gdDecImg(def)}</div>`;}).join('');}
+function gdDecHTML(g){return (g.dec||[]).map((d,i)=>({d,i})).sort((a,b)=>a.d.y-b.d.y).map(({d,i})=>{const def=GD_DEC.find(x=>x.k===d.k);if(!def)return '';const sp=GD_SPR(def.k);if(!sp)return '';return `<div class=gdDec data-di="${i}" style="--w:${sp.w};--h:${sp.h};left:${d.x}%;top:${d.y}%;z-index:1">${gdDecImg(def)}</div>`;}).join('');}
 function gdDecor(){const m=S.meta,g=gd(m);g.dec=Array.isArray(g.dec)?g.dec:[];
  const draw=()=>{const full=g.dec.length>=GD_DEC_MAX;
   M(`<h2>🎨 정원 꾸미기</h2><p class=mut style="font-size:13px;text-align:center">장식을 사서 정원에 놓고, 손으로 끌어서 원하는 곳에 옮겨요. (${g.dec.length}/${GD_DEC_MAX}개 · 🪙 ${m.coins||0})</p>
@@ -14394,9 +14631,9 @@ function gdRow2HTML(g,pets){const st=gdMisState();return `<div class=gdBtns2><bu
  document.addEventListener('pointerdown',e=>{try{if(e.button>0)return;const el=e.target.closest&&e.target.closest('.gdDec');if(!el||D)return;const f=fld();if(!f||!f.contains(el))return;D={el,i:+el.dataset.di,pid:e.pointerId,on:0,sx:e.clientX,sy:e.clientY};}catch(x){}});
  document.addEventListener('pointermove',e=>{try{if(!D||e.pointerId!==D.pid)return;const f=fld();if(!f||!f.contains(D.el)){D=null;return;}
   if(!D.on){if(Math.hypot(e.clientX-D.sx,e.clientY-D.sy)<5)return;D.on=1;D.el.classList.add('gdHeld');try{D.el.setPointerCapture(e.pointerId);}catch(x){}}
-  const r=f.getBoundingClientRect(),hh=D.el.offsetHeight/r.height*100;D.x=Math.max(5,Math.min(95,(e.clientX-r.left)/r.width*100));D.y=Math.max(14,Math.min(98,(e.clientY-r.top)/r.height*100+hh*.45));
+  const r=f.getBoundingClientRect(),hh=D.el.offsetHeight/r.height*100;D.x=Math.max(5,Math.min(95,(e.clientX-r.left)/r.width*100));const it0=gd(S.meta).dec[D.i],df=it0&&GD_DEC.find(x=>x.k===it0.k);D.y=Math.max(df&&df.sky?14:54,Math.min(98,(e.clientY-r.top)/r.height*100+hh*.45));
   D.el.style.left=D.x.toFixed(1)+'%';D.el.style.top=D.y.toFixed(1)+'%';e.preventDefault();}catch(x){}},{passive:false});
- const end=e=>{try{if(!D||(e&&e.pointerId!==D.pid))return;const d=D;D=null;if(!d.on)return;d.el.classList.remove('gdHeld');const it=gd(S.meta).dec[d.i];if(it){it.x=+d.x.toFixed(1);it.y=+d.y.toFixed(1);d.el.style.zIndex=2+Math.round(it.y);gdSaveSoon(true);}}catch(x){D=null;}};
+ const end=e=>{try{if(!D||(e&&e.pointerId!==D.pid))return;const d=D;D=null;if(!d.on)return;d.el.classList.remove('gdHeld');const it=gd(S.meta).dec[d.i];if(it){it.x=+d.x.toFixed(1);it.y=+d.y.toFixed(1);d.el.style.zIndex=1;gdSaveSoon(true);}}catch(x){D=null;}};
  document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);})();
 // 포켓몬을 손으로 들어 옮길 수 있어요: 비행 포켓몬은 놓은 자리 그대로 떠 있고, 걷는 포켓몬은 땅으로 톡 떨어져요
 (function(){let D=null;
