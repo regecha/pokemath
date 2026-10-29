@@ -2645,6 +2645,17 @@ table.tcCmpT td.nm{font-weight:900;text-align:left}
 .tcUp{color:#1f6b3d;font-weight:900}.tcDown{color:#b3261e;font-weight:900}.tcFlat{color:#8a7d8f}
 .tcRptRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;margin-bottom:6px;border:1.5px solid #e0d3b5;border-radius:12px;background:#fff}
 </style>
+<style id="readCss">
+/* 읽기 좋은 줄바꿈: 한국어는 낱말 단위로 줄을 바꾸고, 너무 긴 말만 어쩔 수 없이 끊어요 */
+body{word-break:keep-all;overflow-wrap:break-word}
+textarea,input{word-break:normal}
+textarea.inp.code{word-break:break-all}
+.card .cName{text-overflow:clip}
+.hand.crowd .card .cName{text-wrap:balance}
+.btn,.pill,.fbtn,.rl-chip,.sc-tag{word-break:keep-all}
+.sc-line,.scv-ln,.rl-scene .sc-line,.explain,.sc-note,.mut,.mgNote,.tbTxt,.modal p,.modal li{word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty}
+h1,h2,h3,h4,.qText,.hubTop{text-wrap:balance}
+</style>
 </head>
 <body>
 <div id="ttFade"></div>
@@ -3376,13 +3387,14 @@ function applyFit(top,h){const de=document.documentElement,ds=de.style;const z=u
  ds.setProperty('--vt',top/z+'px');ds.setProperty('--vh',h/z+'px');de.classList.toggle('short',h/z<680);}
 const fitMode=()=>S.meta.settings.fit||'auto';
 function refit(){applyFit(fitMode()==='off'?0:FIT.top,fitMode()==='off'||!FIT.h?innerHeight:Math.min(FIT.h,innerHeight));}
-function initFit(){applyFit(0,innerHeight);addEventListener('resize',()=>applyFit(FIT.top,FIT.h>0?Math.min(FIT.h,innerHeight):innerHeight));
+function initFit(){applyFit(0,innerHeight);let io=null,probe=null,rt=0;
+ addEventListener('resize',()=>{FIT.top=0;FIT.h=0;applyFit(0,innerHeight);clearTimeout(rt);rt=setTimeout(()=>{try{if(io&&probe){io.unobserve(probe);io.observe(probe);}}catch(e){}},120);}); // 브라우저 확대·축소로 크기가 바뀌면 옛 높이를 버리고 다시 잼
  if(!('IntersectionObserver' in window))return;const el=document.createElement('div');el.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;visibility:hidden;z-index:-5';document.body.appendChild(el);
  const th=[];for(let i=0;i<=200;i++)th.push(i/200);
- new IntersectionObserver(es=>{const e=es[es.length-1],r=e.intersectionRect,H=innerHeight;let top=0,h=H;
+ probe=el;io=new IntersectionObserver(es=>{const e=es[es.length-1],r=e.intersectionRect,H=innerHeight;let top=0,h=H;
   const bh=e.boundingClientRect.height,k=bh>0&&Math.abs(bh/H-1)>.03?bh/H:1;const rt=r.top/k,rh=r.height/k;
   if(fitMode()!=='off'&&e.isIntersecting&&rh>=260&&rt>=-1&&rt+rh<=H+2&&rh<H-6){top=Math.max(0,Math.round(rt));h=Math.round(rh);}
-  window.__edge={top:!e.isIntersecting||r.top<=1,bot:!e.isIntersecting||r.top+r.height>=H-1};if(top===FIT.top&&h===FIT.h)return;FIT.top=top;FIT.h=h;applyFit(top,h);},{threshold:th}).observe(el);}
+  window.__edge={top:!e.isIntersecting||r.top<=1,bot:!e.isIntersecting||r.top+r.height>=H-1};const hh=(top===0&&h>=H-6)?0:h;if(top===FIT.top&&hh===FIT.h)return;FIT.top=top;FIT.h=hh;applyFit(top,hh||H);},{threshold:th});io.observe(el);}
 async function goFull(){try{if(document.fullscreenElement){await document.exitFullscreen();return;}await document.documentElement.requestFullscreen({navigationUI:'hide'});}
  catch(e){if(canNewWin()){saveLocal();window.open(location.href,'_blank');toast('새 창에서 열었어요. 기록은 저장 코드로 옮길 수 있어요');}else toast('이 화면에서는 전체 화면을 쓸 수 없어요');}}
 const EMBED=(()=>{try{return window.self!==window.top;}catch(e){return true;}})();
@@ -5103,16 +5115,18 @@ function imgFail(el){const id=+el.dataset.id;if(id>=GM_BASE&&id<GM_BASE+2000){gm
  if(el.dataset.k&&el.dataset.k!=='front'){el.dataset.f='1';el.src=SPR_BASE+id+'.png';return;}el.dataset.f='2';el.src=fallbackSprite(id);}
 function monImg(id,kind='front',cls='',ns){if((kind==='anim'||kind==='back')&&S.meta.settings.anim!=='gif')cls=(cls?cls+' ':'')+'idle';return `<img class="${cls}" style="--d:${(id%7)*.17}s" src="${spriteURL(id,kind,ns)}" data-id="${id}" data-k="${kind}" alt="" loading="lazy" draggable="false" onerror="imgFail(this)">`;}
 /* ===== 전투 칸의 포켓몬 그림: 그림 파일 아래쪽의 투명한 여백을 없애 발이 바닥에 닿게 해요 ===== */
+/* 실제 키가 작은 포켓몬(꼬렛·메타몽 등)은 그림 여백을 채우느라 너무 커지지 않게, 도감 키에 맞춰 확대 한도를 둬요 */
+function htCap(id){try{let b=id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];const h=MON[b]&&MON[b].ht;if(!(h>0))return 1.6;return h<=.4?1.05:h<=.7?1.15:h<=1?1.3:h<=1.5?1.45:1.6;}catch(e){return 1.6;}}
 const SPR_SHIFT=new Map();
 function monImgU(id,kind,ns){let h=monImg(id,kind,'',ns);try{const u=spriteURL(id,kind,ns),c=SPR_SHIFT.get(u);if(c&&c!==u)h=h.replace('src="'+u+'"','src="'+c+'" data-shifted="1"');}catch(e){}return h;}
-function shiftSpriteDown(src){return new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';
+function shiftSpriteDown(src,cap){return new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';
  im.onload=()=>{try{const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h||w>600||h>600)return res(src);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(im,0,0);
   const d=cx.getImageData(0,0,w,h).data;let minX=w,maxX=-1,minY=h,maxY=-1;
   for(let y=0;y<h;y++)for(let x=0;x<w;x++){if(d[(y*w+x)*4+3]>24){if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;}}
   if(maxY<0)return res(src);
   /* 몸집에 비해 그림이 작게 나오는 포켓몬(그림 파일에 투명 여백이 큰 경우)은 몸 부분만 잘라 키워서 칸에 알맞게 채워요. 이미 큰 포켓몬은 그대로 둬요 */
   const bw=maxX-minX+1,bh=maxY-minY+1,fill=Math.max(bw/w,bh/h),pad=h-1-maxY;
-  let k=fill<0.8?Math.min(1.6,0.8/fill):1;k=Math.max(1,Math.min(k,w/bw*0.98,h/bh*0.98));
+  let k=fill<0.8?Math.min(cap||1.6,0.8/fill):1;k=Math.max(1,Math.min(k,w/bw*0.98,h/bh*0.98));
   if(k<1.06&&pad<2)return res(src);
   const c2=document.createElement('canvas');c2.width=w;c2.height=h;const c2x=c2.getContext('2d');c2x.imageSmoothingEnabled=false;
   if(k<1.06){c2x.drawImage(im,0,pad);}
@@ -5122,7 +5136,7 @@ function shiftSpriteDown(src){return new Promise(res=>{try{const im=new Image();
 document.addEventListener('load',e=>{const im=e.target;if(!im||im.tagName!=='IMG'||im.dataset.shifted||!im.closest||!im.closest('#myLane .unit .sp,#foeLane:not(.wildLane) .unit .sp'))return;
  const src=im.currentSrc||im.src;if(!src||src.startsWith('data:')||/\.gif(\?|$)/i.test(src))return;
  if(SPR_SHIFT.has(src)){const c=SPR_SHIFT.get(src);if(c!==src){im.dataset.shifted='1';im.src=c;}return;}
- shiftSpriteDown(src).then(c=>{SPR_SHIFT.set(src,c);if(c!==src&&im.isConnected&&(im.currentSrc||im.src)===src){im.dataset.shifted='1';im.src=c;}});},true);
+ shiftSpriteDown(src,htCap(+im.dataset.id)).then(c=>{SPR_SHIFT.set(src,c);if(c!==src&&im.isConnected&&(im.currentSrc||im.src)===src){im.dataset.shifted='1';im.src=c;}});},true);
 /* GIF 그림: 움직임은 그대로 두고, 그림 안의 투명 여백이 커서 작아 보이는 포켓몬만 CSS로 키워서 칸을 채워요 */
 const GIF_FIT=new Map();
 function gifBBox(src){if(GIF_FIT.has(src))return GIF_FIT.get(src);
@@ -5137,7 +5151,8 @@ function gifFit(im){try{
   const f=Math.min(W/bb.w,H/bb.h),cw=bb.w*f,ch=bb.h*f,left=(W-cw)/2,top=H-ch;
   const bx0=left+bb.x0*f,bx1=left+(bb.x1+1)*f,by1=top+(bb.y1+1)*f,bwid=bx1-bx0,bhei=(bb.y1-bb.y0+1)*f;
   const fill=Math.max(bwid/W,bhei/H);
-  let k=fill<0.8?Math.min(1.6,0.8/fill):1;k=Math.max(1,Math.min(k,W/bwid*0.98,H/bhei*0.98));
+  const wide=bwid/bhei>1.12; /* 날개를 펼쳐 옆으로 넓은 포켓몬(리자몽·루기아 등): 칸 폭보다 조금 더 넓게 키워서 몸이 작아 보이지 않게 해요 */
+  let k=bhei/H<0.8?Math.min(htCap(+im.dataset.id),0.8/(bhei/H)):1;k=Math.max(1,Math.min(k,(wide?W*1.55:W*0.98)/bwid,H/bhei*0.98));
   const cxp=(bx0+bx1)/2;
   if(k<1.06&&by1>=H-2)return;
   im.dataset.gfit='1';
@@ -15423,6 +15438,18 @@ const R=(t,ids)=>({t,ids:ids.split(' ')});
 (function(){let last=null;const top=()=>{try{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;const v=document.getElementById('view');if(v)v.scrollTop=0;}catch(e){}};
  function start(){const v=document.getElementById('view');if(!v)return;last=S.screen;
   new MutationObserver(()=>{if(S.screen!==last){last=S.screen;top();requestAnimationFrame(top);}}).observe(v,{childList:true});}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();})();
+</script>
+<script>
+/* 카드·이름표의 포켓몬 이름이 잘리지 않게: 칸에 맞을 때까지 글자 크기를 살짝 줄여요 */
+(function(){const SEL='.card:not(.hand .card) .cName';let q=0,busy=false;
+ function fit(e){try{const w=e.clientWidth;if(!w)return;if(e.dataset.fw==String(w)&&e.dataset.ft===e.textContent)return;
+  e.style.fontSize='';let fs=parseFloat(getComputedStyle(e).fontSize)||12,n=0;const min=Math.max(6,fs*.55);
+  while(e.scrollWidth>e.clientWidth+.5&&fs>min&&n++<24){fs-=.5;e.style.fontSize=fs+'px';}
+  e.dataset.fw=String(w);e.dataset.ft=e.textContent;}catch(x){}}
+ function run(){q=0;if(busy)return;busy=true;try{document.querySelectorAll(SEL).forEach(fit);}finally{busy=false;}}
+ function sched(){if(q)return;q=requestAnimationFrame(run);}
+ function start(){new MutationObserver(sched).observe(document.body,{childList:true,subtree:true,characterData:true});addEventListener('resize',()=>{document.querySelectorAll(SEL).forEach(e=>{delete e.dataset.fw;});sched();});sched();}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();})();
 </script>
 </body></html>
