@@ -2656,6 +2656,7 @@ textarea.inp.code{word-break:break-all}
 .sc-line,.scv-ln,.rl-scene .sc-line,.explain,.sc-note,.mut,.mgNote,.tbTxt,.modal p,.modal li{word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty}
 h1,h2,h3,h4,.qText,.hubTop{text-wrap:balance}
 </style>
+<style>.bkBanner{display:flex;gap:12px;align-items:center;margin-bottom:12px;background:linear-gradient(135deg,#fff7e0,#ffeec2);border:3px solid #ffc94d}</style>
 </head>
 <body>
 <div id="ttFade"></div>
@@ -3220,23 +3221,31 @@ function buildMD(){const m=S.meta,L=lvOf(m.xp);const d=new Date();
  return `# ${GAME.title} 기록 — ${m.name}\n\n> 이 파일을 게임 화면에 끌어다 놓거나 「저장 · 불러오기 → .md 불러오기」로 이어서 할 수 있어요. 맨 아래 저장 데이터 블록은 고치지 마세요.\n\n| 항목 | 값 |\n|---|---|\n| 닉네임 | ${m.name} |\n| 학년·학기 | ${semName(m.gs)} |\n| 저장 시각 | ${d.toLocaleString('ko-KR')} |\n| 트레이너 레벨 | Lv.${L.lv} (${L.title}) |\n| 푼 문제 / 맞힌 문제 | ${m.stats.q} / ${m.stats.c} |\n| 모은 카드 | ${Object.keys(m.col).length}종 |\n| 체육관 배지 | ${Object.keys(m.gyms).length}개 |\n| 도전 과제 배지 | ${ACH.reduce((s,a)=>s+((m.ach[a.k]&&m.ach[a.k].t)||0),0)}개 |\n| 나의 강점 | ${strengths(m).slice(0,2).map(x=>STR[x.k].t).join(', ')||'찾는 중'} |\n| 플레이 스타일 | ${playStyle(m).map(t=>'#'+t[0]).join(' ')||'-'} |\n\n## 최근 공부 기록\n| 날짜 | 푼 문제 | 맞힌 문제 | 정답률 | 문제당 시간 |\n|---|---|---|---|---|\n${days||'| - | - | - | - | - |'}\n\n## 개념별 별\n| 학기 | 개념 | 별 | 맞힘/전체 |\n|---|---|---|---|\n${sks||'| - | - | - | - |'}\n\n> 좌삼초.\n\n## 저장 데이터\n\`\`\`json\n${JSON.stringify({game:GAME.id,v:1,saved:Date.now(),meta:m})}\n\`\`\`\n`;}
 async function saveMD(){const md=buildMD();const nm=(S.meta.name||'트레이너').replace(/[\\/:*?"<>|\s]/g,'');const d=new Date();
  const fn=`${GAME.file}_${nm}_${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}_${pad2(d.getHours())}${pad2(d.getMinutes())}.md`;
- if(window.showSaveFilePicker&&window.self===window.top){try{const h=await showSaveFilePicker({suggestedName:fn,types:[{description:'마크다운 기록',accept:{'text/markdown':['.md']}}]});const w=await h.createWritable();await w.write(md);await w.close();toast('저장했어요: '+esc(h.name));return;}catch(e){if(e&&e.name==='AbortError')return;}}
- const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);toast(esc(fn)+' 파일로 내려받았어요');}
+ if(window.showSaveFilePicker&&window.self===window.top){try{const h=await showSaveFilePicker({suggestedName:fn,types:[{description:'마크다운 기록',accept:{'text/markdown':['.md']}}]});const w=await h.createWritable();await w.write(md);await w.close();markBackup();toast('저장했어요: '+esc(h.name));return;}catch(e){if(e&&e.name==='AbortError')return;}}
+ const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);markBackup();toast(esc(fn)+' 파일로 내려받았어요');}
 function handleFile(f){if(!f)return;const rd=new FileReader();rd.onload=async()=>{try{const o=await readAny(String(rd.result));applyLoaded(o,'파일에서 불러왔어요!');}catch(e){toast(esc(e.message||'불러오지 못했어요'));}};rd.readAsText(f,'utf-8');}
 const canNewWin=()=>EMBED&&/^https?:/.test(location.protocol);
+// 백업(저장 코드·.md 파일·기기 옮기기)을 마지막으로 한 때를 기억해서, 오래되면 홈에서 알려 줘요
+function markBackup(){try{const m=S.meta;m.bk={t:Date.now(),n:((m.bk&&m.bk.n)||0)+1};m.bkSnooze=0;saveLocal();}catch(e){}}
+function bkAgo(){const b=S.meta.bk;if(!b||!b.t)return null;return Math.max(0,Math.floor((Date.now()-b.t)/864e5));}
+function bkNeed(m){try{if(!codeValid()||!m.name)return false;if((m.stats&&m.stats.q||0)<40)return false;if((m.bkSnooze||0)>Date.now())return false;const a=bkAgo();return a===null||a>=7;}catch(e){return false;}}
+function bkLineHTML(){const a=bkAgo();return `<div class=mut style="font-size:13px;margin:6px 0">💾 마지막 백업: <b>${a===null?'아직 없어요':a===0?'오늘':a+'일 전'}</b> <span style="font-size:12px">(저장 코드·.md 파일·기기 옮기기로 해 둔 때)</span></div>`;}
+function bkBannerHTML(m){if(!bkNeed(m))return '';const a=bkAgo();
+ return `<div class="panel bkBanner"><div style="font-size:26px">💾</div><div style="flex:1"><b class=jua style="font-size:17px">기록 백업해 둘까요?</b><div class=mut style="font-size:13px">${a===null?'아직 백업한 적이 없어요.':a+'일 동안 백업하지 않았어요.'} 브라우저 데이터를 지우거나 기기가 바뀌면 기록이 사라질 수 있어요. 저장 코드를 한 번 만들어 두면 안전해요!</div></div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn gold sm" onclick="showSaveBox()">지금 백업</button><button class="btn ghost sm" onclick="bkLater()">나중에</button></div></div>`;}
+function bkLater(){S.meta.bkSnooze=Date.now()+3*864e5;saveLocal();sfx('tap');renderHub();}
 function quickSave(){if(!STORE_OK){showSaveBox();return;}saveLocal();toast(`${I('check')} 저장했어요! 지금 꺼도 다음에 이어서 할 수 있어요 <button class="btn sm ghost" style="margin-left:6px;pointer-events:auto" onclick="showSaveBox()">저장 옮기기</button>`);}
 function showSaveBox(){saveLocal();
  const status=STORE_OK?`<div class=saveStatus>${I('check')} <b>자동 저장 켜짐</b> — 문제를 풀거나 카드를 얻을 때마다 이 브라우저에 저장돼요.<br><span class=mut>지금: ${esc(saveSummary())}</span></div>`
   :`<div class="saveStatus bad">${I('lock')} <b>이 화면에서는 브라우저 저장이 막혀 있어요.</b><br>새로고침되면 기록이 사라지니, 아래 <b>저장 코드</b>를 꼭 만들어 두세요.</div>`;
  const slots=STORE_OK?`<h3>저장 칸 <span class=mut style="font-size:12px">(이 기기·이 브라우저에만 남아요)</span></h3>`+[1,2,3].map(i=>{const o=slotGet(i);return `<div class=slot2><div class=sl1><b>${I('disk')} 저장 칸 ${i}</b><div class=mut>${o?esc((o.name?o.name+' · ':'')+o.sum)+' · '+fmtWhen(o.t):'비어 있어요'}</div></div><div class=sl2><button class="btn sm gold" data-a="s${i}">저장</button><button class="btn sm blue" data-a="l${i}" ${o?'':'disabled'}>불러오기</button></div></div>`;}).join(''):'';
  const acts={x:()=>closeM(),_close:()=>closeM(),
-  mk:async()=>{const c=await makeCode();const ta=$('#codeOut');ta.value=c;copyText(c,ta);},
-  share:async()=>{const c=await makeCode();$('#codeOut').value=c;try{await navigator.share({title:GAME.title+' 저장 코드',text:c});}catch(e){copyText(c,$('#codeOut'));}},
+  mk:async()=>{const c=await makeCode();const ta=$('#codeOut');ta.value=c;copyText(c,ta);markBackup();},
+  share:async()=>{const c=await makeCode();$('#codeOut').value=c;try{await navigator.share({title:GAME.title+' 저장 코드',text:c});}catch(e){copyText(c,$('#codeOut'));}markBackup();},
   ld:async()=>{try{const o=await readAny($('#codeIn').value);if(S.meta.name&&!(await confirmBox('지금 기록이 코드의 기록으로 바뀌어요. 불러올까요?','불러오기','취소')))return;applyLoaded(o,'저장 코드로 불러왔어요!');}catch(e){toast(esc(e.message||'불러오지 못했어요'));}},
   mdS:()=>saveMD(),mdL:()=>$('#fileIn').click(),win:()=>{saveLocal();window.open(location.href,'_blank');},xRcv:()=>{closeM();xferReceive();},xSnd:()=>{closeM();xferSend();}};
  [1,2,3].forEach(i=>{acts['s'+i]=async()=>{const o=slotGet(i);if(o&&!(await confirmBox(`저장 칸 ${i}의 기록을 지금 기록으로 덮어쓸까요?`,'덮어쓰기','취소')))return;if(slotSave(i)){sfx('coin');toast(`저장 칸 ${i}에 저장했어요`);showSaveBox();}else toast('저장하지 못했어요');};
   acts['l'+i]=async()=>{const o=slotGet(i);if(!o)return;if(!(await confirmBox(`지금 기록 대신 저장 칸 ${i}의 기록을 불러올까요?`,'불러오기','취소')))return;applyLoaded(o,`저장 칸 ${i}을 불러왔어요!`);};});
- M(`<h2>${I('disk')} 저장 · 불러오기</h2>${status}${slots}
+ M(`<h2>${I('disk')} 저장 · 불러오기</h2>${status}${bkLineHTML()}${slots}
   <div style="margin:12px 0;padding:14px 12px;border:3px solid #7a5cff;border-radius:16px;background:linear-gradient(180deg,#f3eeff,#fff8e6);box-shadow:0 4px 0 #cdbdff">
    <h3 style="margin:0 0 4px;font-size:20px;text-align:center">📲 다른 기기로 옮기기 <span style="background:#ff5a5f;color:#fff;border-radius:999px;padding:2px 9px;font-size:12px;vertical-align:middle">쉬워요!</span></h3>
    <p class=mut style="font-size:13px;text-align:center;margin:0 0 10px">숫자 4자리만 있으면 돼요 · 두 기기 모두 인터넷이 필요해요</p>
@@ -3358,7 +3367,7 @@ function xferSend(){
   if(room.length!==4){toast('숫자 4자리를 넣어 주세요');return;}
   if(!S.meta.name){toast('닉네임을 만든 뒤에 보낼 수 있어요');return;}
   busy=true;say('연결하는 중…');let done=false,to=0;
-  const fin=(ok,why)=>{if(done)return;done=true;busy=false;clearTimeout(to);xferStop();if(ok){closeM();sfx('win');toast('저장 데이터를 보냈어요! 받는 기기에서 이어서 하세요');}else{say(why||'보내지 못했어요');}};
+  const fin=(ok,why)=>{if(done)return;done=true;busy=false;clearTimeout(to);xferStop();if(ok){markBackup();closeM();sfx('win');toast('저장 데이터를 보냈어요! 받는 기기에서 이어서 하세요');}else{say(why||'보내지 못했어요');}};
   try{await loadPeer();saveLocal();const code=await makeCode();
    xferStop();const p=new Peer(PO());_xfPeer=p;
    to=setTimeout(()=>fin(false,'받는 기기를 찾지 못했어요. 번호와 받는 화면이 열려 있는지 확인해 주세요'),15000);
@@ -4412,7 +4421,12 @@ function tierPool(pool,tier){const n=pool.length;if(n<3)return pool;const T=skTi
 // 도움이 필요한 학생: 최근 20문제(다시 풀기 제외) 정답률이 낮으면 쉬운 문제를 더 많이 섞어요 (1단계 60% 미만, 2단계 40% 미만)
 function struggleLv(){try{const h=(S.meta.hist||[]).slice(-20);if(h.length<10)return 0;const a=h.reduce((x,y)=>x+y,0)/h.length;const lv=a<.4?2:a<.6?1:0;
  if(lv>S._strLv&&lv>0)setTimeout(()=>{try{toast('💪 천천히 가요! 쉬운 문제를 조금 더 섞어 줄게요');}catch(e){}},600);S._strLv=lv;return lv;}catch(e){return 0;}}
+// 잘하는 학생: 최근 20문제 정답률이 90% 이상이면 무거운(어려운) 문제를 더 섞어요 (80% 아래로 내려가면 원래대로)
+function excelLv(){try{const h=(S.meta.hist||[]).slice(-20);if(h.length<15){S._exLv=0;return 0;}const a=h.reduce((x,y)=>x+y,0)/h.length,was=S._exLv|0;const lv=a>=.9||(was&&a>=.8)?1:0;
+ if(lv>was)setTimeout(()=>{try{toast('🚀 척척 잘 풀어요! 어려운 문제를 조금 더 섞어 줄게요');}catch(e){}},600);S._exLv=lv;return lv;}catch(e){return 0;}}
 function nextCyc(){const r=rnd(),lv=struggleLv(),iq=S.meta.settings.iq!==false;
+ if(lv>0)S._exLv=0;
+ if(lv===0&&excelLv()===1){return !iq?(r<.25?'L':r<.55?'M':'H'):(r<.2?'L':r<.5?'M':r<.9?'H':'I');} // 잘할 때: 가벼움 20 · 중간 30 · 무거움 40 · IQ 10
  if(lv===2)return r<.7?'L':r<.95?'M':'H';            // 많이 어려워할 때: 가벼움 70 · 중간 25 · 무거움 5 (IQ 없음)
  if(lv===1){if(!iq)return r<.6?'L':r<.3+.6?'M':'H';return r<.55?'L':r<.85?'M':r<.95?'H':'I';} // 가벼움 55 · 중간 30 · 무거움 10 · IQ 5
  if(!iq)return r<.5?'L':r<.8?'M':'H';return r<.4?'L':r<.7?'M':r<.9?'H':'I';} // 평소 켬: 가벼움 40·중간 30·무거움 20·IQ 10 / 끔: 50·30·20
@@ -8957,6 +8971,7 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
  const next=FEAT.find(f=>!m.unl[f.k]);
  $('#view').innerHTML=hudHTML()+`<div class=wrap>
   <div class="panel hubTop" style="display:flex;gap:12px;align-items:center"><div class=htMon>${monImg(partner,'anim')}</div><div class=htBody><div class=htRow><div class="jua htName">${esc(m.name)}</div><button class="btn ghost sm" id=hPartner>${I('heart')} 파트너 바꾸기</button></div><div class="mut htSub">${esc(lvOf(m.xp).title)} · ${josa(esc(MON[partner].name),'와과')} 함께해요${shinyOn(partner)?' ✨':''}</div><div class="mut htBond">${shinyOn(partner)?'✨ 이로치 파트너!':`이로치까지 함께 푼 문제 ${Math.min(bondOf(partner),SHINY_AT)} / ${SHINY_AT}`}</div><div class=htLine>${hubLine()}</div></div></div>
+  ${bkBannerHTML(m)}
   ${gardenPanel(m)}
   ${wgPanel(m)}
   <div class=panel style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="font-size:30px">🛡️</div><div style="flex:1"><b class=jua style="font-size:19px">트레이너 스킬</b><div class=mut style="font-size:13px">레벨 포인트 ${m.lp||0}개 · 스킬을 배우고 전투에서 사용해요</div></div><button class="btn purple" id="hTrainerSkills">스킬 관리</button></div>
@@ -10969,6 +10984,21 @@ function nkToday(){const m=S.meta,t=today();if(!m.nkDay||m.nkDay.d!==t)m.nkDay={
 function nkLeft(k){return Math.max(0,NK_DAILY_MAX-(nkToday()[k]||0));}
 const __pickQBeforeEnglish=pickQ;
 pickQ=function(opt={}){if(opt.cyc&&!opt.tier){const t=nextCyc();if(t==='I'){const iq=iqQ();if(iq)return iq;opt=Object.assign({},opt,{tier:'H'});}else opt=Object.assign({},opt,{tier:t});}let qm=S.meta.questionMode;{const sk=qm==='korean'?'ko':(qm==='english'||qm==='mix')?'en':null;if(sk&&nkLeft(sk)<=0){S.meta.questionMode='math';qm='math';autoSave();try{toast('오늘 '+(sk==='ko'?'국어':'영어')+' 문제 <b>'+NK_DAILY_MAX+'개</b>를 다 풀었어요! 수학 모드로 바꿨어요 ➗');}catch(e){}}}if(qm==='korean'){const kq=makeKoreanQ(opt.tier||null);if(kq)return kq;}if(qm==='english'||(qm==='mix'&&rnd()<.5))return makeEnglishQ();return __pickQBeforeEnglish(opt);};
+/* 전투 문제에 틀렸던 문제를 가끔 섞어요: 오답 노트에서 아직 해결 못 한 수학 문제를 평소 문제 사이에 끼워 다시 풀게 해요 (맞히면 오답 노트가 정리돼요) */
+let RV_GAP=0;
+function reviewPickQ(opt){try{
+ if(!opt||!opt.cyc||opt.pool||opt.lad||opt.tier)return null;
+ if(S.meta.questionMode&&S.meta.questionMode!=='math')return null;
+ if(typeof B!=='undefined'&&B&&(B.rl||B.pvp))return null; // 모험은 따로 복습 시련이 있고, 친구 대전은 공평하게 그대로 둬요
+ if(/^scenarioRL/.test(S.screen||''))return null;
+ RV_GAP++;if(RV_GAP<5)return null; // 최근에 복습 문제가 나왔다면 4문제는 건너뛰어요
+ if(rnd()>.14)return null;
+ const L=wbList().filter(e=>!e.d&&wbKindOf(e)==='math'&&!RECENT.includes(e.k));if(!L.length)return null;
+ const wts=L.map(e=>1+Math.min(3,(e.n||1)-1));let t=wts.reduce((a,b)=>a+b,0),x=rnd()*t,i=0;for(;i<L.length-1;i++){x-=wts[i];if(x<=0)break;}
+ const q=wbMakeQ(L[i],false);if(!q||!q.ch||q.ch.length<2)return null;
+ q.tier='L';q.rv=1;q.ladTag='📝 틀렸던 문제 다시!';RECENT.push(q.key);if(RECENT.length>8)RECENT.shift();RV_GAP=0;return q;}catch(e){return null;}}
+const __pickQBeforeReview=pickQ;
+pickQ=function(opt={}){const q=reviewPickQ(opt);return q||__pickQBeforeReview.apply(this,arguments);};
 const __foundUpdateBeforeEnglish=foundUpdate;
 foundUpdate=function(q,ok){if(q&&(q.en||q.iq||q.ko))return;return __foundUpdateBeforeEnglish(q,ok);};
 const __recordAnswerBeforeEnglish=recordAnswer;
