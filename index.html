@@ -2447,7 +2447,7 @@ html body .tile.main .tn{font-size:21px}
 html body .tile.main .td{font-size:12.5px}
 html body .tile:not(.main){min-height:112px;padding:10px 8px 9px}
 /* 모서리 조금 더 둥글게 (clip-path·블러 없이 border-radius만) */
-body:not(:has(#battle.on)) :is(#view,.modal,#coach,#toast,#unlock,#banner) *:not(.title *):not(.dmg):not([class*=shadow]):not(.card):not(.card *):not(.dexCell){border-radius:7px!important}
+body:not(:has(#battle.on)) :is(#view,.modal,#coach,#toast,#unlock,#banner) *:not(.title *):not(.dmg):not([class*=shadow]):not(.card):not(.card *):not(.dexCell):not(.fr *){border-radius:7px!important}
 html body :is(.panel,.qCard,.tile,.scv-card,.sc-panel,.mbox,.hero,.gym,.sc-stage){border-radius:12px!important}
 html body :is(.btn,.pill,.inp,.seg button,.nextFeat,.explain,.bubble,.skRow){border-radius:9px!important}
 html body .tile span.ti{border-radius:9px!important}
@@ -2651,6 +2651,7 @@ body{word-break:keep-all;overflow-wrap:break-word}
 textarea,input{word-break:normal}
 textarea.inp.code{word-break:break-all}
 .card .cName{text-overflow:clip}
+.fr i,.fr i:first-child{border-radius:0!important;box-shadow:none!important;background:none!important}/* 분수 가로선이 둥글게 휘지 않게 */
 .hand.crowd .card .cName{text-wrap:balance}
 .btn,.pill,.fbtn,.rl-chip,.sc-tag{word-break:keep-all}
 .sc-line,.scv-ln,.rl-scene .sc-line,.explain,.sc-note,.mut,.mgNote,.tbTxt,.modal p,.modal li{word-break:keep-all;overflow-wrap:break-word;text-wrap:pretty}
@@ -3142,6 +3143,7 @@ function coachNext(){if(!CO)return;const st=CO.q.shift();if(!st)return coachEnd(
 function evoCoachSteps(){return [
    {h:'진화',ic:'candy',pic:evoPic([4,5,6]),t:'<b>사탕</b>을 모으면 도감에서 카드를 눌러 <b>진화</b>시킬 수 있어요. 더 강한 포켓몬 카드가 돼요!'},
    {h:'메가진화',ic:'flame',pic:evoPic([6,MEGA[6]]),t:'전투에서 정답을 <b>10개</b> 맞히면 <b>진화 게이지</b>가 가득 차요. 도감에서 사탕으로 <b>연구</b>한 포켓몬을 누르고 <b>메가</b> 버튼! 공격 +5, 체력 +5 (변신한 차례는 쉬어요).'},
+   {h:'진화가 빨라져요',ic:'flame',pic:stPic([['🧬','진화 연구'],['🔹','Lv.1~2 정답 -1'],['🔷','Lv.3~4 정답 -2'],['💠','Lv.5 정답 -3']]),t:'트레이너 스킬 <b>🧬 진화 연구</b>를 배우면 진화에 필요한 정답 수가 줄어요! Lv.1~2는 <b>-1개</b>, Lv.3~4는 <b>-2개</b>, Lv.5는 <b>-3개</b>예요. 전투 화면의 <b>진화 게이지</b>도 줄어든 숫자로 바뀌어요.'},
    {h:'원시회귀',ic:'flame',pic:evoPic([382,MEGA[382],383,MEGA[383]]),t:'<b>가이오가·그란돈</b>은 메가 대신 <b>원시회귀</b>! 같은 방법으로 쓰고, 공격 +5, 체력 +5예요. 버튼에는 <b>원시</b>라고 나와요.'},
    {h:'거다이맥스',ic:'sword',pic:evoPic([6,GM_BASE+6]),t:'<b>맥스</b> 버튼은 한 판에 한 번! 체력이 <b>3배</b>가 되고, 동료는 잠시 빠지고, 2번의 내 차례 동안 상대 포켓몬 <b>전체</b>를 공격해요.'},
    {h:'무한다이맥스',ic:'sword',pic:evoPic([890,GM_BASE+890]),t:'<b>무한다이노</b>는 특별한 <b>무한다이맥스</b>! 쓰는 방법은 거다이맥스와 같아요. 쓰고 나면 진화 게이지는 처음부터 다시 모아요.'}];}
@@ -3607,6 +3609,9 @@ function ev(expr,p){let js=_evc[expr];if(js===undefined){js=expr.replace(/\s+and
 function renderTxt(text,p){let out='',i=0;while(i<text.length){if(text[i]==='{'){const j=text.indexOf('}',i);const e=text.slice(i+1,j);let v;try{v=ev(e,p);}catch(err){v='{'+e+'}';}if(typeof v==='number'&&!Number.isInteger(v))v=parseFloat(v.toPrecision(12));out+=String(v);i=j+1;}else{out+=text[i];i++;}}return out;}
 const asText=v=>Array.isArray(v)?v.map(String).join(', '):String(v);
 const TPL={};ES_TPL.forEach(t=>TPL[t.id]=t);
+/* 5·6학년 유형별 풀이 단계 설명: 틀렸을 때 '왜 이 답인지' 숫자를 넣어서 한 단계씩 보여 줘요 */
+const ES_HINTS={"06-03-a":"분모와 분자를 둘 다 <b>{k}</b>로 나누어요. {a*k}÷{k}={a}, {b*k}÷{k}={b} → <b>{a}/{b}</b>","06-05-a":"분모 {b}와 {d}의 최소공배수 <b>{lcm(b,d)}</b>를 공통분모로 해요. {a}/{b} = {idiv(a*lcm(b,d),b)}/{lcm(b,d)}, {c}/{d} = {idiv(c*lcm(b,d),d)}/{lcm(b,d)}","07-01-a":"분모를 {b*d}로 통분해 분자를 비교해요. {a}/{b} = {a*d}/{b*d}, {c}/{d} = {c*b}/{b*d} → 분자가 더 큰 쪽, <b>{pick(a*d > c*b, frac(a,b), frac(c,d))}</b>","08-01-a":"분모를 {b*d}로 통분해요. {a*d}/{b*d} + {c*b}/{b*d} = {a*d+c*b}/{b*d} → 기약분수로 나타내면 <b>{reduce(a*d+c*b,b*d)}</b>","08-02-a":"분모를 {b*d}로 통분해요. {a*d}/{b*d} + {c*b}/{b*d} = {a*d+c*b}/{b*d} → 분자가 더 커서 대분수로 바꾸면 <b>{toMixed(a*d+c*b,b*d)}</b>","08-07-a":"분수 부분을 통분하면 {a*d}/{b*d}와 {c*b}/{b*d}예요. {a}/{b}가 더 작아서 자연수 1을 빌려 와요. {A} {a}/{b} = {A-1} {a*d+b*d}/{b*d} → 빼면 <b>{subMixed(A,a,b,B,c,d)}</b>","09-01-a":"전체의 1/{b}의 1/{d}는 전체를 {b}×{d}={b*d}칸으로 나눈 것 중 1칸이에요 → <b>1/{b*d}</b>","09-05-a":"단위분수끼리 곱하면 분자는 1×1=1, 분모는 {b}×{d}={b*d} → <b>1/{b*d}</b>","09-06-a":"분자끼리 {a}×{c}={a*c}, 분모끼리 {b}×{d}={b*d} → <b>{a*c}/{b*d}</b>","09-06-b":"1보다 작은 분수 {a}/{b}를 곱하면 원래 수보다 작아져요 → <b>{n}보다 작다</b>","09-07-a":"먼저 가분수로 바꿔요. {A} {a}/{b} = {A*b+a}/{b}, {B} {c}/{d} = {B*d+c}/{d}. 분자끼리, 분모끼리 곱한 뒤 약분하고 대분수로 → <b>{mulMixed(A,a,b,B,c,d)}</b>","09-08-a":"분자 {a}×{c}={a*c}, 분모 {b}×{d}={b*d}. {gcd(a*c,b*d)}로 약분하면 → <b>{reduce(a*c,b*d)}</b>","11-04-a":"1/{d}이 몇 번 들어가는지는 {d}를 곱하면 돼요. {a}/{b} × {d} = {a*d}/{b} → <b>{reduce(a*d,b)}</b>번","11-06-a":"나누는 분수를 뒤집어서 곱해요. {a}/{b} × {d}/{c} = {a*d}/{b*c} → <b>{reduce(a*d,b*c)}</b>","13-03-a":"소수점을 없애고 자연수처럼 곱해요. {m}×{n}={m*n}. 소수점 아래가 1+1=2자리라서 → <b>{dec(m*n,2)}</b>","15-05-a":"나누는 수를 자연수로 만들려고 둘 다 10배 해요. {dec(q*n,1)} ÷ {n} → <b>{dec(q,1)}</b>","01-01-a":"앞에서부터 차례로 계산해요. {a}−{b}={a-b}, {a-b}+{c}={a-b+c} → <b>{a-b+c}</b>","01-02-a":"앞에서부터 차례로 계산해요. {q*b*c}÷{b}={q*c}, {q*c}×{c}={q*c*c} → <b>{q*c*c}</b>","01-03-a":"곱셈을 먼저 계산해요. {b}×{c}={b*c}, {a}+{b*c}={a+b*c} → <b>{a+b*c}</b>","01-04-a":"나눗셈을 먼저 계산해요. {q*c}÷{c}={q}, {a}−{q}={a-q} → <b>{a-q}</b>","01-05-a":"괄호 안을 먼저 계산해요. {b}+{c}={b+c}, {a}×{b+c}={a*(b+c)} → <b>{a*(b+c)}</b>","01-06-a":"괄호 → 곱셈 → 덧셈 순서예요. {c}−{d}={c-d}, {b}×{c-d}={b*(c-d)}, {a}+{b*(c-d)}={a+b*(c-d)} → <b>{a+b*(c-d)}</b>","02-01-a":"이상·이하는 양 끝의 수도 포함해요. {a}부터 {a+k}까지 → ({a+k}−{a})+1 = <b>{k+1}</b>개","02-02-a":"초과·미만은 양 끝의 수를 빼요. {a+1}부터 {a+k-1}까지 → <b>{k-1}</b>개","02-03-a":"●(색칠한 점)은 그 수를 포함해서 이상·이하, ○(빈 점)은 포함하지 않아서 초과·미만이에요. 왼쪽 점은 작은 수, 오른쪽 점은 큰 수예요.","02-04-a":"{h} cm 이상은 {h} cm도 포함하고 그보다 큰 키예요 → <b>{h} cm 이상</b>","02-04-b":"정원이 {n}명이면 {n}명까지 탈 수 있어요 (그 수도 포함) → <b>{n}명 이하</b>","02-05-a":"{a} 이상 {a+k} 미만이면 가장 작은 수는 {a}, 가장 큰 수는 {a+k-1}이에요 → {a}+{a+k-1}=<b>{a+(a+k-1)}</b>","03-01-a":"올림은 백의 자리 아래에 0이 아닌 수가 있으면 백의 자리를 1 올리고 아래는 모두 0으로 만들어요 → <b>{rup(n,100)}</b>","03-02-a":"버림은 백의 자리 아래를 모두 0으로 만들어요 → <b>{rdown(n,100)}</b>","03-03-a":"반올림은 바로 아래 자리(십의 자리) 숫자를 봐요. 5 이상이면 올리고, 4 이하면 버려요 → <b>{rhalf(n,100)}</b>","03-04-a":"{n}÷{c}의 몫은 {idiv(n,c)}이고 나머지가 있어요. 남은 사람도 타야 하니까 올림해요 → <b>{idiv(rup(n,c),c)}</b>번","03-04-b":"{n}÷{c}의 몫은 {idiv(n,c)}이고 나머지 {n%c}개로는 한 봉지를 못 채워요. 버림해요 → <b>{idiv(n,c)}</b>봉지","03-05-a":"천의 자리까지 나타내려면 바로 아래인 백의 자리 숫자를 봐요. 5 이상이면 올리고 4 이하면 버려요 → <b>{rhalf(n,1000)}</b>","04-01-a":"{n}을 나누어떨어지게 하는 수를 1부터 차례로 찾아요 (1과 {n}도 약수예요) → <b>{numDiv(n)}</b>개","04-02-a":"두 수를 모두 나누어떨어지게 하는 수가 공약수예요. {g*x}={g}×{x}, {g*y}={g}×{y}이니까 <b>{g}</b>로 둘 다 나누어떨어져요.","04-03-a":"{g*x}={g}×{x}, {g*y}={g}×{y}이고 {x}와 {y}는 더 이상 같이 나눌 수 없어요 → 최대공약수는 <b>{g}</b>","04-04-a":"공약수는 최대공약수 {g}의 약수예요. {g}의 약수의 개수를 세어요 → <b>{numDiv(g)}</b>개","04-05-a":"공약수는 최대공약수 {g}의 약수예요. {g}의 약수를 모두 더하면 → <b>{sumDiv(g)}</b>","05-01-a":"{n}×1, {n}×2, {n}×3… 이에요. {k}번째 수는 {n}×{k} = <b>{n*k}</b>","05-02-a":"공배수는 최소공배수 {lcm(a,b)}의 배수예요. {lcm(a,b)}, {lcm(a,b)*2}, … 중 100보다 작은 것을 세어요 → <b>{idiv(99,lcm(a,b))}</b>개","05-03-a":"{a}의 배수와 {b}의 배수를 각각 쓰다 보면 처음 같아지는 수가 있어요 → 최소공배수 <b>{lcm(a,b)}</b>","05-04-a":"공배수는 최소공배수 {l}의 배수예요. {k}번째 수는 {l}×{k} = <b>{l*k}</b>","05-05-a":"공배수는 최소공배수 {lcm(a,b)}의 배수예요. 그중 처음으로 세 자리(100 이상)가 되는 수는 → <b>{(idiv(99,lcm(a,b))+1)*lcm(a,b)}</b>","06-01-a":"분모가 {b}에서 {b*k}로 {k}배가 되었으니 분자도 {k}배 해요. {a}×{k} = <b>{a*k}</b>","06-02-a":"분모가 {b*k}에서 {b}가 되었으니 {k}로 나눈 거예요. 분자도 {k}로 나누어요. {a*k}÷{k} = <b>{a}</b>","06-04-a":"분모와 분자를 둘의 공약수 {p*q}로 나누어요. {a*p*q}÷{p*q}={a}, {b*p*q}÷{p*q}={b} → <b>{a}/{b}</b>","06-06-a":"먼저 {a*k}/{b*k}를 {k}로 나누어 기약분수로 만들면 {a}/{b}예요. 분모 {b}와 {d}의 최소공배수가 가장 작은 공통분모예요 → <b>{lcm(b,d)}</b>","07-02-a":"대분수는 자연수 부분부터 비교해요. {A}와 {B}가 달라서 자연수 부분이 큰 쪽이 더 커요 → <b>{pick(A > B, mixed(A,a,b), mixed(B,c,d))}</b>","07-03-a":"분자가 같으면 분모가 작을수록 커요. 분모 {d}, {f}, {b} 중 가장 작은 {b}의 분수예요 → <b>{n}/{b}</b>","07-04-a":"분모를 {b*d}로 통분하면 {a*d}/{b*d}와 {c*b}/{b*d}예요. 분자가 더 작은 쪽 → <b>{pick(a*d < c*b, frac(a,b), frac(c,d))}</b>","08-03-a":"자연수끼리 {A}+{B}={A+B}, 분수끼리는 통분해서 {a*d}/{b*d}+{c*b}/{b*d}={a*d+c*b}/{b*d} → <b>{mixed(A+B,a*d+c*b,b*d)}</b>","08-04-a":"자연수끼리 {A}+{B}={A+B}, 분수끼리는 {a*d+c*b}/{b*d}로 1보다 커요. 자연수 1을 올려서 → <b>{mixed(A+B,a*d+c*b,b*d)}</b>","08-05-a":"분모를 {b*d}로 통분해요. {a*d}/{b*d} − {c*b}/{b*d} = {a*d-c*b}/{b*d} → <b>{reduce(a*d-c*b,b*d)}</b>","08-06-a":"자연수끼리 {A}−{B}={A-B}, 분수끼리는 통분해서 {a*d}/{b*d}−{c*b}/{b*d}={a*d-c*b}/{b*d} → <b>{mixed(A-B,a*d-c*b,b*d)}</b>","08-08-a":"분수끼리 통분해서 더해요. {a*d}/{b*d}+{c*b}/{b*d}={a*d+c*b}/{b*d}가 1보다 크니 자연수로 올려요 → <b>{mixed(A,a*d+c*b,b*d)}</b>","09-02-a":"분자에 자연수를 곱해요. {a}×{n}={a*n} → {a*n}/{b} → 대분수로 <b>{toMixed(a*n,b)}</b>","09-03-a":"가분수로 바꿔요. {A} {a}/{b} = {A*b+a}/{b}. 분자에 {n}을 곱하면 {(A*b+a)*n}/{b} → <b>{toMixed((A*b+a)*n,b)}</b>","09-04-a":"분자에 자연수를 곱해요. {n}×{a}={n*a} → {n*a}/{b} → 대분수로 <b>{toMixed(n*a,b)}</b>","09-09-a":"대분수를 가분수로 바꿔요. {A} {a}/{b} = {A*b+a}/{b}. 분자끼리 {(A*b+a)*c}, 분모끼리 {b*d} → <b>{mulMixed(A,a,b,0,c,d)}</b>","10-01-a":"(자연수)÷(자연수)의 몫은 나누어지는 수가 분자, 나누는 수가 분모예요. {a}÷{b} = {a}/{b} → <b>{reduce(a,b)}</b>","10-02-a":"{a}÷{b} = {a}/{b} 예요. 분자가 분모보다 큰 가분수가 돼요 → <b>{reduce(a,b)}</b>","10-03-a":"{a}÷{b} = {a}/{b}. 대분수로 바꾸면 몫 {idiv(a,b)}, 나머지 {a%b} → <b>{toMixed(a,b)}</b>","10-04-a":"{a}L를 {b}명이 나누면 {a}÷{b} = {a}/{b} L → <b>{toMixed(a,b)}</b>","11-01-a":"{n}÷1/{b} = {n}×{b} = <b>{n*b}</b>번","11-02-a":"(분수)÷(자연수)는 분모에 자연수를 곱해요. {a}/{b}÷{n} = {a}/{b*n} → <b>{reduce(a,b*n)}</b>","11-03-a":"대분수를 가분수로 바꿔요. {A} {a}/{b} = {A*b+a}/{b}. 분모에 {n}을 곱하면 {A*b+a}/{b*n} → <b>{toMixed(A*b+a,b*n)}</b>","11-05-a":"분모가 같으면 분자끼리 나누어요. {a}÷{c} = {a}/{c} → <b>{toMixed(a,c)}</b>","11-07-a":"나누는 분수를 뒤집어서 곱해요. {n}×{b}/{a} = {n*b}/{a} → <b>{toMixed(n*b,a)}</b>","11-08-a":"대분수를 가분수로 바꾸고 나누는 분수를 뒤집어 곱해요. {A*b+a}/{b} × {d}/{c} → <b>{toMixed((A*b+a)*d,b*c)}</b>","11-09-a":"나누는 분수 {c}/{d}를 뒤집은 {d}/{c}를 곱해요 → <b>{a}/{b} × {d}/{c}</b>","11-10-a":"나누는 분수를 뒤집어서 곱해요. {a}/{b} × {d}/{c} = {a*d}/{b*c} → <b>{toMixed(a*d,b*c)}</b>","12-01-a":"분모가 100이면 소수 두 자리예요. {n}/100 = <b>{dec(n,2)}</b>","12-02-a":"{dec(n,2)} = {n}/100. 분모·분자를 {gcd(n,100)}로 나누어 약분하면 → <b>{reduce(n,100)}</b>","12-03-a":"분모를 100으로 만들어요. {b}×{idiv(100,b)}=100이니까 분자도 {a}×{idiv(100,b)}={a*idiv(100,b)} → {a*idiv(100,b)}/100 = <b>{dec(a*idiv(100,b),2)}</b>","12-04-a":"{a}/10 = {dec(a,1)} = {dec(a*10,2)}예요. {dec(y,2)}와 소수 두 자리로 맞춰 비교해요 → 더 큰 수는 <b>{a}/10</b>","12-05-a":"{dec(n,2)} = {n}/100. 분모와 분자를 {gcd(n,100)}로 나누면 → <b>{reduce(n,100)}</b>","13-01-a":"소수점을 무시하고 곱해요. {m}×{n}={m*n}. 소수점 아래가 1자리니까 → <b>{dec(m*n,1)}</b>","13-02-a":"소수점을 무시하고 곱해요. {n}×{m}={m*n}. 소수점 아래가 2자리니까 → <b>{dec(m*n,2)}</b>","13-04-a":"소수점을 무시하고 곱해요. {m}×{n}={m*n}. 소수점 아래가 2+1=3자리니까 → <b>{dec(m*n,3)}</b>","13-05-a":"{m}×{n}={m*n}이에요. 소수점 아래가 1+2=3자리니까 {m*n}에서 소수점을 세 칸 옮겨요 → <b>{dec(m*n,3)}</b>","13-06-a":"소수점을 무시하고 곱해요. {m}×{n}={m*n}. 소수점 아래가 2+2=4자리니까 → <b>{dec(m*n,4)}</b>","14-01-a":"{a}÷{b} = {a}/{b}. 분모를 10으로 맞추면 {idiv(a*10,b)}/10 → <b>{dec(idiv(a*10,b),1)}</b>","14-02-a":"{a}÷{b} = {a}/{b}. 분모를 100으로 맞추면 {idiv(a*100,b)}/100 → <b>{dec(idiv(a*100,b),2)}</b>","14-03-a":"몫을 소수 둘째 자리까지 구하면 {dec(idiv(a*100,b),2)}예요. 둘째 자리 숫자가 5 이상이면 올리고 4 이하면 버려요 → <b>{dec(idiv(rhalf(idiv(a*100,b),10),10),1)}</b>","14-04-a":"{a}÷{b} = {a}/{b}. 분모를 100으로 맞추면 {idiv(a*100,b)}/100 → <b>{dec(idiv(a*100,b),2)}</b>","15-01-a":"자연수처럼 나누고 소수점 위치를 맞춰요. {dec(q*n,1)} ÷ {n} = <b>{dec(q,1)}</b>","15-02-a":"자연수처럼 나누고 소수점 위치를 맞춰요. 몫이 1보다 작으면 일의 자리에 0을 써요. {dec(q*n,2)} ÷ {n} = <b>{dec(q,2)}</b>","15-03-a":"{dec(m,1)}÷{n}은 나누어떨어지지 않아서 소수점 아래에 0을 내려 계속 나눠요 → <b>{dec(idiv(m*10,n),2)}</b>","15-04-a":"나누는 수를 자연수로 만들려고 둘 다 10배 해요. {dec(q*n,1)}→{q*n}, {dec(n,1)}→{n}. {q*n}÷{n} = <b>{q}</b>","15-06-a":"나누는 수를 자연수로 만들려고 둘 다 10배 해요. {n}→{n*10}, {dec(m,1)}→{m}. {n*10}÷{m} = <b>{idiv(n*10,m)}</b>","15-07-a":"몫을 소수 둘째 자리까지 구하면 {dec(idiv(m*10,n),2)}예요. 둘째 자리 숫자가 5 이상이면 올리고 4 이하면 버려요 → <b>{dec(idiv(rhalf(idiv(m*10,n),10),10),1)}</b>","15-08-a":"{dec(m,1)}÷{k}를 계산해요. 몫은 {idiv(m,k*10)}도막이고, 남는 끈은 {dec(m%(k*10),1)} m예요.","15-09-a":"자연수처럼 나누고 소수점 위치를 맞춰요. {dec(q*n,2)} ÷ {n} = <b>{dec(q,2)}</b>"};
+ES_TPL.forEach(t=>{const k=String(t.id).replace(/^T-\d+-/,'');if(!t.render.hint&&ES_HINTS[k])t.render.hint=ES_HINTS[k];});
 function drawParams(tpl,rng,tries){tries=tries||4000;const spec=tpl.params||{},cond=tpl.where;for(let k=0;k<tries;k++){const p={};for(const key in spec)p[key]=rng.randint(spec[key].range[0],spec[key].range[1]);if(!cond)return p;try{if(ev(cond,p))return p;}catch(e){}}return null;}
 function buildItem(tplId,seed){const tpl=TPL[tplId];if(!tpl)return null;const rng=RNG(seed);const p=drawParams(tpl,rng);if(!p)return null;let ans=ev(tpl.answer,p);if(typeof ans==='string')ans=renderTxt(ans,p);
  const dis=[];(tpl.distract||[]).forEach(ds=>{if(ds.onlyIf){try{if(!ev(ds.onlyIf,p))return;}catch(e){return;}}let v;try{v=ev(ds.value,p);}catch(e){return;}if(typeof v==='string')v=renderTxt(v,p);dis.push([v,ds.misconception]);});
@@ -3657,9 +3662,8 @@ function numVal(t){t=String(t).trim();let m;
  if((m=t.match(/^(\d+)\/(\d+)$/)))return m[2]==0?null:m[1]/m[2];
  if(/^-?[\d,]+(\.\d+)?$/.test(t))return +t.replace(/,/g,'');return null;}
 // 분수·대분수를 보기 좋게: "2 3/4" → 2¾ 꼴의 세로 분수
-function fmtMath(s){
- return String(s).replace(/(\d+) (\d+)\/(\d+)/g,'<span class="mx">$1<span class="fr"><i>$2</i><i>$3</i></span></span>')
-  .replace(/(^|[^\d<\/i>])(\d+)\/(\d+)(?![\d<])/g,'$1<span class="fr"><i>$2</i><i>$3</i></span>');}
+function fmtMath(s){ // 태그(<b> 등) 바깥의 글자에서만 분수를 바꿔요: <b>3/4</b>처럼 굵은 글씨 안의 분수도 세로 분수가 돼요
+ return String(s).split(/(<[^>]*>)/).map(seg=>(seg.charAt(0)==='<'&&seg.slice(-1)==='>')?seg:seg.replace(/(\d+) (\d+)\/(\d+)(?![\d\/])|(^|[^\d\/])(\d+)\/(\d+)(?![\d\/])/g,(m,A,B,C,pre,N,D)=>A!==undefined?`<span class="mx">${A}<span class="fr"><i>${B}</i><i>${C}</i></span></span>`:`${pre}<span class="fr"><i>${N}</i><i>${D}</i></span>`)).join('');}
 function stripTags(s){return String(s).replace(/<[^>]+>/g,'');}
 
 // ===== 학습: 문제 고르기 · 기록 · 좌삼 쌓기 · 성장 =====
@@ -4841,7 +4845,7 @@ async function startTraining(opt={}){
  const endless=!!opt.endless;S.trainEndless=endless;const N=endless?Infinity:(opt.n||trainN());const ghost=(opt.pool||endless)?null:lastTrain();
  const rx=(!opt.pool&&!endless)?buildRx():null;
  const v=$('#view');
- let idx=0,correct=0,combo=0,maxCombo=0,candy=0,rt=0,gw=0;let wRars=endless?rollEndlessSet():[],wBase=0;const wNeed=()=>Math.max(0,...wRars);const retryQ=[];const wbPool=endless?shuffle(wbList(m).filter(e=>!e.d&&wbKindOf(e)==='math')):[];
+ let idx=0,correct=0,combo=0,maxCombo=0,candy=0,rt=0,gw=0;let wRars=endless?rollEndlessSet():[],wBase=0;const wNeed=()=>Math.max(0,...wRars);const retryQ=[];let revN=0,revOk=0,revSolved=0;const dueRev=(!opt.pool&&!endless)?wbDueList(m):[];const revAt=new Set();{const R=Math.min(dueRev.length,Math.max(1,Math.ceil((isFinite(N)?N:0)*.3)));if(isFinite(N)&&N>=4)for(let k=0;k<R;k++)revAt.add(Math.floor((k+.5)*N/R));}const wbPool=endless?shuffle(wbList(m).filter(e=>!e.d&&wbKindOf(e)==='math')):[];
  const startT=performance.now();let ghT=0;let stop=null;const stopP=new Promise(r=>stop=r);
  v.innerHTML=`<div class=qWrap><div class=qTop><button class="btn ghost sm" id=tQuit>${endless?'그만하기':'그만'}</button><button class="btn green sm" id=tSave>${I('disk')} 저장·쉬기</button><div class=prog title="맞힌 문제"><div class=me style="width:0%;background:linear-gradient(90deg,#8be08b,#3cc47c)"></div>${ghost?`<div class=gh style="left:${ghost.c/ghost.n*100}%"><img src="${spriteURL(partnerId(),'front')}" alt=""><div class=gl>어제의 나 ${ghost.c}개</div></div>`:''}</div><div class=comboTag id=tCombo>${endless?'정답 0':''}</div></div><div class=buddy><div class=bimg>${monImg(partnerId(),'anim')}</div><div class=bubble id=tBub>${esc(MON[partnerId()].name)}: ${endless?'끝까지 같이 가자!':rx?`${rx.mode==='hard'?`오늘은 ${josa(rx.names.join('·'),'을를')} 기초부터 천천히 다져 보자!`:rx.mode==='strong'?`오늘은 ${rx.names.join('·')}도 챙기고 새 도전도 해 보자!`:`오늘은 ${josa(rx.names.join('·'),'을를')} 다져 보자!`}`:'같이 해 보자!'}</div></div><div id=qHost></div></div>`;
  v.scrollTop=0;if(endless)setTimeout(()=>prog(),0);
@@ -4852,7 +4856,7 @@ async function startTraining(opt={}){
  if(!m.seen.c_train){await coachOnce('c_train',[
   {h:'오늘의 훈련',ic:'flame',t:`문제 ${trainN()}개를 풀어요.`+' 정답마다 <b>사탕</b>이 생기고, 사탕을 모으면 포켓몬이 <b>진화</b>해요! 공부가 쌓이면 <b>내 약한 개념</b>을 먼저 골라서 내 줘요.'},
   ...(ghost?[{el:'.prog',h:'어제의 나',ic:'calendar',t:'초록 막대는 <b>오늘 맞힌 문제</b>, 회색 포켓몬은 <b>어제의 나</b>가 맞힌 수예요. 빠르기보다 <b>신중하게, 정확하게!</b>'}]:[]),
-  {h:'틀려도 괜찮아요',ic:'heart',t:'틀리면 원리 그림과 설명이 나오고, <b>조금 뒤에 같은 문제를 다시</b> 풀어요. 자꾸 틀리는 개념은 <b>아래 학년 기초부터 좌삼을 쌓아요</b>. 틀린 문제는 <b>나의 학습 기록 → 오답 노트</b>에 모여요. 다시 풀어서 2번 맞히면 해결!'}]);}
+  {h:'틀려도 괜찮아요',ic:'heart',t:'틀리면 원리 그림과 설명이 나오고, <b>조금 뒤에 같은 문제를 다시</b> 풀어요. 자꾸 틀리는 개념은 <b>아래 학년 기초부터 좌삼을 쌓아요</b>. 틀린 문제는 <b>나의 학습 기록 → 오답 노트</b>에 모여요. <b>다음 날, 3일 뒤에 자동으로 다시</b> 나와요. 그때 2번 맞히면 해결!'}]);}
  if(endless&&!m.seen.c_endless)await coachOnce('c_endless',[{h:'야생 포켓몬 포획',ic:'flame',t:'끝이 없는 연습이에요! 문제를 풀다 보면 <b>야생 포켓몬이 불쑥</b> 나타나요. 언제 나올지는 비밀! 아직 도감에 없는 포켓몬이 먼저 나와요. 그만하고 싶을 때 언제든 <b>그만하기</b>를 눌러요.'}]);
  if(endless){await new Promise(res=>{const L=['오늘은 어떤 포켓몬이 모습을 드러낼까?<br>어쩌면 전설의 포켓몬이 나타날지도 몰라!','풀숲이 바스락거려요…<br>오늘 만날 야생 포켓몬은 누구일까요? 전설의 포켓몬이 숨어 있을지도 몰라요!','어떤 포켓몬이 나타날지는 아무도 몰라요.<br>문제를 풀다 보면 전설의 포켓몬을 만나게 될지도 몰라!'];
   M(`<div style="text-align:center"><h2>야생 포켓몬 포획</h2><div style="display:flex;justify-content:center;height:90px">${monImg(partnerId(),'anim')}</div><p style="font-size:17px;line-height:1.7;margin:8px 0 4px"><b>${rpick(L)}</b></p><p class=mut style="font-size:13px">언제 나타날지는 비밀! 문제를 풀면서 기다려 봐요.</p>${wbOpenN(m,'math')?`<p style="font-size:14px;margin:6px 0;color:#a8445e"><b>📝 오답 노트 문제 ${wbOpenN(m,'math')}개가 먼저 나와요.</b><br>오답 문제를 풀다 보면 전설 포켓몬도 만날 수 있어요!</p>`:''}<div class=mbtns><button class="btn gold big" data-a=go>도전 시작!</button></div></div>`,{go:()=>{closeM();res();},_close:()=>{closeM();res();}});});}
@@ -4861,10 +4865,11 @@ async function startTraining(opt={}){
   let q,retry=false;
   const due=retryQ.findIndex(r=>r.at<=idx||idx>=N);
   if(due>=0){q=retryQ.splice(due,1)[0].q;q.retry=true;retry=true;q.ch=shuffle(q.ch.slice());}
-  else{if(idx>=N)break;{let e=null;while(endless&&wbPool.length&&!e){const c=wbPool.shift();if(!c.d)e=c;}q=e?Object.assign(wbMakeQ(e,false),{rxTag:'📝 오답 노트 문제'}):opt.pool?pickQ({pool:opt.pool}):(rx?rxPick(rx,N):pickQ());}if(!q){toast('문제를 만들지 못했어요');break;}}
+  else{if(idx>=N)break;{let e=null;while(endless&&wbPool.length&&!e){const c=wbPool.shift();if(!c.d)e=c;}let rv=null;if(!endless&&revAt.has(idx)&&dueRev.length)rv=dueRev.shift();q=rv?Object.assign(wbMakeQ(rv,false),{rxTag:`📅 복습 · ${Math.max(1,dayDiff(rv.t||today(),today()))}일 전에 틀린 문제`,rvE:rv}):e?Object.assign(wbMakeQ(e,false),{rxTag:'📝 오답 노트 문제'}):opt.pool?pickQ({pool:opt.pool}):(rx?rxPick(rx,N):pickQ());}if(!q){toast('문제를 만들지 못했어요');break;}}
   const r=await Promise.race([askQ($('#qHost'),q,{head:q.rxTag&&!retry?`<div style="text-align:center;margin:0 0 6px"><span class=pill style="font-size:13px;border-color:#f0b35a;background:#fff6e6">${q.rxTag}</span></div>`:''}),stopP]);
   if(r.stop){quit=!!r.quit;if(r.saved)S.savedRest=1;break;}
   recordAnswer(q,r.ok,r.ms,{retry,choice:r.choice,guess:r.guess});
+  if(q.rvE&&!retry){revN++;if(r.ok)revOk++;if(q.rvE.d)revSolved++;}
   if(rx&&q.rxKind&&!retry){const e=rx.res[q.rxKind]||(rx.res[q.rxKind]={n:0,c:0});e.n++;if(r.ok)e.c++;const k=rx.sk[q.sk]||(rx.sk[q.sk]={n:0,c:0});k.n++;if(r.ok)k.c++;}
   {const b=$('#tBub');if(b){const nm=MON[partnerId()].name;b.innerHTML=esc(nm)+': '+(S.foundMsg?S.foundMsg:r.ok?rpick(retry?['다시 해서 해냈다!','이제 네 거야!','역시!']:q.found?['기초가 단단해지고 있어!','좌삼이 한 층 올라갔어!']:['좋아!','멋져!','바로 그거야!','최고야!','계속 가자!']):rpick(['괜찮아, 같이 다시 보자!','틀려도 괜찮아!','조금 뒤에 다시 해 보자!']));S.foundMsg='';b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}partnerReact(r.ok?(combo>=2?'party':'yay'):'hug');}
   if(r.guess)gw++;
@@ -4891,7 +4896,8 @@ async function startTraining(opt={}){
  m.candy+=candy;const coins=correct*5;m.coins+=coins;gainXP(endless?Math.min(60,idx*2):30);if(first)m.packs+=1;
  if(!m.firstPlay)m.firstPlay=Date.now();
  autoSave();
- S.rxResult=(rx&&Object.keys(rx.res).length)?rxSummary(rx):null;
+ const rvh=revN?`<div class=explain style="text-align:left;font-size:14px;margin-top:10px;background:#eef6ff;border-color:#9cc4ee"><b style="color:#2b6cb0">📅 복습 문제</b> — 며칠 전에 틀린 문제 <b>${revN}개</b> 중 <b>${revOk}개</b>를 맞혔어요.${revSolved?` <b>${revSolved}문제</b>는 해결! 🎓`:''}${revOk-revSolved>0?'<br>맞힌 문제는 며칠 뒤에 한 번 더 나와요. 그때 맞히면 해결이에요.':''}${revN-revOk>0?'<br>틀린 문제는 내일 다시 나와요. 설명을 한 번 더 보고 기억해 봐요!':''}</div>`:'';
+  S.rxResult=(((rx&&Object.keys(rx.res).length)?rxSummary(rx):'')+rvh)||null;
  showTrainResult(res,ghost,{candy,coins,first,pool:!!opt.pool,endless});}
 // 파트너 반응: 맞히면 폴짝 + 별, 3연속이면 신나는 춤, 틀리면 토닥토닥 + 하트
 function partnerReact(kind){const b=$('.buddy .bimg');if(!b)return;b.classList.remove('yay','party','hug');void b.offsetWidth;b.classList.add(kind);
@@ -5493,23 +5499,54 @@ function aiDeckScore(deck){let s=0;const cc=[0,0,0,0,0,0,0],types=new Set(),kws=
  for(const k in kws){if(STACK.indexOf(k)<0&&kws[k]>2)s-=(kws[k]-2)*1.5;} // 겹쳐도 더 세지지 않는 특성은 2장까지만
  const def=(kws.taunt||0)+(kws.armor||0);if(def>=1)s+=1;if(def>3)s-=(def-3)*1.5; // 방어 카드는 1~3장
  return s;}
-function autoDeck(){const me=S.meta;
- const ids=Object.keys(me.col).map(Number).filter(id=>MON[id]&&deckLim(id)>0).sort((a,b)=>aiScore(b)-aiScore(a)||a-b);
+// ---- 자동 덱 짜기 v2: 전설(4~5성) 여러 장 + 싼 카드 보조 + 강철/바위 벽 방어 1장 + 날개(반격 없는) 1장 ----
+const AIX={st:3,wg:3,cw:1.4,leg:2.4,dm:5},AI_DEFX={armor:4.2,taunt:3.4,dodge:3,tough:2}; // 모의 대전에서 방어형 특성이 가장 승률이 높았어요
+const aiScore2=id=>aiScore(id)+(AI_DEFX[aiKwOf(id)]||0);
+function aiKwOf(id){return kwOf(MON[id]).k;}
+function aiDeckScore2(deck,want){let s=0;const cc=[0,0,0,0,0,0,0],types=new Set(),kws={};let cost=0,leg=0;
+ deck.forEach(id=>{const m=MON[id];s+=aiScore2(id);cc[aiCost(m)]++;cost+=m.cost;types.add(m.types[0]);const k=aiKwOf(id);kws[k]=(kws[k]||0)+1;if(m.rar>=4)leg++;});
+ s+=AIX.leg*Math.min(leg,want);                                   // 전설은 가진 만큼(최대 5장) 넣어요
+ if(want>=3&&leg>want+1)s-=(leg-want-1)*1.5;
+ const early=cc[1]+cc[2],heavy=cc[5]+cc[6];
+ const needEarly=want>=3?4:5;if(early<needEarly)s-=(needEarly-early)*3.2;   // 싼 카드가 전설을 받쳐 줘요
+ if(early>7)s-=(early-7)*1.5;
+ if(heavy>Math.max(3,want+1))s-=(heavy-Math.max(3,want+1))*3;
+ if(cc[3]+cc[4]>5)s-=(cc[3]+cc[4]-5)*1.2;
+ s-=AIX.cw*Math.abs(cost/Math.max(1,deck.length)-(want>=3?3.8:3.1));
+ const st=(kws.armor||0)+(kws.taunt||0);                     // 강철·바위 벽 방어 1~3장
+ s+=st>=1?AIX.st*Math.min(st,AIX.dm):-AIX.st/2;if(st>AIX.dm)s-=(st-AIX.dm)*1.5;
+ const wg=kws.wing||0;s+=wg>=1?AIX.wg:-AIX.wg/3;if(wg>2)s-=(wg-2)*2;     // 반격 없는 날개 딜 1~2장
+ s+=Math.min(types.size,7)*.9+Math.min(Object.keys(kws).length,9)*.4;
+ ['ember','rush','wave','freeze','poison','grow'].forEach(k=>{if(kws[k]>1)s+=Math.min(2,kws[k]-1)*.8;});
+ for(const k in kws){if(['ember','rush','wave','freeze','poison','grow','armor','taunt','wing'].indexOf(k)<0&&kws[k]>2)s-=(kws[k]-2)*1.5;}
+ return s;}
+function aiBuild(owned,limFn){
+ const ids=owned.filter(id=>MON[id]&&limFn(id)>0).sort((a,b)=>aiScore2(b)-aiScore2(a)||a-b);
  if(!ids.length)return[];
- const lim={},cnt={},deck=[];ids.forEach(id=>lim[id]=deckLim(id));
+ const lim={},cnt={},deck=[];ids.forEach(id=>lim[id]=limFn(id));
  const add=id=>{deck.push(id);cnt[id]=(cnt[id]||0)+1;};
- // 1) 목표 비용 곡선에 맞춰 비용마다 가장 강한 카드부터 채워요
- for(let c=1;c<=6;c++){let need=AI_TARGET[c];for(const id of ids){if(need<=0||deck.length>=DECK_N)break;if(aiCost(MON[id])!==c)continue;while(need>0&&(cnt[id]||0)<lim[id]&&deck.length<DECK_N){add(id);need--;}}}
- // 2) 비는 자리는 가장 강한 카드로
- for(const id of ids){while(deck.length<DECK_N&&(cnt[id]||0)<lim[id])add(id);}
- // 3) 카드를 하나씩 바꿔 보며 덱 전체 점수가 오르면 교체해요 (더 못 오를 때까지)
- let best=aiDeckScore(deck),improved=true,guard=0;
+ const can=id=>(cnt[id]||0)<lim[id]&&deck.length<DECK_N;
+ const legs=ids.filter(id=>MON[id].rar>=4);const want=Math.min(window.AI_LEG||5,legs.length);
+ // 1) 전설: 능력치 좋은 순서로, 너무 싼 전설보다 묵직한 전설을 먼저
+ legs.slice().sort((a,b)=>(aiCost(MON[b])>=4)-(aiCost(MON[a])>=4)||aiScore2(b)-aiScore2(a)).slice(0,want).forEach(id=>{if(can(id))add(id);});
+ // 2) 강철·바위 벽 방어 한 장 (싼 카드 먼저), 날개 한 장
+ const pickKw=(ks,maxC)=>{const l=ids.filter(id=>ks.includes(aiKwOf(id))&&can(id));return l.find(id=>aiCost(MON[id])<=maxC)||l[0];};
+ if(!deck.some(id=>['armor','taunt'].includes(aiKwOf(id)))){const a=pickKw(['armor','taunt'],3);if(a!=null)add(a);}
+ if(!deck.some(id=>aiKwOf(id)==='wing')){const w=pickKw(['wing'],3);if(w!=null)add(w);}
+ // 3) 싼 카드로 보조 (비용 1~2에서 강한 카드부터)
+ const needEarly=want>=3?4:5;
+ for(const id of ids){if(deck.filter(x=>aiCost(MON[x])<=2).length>=needEarly)break;if(aiCost(MON[id])<=2)while(can(id)&&deck.filter(x=>aiCost(MON[x])<=2).length<needEarly)add(id);}
+ // 4) 남는 자리는 가장 강한 카드로
+ for(const id of ids){while(can(id))add(id);}
+ // 5) 하나씩 바꿔 보며 점수가 오르면 교체
+ let best=aiDeckScore2(deck,want),improved=true,guard=0;
  while(improved&&guard++<40){improved=false;
   for(let i=0;i<deck.length;i++){const old=deck[i];let bi=-1,bs=best;
-   for(const id of ids){if(id===old||(cnt[id]||0)>=lim[id])continue;deck[i]=id;const sc=aiDeckScore(deck);if(sc>bs+1e-9){bs=sc;bi=id;}}
+   for(const id of ids){if(id===old||(cnt[id]||0)>=lim[id])continue;deck[i]=id;const sc=aiDeckScore2(deck,want);if(sc>bs+1e-9){bs=sc;bi=id;}}
    deck[i]=old;
    if(bi>=0){cnt[old]--;deck[i]=bi;cnt[bi]=(cnt[bi]||0)+1;best=bs;improved=true;}}}
  return deck.sort((a,b)=>MON[a].cost-MON[b].cost||a-b).slice(0,DECK_N);}
+function autoDeck(){const me=S.meta;return aiBuild(Object.keys(me.col).map(Number),deckLim);}
 function ensureDeck(){const me=S.meta;const cnt={};const ok=me.deck.filter(id=>{cnt[id]=(cnt[id]||0)+1;return me.col[id]&&cnt[id]<=deckLim(id);});
  if(ok.length>DECK_N)ok.length=DECK_N;
  if(ok.length<DECK_N){for(const id of autoDeck()){if(ok.length>=DECK_N)break;const n=ok.filter(x=>x===id).length;if(n<deckLim(id))ok.push(id);}}
@@ -5519,14 +5556,14 @@ function renderDeck(keep){S.screen='deck';const me=S.meta;if(!keep)ensureDeck();
  const counts={};me.deck.forEach(id=>counts[id]=(counts[id]||0)+1);
  const curve=[1,2,3,4,5,6].map(c=>me.deck.filter(id=>MON[id].cost===c).length);
  const owned=Object.keys(me.col).map(Number).sort((a,b)=>MON[a].cost-MON[b].cost||a-b);
- $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('cards')} 내 덱 (${me.deck.length}/${DECK_N})</h2><span class=hudSp></span><button class="btn blue sm" id=dAuto>자동으로 짜기</button></div>
+ $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('cards')} 내 덱 (${me.deck.length}/${DECK_N})</h2><span class=hudSp></span><button class="btn blue sm" id=dAuto>AI 자동 덱 짜기</button></div>
   <p class=mut style="font-size:13px;margin:6px 0">덱 카드를 누르면 빠지고, 아래 카드를 누르면 들어가요. 같은 카드는 2장까지. 비용이 낮은 카드가 많아야 처음부터 싸울 수 있어요.</p>
   <div class=row style="align-items:flex-end;gap:16px;margin-bottom:18px"><div><div class=mut style="font-size:12px">비용별 장수</div><div class=curve>${curve.map((n,i)=>`<div style="height:${n*8+2}px"><span>${i+1}</span></div>`).join('')}</div></div></div>
   <div class=deckBar id=deckBar>${me.deck.map((id,i)=>cardHTML(id,{size:'deck'}).replace('class="card','data-di="'+i+'" class="card')).join('')}</div>
   <h3>가진 카드</h3>${(()=>{const names=[];owned.forEach(id=>{const n=kwOf(MON[id]).n;if(!names.includes(n))names.push(n);});if(DECKKW&&!names.includes(DECKKW))DECKKW='';const cnt=n=>owned.filter(id=>kwOf(MON[id]).n===n).length;const sel=DECKKW?Object.values(KW).find(k=>k.n===DECKKW):null;return `<div class=filters style="margin:6px 0"><button class="fbtn${DECKKW?'':' on'}" data-kw="">전체 특성 <small>${owned.length}</small></button>${names.map(n=>{const k=Object.values(KW).find(v=>v.n===n);return `<button class="fbtn${DECKKW===n?' on':''}" data-kw="${esc(n)}">${I(k.ic)} ${esc(n)} <small>${cnt(n)}</small></button>`;}).join('')}</div>${sel?`<div class=mut style="font-size:13px;margin-bottom:8px">${I(sel.ic)} <b>${esc(sel.n)}</b> · ${esc(sel.d)}</div>`:''}`;})()}<div class=colGrid>${owned.filter(id=>!DECKKW||kwOf(MON[id]).n===DECKKW).map(id=>{const inD=counts[id]||0,lim=deckLim(id);return cardHTML(id,{size:'deck',cnt:me.col[id],cls:inD>=lim?'locked':''});}).join('')}</div></div></div>`;
  bindHud();
  $('#view').querySelectorAll('[data-kw]').forEach(b=>b.onclick=()=>{sfx('tap');DECKKW=b.dataset.kw;renderDeckKeep();});
- $('#dAuto').onclick=()=>{sfx('tap');me.deck=autoDeck();autoSave();renderDeck();try{const d=me.deck,av=(d.reduce((x,id)=>x+MON[id].cost,0)/Math.max(1,d.length)).toFixed(1),tn=new Set(d.map(id=>MON[id].types[0])).size;toast(`가진 카드로 가장 강한 조합을 짰어요! 평균 비용 ${av} · 속성 ${tn}종`);}catch(e){}};
+ $('#dAuto').onclick=()=>{sfx('tap');me.deck=autoDeck();autoSave();renderDeck();try{const d=me.deck,av=(d.reduce((x,id)=>x+MON[id].cost,0)/Math.max(1,d.length)).toFixed(1),tn=new Set(d.map(id=>MON[id].types[0])).size;toast(`가진 카드로 가장 강한 조합을 짰어요! 전설 ${d.filter(id=>MON[id].rar>=4).length}장 · 평균 비용 ${av} · 속성 ${tn}종`);}catch(e){}};
  $('#deckBar').querySelectorAll('.card').forEach(c=>c.onclick=()=>{sfx('tap');me.deck.splice(+c.dataset.di,1);autoSave();renderDeckKeep();});
  $('.colGrid').querySelectorAll('.card').forEach(c=>c.onclick=()=>{const id=+c.dataset.id;const inD=me.deck.filter(x=>x===id).length;if(me.deck.length>=DECK_N){toast('덱이 꽉 찼어요. 위에서 한 장을 빼 주세요');return;}if(inD>=deckLim(id)){toast('같은 카드는 가진 만큼, 최대 2장까지예요');return;}sfx('tap');me.deck.push(id);autoSave();renderDeckKeep();});}
 function renderDeckKeep(){const y=$('#view').scrollTop;renderDeck(true);$('#view').scrollTop=y;}
@@ -5612,7 +5649,7 @@ const megaOk=id=>megaHas(id)||!!(MEGA[id]&&B&&B.rl&&B.me&&rlHas('megastone'));
 const PRIMAL={382:1,383:1};const megaName=id=>(PRIMAL[id]?'원시 ':'메가 ')+((MON[id]&&MON[id].name)||'');
 const mgWord=id=>PRIMAL[id]?'원시회귀':'메가 진화',mgStone=id=>PRIMAL[id]?'원시 구슬':'메가스톤';
 // 지금 이 칸의 포켓몬이 변신할 수 있는지(내 기기에서 해금한 포켓몬만)
-function megaCan(P,i){try{const u=P&&P.board[i];if(!u||u.mg||u.gm||u.hp<=0||P.mgUsed||!megaOk(u.id))return false;if(B.coop&&Number(u.coopOwner??0)!==BC.localIndex)return false;return mgProg()>=MEGA_NEED;}catch(e){return false;}}
+function megaCan(P,i){try{const u=P&&P.board[i];if(!u||u.mg||u.gm||u.hp<=0||P.mgUsed||!megaOk(u.id))return false;if(B.coop&&Number(u.coopOwner??0)!==BC.localIndex)return false;return mgProg()>=evoNeed(MEGA_NEED);}catch(e){return false;}}
 function megaCand(P){try{return P.board.some((u,i)=>u&&!u.mg&&u.hp>0&&megaOk(u.id)&&(!B.coop||Number(u.coopOwner??0)===BC.localIndex));}catch(e){return false;}}
 
 // 메가 진화 연출: 화면이 어두워지고 빛줄기가 돌다가, 하얗게 번쩍인 뒤 메가 모습이 나타나요(약 3초)
@@ -5649,7 +5686,11 @@ const gmaxOk=id=>gmaxHas(id)||!!(GMAX[id]&&B&&B.rl&&B.me&&rlHas('dynaband'));
 const qcUp=P=>{B.qc=(B.qc||0)+1;if(B.coop&&P)P.qc=(P.qc||0)+1;};
 const mgProg=()=>{try{if(B.coop&&B.coop.players){const L=B.coop.players[BC.localIndex];if(L)return Math.max(0,(L.qc||0)-(L.mgBase||0));}return Math.max(0,(B.qc||0)-(B.mgBase||0));}catch(e){return 0;}};
 const gmaxOff=()=>!B||B.tut||B.tutReal;
-function gmaxCan(P,i,show){try{const u=P&&P.board[i];if(gmaxOff()||!u||u.gm||u.mg||u.hp<=0||P.gmUsed||P.gmx||!gmaxOk(u.id)||!(u.att>0)||u.frozen)return false;if(B.coop){if(!show)return false;if(Number(u.coopOwner??0)!==BC.localIndex)return false;}return mgProg()>=GMAX_NEED;}catch(e){return false;}}
+// 트레이너 스킬 '진화 연구': 진화(메가·원시회귀·거다이맥스)에 필요한 정답 수를 줄여요 (Lv.1~2 -1 · Lv.3~4 -2 · Lv.5 -3, 튜토리얼 제외)
+const evoRed=()=>{try{if(window.__sim||!B||B.tut||B.tutReal)return 0;const n=Number(trainerSkillLevels().evo)||0;return n>=5?3:n>=3?2:n>=1?1:0;}catch(e){return 0;}};
+const evoNeed=base=>Math.max(1,base-evoRed());
+const evoNeedFor=(base,P)=>{const n=Number(P&&P.evoLv)||0;return Math.max(1,base-(n>=5?3:n>=3?2:n>=1?1:0));}; // 협동 보스전: 방장이 친구의 진화 연구 레벨로 확인해요
+function gmaxCan(P,i,show){try{const u=P&&P.board[i];if(gmaxOff()||!u||u.gm||u.mg||u.hp<=0||P.gmUsed||P.gmx||!gmaxOk(u.id)||!(u.att>0)||u.frozen)return false;if(B.coop){if(!show)return false;if(Number(u.coopOwner??0)!==BC.localIndex)return false;}return mgProg()>=evoNeed(GMAX_NEED);}catch(e){return false;}}
 function gmaxCand(P){try{if(gmaxOff()||P.gmx||P.gmUsed)return false;return P.board.some(u=>u&&!u.gm&&!u.mg&&u.hp>0&&gmaxOk(u.id));}catch(e){return false;}}
 async function gmaxDo(P,i){const u=P&&P.board[i];if(!B||!u||!GMAX[u.id]||u.gm||u.mg||P.gmUsed||P.gmx)return false;
  P.gmUsed=true;if(B.coop)P.mgBase=P.qc||0;else if(P===B.me)B.mgBase=B.qc||0;B.sel=-1;B.pick=-1;B.busy=true;
@@ -5819,7 +5860,7 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
  $('#battle').innerHTML=`
   <div class=bTop>${B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:calc(100% + 2px);left:4px;transform:none;flex-direction:column;align-items:flex-start;z-index:50">${(u=>{const n=Math.max(1,Math.ceil(u.atk*rlBoost(u))+(B.combo>=2?1:0)+quakeB(u)+dragonMod(u));return `<b class=dmgp>-${n}</b>`+(B.pvp?`<b class=dmgp style="color:#2f62b5">방어 성공 시 -${Math.max(0,n-1)}</b>`:'');})(me.board[B.sel])}</div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front','',true)}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill title="상대 손에 든 카드 수">${I('cards')} ${fo.hand.length}</span><span class=pill title="상대 남은 덱 카드 수">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<button class="btn ghost sm" id=bMenu>메뉴</button></div>
   <div class="lane${B.wildMode?` wildLane wildCount${fo.board.filter(Boolean).length}`:''}${fo.gmx?' gmaxLane':''}" id=foeLane>${fo.board.map((u,i)=>B.wildMode&&!u?'':`<div class=slot data-i="${i}">${unitH(u,fo,i)}</div>`).join('')}</div>
-  <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class=pill style="color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}${(!B.tut&&!B.tutReal)?`<span class=pill id=evoPill title="정답을 ${MEGA_NEED}개 모으면 메가 진화·원시회귀·거다이맥스를 쓸 수 있어요. 쓰면 처음부터 다시 모아요" style="color:${mgProg()>=MEGA_NEED?'#d97800':'#2f62b5'};${mgProg()>=MEGA_NEED?'border-color:#ffb100;background:#fff3d6':''}">${mgProg()>=MEGA_NEED?'✨':'🔷'} 진화 ${Math.min(Math.max(0,mgProg()),MEGA_NEED)}/${MEGA_NEED}</span>`:''}${my&&B.sel>=0&&megaCan(B.me,B.sel)?`<button class="btn gold sm" id=bMega>🔷 ${PRIMAL[B.me.board[B.sel].id]?'원시':'메가'}</button>`:''}${my&&B.sel>=0&&gmaxCan(B.me,B.sel,1)?`<button class="btn red sm" id=bGmax>🌋 맥스</button>`:''}</div>
+  <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class=pill style="color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}${(!B.tut&&!B.tutReal)?`<span class=pill id=evoPill title="정답을 ${evoNeed(MEGA_NEED)}개 모으면 메가 진화·원시회귀·거다이맥스를 쓸 수 있어요. 쓰면 처음부터 다시 모아요" style="color:${mgProg()>=evoNeed(MEGA_NEED)?'#d97800':'#2f62b5'};${mgProg()>=evoNeed(MEGA_NEED)?'border-color:#ffb100;background:#fff3d6':''}">${mgProg()>=evoNeed(MEGA_NEED)?'✨':'🔷'} 진화 ${Math.min(Math.max(0,mgProg()),evoNeed(MEGA_NEED))}/${evoNeed(MEGA_NEED)}</span>`:''}${my&&B.sel>=0&&megaCan(B.me,B.sel)?`<button class="btn gold sm" id=bMega>🔷 ${PRIMAL[B.me.board[B.sel].id]?'원시':'메가'}</button>`:''}${my&&B.sel>=0&&gmaxCan(B.me,B.sel,1)?`<button class="btn red sm" id=bGmax>🌋 맥스</button>`:''}</div>
   <div class="lane${B.coop?' coopLane':''}${me.gmx?' gmaxLane':''}" id=myLane>${me.board.map((u,i)=>`<div class="slot${B.pick>=0&&!u&&!isItemCard(me.hand[B.pick])?' can':''}" data-i="${i}">${unitH(u,me,i)}</div>`).join('')}</div>
   ${B.coop?`<div class="bBot coopHeroes">${heroH(loc,'heroMe',B.side==='me'&&B.coop.active===BC.localIndex)}${ally?heroH(ally,'heroAlly',B.side==='me'&&B.coop.active!==BC.localIndex):''}</div>`:''}<div class=bBot>${B.coop?'':heroH(me,'heroMe',false)}${mana(loc)}
    <button class="btn purple sm" id=bPower ${my&&(loc.powerUses||0)>0?'':'disabled'} title="남은 사용 횟수 ${Math.max(0,loc.powerUses||0)}회: 문제를 맞히면 카드 1장">${I('book')} 공부 기술 <small style="font-size:11px">${Math.max(0,loc.powerUses||0)}회</small></button>
@@ -7714,26 +7755,82 @@ function autoBind(){try{const bt=$('#bAuto'),bat=$('#battle');if(bat)bat.classLi
  if(bt)bt.onclick=()=>{sfx('tap');AUTO.on=!AUTO.on;if(!AUTO.on)acClear();toast(AUTO.on?'자동전투 시작! 공격 문제는 직접 풀어 주세요':'자동전투를 껐어요');renderBattle();};
  if(AUTO.on&&bt)autoKick();}catch(e){}}
 function autoKick(){if(AUTO.running||!AUTO.on)return;AUTO.running=true;autoRun().catch(e=>console.warn('auto',e)).finally(()=>{AUTO.running=false;});}
-async function autoRun(){let idle=0,guard=0;
+// ===== 자동전투 두뇌: 마나를 알차게 쓰고, 잡을 수 있는 상대를 먼저 잡고, 메가진화·거다이맥스를 알맞은 때에 써요 =====
+const AUB={skip:{},tries:{},plan:null,open:false};
+function auVal(v){if(isRandomMonCard(v))return 2+battleCost(v)*1.6;const m=MON[v];if(!m)return 0;return m.atk*1.65+m.hp*1.05+m.rar*.7-m.cost*.35+({taunt:3,armor:3,double:3,grow:2,freeze:2.5,heal:1.5,rush:2}[kwOf(m).k]||0);}
+// 손패에서 마나를 가장 알차게 쓰는 포켓몬 조합을 고르고, 그 중 가치가 가장 높은 카드를 먼저 내요
+function auSummonPick(me){const slots=me.board.filter(x=>!x).length;if(!slots)return -1;
+ const cand=[];me.hand.forEach((v,i)=>{if(isItemCard(v)||battleCost(v)>me.mana)return;if(isRandomMonCard(v)||(typeof v==='number'&&MON[v]))cand.push({i,c:battleCost(v),v:auVal(v)});});
+ if(!cand.length)return -1;cand.sort((a,b)=>b.v-a.v);const L=cand.slice(0,12),n=L.length;let best=0,bv=-1;
+ for(let m=1;m<(1<<n);m++){let c=0,v=0,k=0;for(let j=0;j<n;j++)if(m&(1<<j)){c+=L[j].c;v+=L[j].v;k++;}if(c<=me.mana&&k<=slots&&v+c*.2>bv){bv=v+c*.2;best=m;}}
+ if(!best)return -1;let pj=-1,pv=-1e9;for(let j=0;j<n;j++)if(best&(1<<j)&&L[j].v>pv){pv=L[j].v;pj=j;}return L[pj].i;}
+const auAlive=P=>P.board.filter(u=>u&&u.hp>0);
+// 화염의 돌(상대 전체 피해 2)이 값어치 있는지
+function auFireWorth(){const f=auAlive(B.foe);if(!f.length)return false;const kills=f.filter(u=>u.hp<=2&&!u.dodge&&!(u.shield>0)).length;return kills>=2||f.length>=3||(kills>=1&&f.length>=2);}
+// 공격할 (포켓몬, 대상)을 통째로 비교해서 가장 좋은 한 쌍을 골라요
+function auAttackPick(me,reserved){const fo=B.foe;const att=[];me.board.forEach((u,i)=>{if(u&&u.hp>0&&u.att>0&&!u.frozen&&i!==reserved&&!AUB.skip[i])att.push(i);});if(!att.length)return null;
+ let faceAll=true,faceDmg=0;att.forEach(i=>{if(!targetsFor(i).hero)faceAll=false;faceDmg+=remDmg(me.board[i]);});
+ const lethal=faceAll&&faceDmg>=fo.hp;let best=null;
+ for(const i of att){const u=me.board[i],t=targetsFor(i);
+  if(u.gm){const tg=t.units.length?{u:t.units[0]}:{hero:1};const sc=100;if(!best||sc>best.sc)best={i,tg,sc};continue;}
+  for(const j of t.units){const d=fo.board[j];if(!d)continue;const dm=predDmg(u,d),kills=dm>=d.hp;
+   const cd=(B.wildMode||u.kw==='wing')?0:applyType(d.atk,typeMul(d.id,u.id)),dies=!kills&&cd>=u.hp;
+   const sc=(kills?auVal(d.id)+(dies?0:3)-.1*Math.max(0,dm-d.hp):dm*.7-(cd>0?cd*.25:0))-(dies?auVal(u.id):0);
+   if(!best||sc>best.sc)best={i,tg:{u:j},sc};}
+  if(t.hero){let sc=u.atk*.45+(fo.hp<=8?2:0);if(lethal)sc=200+u.atk;if(!best||sc>best.sc)best={i,tg:{hero:1},sc};}}
+ return best;}
+// 이번 차례에 거다이맥스를 쓸지 미리 정해요: 상대가 2마리 이상이거나 내 트레이너가 위험할 때
+function auPlanTurn(me){const fo=B.foe;AUB.skip={};AUB.tries={};AUB.plan={gm:-1};
+ try{if(!gmaxCand(me)||mgProg()<evoNeed(GMAX_NEED))return;
+  const cands=[];me.board.forEach((u,i)=>{if(u&&gmaxCan(me,i))cands.push({i,u,v:u.atk*2+u.hp});});if(!cands.length)return;cands.sort((a,b)=>b.v-a.v);const c=cands[0];
+  const foes=auAlive(fo),others=me.board.map((u,i)=>u&&u.hp>0&&u.att>0&&!u.frozen&&i!==c.i?i:-1).filter(i=>i>=0);
+  const face=others.every(i=>targetsFor(i).hero)?others.reduce((a,i)=>a+remDmg(me.board[i]),0)+remDmg(c.u):0;if(face>=fo.hp)return; // 이번 차례에 끝낼 수 있으면 그냥 공격
+  const per=foes.reduce((a,f)=>a+Math.min(f.hp,Math.max(1,c.u.atk-2)),0),foeAtk=foes.reduce((a,f)=>a+f.atk,0);
+  const hurt=me.hp<=Math.max(6,(me.max||me.hp)*.45)&&foeAtk>0;
+  if((foes.length>=2&&per>=foes.length+1)||hurt)AUB.plan.gm=c.i;}catch(e){}}
+// 메가진화: 이미 공격을 마쳤거나 쉬는 포켓몬에게 써요(공격 기회를 버리지 않도록)
+function auMegaPick(me){try{if(me.mgUsed||mgProg()<evoNeed(MEGA_NEED))return -1;let bi=-1,bs=-1;me.board.forEach((u,i)=>{if(!u||!megaCan(me,i))return;if(u.att>0&&!u.frozen)return;const s=u.atk+u.hp;if(s>bs){bs=s;bi=i;}});return bi;}catch(e){return -1;}}
+// 트레이너 스킬: 체력 회복(위험할 때) · 응원(가장 센 포켓몬) · 공격(쓰러뜨릴 수 있는 상대) · 반격(상대가 여럿이거나 위험할 때)
+async function auSkill(me,when){try{const lv=trainerSkillLevels(),used=B.trainerSkillUsed||(B.trainerSkillUsed={}),fo=B.foe;const can=k=>(lv[k]||0)>0&&!used[k];
+ if(can('heal')&&me.hp<me.max&&(me.hp<=me.max*.5||(me.max-me.hp>=lv.heal&&me.hp<=me.max*.7))){activateTrainerSkill('heal');return true;}
+ if(when==='pre'&&can('cheer')){let bi=-1,bs=-1;me.board.forEach((u,i)=>{if(u&&u.hp>0&&!u.gm&&u.atk+u.hp*.3>bs){bs=u.atk+u.hp*.3;bi=i;}});if(bi>=0){activateTrainerSkill('cheer');resolveTrainerSkillTarget('me',bi);return true;}}
+ if(when==='post'){
+  if(can('attack')){const f=auAlive(fo);let ti=-1,bv=-1;fo.board.forEach((u,i)=>{if(u&&u.hp>0&&u.hp<=lv.attack&&auVal(u.id)>bv){bv=auVal(u.id);ti=i;}});
+   if(ti<0&&f.length&&(B.round||0)>=4){fo.board.forEach((u,i)=>{if(u&&u.hp>0&&u.atk>bv){bv=u.atk;ti=i;}});}
+   if(ti>=0){activateTrainerSkill('attack');resolveTrainerSkillTarget('foe',ti);return true;}}
+  if(can('counter')){const f=auAlive(fo);if(f.length&&f.some(u=>u.atk>0)&&(me.hp<=me.max*.7||f.length>=2)){activateTrainerSkill('counter');return true;}}}
+ }catch(e){console.warn('auSkill',e);}return false;}
+async function autoRun(){let idle=0,guard=0;AUB.open=false;
  const ok=()=>AUTO.on&&B&&!B.over&&!B.coop&&!B.pvp&&!B.tut&&!B.tutReal&&document.getElementById('bAuto');
- while(ok()&&guard++<400){
+ while(ok()&&guard++<3000){
   const wildPrompt=B.wildState&&B.wildState.captureModalOpen;
-  if(B.side!=='me'||B.busy||wildPrompt||B.itemTargetMode||B.moonTargetMode||B.trainerSkillTarget){await wait(400);if(++idle>150)break;continue;}
-  idle=0;const me=B.me;
-  // 1) 카드: 포켓몬 출전, 돌 카드(번개의 돌 제외)
-  let i=me.hand.findIndex(v=>battleCost(v)<=me.mana&&(isItemCard(v)?(v.item!=='thunder'&&v.item!=='moon'&&me.board.some(u=>u)):me.board.includes(null)));
-  if(i>=0){const v=me.hand[i];if(isItemCard(v))await playItem(me,i,-1);else await summon(me,i,me.board.indexOf(null));B.pick=-1;renderBattle();await wait(300);continue;}
-  // 2) 공격
-  const ai=me.board.findIndex(u=>u&&u.hp>0&&u.att>0&&!u.frozen);
-  if(ai>=0){const u=me.board[ai],t=targetsFor(ai);let tg=null;
-   if(t.units.length){const kill=t.units.find(j=>B.foe.board[j]&&B.foe.board[j].hp<=u.atk);const strong=t.units.slice().sort((a,b)=>B.foe.board[b].atk-B.foe.board[a].atk)[0];if(kill!=null)tg={u:kill};else if(!t.hero)tg={u:strong};}
-   if(!tg)tg=t.hero?{hero:1}:null;if(!tg)break;
-   await playerAttack(ai,tg);await acPace(250);continue;}
-  // 3) 번개의 돌: 이미 공격한 포켓몬을 다시 움직이게
-  const ti=me.board.findIndex(u=>u&&u.hp>0&&u.att<=0&&!u.frozen&&!u.fresh),th=me.hand.findIndex(v=>isItemCard(v)&&v.item==='thunder'&&battleCost(v)<=me.mana);
-  if(ti>=0&&th>=0){const r=await playItem(me,th,ti);renderBattle();await wait(300);if(r!==false)continue;}
-  // 4) 차례 끝
-  B.sel=-1;B.pick=-1;B.trainerSkillTarget=null;endTurn();await wait(900);}
+  if(B.side!=='me'||B.busy||wildPrompt||B.itemTargetMode||B.moonTargetMode||B.trainerSkillTarget){AUB.open=false;await wait(400);if(++idle>150)break;continue;}
+  idle=0;const me=B.me,fo=B.foe;
+  if(!AUB.open){AUB.open=true;auPlanTurn(me);}
+  const hasItem=k=>me.hand.findIndex(v=>isItemCard(v)&&v.item===k&&battleCost(v)<=me.mana);
+  // -1) 공부 기술: 카드를 더 뽑고, 정답이 쌓여 메가진화·거다이맥스도 빨리 쓸 수 있어요
+  if((me.powerUses||0)>0&&me.hand.length<handMax(me)){await usePower();await wait(250);continue;}
+  // 0) 태양의 돌: 에너지를 한 번 더 쓸 수 있어요
+  {const si=hasItem('sun');if(si>=0){await playItem(me,si,-1);B.pick=-1;renderBattle();await wait(250);continue;}}
+  // 1) 화염의 돌: 약한 상대를 한꺼번에 쓸어 낼 수 있을 때
+  {const fi=hasItem('fire');if(fi>=0&&auFireWorth()){await playItem(me,fi,-1);B.pick=-1;renderBattle();await wait(300);continue;}}
+  // 2) 포켓몬 출전: 에너지를 알차게 쓰는 조합
+  {const i=auSummonPick(me);if(i>=0){await summon(me,i,me.board.indexOf(null));B.pick=-1;renderBattle();await wait(300);continue;}}
+  if(await auSkill(me,'pre')){await wait(300);continue;}
+  // 3) 공격: 쓰러뜨릴 수 있는 상대 · 유리한 상성 · 반격에 안 지는 상대를 먼저
+  {const r=auAttackPick(me,AUB.plan?AUB.plan.gm:-1);if(r){const u0=me.board[r.i],att0=u0&&u0.att;await playerAttack(r.i,r.tg);const u1=B&&B.me.board[r.i];if(u1&&u0===u1&&u1.att>=att0){AUB.tries[r.i]=(AUB.tries[r.i]||0)+1;if(AUB.tries[r.i]>=3)AUB.skip[r.i]=1;}await acPace(250);continue;}}
+  // 4) 전기의 돌: 공격력이 가장 센 포켓몬을 다시 움직이게
+  {const th=hasItem('thunder');if(th>=0){let ti=-1,bs=-1;me.board.forEach((u,i)=>{if(u&&u.hp>0&&u.att<=0&&!u.frozen&&!u.fresh&&u.atk>bs){bs=u.atk;ti=i;}});
+   if(ti>=0&&(auAlive(fo).length||!B.wildMode)){const r=await playItem(me,th,ti);renderBattle();await wait(300);if(r!==false)continue;}}}
+  // 5) 거다이맥스(미리 정해 둔 포켓몬) → 아니면 메가진화
+  {const gi=AUB.plan?AUB.plan.gm:-1;if(gi>=0){AUB.plan.gm=-1;if(gmaxCan(me,gi)){await gmaxDo(me,gi);renderBattle();await wait(300);continue;}}
+   const mi=auMegaPick(me);if(mi>=0){await megaDo(me,mi);renderBattle();await wait(300);continue;}}
+  if(await auSkill(me,'post')){await wait(300);continue;}
+  // 6) 남은 에너지: 달의 돌(가장 센 상대를 재우기) · 물의 돌(방어막)
+  {const mo=hasItem('moon');if(mo>=0){let ti=-1,bs=1;fo.board.forEach((u,i)=>{if(u&&u.hp>0&&!u.frozen&&u.atk>bs){bs=u.atk;ti=i;}});if(ti>=0){const r=await playItem(me,mo,ti);renderBattle();await wait(300);if(r!==false)continue;}}
+   const wa=hasItem('water');if(wa>=0&&auAlive(me).length>=2){await playItem(me,wa,-1);renderBattle();await wait(300);continue;}}
+  // 7) 차례 끝
+  B.sel=-1;B.pick=-1;B.trainerSkillTarget=null;AUB.open=false;endTurn();await wait(900);}
  if(B&&B.over)AUTO.on=false;}
 function endTurn(){if(!B||B.over)return;if(B.coop){if(B.coop.active===0){bossSetActive(1);startTurn('me');}else{startTurn('foe');}return;}startTurn(B.side==='me'?'foe':'me');}
 // AI 평가: 실제 피해 처리 규칙(회피·방어막·강철·끈기·반격)을 반영해 공격 결과를 예측해요.
@@ -7913,9 +8010,10 @@ const TRAINER_SKILL_INFO={
  mana:{n:'마나 연구',ic:'🔮',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 매 턴 시작 시 일정 확률로 마나를 1 더 얻어요. (Lv.1 30% → Lv.5 70%)',eff:n=>n?`매 턴 ${manaChance(n)}% 확률로 마나 +1`:'아직 배우지 않았어요',max:5},
  study:{n:'공부 강화',ic:'📚',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 기본 공부 기술 횟수는 0회이고, 이 스킬로 전투마다 쓸 수 있는 횟수가 생겨요. 또  공부 기술로 문제를 맞혔을 때 일정 확률로 카드를 1장 더 뽑아요. (Lv.1 1회·30% / Lv.2 1회·40% / Lv.3 2회·50% / Lv.4 2회·60% / Lv.5 3회·70%)',eff:n=>n?`전투마다 공부 기술 ${STUDY_BASE+studyExtraUses(n)}회 · 성공 시 ${studyChance(n)}% 확률로 카드 +1`:'아직 배우지 않았어요',max:5},
  hand:{n:'카드 보유량',ic:'🃏',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 손에 들 수 있는 카드 최대치가 늘어나요. (Lv.1~2 +1장 → 7장 / Lv.3~4 +2장 → 8장 / Lv.5 +3장 → 9장)',eff:n=>n?`카드 보유 최대 ${HAND_BASE+handBonusOf(n)}장 (+${handBonusOf(n)})`:'아직 배우지 않았어요',max:5},
+ evo:{n:'진화 연구',ic:'🧬',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 메가진화·원시회귀·거다이맥스에 필요한 정답 수가 줄어요. (Lv.1~2: -1개 / Lv.3~4: -2개 / Lv.5: -3개)',eff:n=>n?`필요한 정답 ${MEGA_NEED}개 → ${MEGA_NEED-(n>=5?3:n>=3?2:1)}개`:'아직 배우지 않았어요',max:5},
  vit:{n:'체력 증강',ic:'❤️‍🔥',passive:1,desc:'패시브 · 찍어 두면 상시 적용돼요. 트레이너의 최대 체력이 스킬 레벨만큼 늘어요. (Lv.5 +5)',eff:n=>n?`트레이너 최대 체력 +${n}`:'아직 배우지 않았어요',max:5}
 };
-function trainerSkillLevels(){const m=S.meta;m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},m.trainerSkills||{});return m.trainerSkills;}
+function trainerSkillLevels(){const m=S.meta;m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0,evo:0},m.trainerSkills||{});return m.trainerSkills;}
 const CHEER_ATK=[0,1,1,2,2,3],CHEER_SHIELD=[0,1,2,2,3,3];
 const studyChance=n=>n>0?Math.min(70,20+10*n):0;
 const STUDY_BASE=0; // 기본 공부 기술 횟수 (0이면 '공부 강화' 스킬을 배워야 공부 기술을 써요)
@@ -7933,7 +8031,7 @@ function trainerSkillInvestedPoints(levels){return Object.values(levels).reduce(
 function renderTrainerSkills(){S.screen='trainerSkills';const m=S.meta,lv=trainerSkillLevels();
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">🛡️ 트레이너 스킬</h2><span class=hudSp></span><span class=pill>🔷 레벨 포인트 ${m.lp||0}</span></div><p class=mut style="font-size:13px">레벨 1~2는 각각 1포인트, 레벨 3~4는 각각 2포인트, 레벨 5는 3포인트가 필요해요. 전투에서는 일반 스킬을 종류별로 한 번씩 사용할 수 있고, 패시브 스킬은 자동으로 적용돼요. 트레이너 레벨 5, 10, 15…에 도달할 때마다 보너스 레벨 포인트 +2를 받아요.</p><div style="display:grid;gap:10px">${Object.entries(TRAINER_SKILL_INFO).map(([k,v])=>{const n=lv[k]||0,cost=n>=5?0:trainerSkillUpgradeCost(n+1);return `<div class=panel style="margin:0;border:2px solid ${n?'#b8a4f4':'var(--line)'};background:${n?'#f7f2ff':'#fff'}"><div style="display:flex;align-items:flex-start;gap:10px"><div style="font-size:30px">${v.ic}</div><div style="flex:1;min-width:0"><div class=jua style="font-size:19px">${v.n} <span class=mut style="font-size:14px">Lv.${n}/5</span></div><div class=mut style="font-size:13px;line-height:1.55">${v.desc}</div>${v.eff?`<div style="font-size:13px;color:#7c55c7;margin-top:3px">현재 효과: ${v.eff(n)}</div>`:''}<div style="margin-top:6px;color:#7c55c7;font-size:13px">${'★'.repeat(n)}${'☆'.repeat(5-n)}</div><div class=mut style="font-size:12px;margin-top:4px">${n>=5?'최대 레벨':`다음 레벨 비용: 🔷 ${cost}개`}</div></div><button class="btn ${n>=5?'ghost':'purple'} sm" data-skill-up="${k}" ${n>=5||(m.lp||0)<cost?'disabled':''}>${n>=5?'최대 레벨':`🔷 ${cost} 투자`}</button></div></div>`;}).join('')}</div><div class=mbtns><button class="btn ghost" id=tsBack>← 돌아가기</button><button class="btn red" id=tsReset ${m.coins<100?'disabled':''}>초기화 · 🪙 100코인</button></div><p class=mut style="font-size:12px">초기화하면 모든 트레이너 스킬 레벨이 0이 되고, 투자했던 레벨 포인트를 전부 돌려받아요.</p></div></div>`;
  bindHud();$('#tsBack').onclick=()=>renderHub();$('#view').querySelectorAll('[data-skill-up]').forEach(b=>b.onclick=()=>{const k=b.dataset.skillUp,cur=trainerSkillLevels(),cost=trainerSkillUpgradeCost((cur[k]||0)+1);if((S.meta.lp||0)<cost||cur[k]>=5)return;S.meta.lp-=cost;cur[k]++;autoSave();renderTrainerSkills();toast(`${TRAINER_SKILL_INFO[k].n} Lv.${cur[k]} 달성! (레벨 포인트 ${cost}개 사용)`);});
- $('#tsReset').onclick=async()=>{if((S.meta.coins||0)<100){toast('코인이 100개 필요해요');return;}const yes=await confirmBox(`트레이너 스킬을 초기화할까요?<br>비용: 🪙 100코인<br>투자한 레벨 포인트는 모두 돌려받아요.`,'초기화','취소');if(!yes)return;const cur=trainerSkillLevels(),refund=trainerSkillInvestedPoints(cur);S.meta.coins-=100;S.meta.lp=(S.meta.lp||0)+refund;S.meta.trainerSkills={heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0};autoSave();renderTrainerSkills();toast(`스킬 초기화 완료! 레벨 포인트 ${refund}개를 돌려받았어요.`);};}
+ $('#tsReset').onclick=async()=>{if((S.meta.coins||0)<100){toast('코인이 100개 필요해요');return;}const yes=await confirmBox(`트레이너 스킬을 초기화할까요?<br>비용: 🪙 100코인<br>투자한 레벨 포인트는 모두 돌려받아요.`,'초기화','취소');if(!yes)return;const cur=trainerSkillLevels(),refund=trainerSkillInvestedPoints(cur);S.meta.coins-=100;S.meta.lp=(S.meta.lp||0)+refund;S.meta.trainerSkills={heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0,evo:0};autoSave();renderTrainerSkills();toast(`스킬 초기화 완료! 레벨 포인트 ${refund}개를 돌려받았어요.`);};}
 function openTrainerSkillModal(){if(!B||B.over)return;const levels=trainerSkillLevels(),used=B.trainerSkillUsed||(B.trainerSkillUsed={});const myTurn=B.side==='me'&&!B.busy&&(!B.coop||B.coop.active===BC.localIndex);const skills=Object.entries(TRAINER_SKILL_INFO).filter(([k,v])=>!v.passive).map(([k,v])=>{const n=levels[k]||0,done=!!used[k],disabled=!n||done||!myTurn||(k==='attack'&&!B.foe.board.some(u=>u&&u.hp>0))||(k==='cheer'&&!B.me.board.some(u=>u&&u.hp>0))||(k==='heal'&&B.me.hp>=B.me.max);return `<button class="btn ${disabled?'ghost':'purple'}" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;margin:7px 0;white-space:normal" data-trainer-skill="${k}" ${disabled?'disabled':''}><span style="font-size:24px">${v.ic}</span><span style="flex:1"><b>${v.n} · Lv.${n}</b><br><small>${done?'이번 전투에서 사용 완료':!n?'아직 배우지 않았어요':v.desc}</small></span><span>${done?'✓':n?'사용':''}</span></button>`;}).join('');
  M(`<h2>🛡️ 트레이너 스킬</h2><p class=mut style="font-size:13px">배운 스킬은 종류별로 이 전투에서 한 번 사용할 수 있어요.</p>${skills}<div class=mbtns><button class="btn ghost" data-a=x>닫기</button><button class="btn ghost" data-a=manage>스킬 관리</button></div>`,{x:()=>closeM(),_close:()=>closeM(),manage:()=>{closeM();renderTrainerSkills();}});
  $('#mbox').querySelectorAll('[data-trainer-skill]').forEach(b=>b.onclick=()=>{const k=b.dataset.trainerSkill;if(!B||B.busy||B.side!=='me'||B.over)return;closeM();activateTrainerSkill(k);});}
@@ -8019,8 +8117,8 @@ async function bossConnect(host,code){bossClose();BC.host=host;BC.localIndex=hos
  const id='pkboss-coop-v1-'+code;const peer=host?new Peer(id,PO()):new Peer(PO());BC.peer=peer;
  peer.on('error',e=>{const t=String(e&&e.type||'');bossBox(netErrHTML(t==='unavailable-id'?'이미 사용 중인 코드예요. 새 방을 만들어 주세요.':t==='peer-unavailable'?'해당 방을 찾을 수 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결에 실패했어요 ('+t+')',t,'bcCancel'))});
  peer.on('open',()=>{if(host){bossBox(`<p>친구에게 아래 코드를 알려 주세요.</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구 접속 대기 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);peer.on('connection',c=>{if(BC.conn){c.close();return}BC.conn=c;bossBind(c)});}else{bossBox(`<p>방 ${code}에 접속 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);{const cc=peer.connect(id,{reliable:true});BC.conn=cc;bossBind(cc);setTimeout(()=>{try{if(BC.conn===cc&&!cc.open&&!BC.ready&&S.screen==='bosscoop')bossBox(netErrHTML('친구와 연결되지 않았어요','timeout','bcCancel'));}catch(e){}},20000);}}});}
-const BOSS_NET_VER=3;
-function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:vitBonus(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,name:S.meta.name,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number),avatar:partnerId()});});c.on('data',d=>{if(!d||typeof d!=='object')return;
+const BOSS_NET_VER=4;
+function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:vitBonus(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,evo:Number(trainerSkillLevels().evo)||0,name:S.meta.name,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number),avatar:partnerId()});});c.on('data',d=>{if(!d||typeof d!=='object')return;
  if(d.t==='boss-hi'){if(d.v!==BOSS_NET_VER){BC.ready=false;BC.foe=null;bossBox(`<p style="color:#d9393f">친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}BC.foe=d;BC.ready=true;bossBox(`<h2>친구와 연결됐어요!</h2><p>${esc(d.name||'친구')}와 협동 보스전에 입장할 준비가 됐어요.</p><div class=explain>4성 60% · 5성 40% · 공유 필드 8칸</div>${BC.host?'<button class="btn red big" id=bcStart>보스전 시작</button>':'<p class=mut>방장이 보스전을 시작하기를 기다리는 중…</p>'}<button class="btn ghost" id=bcCancel>나가기</button>`);if(BC.host)bossSend({t:'boss-wait',name:S.meta.name});}
  else if(d.t==='boss-wait'){toast(`${esc(d.name||'친구')}가 접속했어요`)}
  else if(d.t==='boss-start'){if(!BC.host)bossApplySnapshot(d.state,true);}
@@ -8150,7 +8248,7 @@ function bossEscalate(foe){
   const add=extra+(u.ph2?1:0);
   if(add>0){u.att=Math.min(BOSS_ESC.capAtt,u.att+add);u.attTot=u.att;if(extra>0){try{fx(unitEl(foe,i),`우리 필드가 커서 공격 +${extra}`,'txt');}catch(e){}}}
  });}
-function bossStartBattle(){if(!BC.host||!BC.ready||!BC.foe||!ensureDeck())return;const m=S.meta,other=BC.foe;const id=bossWildId(),ids=[id];if(rnd()<.1){let j=bossWildId(),n=0;while(j===id&&n++<10)j=bossWildId();ids.push(j);}const a=mkPlayer(m.name,m.deck,heroHpMax(),partnerId(),false,Object.keys(m.col||{}).map(Number),true);a.manaLv=Number(trainerSkillLevels().mana)||0;a.studyLv=Number(trainerSkillLevels().study)||0;a.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(a.studyLv));a.handLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().hand)||0));const ov=Math.max(0,Math.min(5,Number(other.vit)||0));const b=mkPlayer(other.name||'친구',other.deck||[],HERO_HP+ov,other.avatar||partnerId(),false,other.owned||[],true);b.manaLv=Math.max(0,Math.min(5,Number(other.mana)||0));b.studyLv=Math.max(0,Math.min(5,Number(other.study)||0));b.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(b.studyLv));b.handLv=Math.max(0,Math.min(5,Number(other.hand)||0));const board=Array(8).fill(null);a.board=board;b.board=board;for(let i=0;i<3;i++){draw(a,true);draw(b,true);}const foe=mkPlayer(ids.map(x=>MON[x].name).join(' · '),[],1,id,true,[],false);const slots=ids.length===2?[1,3]:[2];ids.forEach((wid,k)=>{const u=mkUnit(wid);u.hp=MON[wid].hp*15;u.max=u.hp;u.atk=MON[wid].atk;u.att=0;u.fresh=0;u.wildEncounter=1;foe.board[slots[k]]=u;});
+function bossStartBattle(){if(!BC.host||!BC.ready||!BC.foe||!ensureDeck())return;const m=S.meta,other=BC.foe;const id=bossWildId(),ids=[id];if(rnd()<.1){let j=bossWildId(),n=0;while(j===id&&n++<10)j=bossWildId();ids.push(j);}const a=mkPlayer(m.name,m.deck,heroHpMax(),partnerId(),false,Object.keys(m.col||{}).map(Number),true);a.manaLv=Number(trainerSkillLevels().mana)||0;a.studyLv=Number(trainerSkillLevels().study)||0;a.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(a.studyLv));a.handLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().hand)||0));a.evoLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().evo)||0));const ov=Math.max(0,Math.min(5,Number(other.vit)||0));const b=mkPlayer(other.name||'친구',other.deck||[],HERO_HP+ov,other.avatar||partnerId(),false,other.owned||[],true);b.manaLv=Math.max(0,Math.min(5,Number(other.mana)||0));b.studyLv=Math.max(0,Math.min(5,Number(other.study)||0));b.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(b.studyLv));b.handLv=Math.max(0,Math.min(5,Number(other.hand)||0));b.evoLv=Math.max(0,Math.min(5,Number(other.evo)||0));const board=Array(8).fill(null);a.board=board;b.board=board;for(let i=0;i<3;i++){draw(a,true);draw(b,true);}const foe=mkPlayer(ids.map(x=>MON[x].name).join(' · '),[],1,id,true,[],false);const slots=ids.length===2?[1,3]:[2];ids.forEach((wid,k)=>{const u=mkUnit(wid);u.hp=MON[wid].hp*15;u.max=u.hp;u.atk=MON[wid].atk;u.att=0;u.fresh=0;u.wildEncounter=1;foe.board[slots[k]]=u;});
  BC.resultHandled=false;BC.clientCaught=[];BC.lastSeqByPlayer={};const st={n:0,id,ids:ids.slice(),finished:false,caughtIds:[],caughtNewIds:[],captureModalOpen:false,note:'',previousScreen:'bosscoop',coopMode:true};B={gi:-2,g:{n:'협동 보스전',ldr:'보스 포켓몬',c:TYPE_COL[MON[id].types[0]]||'#ffc93c'},diff:Math.max(1,Math.ceil(lvOf(m.xp).lv/2)),turn:0,round:0,side:'me',me:a,foe,sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:false,over:false,wildMode:true,wildId:id,wildSlot:slots[0],wildIds:ids.slice(),wildSlots:slots.slice(),wildState:st,capturePrompted:false,coop:{players:[a,b],active:0,localIndex:0,seq:0,processing:false,result:null}};S.screen='battle';$('#bq').classList.remove('on');closeInfo();$('#battle').innerHTML='';$('#battle').classList.add('on');startBgm('battle');renderBattle();banner(ids.length===2?'보스 포켓몬 2마리 등장!':'보스 포켓몬 등장!',`${ids.map(x=>esc(MON[x].name)).join(' · ')} · 협동 전투 시작!`,1700);if(BC.conn&&BC.conn.open)bossSend({t:'boss-start',state:bossSnapshot(true)});startTurn('me');}
 function bossSetActive(i){if(!B||!B.coop)return;const p=B.coop.players;if(!p||p.length!==2)return;B.coop.active=i;const board=bossSharedBoard();p[0].board=board;p[1].board=board;B.me=p[i];B.me.board=board;B.foe=B.coop.foe||B.foe;}
 function bossSharedBoard(){if(!B||!B.coop||!Array.isArray(B.coop.players))return Array(8).fill(null);const p=B.coop.players;const a=Array.isArray(p[0]?.board)?p[0].board:[];const b=Array.isArray(p[1]?.board)?p[1].board:[];const board=Array(8).fill(null);for(let i=0;i<8;i++){const x=a[i]||null,y=b[i]||null;if(x&&y){const xo=Number(x.coopOwner??0),yo=Number(y.coopOwner??0);board[i]=xo===yo?x:(xo===1?x:y);}else board[i]=x||y;}return board;}
@@ -8164,7 +8262,7 @@ async function bossHandleAction(d){if(!B||!B.coop||!BC.host||BC.processing||B.ov
  else if(a.type==='item'){if(!Number.isInteger(Number(a.h))||Number(a.h)<0||Number(a.h)>=P.hand.length)return;const card=P.hand[Number(a.h)];if(card&&card.item==='thunder'&&(!P.board[Number(a.target)]||Number(P.board[Number(a.target)].coopOwner??0)!==idx))return;B.busy=false;await playItem(P,Number(a.h),Number(a.target??-1),true);}
  else if(a.type==='attack'){B.busy=false;await playerAttack(Number(a.si),a.tg,!!a.ok,!!a.ok&&!!a.crit,a.hint?1:0);}
  else if(a.type==='power'){B.busy=false;await bossApplyPower(!!a.ok,!!a.ok&&!!a.crit);}
- else if(a.type==='mega'){const si=Number(a.si);const u=P.board[si];if(!u||Number(u.coopOwner??0)!==idx||((P.qc||0)-(P.mgBase||0))<MEGA_NEED)return;B.busy=false;await megaDo(P,si);}
+ else if(a.type==='mega'){const si=Number(a.si);const u=P.board[si];if(!u||Number(u.coopOwner??0)!==idx||((P.qc||0)-(P.mgBase||0))<evoNeedFor(MEGA_NEED,P))return;B.busy=false;await megaDo(P,si);}
  else if(a.type==='trainerSkill'){const sk=String(a.skill||''),lv=Math.max(1,Math.min(5,Number(a.level)||1)),slot=Number(a.slot);B.trainerSkillUsed=B.trainerSkillUsed||{};if(!['heal','counter','attack','cheer'].includes(sk)||B.trainerSkillUsed[sk])return;if(sk==='heal'){P.hp=Math.min(P.max||15,P.hp+lv);B.trainerSkillUsed.heal=true;fx(heroEl(P),`+${lv} 회복`,'txt');}else if(sk==='counter'){B.counterActive=lv;B.trainerSkillUsed.counter=true;}else if(sk==='attack'){const u=B.foe.board[slot];if(!u||u.hp<=0)return;B.trainerSkillUsed.attack=true;await dealUnit(B.foe,slot,lv);checkEnd();}else if(sk==='cheer'){const u=P.board[slot];if(!u||u.hp<=0||Number(u.coopOwner??0)!==idx)return;const ca=CHEER_ATK[lv]||0,cs=CHEER_SHIELD[lv]||0;u.atk+=ca;u.shield=(u.shield||0)+cs;B.trainerSkillUsed.cheer=true;fx(unitEl(P,slot),`공격 +${ca} · 방어막 +${cs}`,'txt');}B.busy=false;renderBattle();}
  else if(a.type==='catch'){B.busy=false;B.wildState.captureModalOpen=false;tryCatchWildPokemon(Number(a.slot));}
  }catch(e){console.error('coop action',e)}finally{BC.processing=false;if(B&&B.coop){B.coop.processing=false;B.busy=false;bossRewire();renderBattle();bossBroadcast(true);}}}
@@ -8976,7 +9074,7 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
   ${wgPanel(m)}
   <div class=panel style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="font-size:30px">🛡️</div><div style="flex:1"><b class=jua style="font-size:19px">트레이너 스킬</b><div class=mut style="font-size:13px">레벨 포인트 ${m.lp||0}개 · 스킬을 배우고 전투에서 사용해요</div></div><button class="btn purple" id="hTrainerSkills">스킬 관리</button></div>
   <div class=tiles>
-   <button class="tile main" id=tTrain>${done?'':'<i class=newTag>오늘!</i>'}<span class=ti>${I('flame','ti')}</span><span><span class=tn>오늘의 훈련</span><br><span class=td>${done?'오늘 훈련 완료! 한 번 더 하면 사탕을 더 받아요.':`문제 ${trainN()}개 · 오늘의 카드팩 받기`}${gh?`<br>어제의 나: ${gh.n}문제 중 ${gh.c}개 정답`:''}</span></span></button>
+   <button class="tile main" id=tTrain>${done?'':'<i class=newTag>오늘!</i>'}<span class=ti>${I('flame','ti')}</span><span><span class=tn>오늘의 훈련</span><br><span class=td>${done?'오늘 훈련 완료! 한 번 더 하면 사탕을 더 받아요.':`문제 ${trainN()}개 · 오늘의 카드팩 받기`}${gh?`<br>어제의 나: ${gh.n}문제 중 ${gh.c}개 정답`:''}${(()=>{try{const n=wbDueList(m).length;return n?`<br>📅 복습할 틀린 문제 ${n}개가 섞여 나와요`:'';}catch(e){return '';}})()}</span></span></button>
    ${tiles}</div>
   ${next?`<div class=nextFeat>${I('lock')} 다음에 열릴 기능: <b>${next.n}</b> — ${next.how}</div>`:''}
   <div class=nextFeat>${esc(semName(m.gs))}${m.uMax&&m.uMax<20?` ${m.uMax}단원`:''}까지의 문제가 나와요 (약한 개념은 아래 학년 기초도 나와요) · <a href="#" id=hCode style="color:inherit">학년 변경</a></div></div>`;
@@ -9119,7 +9217,7 @@ function studyCoachSteps(onGrow){
    {h:'문제를 풀어요',ic:'flame',pic:stPic([['✏️','문제'],['⭕','정답!'],['🍬','사탕']]),t:'전투나 훈련에서 <b>문제를 풀어요</b>. 맞히면 공격이 제대로 들어가고 <b>사탕</b>도 생겨요.'},
    {h:'틀리면 어떻게 될까?',ic:'heart',pic:stPic([['❌','틀렸어요'],['💡','설명이 나와요'],['🔁','조금 뒤 다시']]),t:'<b>괜찮아요!</b> 틀리면 <b>그림과 설명</b>을 보여 줘요. 그리고 조금 뒤에 <b>같은 문제를 한 번 더</b> 풀어요. 공격은 약하게 들어가요.'},
    {h:'틀린 문제는 모아 둬요',ic:'book',pic:stPic([['❌','틀린 문제'],['📝','오답 노트']]),t:'틀린 문제는 자동으로 <b>오답 노트</b>에 모여요. 따로 적지 않아도 돼요.'},
-   {h:'다시 풀면 졸업!',ic:'check',pic:stPic([['📝','오답 노트'],['⭕','1번 맞힘'],['⭕','2번 맞힘'],['🎓','해결!']]),t:'오답 노트에서 <b>다시 풀기</b>를 눌러서 <b>2번 맞히면 해결</b>이에요. 해결하면 사탕도 받아요!'},
+   {h:'다시 풀면 졸업!',ic:'check',pic:stPic([['📝','오답 노트'],['📅','내일 다시'],['📅','3일 뒤 다시'],['🎓','해결!']]),t:'틀린 문제는 <b>다음 날, 3일 뒤</b>에 오늘의 훈련에 <b>저절로</b> 다시 나와요. 그때 <b>2번 맞히면 해결</b>이에요! 오답 노트의 <b>다시 풀기</b>로 미리 연습할 수도 있어요.'},
    {h:'자꾸 틀리면?',ic:'star',pic:stPic([['🧱','아래 학년 기초'],['🧱','조금 더 어려운 것'],['🏠','목표 개념']]),t:'같은 개념을 자꾸 틀리면 <b>아래 학년 기초부터</b> 차근차근 다시 쌓아 줘요. 어려워서 그런 게 아니에요!'}];
   if(onGrow)a.push(
    {el:'.filters',h:'학습 기록 탭',ic:'chart',t:'<b>요약</b>: 나의 성장 · 공부 달력 · 강점<br><b>오답 노트</b>: 틀린 문제 다시 풀기<br><b>단원 지도</b>: 개념별 별<br><b>영역 진단</b>·<b>주간 리포트</b>: 선생님·보호자용'},
@@ -9175,6 +9273,14 @@ function renderGrowth(){S.screen='grow';if(GTAB==='cal'||GTAB==='me')GTAB='sum';
 
 // ===== 오답 노트: 틀린 수학 문제를 모아 두고, 다시 풀어서 2번 맞히면 '해결' =====
 const WB_MAX=60;
+// 복습 간격: 틀린 문제는 다음 날 → 3일 뒤에 오늘의 훈련에 자동으로 다시 나와요. 복습 날짜에 2번 맞히면 해결.
+const WB_IV=[1,3];
+function wbPlus(d,n){const x=new Date(String(d)+'T12:00:00');if(isNaN(x.getTime()))return today();x.setDate(x.getDate()+n);return today(x);}
+function wbNx(e){return e.nx||wbPlus(e.t||today(),e.ok?WB_IV[1]:WB_IV[0]);}
+function wbIsDue(e){return !!e&&!e.d&&wbNx(e)<=today();}
+function wbDueLabel(e){const n=dayDiff(today(),wbNx(e));return n<=0?'오늘 복습':n===1?'내일 복습':n+'일 뒤 복습';}
+function wbRevKinds(m=S.meta){const q=m.questionMode||'math';return q==='english'?['en']:q==='mix'?['math','en']:['math'];}
+function wbDueList(m=S.meta,kinds){kinds=kinds||wbRevKinds(m);return wbList(m).filter(e=>wbIsDue(e)&&kinds.includes(wbKindOf(e))).sort((a,b)=>String(wbNx(a)).localeCompare(String(wbNx(b)))||(b.n||1)-(a.n||1));}
 function wbList(m=S.meta){return Array.isArray(m.wb)?m.wb.filter(e=>e&&e.k&&e.q&&e.a&&Array.isArray(e.ch)&&SKM[e.sk]):[];}
 function wbKindOf(e){return(e&&e.kd)||'math';}
 function wbOpenN(m=S.meta,kd){try{return wbList(m).filter(e=>!e.d&&(!kd||wbKindOf(e)===kd)).length;}catch(e){return 0;}}
@@ -9188,12 +9294,12 @@ function wbSafe(h){return String(h==null?'':h).replace(/<\s*script[\s\S]*?(<\/\s
 function wbAdd(q,ok,opt){
  if(!q||!q.key||!q.sk||!SKM[q.sk]||!Array.isArray(q.ch))return;
  opt=opt||{};const m=S.meta;const L=m.wb=Array.isArray(m.wb)?m.wb:[];const kd=wbKind(q),qk=wbKey(q);const e=L.find(x=>x&&x.k===qk);
- if(ok){if(e&&!e.d){e.ok=(e.ok||0)+1;if(e.ok>=2)e.d=today();}return;}
+ if(ok){if(e&&!e.d&&wbNx(e)<=today()){e.ok=(e.ok||0)+1;e.lo=today();if(e.ok>=2){e.d=today();}else e.nx=wbPlus(today(),WB_IV[Math.min(e.ok,WB_IV.length-1)]);}return;}
  const c=opt.choice!=null?String(opt.choice):'';const mi=(q.mis&&c&&q.mis[c])||'';
- if(e){e.n=(e.n||1)+1;e.ok=0;e.d=0;e.t=today();e.c=c;e.mi=mi;return;}
+ if(e){e.n=(e.n||1)+1;e.ok=0;e.d=0;e.t=today();e.nx=wbPlus(today(),WB_IV[0]);e.c=c;e.mi=mi;return;}
  if(opt.retry)return;
  const pic=q.pic||'';if(pic.length>(kd==='math'?6000:8000))return; // 아주 큰 그림 문제는 저장하지 않아요(저장 코드가 커져요)
- const it={k:qk,sk:q.sk,q:q.q,a:q.a,ch:q.ch.slice(),e:q.e||'',pic,m:(q.m&&!pic&&q.m.length<=3000)?q.m:'',c,mi,t:today(),n:1,ok:0,d:0};
+ const it={k:qk,sk:q.sk,q:q.q,a:q.a,ch:q.ch.slice(),e:q.e||'',pic,m:(q.m&&!pic&&q.m.length<=3000)?q.m:'',c,mi,t:today(),n:1,ok:0,d:0,nx:wbPlus(today(),WB_IV[0])};
  if(kd!=='math'){it.kd=kd;it.x={};WB_EX.forEach(f=>{if(q[f]!=null)it.x[f]=q[f];});}
  L.push(it);
  const cap=kd==='math'?WB_MAX:40,same=()=>L.filter(x=>x&&wbKindOf(x)===kd);
@@ -9203,7 +9309,7 @@ function wbMakeQ(e,retry){const x=e.x||{};const q={sk:e.sk,q:e.q,a:e.a,ch:x.keep
 let WBF='all',WBK='math';
 function wbDomOf(e){try{return domOf(SKM[e.sk]);}catch(x){return 'num';}}
 function wbItemHTML(e){const kd=wbKindOf(e),mi=kd==='math'&&e.mi&&ES_MIS[e.mi];const t=stripTags(e.q),tt=t.length>40?t.slice(0,40)+'…':t;const FM=kd==='math'?fmtMath:(h=>h);
- const st=e.d?`<span class=pill style="border-color:#2f9e6e;color:#2f9e6e">해결!</span>`:`<span class=pill>맞힘 ${e.ok||0}/2</span>`;
+ const st=e.d?`<span class=pill style="border-color:#2f9e6e;color:#2f9e6e">해결!</span>`:`<span class=pill>맞힘 ${e.ok||0}/2</span><span class=pill style="border-color:#2b6cb0;color:#2b6cb0">📅 ${wbDueLabel(e)}</span>`;
  return `<details style="margin-bottom:6px"><summary style="cursor:pointer;display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:150px"><b>${esc(tt)}</b><br><span class=mut style="font-size:12px">${esc(wbNm(e))} · ${esc(String(e.t||'').slice(5).replace('-','/'))} · ${e.n||1}번 틀렸어요</span></span>${st}</summary>
   <div class=explain style="margin-top:6px;text-align:left"><div class=qText style="font-size:16px">${FM(wbSafe(e.q))}</div>${e.pic?`<div class=qPic>${wbSafe(e.pic)}</div>`:''}
   ${e.c?`<div style="margin-top:6px">내가 고른 답: <b style="color:#c0392b">${FM(esc(e.c))}</b></div>`:''}<div>정답: <b style="color:#2f9e6e">${FM(esc(e.a))}</b></div>
@@ -9216,8 +9322,8 @@ function wbTabHTML(m){
  const kt=`<div class=filters style="margin-bottom:8px">${WB_KINDS.map(([k,ic,n])=>{const c=every.filter(e=>!e.d&&wbKindOf(e)===k).length;return `<button class="fbtn${WBK===k?' on':''}" data-wbk="${k}">${ic} ${n}${c?' '+c:''}</button>`;}).join('')}</div>`;
  const head=`<div class=panel><h3 style="margin-top:0">📝 오답 노트 <span class=mut style="font-size:13px">(수학·국어·영어·IQ · 틀린 문제가 자동으로 모여요)</span></h3>
   ${kt}
-  <div class=explain style="font-size:13px;line-height:1.7">• 훈련·연습·배틀에서 <b>틀린 문제</b>가 과목별로 자동 저장돼요.<br>• 다시 풀어서 <b>2번 맞히면 '해결'</b>이에요. 해결한 문제는 아래 '해결한 문제'로 옮겨져요.<br>• 같은 문제를 훈련 중에 다시 만나 맞혀도 해결에 포함돼요. 과목마다 수학 ${WB_MAX}문제, 국어·영어·IQ는 40문제까지 보관해요.</div>
-  <div class=row style="gap:8px;margin-top:8px"><span class=pill>다시 풀 문제 ${open.length}개</span><span class=pill style="border-color:#2f9e6e;color:#2f9e6e">해결한 문제 ${done.length}개</span></div></div>`;
+  <div class=explain style="font-size:13px;line-height:1.7">• 훈련·연습·배틀에서 <b>틀린 문제</b>가 과목별로 자동 저장돼요.<br>• 틀린 문제는 <b>다음 날 → 3일 뒤</b>에 <b>오늘의 훈련에 자동으로</b> 다시 나와요. <b>복습 날짜에 2번 맞히면 '해결'</b>이에요. 해결한 문제는 아래 '해결한 문제'로 옮겨져요.<br>• 미리 풀어 봐도 좋지만, 복습 날짜가 되기 전에 맞힌 것은 해결에 세지 않아요. 과목마다 수학 ${WB_MAX}문제, 국어·영어·IQ는 40문제까지 보관해요.</div>
+  <div class=row style="gap:8px;margin-top:8px"><span class=pill>다시 풀 문제 ${open.length}개</span><span class=pill style="border-color:#2b6cb0;color:#2b6cb0">📅 오늘 복습 ${open.filter(wbIsDue).length}개</span><span class=pill style="border-color:#2f9e6e;color:#2f9e6e">해결한 문제 ${done.length}개</span></div></div>`;
  if(!all.length)return head+`<div class=panel style="text-align:center"><p style="font-size:16px;margin:6px 0">아직 ${(WB_KINDS.find(x=>x[0]===WBK)||[])[2]||''} 틀린 문제가 없어요.<br>훈련하다가 틀린 문제는 여기에 자동으로 모여요!</p><p class=mut style="font-size:12px">틀리는 건 나쁜 게 아니에요. 다시 풀어서 내 것으로 만들면 돼요.</p></div>`;
  const chips=WBK!=='math'?'':`<div class=filters style="margin-bottom:8px"><button class="fbtn${WBF==='all'?' on':''}" data-wbf="all">전체 ${open.length}</button>${DOMS.filter(d=>cnt[d.k]).map(d=>`<button class="fbtn${WBF===d.k?' on':''}" data-wbf="${d.k}">${d.ic} ${d.n} ${cnt[d.k]}</button>`).join('')}</div>`;
  const list=open.length?`<div class=panel><h3 style="margin-top:0">다시 풀 문제 <span class=mut style="font-size:13px">(눌러서 정답과 설명을 봐요)</span></h3>${chips}
@@ -9244,9 +9350,9 @@ async function startWrongBook(keys){
   const q=wbMakeQ(e,true);
   const r=await Promise.race([askQ($('#qHost'),q,{noRetry:true}),stopP]);
   if(r.stop){quit=true;break;}
-  const was=!!e.d;recordAnswer(q,r.ok,r.ms,{retry:true,choice:r.choice,guess:r.guess});
+  const was=!!e.d,ok0=e.ok||0;recordAnswer(q,r.ok,r.ms,{retry:true,choice:r.choice,guess:r.guess});
   idx++;if(r.ok){okN++;candy+=2;m.candy+=2;if(!was&&e.d)solved++;}
-  const b=$('#tBub');if(b){b.innerHTML=esc(nm)+': '+(r.ok?(e.d?'해결! 이 문제는 이제 네 거야!':'맞혔어! 한 번만 더 맞히면 해결이야!'):'괜찮아, 설명을 다시 보고 또 도전하자!');S.foundMsg='';b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}
+  const b=$('#tBub');if(b){b.innerHTML=esc(nm)+': '+(r.ok?(e.d?'해결! 이 문제는 이제 네 거야!':((e.ok||0)>ok0?`맞혔어! 📅 다음 복습은 ${wbDueLabel(e).replace(' 복습','')}. 그때 또 맞히면 해결!`:`맞혔어! 복습 날(${wbDueLabel(e).replace(' 복습','')})에 다시 나오면 그때 해결로 세어 줄게!`)):'괜찮아, 설명을 다시 보고 또 도전하자!');S.foundMsg='';b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}
   try{partnerReact(r.ok?'yay':'hug');}catch(x){}
   const pr=$('.prog .me');if(pr)pr.style.width=(idx/N*100)+'%';const tg=$('#wTag');if(tg)tg.textContent=`${idx}/${N} · 정답 ${okN}`;
  }
@@ -9255,7 +9361,7 @@ async function startWrongBook(keys){
  const ns=[...new Set(S.newStars||[])].filter(id=>SKM[id]&&m.sk[id]);sfx('win');if(okN>=idx*.8&&idx)confetti();
  const left=wbOpenN(m);
  v.innerHTML=`<div class=wrap><div class=panel style="text-align:center"><h2>오답 다시 풀기 끝!</h2><div style="font-family:'Black Han Sans';font-size:54px;color:var(--red2)">${okN} / ${idx}</div>
-  <div class=explain style="text-align:center;font-size:16px">${solved?`<b>${solved}문제</b>를 해결했어요! 오답 노트에서 졸업이에요 🎓`:okN?'맞힌 문제는 <b>한 번 더 맞히면 해결</b>이에요!':'틀린 문제는 설명을 다시 보고 또 도전해요. 다시 풀수록 단단해져요!'}</div>
+  <div class=explain style="text-align:center;font-size:16px">${solved?`<b>${solved}문제</b>를 해결했어요! 오답 노트에서 졸업이에요 🎓`:okN?'맞힌 문제는 <b>복습 날짜에 한 번 더 맞히면 해결</b>이에요! 날짜가 되면 오늘의 훈련에 <b>자동으로</b> 나와요 📅':'틀린 문제는 설명을 다시 보고 또 도전해요. 다시 풀수록 단단해져요!'}</div>
   <div class=row style="justify-content:center;margin-top:12px;gap:8px"><span class=pill>${I('candy')} 사탕 +${candy}</span><span class=pill>📝 남은 오답 ${left}개</span></div>
   ${ns.length?`<h3>새로 별을 얻었어요</h3><div class=skList>${ns.map(id=>`<div class=skRow><span class=sn>${esc(SKM[id].n)}</span>${starsHTML(m.sk[id].st)}</div>`).join('')}</div>`:''}
   <div class=mbtns><button class="btn gold big" id=wBook>오답 노트 보기</button><button class="btn ghost big" id=wHub>트레이너 방으로</button></div></div></div>`;
@@ -9541,7 +9647,7 @@ function tcWbHTML(metas){
  const top=Object.values(common).filter(c=>c.who.length>=2).sort((a,b)=>b.who.length-a.who.length||b.n-a.n).slice(0,10);
  let h=`<div class=panel id=tcWbPanel><h2>📝 학생별 틀린 문제</h2>`;
  if(!anyWb){return h+`<p class=mut style="font-size:14px;line-height:1.6">아직 오답 노트가 담긴 기록이 없어요. 학생이 문제를 틀린 뒤 만든 저장 코드·기록을 받으면 여기에 나타나요.</p></div>`;}
- h+=`<p class=mut style="font-size:13.5px;line-height:1.6;margin:2px 0 10px">학생 이름을 누르면 그 학생이 틀린 문제와 <b>고른 답</b>, 정답이 나와요. 다시 풀어 2번 맞히면 '해결'로 바뀌어요. 문제는 과목마다 최근 것만 보관돼요(수학 ${WB_MAX}개, 국어·영어·IQ 40개).</p>`;
+ h+=`<p class=mut style="font-size:13.5px;line-height:1.6;margin:2px 0 10px">학생 이름을 누르면 그 학생이 틀린 문제와 <b>고른 답</b>, 정답이 나와요. 복습 날짜에 2번 맞히면 '해결'로 바뀌어요. 문제는 과목마다 최근 것만 보관돼요(수학 ${WB_MAX}개, 국어·영어·IQ 40개).</p>`;
  if(top.length)h+=`<div class=tcWbTop><b>🔥 여러 학생이 같이 틀린 문제 TOP ${top.length}</b> <span class=mut style="font-size:12.5px">(누르면 학생들이 고른 답이 나와요)</span>${top.map(c=>{const e=c.e,kd=wbKindOf(e),FM=kd==='math'?fmtMath:(x=>x),t=stripTags(e.q);const chs=Object.keys(c.ch).sort((a,b)=>c.ch[b].length-c.ch[a].length);return `<details class=tcWbTopRow><summary><span class=pill>${c.who.length}명</span> <b>${esc(t.slice(0,50))}${t.length>50?'…':''}</b> <span class=mut>(${esc(wbNm(e))})</span></summary><div class=wbBody><div class=qText>${FM(wbSafe(e.q))}</div>${e.pic?`<div class=qPic>${wbSafe(e.pic)}</div>`:''}<div class=wbAns><div>정답: <b class=good>${FM(esc(e.a))}</b></div></div>${chs.length?`<div class=wbCh>${chs.map(a=>`<div>고른 답 <b class=bad>${FM(esc(a))}</b> — ${esc(c.ch[a].join(', '))}</div>`).join('')}</div>`:''}<div class=mut style="font-size:13px">틀린 학생: ${esc(c.who.join(', '))}</div>${e.e?`<div class=wbEx>${FM(wbSafe(e.e))}</div>`:''}</div></details>`;}).join('')}</div>`;
  rowsM.forEach(({m,L})=>{
   const open=L.filter(e=>!e.d).sort((a,b)=>String(b.t).localeCompare(String(a.t))||(b.n||1)-(a.n||1)),done=L.filter(e=>e.d);
@@ -9842,11 +9948,7 @@ const scRegionIds=r=>SC_REGIONS[r].wild.map(scMonId).concat([scMonId(SC_REGIONS[
 const scAllOwned=()=>{const s=new Set(scOwned());Object.keys((S.meta&&S.meta.col)||{}).map(Number).forEach(id=>{if(MON[id])s.add(id);});return [...s];};
 const scOwned=()=>Object.keys(scState().col).map(Number).filter(id=>MON[id]);
 function scLim(id){const r=MON[id].rar,n=scOwned().length;if(r>=4)return 1;if(r===3)return 2;return n<=4?4:3;}
-function scAutoDeck(){const list=[];scOwned().sort((a,b)=>{const A=MON[a],C=MON[b];return (C.atk+C.hp)/(C.cost+1)-(A.atk+A.hp)/(A.cost+1);}).forEach(id=>{for(let k=0;k<scLim(id);k++)list.push(id);});
- const pick=[],want={a:6,b:4,c:2},band=id=>MON[id].cost<=2?'a':MON[id].cost<=4?'b':'c';
- for(const id of list){if(pick.length>=DECK_N)break;const b=band(id);if(want[b]>0&&pick.filter(x=>x===id).length<scLim(id)){want[b]--;pick.push(id);}}
- for(const id of list){if(pick.length>=DECK_N)break;if(pick.filter(x=>x===id).length<scLim(id))pick.push(id);}
- return pick.slice(0,DECK_N);}
+function scAutoDeck(){return aiBuild(scOwned(),scLim);}
 function scEnsureDeck(fill=true){const p=scState(),cnt={};let d=(p.deck||[]).filter(id=>p.col[id]&&MON[id]&&((cnt[id]=(cnt[id]||0)+1)<=scLim(id)));if(d.length>DECK_N)d.length=DECK_N;
  if(fill&&d.length<DECK_N){for(const id of scAutoDeck()){if(d.length>=DECK_N)break;if(d.filter(x=>x===id).length<scLim(id))d.push(id);}}
  p.deck=d;return d.length===DECK_N;}
@@ -10226,7 +10328,7 @@ function scRenderDeck(back){
  if(back)SC.deckBack=back;const p=scState();S.screen='scenarioDeck';scEnsureDeck(!!back);scMusicStart(SC.index);SC.bgKey=undefined;SC.bgVar='camp';scApplyBackdrop(SC.index,false,undefined,'camp');
  const counts={};p.deck.forEach(id=>counts[id]=(counts[id]||0)+1);
  const curve=[1,2,3,4,5,6].map(c=>p.deck.filter(id=>MON[id].cost===c).length),owned=scOwned().sort((a,b)=>MON[a].cost-MON[b].cost||a-b);
- $('#view').innerHTML=`<div class="sc-page scv"><div class="scv-bar"><button class="btn gold sm" id="scDeckDone">✔ 편성 완료</button><h2>시나리오 덱 편성</h2><span class="sc-tag">${p.deck.length} / ${DECK_N}</span></div><div class="scv-card"><div class="row" style="align-items:center"><h3 style="margin:0">${I('cards')} 내 시나리오 덱</h3><span class="hudSp"></span><button class="btn blue sm" id="scDAuto">자동으로 짜기</button></div><p class="sc-note" style="margin:6px 0">덱 카드를 누르면 빠지고, 아래 카드를 누르면 들어가요. 시나리오 덱은 <b>시나리오에서 기록한 포켓몬</b>만 쓸 수 있어요. 같은 카드는 많이 모은 일반 카드는 최대 3~4장, 희귀 카드는 적게 넣을 수 있어요. 비용이 낮은 카드가 많아야 처음부터 싸울 수 있어요.</p><div class="row" style="align-items:flex-end;gap:16px;margin-bottom:18px"><div><div class="mut" style="font-size:12px">비용별 장수</div><div class="curve">${curve.map((n,i)=>`<div style="height:${n*8+2}px"><span>${i+1}</span></div>`).join('')}</div></div></div><div class="deckBar" id="scDeckBar">${p.deck.map((id,i)=>cardHTML(id,{size:'deck'}).replace('class="card','data-di="'+i+'" class="card')).join('')}</div><h3>시나리오 보유 카드 (${owned.length}종)</h3><div class="colGrid" id="scColGrid">${owned.map(id=>{const inD=counts[id]||0,lim=scLim(id);return `<div class="scv-own">${cardHTML(id,{size:'deck',cls:inD>=lim?'locked':''})}<small>${inD}/${lim}</small></div>`;}).join('')}</div></div></div>`;
+ $('#view').innerHTML=`<div class="sc-page scv"><div class="scv-bar"><button class="btn gold sm" id="scDeckDone">✔ 편성 완료</button><h2>시나리오 덱 편성</h2><span class="sc-tag">${p.deck.length} / ${DECK_N}</span></div><div class="scv-card"><div class="row" style="align-items:center"><h3 style="margin:0">${I('cards')} 내 시나리오 덱</h3><span class="hudSp"></span><button class="btn blue sm" id="scDAuto">AI 자동 덱 짜기</button></div><p class="sc-note" style="margin:6px 0">덱 카드를 누르면 빠지고, 아래 카드를 누르면 들어가요. 시나리오 덱은 <b>시나리오에서 기록한 포켓몬</b>만 쓸 수 있어요. 같은 카드는 많이 모은 일반 카드는 최대 3~4장, 희귀 카드는 적게 넣을 수 있어요. 비용이 낮은 카드가 많아야 처음부터 싸울 수 있어요.</p><div class="row" style="align-items:flex-end;gap:16px;margin-bottom:18px"><div><div class="mut" style="font-size:12px">비용별 장수</div><div class="curve">${curve.map((n,i)=>`<div style="height:${n*8+2}px"><span>${i+1}</span></div>`).join('')}</div></div></div><div class="deckBar" id="scDeckBar">${p.deck.map((id,i)=>cardHTML(id,{size:'deck'}).replace('class="card','data-di="'+i+'" class="card')).join('')}</div><h3>시나리오 보유 카드 (${owned.length}종)</h3><div class="colGrid" id="scColGrid">${owned.map(id=>{const inD=counts[id]||0,lim=scLim(id);return `<div class="scv-own">${cardHTML(id,{size:'deck',cls:inD>=lim?'locked':''})}<small>${inD}/${lim}</small></div>`;}).join('')}</div></div></div>`;
  $('#scDeckDone').onclick=()=>{sfx('tap');if(p.deck.length<DECK_N){scEnsureDeck();toast('덱이 '+DECK_N+'장이 아니라서 빈 자리는 자동으로 채웠어요');}autoSave();const b=SC.deckBack||scRenderMap;b();};
  $('#scDAuto').onclick=()=>{sfx('tap');p.deck=scAutoDeck();autoSave();scRenderDeck();};
  $('#scDeckBar').querySelectorAll('.card').forEach(c=>c.onclick=()=>{sfx('tap');p.deck.splice(+c.dataset.di,1);autoSave();const y=$('#view').scrollTop;scRenderDeck();$('#view').scrollTop=y;});
@@ -10307,7 +10409,7 @@ function makeEnglishQ(){
 }
 // ===== 📖 국어 맞춤법 문제 (알맞은 표현 · 받아쓰기식 낱말 · 띄어쓰기 · 틀린 곳 고치기) =====
 // 각 항목의 첫 숫자는 처음 나오는 학년이에요. 학생 학년 이하의 문제가 나오고, 현재·직전 학년 문제를 더 자주 내요.
-const KO_A1="'안'은 '아니'의 준말이에요. 서술어 바로 앞에서 ‘…하지 않다’가 아닌 모양으로 써요. 예) 안 가요, 안 먹어요.";
+const KO_A1="'안'은 '아니'의 준말이에요. 서술어 바로 앞에 띄어 써서 ‘그렇게 하지 않음’을 나타내요. 예) 안 가요, 안 먹어요.";
 const KO_A2="'않'은 '않다'의 줄기예요. ‘…지 않다’처럼 '지' 뒤에 써요. 예) 가지 않아요, 먹지 않아요.";
 const KO_R="'돼'는 '되어'의 준말이에요. 그 자리에 '하'를 넣어 말이 되면 '되', '해'를 넣어 말이 되면 '돼'를 써요.";
 const KO_E="'어떻게'는 ‘어떤 방법으로’라는 뜻으로 서술어를 꾸며요. '어떡해'는 '어떻게 해'의 준말이라서 문장 끝에 많이 써요.";
@@ -15481,5 +15583,27 @@ const R=(t,ids)=>({t,ids:ids.split(' ')});
  function sched(){if(q)return;q=requestAnimationFrame(run);}
  function start(){new MutationObserver(sched).observe(document.body,{childList:true,subtree:true,characterData:true});addEventListener('resize',()=>{document.querySelectorAll(SEL).forEach(e=>{delete e.dataset.fw;});sched();});sched();}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();})();
+</script>
+<script>
+/* 문제·해설 글의 조사 바로잡기: '은(는)'처럼 괄호로 남은 조사를 앞 글자 받침에 맞춰 고치고, '몇 장가'·'1분로' 같은 틀린 조사도 고쳐요 */
+(function(){
+ const PAIR={'이(가)':['이','가'],'을(를)':['을','를'],'은(는)':['은','는'],'와(과)':['과','와'],'으로(로)':['으로','로']};
+ const NUMJ='013678';
+ function jong(ch){if(!ch)return null;const c=ch.charCodeAt(0);if(c>=0xAC00&&c<=0xD7A3)return (c-0xAC00)%28;if(/[0-9]/.test(ch))return NUMJ.includes(ch)?(ch==='1'||ch==='7'||ch==='8'?8:1):0;return null;}
+ function fix(t){if(typeof t!=='string'||!t)return t;
+  t=t.replace(/(이\(가\)|을\(를\)|은\(는\)|와\(과\)|으로\(로\))/g,(m,j,off)=>{const prev=t.slice(0,off).replace(/(?:<[^>]*>|&[a-z]+;)+$/g,'').slice(-1);const J=jong(prev);const pr=PAIR[j];
+   if(j==='으로(로)'){return (J===null||J===0||J===8)?'로':'으로';}
+   return J===null?pr[1]:(J>0?pr[0]:pr[1]);}); // 받침 있으면 첫째, 없으면 둘째 (그림 글자 뒤에는 받침 없는 형태)
+  t=t.replace(/(몇\s?|\d\s?)(장|권|명|병|판|줄|잔|봉)가(?=[\s.,?!<]|$)/g,'$1$2이');
+  t=t.replace(/(분|시간)로(?=\s?바꿔요)/g,(m,u)=>u==='분'?'분으로':'시간으로');
+  t=t.replace(/([가-힣]\s?수)을(?=\s)/g,'$1를');
+  t=t.replace(/(모서리|꼭짓점)은(?=\s?모두)/g,'$1는');
+  return t;}
+ function fixQ(q){try{if(q&&typeof q==='object'){if(q.q)q.q=fix(q.q);if(q.e)q.e=fix(q.e);}}catch(e){}return q;}
+ window.josaFix=fix;
+ const mk=window.makeQ||(typeof makeQ==='function'?makeQ:null);
+ if(mk){makeQ=function(){return fixQ(mk.apply(this,arguments));};}
+ const pk=pickQ;pickQ=function(){return fixQ(pk.apply(this,arguments));};
+})();
 </script>
 </body></html>
