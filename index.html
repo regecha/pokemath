@@ -8340,7 +8340,7 @@ const SIM={p:.8,deck:null,
 
 // ===== 협동 보스전: 권위 호스트 + 공유 필드 + 행동/상태 동기화 =====
 const BC={defWait:null,defSeq:0,peer:null,conn:null,host:false,code:'',foe:null,queue:[],busy:false,ready:false,localIndex:0,processing:false,lastCaught:[],clientCaught:[],lastSeq:0,lastSeqByPlayer:{},resultHandled:false};
-function bossClose(){try{BC.conn&&BC.conn.close()}catch(e){}try{BC.peer&&BC.peer.destroy()}catch(e){}Object.assign(BC,{pendingSnap:null,fxUntil:0,pendTimer:null,defWait:null,peer:null,conn:null,foe:null,queue:[],busy:false,ready:false,processing:false,lastCaught:[],clientCaught:[],lastSeq:0,lastSeqByPlayer:{},resultHandled:false,left:false});}
+function bossClose(){try{bossRecoReset()}catch(e){}try{BC.conn&&BC.conn.close()}catch(e){}try{BC.peer&&BC.peer.destroy()}catch(e){}Object.assign(BC,{pendingSnap:null,fxUntil:0,pendTimer:null,defWait:null,peer:null,conn:null,foe:null,queue:[],busy:false,ready:false,processing:false,lastCaught:[],clientCaught:[],lastSeq:0,lastSeqByPlayer:{},resultHandled:false,left:false});}
 function bossSend(o){try{if(BC.conn&&BC.conn.open)BC.conn.send(o)}catch(e){}}
 function renderBossCoop(keep){S.screen='bosscoop';if(!keep)bossClose();const m=S.meta;ensureDeck();
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><h2>⚔️ 협동 보스전</h2><p style="line-height:1.7">친구와 힘을 합쳐 강력한 보스 포켓몬을 공략하세요. 한 명이 방을 만들고 코드를 공유하면 다른 친구가 코드로 접속합니다.</p>
@@ -8352,12 +8352,12 @@ function renderBossCoop(keep){S.screen='bosscoop';if(!keep)bossClose();const m=S
 function bossBox(h){const b=$('#bcBox');if(!b)return;b.style.display='block';b.innerHTML=h;{const t=b.querySelector('#netTest');if(t)t.onclick=()=>{sfx('tap');showNetTest();};}const c=$('#bcCancel');if(c)c.onclick=()=>{bossClose();if(B&&B.coop){B=null;$('#battle').classList.remove('on');}renderBossCoop()};const st=$('#bcStart');if(st)st.onclick=()=>bossStartBattle();}
 async function bossConnect(host,code){bossClose();BC.host=host;BC.localIndex=host?0:1;BC.code=code;bossBox(`<p>연결 준비 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);
  try{await loadPeer()}catch(e){bossBox(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}
- const id='pkboss-coop-v1-'+code;const peer=host?new Peer(id,PO()):new Peer(PO());BC.peer=peer;
- peer.on('error',e=>{const t=String(e&&e.type||'');bossBox(netErrHTML(t==='unavailable-id'?'이미 사용 중인 코드예요. 새 방을 만들어 주세요.':t==='peer-unavailable'?'해당 방을 찾을 수 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결에 실패했어요 ('+t+')',t,'bcCancel'))});
- peer.on('open',()=>{if(host){bossBox(`<p>친구에게 아래 코드를 알려 주세요.</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구 접속 대기 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);peer.on('connection',c=>{if(BC.conn){c.close();return}BC.conn=c;bossBind(c)});}else{bossBox(`<p>방 ${code}에 접속 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);{const cc=peer.connect(id,{reliable:true});BC.conn=cc;bossBind(cc);setTimeout(()=>{try{if(BC.conn===cc&&!cc.open&&!BC.ready&&S.screen==='bosscoop')bossBox(netErrHTML('친구와 연결되지 않았어요','timeout','bcCancel'));}catch(e){}},20000);}}});}
+ const id='pkboss-coop-v1-'+code;const peer=host?new Peer(id,PO()):new Peer(PO());BC.peer=peer;bossPeerHooks(peer);
+ peer.on('error',e=>{if(B&&B.coop&&!B.coop.result&&S.screen==='battle'){if(!BC.conn||!BC.conn.open)bossRecover();return;}const t=String(e&&e.type||'');bossBox(netErrHTML(t==='unavailable-id'?'이미 사용 중인 코드예요. 새 방을 만들어 주세요.':t==='peer-unavailable'?'해당 방을 찾을 수 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결에 실패했어요 ('+t+')',t,'bcCancel'))});
+ peer.on('open',()=>{if(host){bossBox(`<p>친구에게 아래 코드를 알려 주세요.</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구 접속 대기 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);peer.on('connection',bossOnIncoming);}else{bossBox(`<p>방 ${code}에 접속 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);{const cc=peer.connect(id,{reliable:true});BC.conn=cc;bossBind(cc);setTimeout(()=>{try{if(BC.conn===cc&&!cc.open&&!BC.ready&&S.screen==='bosscoop')bossBox(netErrHTML('친구와 연결되지 않았어요','timeout','bcCancel'));}catch(e){}},20000);}}});}
 const BOSS_NET_VER=4;
-function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:vitBonus(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,evo:Number(trainerSkillLevels().evo)||0,name:S.meta.name,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number),avatar:partnerId()});});c.on('data',d=>{if(!d||typeof d!=='object')return;
- if(d.t==='boss-hi'){if(d.v!==BOSS_NET_VER){BC.ready=false;BC.foe=null;bossBox(`<p style="color:#d9393f">친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}BC.foe=d;BC.ready=true;bossBox(`<h2>친구와 연결됐어요!</h2><p>${esc(d.name||'친구')}와 협동 보스전에 입장할 준비가 됐어요.</p><div class=explain>4성 60% · 5성 40% · 공유 필드 8칸</div>${BC.host?'<button class="btn red big" id=bcStart>보스전 시작</button>':'<p class=mut>방장이 보스전을 시작하기를 기다리는 중…</p>'}<button class="btn ghost" id=bcCancel>나가기</button>`);if(BC.host)bossSend({t:'boss-wait',name:S.meta.name});}
+function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:vitBonus(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,evo:Number(trainerSkillLevels().evo)||0,name:S.meta.name,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number),avatar:partnerId()});});c.on('data',d=>{if(!d||typeof d!=='object')return;BC.lastRx=Date.now();if(BC.reconnecting)bossResumed();if(d.t==='boss-ping')return;
+ if(d.t==='boss-hi'){if(d.v!==BOSS_NET_VER){BC.ready=false;BC.foe=null;bossBox(`<p style="color:#d9393f">친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}BC.foe=d;BC.ready=true;if(B&&B.coop&&S.screen==='battle'){bossResumed();return;}bossBox(`<h2>친구와 연결됐어요!</h2><p>${esc(d.name||'친구')}와 협동 보스전에 입장할 준비가 됐어요.</p><div class=explain>4성 60% · 5성 40% · 공유 필드 8칸</div>${BC.host?'<button class="btn red big" id=bcStart>보스전 시작</button>':'<p class=mut>방장이 보스전을 시작하기를 기다리는 중…</p>'}<button class="btn ghost" id=bcCancel>나가기</button>`);if(BC.host)bossSend({t:'boss-wait',name:S.meta.name});}
  else if(d.t==='boss-wait'){toast(`${esc(d.name||'친구')}가 접속했어요`)}
  else if(d.t==='boss-start'){if(!BC.host)bossApplySnapshot(d.state,true);}
  else if(d.t==='boss-dq'){pvSpecShow(d.q,d.k,d.name);}
@@ -8372,9 +8372,9 @@ function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:v
   else if(d.t==='boss-turn'&&!BC.host){if(B&&B.coop&&B.coop.players[d.a])banner(d.a===BC.localIndex?'내 차례!':`${esc(B.coop.players[d.a].name)}의 차례!`,'',d.ms||1000);}
   else if(d.t==='boss-defq'&&!BC.host){bossAnswerDefense(d);}
   else if(d.t==='boss-defa'&&BC.host){if(BC.defWait&&BC.defWait.id===d.id){const w=BC.defWait;BC.defWait=null;w.res(d.skip?null:{ok:!!d.ok,sv:!!d.sv&&!!d.ok,hint:!!d.hint});}}
- });c.on('close',()=>{if(BC.defWait){const w=BC.defWait;BC.defWait=null;w.res(null);}if(S.screen==='bosscoop'&&!BC.left&&!BC.resultHandled&&!(B&&B.coop&&B.coop.result))bossBox(`<p>연결이 끊어졌어요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);else if(B&&B.coop){bossPeerLeft();}});}
+ });c.on('close',()=>{if(BC.defWait){const w=BC.defWait;BC.defWait=null;w.res(null);}if(BC.conn&&BC.conn!==c)return;if(BC.peer&&B&&B.coop&&!B.coop.result&&!BC.left&&!BC.resultHandled&&S.screen==='battle'){bossRecover();return;}if(S.screen==='bosscoop'&&!BC.left&&!BC.resultHandled&&!(B&&B.coop&&B.coop.result))bossBox(`<p>연결이 끊어졌어요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);else if(B&&B.coop){bossPeerLeft();}});}
 // 친구가 나가거나 연결이 끊기면 전투를 정리하고 협동 보스전 화면으로 돌아가요(이미 결과가 나온 뒤에는 건드리지 않아요)
-function bossPeerLeft(){if(BC.left||BC.resultHandled||!B||!B.coop||B.coop.result)return;BC.left=true;B.over=true;
+function bossPeerLeft(){if(BC.left||BC.resultHandled||!B||!B.coop||B.coop.result)return;try{bossRecoReset()}catch(e){}BC.left=true;B.over=true;
  try{const q=$('#bq');if(q){q.classList.remove('on');q.innerHTML='';}closeInfo();closeM();}catch(e){}
  $('#battle').classList.remove('on');$('#battle').innerHTML='';B=null;BC.pendingSnap=null;BC.defWait=null;startBgm('adventure');
  renderBossCoop(true);bossBox('<h2>친구가 나갔어요</h2><p>친구가 방을 나가서 협동 보스전이 끝났어요.</p><button class="btn blue big" id=bcCancel>확인</button>');}
@@ -15879,6 +15879,64 @@ html body .bMenuCol .fsBtn .ic{width:15px;height:15px}
  /* 전체 화면 상태를 <html>에 표시 → 버튼 아이콘이 바뀌어요 */
  function sync(){try{document.documentElement.classList.toggle('isfs',!!(document.fullscreenElement||document.webkitFullscreenElement));}catch(e){}}
  document.addEventListener('fullscreenchange',sync);document.addEventListener('webkitfullscreenchange',sync);sync();
+})();
+</script>
+<script id="boss-reco">
+/* 협동 보스전 재접속: 연결이 끊겨도 바로 끝내지 않고 90초 동안 다시 이어 붙여요 */
+(function(){
+ const MAX=90000,PID=()=>'pkboss-coop-v1-'+BC.code;
+ const inBattle=()=>!!(B&&B.coop&&!B.coop.result&&S.screen==='battle');
+ function ui(html){let o=document.getElementById('bcReco');if(!o){o=document.createElement('div');o.id='bcReco';o.style.cssText='position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(20,24,44,.62);text-align:center';o.innerHTML='<div style="background:#fffaf1;color:#3a2e3f;border:3px solid #8a7650;border-radius:16px;padding:18px 22px;max-width:86vw;box-shadow:0 8px 0 rgba(0,0,0,.25)"><div style="font-size:22px;margin-bottom:6px;font-family:Jua,sans-serif">📶 연결이 끊겼어요</div><div id="bcRecoTx" style="font-size:15px;line-height:1.6"></div><button class="btn ghost" id="bcRecoX" style="margin-top:12px">포기하고 나가기</button></div>';document.body.appendChild(o);o.querySelector('#bcRecoX').onclick=()=>{window.bossRecoReset();bossPeerLeft();};}
+  o.querySelector('#bcRecoTx').innerHTML=html;}
+ window.bossRecoReset=function(){try{clearInterval(BC.recoTimer);}catch(e){}BC.recoTimer=0;BC.reconnecting=false;BC.tryAt=0;const o=document.getElementById('bcReco');if(o)o.remove();};
+ window.bossPeerHooks=function(peer){try{peer.on('disconnected',()=>{try{if(!peer.destroyed)peer.reconnect();}catch(e){}});}catch(e){}};
+ window.bossOnIncoming=function(c){
+  if(BC.conn){const stale=!BC.conn.open||BC.reconnecting||(inBattle()&&Date.now()-(BC.lastRx||0)>8000);
+   if(!stale){try{c.close();}catch(e){}return;}
+   const old=BC.conn;BC.conn=c;try{old.close();}catch(e){}
+  }else BC.conn=c;
+  bossBind(c);};
+ function remake(){let peer;try{peer=BC.host?new Peer(PID(),PO()):new Peer(PO());}catch(e){return;}
+  BC.peer=peer;bossPeerHooks(peer);if(BC.host)peer.on('connection',bossOnIncoming);
+  peer.on('error',()=>{});}
+ function tick(){
+  if(!BC.reconnecting)return;
+  if(!B||!B.coop||BC.left){window.bossRecoReset();return;}
+  const el=Math.round((Date.now()-BC.recoSince)/1000);
+  if(Date.now()-BC.recoSince>MAX){window.bossRecoReset();bossPeerLeft();return;}
+  ui(BC.host?`친구가 다시 들어오기를 기다리는 중… (${el}초)`:`방장에게 다시 연결하는 중… (${el}초)`);
+  let peer=BC.peer;
+  if(!peer||peer.destroyed){remake();return;}
+  if(peer.disconnected){try{peer.reconnect();}catch(e){}}
+  if(!BC.host&&peer.open&&!peer.disconnected){
+   if(BC.conn&&BC.conn.open)return;
+   if(BC.tryAt&&Date.now()-BC.tryAt<7000)return;
+   BC.tryAt=Date.now();
+   try{const old=BC.conn;BC.conn=null;if(old)try{old.close();}catch(e){}const cc=peer.connect(PID(),{reliable:true});BC.conn=cc;bossBind(cc);}catch(e){}
+  }}
+ window.bossRecover=function(){
+  if(!inBattle()||BC.left||BC.resultHandled||BC.reconnecting)return;
+  BC.reconnecting=true;BC.recoSince=Date.now();BC.tryAt=0;
+  BC.recoTimer=setInterval(tick,2500);tick();};
+ window.bossResumed=function(){
+  const was=BC.reconnecting||!!document.getElementById('bcReco');
+  window.bossRecoReset();BC.lastRx=Date.now();
+  if(was)toast('다시 연결됐어요!');
+  if(BC.host&&B&&B.coop)setTimeout(()=>{try{bossBroadcast(true);}catch(e){}},300);};
+ /* 하트비트: 4초마다 신호를 보내고, 20초 동안 아무 소식이 없으면 끊긴 것으로 보고 재접속해요 */
+ let wl=null;
+ async function wlOn(){try{if(!navigator.wakeLock||wl)return;wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>{wl=null;});}catch(e){wl=null;}}
+ function wlOff(){try{wl&&wl.release();}catch(e){}wl=null;}
+ setInterval(()=>{try{
+  const act=inBattle()&&!!BC.peer,lobby=S.screen==='bosscoop'&&BC.ready&&!!BC.peer;
+  if(act||lobby)wlOn();else wlOff();
+  if(!BC.conn||!BC.peer||BC.left)return;
+  if(!act&&!lobby)return;
+  if(BC.conn.open){try{BC.conn.send({t:'boss-ping'});}catch(e){}
+   if(act&&!document.hidden&&!BC.reconnecting&&Date.now()-(BC.lastRx||Date.now())>20000){try{BC.conn.close();}catch(e){}bossRecover();}}
+  else if(act&&!BC.reconnecting)bossRecover();
+ }catch(e){}},4000);
+ document.addEventListener('visibilitychange',()=>{try{if(document.hidden)return;BC.lastRx=Date.now();if(inBattle()&&BC.peer){wlOn();if(!BC.conn||!BC.conn.open)bossRecover();}}catch(e){}});
 })();
 </script>
 </body></html>
