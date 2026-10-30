@@ -8345,7 +8345,7 @@ function bossSend(o){try{if(BC.conn&&BC.conn.open)BC.conn.send(o)}catch(e){}}
 function renderBossCoop(keep){S.screen='bosscoop';if(!keep)bossClose();const m=S.meta;ensureDeck();
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><h2>⚔️ 협동 보스전</h2><p style="line-height:1.7">친구와 힘을 합쳐 강력한 보스 포켓몬을 공략하세요. 한 명이 방을 만들고 코드를 공유하면 다른 친구가 코드로 접속합니다.</p>
  <div class=tiles style="margin-top:12px"><div class=tile><span class=ti>🌈</span><span class=tn>4성 보스 60%</span><span class=td>희귀한 보스 포켓몬</span></div><div class=tile><span class=ti>✨</span><span class=tn>5성 보스 40%</span><span class=td>최상위 보스 포켓몬</span></div></div>
- <div class=explain style="margin-top:12px;font-size:14px;line-height:1.7">보스 체력은 기본의 <b>15배</b>, 공격력은 그대로이며 기본 공격은 턴마다 <b>2회</b>예요. 단, 우리 포켓몬이 <b>3마리 늘 때마다 공격이 1회씩 늘어요</b>(최대 4회). 보스 체력이 <b>절반 이하면 공격력 +1</b>, <b>25% 이하면 공격 +1회</b>로 더 강해져요. 또 <b>3번째 보스 턴마다</b> 우리 포켓몬 모두에게 <b>1 피해</b>(분노한 뒤에는 2)를 주는 전체 공격이 와요. 한 턴 전에 예고가 떠요. 10% 확률로 보스 2마리가 등장하며, 이때는 각 보스가 턴마다 1회 공격해요. 보스전에서는 쉬운 전투가 적용되지 않아요. 보스를 쓰러뜨리거나 포획하면 보스 1마리당 조각 1개를 획득합니다. 보스는 아직 카드가 없는 포켓몬 위주로 나와요(나와 친구 둘 다 없는 포켓몬을 가장 먼저 찾아요). 두 플레이어는 8칸의 공유 출전 필드를 함께 사용합니다. 보스는 <b>내 트레이너와 친구 트레이너 중 한 명을 골라</b> 공격해요. 둘 중 한 명이라도 체력이 0이 되면 전투가 끝나요.</div>
+ <div class=explain style="margin-top:12px;font-size:14px;line-height:1.7">보스 체력은 기본의 <b>15배</b>, 공격력은 그대로이며 기본 공격은 턴마다 <b>2회</b>예요. 단, 우리 포켓몬이 <b>3마리 늘 때마다 공격이 1회씩 늘어요</b>(최대 4회). 보스 체력이 <b>절반 이하면 공격력 +1</b>, <b>25% 이하면 공격 +1회</b>로 더 강해져요. 또 <b>3번째 보스 턴마다</b> 우리 포켓몬 모두에게 <b>1 피해</b>(분노한 뒤에는 2)를 주는 전체 공격이 와요. 한 턴 전에 예고가 떠요. 10% 확률로 보스 2마리가 등장하며, 이때는 각 보스가 턴마다 1회 공격해요. 보스전에서는 쉬운 전투가 적용되지 않아요. 보스를 쓰러뜨리면 보스 1마리당 조각 4개를 획득합니다. 보스는 아직 카드가 없는 포켓몬 위주로 나와요(나와 친구 둘 다 없는 포켓몬을 가장 먼저 찾아요). 두 플레이어는 8칸의 공유 출전 필드를 함께 사용합니다. 보스는 <b>내 트레이너와 친구 트레이너 중 한 명을 골라</b> 공격해요. 둘 중 한 명이라도 체력이 0이 되면 전투가 끝나요.</div>
  <div class=row style="margin-top:14px"><button class="btn red big" id=bcHost>방 만들기</button><button class="btn blue big" id=bcJoin>코드로 접속</button></div><input class="inp codeIn" id=bcCode maxlength=4 inputmode=numeric placeholder="방 코드 4자리" style="margin-top:10px">
  <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요합니다. <b>학교 와이파이는 작동하지 않을 수 있어요.</b> 두 사람 모두 같은 버전의 게임 파일을 사용해 주세요. <a href="#" id=bcNet style="color:inherit">📶 연결 시험</a></p></div><div class=panel id=bcBox style="display:none;text-align:center"></div><div class=panel><h3>협동 규칙</h3><ul style="line-height:1.8;padding-left:20px"><li>턴 순서: 방장 → 친구 → 보스</li><li>각자 자기 손패와 덱으로 행동</li><li>8칸 공유 필드의 체력·상태·공격 횟수 동기화</li><li>문제는 행동한 플레이어가 풀고, 결과를 호스트가 판정·반영</li><li>보스 행동과 포획 결과는 호스트가 한 번만 처리해 두 화면에 전파</li></ul></div></div>`;
  bindHud();$('#bcNet').onclick=e=>{e.preventDefault();sfx('tap');showNetTest();};$('#bcHost').onclick=()=>bossConnect(true,String(rint(1000,9999)));$('#bcJoin').onclick=()=>{const c=($('#bcCode').value||'').replace(/\D/g,'');if(c.length!==4){toast('방 코드 4자리를 입력해 주세요');return;}bossConnect(false,c);};}
@@ -8506,9 +8506,9 @@ async function bossHandleAction(d){if(!B||!B.coop||!BC.host||BC.processing||B.ov
  }catch(e){console.error('coop action',e)}finally{BC.processing=false;if(B&&B.coop){B.coop.processing=false;B.busy=false;bossRewire();renderBattle();bossBroadcast(true);}}}
 async function bossApplyPower(ok,crit=false){const me=B.me;if((me.powerUses||0)<=0)return;B.qn++;B.busy=true;me.powerUses=Math.max(0,(me.powerUses||0)-1);if(ok){qcUp(me);B.combo++;draw(me);const xb=studyBonusDraw(me);if(crit){draw(me);fx(heroEl(me),'크리티컬! 카드 +1 더','crit');}fx($('.hand'),xb?'공부 강화! 카드 +2':'카드 +1','txt')}else B.combo=0;B.busy=false;renderBattle();}
 function bossClientResult(d){if(!d||!d.outcome||BC.resultHandled)return;BC.resultHandled=true;BC.pendingSnap=null;const rids=(Array.isArray(d.ids)&&d.ids.length?d.ids:(d.id!=null?[d.id]:[])).filter(x=>MON[x]);
- let g=null,gs=[];if(d.outcome==='win'&&rids.length){gs=rids.map(x=>gainCard(x,true));g=gs[0];S.meta.coins=(S.meta.coins||0)+100;S.meta.dust=(S.meta.dust||0)+10;S.meta.candy=(S.meta.candy||0)+10;}
+ let g=null,gs=[];if(d.outcome==='win'&&rids.length){gs=rids.map(x=>gainBossShards(x));g=gs[0];S.meta.coins=(S.meta.coins||0)+100;S.meta.dust=(S.meta.dust||0)+10;S.meta.candy=(S.meta.candy||0)+10;}
  autoSave();LASTREC={d:(d.rec&&d.rec.mvp&&d.rec.best)?d.rec:null,t:Date.now()};
- const html=`<h2>${d.outcome==='win'?'🏆 보스 격파!':'전투 종료'}</h2><p>${esc(d.name||'보스 포켓몬')} · ${d.outcome==='win'?`보스 조각 ${rids.length}개를 획득했어요!`:'이번 전투에서 승리하지 못했어요.'}</p>${recapHTML(true)}<button class=\"btn blue big\" id=bcCancel>확인</button>`;
+ const html=`<h2>${d.outcome==='win'?'🏆 보스 격파!':'전투 종료'}</h2><p>${esc(d.name||'보스 포켓몬')} · ${d.outcome==='win'?`보스 조각 ${rids.length*BOSS_SHARDS}개를 획득했어요!`:'이번 전투에서 승리하지 못했어요.'}</p>${recapHTML(true)}<button class=\"btn blue big\" id=bcCancel>확인</button>`;
  // 마지막 공격 연출이 끝난 뒤, 비어 있는 친구 화면에 로비를 다시 만들고 결과 상자를 띄워요
  const show=()=>{try{const q=$('#bq');if(q){q.classList.remove('on');q.innerHTML='';}closeInfo();$('#battle').classList.remove('on');$('#battle').innerHTML='';startBgm('adventure');renderBossCoop(true);bossBox(html);if(d.outcome==='win'&&g)bossRewardPack(rids,gs);}catch(e){console.error('coop result',e);}};
  setTimeout(show,Math.min(1800,Math.max(0,(BC.fxUntil||0)-Date.now())+500));}
@@ -8574,7 +8574,7 @@ function bossRewardShow(res,g,rest,chained){rest=rest||[];
 async function bossRewardPack(rids,gs){
  try{await cardRewardFx(rids.map((id,i)=>({id,g:gs[i]})),{title:'🏆 보스 격파! 보스 조각 획득',logo:'BOSS SHARD',sub:'🎁 보너스 보상 · 코인 <b>+100</b> · 별가루 <b>+10</b> · 사탕 <b>+10</b>'});}catch(e){console.error('boss reward pack',e);}
  try{const c=$('#bcCancel');if(c)c.click();else{try{bossClose();}catch(e){}if(B&&B.coop){B=null;$('#battle').classList.remove('on');}renderBossCoop();}}catch(e){console.error(e);}}
-function bossFinish(outcome){if(!B||!B.coop||B.coop.result)return;try{recapData();}catch(e){}const ids=((B.wildState.ids&&B.wildState.ids.length)?B.wildState.ids:[B.wildId]).filter(x=>MON[x]),id=ids[0],name=ids.map(x=>MON[x].name).join(' · ')||'보스 포켓몬';let gs=[];if(outcome==='win'){gs=ids.map(x=>gainCard(x,true));S.meta.coins=(S.meta.coins||0)+100;S.meta.dust=(S.meta.dust||0)+10;S.meta.candy=(S.meta.candy||0)+10;autoSave();}const result={outcome,id,ids:ids.slice(),name,caughtIds:(B.wildState.caughtIds||[]).slice(),rec:recapData()};B.coop.result=result;B.over=true;bossSend({t:'boss-result',...result});S.screen='bosscoop';$('#battle').classList.remove('on');$('#battle').innerHTML='';startBgm('adventure');bossBox(`<h2>${outcome==='win'?'🏆 보스 격파!':'전투 종료'}</h2><p>${esc(name)} · ${outcome==='win'?`보스 조각 ${ids.length}개를 획득했어요!`:'이번 전투에서 승리하지 못했어요.'}</p>${recapHTML(true)}<button class="btn blue big" id=bcCancel>확인</button>`);if(outcome==='win'&&gs[0])bossRewardPack(ids,gs);}
+function bossFinish(outcome){if(!B||!B.coop||B.coop.result)return;try{recapData();}catch(e){}const ids=((B.wildState.ids&&B.wildState.ids.length)?B.wildState.ids:[B.wildId]).filter(x=>MON[x]),id=ids[0],name=ids.map(x=>MON[x].name).join(' · ')||'보스 포켓몬';let gs=[];if(outcome==='win'){gs=ids.map(x=>gainBossShards(x));S.meta.coins=(S.meta.coins||0)+100;S.meta.dust=(S.meta.dust||0)+10;S.meta.candy=(S.meta.candy||0)+10;autoSave();}const result={outcome,id,ids:ids.slice(),name,caughtIds:(B.wildState.caughtIds||[]).slice(),rec:recapData()};B.coop.result=result;B.over=true;bossSend({t:'boss-result',...result});S.screen='bosscoop';$('#battle').classList.remove('on');$('#battle').innerHTML='';startBgm('adventure');bossBox(`<h2>${outcome==='win'?'🏆 보스 격파!':'전투 종료'}</h2><p>${esc(name)} · ${outcome==='win'?`보스 조각 ${ids.length*BOSS_SHARDS}개를 획득했어요!`:'이번 전투에서 승리하지 못했어요.'}</p>${recapHTML(true)}<button class="btn blue big" id=bcCancel>확인</button>`);if(outcome==='win'&&gs[0])bossRewardPack(ids,gs);}
 
 // --- 협동 보스전: 스킬 이펙트 동기화 (방장이 연출 이벤트를 보내면 친구 화면에서 같이 재생) ---
 // 화면 요소를 '누구 것인지'로 설명해요(방장의 #heroMe = 0번 트레이너, 필드 칸 = 공유 필드)
@@ -8641,7 +8641,7 @@ async function bossAnswerDefense(d){if(!B||!B.coop)return;const q=pickQ({cyc:1})
 const PVP_COST=60;       // 한 판에 드는 코인 (훈련 정답 12개쯤) — 쉬는 시간 내내 하지 않도록
 const PVP_WIN=30,PVP_LOSE=10;
 const PVP_VER=6; // 마나 연구·공부 강화·카드 보유량 패시브가 대전에도 적용되는 버전
-const PV={peer:null,conn:null,host:false,code:'',q:[],busy:false,foe:null,started:false,charged:false};
+const PV={peer:null,conn:null,host:false,code:'',q:[],busy:false,foe:null,started:false,charged:false,tx:0,rx:0,out:[]};
 const TURN_SECRET='openrelayprojectsecret';let _turnCred=null;
 async function turnPrepStatic(){if(_turnCred&&_turnCred.exp>Date.now()/1000+600)return;
  try{const u=String(Math.floor(Date.now()/1000)+86400),k=await crypto.subtle.importKey('raw',new TextEncoder().encode(TURN_SECRET),{name:'HMAC',hash:'SHA-1'},false,['sign']);
@@ -8664,10 +8664,10 @@ function iceList(){const l=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:st
  l.push({urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turns:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'});return l;}
 const PO=()=>({config:{iceServers:iceList()}});
 function loadPeer(){return new Promise((res,rej)=>{const go=()=>turnPrep().then(()=>res(),()=>res());if(window.Peer)return go();const s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';s.onload=()=>go();s.onerror=()=>rej(new Error('연결 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'));document.head.appendChild(s);});}
-function pvpClose(){try{PV.conn&&PV.conn.close();}catch(e){}try{PV.peer&&PV.peer.destroy();}catch(e){}PV.peer=null;PV.conn=null;PV.q=[];PV.busy=false;PV.started=false;}
+function pvpClose(){try{pvRecoReset()}catch(e){}PV.tx=0;PV.rx=0;PV.out=[];try{PV.conn&&PV.conn.close();}catch(e){}try{PV.peer&&PV.peer.destroy();}catch(e){}PV.peer=null;PV.conn=null;PV.q=[];PV.busy=false;PV.started=false;}
 // 상대가 '대전 끝!'을 알려 오면, 내 화면 계산이 늦거나 달라도 종료 화면을 꼭 띄워요(친구에게 종료 화면이 안 뜨던 문제 방지)
 function pvpPeerOver(d){setTimeout(()=>{try{if(!B||!B.pvp||B.__pvDone)return;B.over=true;endBattle(!d.w);}catch(e){}},1400);}
-function pvpSend(o){try{PV.conn&&PV.conn.open&&PV.conn.send(o);}catch(e){}}
+function pvpSend(o){try{o=Object.assign({},o);if(o.t!=='ping'){o.n=++PV.tx;o.a=PV.rx||0;PV.out.push(o);if(PV.out.length>500)PV.out.shift();}PV.conn&&PV.conn.open&&PV.conn.send(o);}catch(e){}}
 /* 친구 대전 응원 말: 정해진 말만 골라서 보내요 (직접 입력은 없어요) */
 const PV_EMO=[['👏','좋은 경기!'],['😅','아슬아슬!'],['🤩','대단해!'],['🔥','한 번 더 하자!'],['💪','역시 강하다!'],['😎','방심하면 안 돼!'],['😲','으악, 깜짝이야!'],['🤝','잘 부탁해!']];
 let PV_EMO_T=0;
@@ -8734,21 +8734,21 @@ async function showNetTest(){
  draw(p2p.srflx>0?'<b>연결할 수 있을 것 같아요!</b> 방 만들기와 방 들어가기를 눌러 보세요. 그래도 안 되면 한 명을 휴대폰 데이터로 바꿔 보세요.':p2p.host>0?'<b>같은 와이파이의 친구와는 될 수 있어요.</b> 다른 곳에 있는 친구와 할 때 안 되면 한 명을 휴대폰 데이터로 바꿔 보세요.':'<b>이 네트워크에서는 연결이 어려울 수 있어요.</b> 휴대폰 데이터(핫스팟)로 바꿔서 다시 시험해 보세요. 수업 전에 선생님이 미리 확인해 두면 좋아요.');}
 function pvBox(html){const b=$('#pvBox');if(!b)return;b.style.display='block';b.innerHTML=html;{const t=b.querySelector('#netTest');if(t)t.onclick=()=>{sfx('tap');showNetTest();};}const c=b.querySelector('#pvCancel');if(c)c.onclick=()=>{sfx('tap');pvpClose();renderPvp();};}
 async function pvpStart(host,code){const m=S.meta;if(m.coins<PVP_COST){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 12장이어야 해요');return;}
- PV.host=host;PV.code=code;PV.q=[];PV.started=false;PV.charged=false;PV.peerOver=false;
+ PV.host=host;PV.code=code;PV.q=[];PV.tx=0;PV.rx=0;PV.out=[];PV.started=false;PV.charged=false;PV.peerOver=false;
  pvBox(`<p>연결 준비 중…</p><button class="btn ghost" id=pvCancel>취소</button>`);
  try{await loadPeer();}catch(e){pvBox(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);return;}
  const id='pkmath-'+PVP_VER+'-'+code;
- const peer=host?new Peer(id,PO()):new Peer(PO());PV.peer=peer;
- peer.on('error',e=>{const t=String(e&&e.type||'');pvBox(netErrHTML(t==='unavailable-id'?'이미 쓰는 방 번호예요. 다시 만들어 주세요.':t==='peer-unavailable'?'그 번호의 방이 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결하지 못했어요 ('+t+')',t,'pvCancel'));});
+ const peer=host?new Peer(id,PO()):new Peer(PO());PV.peer=peer;pvPeerHooks(peer);
+ peer.on('error',e=>{if(pvInBattle()){if(!PV.conn||!PV.conn.open)pvRecover();return;}const t=String(e&&e.type||'');pvBox(netErrHTML(t==='unavailable-id'?'이미 쓰는 방 번호예요. 다시 만들어 주세요.':t==='peer-unavailable'?'그 번호의 방이 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결하지 못했어요 ('+t+')',t,'pvCancel'));});
  peer.on('open',()=>{
   if(host){pvBox(`<p>친구에게 이 방 번호를 알려 주세요</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구를 기다리는 중…</p><button class="btn ghost" id=pvCancel>취소</button>`);
-   peer.on('connection',c=>{if(PV.conn){c.close();return;}PV.conn=c;pvBind(c);});}
+   peer.on('connection',pvOnIncoming);}
   else{pvBox(`<p>방 ${code}에 들어가는 중…</p><button class="btn ghost" id=pvCancel>취소</button>`);const c=peer.connect(id,{reliable:true});PV.conn=c;pvBind(c);setTimeout(()=>{try{if(PV.conn===c&&!c.open&&!PV.started&&S.screen==='pvp')pvBox(netErrHTML('친구와 연결되지 않았어요','timeout','pvCancel'));}catch(e){}},20000);}});}
 function pvBind(c){
- c.on('open',()=>{const me=S.meta;const deck=shuffle(me.deck.slice());PV.myDeck=deck;PV.myOwned=Object.keys(me.col).map(Number).filter(id=>MON[id]);
+ c.on('open',()=>{if(PV.started){try{c.send({t:'sync',have:PV.rx});}catch(e){}return;}const me=S.meta;const deck=shuffle(me.deck.slice());PV.myDeck=deck;PV.myOwned=Object.keys(me.col).map(Number).filter(id=>MON[id]);
   pvpSend({t:'hi',v:PVP_VER,name:me.name,deck,col:PV.myOwned,av:partnerId(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,seed:PV.host?(Math.random()*1e9|0):0});});
- c.on('data',d=>{if(d&&d.t==='emo'){pvEmoRecv(d);return;}if(d&&d.t==='over'){PV.peerOver=true;pvpPeerOver(d);return;}PV.q.push(d);pvpPump();});
- c.on('close',()=>{if(PV.peerOver||PV.q.some(x=>x&&x.t==='quit'))return;if(B&&B.pvp&&!B.over){B.over=true;toast('친구와 연결이 끊겼어요');pvpEnd(null);}else if(!PV.started&&S.screen==='pvp'){pvBox(`<p>연결이 끊겼어요</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);}});}
+ c.on('data',d=>{if(!pvRx(d))return;if(d&&d.t==='emo'){pvEmoRecv(d);return;}if(d&&d.t==='over'){PV.peerOver=true;pvpPeerOver(d);return;}PV.q.push(d);pvpPump();});
+ c.on('close',()=>{if(PV.conn&&PV.conn!==c)return;if(PV.peerOver||PV.q.some(x=>x&&x.t==='quit'))return;if(PV.peer&&pvInBattle()){pvRecover();return;}if(B&&B.pvp&&!B.over){B.over=true;toast('친구와 연결이 끊겼어요');pvpEnd(null);}else if(!PV.started&&S.screen==='pvp'){pvBox(`<p>연결이 끊겼어요</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);}});}
 // 받은 행동을 차례대로 하나씩 처리해요(애니메이션이 겹치지 않게)
 function pvSpecShow(q,k,nm0){try{pvSpecHide();clearTimeout(window.__pvsT);window.__pvsT=setTimeout(pvSpecHide,90000);if(!q||!Array.isArray(q.ch))return;const nm=esc(nm0||(PV.foe&&PV.foe.name)||'친구');const el=document.createElement('div');el.id='pvSpec';el.className='k-'+(k||'def');
  const sk=SKM[q.sk]?esc(SKM[q.sk].n):'';
@@ -15938,5 +15938,85 @@ html body .bMenuCol .fsBtn .ic{width:15px;height:15px}
  }catch(e){}},4000);
  document.addEventListener('visibilitychange',()=>{try{if(document.hidden)return;BC.lastRx=Date.now();if(inBattle()&&BC.peer){wlOn();if(!BC.conn||!BC.conn.open)bossRecover();}}catch(e){}});
 })();
+</script>
+<script id="pvp-reco">
+/* 친구 대전 재접속: 끊겨도 90초 동안 다시 잇고, 끊긴 동안 못 받은 행동은 번호표로 다시 보내 서로의 화면을 맞춰요 */
+(function(){
+ const MAX=90000,PID=()=>'pkmath-'+PVP_VER+'-'+PV.code;
+ window.pvInBattle=()=>!!(B&&B.pvp&&!B.over&&!B.__pvDone&&PV.started&&S.screen==='battle');
+ function ui(html){let o=document.getElementById('pvReco');if(!o){o=document.createElement('div');o.id='pvReco';o.style.cssText='position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(20,24,44,.62);text-align:center';o.innerHTML='<div style="background:#fffaf1;color:#3a2e3f;border:3px solid #8a7650;border-radius:16px;padding:18px 22px;max-width:86vw;box-shadow:0 8px 0 rgba(0,0,0,.25)"><div style="font-size:22px;margin-bottom:6px;font-family:Jua,sans-serif">📶 연결이 끊겼어요</div><div id="pvRecoTx" style="font-size:15px;line-height:1.6"></div><button class="btn ghost" id="pvRecoX" style="margin-top:12px">포기하고 나가기</button></div>';document.body.appendChild(o);o.querySelector('#pvRecoX').onclick=()=>giveUp();}
+  o.querySelector('#pvRecoTx').innerHTML=html;}
+ function giveUp(){window.pvRecoReset();try{if(B&&B.pvp&&!B.over){B.over=true;toast('친구와 연결이 끊겼어요');pvpEnd(null);}}catch(e){}}
+ window.pvRecoReset=function(){try{clearInterval(PV.recoTimer);}catch(e){}PV.recoTimer=0;PV.reconnecting=false;PV.tryAt=0;const o=document.getElementById('pvReco');if(o)o.remove();};
+ window.pvPeerHooks=function(peer){try{peer.on('disconnected',()=>{try{if(!peer.destroyed)peer.reconnect();}catch(e){}});}catch(e){}};
+ window.pvOnIncoming=function(c){
+  if(PV.conn){const stale=!PV.conn.open||PV.reconnecting||(pvInBattle()&&Date.now()-(PV.lastRx||0)>8000);
+   if(!stale){try{c.close();}catch(e){}return;}
+   const old=PV.conn;PV.conn=c;try{old.close();}catch(e){}
+  }else PV.conn=c;
+  pvBind(c);};
+ /* 번호표: 보낸 행동마다 번호를 붙여 보관하고, 상대가 받았다고 알려 오면 지워요 */
+ function trim(a){PV.out=PV.out.filter(o=>o.n>a);}
+ function resend(have){try{if(!PV.conn||!PV.conn.open)return;for(const o of PV.out)if(o.n>have)PV.conn.send(o);}catch(e){}}
+ window.pvRx=function(d){
+  if(!d||typeof d!=='object')return false;
+  PV.lastRx=Date.now();if(PV.reconnecting)window.pvResumed();
+  if(typeof d.a==='number')trim(d.a);
+  if(d.t==='ping')return false;
+  if(d.t==='sync'){const h=Number(d.have)||0;trim(h);resend(h);return false;}
+  if(typeof d.n==='number'){
+   if(d.n<=PV.rx)return false;
+   if(d.n>PV.rx+1){try{PV.conn.send({t:'sync',have:PV.rx});}catch(e){}return false;}
+   PV.rx=d.n;}
+  return true;};
+ function remake(){let peer;try{peer=PV.host?new Peer(PID(),PO()):new Peer(PO());}catch(e){return;}
+  PV.peer=peer;pvPeerHooks(peer);if(PV.host)peer.on('connection',pvOnIncoming);peer.on('error',()=>{});}
+ function tick(){
+  if(!PV.reconnecting)return;
+  if(!pvInBattle()){window.pvRecoReset();return;}
+  const el=Math.round((Date.now()-PV.recoSince)/1000);
+  if(Date.now()-PV.recoSince>MAX){giveUp();return;}
+  ui(PV.host?`친구가 다시 들어오기를 기다리는 중… (${el}초)`:`친구에게 다시 연결하는 중… (${el}초)`);
+  let peer=PV.peer;
+  if(!peer||peer.destroyed){remake();return;}
+  if(peer.disconnected){try{peer.reconnect();}catch(e){}}
+  if(!PV.host&&peer.open&&!peer.disconnected){
+   if(PV.conn&&PV.conn.open)return;
+   if(PV.tryAt&&Date.now()-PV.tryAt<7000)return;
+   PV.tryAt=Date.now();
+   try{const old=PV.conn;PV.conn=null;if(old)try{old.close();}catch(e){}const cc=peer.connect(PID(),{reliable:true});PV.conn=cc;pvBind(cc);}catch(e){}
+  }}
+ window.pvRecover=function(){
+  if(!pvInBattle()||PV.reconnecting)return;
+  PV.reconnecting=true;PV.recoSince=Date.now();PV.tryAt=0;
+  PV.recoTimer=setInterval(tick,2500);tick();};
+ window.pvResumed=function(){
+  const was=PV.reconnecting||!!document.getElementById('pvReco');
+  window.pvRecoReset();PV.lastRx=Date.now();
+  if(was)toast('다시 연결됐어요!');};
+ let wl=null;
+ async function wlOn(){try{if(!navigator.wakeLock||wl)return;wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>{wl=null;});}catch(e){wl=null;}}
+ function wlOff(){try{wl&&wl.release();}catch(e){}wl=null;}
+ setInterval(()=>{try{
+  const act=pvInBattle()&&!!PV.peer;
+  if(act)wlOn();else wlOff();
+  if(!act||!PV.conn)return;
+  if(PV.conn.open){try{PV.conn.send({t:'ping',a:PV.rx});}catch(e){}
+   if(!document.hidden&&!PV.reconnecting&&Date.now()-(PV.lastRx||Date.now())>20000){try{PV.conn.close();}catch(e){}pvRecover();}}
+  else if(!PV.reconnecting)pvRecover();
+ }catch(e){}},4000);
+ document.addEventListener('visibilitychange',()=>{try{if(document.hidden)return;PV.lastRx=Date.now();if(pvInBattle()&&PV.peer){wlOn();if(!PV.conn||!PV.conn.open)pvRecover();}}catch(e){}});
+})();
+</script>
+<script id="boss-shards">
+/* 협동 보스전 승리 보상: 보스 1마리당 조각 4개 (조각이 다 모이면 카드가 되고, 남는 조각은 코인·별가루로 바뀌어요) */
+const BOSS_SHARDS=4;
+function gainBossShards(id){
+ const m=S.meta,owned=!!m.col[id],need=SHARD_NEED[MON[id].rar];
+ let added=0,coin=0,dust=0,done=false,last=null;
+ for(let i=0;i<BOSS_SHARDS;i++){const r=gainCard(id,true);last=r;if(r.k==='dup'){coin+=r.coin||0;dust+=r.dust||0;}else{added++;if(r.k==='done')done=true;}}
+ if(owned||!added)return{k:'dup',id,coin,dust};
+ if(done)return{k:'done',id,need,n:need,added,coin,dust};
+ return{k:'shard',id,need,n:(m.shard&&m.shard[id])||last.n||added,added,coin,dust};}
 </script>
 </body></html>
