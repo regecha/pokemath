@@ -5658,7 +5658,9 @@ function renderDex(){S.screen='dex';const me=S.meta;const own=ownCount();
 
 // ---- 덱 ----
 const DECK_N=12;
-function deckValid(d){return d.length===DECK_N&&d.every(id=>MON[id]);}
+// 트레이너 스킬 '덱 연구': 레벨만큼 덱에 넣을 수 있는 포켓몬이 늘어요 (Lv.5 → 17마리)
+function deckN(){try{if(window.__sim)return DECK_N;return DECK_N+Math.max(0,Math.min(5,Number(trainerSkillLevels().deck)||0));}catch(e){return DECK_N;}}
+function deckValid(d){return d.length===deckN()&&d.every(id=>MON[id]);}
 // ---- 카드 평가 AI: 덱 자동 구성과 로그라이크 자동 선택이 같이 써요 ----
 const AI_KW={tough:1,ember:2.2,wave:1.4,heal:.8,rush:2.2,freeze:2.6,fight:1,poison:1.8,quake:1,wing:2,draw:1.8,grow:2.2,taunt:1.6,dodge:2,double:2.6,sneak:1.2,armor:1.8,fairy:1.2};
 const AI_AVG=[0,5,7,9,11,13.2,15.7],AI_ATK=[0,2.2,3.2,4,5,6,7.3],AI_TARGET=[0,2,3,3,2,1,1]; // 비용별 평균 능력치 합·공격, 12장 덱의 목표 비용 곡선
@@ -5692,7 +5694,8 @@ function aiDeckScore2(deck,want){let s=0;const cc=[0,0,0,0,0,0,0],types=new Set(
  s+=AIX.leg*Math.min(leg,want);                                   // 전설은 가진 만큼(최대 5장) 넣어요
  if(want>=3&&leg>want+1)s-=(leg-want-1)*1.5;
  const early=cc[1]+cc[2],heavy=cc[5]+cc[6];
- const needEarly=want>=3?4:5;if(early<needEarly)s-=(needEarly-early)*3.2;   // 싼 카드가 전설을 받쳐 줘요
+ const needEarly=want>=3?4:5;if(early<needEarly)s-=(needEarly-early)*3.2;
+ if(cc[1]<2)s-=(2-cc[1])*3.2;   // 1코스트 카드가 2장은 있어야 첫 턴부터 낼 수 있어요   // 싼 카드가 전설을 받쳐 줘요
  if(early>7)s-=(early-7)*1.5;
  if(heavy>Math.max(3,want+1))s-=(heavy-Math.max(3,want+1))*3;
  if(cc[3]+cc[4]>5)s-=(cc[3]+cc[4]-5)*1.2;
@@ -5704,12 +5707,12 @@ function aiDeckScore2(deck,want){let s=0;const cc=[0,0,0,0,0,0,0],types=new Set(
  ['ember','rush','wave','freeze','poison','grow'].forEach(k=>{if(kws[k]>1)s+=Math.min(2,kws[k]-1)*.8;});
  for(const k in kws){if(['ember','rush','wave','freeze','poison','grow','armor','taunt','wing'].indexOf(k)<0&&kws[k]>2)s-=(kws[k]-2)*1.5;}
  return s;}
-function aiBuild(owned,limFn,maxLeg){
+function aiBuild(owned,limFn,maxLeg,N){N=N||DECK_N;
  const ids=owned.filter(id=>MON[id]&&limFn(id)>0).sort((a,b)=>aiScore2(b)-aiScore2(a)||a-b);
  if(!ids.length)return[];
  const lim={},cnt={},deck=[];ids.forEach(id=>lim[id]=limFn(id));
  const add=id=>{deck.push(id);cnt[id]=(cnt[id]||0)+1;};
- const can=id=>(cnt[id]||0)<lim[id]&&deck.length<DECK_N;
+ const can=id=>(cnt[id]||0)<lim[id]&&deck.length<N;
  const legs=ids.filter(id=>MON[id].rar>=4);const want=Math.min(maxLeg||5,legs.length);
  // 1) 전설: 능력치 좋은 순서로, 너무 싼 전설보다 묵직한 전설을 먼저
  legs.slice().sort((a,b)=>(aiCost(MON[b])>=4)-(aiCost(MON[a])>=4)||aiScore2(b)-aiScore2(a)).slice(0,want).forEach(id=>{if(can(id))add(id);});
@@ -5718,6 +5721,7 @@ function aiBuild(owned,limFn,maxLeg){
  if(!deck.some(id=>['armor','taunt'].includes(aiKwOf(id)))){const a=pickKw(['armor','taunt'],3);if(a!=null)add(a);}
  if(!deck.some(id=>aiKwOf(id)==='wing')){const w=pickKw(['wing'],3);if(w!=null)add(w);}
  // 3) 싼 카드로 보조 (비용 1~2에서 강한 카드부터)
+ for(const id of ids){if(deck.filter(x=>aiCost(MON[x])===1).length>=2)break;if(aiCost(MON[id])===1&&can(id))add(id);} // 첫 턴부터 낼 1코스트 2장
  const needEarly=want>=3?4:5;
  for(const id of ids){if(deck.filter(x=>aiCost(MON[x])<=2).length>=needEarly)break;if(aiCost(MON[id])<=2)while(can(id)&&deck.filter(x=>aiCost(MON[x])<=2).length<needEarly)add(id);}
  // 4) 남는 자리는 가장 강한 카드로
@@ -5729,18 +5733,43 @@ function aiBuild(owned,limFn,maxLeg){
    for(const id of ids){if(id===old||(cnt[id]||0)>=lim[id])continue;deck[i]=id;const sc=aiDeckScore2(deck,want);if(sc>bs+1e-9){bs=sc;bi=id;}}
    deck[i]=old;
    if(bi>=0){cnt[old]--;deck[i]=bi;cnt[bi]=(cnt[bi]||0)+1;best=bs;improved=true;}}}
- return deck.sort((a,b)=>MON[a].cost-MON[b].cost||a-b).slice(0,DECK_N);}
-function autoDeck(){const me=S.meta;return aiBuild(Object.keys(me.col).map(Number),deckLim);}
+ return deck.sort((a,b)=>MON[a].cost-MON[b].cost||a-b).slice(0,N);}
+// 자동 덱 짜기: 1~6코스트 2장씩 · 강철/바위 벽 3~4장(코스트 골고루, 1순위) · 날개 저코 1+고코 1(2순위) · 나머지는 전설 위주 + 특성 골고루
+function aiBuildCurve(owned,limFn,N){
+ const ids=owned.filter(id=>MON[id]&&limFn(id)>0);if(!ids.length)return[];
+ const cnt={},deck=[],cc=[0,0,0,0,0,0,0],kc={};const cs=id=>aiCost(MON[id]);
+ const can=id=>(cnt[id]||0)<limFn(id)&&deck.length<N;
+ const add=id=>{deck.push(id);cnt[id]=(cnt[id]||0)+1;cc[cs(id)]++;const k=aiKwOf(id);kc[k]=(kc[k]||0)+1;};
+ const isWall=id=>{const k=aiKwOf(id);return k==='armor'||k==='taunt';},isWing=id=>aiKwOf(id)==='wing';
+ const rk=id=>MON[id].rar*10+aiScore2(id)*.01; // 별이 많은 카드 먼저(5성 > 4성 > 나머지), 같으면 점수 순
+ const room=c=>cc[c]<2;
+ // 1순위: 강철·바위 벽 — 저·중·고코스트에 골고루 (가진 카드가 없는 코스트는 가까운 코스트에서)
+ const wallG=[[1,2],[1,2],[3,4],[5,6]];if(N>=14)wallG.push([5,6]); // 1~2코스트 2장 · 3~4코스트 1장 · 5~6코스트 1장 (14마리 이상이면 5~6코스트 1장 더)
+ const wc=[0,0,0,0,0,0,0];
+ for(const [lo,hi] of wallG){let pick=null;for(const d of [0,1,2,3,4,5]){const rng=[];for(let c=lo-d;c<=hi+d;c++)if(c>=1&&c<=6&&(d===0||c<lo||c>hi))rng.push(c);
+   const l=ids.filter(id=>isWall(id)&&rng.includes(cs(id))&&room(cs(id))&&can(id)).sort((a,b)=>(rk(b)-wc[cs(b)]*15)-(rk(a)-wc[cs(a)]*15));if(l.length){pick=l[0];break;}}
+  if(pick!=null){add(pick);wc[cs(pick)]++;}}
+ // 2순위: 날개(반격 없는 딜러) — 저코스트(1~3) 1장 + 고코스트(4~6) 1장
+ for(const [lo,hi] of [[1,3],[4,6]]){const l=ids.filter(id=>isWing(id)&&cs(id)>=lo&&cs(id)<=hi&&room(cs(id))&&can(id)).sort((a,b)=>rk(b)-rk(a));if(l.length)add(l[0]);}
+ // 나머지: 코스트마다 2장이 될 때까지, 전설 위주 + 같은 특성이 겹치지 않게
+ const fillScore=id=>(MON[id].rar>=4?1000:0)+rk(id)-(kc[aiKwOf(id)]||0)*6;
+ const fill=(c,strict)=>{const l=ids.filter(id=>(c==null||cs(id)===c)&&can(id)&&(!strict||!(isWall(id)||isWing(id)))).sort((a,b)=>fillScore(b)-fillScore(a));return l.length?l[0]:null;};
+ for(let c=1;c<=6;c++)while(cc[c]<2&&deck.length<N){const id=fill(c,true);if(id==null)break;add(id);}
+ // 덱 연구로 늘어난 자리·가진 카드가 없는 코스트 자리: 코스트를 돌아가며 채워요
+ const ORD=[4,5,3,6,2,1];for(let g=0,stuck=0;deck.length<N&&stuck<6;g++){const id=fill(ORD[g%6],true);if(id!=null){add(id);stuck=0;}else stuck++;}
+ while(deck.length<N){const id=fill(null,true)??fill(null,false);if(id==null)break;add(id);}
+ return deck.sort((a,b)=>MON[a].cost-MON[b].cost||a-b).slice(0,N);}
+function autoDeck(){const me=S.meta;return aiBuildCurve(Object.keys(me.col).map(Number),deckLim,deckN());}
 function ensureDeck(){const me=S.meta;const cnt={};const ok=me.deck.filter(id=>{cnt[id]=(cnt[id]||0)+1;return me.col[id]&&cnt[id]<=deckLim(id);});
- if(ok.length>DECK_N)ok.length=DECK_N;
- if(ok.length<DECK_N){for(const id of autoDeck()){if(ok.length>=DECK_N)break;const n=ok.filter(x=>x===id).length;if(n<deckLim(id))ok.push(id);}}
+ const DN=deckN();if(ok.length>DN)ok.length=DN;
+ if(ok.length<DN){for(const id of autoDeck()){if(ok.length>=DN)break;const n=ok.filter(x=>x===id).length;if(n<deckLim(id))ok.push(id);}}
  me.deck=ok;return deckValid(me.deck);}
 let DECKKW='';
 function renderDeck(keep){S.screen='deck';const me=S.meta;if(!keep)ensureDeck();
  const counts={};me.deck.forEach(id=>counts[id]=(counts[id]||0)+1);
  const curve=[1,2,3,4,5,6].map(c=>me.deck.filter(id=>MON[id].cost===c).length);
  const owned=Object.keys(me.col).map(Number).sort((a,b)=>MON[a].cost-MON[b].cost||a-b);
- $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('cards')} 내 덱 (${me.deck.length}/${DECK_N})</h2><span class=hudSp></span><button class="btn blue sm" id=dAuto>AI 자동 덱 짜기</button></div>
+ $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('cards')} 내 덱 (${me.deck.length}/${deckN()})</h2><span class=hudSp></span><button class="btn blue sm" id=dAuto>AI 자동 덱 짜기</button></div>
   <p class=mut style="font-size:13px;margin:6px 0">덱 카드를 누르면 빠지고, 아래 카드를 누르면 들어가요. 같은 카드는 2장까지. 비용이 낮은 카드가 많아야 처음부터 싸울 수 있어요.</p>
   <div class=row style="align-items:flex-end;gap:16px;margin-bottom:18px"><div><div class=mut style="font-size:12px">비용별 장수</div><div class=curve>${curve.map((n,i)=>`<div style="height:${n*8+2}px"><span>${i+1}</span></div>`).join('')}</div></div></div>
   <div class=deckBar id=deckBar>${me.deck.map((id,i)=>cardHTML(id,{size:'deck'}).replace('class="card','data-di="'+i+'" class="card')).join('')}</div>
@@ -5749,7 +5778,7 @@ function renderDeck(keep){S.screen='deck';const me=S.meta;if(!keep)ensureDeck();
  $('#view').querySelectorAll('[data-kw]').forEach(b=>b.onclick=()=>{sfx('tap');DECKKW=b.dataset.kw;renderDeckKeep();});
  $('#dAuto').onclick=()=>{sfx('tap');me.deck=autoDeck();autoSave();renderDeck();try{const d=me.deck,av=(d.reduce((x,id)=>x+MON[id].cost,0)/Math.max(1,d.length)).toFixed(1),tn=new Set(d.map(id=>MON[id].types[0])).size;toast(`가진 카드로 가장 강한 조합을 짰어요! 전설 ${d.filter(id=>MON[id].rar>=4).length}장 · 평균 비용 ${av} · 속성 ${tn}종`);}catch(e){}};
  $('#deckBar').querySelectorAll('.card').forEach(c=>c.onclick=()=>{sfx('tap');me.deck.splice(+c.dataset.di,1);autoSave();renderDeckKeep();});
- $('.colGrid').querySelectorAll('.card').forEach(c=>c.onclick=()=>{const id=+c.dataset.id;const inD=me.deck.filter(x=>x===id).length;if(me.deck.length>=DECK_N){toast('덱이 꽉 찼어요. 위에서 한 장을 빼 주세요');return;}if(inD>=deckLim(id)){toast('같은 카드는 가진 만큼, 최대 2장까지예요');return;}sfx('tap');me.deck.push(id);autoSave();renderDeckKeep();});}
+ $('.colGrid').querySelectorAll('.card').forEach(c=>c.onclick=()=>{const id=+c.dataset.id;const inD=me.deck.filter(x=>x===id).length;if(me.deck.length>=deckN()){toast('덱이 꽉 찼어요. 위에서 한 장을 빼 주세요');return;}if(inD>=deckLim(id)){toast('같은 카드는 가진 만큼, 최대 2장까지예요');return;}sfx('tap');me.deck.push(id);autoSave();renderDeckKeep();});}
 function renderDeckKeep(){const y=$('#view').scrollTop;renderDeck(true);$('#view').scrollTop=y;}
 
 // ===== 카드 배틀 (하스스톤을 아이들에 맞게 줄인 규칙) =====
@@ -5921,7 +5950,7 @@ function drawSpecial(P){if(!P||!P.specials)return null;
 
 const isTaunt=u=>u&&(u.kw==='taunt'||u.kw==='armor');
 const gmxIdx=P=>P&&P.board?P.board.map((u,i)=>u&&u.gm&&u.hp>0?i:-1).filter(i=>i>=0):[]; // 거다이맥스 중인 포켓몬: 트레이너는 공격받지 않고, 이 포켓몬부터 공격해야 해요(몰래 공격도 예외 없음)
-function startBattle(gi,hi){const me=S.meta;const H=hi!=null?HARD[hi]:null;if(gi>=0&&!window.__sim)me.stats.gymTry=(me.stats.gymTry||0)+1;if(!ensureDeck()){toast('덱에 카드가 12장 있어야 해요. 카드팩을 더 열어 봐요!');return;}
+function startBattle(gi,hi){const me=S.meta;const H=hi!=null?HARD[hi]:null;if(gi>=0&&!window.__sim)me.stats.gymTry=(me.stats.gymTry||0)+1;if(!ensureDeck()){toast('덱에 카드가 '+deckN()+'장 있어야 해요. 카드팩을 더 열어 봐요!');return;}
  const g=gi>=0?GYMS[gi]:null;const diff=H?10+hi:(g?gi+1:clamp(Math.ceil(lvOf(me.xp).lv/2),1,7));
  const wildT=rint(0,17);const wild=(g||H)?null:{n:'연습 대전',ldr:'떠돌이 트레이너',types:[wildT,rint(0,17)],c:TYPE_COL[wildT]};
  const G=H||g||wild;
@@ -10010,9 +10039,10 @@ const TRAINER_SKILL_INFO={
  study:{n:'공부 강화',ic:'📚',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 기본 공부 기술 횟수는 0회이고, 이 스킬로 전투마다 쓸 수 있는 횟수가 생겨요. 또  공부 기술로 문제를 맞혔을 때 일정 확률로 카드를 1장 더 뽑아요. (Lv.1 1회·30% / Lv.2 1회·40% / Lv.3 2회·50% / Lv.4 2회·60% / Lv.5 3회·70%)',eff:n=>n?`전투마다 공부 기술 ${STUDY_BASE+studyExtraUses(n)}회 · 성공 시 ${studyChance(n)}% 확률로 카드 +1`:'아직 배우지 않았어요',max:5},
  hand:{n:'카드 보유량',ic:'🃏',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 손에 들 수 있는 카드 최대치가 늘어나요. (Lv.1~2 +1장 → 7장 / Lv.3~4 +2장 → 8장 / Lv.5 +3장 → 9장)',eff:n=>n?`카드 보유 최대 ${HAND_BASE+handBonusOf(n)}장 (+${handBonusOf(n)})`:'아직 배우지 않았어요',max:5},
  evo:{n:'진화 연구',ic:'🧬',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 메가진화·원시회귀·거다이맥스에 필요한 정답 수가 줄어요. (Lv.1~2: -1개 / Lv.3~4: -2개 / Lv.5: -2개 + 메가진화 2회)',eff:n=>n?`필요한 정답 ${MEGA_NEED}개 → ${MEGA_NEED-(n>=3?2:1)}개`:'아직 배우지 않았어요',max:5},
+ deck:{n:'덱 연구',ic:'📖',passive:1,desc:'패시브 · 찍어 두면 덱 짜기에 자동 적용돼요. 스킬 레벨만큼 덱에 넣을 수 있는 포켓몬이 늘어요. (기본 12마리 → Lv.5 17마리)',eff:n=>n?`덱 ${DECK_N+n}마리 (+${n})`:'아직 배우지 않았어요',max:5},
  vit:{n:'체력 증강',ic:'❤️‍🔥',passive:1,desc:'패시브 · 찍어 두면 상시 적용돼요. 트레이너의 최대 체력이 스킬 레벨만큼 늘어요. (Lv.5 +5)',eff:n=>n?`트레이너 최대 체력 +${n}`:'아직 배우지 않았어요',max:5}
 };
-function trainerSkillLevels(){const m=S.meta;m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0,evo:0},m.trainerSkills||{});return m.trainerSkills;}
+function trainerSkillLevels(){const m=S.meta;m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0,evo:0,deck:0},m.trainerSkills||{});return m.trainerSkills;}
 const CHEER_ATK=[0,1,1,2,2,3],CHEER_SHIELD=[0,1,2,2,3,3];
 const studyChance=n=>n>0?Math.min(70,20+10*n):0;
 const STUDY_BASE=0; // 기본 공부 기술 횟수 (0이면 '공부 강화' 스킬을 배워야 공부 기술을 써요)
@@ -10495,7 +10525,7 @@ async function showNetTest(){
  else st.p2p=['✗','기기끼리 직접 연결하는 길이 막혀 있어요'];
  draw(p2p.srflx>0?'<b>연결할 수 있을 것 같아요!</b> 방 만들기와 방 들어가기를 눌러 보세요. 그래도 안 되면 한 명을 휴대폰 데이터로 바꿔 보세요.':p2p.host>0?'<b>같은 와이파이의 친구와는 될 수 있어요.</b> 다른 곳에 있는 친구와 할 때 안 되면 한 명을 휴대폰 데이터로 바꿔 보세요.':'<b>이 네트워크에서는 연결이 어려울 수 있어요.</b> 휴대폰 데이터(핫스팟)로 바꿔서 다시 시험해 보세요. 수업 전에 선생님이 미리 확인해 두면 좋아요.');}
 function pvBox(html){const b=$('#pvBox');if(!b)return;b.style.display='block';b.innerHTML=html;{const t=b.querySelector('#netTest');if(t)t.onclick=()=>{sfx('tap');showNetTest();};}const c=b.querySelector('#pvCancel');if(c)c.onclick=()=>{sfx('tap');pvpClose();renderPvp();};}
-async function pvpStart(host,code){const m=S.meta;if(m.coins<PVP_COST){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 12장이어야 해요');return;}
+async function pvpStart(host,code){const m=S.meta;if(m.coins<PVP_COST){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
  PV.host=host;PV.code=code;PV.q=[];PV.tx=0;PV.rx=0;PV.out=[];PV.started=false;PV.charged=false;PV.peerOver=false;
  pvBox(`<p>연결 준비 중…</p><button class="btn ghost" id=pvCancel>취소</button>`);
  try{await loadPeer();}catch(e){pvBox(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);return;}
