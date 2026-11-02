@@ -1199,6 +1199,8 @@ html body #bq .sheet.heavy.defense .bqHead .who{background:#dbe2ff}
 
 /* 선생님 화면 탭 · 운영자 모드 */
 .tcTabs{display:flex;gap:8px;margin:10px 0 2px;flex-wrap:wrap}
+#tcPickG,#tcPickS{gap:5px}
+#tcPickG button,#tcPickS button{font-size:12.5px;padding:4px 10px;border-width:1.5px}
 .tcTabs button{font:inherit;font-weight:800;font-size:15px;padding:8px 16px;border-radius:999px;border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
 .tcTabs button.on{background:linear-gradient(#ffe9a8,#ffd24d);border-color:#e0a21a;color:#5a3a00}
 .tcMain[hidden],#tcOp[hidden]{display:none!important}
@@ -11373,7 +11375,7 @@ function tsSend(room,silent){return new Promise(async res=>{
 // 훈련 결과가 나올 때, 자동 전송이 켜져 있으면 조용히 한 번 보내요(3분에 한 번까지만)
 function tsAuto(){try{const st=S.meta&&S.meta.settings;if(!st||!st.tAuto||!st.tRoom||Date.now()-_tsLast<180000)return;tsSend(st.tRoom,true);}catch(e){}}
 function showTsend(){const st=S.meta.settings;
- M(`<h2>📡 선생님께 기록 보내기</h2><p class=mut style="font-size:14px;line-height:1.6;text-align:left">선생님 화면에서 <b>실시간으로 받기</b>를 열면 나오는 <b>방 번호 4자리</b>를 넣어 주세요. 닉네임과 공부 기록이 선생님께 전달돼요. (내 저장 코드와 같은 내용이에요) <b>학교 와이파이는 작동하지 않을 수 있어요.</b></p>
+ M(`<h2>📡 선생님께 기록 보내기</h2><p class=mut style="font-size:14px;line-height:1.6;text-align:left">선생님 화면에서 <b>학생 기록 실시간 전송 받기</b>를 열면 나오는 <b>방 번호 4자리</b>를 넣어 주세요. 닉네임과 공부 기록이 선생님께 전달돼요. (내 저장 코드와 같은 내용이에요) <b>학교 와이파이는 작동하지 않을 수 있어요.</b></p>
   <input class="inp codeIn" id=tsRoom inputmode=numeric maxlength=4 style="width:150px;font-size:26px;text-align:center" value="${esc(st.tRoom||'')}" placeholder="0000">
   <div class=setRow style="margin-top:8px"><span><b>훈련이 끝나면 자동 전송</b><br><span class=mut style="font-size:12px">켜 두면 훈련 결과가 나올 때 조용히 보내요</span></span><div class=seg><button class="${st.tAuto?'on':''}" data-v=1>켜기</button><button class="${st.tAuto?'':'on'}" data-v=0>끄기</button></div></div>
   <div class=mbtns><button class="btn blue" data-a=send>지금 보내기</button><button class="btn gold" data-a=x>닫기</button></div>`,
@@ -11794,7 +11796,7 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
  $('#view').innerHTML=`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('teacher')} 선생님 화면</h2><span class=hudSp></span><button class="btn ghost sm" id=tcBack>나가기</button></div>
   <div class=tcTabs id=tcTabs><button class=on data-tt=main>📋 학급 관리</button><button data-tt=op>🛠 운영자 모드</button></div>
   <p class=tcMain style="font-size:14px;line-height:1.6;margin-top:8px">학생은 처음에 <b>학년·학기·단원을 직접 골라</b> 시작해요. 그 뒤로 기본 학기를 바꾸려면 <b>선생님 코드</b>가 있어야 해요. 별을 모으면 위 학기는 학생이 직접 열 수 있어요. 코드는 <b>학년+학기 숫자 두 자리 + -LJC</b> 모양이에요. 예: 1학년 1학기 <b>11-LJC</b>, 1학년 2학기 <b>12-LJC</b>.</p>
-  <div id=tcList class=tcMain style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:10px"></div></div>
+  <div id=tcList class=tcMain style="margin-top:10px"></div></div>
 
  <div class=panel id=tcOp hidden><h2>🛠 운영자 모드</h2>
   <p class=mut style="font-size:14px;line-height:1.6;margin:4px 0 0">학생에게 선물을 보내는 도구가 모여 있어요. 이 탭은 선생님 비밀번호로 들어온 화면에서만 보여요.</p>
@@ -11805,12 +11807,12 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
    <div id=gfSt class=mut style="font-size:13px;margin-top:6px"></div>
    <div id=gfList style="margin-top:8px;font-size:13px"></div>
   </div></div>
- <div class="panel tcMain"><h2>📡 실시간으로 받기 <span class=mut style="font-size:13px">(학생이 보내면 아래 표가 자동으로 바뀌어요)</span></h2>
+ <div class="panel tcMain"><h2>📡 학생 기록 실시간 전송 받기 <span class=mut style="font-size:13px">(학생이 보내면 아래 표가 자동으로 바뀌어요)</span></h2>
   <div class=explain style="font-size:14px;line-height:1.7;text-align:left">① <b>방 열기</b>를 누르면 방 번호 4자리가 나와요. ② 학생은 게임 <b>설정 → 📡 선생님께 기록 보내기</b>에서 그 번호를 넣고 <b>지금 보내기</b>(또는 자동 전송 켜기)를 해요. ③ 받은 기록은 이 기기에 저장돼서 화면을 닫았다 열어도 남아 있어요. 방을 열어 둔 동안에만 받을 수 있어요.</div>
   <div class=row style="margin-top:8px;align-items:center;gap:10px"><button class="btn blue" id=trOpen>방 열기</button><span id=trCode class=tcode style="font-size:34px"></span><span id=trSt class=mut style="font-size:13px"></span></div>
   <div id=trList style="margin-top:8px;font-size:13px"></div>
   <div class=row style="margin-top:6px"><button class="btn ghost sm" id=trClear>받은 기록 모두 지우기</button></div></div>
- <div class="panel tcMain"><h2>${I('chart')} 학생 기록 모아 보기</h2><p class=mut style="font-size:14px;line-height:1.6;margin:4px 0 8px">위 <b>📡 실시간으로 받기</b>로 받은 기록이 아래 표에 자동으로 모여요.</p><div class=tcCodeBar><button class="btn ghost" id=tcCodeBtn aria-expanded=false>🔑 학생 코드 보기</button><span class=tcCodeHint>⚠️ <b>인터넷 통신이 불가능한 경우</b>에 사용하세요. 학생이 보낸 저장 코드(PKMT…)를 직접 붙여 넣어 표를 만들 수 있어요.</span></div><div id=tcCodeBox class=tcCodeBox hidden><div class=explain style="font-size:14px;line-height:1.7;text-align:left"><b>사용 순서</b><br>① 학생이 게임에서 <b>설정 → 저장 · 불러오기 → 코드 만들고 복사</b>를 눌러 저장 코드(PKMT…)를 선생님께 보내요. 닉네임이 같이 보이게 해 주세요.<br>② 받은 코드를 <b>아래 칸에 한 줄에 하나씩</b> 붙여 넣고 <b>표 만들기</b>를 눌러요.<br>③ 학생별 표 아래에 <b>학급 영역 요약</b>(영역별 현황 · 학생×영역 표 · 처방 훈련 현황 · 공통 약한 개념 · 공통 오개념 · 먼저 살펴볼 학생)이 이어서 나와요.<br><span class=mut>※ 저장 코드는 코드를 만든 그 시점의 기록이에요. 변화를 보려면 학생들에게 주마다 새 코드를 받아 주세요.</span></div><p class=mut style="font-size:13px">학생들이 보낸 <b>저장 코드(PKMT…)</b>를 한 줄에 하나씩 붙여 넣거나 .md 파일을 여러 개 고르면 표로 보여 줘요. 이 표는 이 기기 화면에만 보이고 다른 곳으로 보내지 않아요(학생이 보낸 기록만 받아요). 학생은 실명 대신 <b>닉네임</b>을 써요 — 누가 누구인지는 선생님만 따로 적어 두세요.</p>
+ <div class="panel tcMain"><h2>${I('chart')} 학생 기록 모아 보기</h2><p class=mut style="font-size:14px;line-height:1.6;margin:4px 0 8px">위 <b>📡 학생 기록 실시간 전송 받기</b>로 받은 기록이 아래 표에 자동으로 모여요.</p><div class=tcCodeBar><button class="btn ghost" id=tcCodeBtn aria-expanded=false>🔑 학생 코드 보기</button><span class=tcCodeHint>⚠️ <b>인터넷 통신이 불가능한 경우</b>에 사용하세요. 학생이 보낸 저장 코드(PKMT…)를 직접 붙여 넣어 표를 만들 수 있어요.</span></div><div id=tcCodeBox class=tcCodeBox hidden><div class=explain style="font-size:14px;line-height:1.7;text-align:left"><b>사용 순서</b><br>① 학생이 게임에서 <b>설정 → 저장 · 불러오기 → 코드 만들고 복사</b>를 눌러 저장 코드(PKMT…)를 선생님께 보내요. 닉네임이 같이 보이게 해 주세요.<br>② 받은 코드를 <b>아래 칸에 한 줄에 하나씩</b> 붙여 넣고 <b>표 만들기</b>를 눌러요.<br>③ 학생별 표 아래에 <b>학급 영역 요약</b>(영역별 현황 · 학생×영역 표 · 처방 훈련 현황 · 공통 약한 개념 · 공통 오개념 · 먼저 살펴볼 학생)이 이어서 나와요.<br><span class=mut>※ 저장 코드는 코드를 만든 그 시점의 기록이에요. 변화를 보려면 학생들에게 주마다 새 코드를 받아 주세요.</span></div><p class=mut style="font-size:13px">학생들이 보낸 <b>저장 코드(PKMT…)</b>를 한 줄에 하나씩 붙여 넣거나 .md 파일을 여러 개 고르면 표로 보여 줘요. 이 표는 이 기기 화면에만 보이고 다른 곳으로 보내지 않아요(학생이 보낸 기록만 받아요). 학생은 실명 대신 <b>닉네임</b>을 써요 — 누가 누구인지는 선생님만 따로 적어 두세요.</p>
   <textarea class="inp code" id=tcIn style="height:120px" placeholder="PKMTZ:...&#10;PKMTZ:..."></textarea><div class=row style="margin-top:8px"><button class="btn blue" id=tcGo>표 만들기</button><button class="btn ghost" id=tcFiles>${I('folder')} .md 파일 여러 개</button></div>
   <input type=file id=tcF multiple accept=".md,.txt" class=hidden></div><div id=tcRep style="overflow-x:auto;margin-top:10px"></div></div>
  <div id=tcAttn class=tcMain></div>
@@ -11820,7 +11822,18 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
  <div id=tcDom class=tcMain></div>
  <div class="panel tcMain"><h2>${I('medal')} 학생 트레이너 카드 인쇄</h2><p class=mut style="font-size:13px">위 칸에 학생 저장 코드를 넣고 「카드 만들기」를 누르면, 학생이 꾸민 배지와 기록으로 카드(85.5×54mm, 300dpi)를 만들어요. <b>포켓몬 그림·이름은 들어가지 않아요.</b> 카드 등급(첫 돌 5 · 돌탑 20 · 좌삼 50 · 공든 좌삼 100 돌)에 오른 학생만 만들어져요.</p>
   <div class=row><button class="btn blue" id=tcCards>카드 만들기</button><button class="btn ghost" id=tcCardsA4>모두 A4로 인쇄</button></div><div id=tcCardBox style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px"></div></div></div>`;
- const list=()=>{let h='';for(let g=1;g<=6;g++)for(let s=1;s<=2;s++){const code=makeTeacherCode(g,s);h+=`<div style="text-align:center;background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px"><div class=jua>${g}학년 ${s}학기</div><div class=tcode style="font-size:24px">${code}</div></div>`;}$('#tcList').innerHTML=h;};
+ const list=()=>{const box=$('#tcList');if(!box)return;let g=0,s=0;
+  box.innerHTML=`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b class=jua style="min-width:42px">학년</b><div class=tcTabs id=tcPickG style="margin:0">${[1,2,3,4,5,6].map(n=>`<button type=button data-g="${n}">${n}학년</button>`).join('')}</div></div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px"><b class=jua style="min-width:42px">학기</b><div class=tcTabs id=tcPickS style="margin:0">${[1,2].map(n=>`<button type=button data-s="${n}">${n}학기</button>`).join('')}</div></div>
+  <div id=tcShow style="text-align:center;margin-top:12px"></div>`;
+  const draw=()=>{box.querySelectorAll('#tcPickG button').forEach(b=>b.classList.toggle('on',+b.dataset.g===g));box.querySelectorAll('#tcPickS button').forEach(b=>b.classList.toggle('on',+b.dataset.s===s));
+   const out=$('#tcShow');if(!out)return;
+   if(!g||!s){out.innerHTML=`<p class=mut style="font-size:14px;margin:6px 0">${!g&&!s?'학년과 학기를 고르면 코드가 나와요.':!g?'학년을 골라 주세요.':'학기를 골라 주세요.'}</p>`;return;}
+   const code=makeTeacherCode(g,s);
+   out.innerHTML=`<div class=jua style="margin-bottom:6px">${g}학년 ${s}학기</div><div class=tcode id=tcShowCode style="font-size:34px">${code}</div><div style="margin-top:8px"><button type=button class="btn ghost sm" id=tcCopy>📋 코드 복사</button></div>`;
+   const cp=$('#tcCopy');if(cp)cp.onclick=async()=>{sfx('tap');try{await navigator.clipboard.writeText(code);toast('코드를 복사했어요');}catch(e){try{const r=document.createRange();r.selectNodeContents($('#tcShowCode'));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);document.execCommand('copy');sel.removeAllRanges();toast('코드를 복사했어요');}catch(_){toast('코드를 눌러 직접 복사해 주세요');}}};};
+  box.onclick=ev=>{const b=ev.target.closest('button');if(!b)return;if(b.dataset.g){g=+b.dataset.g;sfx('tap');draw();}else if(b.dataset.s){s=+b.dataset.s;sfx('tap');draw();}};
+  draw();};
  list();
  $('#tcBack').onclick=()=>{sfx('tap');renderTitle();};
  try{tcOpInit();}catch(e){console.warn('tcOp',e);}
