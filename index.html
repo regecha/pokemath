@@ -5040,6 +5040,7 @@ async function startTraining(opt={}){
 // ===== 오늘의 훈련 · 파트너가 정답 때 자기 스킬(대표 기술 포함)을 작은 크기로 써요 =====
 let __psBusy=0;
 function partnerSkill(combo){try{
+ return false; /* 오늘의 훈련: 파트너 포켓몬은 스킬을 쓰지 않아요 */
  if(__psBusy||window.__sim||S.meta.settings.lowfx||typeof PXF==='undefined'||typeof skillMix!=='function')return false;
  const b=$('.buddy .bimg');if(!b)return false;const id=partnerId();if(!id||!MON[id])return false;
  const k=skillMix(id),pw=combo?.95:.7,cb=!!combo,r=b.getBoundingClientRect(),vw=innerWidth,vh=innerHeight,dir=(r.left+r.width/2)<vw/2?1:-1;
