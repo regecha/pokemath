@@ -214,7 +214,7 @@ h2{font-size:26px;margin-bottom:8px}h3{font-size:19px;margin:12px 0 6px}
 .gdSky.snow i{width:5px;height:5px;border-radius:50%;background:#fff;animation-name:gdSnow;box-shadow:0 0 3px #fff}
 @keyframes gdRain{to{top:105%;margin-left:-14px}}
 @keyframes gdSnow{0%{top:-6%;margin-left:0}50%{margin-left:8px}100%{top:105%;margin-left:-6px}}
-.gdWx{position:absolute;left:6px;top:6px;z-index:30;pointer-events:none;font:700 11px/1 'Jua',sans-serif;background:rgba(255,253,240,.78);border:2px solid rgba(201,154,46,.8);border-radius:999px;padding:3px 9px;color:#5a4220}
+.gdWx{position:absolute;left:6px;top:6px;z-index:2;pointer-events:none;font:700 11px/1 'Jua',sans-serif;background:rgba(255,253,240,.78);border:2px solid rgba(201,154,46,.8);border-radius:999px;padding:3px 9px;color:#5a4220}
 .gdDec{position:absolute;width:calc(var(--w,40) * .85px * var(--k,1));height:calc(var(--h,40) * .85px * var(--k,1));transform:translate(-50%,-100%);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
 .gdDec img{width:100%;height:100%;image-rendering:pixelated;display:block;pointer-events:none}
 .gdTabs{display:flex;gap:6px;justify-content:center;margin:6px 0 2px}
@@ -224,7 +224,7 @@ h2{font-size:26px;margin-bottom:8px}h3{font-size:19px;margin:12px 0 6px}
 .gdBgItem b{font-size:13px}.gdBgItem i{font-style:normal;font-size:12px;color:#b05a00}
 .gdBgPrev{position:relative;width:100%;aspect-ratio:3/2;border-radius:8px;overflow:hidden;border:2px solid #c9a24a}
 .gdBgPrev img{width:100%;height:100%;display:block;image-rendering:pixelated}
-.gdZoomBtn{position:absolute;right:6px;top:6px;z-index:120;border:2px solid #c9a24a;background:linear-gradient(#fffbe0,#ffefa6);color:#7a4a00;border-radius:999px;padding:3px 10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 0 rgba(138,100,32,.4)}
+.gdZoomBtn{position:absolute;right:6px;top:6px;z-index:2;border:2px solid #c9a24a;background:linear-gradient(#fffbe0,#ffefa6);color:#7a4a00;border-radius:999px;padding:3px 10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 0 rgba(138,100,32,.4)}
 .gdZoomBtn::before{content:'🔍 확대'}
 body.gdZoom .gdZoomBtn::before{content:'✕ 닫기'}
 body.gdZoom .gdZoomBtn{font-size:15px;padding:6px 16px;right:12px;top:12px}
@@ -3276,7 +3276,7 @@ function coachNext(){if(!CO)return;const st=CO.q.shift();if(!st)return coachEnd(
 function evoCoachSteps(){return [
    {h:'진화',ic:'candy',pic:evoPic([4,5,6]),t:'<b>사탕</b>을 모으면 도감에서 카드를 눌러 <b>진화</b>시킬 수 있어요. 더 강한 포켓몬 카드가 돼요!'},
    {h:'메가진화',ic:'flame',pic:evoPic([6,MEGA[6]]),t:'전투에서 정답을 <b>10개</b> 맞히면 <b>진화 게이지</b>가 가득 차요. 도감에서 사탕으로 <b>연구</b>한 포켓몬을 누르고 <b>메가</b> 버튼! 공격 +5, 체력 +5 (변신한 차례는 쉬어요).'},
-   {h:'진화가 빨라져요',ic:'flame',pic:stPic([['🧬','진화 연구'],['🔹','Lv.1~2 정답 -1'],['🔷','Lv.3~4 정답 -2'],['💠','Lv.5 정답 -3']]),t:'트레이너 스킬 <b>🧬 진화 연구</b>를 배우면 진화에 필요한 정답 수가 줄어요! Lv.1~2는 <b>-1개</b>, Lv.3~4는 <b>-2개</b>, Lv.5는 <b>-3개</b>예요. 전투 화면의 <b>진화 게이지</b>도 줄어든 숫자로 바뀌어요.'},
+   {h:'진화가 빨라져요',ic:'flame',pic:stPic([['🧬','진화 연구'],['🔹','Lv.1~2 정답 -1'],['🔷','Lv.3~4 정답 -2'],['💠','Lv.5 정답 -2 · 메가 2회']]),t:'트레이너 스킬 <b>🧬 진화 연구</b>를 배우면 진화에 필요한 정답 수가 줄어요! Lv.1~2는 <b>-1개</b>, Lv.3~4는 <b>-2개</b>, Lv.5는 <b>-2개</b>에 <b>메가진화를 한 판에 2번</b>까지 쓸 수 있어요. 전투 화면의 <b>진화 게이지</b>도 줄어든 숫자로 바뀌어요.'},
    {h:'원시회귀',ic:'flame',pic:evoPic([382,MEGA[382],383,MEGA[383]]),t:'<b>가이오가·그란돈</b>은 메가 대신 <b>원시회귀</b>! 같은 방법으로 쓰고, 공격 +5, 체력 +5예요. 버튼에는 <b>원시</b>라고 나와요.'},
    {h:'거다이맥스',ic:'sword',pic:evoPic([6,GM_BASE+6]),t:'<b>맥스</b> 버튼은 한 판에 한 번! 체력이 <b>3배</b>가 되고, 동료는 잠시 빠지고, 2번의 내 차례 동안 상대 포켓몬 <b>전체</b>를 공격해요.'},
    {h:'무한다이맥스',ic:'sword',pic:evoPic([890,GM_BASE+890]),t:'<b>무한다이노</b>는 특별한 <b>무한다이맥스</b>! 쓰는 방법은 거다이맥스와 같아요. 쓰고 나면 진화 게이지는 처음부터 다시 모아요.'}];}
@@ -5295,6 +5295,8 @@ function monImg(id,kind='front',cls='',ns){if((kind==='anim'||kind==='back')&&S.
 /* ===== 전투 칸의 포켓몬 그림: 그림 파일 아래쪽의 투명한 여백을 없애 발이 바닥에 닿게 해요 ===== */
 /* 실제 키가 작은 포켓몬(꼬렛·메타몽 등)은 그림 여백을 채우느라 너무 커지지 않게, 도감 키에 맞춰 확대 한도를 둬요 */
 function htCap(id){try{let b=id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];const h=MON[b]&&MON[b].ht;if(!(h>0))return 1.6;return h<=.4?1.05:h<=.7?1.15:h<=1?1.3:h<=1.5?1.45:1.6;}catch(e){return 1.6;}}
+/* 도감 키에 맞는 '몸 높이 비율' 한도: GIF는 그림 크기에 딱 맞게 잘려 있어서 작은 포켓몬도 칸을 가득 채워 커져 버리므로, 작은 포켓몬은 칸의 일부만 차지하게 줄여요 */
+function htFrac(id){try{let b=id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];const h=MON[b]&&MON[b].ht;if(!(h>0))return 1;const T=[[.2,.30],[.4,.38],[.6,.46],[.8,.53],[1,.58],[1.5,.70],[2,.80],[3,.92]];if(h<=T[0][0])return T[0][1];for(let i=1;i<T.length;i++){if(h<=T[i][0]){const a=T[i-1],b2=T[i];return a[1]+(b2[1]-a[1])*(h-a[0])/(b2[0]-a[0]);}}return 1;}catch(e){return 1;}}
 const SPR_SHIFT=new Map();
 function monImgU(id,kind,ns){let h=monImg(id,kind,'',ns);try{const u=spriteURL(id,kind,ns),c=SPR_SHIFT.get(u);if(c&&c!==u)h=h.replace('src="'+u+'"','src="'+c+'" data-shifted="1"');}catch(e){}return h;}
 function shiftSpriteDown(src,cap){return new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';
@@ -5331,12 +5333,13 @@ function gifFit(im){try{
   const fill=Math.max(bwid/W,bhei/H);
   const wide=bwid/bhei>1.12; /* 날개를 펼쳐 옆으로 넓은 포켓몬(리자몽·루기아 등): 칸 폭보다 조금 더 넓게 키워서 몸이 작아 보이지 않게 해요 */
   const tgt=wide?0.95:0.8;let k=bhei/H<tgt?Math.min(wide?Math.max(htCap(+im.dataset.id),1.7):htCap(+im.dataset.id),tgt/(bhei/H)):1;k=Math.max(1,Math.min(k,(wide?W*1.7:W*0.98)/bwid,H/bhei*0.98));
+  {const fr=bhei/H,allow=htFrac(+im.dataset.id)*(wide?1.45:1),kMax=allow/fr;if(kMax<1)k=Math.max(.4,kMax);else k=Math.min(k,kMax);const aw=Math.min(1.4,htFrac(+im.dataset.id)*1.3+.1),kW=aw/(bwid/W);if(kW<1)k=Math.min(k,Math.max(.4,kW));}
   const cxp=(bx0+bx1)/2;
-  if(k<1.06&&by1>=H-2)return;
+  if(Math.abs(k-1)<.06&&by1>=H-2)return;
   im.dataset.gfit='1';
   im.style.transformOrigin=(cxp/W*100).toFixed(2)+'% '+(by1/H*100).toFixed(2)+'%';
   im.style.translate=((W/2-cxp)/W*100).toFixed(2)+'% '+((H-by1)/H*100).toFixed(2)+'%';
-  if(k>=1.06)im.style.scale=k.toFixed(3);
+  if(Math.abs(k-1)>=.06)im.style.scale=k.toFixed(3);
  }catch(err){}});}catch(err){}}
 document.addEventListener('load',e=>{const im=e.target;if(im&&im.tagName==='IMG'&&im.closest&&im.closest('#myLane .unit .sp,#foeLane:not(.wildLane) .unit .sp'))gifFit(im);},true);
 /* 전투 화면이 다시 그려질 때마다(이미 불러온 GIF는 load 이벤트가 오지 않아요) 크기 보정을 다시 걸어 줘요 → 출전 직후 커졌다가 작아지는 문제 해결 */
@@ -5345,7 +5348,7 @@ const __rbGif=renderBattle;renderBattle=function(){const r=__rbGif.apply(this,ar
 /* '진화 N/10' 표시를 누르면: 지금 진화할 수 있는 포켓몬과 그 종류를 안내해요 */
 function evoKinds(id){const k=[];try{if(megaOk(id))k.push(PRIMAL[id]?'원시회귀':'메가 진화');if(gmaxOk(id))k.push(id===890?'무한다이맥스':'거다이맥스');}catch(e){}return k;}
 document.addEventListener('click',e=>{const t=e.target&&e.target.closest&&e.target.closest('#evoPill');if(!t||!B||B.over)return;
- try{sfx('tap');const need=evoNeed(MEGA_NEED),prog=Math.min(Math.max(0,mgProg()),need),ready=prog>=need;
+ try{sfx('tap');if(B.me&&evoOut(B.me)&&!gmaxOff()){alertBox('<h3 style="margin:0 0 8px;text-align:center">🔒 진화 끝!</h3><p style="line-height:1.7;text-align:center">'+EVO_OUT_MSG+'</p>');return;}const need=evoNeed(MEGA_NEED),prog=Math.min(Math.max(0,mgProg()),need),ready=prog>=need;
   const all=B.me.board.map((u,i)=>u&&u.hp>0&&!u.mg&&!u.gm?{u,i,k:evoKinds(u.id)}:null).filter(x=>x&&x.k.length);
   const now=all.filter(x=>{try{return(megaCan(B.me,x.i)||gmaxCan(B.me,x.i,1));}catch(er){return false;}});
   const nm=x=>`<b>${esc(MON[x.u.id].name)}</b> (${x.k.map(esc).join(' · ')})`;
@@ -5830,7 +5833,7 @@ const megaOk=id=>megaHas(id)||!!(MEGA[id]&&B&&B.rl&&B.me&&rlHas('megastone'));
 const PRIMAL={382:1,383:1};const megaName=id=>(PRIMAL[id]?'원시 ':'메가 ')+((MON[id]&&MON[id].name)||'');
 const mgWord=id=>PRIMAL[id]?'원시회귀':'메가 진화',mgStone=id=>PRIMAL[id]?'원시 구슬':'메가스톤';
 // 지금 이 칸의 포켓몬이 변신할 수 있는지(내 기기에서 해금한 포켓몬만)
-function megaCan(P,i){try{const u=P&&P.board[i];if(!u||u.mg||u.gm||u.hp<=0||P.mgUsed||!megaOk(u.id))return false;if(B.coop&&Number(u.coopOwner??0)!==BC.localIndex)return false;return mgProg()>=evoNeed(MEGA_NEED);}catch(e){return false;}}
+function megaCan(P,i){try{const u=P&&P.board[i];if(!u||u.mg||u.gm||u.hp<=0||P.mgUsed||!megaOk(u.id))return false;if(B.coop&&Number(u.coopOwner??0)!==BC.localIndex)return false;return mgProg('m')>=evoNeed(MEGA_NEED);}catch(e){return false;}}
 function megaCand(P){try{return P.board.some((u,i)=>u&&!u.mg&&u.hp>0&&megaOk(u.id)&&(!B.coop||Number(u.coopOwner??0)===BC.localIndex));}catch(e){return false;}}
 
 // 메가 진화 연출: 화면이 어두워지고 빛줄기가 돌다가, 하얗게 번쩍인 뒤 메가 모습이 나타나요(약 3초)
@@ -5852,7 +5855,7 @@ function megaCine(baseId,megaId,name,onFlash,title){return new Promise(res=>{
  setTimeout(()=>{o.classList.add('out');},3000);
  setTimeout(()=>{o.remove();res();},3450);});}
 async function megaDo(P,i,fromRemote){const u=P&&P.board[i];if(!B||!u||!MEGA[u.id]||u.mg||P.mgUsed)return false;
- P.mgUsed=true;if(B.coop)P.mgBase=P.qc||0;else if(P===B.me)B.mgBase=B.qc||0;u.mg=MEGA[u.id];u.atk+=MEGA_ATK;u.max+=MEGA_HP;u.hp+=MEGA_HP;u.att=0;B.sel=-1;B.pick=-1;
+ P.mgN=(P.mgN||0)+1;P.mgUsed=P.mgN>=mgMax(P);if(B.coop)P.mgBase=P.qc||0;else if(P===B.me)B.mgBase=B.qc||0;u.mg=MEGA[u.id];u.atk+=MEGA_ATK;u.max+=MEGA_HP;u.hp+=MEGA_HP;u.att=0;B.sel=-1;B.pick=-1;
  B.busy=true;try{try{if(BC&&BC.host&&B.coop)bossSend({t:'boss-megafx',b:u.id,m:u.mg,n:megaName(u.id)});}catch(e){}await megaCine(u.id,u.mg,megaName(u.id),()=>{renderBattle();});renderBattle();const el=unitEl(P,i);if(el){el.classList.add('megaGo');fx(el,`공격 +${MEGA_ATK} · 체력 +${MEGA_HP}`,'txt');}if(!window.__sim)confetti(50);await wait(500);}catch(e){}
  B.busy=false;renderBattle();return true;}
 // ===== 거다이맥스 =====
@@ -5865,13 +5868,20 @@ const gmaxHas=id=>!!(GMAX[id]&&S.meta&&S.meta.gmax&&S.meta.gmax[id]);
 const gmaxOk=id=>gmaxHas(id)||!!(GMAX[id]&&B&&B.rl&&B.me&&rlHas('dynaband'));
 // 정답 개수(진화 문제수): 혼자·친구 대전은 내 개수, 협동 보스전은 플레이어마다 따로 세요(친구와 공유하지 않아요)
 const qcUp=P=>{B.qc=(B.qc||0)+1;if(B.coop&&P)P.qc=(P.qc||0)+1;};
-const mgProg=()=>{try{if(B.coop&&B.coop.players){const L=B.coop.players[BC.localIndex];if(L)return Math.max(0,(L.qc||0)-(L.mgBase||0));}return Math.max(0,(B.qc||0)-(B.mgBase||0));}catch(e){return 0;}};
+const mgProgK=k=>{try{const bk=k==='g'?'gmBase':'mgBase';if(B.coop&&B.coop.players){const L=B.coop.players[BC.localIndex];if(L)return Math.max(0,(L.qc||0)-(L[bk]||0));}return Math.max(0,(B.qc||0)-(B[bk]||0));}catch(e){return 0;}};
+// 메가는 한 판에 1회(진화 연구 Lv.5면 2회), 다이맥스는 1회 — 횟수는 따로, 게이지는 같이 써요
+const mgMax=P=>{try{if(P===B.me&&!B.coop)return (Number(trainerSkillLevels().evo)||0)>=5&&!B.tut&&!B.tutReal&&!window.__sim?2:1;if(P&&Number(P.evoLv)>=5)return 2;}catch(e){}return 1;};
+const evoOut=P=>!!(P&&P.mgUsed&&P.gmUsed);
+const mgProg=()=>mgProgK('m'); // 진화 게이지는 메가·다이맥스가 같이 써요
 const gmaxOff=()=>!B||B.tut||B.tutReal;
 // 트레이너 스킬 '진화 연구': 진화(메가·원시회귀·거다이맥스)에 필요한 정답 수를 줄여요 (Lv.1~2 -1 · Lv.3~4 -2 · Lv.5 -3, 튜토리얼 제외)
-const evoRed=()=>{try{if(window.__sim||!B||B.tut||B.tutReal)return 0;const n=Number(trainerSkillLevels().evo)||0;return n>=5?3:n>=3?2:n>=1?1:0;}catch(e){return 0;}};
+const evoRed=()=>{try{if(window.__sim||!B||B.tut||B.tutReal)return 0;const n=Number(trainerSkillLevels().evo)||0;return n>=3?2:n>=1?1:0;}catch(e){return 0;}};
 const evoNeed=base=>Math.max(1,base-evoRed());
-const evoNeedFor=(base,P)=>{const n=Number(P&&P.evoLv)||0;return Math.max(1,base-(n>=5?3:n>=3?2:n>=1?1:0));}; // 협동 보스전: 방장이 친구의 진화 연구 레벨로 확인해요
-function gmaxCan(P,i,show){try{const u=P&&P.board[i];if(gmaxOff()||!u||u.gm||u.mg||u.hp<=0||P.gmUsed||P.gmx||!gmaxOk(u.id)||!(u.att>0)||u.frozen)return false;if(B.coop){if(!show)return false;if(Number(u.coopOwner??0)!==BC.localIndex)return false;}return mgProg()>=evoNeed(GMAX_NEED);}catch(e){return false;}}
+const evoNeedFor=(base,P)=>{const n=Number(P&&P.evoLv)||0;return Math.max(1,base-(n>=3?2:n>=1?1:0));}; // 협동 보스전: 방장이 친구의 진화 연구 레벨로 확인해요
+// 선택한 포켓몬이 쓸 수 있는 진화 종류를 이번 판에 모두 소모했는지
+function evoLeft(P,i){try{const u=P&&P.board[i];if(!u||u.mg||u.gm||u.hp<=0||gmaxOff())return false;const mo=megaOk(u.id),go=gmaxOk(u.id);if(!mo&&!go)return false;return (!mo||P.mgUsed)&&(!go||P.gmUsed||!!P.gmx);}catch(e){return false;}}
+const EVO_OUT_MSG='이번 판에 사용할 수 있는 진화 횟수를 모두 소모했어요.';
+function gmaxCan(P,i,show){try{const u=P&&P.board[i];if(gmaxOff()||!u||u.gm||u.mg||u.hp<=0||P.gmUsed||P.gmx||!gmaxOk(u.id)||!(u.att>0)||u.frozen)return false;if(B.coop){if(!show)return false;if(Number(u.coopOwner??0)!==BC.localIndex)return false;}return mgProg('g')>=evoNeed(GMAX_NEED);}catch(e){return false;}}
 function gmaxCand(P){try{if(gmaxOff()||P.gmx||P.gmUsed)return false;return P.board.some(u=>u&&!u.gm&&!u.mg&&u.hp>0&&gmaxOk(u.id));}catch(e){return false;}}
 async function gmaxDo(P,i){const u=P&&P.board[i];if(!B||!u||!GMAX[u.id]||u.gm||u.mg||P.gmUsed||P.gmx)return false;
  P.gmUsed=true;if(B.coop)P.mgBase=P.qc||0;else if(P===B.me)B.mgBase=B.qc||0;B.sel=-1;B.pick=-1;B.busy=true;
@@ -6041,7 +6051,7 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
  $('#battle').innerHTML=`
   <div class=bTop>${B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?((B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:(B.coop?`<button class="btn ghost sm waitCatch" data-wild-catch-slot="${i}" title="체력이 30% 이하라 포획할 수 있어요. 내 차례에 시도해요">🔴 포획 가능</button>`:'')):''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:calc(100% + 2px);left:4px;transform:none;flex-direction:column;align-items:flex-start;z-index:50">${(u=>{const n=Math.max(1,Math.ceil(u.atk*rlBoost(u))+(B.combo>=2?1:0)+quakeB(u)+dragonMod(u));return `<b class=dmgp>-${n}</b>`+(B.pvp?`<b class=dmgp style="color:#2f62b5">방어 성공 시 -${Math.max(0,n-1)}</b>`:'');})(me.board[B.sel])}</div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front','',true)}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill title="상대 손에 든 카드 수">${I('cards')} ${fo.hand.length}</span><span class=pill title="상대 남은 덱 카드 수">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<div class=bMenuCol><button class="btn ghost sm" id=bMenu>메뉴</button><button class="btn ghost sm fsBtn" id=bFull title="전체 화면" aria-label="전체 화면">${I('full','fsO')}${I('fullx','fsX')}</button></div></div>
   <div class="lane${B.wildMode?` wildLane wildCount${fo.board.filter(Boolean).length}`:''}${fo.gmx?' gmaxLane':''}" id=foeLane>${fo.board.map((u,i)=>B.wildMode&&!u?'':`<div class=slot data-i="${i}">${unitH(u,fo,i)}</div>`).join('')}</div>
-  <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class="pill cmbPill ${B.combo>=10?'t10':B.combo>=7?'t7':B.combo>=5?'t5':''}" style="--lv:${Math.min(B.combo,14)};color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}${(!B.tut&&!B.tutReal)?`<span class=pill id=evoPill title="정답을 ${evoNeed(MEGA_NEED)}개 모으면 메가 진화·원시회귀·거다이맥스를 쓸 수 있어요. 쓰면 처음부터 다시 모아요" style="color:${mgProg()>=evoNeed(MEGA_NEED)?'#d97800':'#2f62b5'};${mgProg()>=evoNeed(MEGA_NEED)?'border-color:#ffb100;background:#fff3d6':''}">${mgProg()>=evoNeed(MEGA_NEED)?'✨':'🔷'} 진화 ${Math.min(Math.max(0,mgProg()),evoNeed(MEGA_NEED))}/${evoNeed(MEGA_NEED)}</span>`:''}${my&&B.sel>=0&&megaCan(B.me,B.sel)?`<button class="btn gold sm" id=bMega>🔷 ${PRIMAL[B.me.board[B.sel].id]?'원시':'메가'}</button>`:''}${my&&B.sel>=0&&gmaxCan(B.me,B.sel,1)?`<button class="btn red sm" id=bGmax>🌋 맥스</button>`:''}</div>
+  <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class="pill cmbPill ${B.combo>=10?'t10':B.combo>=7?'t7':B.combo>=5?'t5':''}" style="--lv:${Math.min(B.combo,14)};color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}${(!B.tut&&!B.tutReal)?`<span class=pill id=evoPill title="정답을 ${evoNeed(MEGA_NEED)}개 모으면 메가 진화·원시회귀·거다이맥스를 쓸 수 있어요. 쓰면 처음부터 다시 모아요" style="color:${mgProg()>=evoNeed(MEGA_NEED)?'#d97800':'#2f62b5'};${mgProg()>=evoNeed(MEGA_NEED)?'border-color:#ffb100;background:#fff3d6':''}">${mgProg()>=evoNeed(MEGA_NEED)?'✨':'🔷'} 진화 ${Math.min(Math.max(0,mgProg()),evoNeed(MEGA_NEED))}/${evoNeed(MEGA_NEED)}</span>`:''}${my&&B.sel>=0&&megaCan(B.me,B.sel)?`<button class="btn gold sm" id=bMega>🔷 ${PRIMAL[B.me.board[B.sel].id]?'원시':'메가'}</button>`:''}${my&&B.sel>=0&&gmaxCan(B.me,B.sel,1)?`<button class="btn red sm" id=bGmax>🌋 맥스</button>`:''}${my&&!B.coop&&B.sel>=0&&evoLeft(B.me,B.sel)?`<button class="btn sm" id=bEvoOut style="opacity:.6">🔒 진화</button>`:''}</div>
   <div class="lane${B.coop?' coopLane':''}${me.gmx?' gmaxLane':''}" id=myLane>${me.board.map((u,i)=>`<div class="slot${B.pick>=0&&!u&&!isItemCard(me.hand[B.pick])?' can':''}" data-i="${i}">${unitH(u,me,i)}</div>`).join('')}</div>
   ${B.coop?`<div class="bBot coopHeroes">${heroH(loc,'heroMe',B.side==='me'&&B.coop.active===BC.localIndex)}${ally?heroH(ally,'heroAlly',B.side==='me'&&B.coop.active!==BC.localIndex):''}</div>`:''}<div class=bBot>${B.coop?'':heroH(me,'heroMe',false)}${mana(loc)}
    <button class="btn purple sm" id=bPower ${my&&(loc.powerUses||0)>0?'':'disabled'} title="남은 사용 횟수 ${Math.max(0,loc.powerUses||0)}회: 문제를 맞히면 카드 1장">${I('book')} 공부 기술 <small style="font-size:11px">${Math.max(0,loc.powerUses||0)}회</small></button>
@@ -6062,7 +6072,7 @@ function bindBattle(){const me=B.me;
  autoBind();$('#bEnd').onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;sfx('tap');B.sel=-1;B.pick=-1;B.trainerSkillTarget=null;if(B.coop&&!BC.host){bossSubmit({type:'end'});return;}if(B.pvp)pvpSend({t:'end'});endTurn();};
  $('#bPower').onclick=()=>{if(B&&B.coop&&!BC.host){if(B.busy||B.side!=='me'||B.coop.active!==BC.localIndex)return;const q=pickQ({cyc:1});(async()=>{if(!q){bossSubmit({type:'power',ok:true});return;}const r=await battleQ(q,{who:B.me.av,what:'공부 기술: 맞히면 카드 1장!',power:true});bossSubmit({type:'power',ok:r.ok,crit:!!(r.ok&&q.tier==='H')});})();return;}usePower();};
  fitHandCrowd();
- {const gb=$('#bGmax');if(gb)gb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0)return;if(B.coop){sfx('tap');toast('협동 보스전에서는 사용이 불가능해요.');return;}if(!gmaxCan(B.me,B.sel))return;const si=B.sel;sfx('tap');if(B.pvp)pvpSend({t:'gmax',si});gmaxDo(B.me,si);};}{const mb=$('#bMega');if(mb)mb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0||!megaCan(B.me,B.sel))return;const si=B.sel;sfx('tap');if(B.coop&&!BC.host){bossSubmit({type:'mega',si});B.sel=-1;return;}if(B.pvp)pvpSend({t:'mega',si});megaDo(B.me,si);};}
+ {const eo=$('#bEvoOut');if(eo)eo.onclick=()=>{sfx('tap');toast(EVO_OUT_MSG);};}{const gb=$('#bGmax');if(gb)gb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0)return;if(B.coop){sfx('tap');toast('협동 보스전에서는 사용이 불가능해요.');return;}if(!gmaxCan(B.me,B.sel))return;const si=B.sel;sfx('tap');if(B.pvp)pvpSend({t:'gmax',si});gmaxDo(B.me,si);};}{const mb=$('#bMega');if(mb)mb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0||!megaCan(B.me,B.sel))return;const si=B.sel;sfx('tap');if(B.coop&&!BC.host){bossSubmit({type:'mega',si});B.sel=-1;return;}if(B.pvp)pvpSend({t:'mega',si});megaDo(B.me,si);};}
  $('#battle').querySelectorAll('.hand .card').forEach(c=>c.onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;const i=+c.dataset.h,v=(B.coop?B.coop.players[BC.localIndex].hand:me.hand)[i];
   if(B.itemTargetMode){if(i===B.itemTargetMode.hand){B.itemTargetMode=null;B.pick=-1;renderBattle();toast('전기의 돌 사용을 취소했어요');}else toast('먼저 전기의 돌을 사용할 포켓몬을 골라 주세요');return;}
   if(B.moonTargetMode){if(i===B.moonTargetMode.hand){B.moonTargetMode=null;B.pick=-1;renderBattle();toast('달의 돌 사용을 취소했어요');}else toast('먼저 달의 돌로 기절시킬 상대 포켓몬을 골라 주세요');return;}
@@ -6552,26 +6562,42 @@ const PXF=(()=>{
  function size(){const w=VW(),h=VH();const S0=Math.max(3,Math.min(6,q(Math.min(w,h)/115)));S=Math.max(2,Math.min(3,q(Math.min(w,h)/200)));K=Math.max(1,S0/S);const nw=Math.ceil(w/S),nh=Math.ceil(h/S);
   if(!cv){cv=document.createElement('canvas');cv.id='pxfx';document.body.appendChild(cv);cx=cv.getContext('2d');}
   if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;}cw=nw;ch=nh;cv.style.width=nw*S+'px';cv.style.height=nh*S+'px';}
+ const SEEN=new Map(),warm=k=>{const n=(SEEN.get(k)||0)+1;if(SEEN.size>4000)SEEN.clear();SEEN.set(k,n);return n>=3;},DCH=new Map(),cacheCv=(key,w,h,draw)=>{let c=DCH.get(key);if(c)return c;if(DCH.size>700)DCH.clear();c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'));DCH.set(key,c);return c;};
  const rgba=(h,a)=>{const n=parseInt(h.slice(1),16);return 'rgba('+(n>>16)+','+((n>>8)&255)+','+(n&255)+','+a+')';};
  const P={
   blend(m){cx.globalCompositeOperation=m||'source-over';},
   // 부드러운 빛무리(방사형 번짐)
-  halo(x,y,r,c,a){if(a<=.003||r<=.5)return;const A=a*baseA,g=cx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,rgba(c,A));g.addColorStop(.3,rgba(c,A*.55));g.addColorStop(.65,rgba(c,A*.16));g.addColorStop(1,rgba(c,0));cx.save();cx.globalAlpha=1;cx.fillStyle=g;cx.fillRect(x-r,y-r,r*2,r*2);cx.restore();},
+  halo(x,y,r,c,a){if(a<=.003||r<=.5)return;const A=a*baseA,n=r<6?Math.round(r*2):12+Math.round(Math.log(r/6)/.0953);
+   if(!warm('h'+n+c)){const g=cx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,rgba(c,A));g.addColorStop(.3,rgba(c,A*.55));g.addColorStop(.65,rgba(c,A*.16));g.addColorStop(1,rgba(c,0));cx.save();cx.globalAlpha=1;cx.fillStyle=g;cx.fillRect(x-r,y-r,r*2,r*2);cx.restore();return;}
+   const rq=r<6?n/2:6*Math.exp((n-12)*.0953),sz=Math.max(2,Math.ceil(rq)*2),spr=cacheCv('h'+n+c,sz,sz,g=>{const R=sz/2,gr=g.createRadialGradient(R,R,0,R,R,R);gr.addColorStop(0,rgba(c,1));gr.addColorStop(.3,rgba(c,.55));gr.addColorStop(.65,rgba(c,.16));gr.addColorStop(1,rgba(c,0));g.fillStyle=gr;g.fillRect(0,0,sz,sz);}),ga0=cx.globalAlpha;cx.globalAlpha=Math.min(1,A);cx.drawImage(spr,x-r,y-r,r*2,r*2);cx.globalAlpha=ga0;},
   // 결 고운 빛 고리(양쪽으로 부드럽게 사라지는 링)
   ringGlow(x,y,r,w,c,a,sy){if(a<=.003||r<=.5)return;w=Math.max(.6,w);const r0=Math.max(0,r-w),r1=r+w,A=a*baseA,m=Math.min(.99,Math.max(.01,(r-r0)/(r1-r0))),g=cx.createRadialGradient(0,0,r0,0,0,r1);g.addColorStop(0,rgba(c,0));g.addColorStop(m,rgba(c,A));g.addColorStop(1,rgba(c,0));cx.save();cx.globalAlpha=1;cx.translate(x,y);cx.scale(1,sy||.88);cx.fillStyle=g;cx.beginPath();cx.arc(0,0,r1,0,6.2832);cx.fill();cx.restore();},
   // 끝으로 갈수록 옅어지는 빛살
   ray(x,y,ang,len,w,c,a){if(a<=.003||len<=.5)return;const A=a*baseA;cx.save();cx.globalAlpha=1;cx.translate(x,y);cx.rotate(ang);const g=cx.createLinearGradient(0,0,len,0);g.addColorStop(0,rgba(c,A));g.addColorStop(1,rgba(c,0));cx.fillStyle=g;cx.beginPath();cx.moveTo(0,-w);cx.lineTo(len,0);cx.lineTo(0,w);cx.closePath();cx.fill();cx.restore();},
   px(x,y,c){cx.fillStyle=c;cx.fillRect(q(x),q(y),1,1);},
   rect(x,y,w,h,c){cx.fillStyle=c;cx.fillRect(q(x),q(y),Math.max(1,q(w)),Math.max(1,q(h)));},
-  line(x0,y0,x1,y1,c,th){th=th||1;x0=q(x0);y0=q(y0);x1=q(x1);y1=q(y1);cx.fillStyle=c;const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1,o=-(th>>1);let e=dx+dy,n=0;
-   for(;;){cx.fillRect(x0+o,y0+o,th,th);if((x0===x1&&y0===y1)||++n>900)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}},
-  disc(x,y,r,c,dith){cx.fillStyle=c;x=q(x);y=q(y);r=Math.max(0,q(r));
+  line(x0,y0,x1,y1,c,th){th=th||1;x0=q(x0);y0=q(y0);x1=q(x1);y1=q(y1);cx.fillStyle=c;const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1,o=-(th>>1);let e=dx+dy,n=0,px=0,py=0,pw=0,ph=0,has=false;
+   for(;;){const nx=x0+o,ny=y0+o;
+    if(has&&ny===py&&ph===th&&nx<=px+pw&&nx+th>=px){const l=Math.min(px,nx),r=Math.max(px+pw,nx+th);px=l;pw=r-l;}
+    else if(has&&nx===px&&pw===th&&ny<=py+ph&&ny+th>=py){const t=Math.min(py,ny),bt=Math.max(py+ph,ny+th);py=t;ph=bt-t;}
+    else{if(has)cx.fillRect(px,py,pw,ph);px=nx;py=ny;pw=th;ph=th;has=true;}
+    if((x0===x1&&y0===y1)||++n>900)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}
+   if(has)cx.fillRect(px,py,pw,ph);},
+  disc(x,y,r,c,dith){x=q(x);y=q(y);r=Math.max(0,q(r));
+   if(r>=3&&r<=160&&warm('d'+r+c+(dith?'t'+((x+y)&1):''))){const par=dith?((x+y)&1):0,sp=cacheCv('d'+r+c+(dith?'t'+par:''),2*r+1,2*r+1,g=>{g.fillStyle=c;for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));if(!dith)g.fillRect(r-w,r+j,w*2+1,1);else for(let i=-w;i<=w;i++)if(((par+i+j)&1)===0)g.fillRect(r+i,r+j,1,1);}});cx.drawImage(sp,x-r,y-r);return;}
+   cx.fillStyle=c;
    for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));
     if(!dith)cx.fillRect(x-w,y+j,w*2+1,1);else for(let i=-w;i<=w;i++)if(((x+i+y+j)&1)===0)cx.fillRect(x+i,y+j,1,1);}},
-  ring(x,y,R,c,th,dith){cx.fillStyle=c;x=q(x);y=q(y);R=Math.max(1,q(R));th=Math.max(1,th||1);const ri=R-th;
-   for(let j=-R;j<=R;j++){const wo=Math.floor(Math.sqrt(Math.max(0,R*R+R*.8-j*j)));const wi=(ri>0&&Math.abs(j)<=ri)?Math.floor(Math.sqrt(Math.max(0,ri*ri+ri*.8-j*j))):-1;
-    const put=(a,b)=>{if(!dith)cx.fillRect(a,y+j,b-a+1,1);else for(let i=a;i<=b;i++)if(((i+y+j)&1)===0)cx.fillRect(i,y+j,1,1);};
-    if(wi<0)put(x-wo,x+wo);else{put(x-wo,x-wi-1);put(x+wi+1,x+wo);}}},
+  ring(x,y,R,c,th,dith){x=q(x);y=q(y);R=Math.max(1,q(R));th=Math.max(1,th||1);const ri=R-th,par=dith?((x+y)&1):0;
+   const draw=(g,X,Y,pp)=>{g.fillStyle=c;for(let j=-R;j<=R;j++){const wo=Math.floor(Math.sqrt(Math.max(0,R*R+R*.8-j*j)));const wi=(ri>0&&Math.abs(j)<=ri)?Math.floor(Math.sqrt(Math.max(0,ri*ri+ri*.8-j*j))):-1;
+    const put=(a,b)=>{if(!dith)g.fillRect(a,Y+j,b-a+1,1);else for(let i=a;i<=b;i++)if(((i-X+pp+j)&1)===0)g.fillRect(i,Y+j,1,1);};
+    if(wi<0)put(X-wo,X+wo);else{put(X-wo,X-wi-1);put(X+wi+1,X+wo);}}};
+   if(R<=160&&warm('r'+R+'|'+th+c+(dith?'t'+par:''))){const sp=cacheCv('r'+R+'|'+th+c+(dith?'t'+par:''),2*R+1,2*R+1,g=>draw(g,R,R,par));cx.drawImage(sp,x-R,y-R);return;}
+   cx.fillStyle=c;draw(cx,x,y,(x+y)&1);},
+  // 미리 구워 둔 그림을 통째로 찍어요(회전·확대·세로 일부만 보이기). 도트 느낌을 지키려고 보간은 끄고 찍어요
+  blit(cv,x,y,o){o=o||{};const ga0=cx.globalAlpha,a=o.a==null?1:o.a;if(a<=.003)return;cx.globalAlpha=Math.min(1,baseA*a);const ch=o.ch==null?cv.height:Math.max(0,Math.min(cv.height,Math.round(o.ch))),sc=o.sc||1,ox=o.ox||0,oy=o.oy||0;
+   if(ch>0){cx.imageSmoothingEnabled=false;if(o.rot||sc!==1){cx.save();cx.translate(Math.round(x),Math.round(y));if(o.rot)cx.rotate(o.rot);cx.drawImage(cv,0,0,cv.width,ch,-ox*sc,-oy*sc,cv.width*sc,ch*sc);cx.restore();}else cx.drawImage(cv,0,0,cv.width,ch,Math.round(x-ox),Math.round(y-oy),cv.width,ch);cx.imageSmoothingEnabled=true;}
+   cx.globalAlpha=ga0;},
   spr(rows,pal,x,y,sc){sc=Math.max(1,Math.round((sc||1)*K*.75));const h=rows.length,w=rows[0].length;x=q(x-w*sc/2);y=q(y-h*sc/2);
    for(let j=0;j<h;j++)for(let i=0;i<w;i++){const k=rows[j][i];if(k==='.')continue;cx.fillStyle=pal[k];cx.fillRect(x+i*sc,y+j*sc,sc,sc);}},
   fill(c,alpha,dither){cx.save();cx.globalAlpha=alpha==null?1:alpha;if(dither){let pt=DPAT[c];if(!pt||pt.cx!==cx){const t=document.createElement('canvas');t.width=t.height=2;const g=t.getContext('2d');g.fillStyle=c;g.fillRect(0,0,1,1);g.fillRect(1,1,1,1);pt=DPAT[c]={cx,p:cx.createPattern(t,'repeat')};}cx.fillStyle=pt.p;}else cx.fillStyle=c;cx.fillRect(0,0,cw,ch);cx.restore();},
@@ -7675,6 +7701,13 @@ const mk=c=>{const S=F.S();return{S,sc:cl(c.pw||1,.6,1.8),ax:c.x0/S,ay:c.y0/S,bx
 const add=(d,du,f,o)=>F.add(d,du,0,0,(P_,p,k)=>f(k,p),o||{nf:1});
 const fn=p=>Math.floor(Math.max(0,p.age)/33);
 const glow=(x,y,r,c,a)=>{P.blend('lighter');P.halo(x,y,r,c,a);P.blend();};
+// 한 번만 그려 두고 계속 찍어 쓰는 그림(비싼 정적 요소를 매 프레임 다시 그리지 않으려고)
+const bake=(w,h,fn)=>{const cv=document.createElement('canvas');cv.width=Math.max(1,Math.ceil(w));cv.height=Math.max(1,Math.ceil(h));const g=cv.getContext('2d'),q=Math.round,B={g,ga:a=>{g.globalAlpha=a;},
+ rect:(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(q(x),q(y),Math.max(1,q(w)),Math.max(1,q(h)));},
+ disc:(x,y,r,c)=>{g.fillStyle=c;x=q(x);y=q(y);r=Math.max(0,q(r));for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));g.fillRect(x-w,y+j,w*2+1,1);}},
+ poly:(pts,c)=>{const n=pts.length;let y0=1e9,y1=-1e9;for(const p of pts){if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1];}g.fillStyle=c;y0=q(y0);y1=q(y1);for(let y=y0;y<=y1;y++){const yy=y+.5,xs=[];for(let i=0;i<n;i++){const A=pts[i],Bp=pts[(i+1)%n];if((A[1]<=yy&&Bp[1]>yy)||(Bp[1]<=yy&&A[1]>yy))xs.push(A[0]+(yy-A[1])/(Bp[1]-A[1])*(Bp[0]-A[0]));}xs.sort((u,v)=>u-v);for(let i=0;i+1<xs.length;i+=2){const xa=q(xs[i]),xb=q(xs[i+1]);if(xb>=xa)g.fillRect(xa,y,Math.max(1,xb-xa),1);}}},
+ line:(x0,y0,x1,y1,c,th)=>{th=th||1;x0=q(x0);y0=q(y0);x1=q(x1);y1=q(y1);g.fillStyle=c;const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1,o=-(th>>1);let e=dx+dy,n=0;for(;;){g.fillRect(x0+o,y0+o,th,th);if((x0===x1&&y0===y1)||++n>900)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}}};
+ fn(B);return cv;};
 // 기 모으기: 알갱이가 소용돌이치며 한 점으로 모여요
 function gather(x,y,R,cols,dur,n){add(0,dur,(k,p)=>{const e=ez.in(k);glow(x,y,R*(.35+.55*e),cols[0],.55*e);glow(x,y,R*(.16+.24*e),cols[1],.8*e);
  for(let i=0;i<n;i++){const a=hz(i+1)*TAU+k*(4+hz(i)*3),d=R*(1-ez.out(k))*(.5+.8*hz(i+7)),big=i%4===0;P.ga(.3+.7*k);P.rect(x+cos(a)*d,y+sin(a)*d*.78,1+big,1+big,cols[i%cols.length]);}
@@ -7989,12 +8022,13 @@ Object.assign(FX,{
 shuriken(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,per=big?3:2,tC=440,vg=190,fl=240,
  W={d:'#0b3a7a',a:'#1e6fd9',b:'#4db5ff',c:'#9fdcff',e:'#dff4ff',w:'#ffffff'};
  // 날카로운 4날 수리검: 휘어진 날마다 한쪽은 밝은 강철빛, 한쪽은 어둡게 칠하고 날 끝에 반짝임을 줘요
- const shuri=(x,y,r,rot,al,gl)=>{const o=[];for(let i=0;i<8;i++){const tip=i%2===0,q=rot+i*PI/4+(tip?0:.42),d=tip?r:r*.3;o.push([x+cos(q)*d,y+sin(q)*d]);}
-  if(al!=null)P.ga(al);if(gl)glow(x,y,r*2.4,W.b,.45*gl);
-  P.poly(o.map(([px,py])=>[x+(px-x)*1.1,y+(py-y)*1.1]),W.d);
-  for(let i=0;i<4;i++){const tip=o[2*i],inN=o[2*i+1],inP=o[(2*i+7)%8];P.poly([[x,y],tip,inP],i%2?W.c:W.e);P.poly([[x,y],tip,inN],i%2?W.a:W.b);P.line(tip[0],tip[1],inP[0],inP[1],W.w,1);}
-  P.disc(x,y,Math.max(1,r*.3),W.d);P.disc(x,y,Math.max(1,r*.22),W.a);P.disc(x,y,Math.max(1,r*.12),W.e);
-  if(al!=null)P.ga(1);return o;};
+ // 수리검은 크기별로 한 번만 그려 두고(날마다 밝은 면·어두운 면) 돌려서 찍어요
+ const SH={};const shuriSp=r=>{const rr=Math.max(1,Math.round(r));if(SH[rr])return SH[rr];const D=Math.ceil(rr*2.4)+4,c=D/2;
+  return SH[rr]={rr,c,cv:bake(D,D,B=>{const x=c,y=c,o=[];for(let i=0;i<8;i++){const tip=i%2===0,q=i*PI/4+(tip?0:.42),d=tip?rr:rr*.3;o.push([x+cos(q)*d,y+sin(q)*d]);}
+   B.poly(o.map(([px,py])=>[x+(px-x)*1.1,y+(py-y)*1.1]),W.d);
+   for(let i=0;i<4;i++){const tip=o[2*i],inN=o[2*i+1],inP=o[(2*i+7)%8];B.poly([[x,y],tip,inP],i%2?W.c:W.e);B.poly([[x,y],tip,inN],i%2?W.a:W.b);B.line(tip[0],tip[1],inP[0],inP[1],W.w,1);}
+   B.disc(x,y,Math.max(1,rr*.3),W.d);B.disc(x,y,Math.max(1,rr*.22),W.a);B.disc(x,y,Math.max(1,rr*.12),W.e);})};};
+ const shuri=(x,y,r,rot,al,gl)=>{if(gl)glow(x,y,r*2.4,W.b,.45*gl);const sp=shuriSp(r);P.blit(sp.cv,x,y,{a:al==null?1:al,rot,sc:r/sp.rr,ox:sp.c,oy:sp.c});};
  // 날카로운 베기 자국: 양 끝이 뾰족한 칼날 모양
  const slash=(x,y,L,ang,w,al)=>{const ux=cos(ang),uy=sin(ang),nx=-uy,ny=ux;P.ga(al);P.poly([[x-ux*L,y-uy*L],[x+nx*w,y+ny*w],[x+ux*L,y+uy*L],[x-nx*w,y-ny*w]],W.b);P.poly([[x-ux*L*.96,y-uy*L*.96],[x+nx*w*.5,y+ny*w*.5],[x+ux*L*.96,y+uy*L*.96],[x-nx*w*.5,y-ny*w*.5]],W.w);P.ga(1);};
  const glint=(x,y,r,al)=>{P.ga(al);P.ray(x,y,0,r,1,W.w,1);P.ray(x,y,PI/2,r*.8,1,W.w,1);P.ray(x,y,PI,r,1,W.w,1);P.ray(x,y,-PI/2,r*.8,1,W.w,1);P.ga(1);};
@@ -8008,7 +8042,7 @@ shuriken(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,per=big?3:2,tC=440,vg
  const mkThrow=(t0,dur,sx,sy,tx,ty,r,bow,boss)=>{
   const pos=kk=>{const e=kk*kk*(3-2*kk)*.35+kk*.65,dx=tx-sx,dy=ty-sy,L=Math.hypot(dx,dy)||1;return[lerp(sx,tx,e)-dy/L*Math.sin(kk*PI)*bow,lerp(sy,ty,e)+dx/L*Math.sin(kk*PI)*bow];};
   add(t0,dur,(k,p)=>{const[x,y]=pos(k),f=fn(p);
-   for(let s=14;s>=1;s--){const kk=Math.max(0,k-s*.03),[px,py]=pos(kk),a=1-s/15;P.ga(a*.9);P.line(px,py,x,y,s>7?W.a:W.c,Math.max(1,Math.round(r*.22*a)));P.ga(1);}
+   for(let s=8;s>=1;s--){const kk=Math.max(0,k-s*.052),[px,py]=pos(kk),a=1-s/9;P.ga(a*.9);P.line(px,py,x,y,s>4?W.a:W.c,Math.max(1,Math.round(r*.26*a)));P.ga(1);}
    P.ga(.9);P.line(pos(Math.max(0,k-.2))[0],pos(Math.max(0,k-.2))[1],x,y,W.w,1);P.ga(1);
    for(let s=3;s>=1;s--){const kk=Math.max(0,k-s*.06),[px,py]=pos(kk);shuri(px,py,r*(1-.1*s),(kk*40+t0)%TAU,.22*(4-s)/3,0);}
    shuri(x,y,r,k*(boss?26:38)+t0,1,1);if(f%2===0)glint(x+cos(k*40+t0)*r,y+sin(k*40+t0)*r,r*.7,1);});};
@@ -8047,28 +8081,22 @@ dracometeor(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,n=big?8:6,tC=340,t
   // 낙하 지점 경고 표시
   add(q.t-280,280,(k)=>{const rr=R*(last?1.9:1.1)*(1.25-.3*k);P.ga(.35+.5*sin(k*PI*3)**2);P.ring(q.x,q.y+R*.1,Math.max(2,rr),'#ff5a2a',last?2:1,true);P.ring(q.x,q.y+R*.1,Math.max(2,rr*.55),'#ffd45c',1,true);P.ga(1);});
   add(q.t,q.fall,(k,p)=>{const f=fn(p),[x,y]=pos(k);
-   for(let j=46;j>=1;j--){const kk=Math.max(0,k-j*.0105),[tx,ty]=pos(kk),a=1-j/47,pj=(hz(j*2.1+f*.5)-.5)*r0*.55*a,rad=r0*(.12+.78*a*a+.2*a),t=1-a;
-    glow(tx-uy*pj,ty+ux*pj,Math.max(2,rad*1.8),hot(.32+t*.68),.36*Math.min(1,a*1.6));if(j%3===0){P.ga(a*.8);P.disc(tx-uy*pj,ty+ux*pj,Math.max(1,rad*.5),hot(.12+t*.7));P.ga(1);}
+   for(let j=22;j>=1;j--){const kk=Math.max(0,k-j*.0222),[tx,ty]=pos(kk),a=1-j/23,pj=(hz(j*2.1+f*.5)-.5)*r0*.55*a,rad=r0*(.12+.78*a*a+.2*a),t=1-a;
+    glow(tx-uy*pj,ty+ux*pj,Math.max(2,rad*2.4),hot(.32+t*.68),.5*Math.min(1,a*1.6));if(j%3===0){P.ga(a*.8);P.disc(tx-uy*pj,ty+ux*pj,Math.max(1,rad*.5),hot(.12+t*.7));P.ga(1);}
     if(j%4===0){const sp=(hz(j*5.7+f*.3)-.5)*r0*2.6;P.ga(a);P.rect(tx-uy*sp,ty+ux*sp,1+(j%8===0),1+(j%8===0),HOT[1+j%3]);P.ga(1);}}
    P.ga(1);glow(x,y,r0*3.4,'#ff4a1a',.45);glow(x,y,r0*1.8,'#ff9a3c',.55);
    // 운석 몸체: 면마다 빛을 받는 정도가 달라 입체적으로 보이고, 분화구·용암 균열·달궈진 앞면이 있어요
-   {const rot=k*3.2+i*1.7,NV=14,lx=ux,ly=uy,vs=[];
-    for(let v=0;v<NV;v++){const an=v/NV*TAU+rot,rr=r0*(.92+.18*hz(v*1.3+i*7)+(v%4===0?.07:0));vs.push([x+cos(an)*rr,y+sin(an)*rr*.94,an]);}
-    // 바깥 달궈진 테두리(앞쪽)
-    for(let v=0;v<NV;v++){const[px,py,an]=vs[v],fr=cos(an-rot-0)*0;}
-    for(let v=0;v<NV;v++){const A=vs[v],B=vs[(v+1)%NV],mx=(A[0]+B[0])/2-x,my=(A[1]+B[1])/2-y,ml=Math.hypot(mx,my)||1,lit=(mx*lx+my*ly)/ml; // -1(뒷면)~1(앞면)
-     const t=cl((lit+1)/2,0,1),col=t>.82?'#d9682c':t>.62?'#a8472a':t>.4?'#74331f':t>.2?'#4a2216':'#2a130e';
-     P.poly([[x,y],[A[0],A[1]],[B[0],B[1]]],col);
-     // 면 안쪽 한 겹 더 밝은 조각으로 거친 질감
-     const q=.62;P.poly([[x+(A[0]-x)*q+mx*.12,y+(A[1]-y)*q+my*.12],[x+(A[0]-x)*.95,y+(A[1]-y)*.95],[x+(B[0]-x)*.6,y+(B[1]-y)*.6]],t>.5?'#c2592c':'#5a2a1a');
-     if(t>.55){P.ga(.35+.5*(t-.55)/.45);P.line(A[0],A[1],B[0],B[1],t>.8?'#ffd45c':'#ff9a3c',1);P.ga(1);}
-     else{P.ga(.5);P.line(A[0],A[1],B[0],B[1],'#120806',1);P.ga(1);}}
-    // 분화구
-    for(let v=0;v<3;v++){const an=rot*.9+v*2.3+i,d=r0*(.22+.3*hz(v+i*3)),cx=x+cos(an)*d,cy=y+sin(an)*d*.94,cr=Math.max(1,r0*(.13+.07*hz(v*2+i)));P.disc(cx+lx*cr*.35,cy+ly*cr*.35,cr+.5,'#c2592c');P.disc(cx,cy,cr,'#1a0a06');P.disc(cx-lx*cr*.2,cy-ly*cr*.2,Math.max(1,cr*.6),'#2b140c');}
-    // 용암 균열(빛나는 선)
-    for(let v=0;v<4;v++){let px=x+(hz(v*3+i)-.5)*r0*.3,py=y+(hz(v*3+i+1)-.5)*r0*.3,an=rot+v*1.6+hz(v+i)*.8;for(let sg=0;sg<3;sg++){const nx=px+cos(an)*r0*.2,ny=py+sin(an)*r0*.19;glow(nx,ny,r0*.22,'#ff7a2e',.4);P.line(px,py,nx,ny,'#ff7a2e',1);P.ga(.75);P.line(px,py,nx,ny,'#ffd45c',1);P.ga(1);px=nx;py=ny;an+=(hz(v*7+sg+i)-.5)*1.4;}}
-    // 앞쪽 충격파 불꽃(공기와 마찰해 달궈진 면)
-    for(let v=0;v<7;v++){const o=(v-3)/3,an=Math.atan2(uy,ux)+o*1.1,rr=r0*(1.0+.12*(1-Math.abs(o)));P.ga(.85-.5*Math.abs(o));P.disc(x+cos(an)*rr,y+sin(an)*rr,Math.max(1,r0*.2*(1-Math.abs(o)*.5)),Math.abs(o)<.4?'#fff1b0':'#ffb347');P.ga(1);}
+   {const rot=k*3.2+i*1.7,rq=((Math.round(rot/(TAU/24))%24)+24)%24,lx=ux,ly=uy;
+    // 운석 몸체는 15°씩 돌린 모양을 한 번씩만 그려 두고 찍어요
+    const sp=(q.sp=q.sp||{})[rq]||(q.sp[rq]=(()=>{const D=Math.ceil(r0*2.9)+8,c=D/2,rot2=rq*TAU/24,NV=14,vs=[];return{c,cv:bake(D,D,B=>{const x=c,y=c;
+     for(let v=0;v<NV;v++){const an=v/NV*TAU+rot2,rr=r0*(.92+.18*hz(v*1.3+i*7)+(v%4===0?.07:0));vs.push([x+cos(an)*rr,y+sin(an)*rr*.94,an]);}
+     for(let v=0;v<NV;v++){const A=vs[v],Bv=vs[(v+1)%NV],mx=(A[0]+Bv[0])/2-x,my=(A[1]+Bv[1])/2-y,ml=Math.hypot(mx,my)||1,lit=(mx*lx+my*ly)/ml,t=cl((lit+1)/2,0,1),col=t>.82?'#d9682c':t>.62?'#a8472a':t>.4?'#74331f':t>.2?'#4a2216':'#2a130e';
+      B.poly([[x,y],[A[0],A[1]],[Bv[0],Bv[1]]],col);const qq=.62;B.poly([[x+(A[0]-x)*qq+mx*.12,y+(A[1]-y)*qq+my*.12],[x+(A[0]-x)*.95,y+(A[1]-y)*.95],[x+(Bv[0]-x)*.6,y+(Bv[1]-y)*.6]],t>.5?'#c2592c':'#5a2a1a');
+      if(t>.55){B.ga(.35+.5*(t-.55)/.45);B.line(A[0],A[1],Bv[0],Bv[1],t>.8?'#ffd45c':'#ff9a3c',1);B.ga(1);}else{B.ga(.5);B.line(A[0],A[1],Bv[0],Bv[1],'#120806',1);B.ga(1);}}
+     for(let v=0;v<3;v++){const an=rot2*.9+v*2.3+i,d=r0*(.22+.3*hz(v+i*3)),cx=x+cos(an)*d,cy=y+sin(an)*d*.94,cr=Math.max(1,r0*(.13+.07*hz(v*2+i)));B.disc(cx+lx*cr*.35,cy+ly*cr*.35,cr+.5,'#c2592c');B.disc(cx,cy,cr,'#1a0a06');B.disc(cx-lx*cr*.2,cy-ly*cr*.2,Math.max(1,cr*.6),'#2b140c');}
+     for(let v=0;v<4;v++){let px=x+(hz(v*3+i)-.5)*r0*.3,py=y+(hz(v*3+i+1)-.5)*r0*.3,an=rot2+v*1.6+hz(v+i)*.8;for(let sg=0;sg<3;sg++){const nx=px+cos(an)*r0*.2,ny=py+sin(an)*r0*.19;B.line(px,py,nx,ny,'#ff7a2e',1);B.ga(.75);B.line(px,py,nx,ny,'#ffd45c',1);B.ga(1);px=nx;py=ny;an+=(hz(v*7+sg+i)-.5)*1.4;}}
+     for(let v=0;v<7;v++){const o=(v-3)/3,an=Math.atan2(uy,ux)+o*1.1,rr=r0*(1.0+.12*(1-Math.abs(o)));B.ga(.85-.5*Math.abs(o));B.disc(x+cos(an)*rr,y+sin(an)*rr,Math.max(1,r0*.2*(1-Math.abs(o)*.5)),Math.abs(o)<.4?'#fff1b0':'#ffb347');B.ga(1);}})};})());
+    glow(x,y,r0*1.1,'#ff7a2e',.3);P.blit(sp.cv,x,y,{ox:sp.c,oy:sp.c});
     glow(x+ux*r0*.9,y+uy*r0*.9,r0*1.1,'#ffd45c',.5);
     // 떨어져 나가는 불붙은 파편
     for(let v=0;v<8;v++){const age=(k*9+v*.37)%1,[tx,ty]=pos(Math.max(0,k-age*.08)),sp=(hz(v*4.1+i)-.5)*r0*2.8*(.3+age),px=tx-uy*sp,py=ty+ux*sp,a=1-age;P.ga(a);P.rect(px,py,1+(v%3===0)*2,1+(v%3===0)*2,v%2?'#ff9a3c':'#3a1b12');if(v%2)glow(px,py,3,'#ff7a2e',.6*a);P.ga(1);}
@@ -8078,7 +8106,7 @@ dracometeor(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,n=big?8:6,tC=340,t
   const ex=q.x,ey=q.y,eR=R*(last?2.9:1.35),tH=q.t+q.fall,nf=last?9:5,dur=last?950:640;
   add(tH,dur,(k,p)=>{const f=fn(p),e=ez.out(k),a=1-k;glow(ex,ey,eR*(.8+1.3*e),'#ff4a1a',.7*a);glow(ex,ey,eR*(.5+.8*e),'#ffd45c',.8*a);
    P.ga(a);P.disc(ex,ey,Math.max(1,eR*.58*e+1),'#ff7a2e');P.disc(ex,ey,Math.max(1,eR*.42*e),'#ffd45c');P.disc(ex,ey,Math.max(1,eR*.24*(1-k*.5)),'#ffffff');
-   P.ga(1);for(let j=0;j<nf*3;j++){const ph=(k*1.25+j*.137)%1,x0=ex+(hz(j*1.7+i)-.5)*eR*1.15+sin(f*.35+j)*eR*.08,y0=ey+eR*.18-eR*(.15+1.15*ph)*(.7+.5*hz(j+3)),rr=eR*.3*(1-ph*.8)*(1-k*.35);if(rr<1)continue;glow(x0,y0,rr*2.2,hot(.3+ph*.6),.55*(1-ph*.5)*a);P.ga(a*(1-ph*.6));P.disc(x0,y0,Math.max(1,rr*.7),hot(.15+ph*.7));P.ga(1);}
+   P.ga(1);for(let j=0;j<nf*2;j++){const ph=(k*1.25+j*.2)%1,x0=ex+(hz(j*1.7+i)-.5)*eR*1.15+sin(f*.35+j)*eR*.08,y0=ey+eR*.18-eR*(.15+1.15*ph)*(.7+.5*hz(j+3)),rr=eR*.3*(1-ph*.8)*(1-k*.35);if(rr<1)continue;glow(x0,y0,rr*2.2,hot(.3+ph*.6),.55*(1-ph*.5)*a);P.ga(a*(1-ph*.6));P.disc(x0,y0,Math.max(1,rr*.7),hot(.15+ph*.7));P.ga(1);}
    P.ga(1);});
   add(tH,1500,(k)=>{const a=1-k;ell(ex,ey+R*.14,eR*.62,eR*.26,'#140704',.55*a);ell(ex,ey+R*.14,eR*.42,eR*.17,'#ff6a22',.5*a*a);ell(ex,ey+R*.14,eR*.26,eR*.1,'#ffd45c',.5*a*a*a);});
   ring(ex,ey,eR*1.7,'#ffb347',tH,540,2);if(last){ring(ex,ey,eR*2.8,'#ff5a2a',tH+90,720,2);ring(ex,ey,eR*3.8,'#b49bff',tH+200,760,1);}
@@ -8480,7 +8508,7 @@ stoneedge(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,n=sc>=1.3?8:7,tC=720,gap=sc>=1.3
  setTimeout(()=>{F.hold(150);F.flash('#f4f0e0');shk();setTimeout(shk,140);setTimeout(shk,300);sparks(bx,by,24,[GL,'#ffffff',K[3]],320,850);},tS);
  return wait(tS+60);},
 // 메타그로스 · 코멧펀치: 쇠주먹이 혜성처럼 날아가 꽝! 부딪혀요
-cometpunch(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,N=big?7:5,tC=520,gap=150,fl=190,ang=Math.atan2(by-ay,bx-ax),dx=cos(ang),dy=sin(ang),
+cometpunch(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,N=big?4:3,tC=520,gap=150,fl=190,ang=Math.atan2(by-ay,bx-ax),dx=cos(ang),dy=sin(ang),
  M={o:'#141c3a',d:'#2c3c70',a:'#4a5f95',b:'#3f74f0',c:'#8fb4ff',e:'#cfe2ff',w:'#ffffff',g:'#6fe0ff'},DU={l:'#eceafd',m:'#c3c2ee',d:'#8f90cb',x:'#5f619f'};
  // ── 도트 주먹: 팔레트 도트를 직접 찍어 만든 돌 건틀릿(한 번만 생성해 회전해서 찍어요)
  const pixFist=()=>{const W=72,H=40,G=[];for(let y=0;y<H;y++)G.push(new Array(W).fill(null));
@@ -8530,32 +8558,27 @@ cometpunch(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,N=big?7:5,tC=520,ga
   // 손목 끝: 왼쪽 가장자리를 도트 단위로 흩어지게
   for(let y=0;y<H;y++)for(let x=0;x<16;x++){if(G[y][x]&&rnd()>(x/16)*1.1+.08)G[y][x]=null;}
   const cells=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(G[y][x])cells.push({x,y,col:G[y][x]});return{W,H,cells};};
- const fistCells=()=>{if(window.__pf)return window.__pf;const R=pixFist();R.PPU=R.W/2.9;return window.__pf=R;};
- const fist=(x,y,s,rot,al,gl)=>{const c_=cos(rot),s_=sin(rot),A0=al==null?1:al;if(gl)glow(x,y,s*2.2,M.c,.28*gl*A0);
-  const D=fistCells(),cs=s/D.PPU,w=Math.max(1,Math.ceil(cs*1.1)),cx=D.W*.55,cy=D.H*.5;P.ga(A0);
-  for(const c of D.cells){const u=(c.x+.5-cx)/D.PPU,v=(c.y+.5-cy)/D.PPU;P.rect(Math.round(x+(u*c_-v*s_)*s-w/2),Math.round(y+(u*s_+v*c_)*s-w/2),w,w,c.col);}P.ga(1);};
- // ── 강철빛 빛무리: 은빛 후광 + 도는 반짝임 + 방사 광선 + 앞쪽 충격 링
- const halo=(x,y,s,rot,a,t,big,ph)=>{const c_=cos(rot),s_=sin(rot),ST={a:'#7787a2',b:'#b0bed3',c:'#dde6f2'},back=ph===0,front=ph===1;
-  if(!back)glow(x,y,s*(big?3.4:2.7),ST.a,.26*a);glow(x,y,s*(big?2.3:1.9),ST.b,.24*a);glow(x,y,s*1.35,ST.c,.16*a);
-  // 방사 광선(천천히 돌아요)
-  const NR=big?10:8;if(!front)for(let i=0;i<NR;i++){const an=rot*0+t*.0011+i*TAU/NR,L=s*(1.5+.9*hz(i+2))*(big?1.35:1),w=s*.07;
-   P.ga(a*(i%2?.45:.7));P.poly([[x+cos(an+PI/2)*w,y+sin(an+PI/2)*w],[x+cos(an)*L,y+sin(an)*L],[x+cos(an-PI/2)*w,y+sin(an-PI/2)*w]],i%2?ST.b:ST.c);}
-  // 주먹 둘레를 도는 은빛 마름모 반짝임
-  if(back){P.ga(1);return;}
+ const fistSpr=()=>{if(window.__pfs)return window.__pfs;const R0=pixFist(),PPU=R0.W/2.9;const cv=bake(R0.W,R0.H,B=>{for(const c of R0.cells)B.rect(c.x,c.y,1,1,c.col);});return window.__pfs={cv,PPU,ox:R0.W*.55,oy:R0.H*.5};};
+ const fist=(x,y,s,rot,al,gl)=>{const A0=al==null?1:al;if(gl)glow(x,y,s*2.2,M.c,.28*gl*A0);const F0=fistSpr();P.blit(F0.cv,x,y,{a:A0,rot,sc:s/F0.PPU,ox:F0.ox,oy:F0.oy});};
+ // ── 강철빛 빛무리: 방사 광선은 한 번 구워 두고 돌려 찍어요
+ const RS={};const halo=(x,y,s,rot,a,t,big,ph)=>{const c_=cos(rot),s_=sin(rot),ST={a:'#7787a2',b:'#b0bed3',c:'#dde6f2'},back=ph===0,front=ph===1;
+  if(!back){glow(x,y,s*(big?3.4:2.7),ST.a,.26*a);glow(x,y,s*(big?2.3:1.9),ST.b,.24*a);glow(x,y,s*1.35,ST.c,.16*a);}
+  const NR=big?10:8;
+  if(!front){const key=Math.round(s)+(big?'b':'n');let rs=RS[key];if(!rs){const Lm=Math.ceil(s*(1.5+.9)*(big?1.35:1))+2;rs=RS[key]={Lm,cv:bake(Lm*2,Lm*2,B=>{for(let i=0;i<NR;i++){const an=i*TAU/NR,L=s*(1.5+.9*hz(i+2))*(big?1.35:1),w=s*.07;B.ga(i%2?.45:.7);B.poly([[Lm+cos(an+PI/2)*w,Lm+sin(an+PI/2)*w],[Lm+cos(an)*L,Lm+sin(an)*L],[Lm+cos(an-PI/2)*w,Lm+sin(an-PI/2)*w]],i%2?ST.b:ST.c);}B.ga(1);})};}
+   P.blit(rs.cv,x,y,{a,rot:t*.0011,ox:rs.Lm,oy:rs.Lm});}
+  if(back)return;
   const NS=big?9:6;for(let i=0;i<NS;i++){const an=-t*.0042+i*TAU/NS,rr=s*(1.05+.12*Math.sin(t*.01+i)),qx=x+cos(an)*rr,qy=y+sin(an)*rr*.82,z=s*(.1+.05*hz(i+8));
    P.ga(a*.9);P.poly([[qx,qy-z*1.6],[qx+z,qy],[qx,qy+z*1.6],[qx-z,qy]],ST.c);P.ga(a);P.disc(qx,qy,Math.max(1,z*.5),'#fff');}
-  // 앞쪽으로 퍼지는 강철빛 충격 링(진행 방향에 수직인 타원)
-  for(let q=0;q<3;q++){const ph=((t*.0034+q/3)%1),rx=s*(.35+ph*.55),ry=s*(.35+ph*1.25);P.ga(a*(1-ph)*.8);
-   let px=null,py=null;for(let i=0;i<=18;i++){const an=i/18*TAU,u=cos(an)*rx+s*.95,v=sin(an)*ry,X=x+u*c_-v*s_,Y=y+u*s_+v*c_;if(px!=null)P.line(px,py,X,Y,q?ST.b:ST.c,1);px=X;py=Y;}}
-  // 반짝이는 별 부스러기
-  for(let i=0;i<(big?7:4);i++){const ph=((t*.002+hz(i)*3)%1),an=hz(i+5)*TAU,d=s*(.8+1.5*ph);P.ga(a*(1-ph));F.spark4(x+cos(an)*d,y+sin(an)*d,big?2:1,'#ffffff',ST.b);}P.ga(1);};
- // ── 푸른 빛줄기: 주먹 뒤로 길게 뻗는 날카로운 광선 다발
- const beams=(x,y,rot,s,a,len)=>{const c_=cos(rot),s_=sin(rot),T=(u,v)=>[x+(u*c_-v*s_),y+(u*s_+v*c_)];
-  glow(x-c_*s*1.6,y-s_*s*1.6,s*(1.1+len*.25),M.c,.28*a);
-  for(let i=0;i<13;i++){const o=(i-6)/6,ow=o*s*.95,L=s*(1.4+3.4*hz(i+7)*len)*(1-.45*Math.abs(o)),w0=s*(.12-.07*Math.abs(o)),core=Math.abs(o)<.45;
-   P.ga(a*(core?.9:.6));P.poly([T(-s*.75,ow-w0),T(-s*.75-L,ow*1.12),T(-s*.75,ow+w0)],core?M.e:(i%2?M.b:M.c));
-   if(core){P.ga(a*.9);P.poly([T(-s*.75,ow-w0*.4),T(-s*.75-L*.7,ow*1.08),T(-s*.75,ow+w0*.4)],M.w);}}P.ga(1);};
- // ── 먼지 뭉치와 초승달 바람결, 돌 파편
+  for(let q=0;q<2;q++){const ph2=((t*.0034+q/2)%1),rx=s*(.35+ph2*.55),ry=s*(.35+ph2*1.25);P.ga(a*(1-ph2)*.8);
+   let px=null,py=null;for(let i=0;i<=12;i++){const an=i/12*TAU,u=cos(an)*rx+s*.95,v=sin(an)*ry,X=x+u*c_-v*s_,Y=y+u*s_+v*c_;if(px!=null)P.line(px,py,X,Y,q?ST.b:ST.c,1);px=X;py=Y;}}
+  for(let i=0;i<(big?5:3);i++){const ph3=((t*.002+hz(i)*3)%1),an=hz(i+5)*TAU,d=s*(.8+1.5*ph3);P.ga(a*(1-ph3));F.spark4(x+cos(an)*d,y+sin(an)*d,big?2:1,'#ffffff',ST.b);}P.ga(1);};
+ // ── 푸른 빛줄기: 펀치마다 방향·크기가 정해져 있어 한 번만 구워요
+ const BC={};const beams=(x,y,rot,s,a,len)=>{const key=Math.round(s)+'|'+Math.round(rot*40)+'|'+len;let bs=BC[key];
+  if(!bs){const Rb=Math.ceil(s*(.75+1.5+3.6*len)+4),c_=cos(rot),s_=sin(rot),T=(u,v)=>[Rb+u*c_-v*s_,Rb+u*s_+v*c_];
+   bs=BC[key]={Rb,cv:bake(Rb*2,Rb*2,B=>{for(let i=0;i<13;i++){const o=(i-6)/6,ow=o*s*.95,L=s*(1.4+3.4*hz(i+7)*len)*(1-.45*Math.abs(o)),w0=s*(.12-.07*Math.abs(o)),core=Math.abs(o)<.45;
+    B.ga(core?.9:.6);B.poly([T(-s*.75,ow-w0),T(-s*.75-L,ow*1.12),T(-s*.75,ow+w0)],core?M.e:(i%2?M.b:M.c));
+    if(core){B.ga(.9);B.poly([T(-s*.75,ow-w0*.4),T(-s*.75-L*.7,ow*1.08),T(-s*.75,ow+w0*.4)],M.w);}}B.ga(1);})};}
+  glow(x-cos(rot)*s*1.6,y-sin(rot)*s*1.6,s*(1.1+len*.25),M.c,.28*a);P.blit(bs.cv,x-bs.Rb,y-bs.Rb,{a});};
  // 구름 덩어리: 뒤→앞으로 여러 겹의 원을 쌓고 (그늘→중간톤→밝은 면→반짝이) 층별로 칠해 하나의 입체 구름처럼 보이게 해요
  const blob=(cs,a)=>{cs.sort((p,q)=>p[1]-q[1]);P.ga(a);
   for(const[x,y,r]of cs)P.disc(x+r*.05,y+r*.1,Math.max(1,r*1.05),DU.x);
@@ -8594,18 +8617,19 @@ cometpunch(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,N=big?7:5,tC=520,ga
    halo(x,y,s,rot,Math.min(1,k*3+.4),p.age+t0,boss,0);
    fist(x,y,s,rot,1,1);
    halo(x,y,s,rot,Math.min(1,k*3+.4),p.age+t0,boss,1);});};
+ fistSpr();
  // ① 힘을 모아요: 푸른 기운이 모이고 주먹이 나타나요
  add(0,tC,(k,p)=>{const e=ez.in(k),t=p.age;glow(ax,ay,R*(.8+1.2*e),M.b,.4*e);
   for(let i=0;i<26;i++){const ph=((t*.0013+hz(i)*2)%1),an=hz(i+3)*TAU,d=R*2.4*(1-ph);P.ga(ph*e);P.rect(ax+cos(an)*d,ay+sin(an)*d*.85,1+(i%4===0),1+(i%4===0),i%2?M.e:M.w);}P.ga(1);
-  const px=ax+dx*R*.4,py=ay+dy*R*.4;halo(px,py,R*(.7+.45*e),ang,e*.8,t,false,0);fist(px,py,R*(.7+.45*e),ang,Math.min(1,e*1.5),e);halo(px,py,R*(.7+.45*e),ang,e*.8,t,false,1);
+  const px=ax+dx*R*.4,py=ay+dy*R*.4;halo(px,py,R*(.5+.3*e),ang,e*.8,t,false,0);fist(px,py,R*(.5+.3*e),ang,Math.min(1,e*1.5),e);halo(px,py,R*(.5+.3*e),ang,e*.8,t,false,1);
   const f=Math.min(1,e*2);P.ga(f);for(let i=0;i<3;i++){const o=(i-1)*.5,bx0=px-dy*R*(1.15)*(o>=0?1:-1)*0+ -dx*R*1.55-dy*R*o*1.3,by0=py-dy*R*1.55+dx*R*o*1.3;const L=R*(.9-.18*Math.abs(o)*2),w=R*.13;P.poly([[bx0-dx*L*.2-dy*w,by0-dy*L*.2+dx*w],[bx0+dx*L*.7,by0+dy*L*.7],[bx0-dx*L*.2+dy*w,by0-dy*L*.2-dx*w]],M.e);}P.ga(1);});
  // ② 연속 주먹
  for(let j=0;j<N;j++){const t0=tC+j*gap,sx=ax+dx*R*.8,sy=ay+dy*R*.8,tx=bx+(hz(j*3)-.5)*R*1.3,ty=by+(hz(j*5)-.5)*R*1.2;
-  punch(t0,fl,sx,sy,tx,ty,R*(1.05+.12*hz(j)),false);hit(t0+fl,tx,ty,R*(.9+.1*hz(j)),false);}
+  punch(t0,fl,sx,sy,tx,ty,R*(.72+.08*hz(j)),false);hit(t0+fl,tx,ty,R*(.9+.1*hz(j)),false);}
  // ③ 마지막 일격
  const tW=tC+N*gap+80,tFb=tW+420,fB=330,tHb=tFb+fB;
- add(tW,420,(k)=>{const e=ez.out(k),sx=ax-dx*R*.6*e,sy=ay-dy*R*.6*e;glow(sx,sy,R*(1.5+1.3*e),M.b,.5*e);P.ga(e);P.ring(sx,sy,R*(2.4-1.4*e),M.w,2,true);P.ga(1);halo(sx,sy,R*(1.2+.9*e),ang,e,k*420,true,0);fist(sx,sy,R*(1.2+.9*e),ang,1,1+e);halo(sx,sy,R*(1.2+.9*e),ang,e,k*420,true,1);});
- punch(tFb,fB,ax-dx*R*.6,ay-dy*R*.6,bx,by,R*2.15*(big?1.1:1),true);
+ add(tW,420,(k)=>{const e=ez.out(k),sx=ax-dx*R*.6*e,sy=ay-dy*R*.6*e;glow(sx,sy,R*(1.5+1.3*e),M.b,.5*e);P.ga(e);P.ring(sx,sy,R*(2.4-1.4*e),M.w,2,true);P.ga(1);halo(sx,sy,R*(.85+.6*e),ang,e,k*420,true,0);fist(sx,sy,R*(.85+.6*e),ang,1,1+e);halo(sx,sy,R*(.85+.6*e),ang,e,k*420,true,1);});
+ punch(tFb,fB,ax-dx*R*.6,ay-dy*R*.6,bx,by,R*1.5*(big?1.1:1),true);
  hit(tHb,bx,by,R*2.0,true);
  return wait(tHb+520);},
 // 리피아 · 리프블레이드: 초록 칼날이 교차해 베고 나뭇잎이 휘몰아쳐요
@@ -8794,13 +8818,13 @@ sludgebomb(c){const m=mk(c),{S,ax,ay,bx,by,R,sc}=m,tC=420,tF=540,tH=tC+tF,K=['#2
 });
 Object.assign(FX,{
 // 쥬피썬더 · 번개: 먹구름이 몰려오고 → 하늘에서 벼락이 연달아 내리꽂혀요
-stormbolt(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,wS=sc>=1.3?1.2:1,tD=520,CB='#5b7bd8',CB2='#9fb6ff',CY='#fff59a',CW='#ffffff',
- S=[{t:tD,x:bx-R*2.5,w:.5,d:300,sd:11},{t:tD+190,x:bx+R*2.3,w:.55,d:300,sd:23},{t:tD+400,x:bx,w:1,d:1250,main:1,sd:37}],tEnd=tD+400+1300,
+stormbolt(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,wS=sc>=1.3?1.05:.9,tD=520,CB='#5b7bd8',CB2='#9fb6ff',CY='#fff59a',CW='#ffffff',
+ S=[{t:tD,x:bx-R*1.8,w:.5,d:300,sd:11},{t:tD+190,x:bx+R*1.7,w:.55,d:300,sd:23},{t:tD+400,x:bx,w:1,d:1250,main:1,sd:37}],tEnd=tD+400+1300,
  hx=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)],mix=(a,b,t)=>{const A=hx(a),B=hx(b);return'#'+[0,1,2].map(q=>Math.round(A[q]+(B[q]-A[q])*cl(t,0,1)).toString(16).padStart(2,'0')).join('');},
  litAt=t=>S.reduce((mx,s)=>{const d=t-s.t;if(d<0)return mx;let v=Math.exp(-d/110)*(s.main?1:.55);if(s.main){if(d>150&&d<215)v=Math.max(v,.6);if(d>290&&d<350)v=Math.max(v,.4);}return Math.max(mx,v);},0);
  // 번개 줄기(위에서 아래로)와 가지를 미리 만들어 둬요
- const mkBolt=(s)=>{const sx=s.x+(hz(s.sd)-.5)*R*.8,pts=jag(sx,-R*.3,s.x,by,s.main?24:16,R*(s.main?.4:.3),s.sd),br=[];
-  for(let j=3;j<pts.length-3;j++)if(hz(j*1.9+s.sd)>(s.main?.55:.72)){const q=pts[j],sg=hz(j+s.sd)>.5?1:-1,L=R*(s.main?1.5+2.6*hz(j*3+s.sd):1+1.2*hz(j*3+s.sd)),ex=q[0]+sg*L*(.45+.5*hz(j*5)),ey=q[1]+L*(.7+.5*hz(j*7)),bp=jag(q[0],q[1],ex,ey,6,R*.3,j+s.sd),sub=[];
+ const mkBolt=(s)=>{const sx=s.x+(hz(s.sd)-.5)*R*.8,pts=jag(sx,-R*.3,s.x,by,s.main?24:16,R*(s.main?.26:.2),s.sd),br=[];
+  for(let j=3;j<pts.length-3;j++)if(hz(j*1.9+s.sd)>(s.main?.55:.72)){const q=pts[j],sg=hz(j+s.sd)>.5?1:-1,L=R*(s.main?1.0+1.6*hz(j*3+s.sd):.7+.8*hz(j*3+s.sd)),ex=q[0]+sg*L*(.45+.5*hz(j*5)),ey=q[1]+L*(.7+.5*hz(j*7)),bp=jag(q[0],q[1],ex,ey,6,R*.3,j+s.sd),sub=[];
    if(s.main&&hz(j*11+s.sd)>.5){const mq=bp[3];sub.push(jag(mq[0],mq[1],mq[0]+sg*R*(.8+hz(j)*1.2),mq[1]+R*(.8+hz(j+2)*1.2),4,R*.2,j*3+s.sd));}
    br.push({bp,sub});}
   return{pts,br};};
@@ -8808,40 +8832,45 @@ stormbolt(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,wS=sc>=1.3?1.2:1,tD=520,CB='#5b7
  const strokes=(pts,th,al,upto)=>{const n=pts.length-1,last=upto==null?n:upto*n,seg=[];for(let j=0;j<n;j++){if(j>last)break;const x0=pts[j][0],y0=pts[j][1];let x1=pts[j+1][0],y1=pts[j+1][1];if(j+1>last){const f=last-j;x1=x0+(x1-x0)*f;y1=y0+(y1-y0)*f;}seg.push([x0,y0,x1,y1,1-.45*j/n]);}
   P.ga(al);[[CB,th*2.4+3],[CB2,th*1.5+2],[CY,th*.9+1],[CW,th*.45+1]].forEach(([col,w])=>{seg.forEach(([x0,y0,x1,y1,ta])=>{const ww=Math.max(1,Math.round(w*ta));P.line(x0,y0,x1,y1,col,ww);if(ww>2)P.disc(x1,y1,ww*.5,col);});});P.ga(1);};
  // 먹구름: 겹겹이 소용돌이치고, 번개가 칠 때마다 안쪽에서 번쩍여요
- const cl_=[],TW=[];for(let q=0;q<6;q++)TW.push({x:bx+(q/5-.5)*R*12.5+(hz(q*7)-.5)*R*1.2,w:R*(2.6+1.6*hz(q+2))*wS,h:R*(1.1+.8*hz(q+5)),s:hz(q+9)*6});
- TW.forEach((T,q)=>{for(let i=0;i<30;i++){const u=hz(q*31+i*1.7),v=hz(q*17+i*2.9),x=T.x+(u-.5)*T.w,dome=1-Math.pow(Math.abs(u-.5)*2,1.7),hh=T.h*dome*Math.pow(v,.8),y=R*1.05-hh+(hz(i+q*5)-.5)*R*.18,r=R*(.34+.5*hz(i*3+q))*wS*(.7+.5*dome);cl_.push({x,y,r,hf:hh/(T.h||1),s:T.s+i*.3,q});}
+ const cl_=[],TW=[];for(let q=0;q<6;q++)TW.push({x:bx+(q/5-.5)*R*8.6+(hz(q*7)-.5)*R*.9,w:R*(2.0+1.2*hz(q+2))*wS,h:R*(.9+.6*hz(q+5)),s:hz(q+9)*6});
+ TW.forEach((T,q)=>{for(let i=0;i<30;i++){const u=hz(q*31+i*1.7),v=hz(q*17+i*2.9),x=T.x+(u-.5)*T.w,dome=1-Math.pow(Math.abs(u-.5)*2,1.7),hh=T.h*dome*Math.pow(v,.8),y=R*1.05-hh+(hz(i+q*5)-.5)*R*.18,r=R*(.28+.38*hz(i*3+q))*wS*(.7+.5*dome);cl_.push({x,y,r,hf:hh/(T.h||1),s:T.s+i*.3,q});}
   for(let i=0;i<9;i++){const x=T.x+((i/8)-.5)*T.w*1.1,y=R*(1.05+.12*hz(i+q*3)),r=R*(.3+.25*hz(i*2+q))*wS;cl_.push({x,y,r,hf:-.1,s:T.s+i,q});}});
  cl_.sort((p,q)=>q.y-p.y);
+ // 먹구름 덩어리는 한 번만 그려 두고(어두운 판 + 번개 칠 때 번쩍이는 밝은 판), 프레임마다 겹쳐 찍어요
+ const CS=TW.map((T,q)=>{const ps=cl_.filter(o=>o.q===q);let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;ps.forEach(o=>{x0=Math.min(x0,o.x-o.r);x1=Math.max(x1,o.x+o.r);y0=Math.min(y0,o.y-o.r);y1=Math.max(y1,o.y+o.r);});
+  const mg=Math.ceil(R*.25)+3,dr=lit=>bake(x1-x0+mg*2,y1-y0+mg*2,B=>{ps.forEach(o=>{const x=o.x-x0+mg,y=o.y-y0+mg,hf=cl(o.hf,0,1),base=mix('#0c1024','#2a3566',hf),mid=mix('#141a38','#3d4a86',hf),hi=mix('#27305a','#66769f',hf);
+   B.disc(x,y,o.r,mix(base,'#5c6ec8',lit*.6));B.disc(x-o.r*.14,y-o.r*.16,o.r*.82,mix(mid,'#8d9eec',lit*.75));B.disc(x-o.r*.28,y-o.r*.34,o.r*.42,mix(hi,'#e1e8ff',lit*.9));});});
+  return{b:dr(0),l:dr(1),ox:x0-mg,oy:y0-mg};});
  add(0,tEnd,(k,p)=>{const t=p.age,a=cl(t/320,0,1)*(t>tEnd-420?(tEnd-t)/420:1),lit=litAt(t);
   P.fill('#070a1c',.5*a);
-  TW.forEach(T=>{P.halo(T.x,R*.7,T.w*.8,mix('#0b0f24','#4a5aae',lit*.5),.55*a);});
-  P.ga(a);
-  cl_.forEach(o=>{const sw=sin(t*.0011+o.s)*R*.1,x=o.x+sw,y=o.y+sin(t*.0009+o.s*2)*R*.04,hf=cl(o.hf,0,1),
-   base=mix('#0c1024','#2a3566',hf),mid=mix('#141a38','#3d4a86',hf),hi=mix('#27305a','#66769f',hf);
-   P.disc(x,y,o.r,mix(base,'#5c6ec8',lit*.6));P.disc(x-o.r*.14,y-o.r*.16,o.r*.82,mix(mid,'#8d9eec',lit*.75));P.disc(x-o.r*.28,y-o.r*.34,o.r*.42,mix(hi,'#e1e8ff',lit*.9));});
+  TW.forEach(T=>{P.halo(T.x,R*.7,T.w*.8,'#0b0f24',.55*a*(1-lit*.5));if(lit>.03)P.halo(T.x,R*.7,T.w*.8,'#4a5aae',.55*a*lit*.5);});
+  CS.forEach((c,q)=>{const T=TW[q],sw=sin(t*.0011+T.s)*R*.1,sy=sin(t*.0009+T.s*2)*R*.04;P.blit(c.b,c.ox+sw,c.oy+sy,{a});if(lit>.02)P.blit(c.l,c.ox+sw,c.oy+sy,{a:a*lit});});
   P.ga(1);
   P.ga(a);
-  glow(bx,R*.5,R*7,'#8aa0ff',.4*lit*a);glow(bx,R*.2,R*4,'#e8eeff',.35*lit*a);
+  glow(bx,R*.5,R*5,'#8aa0ff',.36*lit*a);glow(bx,R*.2,R*2.8,'#e8eeff',.3*lit*a);
   // 구름 속 잔번개
   if(t>tD-260&&t<tD+60){const f=fn(p);for(let i=0;i<3;i++){const x0=bx+(hz(i*3+f)-.5)*R*8,y0=R*(.2+.8*hz(i+f));drawBolt(jag(x0,y0,x0+(hz(i+f*2)-.5)*R*3,y0+R*.8,5,R*.25,i+f),1,[CB,CW]);}}
   P.ga(1);});
  // 낙뢰 지점 경고
- add(tD-260,260,(k)=>{const rr=R*(2.1-.8*k);P.ga(.4+.5*sin(k*PI*4)**2);P.ring(bx,by+R*.1,Math.max(2,rr),CY,2,true);P.ring(bx,by+R*.1,Math.max(2,rr*.55),CB2,1,true);P.ga(1);});
+ add(tD-260,260,(k)=>{const rr=R*(1.5-.6*k);P.ga(.4+.5*sin(k*PI*4)**2);P.ring(bx,by+R*.1,Math.max(2,rr),CY,2,true);P.ring(bx,by+R*.1,Math.max(2,rr*.55),CB2,1,true);P.ga(1);});
  // 내리치는 번개
- S.forEach(s=>{const main=!!s.main,th=Math.max(1,R*(main?.2:.1)*wS),ex=s.x,ey=by,{pts,br}=s.b;
+ S.forEach(s=>{const main=!!s.main,th=Math.max(1,R*(main?.11:.06)*wS),ex=s.x,ey=by,{pts,br}=s.b;
+  // 번개 줄기와 가지는 한 번만 그려 두고, 위에서 아래로 드러나는 만큼만 찍어요
+  const BG=(()=>{const lst=[pts];br.forEach(b=>{lst.push(b.bp);b.sub.forEach(q=>lst.push(q));});let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;lst.forEach(l=>l.forEach(p=>{x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);}));
+   const mg=Math.ceil(th*2.4+4)+2,st=(B,pp,t_,al_)=>{const n=pp.length-1;B.ga(al_);[[CB,t_*2.4+3],[CB2,t_*1.5+2],[CY,t_*.9+1],[CW,t_*.45+1]].forEach(([col,w])=>{for(let j=0;j<n;j++){const ta=1-.45*j/n,ww=Math.max(1,Math.round(w*ta));B.line(pp[j][0]-x0+mg,pp[j][1]-y0+mg,pp[j+1][0]-x0+mg,pp[j+1][1]-y0+mg,col,ww);if(ww>2)B.disc(pp[j+1][0]-x0+mg,pp[j+1][1]-y0+mg,ww*.5,col);}});B.ga(1);};
+   return{ox:x0-mg,oy:y0-mg,cv:bake(x1-x0+mg*2,y1-y0+mg*2,B=>{st(B,pts,th,1);br.forEach(b=>{st(B,b.bp,th*.42,.9);b.sub.forEach(q=>st(B,q,th*.25,.7));});})};})();
   add(s.t,s.d,(k,p)=>{const t=p.age,f=fn(p);let al=1;if(main){al=t<150?1:t<215?.3:t<290?.95:t<350?.35:t<420?.7:cl(1-(t-420)/830,0,1)**1.4;}else al=cl(1-t/s.d,0,1);
    const rv=cl(t/(main?85:60),0,1);
-   glow(ex,by,R*(main?4.2:2.2)*(.7+.3*al),CB,.6*al);glow(ex,by,R*(main?2.4:1.3),CY,.7*al);
-   if(main){P.ga(.18*al);P.rect(ex-R*.9,0,R*1.8,by,CB2);P.ga(.22*al);P.rect(ex-R*.4,0,R*.8,by,CW);P.ga(1);}
-   strokes(pts,th,al,rv);
-   if(rv>.5){br.forEach(b=>{strokes(b.bp,th*.42,al*.9,cl((rv-.4)*1.8,0,1));b.sub.forEach(q=>strokes(q,th*.25,al*.7,cl((rv-.6)*2,0,1)));});}
-   if(rv>=1){glow(ex,by,R*(main?2.6:1.5),CW,.8*al);P.ga(al);P.disc(ex,by,Math.max(1,R*(main?.75:.4)),CW);
+   glow(ex,by,R*(main?2.7:1.4)*(.7+.3*al),CB,.55*al);glow(ex,by,R*(main?1.5:.85),CY,.65*al);
+   if(main){P.ga(.15*al);P.rect(ex-R*.5,0,R*1,by,CB2);P.ga(.2*al);P.rect(ex-R*.2,0,R*.4,by,CW);P.ga(1);}
+   P.blit(BG.cv,BG.ox,BG.oy,{a:al,ch:rv>=1?BG.cv.height:(lerp(-R*.3,by,rv)-BG.oy+th*2+3)});
+   if(rv>=1){glow(ex,by,R*(main?1.7:.95),CW,.75*al);P.ga(al);P.disc(ex,by,Math.max(1,R*(main?.45:.26)),CW);
     // 땅을 타고 퍼지는 전기
-    for(let i=0;i<(main?9:4);i++){const an=(i/(main?9:4))*TAU+hz(i+f)*.4,L=R*(main?3.2:1.6)*(.5+.6*hz(i*2+f)),ee=ez.out(cl(t/200,0,1));drawBolt(jag(ex,by,ex+cos(an)*L*ee,by+sin(an)*L*.38*ee,5,R*.18,i*5+f),1,[CB,CY,CW]);}
+    for(let i=0;i<(main?9:4);i++){const an=(i/(main?9:4))*TAU+hz(i+f)*.4,L=R*(main?2.1:1.1)*(.5+.6*hz(i*2+f)),ee=ez.out(cl(t/200,0,1));drawBolt(jag(ex,by,ex+cos(an)*L*ee,by+sin(an)*L*.38*ee,5,R*.18,i*5+f),1,[CB,CY,CW]);}
     P.ga(1);}
    P.ga(1);});
   setTimeout(()=>{F.hold(main?170:60);if(main){F.flash('#f4f8ff');}shk();sparks(ex,by,main?30:10,[CY,CW,CB2,CB],main?340:230,main?900:560,true);},s.t+70);
-  ring(ex,by,R*(main?4.4:2.4),CY,s.t+70,main?620:400,main?2:1);if(main){ring(ex,by,R*6.5,CB2,s.t+200,760,1);ring(ex,by,R*2.4,CW,s.t+90,380,2);for(let i=0;i<6;i++)setTimeout(()=>embers(ex+(hz(i)-.5)*R*2.4,by+(hz(i+4)-.3)*R*.5,4,[CY,CB2,CW],900),s.t+200+i*120);}
+  ring(ex,by,R*(main?2.8:1.5),CY,s.t+70,main?620:400,main?2:1);if(main){ring(ex,by,R*4.2,CB2,s.t+200,760,1);ring(ex,by,R*1.6,CW,s.t+90,380,2);for(let i=0;i<6;i++)setTimeout(()=>embers(ex+(hz(i)-.5)*R*2.4,by+(hz(i+4)-.3)*R*.5,4,[CY,CB2,CW],900),s.t+200+i*120);}
  });
  return wait(S[2].t+700);},
 // 부스터 · 오버히트: 불줄기가 뻗은 뒤 상대 위에 불타는 태양이 떠올라 폭발해요
@@ -8927,16 +8956,29 @@ ancientpower(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,wS=sc>=1.3?1.15:1,n=sc>=1.3?9
   // 금빛 균열과 문양
   for(let v=0;v<3;v++){let px=x+(hz(v*3+seed)-.5)*r*.3,py=y+(hz(v*3+seed+1)-.5)*r*.3,an=rot+v*2.1+hz(v+seed);for(let sg=0;sg<3;sg++){const nx=px+cos(an)*r*.24,ny=py+sin(an)*r*.22;if(gl>0)glow(nx,ny,r*.24,K.o,.45*gl);P.ga(.55+.4*gl);P.line(px,py,nx,ny,gl>0?K.g:K.c,1);P.ga(1);px=nx;py=ny;an+=(hz(v*7+sg+seed)-.5)*1.5;}}
   if(gl>0&&r>R*.3){const cx=x+cos(rot*.5)*r*.15,cy=y+sin(rot*.5)*r*.15;P.ga(.85*gl);P.line(cx-r*.16,cy,cx+r*.16,cy,K.w,1);P.line(cx,cy-r*.16,cx,cy+r*.16,K.w,1);P.line(cx-r*.11,cy-r*.11,cx+r*.11,cy+r*.11,K.g,1);P.ga(1);}};
+ // 돌은 한 번만 그려 두고(어두운 판·금빛으로 달아오른 판) 회전·확대해서 찍어요
+ const rockB=(B,x,y,r,rot,seed,gl)=>{const NV=11,vs=[],lx=-.55,ly=-.8;
+  for(let v=0;v<NV;v++){const an=v/NV*TAU+rot,rr=r*(.84+.3*hz(v*1.7+seed));vs.push([x+cos(an)*rr,y+sin(an)*rr*.9]);}
+  for(let v=0;v<NV;v++){const A=vs[v],Bv=vs[(v+1)%NV],mx=(A[0]+Bv[0])/2-x,my=(A[1]+Bv[1])/2-y,ml=Math.hypot(mx,my)||1,lit=(mx*lx+my*ly)/ml,t=cl((lit+1)/2,0,1),col=CK[Math.min(4,Math.floor(t*5))];
+   B.poly([[x,y],A,Bv],col);B.poly([[x+(A[0]-x)*.6+mx*.1,y+(A[1]-y)*.6+my*.1],[x+(A[0]-x)*.94,y+(A[1]-y)*.94],[x+(Bv[0]-x)*.58,y+(Bv[1]-y)*.58]],CK[Math.max(0,Math.min(4,Math.floor(t*5)-1))]);
+   if(t>.62){B.ga(.7);B.line(A[0],A[1],Bv[0],Bv[1],K.h,1);B.ga(1);}else{B.ga(.5);B.line(A[0],A[1],Bv[0],Bv[1],'#120d08',1);B.ga(1);}}
+  for(let v=0;v<3;v++){const an=rot*.7+v*2.1+seed*1.3,d=r*(.38+.3*hz(v*2+seed)),cx=x+cos(an)*d,cy=y+sin(an)*d*.9,cr=Math.max(1,r*(.05+.05*hz(v+seed)));B.ga(.75);B.disc(cx+cr*.35,cy+cr*.45,cr+.4,K.e);B.disc(cx,cy,cr,'#2a1f14');B.ga(1);}
+  for(let v=0;v<3;v++){let px=x+(hz(v*3+seed)-.5)*r*.3,py=y+(hz(v*3+seed+1)-.5)*r*.3,an=rot+v*2.1+hz(v+seed);for(let sg=0;sg<3;sg++){const nx=px+cos(an)*r*.24,ny=py+sin(an)*r*.22;B.ga(.55+.4*gl);B.line(px,py,nx,ny,gl>0?K.g:K.c,1);B.ga(1);px=nx;py=ny;an+=(hz(v*7+sg+seed)-.5)*1.5;}}
+  if(gl>0&&r>R*.3){const cx=x+cos(rot*.5)*r*.15,cy=y+sin(rot*.5)*r*.15;B.ga(.85*gl);B.line(cx-r*.16,cy,cx+r*.16,cy,K.w,1);B.line(cx,cy-r*.16,cx,cy+r*.16,K.w,1);B.line(cx-r*.11,cy-r*.11,cx+r*.11,cy+r*.11,K.g,1);B.ga(1);}};
+ const rkSpr=o=>{if(o.spr)return o.spr;const D=Math.ceil(o.r*2.7)+6,c=D/2;return o.spr={c,d:bake(D,D,B=>rockB(B,c,c,o.r,0,o.seed,0)),l:bake(D,D,B=>rockB(B,c,c,o.r,0,o.seed,1))};};
+ const rockDraw=(o,x,y,r,rot,gl)=>{if(gl>0){glow(x,y,r*2.4,K.o,.5*gl);}const sp=rkSpr(o),sc=r/o.r;P.blit(sp.d,x,y,{rot,sc,ox:sp.c,oy:sp.c});if(gl>.02)P.blit(sp.l,x,y,{a:Math.min(1,gl),rot,sc,ox:sp.c,oy:sp.c});};
  // 땅 위의 고대 마법진(타원)
  const ellP=(cx,cy,rx,ry,a)=>[cx+cos(a)*rx,cy+sin(a)*ry];
- const circle=(cx,cy,rx,ry,rot,al,gl,rich)=>{P.ga(al);const N=72;for(let i=0;i<N;i++){const a0=i/N*TAU,a1=(i+1)/N*TAU,[x0,y0]=ellP(cx,cy,rx,ry,a0),[x1,y1]=ellP(cx,cy,rx,ry,a1);P.line(x0,y0,x1,y1,K.g,2);if(i%2===0){const[ix,iy]=ellP(cx,cy,rx*.86,ry*.86,a0),[jx,jy]=ellP(cx,cy,rx*.86,ry*.86,a1);P.line(ix,iy,jx,jy,K.o,1);}}
+ const CB_={};const cBase=(rx0,ry0)=>{const key=Math.round(rx0)+'|'+Math.round(ry0);if(CB_[key])return CB_[key];const mx=Math.ceil(rx0*1.1)+4,my=Math.ceil(ry0*1.1)+4,N=72;
+  return CB_[key]={mx,my,cv:bake(mx*2,my*2,B=>{for(let i=0;i<N;i++){const a0=i/N*TAU,a1=(i+1)/N*TAU,[x0,y0]=ellP(mx,my,rx0,ry0,a0),[x1,y1]=ellP(mx,my,rx0,ry0,a1);B.line(x0,y0,x1,y1,K.g,2);if(i%2===0){const[ix,iy]=ellP(mx,my,rx0*.86,ry0*.86,a0),[jx,jy]=ellP(mx,my,rx0*.86,ry0*.86,a1);B.line(ix,iy,jx,jy,K.o,1);}}})};};
+ const circle=(cx,cy,rx,ry,rot,al,gl,rich,rx0,ry0)=>{if(rx<=.5)return;const cb=cBase(rx0,ry0);P.blit(cb.cv,cx,cy,{a:al,sc:rx/rx0,ox:cb.mx,oy:cb.my});P.ga(al);
   for(let i=0;i<16;i++){const a=rot+i/16*TAU,[x0,y0]=ellP(cx,cy,rx*.9,ry*.9,a),[x1,y1]=ellP(cx,cy,rx*1.06,ry*1.06,a);P.line(x0,y0,x1,y1,i%4===0?K.w:K.g,1);}
   if(rich){for(let s=0;s<2;s++)for(let i=0;i<3;i++){const[x0,y0]=ellP(cx,cy,rx*.84,ry*.84,rot*(s?-1:1)+i*TAU/3+s*PI/3),[x1,y1]=ellP(cx,cy,rx*.84,ry*.84,rot*(s?-1:1)+(i+1)*TAU/3+s*PI/3);P.line(x0,y0,x1,y1,s?K.g:K.o,1);}
    for(let i=0;i<8;i++){const[gx,gy2]=ellP(cx,cy,rx*.62,ry*.62,-rot*.6+i/8*TAU);P.ga(al*.8);P.line(gx-2,gy2,gx+2,gy2,K.w,1);P.line(gx,gy2-2,gx,gy2+2,K.w,1);}}
   P.ga(1);glow(cx,cy,rx*1.15,K.o,.34*gl);glow(cx,cy,rx*.55,K.g,.3*gl);};
  // 바닥 균열
  const cracks=[];for(let i=0;i<7;i++){const an=i/7*TAU+hz(i)*.5,L=R*(1.7+1.0*hz(i+3));cracks.push(jag(ax,gy,ax+cos(an)*L*1.25,gy+sin(an)*L*.42,8,R*.1,i*9+3));}
- const strokes=(pts,rev,al)=>{const nn=pts.length-1,last=rev*nn;P.ga(al);for(let j=0;j<nn;j++){if(j>last)break;let x1=pts[j+1][0],y1=pts[j+1][1];if(j+1>last){const f=last-j;x1=pts[j][0]+(x1-pts[j][0])*f;y1=pts[j][1]+(y1-pts[j][1])*f;}P.ga(al*.8);P.line(pts[j][0],pts[j][1],x1,y1,'#120d08',2);P.ga(al);glow(x1,y1,R*.22,K.o,.35);P.line(pts[j][0],pts[j][1],x1,y1,j%2?K.g:K.o,1);}P.ga(1);};
+ const strokes=(pts,rev,al)=>{const nn=pts.length-1,last=rev*nn;P.ga(al);for(let j=0;j<nn;j++){if(j>last)break;let x1=pts[j+1][0],y1=pts[j+1][1];if(j+1>last){const f=last-j;x1=pts[j][0]+(x1-pts[j][0])*f;y1=pts[j][1]+(y1-pts[j][1])*f;}P.ga(al*.8);P.line(pts[j][0],pts[j][1],x1,y1,'#120d08',2);P.ga(al);P.line(pts[j][0],pts[j][1],x1,y1,j%2?K.g:K.o,1);if(j%3===0||j===Math.floor(last))glow(x1,y1,R*.3,K.o,.4);}P.ga(1);};
  // 돌 설정
  const rk=[];for(let j=0;j<n;j++){const boss=j===n-1;rk.push({a0:j/(n-1)*TAU+hz(j)*.4,rx:R*(2.0+.7*hz(j+1)),h:boss?R*2.4:R*(.5+1.3*hz(j+4)),r:boss?R*1.25*wS:R*(.46+.26*hz(j+7))*wS,d:boss?.1:.02+j*.04,seed:j*3.7+1,boss});}
  const orbA=(o,t)=>o.a0+t*.0026+Math.pow(Math.max(0,t-tEr)/1000,2)*6;
@@ -8945,7 +8987,7 @@ ancientpower(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,wS=sc>=1.3?1.15:1,n=sc>=1.3?9
  add(0,tEnd+200,(k,p)=>{const t=p.age,f=fn(p),inA=cl(t/260,0,1),outA=t>tl(n-1)+150?cl(1-(t-tl(n-1)-150)/320,0,1):1,al=inA*outA,spin=1+cl((t-tEr)/tSp,0,1)*3;
   if(al<=0)return;
   P.fill('#1a1006',.18*al*Math.sin(Math.min(1,t/tEnd)*PI));
-  circle(ax,gy,R*2.3*ez.out(inA),R*.86*ez.out(inA),t*.0012*spin,al*.9,al*(.7+.3*Math.sin(t*.01)),true);
+  circle(ax,gy,R*2.3*ez.out(inA),R*.86*ez.out(inA),t*.0012*spin,al*.9,al*(.7+.3*Math.sin(t*.01)),true,R*2.3,R*.86);
   cracks.forEach((cp,i)=>strokes(cp,cl((t-80-i*20)/340,0,1),al*.9));
   glow(ax,ay,R*(.7+.8*cl(t/(tEr+tSp),0,1)),K.g,.28*al);
   // 금빛 기운 리본
@@ -8958,14 +9000,14 @@ ancientpower(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,wS=sc>=1.3?1.15:1,n=sc>=1.3?9
   const live=rk.map((o,j)=>({o,j,pp:posAt(o,t)})).filter(q=>t<tl(q.j)).sort((u,v)=>u.pp[3]-v.pp[3]);
   live.forEach(({o,j,pp})=>{const[x,y,e]=pp;if(e<=0)return;
    if(e<1){for(let d=0;d<5;d++){const dx=(hz(j*5+d)-.5)*o.r*2.4,rr=o.r*(.5+.9*(1-e));P.ga((1-e)*.5*al);P.halo(x+dx*e*1.4,gy-R*.1+(1-e)*R*-.2,rr,'#a48a5e',.6);}P.ga(1);}
-   rock(x,y,o.r*(.6+.4*e),t*.003*(j%2?1:-1)+o.seed,o.seed,cl((t-tEr+200)/500,0,1)*(o.boss?1:.85));
+   rockDraw(o,x,y,o.r*(.6+.4*e),t*.003*(j%2?1:-1)+o.seed,cl((t-tEr+200)/500,0,1)*(o.boss?1:.85));
    if(t>tEr)for(let s=1;s<5;s++){const[tx,ty]=posAt(o,t-s*22);P.ga(.5/s);P.disc(tx,ty,Math.max(1,o.r*.2),K.g);P.ga(1);}});
   P.ga(1);});
  // ② 발사: 금빛 꼬리를 끌며 날아가 폭발해요
  rk.forEach((o,j)=>{const t0=tl(j),dur=o.boss?420:300,tx=o.boss?bx:bx+(hz(j*3)-.5)*R*1.8,ty=o.boss?by:by+(hz(j*5)-.5)*R*1.3,[sx,sy]=posAt(o,t0),arc=(j%2?1:-1)*R*(o.boss?.3:1.2);
   add(t0,dur,(k,p)=>{const f=fn(p),pos=kk=>{const e=ez.in(kk);return[lerp(sx,tx,e)+Math.sin(kk*PI)*arc,lerp(sy,ty,e)-Math.sin(kk*PI)*R*.55];},[x,y]=pos(k),rr=o.r*(o.boss?1:.85);
-   for(let s=18;s>=1;s--){const kk=Math.max(0,k-s*.03),[px,py]=pos(kk),a=1-s/19;glow(px,py,Math.max(2,rr*(.5+1.1*a)),s>8?K.o:K.g,.4*a+.1);if(s%3===0){P.ga(a);P.disc(px+(hz(s+j)-.5)*rr*.6,py+(hz(s*2+j)-.5)*rr*.6,Math.max(1,rr*.18*a),'#7a5f3a');P.ga(1);}}
-   rock(x,y,rr,k*14+o.seed,o.seed,1);});
+   for(let s=12;s>=1;s--){const kk=Math.max(0,k-s*.045),[px,py]=pos(kk),a=1-s/13;glow(px,py,Math.max(2,rr*(.6+1.3*a)),s>6?K.o:K.g,.48*a+.1);if(s%3===0){P.ga(a);P.disc(px+(hz(s+j)-.5)*rr*.6,py+(hz(s*2+j)-.5)*rr*.6,Math.max(1,rr*.18*a),'#7a5f3a');P.ga(1);}}
+   rockDraw(o,x,y,rr,k*14+o.seed,1);});
   const th=t0+dur,eR=R*(o.boss?3.4:1.5);
   add(th,o.boss?1000:620,(k,p)=>{const e=ez.out(k),a=1-k,f=fn(p);glow(tx,ty,eR*(.7+1.1*e),K.o,.55*a);glow(tx,ty,eR*(.4+.6*e),K.g,.65*a);
    for(let d=0;d<(o.boss?12:6);d++){const an=d/(o.boss?12:6)*TAU+hz(d+j),dd=eR*(.3+.8*e)*(.6+.6*hz(d*2+j));P.ga(a*.7);P.halo(tx+Math.cos(an)*dd,ty+Math.sin(an)*dd*.7-eR*.2*e,eR*(.35+.3*e),'#a48a5e',.5);}
@@ -8976,7 +9018,7 @@ ancientpower(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,wS=sc>=1.3?1.15:1,n=sc>=1.3?9
    if(o.boss){F.hold(160);F.flash('#fff2cc');}else F.hold(40);shk();},th);
   if(o.boss){ // 상대 발밑에 고대 문양이 번쩍이며 땅이 갈라져요
    const cr2=[];for(let i=0;i<8;i++){const an=i/8*TAU+hz(i+5)*.4,L=R*(2.4+1.6*hz(i+7));cr2.push(jag(tx,ty+R*.5,tx+Math.cos(an)*L,ty+R*.5+Math.sin(an)*L*.36,7,R*.16,i*7+1));}
-   add(th,1300,(k,p)=>{const t=p.age,al=t<900?1:cl(1-(t-900)/400,0,1),e=ez.out(cl(t/300,0,1));circle(tx,ty+R*.5,R*2.8*e,R*1.0*e,t*.002,al*.9,al,true);cr2.forEach((cp,i)=>strokes(cp,cl((t-i*15)/260,0,1),al));
+   add(th,1300,(k,p)=>{const t=p.age,al=t<900?1:cl(1-(t-900)/400,0,1),e=ez.out(cl(t/300,0,1));circle(tx,ty+R*.5,R*2.8*e,R*1.0*e,t*.002,al*.9,al,true,R*2.8,R*1.0);cr2.forEach((cp,i)=>strokes(cp,cl((t-i*15)/260,0,1),al));
     P.ga(.22*al);P.rect(tx-R*.9,ty-R*4,R*1.8,R*4.6,K.g);P.ga(.3*al);P.rect(tx-R*.35,ty-R*4,R*.7,R*4.6,K.w);P.ga(1);});}
  });
  return wait(tl(n-1)+420+450);},
@@ -9073,12 +9115,14 @@ originpulse(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,dx=bx-ax,dy=by-ay,
 swift(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,n=big?15:12,W=3,tC=520,wGap=230,fl=400,
  G={d:'#8a4a06',a:'#d98a10',b:'#f2b32a',c:'#ffd84a',e:'#ffe98a',f:'#fff7c4',w:'#ffffff',s:'#9fc2ff'};
  // 입체감 있는 별: 각 모서리가 한쪽은 밝고 한쪽은 어두워요
- const star=(x,y,r,rot,al)=>{const o=[];for(let i=0;i<10;i++){const q=rot+i*PI/5-PI/2,d=i%2?r*.46:r;o.push([x+cos(q)*d,y+sin(q)*d]);}
-  if(al!=null)P.ga(al);glow(x,y,r*2.2,G.b,.4);
-  P.poly(o.map(([px,py])=>[x+(px-x)*1.16,y+(py-y)*1.16]),G.d);
-  for(let i=0;i<5;i++){const tip=o[2*i],iL=o[(2*i+9)%10],iR=o[(2*i+1)%10];P.poly([[x,y],tip,iL],i%2?G.e:G.c);P.poly([[x,y],tip,iR],i%2?G.a:G.b);}
-  for(let i=0;i<5;i++){const tip=o[2*i];P.line(x,y,tip[0],tip[1],G.f,1);}
-  P.poly(o.filter((_,i)=>i%2).map(([px,py])=>[x+(px-x)*.9,y+(py-y)*.9]),G.f);P.disc(x,y,Math.max(1,r*.18),G.w);if(al!=null)P.ga(1);};
+ // 별은 반지름별로 한 번만 그려 두고(각 모서리 한쪽은 밝고 한쪽은 어둡게) 돌려서 찍어요
+ const SS={};const starSp=r=>{const rr=Math.max(1,Math.round(r));if(SS[rr])return SS[rr];const D=Math.ceil(rr*2.5)+4,c=D/2;
+  return SS[rr]={rr,c,cv:bake(D,D,B=>{const x=c,y=c,o=[];for(let i=0;i<10;i++){const q=i*PI/5-PI/2,d=i%2?rr*.46:rr;o.push([x+cos(q)*d,y+sin(q)*d]);}
+   B.poly(o.map(([px,py])=>[x+(px-x)*1.16,y+(py-y)*1.16]),G.d);
+   for(let i=0;i<5;i++){const tip=o[2*i],iL=o[(2*i+9)%10],iR=o[(2*i+1)%10];B.poly([[x,y],tip,iL],i%2?G.e:G.c);B.poly([[x,y],tip,iR],i%2?G.a:G.b);}
+   for(let i=0;i<5;i++){const tip=o[2*i];B.line(x,y,tip[0],tip[1],G.f,1);}
+   B.poly(o.filter((_,i)=>i%2).map(([px,py])=>[x+(px-x)*.9,y+(py-y)*.9]),G.f);B.disc(x,y,Math.max(1,rr*.18),G.w);})};};
+ const star=(x,y,r,rot,al)=>{glow(x,y,r*2.2,G.b,.4);const sp=starSp(r);P.blit(sp.cv,x,y,{a:al==null?1:al,rot,sc:r/sp.rr,ox:sp.c,oy:sp.c});};
  const flare=(x,y,r,al)=>{P.ga(al);glow(x,y,r*1.6,G.e,.7);for(let i=0;i<4;i++){const an=i*PI/2+PI/4*(i%2?0:0);P.ray(x,y,an,r*(i%2?.7:1.2),Math.max(1,r*.09),G.w,.95);}P.disc(x,y,Math.max(1,r*.2),G.w);P.ga(1);};
  const emb=(x,y,r,rot,al)=>{ // 시전자 뒤에 떠오르는 금빛 별 문양
   P.ga(al);const pv=[];for(let i=0;i<5;i++){const q=rot+i*TAU/5-PI/2;pv.push([x+cos(q)*r,y+sin(q)*r*.92]);}
@@ -9101,7 +9145,7 @@ swift(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,n=big?15:12,W=3,tC=520,w
    dx=tx-sx,dy=ty-sy,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L,cx=(sx+tx)/2+nx*sg*R*(1.8+hz(j)*1.4),cy=(sy+ty)/2+ny*sg*R*(1.8+hz(j)*1.4)-R*.9,
    pos=kk=>{const e=kk<.5?2*kk*kk:1-Math.pow(-2*kk+2,2)/2,u=1-e;return[u*u*sx+2*u*e*cx+e*e*tx,u*u*sy+2*u*e*cy+e*e*ty];};
   add(t0,fl,(k,p)=>{const f=fn(p),[x,y]=pos(k);
-   for(let s=24;s>=1;s--){const kk=Math.max(0,k-s*.018),[px,py]=pos(kk),a=1-s/25;glow(px,py,Math.max(2,size*(.4+1.0*a)),s>10?G.b:G.e,.38*a+.08);if(s%4===0){P.ga(a);F.spark4(px+(hz(s+j+f*.3)-.5)*size*1.4,py+(hz(s*2+j)-.5)*size*1.4,1,s%8?G.f:G.w,G.e);P.ga(1);}}
+   for(let s=14;s>=1;s--){const kk=Math.max(0,k-s*.031),[px,py]=pos(kk),a=1-s/15;glow(px,py,Math.max(2,size*(.5+1.3*a)),s>6?G.b:G.e,.46*a+.08);if(s%4===0){P.ga(a);F.spark4(px+(hz(s+j+f*.3)-.5)*size*1.4,py+(hz(s*2+j)-.5)*size*1.4,1,s%8?G.f:G.w,G.e);P.ga(1);}}
    star(x,y,size,k*(11+j%4)+j,1);});
   add(t0+fl,360,(k)=>{const e=ez.out(k),a=1-k;flare(tx,ty,R*(.5+1.0*e),a);P.ga(a);P.ring(tx,ty,Math.max(2,R*(.3+1.1*e)),G.e,1,k>.5);P.ga(1);});
   setTimeout(()=>{F.hold(35);sparks(tx,ty,6,[G.f,G.w,G.c],200,520,true);},t0+fl);}
@@ -9282,12 +9326,7 @@ async function skillMove(A,si,toEl,ok,cb,ov){const a=ov?{id:ov.id}:A.board[si];c
   try{fromEl.animate([{transform:'none'},{transform:`translateY(${A===B.me?6:-6}px) scale(${epic&&ok?1.12:.94})`,offset:.5},{transform:'none'}],{duration:260});}catch(e){}
   try{await SIGFX[k.fx]({x0:sx0,y0:sy0,x1:bx0,y1:by0,R:rr0,pw,cb,epic:epic&&ok,k,toEl,fromEl});}catch(e){console.warn('sig fx',e);}
   window.SKSND&&SKSND.hit(k.t,pw,cb,epic&&ok,0,bx0);return;}
- const trainerTarget=toEl.classList&&toEl.classList.contains('hero');
- if(trainerTarget){
-  skAura(k,fromEl,pw);window.SKSND&&SKSND.cast(k.t,pw,cb,epic&&ok,0,center(fromEl)[0]);
-  try{fromEl.animate([{transform:'none'},{transform:`translateY(${A===B.me?6:-6}px) scale(${epic&&ok?1.12:.94})`,offset:.5},{transform:'none'}],{duration:260});}catch(e){}
-  await wait(100);await skTrainerStrike(k,toEl,pw,cb);skBurst(k,toEl,pw,cb);if(epic&&ok)skEpicBurst(k,toEl);skTint(k,toEl,ok);return;
- }
+ // 트레이너를 공격할 때도 포켓몬을 공격할 때와 똑같이, 공격하는 포켓몬에서 기술 이펙트가 날아가요
  if(k.m==='melee'){skAura(k,fromEl,pw);window.SKSND&&SKSND.cast(k.t,pw,cb,epic&&ok,0,center(fromEl)[0]);await lunge(fromEl,toEl);skBurst(k,toEl,pw,cb);if(epic&&ok)skEpicBurst(k,toEl);skTint(k,toEl,ok);return;}
  skAura(k,fromEl,pw);window.SKSND&&SKSND.cast(k.t,pw,cb,epic&&ok,0,center(fromEl)[0]);
  try{fromEl.animate([{transform:'none'},{transform:`translateY(${A===B.me?6:-6}px) scale(${epic&&ok?1.12:.94})`,offset:.5},{transform:'none'}],{duration:260});}catch(e){}
@@ -9733,7 +9772,7 @@ function auAttackPick(me,reserved){const fo=B.foe;const att=[];me.board.forEach(
  return best;}
 // 이번 차례에 거다이맥스를 쓸지 미리 정해요: 상대가 2마리 이상이거나 내 트레이너가 위험할 때
 function auPlanTurn(me){const fo=B.foe;AUB.skip={};AUB.tries={};AUB.plan={gm:-1};
- try{if(!gmaxCand(me)||mgProg()<evoNeed(GMAX_NEED))return;
+ try{if(!gmaxCand(me)||mgProg('g')<evoNeed(GMAX_NEED))return;
   const cands=[];me.board.forEach((u,i)=>{if(u&&gmaxCan(me,i))cands.push({i,u,v:u.atk*2+u.hp});});if(!cands.length)return;cands.sort((a,b)=>b.v-a.v);const c=cands[0];
   const foes=auAlive(fo),others=me.board.map((u,i)=>u&&u.hp>0&&u.att>0&&!u.frozen&&i!==c.i?i:-1).filter(i=>i>=0);
   const face=others.every(i=>targetsFor(i).hero)?others.reduce((a,i)=>a+remDmg(me.board[i]),0)+remDmg(c.u):0;if(face>=fo.hp)return; // 이번 차례에 끝낼 수 있으면 그냥 공격
@@ -9741,7 +9780,7 @@ function auPlanTurn(me){const fo=B.foe;AUB.skip={};AUB.tries={};AUB.plan={gm:-1}
   const hurt=me.hp<=Math.max(6,(me.max||me.hp)*.45)&&foeAtk>0;
   if((foes.length>=2&&per>=foes.length+1)||hurt)AUB.plan.gm=c.i;}catch(e){}}
 // 메가진화: 이미 공격을 마쳤거나 쉬는 포켓몬에게 써요(공격 기회를 버리지 않도록)
-function auMegaPick(me){try{if(me.mgUsed||mgProg()<evoNeed(MEGA_NEED))return -1;let bi=-1,bs=-1;me.board.forEach((u,i)=>{if(!u||!megaCan(me,i))return;if(u.att>0&&!u.frozen)return;const s=u.atk+u.hp;if(s>bs){bs=s;bi=i;}});return bi;}catch(e){return -1;}}
+function auMegaPick(me){try{if(me.mgUsed||mgProg('m')<evoNeed(MEGA_NEED))return -1;let bi=-1,bs=-1;me.board.forEach((u,i)=>{if(!u||!megaCan(me,i))return;if(u.att>0&&!u.frozen)return;const s=u.atk+u.hp;if(s>bs){bs=s;bi=i;}});return bi;}catch(e){return -1;}}
 // 트레이너 스킬: 체력 회복(위험할 때) · 응원(가장 센 포켓몬) · 공격(쓰러뜨릴 수 있는 상대) · 반격(상대가 여럿이거나 위험할 때)
 async function auSkill(me,when){try{const lv=trainerSkillLevels(),used=B.trainerSkillUsed||(B.trainerSkillUsed={}),fo=B.foe;const can=k=>(lv[k]||0)>0&&!used[k];
  if(can('heal')&&me.hp<me.max&&(me.hp<=me.max*.5||(me.max-me.hp>=lv.heal&&me.hp<=me.max*.7))){activateTrainerSkill('heal');return true;}
@@ -9962,7 +10001,7 @@ const TRAINER_SKILL_INFO={
  mana:{n:'마나 연구',ic:'🔮',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 매 턴 시작 시 일정 확률로 마나를 1 더 얻어요. (Lv.1 30% → Lv.5 70%)',eff:n=>n?`매 턴 ${manaChance(n)}% 확률로 마나 +1`:'아직 배우지 않았어요',max:5},
  study:{n:'공부 강화',ic:'📚',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 기본 공부 기술 횟수는 0회이고, 이 스킬로 전투마다 쓸 수 있는 횟수가 생겨요. 또  공부 기술로 문제를 맞혔을 때 일정 확률로 카드를 1장 더 뽑아요. (Lv.1 1회·30% / Lv.2 1회·40% / Lv.3 2회·50% / Lv.4 2회·60% / Lv.5 3회·70%)',eff:n=>n?`전투마다 공부 기술 ${STUDY_BASE+studyExtraUses(n)}회 · 성공 시 ${studyChance(n)}% 확률로 카드 +1`:'아직 배우지 않았어요',max:5},
  hand:{n:'카드 보유량',ic:'🃏',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 손에 들 수 있는 카드 최대치가 늘어나요. (Lv.1~2 +1장 → 7장 / Lv.3~4 +2장 → 8장 / Lv.5 +3장 → 9장)',eff:n=>n?`카드 보유 최대 ${HAND_BASE+handBonusOf(n)}장 (+${handBonusOf(n)})`:'아직 배우지 않았어요',max:5},
- evo:{n:'진화 연구',ic:'🧬',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 메가진화·원시회귀·거다이맥스에 필요한 정답 수가 줄어요. (Lv.1~2: -1개 / Lv.3~4: -2개 / Lv.5: -3개)',eff:n=>n?`필요한 정답 ${MEGA_NEED}개 → ${MEGA_NEED-(n>=5?3:n>=3?2:1)}개`:'아직 배우지 않았어요',max:5},
+ evo:{n:'진화 연구',ic:'🧬',passive:1,desc:'패시브 · 찍어 두면 전투 중 자동 적용돼요. 메가진화·원시회귀·거다이맥스에 필요한 정답 수가 줄어요. (Lv.1~2: -1개 / Lv.3~4: -2개 / Lv.5: -2개 + 메가진화 2회)',eff:n=>n?`필요한 정답 ${MEGA_NEED}개 → ${MEGA_NEED-(n>=3?2:1)}개`:'아직 배우지 않았어요',max:5},
  vit:{n:'체력 증강',ic:'❤️‍🔥',passive:1,desc:'패시브 · 찍어 두면 상시 적용돼요. 트레이너의 최대 체력이 스킬 레벨만큼 늘어요. (Lv.5 +5)',eff:n=>n?`트레이너 최대 체력 +${n}`:'아직 배우지 않았어요',max:5}
 };
 function trainerSkillLevels(){const m=S.meta;m.trainerSkills=Object.assign({heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0,evo:0},m.trainerSkills||{});return m.trainerSkills;}
@@ -9971,7 +10010,7 @@ const studyChance=n=>n>0?Math.min(70,20+10*n):0;
 const STUDY_BASE=0; // 기본 공부 기술 횟수 (0이면 '공부 강화' 스킬을 배워야 공부 기술을 써요)
 const studyExtraUses=n=>[0,1,1,2,2,3][Math.max(0,Math.min(5,Number(n)||0))]||0;
 const HAND_BASE=6;
-const handBonusOf=n=>{n=Math.max(0,Math.min(5,Number(n)||0));return n>=5?3:n>=3?2:n>=1?1:0;};
+const handBonusOf=n=>{n=Math.max(0,Math.min(5,Number(n)||0));return n>=3?2:n>=1?1:0;};
 function handMax(P){let lv=0;try{if(!P||window.__sim||typeof B==='undefined'||!B)return HAND_BASE;if(B.coop||B.pvp)lv=Number(P.handLv)||0;else if(P===B.me)lv=Number(trainerSkillLevels().hand)||0;}catch(e){}return HAND_BASE+handBonusOf(lv);}
 function spendMana(P,n){const b=Math.min(P.bonusMana||0,n);P.bonusMana=(P.bonusMana||0)-b;const s=Math.min(P.sunMana||0,n-b);P.sunMana=(P.sunMana||0)-s;P.mana-=n;}
 const studyBonusDraw=P=>{if(window.__sim||!P||P.hand.length>=handMax(P))return false;const shared=B.coop||B.pvp;const lv=shared?(Number(P.studyLv)||0):(Number(trainerSkillLevels().study)||0);if(lv<=0)return false;const r=B.pvp?P.passRng():rnd();if(r*100<studyChance(lv)){draw(P);return true;}return false;};
@@ -10032,7 +10071,7 @@ const SIM={p:.8,deck:null,
     if(!best)break;let pj=-1,pv=-1e9;for(let j=0;j<n;j++)if(best&(1<<j)&&val(cand[j].id)>pv){pv=val(cand[j].id);pj=j;}
     const hi=B.me.hand.indexOf(cand[pj].id);const sl=B.me.board.indexOf(null);await summon(B.me,hi,sl);}
    for(let g=0;g<6;g++){const i=B.me.hand.findIndex(v=>typeof v!=='number'&&battleCost(v)<=B.me.mana&&(isItemCard(v)?(v.item!=='thunder'||B.me.board.some(u=>u&&!u.frozen)):B.me.board.includes(null)));if(i<0)break;const v=B.me.hand[i];if(isItemCard(v)){const ti=v.item==='thunder'?B.me.board.findIndex(u=>u&&!u.frozen):-1;await playItem(B.me,i,ti);}else{const sl=B.me.board.indexOf(null);if(sl<0)break;await summon(B.me,i,sl);}}
-   if(mgProg()>=MEGA_NEED&&!B.me.mgUsed){let bi=-1,bs=-1;B.me.board.forEach((u,i)=>{if(u&&u.hp>0&&MEGA[u.id]&&!u.mg&&(u.atk+u.hp)>bs){bs=u.atk+u.hp;bi=i;}});if(bi>=0)await megaDo(B.me,bi);}
+   if(mgProg('m')>=MEGA_NEED&&!B.me.mgUsed){let bi=-1,bs=-1;B.me.board.forEach((u,i)=>{if(u&&u.hp>0&&MEGA[u.id]&&!u.mg&&(u.atk+u.hp)>bs){bs=u.atk+u.hp;bi=i;}});if(bi>=0)await megaDo(B.me,bi);}
    const totalFace=()=>B.me.board.reduce((s,x)=>s+(x&&x.att>0&&!x.frozen?remDmg(x):0),0);
    for(let i=0;i<B.me.board.length&&!B.over;i++){let u=B.me.board[i],k=0;while(u&&u.att>0&&!u.frozen&&!B.over&&k++<3){const t=targetsFor(i);let tg=null;
      if(t.hero&&totalFace()>=B.foe.hp)tg={hero:1};
@@ -17598,7 +17637,7 @@ function gdBgPaint(k,B,DW,DH){
 
  const MX=(X,Y,c,a)=>{X+=OFX;if(TS){X=Math.round(TS.ox+(X-TS.ax)*TS.sc);Y=Math.round(TS.oy+(Y-TS.ay)*TS.sc);}if(X<0||Y<0||X>=DW||Y>=DH)return;const q=hx(c),i=(Y*DW+X)*4;B[i]=B[i]*(1-a)+q[0]*a;B[i+1]=B[i+1]*(1-a)+q[1]*a;B[i+2]=B[i+2]*(1-a)+q[2]*a;};
  const P=(x,y,c)=>{const xi=x%1===0,yi=y%1===0,X=Math.floor(x*S),Y=Math.floor(y*S);for(let j=0;j<(yi?S:1);j++)for(let i=0;i<(xi?S:1);i++)PX(X+i,Y+j,c);};
- let sd=({forest:11,sea:23,fire:37,ice:41,desert:53,future:67})[k]||1;
+ let sd=({home:71,forest:11,sea:23,fire:37,ice:41,desert:53,future:67})[k]||1;
  const hs=(x,y)=>{const a=Math.floor(x*S),b=Math.floor(y*S);let h=(Math.imul(a,374761393)+Math.imul(b,668265263)+Math.imul(sd,1442695041))|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296;};
  const vn=(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);return(hs(xi,yi)*(1-u)+hs(xi+1,yi)*u)*(1-v)+(hs(xi,yi+1)*(1-u)+hs(xi+1,yi+1)*u)*v;};
  const fb=(x,y)=>vn(x,y)*.55+vn(x*2.1+5,y*2.1+3)*.3+vn(x*4.3+9,y*4.3+7)*.15;
@@ -17681,6 +17720,56 @@ function gdBgPaint(k,B,DW,DH){
   for(let t=0;t<4;t++){const bt=b-h*.06-t*(h*.2),hh=h*.34,w=(h*.2)*(1-t*.17)+1.6;
    for(let Y=Math.floor((bt-hh)*S);Y<=bt*S;Y++){const y=(Y+.5)/S,f=(y-(bt-hh))/hh,sc=1+.08*Math.sin(f*14+t*2),hw=f*w*sc;for(let X=Math.floor((x-hw)*S);X<=(x+hw)*S;X++){const xx=(X+.5)/S,u=(xx-x+hw)/(hw*2+.01),se=.52+.14*Math.sin(u*9+t*2)-(u>.5?.14:0);PX(X,Y,f<se?RPQ(['#9fbbdc','#d4e6f6','#f4faff','#ffffff'],.95-u*.6-(f>se-.12?.2:0)):RPQ(['#0f3a2e','#1b5a44','#2c7c5c','#46a07a'],.9-u*.85-(f>.88?.2:0)));}}}};
 // ---------------- scenes ----------------
+ if(k==='home'){
+  const G6=['#143e24','#1f5c34','#2f8040','#52a850','#86d070','#b4ec8c'],PK=['#7a2a50','#b8487c','#e878a8','#f8a8c8','#ffd0e2','#fff0f6'];
+  SKY(0,64,['#3d94e6','#62b2f0','#8fcff8','#c4ebfc','#e6f8ff']);SUN(160,17,9,'#fff0a0');
+  CLOUD(4,46,.5,['#8fb0dc','#c4d8f2','#ffffff','#ffffff'],.04);
+  {const PK2=[[56,38,30],[100,30,42],[144,38,32],[122,52,26],[28,44,28],[178,46,26]];FOR(26,73,(x,y)=>{let top=99,lit=0;for(const [px,ty,w] of PK2){const d=Math.abs(x-px)/w;if(d<1){const yy=72-(72-ty)*Math.max(0,(1-d)+(fb(x*.35+px,2)-.5)*.2);if(yy<top){top=yy;lit=x<px?1:-1;}}}if(y<top)return;const h=72-top,dep=(y-top)/h,nz=(fb(x*.3,y*.4)-.5)*.5;if(y-top<h*.36*(.75+fb(x*.4,y*.4)*.6))P(x,y,RP(['#9db6dc','#d8e6f8','#ffffff'],.5+lit*.22+nz*.6,x,y));else P(x,y,RP(['#3f628e','#5f86b4','#8fb0d4','#b4cde6'],.48+lit*.2-dep*.18+nz,x,y));D(x,y,'#d6e8f6',.3*(1-dep));});}
+  FOR(54,76,(x,y)=>D(x,y,'#e4f0f8',Math.max(0,(y-54)/22)*.42));
+  {const t1=x=>63+Math.sin(x*.03+1)*4+Math.sin(x*.075)*2+(fb(x*.05,5)-.5)*5,t2=x=>67.5+Math.sin(x*.045+2.4)*2.4+Math.sin(x*.11)*1.1+(fb(x*.07,9)-.5)*3;
+   FOR(56,78,(x,y)=>{const t=t1(x);if(y<t)return;const d=(y-t)/14;P(x,y,RP(['#6f9ab4','#86b0c0','#a0c4cc','#bcd8d4'],.38+(fb(x*.2,y*.4)-.5)*.3-Math.min(1,d)*.25+(Math.abs(t1(x-2)-t1(x+2))<.4?0:.05),x,y));D(x,y,'#d6e8ee',.24*(1-Math.min(1,d)));});
+   FOR(60,80,(x,y)=>{const t=t2(x);if(y<t)return;const d=(y-t)/10;P(x,y,RP(['#2f6a44','#3f8450','#5aa060','#82bc78'],.36+(fb(x*.25,y*.5)-.5)*.35-Math.min(1,d)*.2+((Math.sin(x*.3+y)>.9)?.1:0),x,y));D(x,y,'#cfe6c0',.14*(1-Math.min(1,d)));});
+   for(let i=0;i<46;i++){const x=2+i*4.1+(hs(i,41)-.5)*2.6,r=1.8+hs(i,42)*2.2,y=t2(x)+1.4+hs(i,43)*2.2;OBJ(()=>CEL(x,y-r*.4,r,r*.85,['#143e24','#1f5c34','#2f8040','#52a850','#86d070'],{ph:i,am:.12,sc:6,nz:.2}),[.5,.6,.55]);}
+   const eg=x=>71.5+Math.sin(x*.055+.6)*1.6+Math.sin(x*.14)*.7+(fb(x*.08,3)-.5)*2.2;
+   FOR(66,H,(x,y)=>{const e=eg(x);if(y<e)return;const d=(y-e)/(H-e),v=.3+fb(x*.05,y*.1+7)*.8+(1-d)*.12+(hs(x,y)-.5)*.2;P(x,y,RP(['#2a7a36','#3f9a44','#5cba50','#82d866','#a8ec80'],v+((y-e)<2.4?.32:0),x,y));});
+   FOR(66,96,(x,y)=>{const e=eg(x);if(y<e)return;D(x,y,'#d6f6a8',Math.max(0,1-(y-e)/22)*.32);if(((Math.floor((y-70)/5))&1)&&y>76)D(x,y,'#ffffff',.045);});
+   for(let x=2;x<W;x+=2.5){const e=eg(x);if(hs(x,77)<.55){P(x,e+.3,'#b4ec8c');P(x,e-.7,'#52a850');}}}
+  [[40,19],[48,24],[128,21],[136,26],[150,30]].forEach(([x,y])=>{P(x,y,'#2a3a58');P(x+1,y-1,'#2a3a58');P(x+2,y,'#2a3a58');P(x-1,y-1,'#2a3a58');});
+  const CX=96,CY=87,RX=41,RY=11.5,PY=CY+RY-3;
+  const pcx=y=>96+Math.sin((y-96)*.06)*3,phw=y=>8+(y-PY)*.34;
+  const STN=(x,y,u,bw,rh,cs)=>{const row=Math.floor(u/rh),off=(row&1)*bw/2,fx=(((x+off)%bw)+bw)%bw/bw,fy=(u/rh)-row;const mortar=fx<.1||fy<.16;return mortar?'#a58f64':RP(cs,.55+(fb(x*.7,u*.5)-.5)*.5+(fy>.7?-.1:fy<.35?.12:0)-(fx<.2?.06:0),x,y);};
+  const SC=['#b9a278','#d2bc8c','#e6d4a6','#f6ead0'];
+  SHD(CX,CY+3.2,RX+2,RY+2.6,'#0e3a18',.5);
+  FOR(PY,H,(x,y)=>{const c=pcx(y),h=phw(y),dx=Math.abs(x-c);if(dx>h+1.2)return;if(dx>h){P(x,y,'#8a7650');return;}P(x,y,dx>h-1.1?'#cdb888':STN(x,y,(y-PY)*1.15,5+(y-PY)*.05,2.5,SC));});
+  FOR(PY,H,(x,y)=>{const c=pcx(y),h=phw(y),dx=Math.abs(x-c);if(dx>h+1.2&&dx<h+3.2&&hs(Math.floor(x),Math.floor(y))<.22)P(x,y,'#4a8a36');});
+  EL(CX,CY+1.2,RX+1.6,RY+1.4,(x,y)=>P(x,y,'#8a7650'));
+  EL(CX,CY,RX,RY,(x,y,d,nx,ny)=>{const c=d>.86?(ny<-.3?'#e8d8ae':'#b39c70'):STN(x,y+nx*0,(ny+1)*RY*1.2+4,6.4,2.5,SC);P(x,y,c);});
+  for(let a=0;a<Math.PI*2;a+=.025){const x=CX+Math.cos(a)*RX*.8,y=CY+Math.sin(a)*RY*.8;if(Math.floor(a*16)%3!==0){DOT(x,y,'#e8b02c',2);if(Math.sin(a)<0)DOT(x,y-.5,'#ffe27a',1);}}
+  for(let i=0;i<8;i++){const a=i*.8+.3,x=CX+Math.cos(a)*RX*.8,y=CY+Math.sin(a)*RY*.8;P(x,y,'#fff6b0');P(x+1,y,'#ffe27a');P(x-1,y,'#ffe27a');P(x,y-1,'#ffe27a');P(x,y+1,'#ffe27a');}
+  const FENCE=(x0,x1,yb,s2)=>OBJ(()=>{BX(x0,yb-7*s2,x1-x0,1.4*s2,['#5a3a1c','#8a5e32','#b8884e'],.2);BX(x0,yb-3.6*s2,x1-x0,1.4*s2,['#5a3a1c','#8a5e32','#b8884e'],.2);for(let x=x0;x<x1;x+=9*s2)BX(x,yb-9*s2,2.2*s2,9*s2,['#4a2e14','#7a5028','#a8763c'],.25);},[.4,.4,.4]);
+  FENCE(0,44,66,1);FENCE(148,192,67,1);
+  TREEL(130,76,34,17,G6);TREEL(66,75,36,18,G6);
+  TREEL(24,88,70,32,G6);
+  TREEL(176,92,66,31,PK,['#2a180c','#4a301c','#74502c','#9a7442']);
+  const LANT=(x,b)=>{SHD(x+1,b+.5,5,1.4,'#0e3a18',.5);GL(x,b-14,9,'#ffe080',.28);OBJ(()=>{BX(x-3.4,b-2.4,6.8,2.4,['#4a4a58','#7a7a8a','#a8a8b8'],.2);BX(x-1,b-12.6,2,10.4,['#5a5a68','#8a8a9a','#b8b8c8'],.2);BX(x-3.6,b-17.4,7.2,5,['#5a5a68','#8a8a9a','#b8b8c8'],.15);for(let t=0;t<5;t++){const hw=5.4*(1-t/5);BX(x-hw,b-22.4+t,hw*2,1,['#4a4a58','#7a7a8a','#a8a8b8'],.1);}BX(x-.8,b-24.2,1.6,1.8,['#c89a2a','#ffd860','#fff0a0'],.05);},[.4,.4,.5]);EL(x,b-14.9,1.9,1.9,(a,c,d)=>P(a,c,d>.6?'#ffb840':'#fff2a0'));};
+  LANT(40,91);LANT(152,91);
+  {const PW=[30,116,23,8.2];
+   EL(PW[0],PW[1]+1,PW[2]+2.6,PW[3]+2,(x,y,d)=>P(x,y,'#4a4a58'));
+   EL(PW[0],PW[1],PW[2]+2.2,PW[3]+1.6,(x,y,d,nx,ny)=>{const st=hs(Math.floor(x/2.2),Math.floor(y/1.4))<.5;P(x,y,RPQ(['#6a6a78','#9a9aa8','#c4c4d0','#e4e4ec'],(st?.55:.35)+(ny<0?.22:-.1)+(hs(x,y)-.5)*.15));});
+   EL(PW[0],PW[1],PW[2],PW[3],(x,y,d,nx,ny)=>{const fl=fb(x*.35,y*.9);let c=RPQ(['#1f6aa8','#2e86c8','#43a8e4','#6cc8f4'],.45+(1-d)*.3+(fl-.5)*.7+(ny<-.3?.12:0));if(fl>.72)c='#d8f4ff';P(x,y,c);});
+   [[24,114,2.6],[38,118,2.4],[32,121,2]].forEach(([x,y,r])=>{EL(x,y,r,r*.55,(a,c,d)=>P(a,c,d>.6?'#2e8a3e':'#52c060'));EL(x+.6,y-.3,.8,.5,(a,c)=>P(a,c,'#ffb8d0'));});
+   for(let i=0;i<7;i++)P(PW[0]-16+hs(i,3)*30,PW[1]-4+hs(i,4)*8,'#ffffff');
+   [[10,108],[13,107],[12,110]].forEach(([x,y])=>{R(x,y-5,.7,6,'#6a4a22');EL(x+.3,y-5.4,.9,1.6,(a,c)=>P(a,c,'#4a2a12'));});}
+  NG=(x,y)=>{const nx=(x-CX)/(RX+3),ny=(y-CY)/(RY+3);if(nx*nx+ny*ny<1)return true;if(y>PY&&Math.abs(x-pcx(y))<phw(y)+3)return true;const px=(x-30)/27,py=(y-116)/12;return px*px+py*py<1;};
+  TUFT(150,72,127,'#2a7a36','#8ae870');FLW(110,76,127,['#ff6a8a','#ffffff','#ffd84a','#b88aff','#ff9a4a','#6ab8ff']);
+  [[46,96],[148,97],[16,100],[176,106],[130,112],[66,118]].forEach(([cx,cy],q)=>{for(let i=0;i<16;i++){const x=cx+(hs(i,q+20)-.5)*16,y=cy+(hs(i,q+30)-.5)*7,c=['#ff6a8a','#ffffff','#ffd84a','#b88aff','#ff9a4a'][(i+q)%5];DOT(x,y,c,2);DOT(x+.5,y-.5,'#ffe680',1);P(x+.25,y+1.5,'#3f8a36');}});
+  NG=null;
+  [[20,97],[154,100],[104,121]].forEach(([x,y])=>{R(x,y,1,3,'#f4ecd8');BALL(x,y-1,3,2,['#9a2a2a','#d83a3a','#f06a5a']);P(x-1,y-1,'#ffffff');});
+  ROCK(174,112,5,3,2.2);ROCK(62,124,4,2.4,.7);
+  [[56,86],[138,84],[70,106],[124,102]].forEach(([x,y],i)=>{const c=['#ffb04a','#ff8ab0','#8ac8ff','#ffe27a'][i];P(x,y,c);P(x+1,y-1,c);P(x-1,y-1,c);P(x+.5,y,'#3a2410');});
+  [[60,82],[126,80],[84,70],[168,76],[28,78],[112,92]].forEach(([x,y])=>{P(x,y,'#ffe27a');P(x+1,y,'#fff6b0');P(x-1,y,'#fff6b0');P(x,y+1,'#fff6b0');P(x,y-1,'#fff6b0');});
+  SPK(34,66,127,['#ffffd0','#ffffff']);
+ }else
  if(k==='forest'){
   SKY(0,66,['#3d94e6','#62b2f0','#8fcff8','#c4ebfc','#e6f8ff']);SUN(160,18,9,'#fff0a0');CLOUD(4,46,.52,['#8fb0dc','#c4d8f2','#ffffff','#ffffff']);
   MTN({b:70,amp:40,f:.011,s:2,cs:['#4b6e9a','#6f93bd','#9cbbd8','#c3d8ea'],hz:.7,hc:'#d2e6f4',sn:.28,sc:['#a0b8dc','#dbe8f8','#ffffff']});
@@ -17871,10 +17960,10 @@ function gdBgPaint(k,B,DW,DH){
   SPK(30,82,127,['#ffffff','#bff6ff']);
  }
 }
-function gdBgURL(k){if(!k)return '';if(_gdBgC[k])return _gdBgC[k];
+function gdBgURL(k){if(!k)k='home';if(_gdBgC[k])return _gdBgC[k];
  try{const W=384,H=256,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d'),id=x.createImageData(W,H);gdBgPaint(k,id.data,W,H);x.putImageData(id,0,0);const c2=document.createElement('canvas');c2.width=W*4;c2.height=H*4;const y2=c2.getContext('2d');y2.imageSmoothingEnabled=false;y2.drawImage(cv,0,0,W*4,H*4);return _gdBgC[k]=c2.toDataURL('image/png');}catch(e){return '';}}
 function gdBgStyle(g){const u=gdBgURL(g&&g.bg);return u?`background-image:url(${u});background-size:100% 100%;background-repeat:no-repeat;background-position:0 0;image-rendering:auto`:'';}
-function gdBgPickHTML(g){const cur=g.bg||'';return `<p class=mut style="font-size:13px;text-align:center">정원 배경을 골라요. 누르면 바로 바뀌어요!</p><div class=gdBgGrid>${GD_BGS.map(b=>`<button class="gdBgItem${b.k===cur?' on':''}" data-bg="${b.k}"><div class=gdBgPrev>${b.k?`<img src="${gdBgURL(b.k)}" alt="">`:'<div class=gdBg></div>'}</div><b>${b.n}</b>${b.k===cur?'<i>✓ 사용 중</i>':''}</button>`).join('')}</div>`;}
+function gdBgPickHTML(g){const cur=g.bg||'';return `<p class=mut style="font-size:13px;text-align:center">정원 배경을 골라요. 누르면 바로 바뀌어요!</p><div class=gdBgGrid>${GD_BGS.map(b=>`<button class="gdBgItem${b.k===cur?' on':''}" data-bg="${b.k}"><div class=gdBgPrev><img src="${gdBgURL(b.k||'home')}" alt=""></div><b>${b.n}</b>${b.k===cur?'<i>✓ 사용 중</i>':''}</button>`).join('')}</div>`;}
 // 꾸미기
 const GD_DEC=[
  {k:'bed',n:'꽃밭',p:40},{k:'sun',n:'해바라기',p:50},{k:'mush',n:'버섯 가족',p:30},{k:'rock',n:'이끼 바위',p:50},
@@ -18798,6 +18887,31 @@ html body .bMenuCol .fsBtn{width:30px;min-width:30px;height:24px}
 html body .bMenuCol .fsBtn .ic{width:15px;height:15px}
 
 html body .waitCatch{opacity:.7}
+</style>
+<style id="hudFit">
+/* 모바일 상단 HUD: 원래 사선 모양·높이(62px)는 그대로 두고, 오른쪽 칸(재화·리그·전체화면)을
+   2줄에 들어가도록 칸 크기만 작게 줄여요. 왼쪽 버튼·레벨 표시도 조금 줄여요 */
+@media(max-width:640px){
+html body .hud{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html body .hud .hudR{gap:3px;padding:4px 8px 7px 6px;align-content:center}
+html body .hud .hudR .pill{font-size:clamp(10px,2.8vw,12px);height:22px;padding:0 4px;gap:2px;border-width:1.5px;border-radius:7px!important;box-sizing:border-box}
+html body .hud .hudR .pill .ic{width:12px;height:12px}
+html body .hud .hudR .lgPill{flex:1 1 0;min-width:0;padding:0 5px 0 2px}
+html body .hud .hudR .lgPill .ic{width:17px;height:17px}
+html body .hud .hudR .lgPill b{font-size:clamp(10px,2.8vw,12px)}
+html body .hud .hudR .fsBtn{width:26px;min-width:26px;height:22px;margin:0}
+html body .hud .hudR .fsBtn .ic{width:14px;height:14px}
+html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{font-size:13px;padding:4px 8px}
+html body .hud .lvNum{font-size:15px;padding:0 7px}
+html body .hud .xpBar{height:12px}
+html body .hud .gsTag{font-size:11.5px;padding:2px 6px}
+}
+@media(max-width:400px){
+html body .hud,html[data-th] body .hud{--tw:clamp(184px,48%,232px)}
+html body .hud .hudR .pill{font-size:10px;padding:0 3px}
+html body .hud .hudR .pill .ic{width:11px;height:11px}
+html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{padding:4px 7px}
+}
 </style>
 <script id="fs-peek-js">
 (function(){
