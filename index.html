@@ -2799,6 +2799,18 @@ html body .btn.purple.tsGo,html body .btn.tsGo.tsGo.tsGo{background:linear-gradi
 @keyframes tsBounce{50%{transform:scale(1.08)}}
 .tiles>.tsPanel{grid-column:1/-1;margin-bottom:0!important}
 </style>
+<style id="lowfxPlus">
+/* 홈 화면 최적화: 홈 화면과 포켓몬 정원의 상시 효과(밤·저녁 색 필터, 하늘 반짝임, 깜빡이는 테두리)를 꺼요 */
+html.homelite .gdField .gdBg{filter:none!important}
+html.homelite .gdField.gdT-night .gdPet:not(.gdHeld) img,html.homelite .gdField.gdT-night .gdDec:not(.gdHeld) img,html.homelite .gdField.gdT-night .gdDec:not(.gdHeld) span{filter:brightness(.74) saturate(.85)!important}
+html.homelite .gdField.gdT-evening .gdPet:not(.gdHeld) img,html.homelite .gdField.gdT-evening .gdDec:not(.gdHeld) img,html.homelite .gdField.gdT-evening .gdDec:not(.gdHeld) span{filter:brightness(.94) sepia(.2)!important}
+html.homelite .gdField .gdDec img,html.homelite .gdField .gdDec.gdGlow:after{animation:none!important}
+html.homelite .gdField .gdDec.gdGlow:after{mix-blend-mode:normal!important}
+html.homelite .gdSky b,html.homelite .gdSky .gdCl,html.homelite .gdSky i{animation:none!important;box-shadow:none!important}
+html.homelite .gdSky .gdCl,html.homelite .gdSky i{display:none!important}
+html.homelite .tsPanel.hasLp,html.homelite .wgRew.rdy,html.homelite .btn.tsGo{animation:none!important}
+html.homelite .tsPanel.hasLp{box-shadow:0 0 8px 2px rgba(245,180,0,.7)!important}
+</style>
 </head>
 <body>
 <div id="ttFade"></div>
@@ -2832,6 +2844,8 @@ const ART={"bg": {"title": "data:image/webp;base64,UklGRkqqAQBXRUJQVlA4TD6qAQAvv
 
 // ===== 설정 =====
 const GAME={id:'poke-math',title:'좌삼몬스터디',file:'좌삼몬스터디',ver:'1.0'};
+// ★ 업데이트한 파일을 올릴 때마다 이 번호만 바꿔 주세요. 번호가 달라지면 저사양 모드가 한 번 풀려요.
+const BUILD_ID='2026-11-03a';
 // 교사 코드: 학년도마다 바뀌어요. 아래 SECRET을 바꾸면 우리 학교만의 코드가 돼요(README 참고).
 const CODE_SECRET='hada-pokemath-2026';
 const TEACHER_PW='teacher'; // 교사 화면 비밀번호(README에서 바꾸는 법 안내)
@@ -3324,7 +3338,7 @@ function defaultMeta(){return{ver:SAVE_VER,name:'',pg:'m',code:'',gs:'',cls:'',f
  xp:0,lp:0,lpRetrofit:false,lpBonus5Done:false,trainerSkills:{heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},coins:0,candy:0,packs:0,dust:0,pity:{p4:0,p5:0},col:{},seen:{},dexSeen:{},deck:[],
  sk:{},days:{},hist:[],train:{last:'',best:0,count:0,lastRes:null,daily:''},
  badges:{},gyms:{},battles:{w:0,l:0},stats:{q:0,c:0,streak:0,bestCombo:0,bestStreak:0,guessWrong:0,guessAlert:0,careful:0,lowerStar:0,shardDone:0,crafted:0,foundDone:0,superEff:0,gymTry:0,retryOk:0,bounce:0,fast:0,better:0,perfect:0,quickTrain:0,practice:0,comeback:0,flawless:0,defOk:0,candyAll:0,evolved:0,opened:0},
- unl:{},unlNew:{},ach:{},partner:0,bond:{},stoneSeen:null,card:null,uMaxAt:'',shard:{},dust:0,season:null,seasons:[],bsave:null,thist:[],first20:null,first20t:null,found:{},endless:{best:0,total:0,runs:0,caught:0},pvp:{n:0,w:0,l:0,gg:0,foes:{},last:0},tod:{m:0,a:0,e:0},firstPlay:0,scenario:{chapter:0,unlocked:0,cleared:[],seenIntro:false},settings:{anim:'gif',sound:true,bgm:true,lowfx:false,easy:false,safe:'auto',zoom:(/Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent)||(window.matchMedia&&matchMedia('(pointer:coarse)').matches)?'0.85':'auto'),fit:'auto',imgs:true,defq:true,iq:true}};}
+ unl:{},unlNew:{},ach:{},partner:0,bond:{},stoneSeen:null,card:null,uMaxAt:'',shard:{},dust:0,season:null,seasons:[],bsave:null,thist:[],first20:null,first20t:null,found:{},endless:{best:0,total:0,runs:0,caught:0},pvp:{n:0,w:0,l:0,gg:0,foes:{},last:0},tod:{m:0,a:0,e:0},firstPlay:0,scenario:{chapter:0,unlocked:0,cleared:[],seenIntro:false},settings:{anim:'gif',sound:true,bgm:true,lowfx:false,homeLite:false,easy:false,safe:'auto',zoom:(/Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent)||(window.matchMedia&&matchMedia('(pointer:coarse)').matches)?'0.85':'auto'),fit:'auto',imgs:true,defq:true,iq:true}};}
 function mergeMeta(m){const d=defaultMeta();if(!m||typeof m!=='object')return d;for(const k in d){if(!(k in m))continue;if(d[k]&&typeof d[k]==='object'&&!Array.isArray(d[k]))d[k]=Object.assign(d[k],m[k]);else d[k]=m[k];}for(const k in m){if(!(k in d))d[k]=m[k];}return d;}  // 기본값에 없는 키(예: 로그라이크 rl 기록)도 버리지 않고 그대로 이어받아요
 function upgradeMeta(m){
  // v1 → v2: 처음 20문제 기록·개념별 최근 기록이 생겼어요. 옛 기록에서 알 수 있는 만큼 채워요.
@@ -3350,17 +3364,20 @@ const S={meta:defaultMeta(),screen:'title',busy:false};
 
 // ===== 저장 · 불러오기 =====
 const STORE_OK=(()=>{try{const k='__pm';localStorage.setItem(k,'1');const ok=localStorage.getItem(k)==='1';localStorage.removeItem(k);return ok;}catch(e){return false;}})();
-function saveLocal(){if(window.__sim)return;try{localStorage.setItem(SAVE_KEY,JSON.stringify({meta:S.meta}));}catch(e){}}
+function __J(o){const st=S.meta&&S.meta.settings;if(window.__autoLow&&st){const v=st.lowfx;st.lowfx=false;try{return JSON.stringify(o);}finally{st.lowfx=v;}}return JSON.stringify(o);} /* 전투 중 자동으로 켠 저사양 모드는 저장에 남기지 않아요 */
+function saveLocal(){if(window.__sim)return;try{localStorage.setItem(SAVE_KEY,__J({meta:S.meta}));}catch(e){}}
 function loadLocal(){try{const s=localStorage.getItem(SAVE_KEY);if(!s)return;const o=JSON.parse(s);S.meta=upgradeMeta(mergeMeta(o.meta));}catch(e){}}
+// 새 버전을 처음 열면 저사양 모드를 풀어요. (기기가 정말 느리면 전투 중에 다시 자동으로 켜져요)
+function buildCheck(){try{const m=S.meta;if(!m||!m.settings||m.buildSeen===BUILD_ID)return;const was=!!m.settings.lowfx;m.settings.lowfx=false;m.buildSeen=BUILD_ID;saveLocal();if(was)setTimeout(()=>{try{toast('새 버전이에요! <b>저사양 모드</b>를 풀었어요. (설정에서 다시 켤 수 있어요)');}catch(e){}},900);}catch(e){}}
 let _asT=0;function autoSave(){clearTimeout(_asT);_asT=setTimeout(()=>{saveLocal();if(typeof achCheck==='function')achCheck();},300);}
 const slotKey=i=>GAME.id+'-slot'+i;
 function slotGet(i){try{const s=localStorage.getItem(slotKey(i));return s?JSON.parse(s):null;}catch(e){return null;}}
 function saveSummary(){const m=S.meta;return `${semName(m.gs)} · Lv.${lvOf(m.xp).lv} · 카드 ${Object.keys(m.col).length}종`;}
-function slotSave(i){try{localStorage.setItem(slotKey(i),JSON.stringify({t:Date.now(),sum:saveSummary(),name:S.meta.name,meta:S.meta}));return true;}catch(e){return false;}}
+function slotSave(i){try{localStorage.setItem(slotKey(i),__J({t:Date.now(),sum:saveSummary(),name:S.meta.name,meta:S.meta}));return true;}catch(e){return false;}}
 function fmtWhen(t){const d=new Date(t);return `${d.getMonth()+1}월 ${d.getDate()}일 ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;}
 function b64u(u){let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
 function ub64u(t){t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';const b=atob(t);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
-async function makeCode(){let b=new TextEncoder().encode(JSON.stringify({game:GAME.id,v:1,meta:S.meta})),tag='A';
+async function makeCode(){let b=new TextEncoder().encode(__J({game:GAME.id,v:1,meta:S.meta})),tag='A';
  if(window.CompressionStream){try{b=new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());tag='Z';}catch(e){}}
  return 'PKMT'+tag+':'+b64u(b);}
 async function readAny(text){text=String(text||'').trim();if(!text)throw new Error('코드를 붙여 넣어 주세요');
@@ -3368,7 +3385,7 @@ async function readAny(text){text=String(text||'').trim();if(!text)throw new Err
  const m=text.replace(/\s+/g,'').match(/PKMT([AZ]):([A-Za-z0-9_-]+)/);if(!m)throw new Error('저장 코드 모양이 아니에요 (PKMT로 시작해요)');
  let b=ub64u(m[2]);if(m[1]==='Z'){if(!window.DecompressionStream)throw new Error('이 브라우저는 이 코드를 읽지 못해요');b=new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());}
  const o=JSON.parse(new TextDecoder().decode(b));if(o.game!==GAME.id)throw new Error(GAME.title+' 코드가 아니에요');return o;}
-function applyLoaded(o,msg){S.meta=upgradeMeta(mergeMeta(o.meta));saveLocal();applySafe();closeM();closeM(1);toast(msg||'불러왔어요!');goStart();}
+function applyLoaded(o,msg){S.meta=upgradeMeta(mergeMeta(o.meta));buildCheck();saveLocal();applySafe();closeM();closeM(1);toast(msg||'불러왔어요!');goStart();}
 async function copyText(t,ta){try{await navigator.clipboard.writeText(t);toast('복사했어요! 메모장이나 채팅방에 붙여 두세요');return;}catch(e){}
  try{if(ta){ta.focus();ta.select();ta.setSelectionRange(0,t.length);}if(document.execCommand('copy')){toast('복사했어요! 메모장이나 채팅방에 붙여 두세요');return;}}catch(e){}
  if(ta){ta.focus();ta.select();}toast('자동 복사가 막혀 있어요. 칸 안의 글자를 길게 눌러 직접 복사해 주세요');}
@@ -3567,7 +3584,7 @@ function initFit(){applyFit(0,innerHeight);let io=null,probe=null,rt=0,rt2=0;
 async function goFull(){try{if(document.fullscreenElement){await document.exitFullscreen();return;}await document.documentElement.requestFullscreen({navigationUI:'hide'});}
  catch(e){if(canNewWin()){saveLocal();window.open(location.href,'_blank');toast('새 창에서 열었어요. 기록은 저장 코드로 옮길 수 있어요');}else toast('이 화면에서는 전체 화면을 쓸 수 없어요');}}
 const EMBED=(()=>{try{return window.self!==window.top;}catch(e){return true;}})();
-function applySafe(){const v=S.meta.settings.safe||'auto';document.documentElement.classList.toggle('safe',v==='on'||(v==='auto'&&EMBED));document.documentElement.classList.toggle('lowfx',!!S.meta.settings.lowfx);}
+function applySafe(){const v=S.meta.settings.safe||'auto';document.documentElement.classList.toggle('safe',v==='on'||(v==='auto'&&EMBED));document.documentElement.classList.toggle('lowfx',!!S.meta.settings.lowfx);document.documentElement.classList.toggle('homelite',!!S.meta.settings.homeLite);}
 
 /* 콘텐츠 팩 — 포켓몬 1~1025 (PokeAPI). 나중에 우리 반 캐릭터로 바꿀 때는 이 파일만 갈아 끼웁니다.
    행: [번호, 이름, 타입들, 진화 전 번호, 진화 단계, 희귀도1~5, 비용, 공격, 체력, 분류, 도감 설명, 키(m), 몸무게(kg)] */
@@ -6073,7 +6090,7 @@ function tgtBadge(d,i){if(!B||B.side!=='me')return '';const me=B.me;let out='';
    if(bad>=2&&!auto&&!root.classList.contains('lowfx')){auto=true;root.classList.add('lowfx');try{toast('화면이 버벅여서 효과를 조금 줄였어요');}catch(e){}}}
   requestAnimationFrame(tick);
  }
- window.__fpsGuard=function(){if(run)return;run=1;last=0;acc=0;n=0;requestAnimationFrame(tick);};
+ window.__fpsGuard=function(){}; /* 전투 중 자동 저사양은 아래 perfWatch가 맡아요 */
 })();
 
 /* 손패가 5장 이상이어도, 카드 한 장이 기본 크기(PC 96px·모바일 76px)를 유지할 만큼 가로가 넉넉하면 세로로 긴 '빽빽한' 배치를 쓰지 않아요 */
@@ -11913,14 +11930,15 @@ function tutPicker(){
     x:()=>closeM(),_close:()=>closeM()});
 }
 function tutBtnLabel(){try{const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(!sk)return '튜토리얼 다시 보기';const d=m.tutDone||0;return d>0?`튜토리얼 이어하기 (파트 ${Math.min(5,d+1)}/5부터)`:'튜토리얼 이어하기';}catch(e){return '튜토리얼 다시 보기';}}
-function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.easy=false;if(st.enTts===undefined)st.enTts=true;if(st.iq===undefined)st.iq=true;const seg=(k,opts)=>`<div class=seg>${opts.map(([v,n])=>`<button class="${String(st[k])===String(v)?'on':''}" data-s="${k}" data-v="${v}">${n}</button>`).join('')}</div>`;
+function showSettings(l2){const st=S.meta.settings;if(st.easy===undefined)st.easy=false;if(st.enTts===undefined)st.enTts=true;if(st.iq===undefined)st.iq=true;if(st.homeLite===undefined)st.homeLite=false;const seg=(k,opts)=>`<div class=seg>${opts.map(([v,n])=>`<button class="${String(st[k])===String(v)?'on':''}" data-s="${k}" data-v="${v}">${n}</button>`).join('')}</div>`;
  M(`<h2>${I('gear')} 설정</h2>
   <div class=setRow><span><b>쉬운 전투</b><br><span class=mut style="font-size:12px">켜면 야생 포켓몬과 시나리오 포켓몬이 한 차례에 1번만 공격해요. 끄면 1마리와 싸울 때 2번 공격해요</span></span>${seg('easy',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>막기 문제</b><br><span class=mut style="font-size:12px">켜면 상대 차례에도 문제를 한 개 풀어서 공격을 막아요</span></span>${seg('defq',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>IQ 문제</b><br><span class=mut style="font-size:12px">켜면 전투 문제 10%가 수열·논리·도형 퀴즈예요. 끄면 IQ 문제가 나오지 않고 가벼운 문제가 50%로 돌아와요</span></span>${seg('iq',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>화면 크기</b><br><span class=mut style="font-size:12px">자동은 기기 화면에 맞춰 줘요</span></span>${seg('zoom',[['auto','자동'],['0.7','70%'],['0.85','85%'],['1','100%']])}</div>
   <div class=setRow><span><b>포켓몬 디자인</b><br><span class=mut style="font-size:12px">3D 모델링은 PC에서 빠르게 보일 수 있어요</span></span>${seg('anim',[['calm','2D 도트'],['gif','3D 모델링']])}</div>
-  <div class=setRow><span><b>저사양 모드</b><br><span class=mut style="font-size:12px">켜면 느린 기기에서 반짝임·흔들림을 줄여요</span></span>${seg('lowfx',[[true,'켜기'],[false,'끄기']])}</div>
+  <div class=setRow><span><b>홈 화면 최적화</b><br><span class=mut style="font-size:12px">홈·정원이 느릴 때 켜요. 전투 스킬 이펙트는 그대로예요 (느리면 자동으로 켜져요)</span></span>${seg('homeLite',[[true,'켜기'],[false,'끄기']])}</div>
+  <div class=setRow><span><b>저사양 모드</b><br><span class=mut style="font-size:12px">전투 스킬 이펙트·흔들림까지 줄여요. 전투가 많이 느릴 때만 켜세요</span></span>${seg('lowfx',[[true,'켜기'],[false,'끄기']])}</div>
   <div class=setRow><span><b>영어 발음 🔊</b><br><span class=mut style="font-size:12px">자동 재생: 영어 문제에서 단어·문장을 읽어 줘요 · 버튼 재생: 🔊 듣기 버튼을 눌러야 들려요</span></span>${seg('enTts',[[true,'자동 재생'],[false,'버튼 재생']])}</div>
   <div class=setRow><span><b>배경음악 🎵</b><br><span class=mut style="font-size:12px">처음 화면을 터치하면 재생되고, 전투 중에는 긴장감 있는 음악으로 바뀌어요</span></span>${seg('bgm',[[true,'켜기'],[false,'끄기']])}<div class=volBar style="flex-basis:100%"><span class=mut style="font-size:12px;white-space:nowrap">음량</span><input type=range id=bgmVol min=0 max=100 step=5 value="${st.bgmVol==null?100:st.bgmVol}" aria-label="배경음악 음량"><b id=bgmVolN>${st.bgmVol==null?100:st.bgmVol}%</b></div></div>
   <div class=setRow><span><b>효과음 🔔</b><br><span class=mut style="font-size:12px">음량 막대를 밀면 '딩' 소리로 크기를 들어볼 수 있어요</span></span>${seg('sound',[[true,'켜기'],[false,'끄기']])}<div class=volBar style="flex-basis:100%"><span class=mut style="font-size:12px;white-space:nowrap">음량</span><input type=range id=sfxVol min=0 max=100 step=5 value="${st.sfxVol==null?100:st.sfxVol}" aria-label="효과음 음량"><b id=sfxVolN>${st.sfxVol==null?100:st.sfxVol}%</b></div></div>
@@ -12362,7 +12380,7 @@ let _bgCur='';function bgTick(){
  const nat=wildNatOn(),k=nat?'wildnat':(BGMAP[S.screen]||'town');if(k===_bgCur)return;_bgCur=k;const bk=nat?'title':k;const el=$('#bgImg');el.style.backgroundImage=`url(${bgPick(bk)})`;el.style.imageRendering=(bk==='title'||bk==='town'||bk==='stadium'||bk==='dusk'||bk==='sunny')?'auto':'pixelated';el.classList.add('on');const b=$('#battle');b.classList.add('art');b.style.backgroundImage=nat?'none':`url(${ART.bg.battle})`;
 }
 // ===== 시작 =====
-function init(){loadLocal();applySafe();initFit();coachInit();
+function init(){loadLocal();buildCheck();applySafe();initFit();coachInit();
  $('#fileIn').onchange=e=>{handleFile(e.target.files[0]);e.target.value='';};
  addEventListener('dragover',e=>e.preventDefault());
  addEventListener('drop',e=>{e.preventDefault();const f=e.dataTransfer&&e.dataTransfer.files[0];if(f&&/\.(md|markdown|txt)$/i.test(f.name))handleFile(f);});
@@ -14769,17 +14787,26 @@ easyHint=function(){try{const run=RUN();if(run&&!run.retryUsed&&/^scenarioRL/.te
 init();
 
 // ===== 전투 프레임 감시: 전투 중 화면이 계속 끊기면 '저사양 모드'로 자동 전환 (설정에서 다시 바꿀 수 있어요) =====
-(function perfWatch(){let buf=[],last=0,strikes=0,done=false;
- function tick(t){requestAnimationFrame(tick);
-  if(done||document.hidden){last=0;return;}
-  const dt=last?t-last:0;last=t;
-  let inBattle=false;try{inBattle=S.screen==='battle'&&!!B&&!B.over&&!document.querySelector('#bq.on,#modal.on,#modal2.on');}catch(e){}
-  if(!inBattle||!dt||dt>250){if(!inBattle)buf.length=0;return;}
-  buf.push(dt);
-  if(buf.length>=120){const avg=buf.reduce((a,b)=>a+b,0)/buf.length;buf.length=0;
-   if(avg>32)strikes++;else strikes=Math.max(0,strikes-1);
-   if(strikes>=2){done=true;try{if(!S.meta.settings.lowfx){S.meta.settings.lowfx=true;applySafe();autoSave();toast('화면이 느려서 <b>저사양 모드</b>로 바꿨어요. (설정에서 되돌릴 수 있어요)');}}catch(e){}}}}
- requestAnimationFrame(tick);})();
+(function perfWatch(){let buf=[],last=0,mode='';const strikes={battle:0,hub:0},done={hub:false};
+  const inB=()=>{try{return S.screen==='battle'&&typeof B!=='undefined'&&!!B&&!B.over;}catch(e){return false;}};
+  function autoLowOff(){ // 전투가 끝났어요: 자동으로 켠 저사양 모드를 끄고, 다음 전투에서 다시 이펙트가 나오게 해요
+   window.__autoLow=false;try{S.meta.settings.lowfx=false;applySafe();}catch(e){}strikes.battle=0;}
+  function tick(t){requestAnimationFrame(tick);
+   if(document.hidden){last=0;return;}
+   const dt=last?t-last:0;last=t;
+   if(window.__autoLow&&!inB()){autoLowOff();buf.length=0;mode='';return;}
+   let m='';try{if(inB()&&!document.querySelector('#bq.on,#modal.on,#modal2.on'))m='battle';else if(S.screen==='hub'&&!document.querySelector('#modal.on,#modal2.on'))m='hub';}catch(e){}
+   if(m!==mode){mode=m;buf.length=0;}
+   if(!m||(m==='hub'&&done.hub)||!dt||dt>250)return;
+   if(m==='battle'&&(window.__autoLow||S.meta.settings.lowfx))return;   // 이미 저사양이면 더 볼 필요 없어요
+   buf.push(dt);
+   if(buf.length>=(m==='hub'?50:90)){const avg=buf.reduce((a,b)=>a+b,0)/buf.length;buf.length=0;
+    if(avg>(m==='hub'?32:27))strikes[m]++;else strikes[m]=Math.max(0,strikes[m]-1);
+    if(strikes[m]>=2){try{
+     if(m==='battle'){strikes.battle=0;if(!S.meta.settings.lowfx){S.meta.settings.lowfx=true;window.__autoLow=true;applySafe();toast('전투가 느려서 <b>저사양 모드</b>를 잠깐 켰어요. 전투가 끝나면 다시 꺼져요');}}
+     else{done.hub=true;if(!S.meta.settings.homeLite){S.meta.settings.homeLite=true;applySafe();autoSave();toast('홈 화면이 느려서 <b>홈 화면 최적화</b>를 켰어요. 전투 이펙트는 그대로예요. (설정에서 바꿀 수 있어요)');}}
+    }catch(e){}}}}
+  requestAnimationFrame(tick);})();
 
 // ===== 전투 글자 예열: 처음 전투에 들어갈 때 글꼴과 숫자 글자를 미리 불러와 첫 데미지·배너에서 안 끊기게 해요 =====
 (function fxWarm(){let done=false;
@@ -17018,7 +17045,7 @@ function gardenPanel(m){setTimeout(gdScale,0);setTimeout(gdScale,300);const g=gd
   if(C.walk)setTimeout(()=>{try{const el=document.querySelector('#gdField .gdPet[data-id="'+id+'"]');if(el){el.style.transitionDuration=C.rem.toFixed(2)+'s';el.style.left=C.tx.toFixed(1)+'%';el.style.top=C.ty.toFixed(1)+'%';}}catch(e){}},40);
   return `<div class="gdPet${P.fly?' fly':''}${P.fl?' gdFlip':''}" data-gd="pet" data-id="${id}" style="--s:${sz};left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;z-index:${3+Math.round(y)}">${monImg(id,'anim')}</div>`;}).join('');
  const html=`<div class="panel gardenPanel" id=gardenPanel><div class=gdHead><b class=jua>나의 좌삼</b><span class=motto>포켓몬 정원</span><span class=hudSp></span><span class=pill title="개념을 3번 연속 맞히면 에너지 1개">⚡ 에너지 ${en}</span><button class="btn ghost sm" data-gd=info>ⓘ</button></div>
-  <div data-bg="${g.bg||''}" class="gdField gdT-${gdSkyInfo().slot}${S.meta.settings&&S.meta.settings.lowfx?' gdLow':''}" id=gdField><svg width=0 height=0 style="position:absolute" aria-hidden=true><filter id=gdNightF color-interpolation-filters=sRGB><feColorMatrix type=matrix values=".5 0 0 0 0  0 .58 0 0 0  0 0 .86 0 .03  0 0 0 1 0"/></filter><filter id=gdDuskF color-interpolation-filters=sRGB><feColorMatrix type=matrix values=".97 0 0 0 .02  0 .8 0 0 0  0 0 .66 0 0  0 0 0 1 0"/></filter></svg><div class=gdBg style="${gdBgStyle(g)}"></div><button class=gdZoomBtn data-gd=zoom title="정원 크게 보기"></button>${gdSkyHTML()}${gdDecHTML(g)}${pos}${!pets.length?`<div class=gdEmptyNote style="position:absolute;left:0;right:0;top:36px;text-align:center;font-size:12px;color:#3f5a3a;padding:0 10px;z-index:5;pointer-events:none">파트너로 <b>100문제</b> 이상 함께 푼 포켓몬을 정원에 풀어놓을 수 있어요 (최대 ${GD_MAX}마리)</div>`:''}
+  <div data-bg="${g.bg||''}" class="gdField gdT-${gdSkyInfo().slot}${S.meta.settings&&(S.meta.settings.lowfx||S.meta.settings.homeLite)?' gdLow':''}" id=gdField><svg width=0 height=0 style="position:absolute" aria-hidden=true><filter id=gdNightF color-interpolation-filters=sRGB><feColorMatrix type=matrix values=".5 0 0 0 0  0 .58 0 0 0  0 0 .86 0 .03  0 0 0 1 0"/></filter><filter id=gdDuskF color-interpolation-filters=sRGB><feColorMatrix type=matrix values=".97 0 0 0 .02  0 .8 0 0 0  0 0 .66 0 0  0 0 0 1 0"/></filter></svg><div class=gdBg style="${gdBgStyle(g)}"></div><button class=gdZoomBtn data-gd=zoom title="정원 크게 보기"></button>${gdSkyHTML()}${gdDecHTML(g)}${pos}${!pets.length?`<div class=gdEmptyNote style="position:absolute;left:0;right:0;top:36px;text-align:center;font-size:12px;color:#3f5a3a;padding:0 10px;z-index:5;pointer-events:none">파트너로 <b>100문제</b> 이상 함께 푼 포켓몬을 정원에 풀어놓을 수 있어요 (최대 ${GD_MAX}마리)</div>`:''}
    ${gdBubHTML()}<div class=gdHatch>${gdIncHTML(egg)}<span class=gdLbl>${egg?`${TYPE_KO[egg.t]} 알 · ${egg.fed}/${GD_NEED}`:'알 부화기 (비어 있음)'}</span></div></div>
   ${egg?`<div class=gdBar><i style="width:${Math.min(100,egg.fed/GD_NEED*100)}%"></i><span>${egg.fed} / ${GD_NEED}</span></div>`:''}
   <div class=gdBtns>${egg?`<button class="gdB feed" data-gd=feed1 title="에너지 1개 주기"><span class=zp>⚡</span></button><button class="gdB feed2" data-gd=feed10 title="에너지 10개 주기"><span class=zp>⚡</span>×10</button>`:`<button class="gdB pick" data-gd=pick title="알 고르기">🥚<small>🪙${GD_EGG_COST}</small></button>`}<button class="gdB pets" data-gd=pets title="정원 꾸리기">${I('ball')}<small>${pets.length}/${GD_MAX}</small></button></div>${gdRow2HTML(g,pets)}</div>`;
@@ -17968,7 +17995,7 @@ function gdSkyInfo(){const d=new Date(),h=d.getHours(),slot=h>=5&&h<10?'morning'
  const r=hashStr(typeof today==='function'?today():d.toDateString())%10,mo=d.getMonth()+1,winter=mo===12||mo<=2;
  const wx=r<=5?'clear':r<=7?'cloud':r===8?(winter?'snow':'rain'):(winter?'snow':'cloud');
  return{slot,wx};}
-function gdSkyHTML(){try{const{slot,wx}=gdSkyInfo(),low=!!(S.meta.settings&&S.meta.settings.lowfx);
+function gdSkyHTML(){try{const{slot,wx}=gdSkyInfo(),low=!!(S.meta.settings&&(S.meta.settings.lowfx||S.meta.settings.homeLite));
  let fx='';
  if(slot==='night')for(let i=0;i<14;i++)fx+=`<b style="left:${(i*37+11)%96}%;top:${(i*23+5)%38}%;animation-delay:${(i%6)*.4}s"></b>`;
  if(wx!=='clear'&&!low)for(let i=0;i<(wx==='cloud'?2:3);i++)fx+=`<span class=gdCl style="top:${8+i*11}%;animation-delay:${-i*13}s"></span>`;
