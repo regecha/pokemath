@@ -5133,7 +5133,7 @@ function rxHint(){try{const rx=buildRx();return rx?`<br>🎯 오늘의 처방: <
 async function startTraining(opt={}){
  const m=S.meta;if(!allowedSkills().length){toast('이 학기에는 아직 연습할 단원이 없어요');return;}
  S.screen='train';S.newStars=[];S.newBadges=[];S.lvUp=0;S.foundMsg='';
- const endless=!!opt.endless;const rescue=opt.rescue||null;S.trainEndless=endless;const N=endless?Infinity:(opt.n||trainN());const ghost=(opt.pool||endless)?null:lastTrain();
+ const endless=!!opt.endless;const rescue=opt.rescue||null;S.trainEndless=endless;S.trainSpray=!!(endless&&rescue&&window.RESQ&&RESQ.R().spray);const N=endless?Infinity:(opt.n||trainN());const ghost=(opt.pool||endless)?null:lastTrain();
  const rx=(!opt.pool&&!endless)?buildRx():null;
  const v=$('#view');
  let idx=0,correct=0,combo=0,maxCombo=0,candy=0,rt=0,gw=0;let wRars=endless?rollEndlessSet():[],wBase=0;const wNeed=()=>Math.max(0,...wRars);const retryQ=[];let revN=0,revOk=0,revSolved=0;const dueRev=(!opt.pool&&!endless)?wbDueList(m):[];const revAt=new Set();{const R=Math.min(dueRev.length,Math.max(1,Math.ceil((isFinite(N)?N:0)*.3)));if(isFinite(N)&&N>=4)for(let k=0;k<R;k++)revAt.add(Math.floor((k+.5)*N/R));}const wbPool=(endless&&!rescue)?shuffle(wbList(m).filter(e=>!e.d&&wbKindOf(e)==='math')):[];
@@ -5168,7 +5168,7 @@ async function startTraining(opt={}){
    }
   else{combo=0;if(!retry||rnd()<.5)retryQ.push({q:Object.assign({},q,{retry:false}),at:idx+2});}
   if(!retry){idx++;}prog();if(!retry){
-   if(endless&&r.ok&&window.RESQ){const hr=await RESQ.hit(q);if(hr&&rescue){if(hr.done)break;if(hr.unitDone&&await confirmBox('✅ <b>'+esc(rescue.n)+'</b> 단원은 필요한 문제를 다 풀었어요!<br>다른 단원으로 갈까요?','다른 단원 고르기','계속 풀기'))break;}}
+   if(r.ok&&window.RESQ&&(endless||!opt.pool||opt.rescueCount)){const hr=await RESQ.hit(q);if(hr&&!rescue&&hr.unitDone&&!hr.done)toast('✅ 구출 미션: 한 단원의 문제를 다 풀었어요!');if(hr&&rescue){if(hr.done)break;if(hr.unitDone&&await confirmBox('✅ <b>'+esc(rescue.n)+'</b> 단원은 필요한 문제를 다 풀었어요!<br>다른 단원으로 갈까요?','다른 단원 고르기','계속 풀기'))break;}}
    if(endless&&!(rescue&&window.RESQ&&RESQ.R().spray)&&correct-wBase>=wNeed()){const rr=wRars.slice(),nd=wNeed(),gc=Math.max(1,Math.round(nd*0.6)),gm=nd*2;m.candy+=gc;m.coins+=gm;const go=await endlessCheck(idx,correct,rr,{candy:gc,coins:gm});wBase=correct;wRars=rollEndlessSet();prog();if(!go)break;}}
  }
  clearInterval(ghT);
@@ -11628,7 +11628,7 @@ function packTile(){const m=S.meta;if(m.packs>1)return packCountMenu();if(m.pack
 // ---- 트레이너 방(허브) ----
 
 // ===== 오늘의 추천 + 주간 목표 =====
-const WG_NEED=15,WG_COINS=300,WG_PACKS=3;
+const WG_NEED=15,WG_COINS=300,WG_PACKS=10;
 function wgMonday(d=new Date()){const x=new Date(d);const k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);return today(x);}
 function wgCount(m,k){let n=0;const mon=new Date(wgMonday()+'T00:00:00');for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);const e=(m.domDay||{})[today(d)];if(e&&e[k])n+=e[k][0];}return n;}
 function wgDay(m,k){const e=(m.domDay||{})[today()];return e&&e[k]?e[k][0]:0;}
@@ -11637,15 +11637,15 @@ function wgEnsure(m){const w=wgMonday();if(m.wg&&m.wg.w===w&&Array.isArray(m.wg.
  let st=null;try{st=domStats(m);}catch(e){}
  const ranked=DOMS.map((d,i)=>({k:d.k,i,r:st&&st[d.k]&&st[d.k].n>=10&&st[d.k].racc!=null?st[d.k].racc:1.5})).sort((a,b)=>a.r-b.r||a.i-b.i);
  m.wg={w,doms:ranked.slice(0,3).map(x=>x.k),claimed:false};autoSave();return m.wg;}
-function wgTrain(k){const m=S.meta,st=domStats(m),pool=domTrainPool(m,st,[k]);const all=st[k].skills;const use=pool.length>=4?pool.concat(all.filter(x=>!pool.includes(x)).slice(0,4)):all;if(!use.length){toast('연습할 문제가 아직 없어요');return;}startTraining({pool:use,n:8});}
-function wgPanel(m){if(!m.train||!m.train.count)return '';if((m.questionMode||'math')!=='math')return '';   // 영어·국어 모드에서는 수학 추천을 보여 주지 않아요
+function wgTrain(k){const m=S.meta,st=domStats(m),pool=domTrainPool(m,st,[k]);const all=st[k].skills;const use=pool.length>=4?pool.concat(all.filter(x=>!pool.includes(x)).slice(0,4)):all;if(!use.length){toast('연습할 문제가 아직 없어요');return;}startTraining({pool:use,n:8,rescueCount:true});}
+function wgPanel(m){if(!m.train||!m.train.count)return '';   // 이번 주 목표는 수학이 목표라서 영어·국어 모드에서도 그대로 보여요
  let g;try{g=wgEnsure(m);}catch(e){return '';}
  const rows=g.doms.map(k=>({d:DOM_BY[k],n:wgCount(m,k),t:wgDay(m,k)}));
  const allDone=rows.every(r=>r.n>=WG_NEED);
  // 오늘의 추천: 이번 주 목표 중 아직 덜 채운 영역 하나(오늘 푼 문제가 적은 것 먼저), 다 채웠으면 가장 약한 영역
  const todo=rows.filter(r=>r.n<WG_NEED).sort((a,b)=>a.t-b.t||a.n-b.n);
  const rec=todo[0]||rows[0];const recDone=rec.t>=WG_NEED&&!todo.length;
- return `<div class=panel id=wgBox style="border-left:6px solid ${rec.d.c}"><div class=row style="align-items:center;gap:8px"><h3 style="margin:0">🎯 오늘의 추천</h3><span class=hudSp></span><span class=mut style="font-size:12px">이번 주 목표</span></div>
+ return `<div class=panel id=wgBox style="border-left:6px solid ${rec.d.c}"><div class=row style="align-items:center;gap:8px"><h3 style="margin:0">🎯 이번 주 목표</h3><span class=hudSp></span><span class=mut style="font-size:12px">오늘의 추천 영역</span></div>
   <div class=row style="margin-top:8px;align-items:center;gap:10px;flex-wrap:wrap"><div style="flex:1;min-width:160px;font-size:15px;line-height:1.5">${allDone?'이번 주 목표를 모두 채웠어요! 🎉':`오늘은 <b>${rec.d.ic} ${rec.d.n}</b> 어때요?`}</div><button class="btn red" id=wgGo data-k="${rec.d.k}">${rec.d.n} 8문제</button></div>
   <div style="display:grid;gap:6px;margin-top:10px">${rows.map(r=>{const p=Math.min(100,Math.round(r.n/WG_NEED*100));return `<div style="display:flex;align-items:center;gap:8px"><span style="min-width:112px;font-size:13px"><b>${r.d.ic} ${r.d.n}</b></span><div style="flex:1;height:14px;background:#f0e8d8;border-radius:7px;overflow:hidden"><i style="display:block;height:100%;width:${p}%;background:${r.d.c}"></i></div><span style="min-width:44px;text-align:right;font-size:13px;font-weight:700">${r.n>=WG_NEED?'✓':r.n+'/'+WG_NEED}</span></div>`;}).join('')}</div>
   <div class="wgRew${allDone&&!g.claimed?' rdy':''}"><div class=wgRewTop><span class=mut style="font-size:12px">세 영역을 각각 <b>${WG_NEED}문제</b> 이상 풀면 (훈련·전투·포획 모두 세요)</span></div>
@@ -12541,7 +12541,7 @@ function bmTitleHTML(){const P=innerHeight>innerWidth*1.05,q=P?BM_POS.P:BM_POS.L
   /* 이상해씨(1)·파이리(4)·꼬부기(7) 중 1마리 랜덤 */
   {const w=q.walk[1],id=pick([1,4,7]);h+=`<div class="bs walk" style="bottom:${w.b}%;width:${w.w}%;margin-left:${-w.w/2}%;--x0:${w.x0}%;--x1:${w.x1}%;--n0:${w.x0};--n1:${w.x1};--du:${w.du}s;--dl:${w.dl}s"><div class="fl">${im(id)}</div></div>`;}
  h+=`</div>`;return h;}
-function wildNatOn(){try{if(S.screen==='train'||S.screen==='result')return !!S.trainEndless;return S.screen==='battle'&&typeof B!=='undefined'&&!!B&&B.wildMode&&!B.coop&&!(B.wildState&&B.wildState.scenarioMode);}catch(e){return false;}}
+function wildNatOn(){try{if(S.screen==='train'||S.screen==='result')return !!S.trainEndless&&!S.trainSpray;return S.screen==='battle'&&typeof B!=='undefined'&&!!B&&B.wildMode&&!B.coop&&!(B.wildState&&B.wildState.scenarioMode);}catch(e){return false;}}
 function bmNatureHTML(){const P=innerHeight>innerWidth*1.05,q=P?BM_POS.P:BM_POS.L;return `<div class="bmstage" style="--ar:${q.ar}"><img class="ov" src="${P?BM_OV.P:BM_OV.L}" alt="" draggable="false"></div>`;}
 let _silT=0;
 function silSpawn(){const st=document.querySelector('#bgMons .bmstage');if(!st)return;
@@ -13790,7 +13790,7 @@ const NK_DAILY_MAX=100;
 function nkToday(){const m=S.meta,t=today();if(!m.nkDay||m.nkDay.d!==t)m.nkDay={d:t,ko:0,en:0};return m.nkDay;}
 function nkLeft(k){return Math.max(0,NK_DAILY_MAX-(nkToday()[k]||0));}
 const __pickQBeforeEnglish=pickQ;
-pickQ=function(opt={}){if(opt.cyc&&!opt.tier){const t=nextCyc();if(t==='I'){const iq=iqQ();if(iq)return iq;opt=Object.assign({},opt,{tier:'H'});}else opt=Object.assign({},opt,{tier:t});}let qm=S.meta.questionMode;{const sk=qm==='korean'?'ko':(qm==='english'||qm==='mix')?'en':null;if(sk&&nkLeft(sk)<=0){S.meta.questionMode='math';qm='math';autoSave();try{toast('오늘 '+(sk==='ko'?'국어':'영어')+' 문제 <b>'+NK_DAILY_MAX+'개</b>를 다 풀었어요! 수학 모드로 바꿨어요 ➗');}catch(e){}}}if(qm==='korean'){const kq=makeKoreanQ(opt.tier||null);if(kq)return kq;}if(qm==='english'||(qm==='mix'&&rnd()<.5))return makeEnglishQ();return __pickQBeforeEnglish(opt);};
+pickQ=function(opt={}){if(opt.cyc&&!opt.tier){const t=nextCyc();if(t==='I'){const iq=iqQ();if(iq)return iq;opt=Object.assign({},opt,{tier:'H'});}else opt=Object.assign({},opt,{tier:t});}let qm=opt.pool?'math':S.meta.questionMode;{const sk=qm==='korean'?'ko':(qm==='english'||qm==='mix')?'en':null;if(sk&&nkLeft(sk)<=0){S.meta.questionMode='math';qm='math';autoSave();try{toast('오늘 '+(sk==='ko'?'국어':'영어')+' 문제 <b>'+NK_DAILY_MAX+'개</b>를 다 풀었어요! 수학 모드로 바꿨어요 ➗');}catch(e){}}}if(qm==='korean'){const kq=makeKoreanQ(opt.tier||null);if(kq)return kq;}if(qm==='english'||(qm==='mix'&&rnd()<.5))return makeEnglishQ();return __pickQBeforeEnglish(opt);};
 /* 전투 문제에 틀렸던 문제를 가끔 섞어요: 오답 노트에서 아직 해결 못 한 수학 문제를 평소 문제 사이에 끼워 다시 풀게 해요 (맞히면 오답 노트가 정리돼요) */
 let RV_GAP=0;
 function reviewPickQ(opt){try{
@@ -20021,6 +20021,16 @@ html body .tileRow>.tile.main .td,html body .tileRow>.tile .td{font-size:12px!im
 html body .tileRow>.tile.main .ti,html body .tileRow>.tile.main span.ti{width:52px!important;height:52px!important;padding:5px!important;font-size:36px!important}
 html body .tileRow>.tile[data-f=rescue]{--ta:#c9526b;background-image:linear-gradient(120deg,#fff4f6,#ffd9e0)!important;border-color:#e08a9c!important}
 @media(max-width:520px){html body .tiles{gap:8px}.tiles>.tileRow{gap:8px}}
+/* 상세보기 카드: 이미지 · 코스트 · 타입 · 별 · 공격력 · 체력 (이름·특성은 오른쪽 설명에 있어요) */
+html body #bInfo .card .cName,html body #bInfo .card .kw{display:none!important}
+html body #bInfo .card .cTop{position:absolute;top:3px;right:3px;z-index:3;min-height:0;padding:0;width:auto;display:block;line-height:0;background:none!important;background-image:none!important;border:0!important;box-shadow:none!important;border-radius:0}
+html body #bInfo .card .cost{width:28px;height:28px;min-width:28px;min-height:28px;aspect-ratio:1/1;border-radius:50%;padding:0;flex:none;line-height:1;font-size:16px;box-shadow:0 2px 0 #1f4fbf,0 0 0 2px #fff}
+html body #bInfo .card{aspect-ratio:63/102}
+html body #bInfo .card .art{min-height:0;flex:1 1 auto;margin:3px 0}
+html body #bInfo .card .art img{width:100%;height:100%;transform:scale(1.15)}
+html body #bInfo .card .stats{justify-content:space-between}
+html body #bInfo .card{width:128px}
+@media(min-width:521px){html body #bInfo .card{width:170px}}
 </style>
 <script id="rescue-js">
 /* ===== 미션! 포켓몬 구하기 =====
@@ -20092,12 +20102,12 @@ html body .tileRow>.tile[data-f=rescue]{--ta:#c9526b;background-image:linear-gra
  function renderRescue(){
   S.screen='rescue';const m=S.meta,r=R(),nd=need(),us=units(),tt=total(),has=!!(r.t&&MON[r.t]);
   const head=has?
-   '<div style="display:flex;gap:12px;align-items:center"><div style="width:96px;height:96px;flex:none;display:flex;align-items:center;justify-content:center">'+monImg(r.t,'front')+'</div><div style="flex:1;min-width:0"><div class=jua style="font-size:20px">'+esc(MON[r.t].name)+' <span class=mut style="font-size:14px">'+'★'.repeat(MON[r.t].rar)+'</span></div><div class=mut style="font-size:13px">모든 단원 <b>'+nd+'문제</b>씩 풀면 구출해요 · 지금까지 '+(r.n||0)+'마리 구출</div><div style="margin-top:6px">'+bar(tt.a,tt.b)+'<div class=mut style="font-size:12px;margin-top:2px">전체 '+tt.a+' / '+tt.b+'문제</div></div></div></div><div class=mbtns style="margin-top:8px"><button class="btn gold" id=rsPick>다른 포켓몬 고르기</button><button class="btn '+(r.spray?'green':'ghost')+'" id=rsSpray title="켜면 문제를 풀 때 야생 포켓몬이 나타나지 않아요">🧴 야생 포켓몬 차단: '+(r.spray?'ON':'OFF')+'</button></div>':
-   '<div style="text-align:center;padding:8px 0"><div style="font-size:44px">🆘</div><p style="font-size:16px;line-height:1.6;margin:6px 0">구하고 싶은 포켓몬을 한 마리 골라요!'+((r.n||0)?'<br><span class=mut style="font-size:13px">지금까지 '+r.n+'마리 구출</span>':'')+'</p><button class="btn gold big" id=rsPick>포켓몬 고르기</button><div class=mbtns style="margin-top:10px"><button class="btn '+(r.spray?'green':'ghost')+'" id=rsSpray title="켜면 문제를 풀 때 야생 포켓몬이 나타나지 않아요">🧴 야생 포켓몬 차단: '+(r.spray?'ON':'OFF')+'</button></div></div>';
+   '<div style="display:flex;gap:12px;align-items:center"><div style="width:96px;height:96px;flex:none;display:flex;align-items:center;justify-content:center">'+monImg(r.t,'front')+'</div><div style="flex:1;min-width:0"><div class=jua style="font-size:20px">'+esc(MON[r.t].name)+' <span class=mut style="font-size:14px">'+'★'.repeat(MON[r.t].rar)+'</span></div><div class=mut style="font-size:13px">모든 단원 <b>'+nd+'문제</b>씩 풀면 구출해요 · 지금까지 '+(r.n||0)+'마리 구출</div><div style="margin-top:6px">'+bar(tt.a,tt.b)+'<div class=mut style="font-size:12px;margin-top:2px">전체 '+tt.a+' / '+tt.b+'문제</div></div></div></div><div class=mbtns style="margin-top:8px"><button class="btn gold" id=rsPick>다른 포켓몬 고르기</button><button class="btn '+(r.spray?'green':'ghost')+'" id=rsSpray title="켜면 문제를 풀 때 야생 포켓몬이 나타나지 않아요">🧴 회피스프레이: '+(r.spray?'ON':'OFF')+'</button></div>':
+   '<div style="text-align:center;padding:8px 0"><div style="font-size:44px">🆘</div><p style="font-size:16px;line-height:1.6;margin:6px 0">구하고 싶은 포켓몬을 한 마리 골라요!'+((r.n||0)?'<br><span class=mut style="font-size:13px">지금까지 '+r.n+'마리 구출</span>':'')+'</p><button class="btn gold big" id=rsPick>포켓몬 고르기</button><div class=mbtns style="margin-top:10px"><button class="btn '+(r.spray?'green':'ghost')+'" id=rsSpray title="켜면 문제를 풀 때 야생 포켓몬이 나타나지 않아요">🧴 회피스프레이: '+(r.spray?'ON':'OFF')+'</button></div></div>';
   const by={};us.forEach(u=>(by[u.s]=by[u.s]||[]).push(u));
   const rows=Object.keys(by).map(s=>'<div class=panel><h3 style="margin-top:0">'+semName(s)+'</h3>'+by[s].map(u=>{const g=Math.min(nd,got(u.k)),d=has&&g>=nd;
    return '<div class=skRow style="flex-wrap:wrap;gap:6px"><span class=sn style="flex:1;min-width:150px"><b>'+u.u+'. '+esc(u.n)+'</b><br><span class=mut style="font-size:12px">'+(has?'푼 문제 '+g+' / '+nd:'포켓몬을 고르면 시작해요')+'</span>'+(has?bar(g,nd):'')+'</span><button class="btn '+(d?'ghost':'blue')+' sm" data-rs="'+u.s+'|'+u.u+'"'+(d?' disabled':'')+'>'+(d?'✓ 완료':'구출하기')+'</button></div>';}).join('')+'</div>').join('');
-  $('#view').innerHTML=hudHTML()+'<div class=wrap><div class=panel><h2 style="margin:0 0 4px">🆘 미션! 포켓몬 구하기</h2><div class=rsGuide><div><b>🎯</b><span>구할 포켓몬을 골라요 · ★ 하나당 <b>10문제</b></span></div><div><b>📚</b><span>우리 학년 <b>모든 단원</b> 문제를 다 풀면 구출 성공!</span></div><div><b>🐾</b><span><b>구출하기</b>와 <b>야생 포켓몬 포획</b>에서 맞힌 문제가 모두 세어져요</span></div><div><b>🧴</b><span><b>야생 포켓몬 차단</b>을 켜면 문제만 빠르게 풀어요</span></div></div>'+head+(r.spray?'<div class=rsGuide style="margin:8px 0 0"><div><b>🧴</b><span><b>야생 포켓몬 차단 중</b> · 오늘의 훈련처럼 문제만 이어서 풀어요</span></div></div>':'')+'</div>'+rows+
+  $('#view').innerHTML=hudHTML()+'<div class=wrap><div class=panel><h2 style="margin:0 0 4px">🆘 미션! 포켓몬 구하기</h2><div class=rsGuide><div><b>🎯</b><span>구할 포켓몬을 골라요 · ★ 하나당 <b>10문제</b></span></div><div><b>📚</b><span>우리 학년 <b>모든 단원</b> 문제를 다 풀면 구출 성공!</span></div><div><b>🐾</b><span><b>구출하기</b>·<b>오늘의 훈련</b>·<b>야생 포켓몬 포획</b>에서 맞힌 문제가 모두 세어져요</span></div><div><b>🧴</b><span><b>야생 포켓몬 차단</b>을 켜면 문제만 빠르게 풀어요</span></div></div>'+head+(r.spray?'<div class=rsGuide style="margin:8px 0 0"><div><b>🧴</b><span><b>야생 포켓몬 차단 중</b> · 오늘의 훈련처럼 문제만 이어서 풀어요</span></div></div>':'')+'</div>'+rows+
    '<div class=panel><div class=mbtns style="margin:0"><button class="btn ghost" id=rsHome>← 홈으로</button></div></div></div>';
   bindHud();
   const p=$('#rsPick');if(p)p.onclick=()=>{sfx('tap');pick();};
