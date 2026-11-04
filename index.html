@@ -4650,6 +4650,14 @@ function focusSkills(){const m=S.meta,al=allowedSkills();
  if(m.focus&&m.focus.length){const f=al.filter(s=>m.focus.includes(unitKey(s.s,s.u)));if(f.length)return f;}
  const cur=al.filter(s=>s.s===m.gs);if(cur.length)return cur;
  const gi=semIdx(m.gs);for(let k=gi-1;k>=0;k--){const p=al.filter(s=>s.s===SEMS[k]);if(p.length)return p;}return al;}
+// 단원 집중: 집중으로 고른 단원의 개념 중 별 5개를 아직 못 모은 것이 남아 있으면, 그 개념만 계속 나와요 (다 모으면 자동으로 풀려요)
+function focusLock(){const m=S.meta;if(!m||!m.focus||!m.focus.length||(m.questionMode||'math')!=='math')return null;
+ const re=m.focusRe||{};const f=allowedSkills().filter(s=>{const k=unitKey(s.s,s.u);return m.focus.includes(k)&&(!((m.sk[s.id]&&m.sk[s.id].st)>=5)||(re[k]||0)>0);});return f.length?f:null;}
+// 별을 다 모은 단원을 다시 집중하면 100문제 동안 그 단원만 나와요
+const FOCUS_RE_N=100;
+function unitAllStars(k){const m=S.meta;const l=SK.filter(s=>unitKey(s.s,s.u)===k);return l.length>0&&l.every(s=>(m.sk[s.id]&&m.sk[s.id].st)>=5);}
+function focusReTick(q){try{const m=S.meta;if(!m.focusRe||!q||!q.sk||q.ko||q.iq||q.en)return;const sk=SKM[q.sk];if(!sk)return;const k=unitKey(sk.s,sk.u);
+ if(m.focusRe[k]>0&&(m.focus||[]).includes(k)){m.focusRe[k]--;if(m.focusRe[k]<=0){delete m.focusRe[k];S.foundMsg=S.foundMsg||'📘 다시 집중 100문제를 다 풀었어요!';}}}catch(e){}}
 function skState(id){const m=S.meta;return m.sk[id]||(m.sk[id]={c:0,x:0,st:0,run:0,last:'',w:0,r:''});}
 function needW(s){const v=S.meta.sk[s.id];if(!v)return 3;let w=1+Math.max(0,3-v.st)*.8+v.w*2;if(v.last&&dayDiff(v.last,today())>=3)w+=1;return w;}
 function wpick(list){let t=0;for(const s of list)t+=needW(s);let r=rnd()*t;for(const s of list){r-=needW(s);if(r<=0)return s;}return list[list.length-1];}
@@ -4981,8 +4989,8 @@ function iqQ(){
  return null;}
 SKM['iq']={id:'iq',s:'',u:0,n:'🧠 IQ 퀴즈',es:[]};
 
-function pickQ(opt={}){let pool=opt.pool,found=null;let tier=opt.cyc?(opt.tier||nextCyc()):null;if(tier==='I'){const iq=iqQ();if(iq)return iq;tier='H';}
- if((!opt.pool||opt.lad)&&window.LADX){const lq=LADX.pick(tier);if(lq)return lq;}
+function pickQ(opt={}){let pool=opt.pool,found=null;const fl=(!opt.pool&&!opt.lad)?focusLock():null;if(fl)pool=fl;let tier=opt.cyc?(opt.tier||nextCyc()):null;if(tier==='I'){const iq=fl?null:iqQ();if(iq)return iq;tier='H';} // 단원 집중 중에는 배틀 문제도 그 단원 개념만 (난이도 단계는 유지, IQ 문제는 건너뜀)
+ if(!fl&&(!opt.pool||opt.lad)&&window.LADX){const lq=LADX.pick(tier);if(lq)return lq;}
  if(!pool){const fp=foundPool();if(fp.length&&rnd()<(struggleLv()>=1?.5:.35)){pool=fp;found=1;}else pool=rnd()<.7?focusSkills():reviewSkills();}
  if(!pool.length)return null;
  if(tier)pool=tierPool(pool,tier);
@@ -5007,7 +5015,7 @@ function dayRec(d=today()){const m=S.meta;return m.days[d]||(m.days[d]={n:0,c:0,
 function recordAnswer(q,ok,ms,opt={}){const m=S.meta,v=(q.iq||q.ko)?{c:0,x:0,st:0,run:0,last:'',w:0,r:''}:skState(q.sk),d=dayRec();
  if(q.iq&&!opt.retry&&!opt.guess){const z=m.iq=m.iq||{n:0,c:0,r:[]};z.n++;if(ok)z.c++;z.r.push([ok?1:0,Math.round(Math.min(ms,60000)/100)/10]);if(z.r.length>30)z.r.shift();} // IQ 문제 기록(정답·시간)
  if(q.ko&&!opt.retry){const z=m.ko=m.ko||{n:0,c:0,t:{},w:[]};z.n++;if(ok)z.c++;const t=z.t[q.type]=z.t[q.type]||{n:0,c:0};t.n++;if(ok)t.c++;z.w=z.w||[];const ix=z.w.indexOf(q.iid);if(ok){if(ix>=0)z.w.splice(ix,1);}else if(ix<0){z.w.push(q.iid);if(z.w.length>60)z.w.shift();}} // 국어 기록·틀린 문제 복습
- if(!opt.retry){m.stats.q++;d.n++;v.c+=ok?1:0;v.x+=ok?0:1;}
+ if(!opt.retry){m.stats.q++;d.n++;v.c+=ok?1:0;v.x+=ok?0:1;focusReTick(q);}
  if((q.ko||q.iq)&&!opt.retry){try{xsTick(q,ok);}catch(e){console.warn('xsTick',e);}} // 국어·IQ도 개념(유형)을 3번 연속 맞히면 별 = 돌(정원 에너지)
  if(!opt.retry&&!q.ko&&!q.iq){try{domTick(q.sk,ok);}catch(e){}} // 영역별 하루 기록(진단 탭의 지난주 대비 변화용)
  try{wbAdd(q,ok,opt);}catch(e){console.warn('wbAdd',e);} // 오답 노트: 틀린 문제(수학·국어·IQ) 저장·해결 확인
@@ -5105,7 +5113,7 @@ function lastTrain(){const h=S.meta.train.hist||[];const td=today();
  for(let i=h.length-1;i>=0;i--)if(h[i].d!==td)return h[i];
  return h.length?h[h.length-1]:null;}
 // ===== 오늘의 훈련 = 맞춤 처방: 영역 진단 결과로 오늘 풀 문제를 정해요 (약한 개념 55% · 이번 단원 30% · 복습 15%) =====
-function buildRx(){try{const m=S.meta;if((m.questionMode||'math')!=='math')return null;
+function buildRx(){try{const m=S.meta;if((m.questionMode||'math')!=='math')return null;if(focusLock())return null;
  const st=domStats(m),tot=DOMS.reduce((a,d)=>a+st[d.k].n,0);if(tot<20)return null;
  const need=DOMS.map(d=>st[d.k]).filter(o=>o.n>=10&&o.racc!=null&&o.racc<.85).sort((a,b)=>a.racc-b.racc).slice(0,2);
  const meas=DOMS.map(d=>st[d.k]).filter(o=>o.n>=10&&o.racc!=null),tn=meas.reduce((a,o)=>a+o.n,0),oa=tn?meas.reduce((a,o)=>a+o.racc*o.n,0)/tn:null;
@@ -5136,7 +5144,7 @@ async function startTraining(opt={}){
  const endless=!!opt.endless;const rescue=opt.rescue||null;S.rescueCtx=(endless&&rescue&&rescue.pool&&rescue.pool.length)?rescue.pool:null;S.trainEndless=endless;S.trainSpray=!!(endless&&rescue&&window.RESQ&&RESQ.R().spray);const N=endless?Infinity:(opt.n||trainN());const ghost=(opt.pool||endless)?null:lastTrain();
  const rx=(!opt.pool&&!endless)?buildRx():null;
  const v=$('#view');
- let idx=0,correct=0,combo=0,maxCombo=0,candy=0,rt=0,gw=0;let wRars=endless?rollEndlessSet():[],wBase=0;const wNeed=()=>Math.max(0,...wRars);const retryQ=[];let revN=0,revOk=0,revSolved=0;const dueRev=(!opt.pool&&!endless)?wbDueList(m):[];const revAt=new Set();{const R=Math.min(dueRev.length,Math.max(1,Math.ceil((isFinite(N)?N:0)*.3)));if(isFinite(N)&&N>=4)for(let k=0;k<R;k++)revAt.add(Math.floor((k+.5)*N/R));}const wbPool=(endless&&!rescue)?shuffle(wbList(m).filter(e=>!e.d&&wbKindOf(e)==='math')):[];
+ let idx=0,correct=0,combo=0,maxCombo=0,candy=0,rt=0,gw=0;let wRars=endless?rollEndlessSet():[],wBase=0;const wNeed=()=>Math.max(0,...wRars);const retryQ=[];let revN=0,revOk=0,revSolved=0;const dueRev=(!opt.pool&&!endless&&!focusLock())?wbDueList(m):[];const revAt=new Set();{const R=Math.min(dueRev.length,Math.max(1,Math.ceil((isFinite(N)?N:0)*.3)));if(isFinite(N)&&N>=4)for(let k=0;k<R;k++)revAt.add(Math.floor((k+.5)*N/R));}const wbPool=(endless&&!rescue)?shuffle(wbList(m).filter(e=>!e.d&&wbKindOf(e)==='math')):[];
  const startT=performance.now();let ghT=0;let stop=null;const stopP=new Promise(r=>stop=r);
  v.innerHTML=`<div class=qWrap><div class=qTop><button class="btn ghost sm" id=tQuit>${endless?'그만하기':'그만'}</button><button class="btn green sm" id=tSave>${I('disk')} 저장·쉬기</button><div class=prog title="맞힌 문제"><div class=me style="width:0%;background:linear-gradient(90deg,#8be08b,#3cc47c)"></div>${ghost?`<div class=gh style="left:${ghost.c/ghost.n*100}%"><img src="${spriteURL(partnerId(),'front')}" alt=""><div class=gl>어제의 나 ${ghost.c}개</div></div>`:''}</div><div class=comboTag id=tCombo>${endless?'정답 0':''}</div></div><div class=buddy><div class=bimg>${monImg(partnerId(),'anim')}</div><div class=bubble id=tBub>${esc(MON[partnerId()].name)}: ${endless?'끝까지 같이 가자!':rx?`${rx.mode==='hard'?`오늘은 ${josa(rx.names.join('·'),'을를')} 기초부터 천천히 다져 보자!`:rx.mode==='strong'?`오늘은 ${rx.names.join('·')}도 챙기고 새 도전도 해 보자!`:`오늘은 ${josa(rx.names.join('·'),'을를')} 다져 보자!`}`:'같이 해 보자!'}</div></div><div id=qHost></div></div>`;
  v.scrollTop=0;if(endless)setTimeout(()=>prog(),0);
@@ -12196,7 +12204,7 @@ async function startWrongBook(keys){
 function mapCoachSteps(){return [
  {h:'학습 지도',ic:'map',pic:stPic([['🗺️','학습 지도'],['📖','단원 고르기'],['✏️','연습']]),t:'여기는 <b>무엇을 공부할지 고르는 곳</b>이에요. 어렵지 않아요, 하나씩 볼게요!'},
  {el:'#uSeg',h:'지금 배우는 단원',ic:'book',t:'학교에서 <b>지금 배우는 단원 번호</b>를 눌러요. 그 단원까지만 문제가 나와서 아직 안 배운 문제는 안 나와요. <b>전체</b>를 누르면 모든 단원이 나와요.'},
- {el:'#fClr',h:'집중과 연습',ic:'flame',pic:stPic([['🎯','집중'],['🍬','오늘 훈련에서 먼저']]),t:'단원 옆 <b>집중</b>을 누르면 오늘 훈련에서 그 단원을 먼저 풀어요. <b>연습</b>을 누르면 그 단원 문제를 <b>바로</b> 풀어요. 집중은 여기 <b>집중 해제</b>로 풀 수 있어요.'},
+ {el:'#fClr',h:'집중과 연습',ic:'flame',pic:stPic([['🎯','집중'],['🍬','오늘 훈련에서 먼저']]),t:'단원 옆 <b>집중</b>을 켜면 훈련과 배틀에서 <b>그 단원 문제만</b> 나와요. 그 단원 개념마다 <b>별 5개를 다 모으면</b> 저절로 풀려요. 다 모은 단원을 다시 켜면 <b>100문제</b> 동안 또 그 단원만 나와요. <b>연습</b>을 누르면 그 단원 문제를 <b>바로</b> 풀어요. 집중은 여기 <b>집중 해제</b>로 풀 수 있어요.'},
  {h:'아래 학년도 보물!',ic:'coin',pic:stPic([['🧱','아래 학년'],['⭐','별 얻기'],['🪙','코인·사탕']]),t:'지난 학년 단원에서 별을 얻으면 <b>코인 15 · 사탕 5</b>, 단원 배지를 받으면 <b>코인 100</b>을 더 줘요. 기초를 탄탄하게 쌓아 봐요!'},
  {el:'#mpKo',h:'국어·영어 모드',ic:'book',t:'<b>국어</b>나 <b>영어</b> 문제도 풀 수 있어요. 하루 <b>100문제</b>씩만 풀 수 있고, 다 풀면 수학으로 돌아가요.'}];}
 function mapTutorial(){try{renderMap();}catch(e){console.warn('map tut',e);return;}return wait(250).then(()=>coach(mapCoachSteps()));}
@@ -12206,16 +12214,16 @@ function renderMap(){S.screen='map';const m=S.meta;const map=unitsWithSkills();c
   <p class=mut style="font-size:13px">선생님 코드는 <b>${esc(semName(m.gs))}</b>이에요. 그보다 뒤 학년의 단원은 나오지 않아요.</p>
   <div class=explain style="font-size:14px;margin-top:6px">${I('coin')} <b>아래 학년 단원도 보물이에요!</b> 아래 학년 개념에서 별을 얻으면 <b>코인 15 · 사탕 5</b>, 아래 학년 단원 배지를 받으면 <b>코인 100</b>을 더 받아요. 좌삼을 탄탄하게 쌓아 봐요.</div>
   <div class=setRow><span><b>지금 배우는 단원</b><br><span class=mut style="font-size:12px">${esc(semName(m.gs))}에서 이 단원까지만 문제가 나와요</span></span><div class=seg id=uSeg>${UNITS[m.gs].map((n,i)=>`<button class="${m.uMax===i+1?'on':''}" data-u="${i+1}">${i+1}</button>`).join('')}<button class="${!m.uMax||m.uMax>=99?'on':''}" data-u="99">전체</button></div></div>
-  <div class=setRow><span><b>훈련 집중 단원</b><br><span class=mut style="font-size:12px">고르지 않으면 이번 학기 단원 위주로 나와요(복습도 섞여요)</span></span><button class="btn ghost sm" id=fClr>집중 해제</button></div></div>
+  <div class=setRow><span><b>훈련 집중 단원</b><br><span class=mut style="font-size:12px">켜 두면 그 단원 문제만 나와요 (개념마다 별 5개를 다 모으면 풀려요. 다 모은 단원을 다시 켜면 100문제 동안 나와요). 고르지 않으면 이번 학기 단원 위주로 나와요</span></span><button class="btn ghost sm" id=fClr>집중 해제</button></div></div>
   <div class=panel><h3 style="margin-top:0">🪨 과목별 돌 <span class=mut style="font-size:13px">(수학·영어·국어·IQ 모두 정원 에너지가 돼요)</span></h3>${subjSummaryHTML(m)}</div>
   ${sems.map(s=>{const us=UNITS[s].map((n,i)=>({n,u:i+1,k:unitKey(s,i+1)})).filter(x=>map[x.k]);if(!us.length)return '';return `<div class=panel><h3 style="margin-top:0">${semName(s)}</h3>${us.map(x=>{const sks=map[x.k];const st=sks.reduce((a,sk)=>a+(m.sk[sk.id]?m.sk[sk.id].st:0),0);const foc=(m.focus||[]).includes(x.k);
-   return `<div class=skRow style="flex-wrap:wrap">${m.badges[x.k]?I('medal','uBadge'):''}<span class=sn><b>${x.u}. ${esc(x.n)}</b><br><span class=mut style="font-size:12px">개념 ${sks.length}개 · 별 ${st}/${sks.length*5}</span></span><button class="fbtn${foc?' on':''}" data-fk="${x.k}">${foc?'집중 중':'집중'}</button><button class="btn blue sm" data-pk="${x.k}">연습</button></div>`;}).join('')}</div>`;}).join('')}${xsPanelsHTML(m,true)}<div class=panel><div class=mbtns style="margin:0"><button class="btn ghost" id=mpKo>📖 국어 모드로 바꾸기</button><button class="btn ghost" id=mpEn>📘 영어 모드 설정</button></div><p class=mut style="font-size:12px;margin:6px 0 0">국어·영어는 하루 100문제씩만 풀 수 있고, 다 풀면 수학 모드로 돌아가요.</p></div></div>`;
+   return `<div class=skRow style="flex-wrap:wrap">${m.badges[x.k]?I('medal','uBadge'):''}<span class=sn><b>${x.u}. ${esc(x.n)}</b><br><span class=mut style="font-size:12px">개념 ${sks.length}개 · 별 ${st}/${sks.length*5}</span></span><button class="fbtn${foc?' on':''}" data-fk="${x.k}">${foc?((m.focusRe&&m.focusRe[x.k]>0)?'집중 중 · '+m.focusRe[x.k]+'문제 남음':'집중 중'):'집중'}</button><button class="btn blue sm" data-pk="${x.k}">연습</button></div>`;}).join('')}</div>`;}).join('')}${xsPanelsHTML(m,true)}<div class=panel><div class=mbtns style="margin:0"><button class="btn ghost" id=mpKo>📖 국어 모드로 바꾸기</button><button class="btn ghost" id=mpEn>📘 영어 모드 설정</button></div><p class=mut style="font-size:12px;margin:6px 0 0">국어·영어는 하루 100문제씩만 풀 수 있고, 다 풀면 수학 모드로 돌아가요.</p></div></div>`;
  bindHud();
  {const mh=$('#mHelp');if(mh)mh.onclick=()=>{sfx('tap');mapTutorial();};} try{if(!S.meta.seen.c_map1)setTimeout(()=>{if(S.screen==='map')coachOnce('c_map1',mapCoachSteps());},500);}catch(e){}
  {const a=$('#mpKo');if(a)a.onclick=()=>{sfx('tap');if(nkLeft('ko')<=0){toast('오늘 국어 문제 100개를 다 풀었어요. 내일 또 만나요!');return;}S.meta.questionMode='korean';autoSave();chooseKoreanMode(true);};const b=$('#mpEn');if(b)b.onclick=()=>{sfx('tap');if(nkLeft('en')<=0){toast('오늘 영어 문제 100개를 다 풀었어요. 내일 또 만나요!');return;}chooseEnglishMode(true,'english');};}
  $('#uSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{sfx('tap');m.uMax=+b.dataset.u;m.uMaxAt=today();autoSave();renderMap();});
- $('#fClr').onclick=()=>{m.focus=null;autoSave();renderMap();};
- $('#view').querySelectorAll('[data-fk]').forEach(b=>b.onclick=()=>{sfx('tap');const k=b.dataset.fk;m.focus=m.focus||[];const i=m.focus.indexOf(k);if(i>=0)m.focus.splice(i,1);else m.focus.push(k);autoSave();renderMap();});
+ $('#fClr').onclick=()=>{m.focus=null;m.focusRe=null;autoSave();renderMap();};
+ $('#view').querySelectorAll('[data-fk]').forEach(b=>b.onclick=()=>{sfx('tap');const k=b.dataset.fk;m.focus=m.focus||[];const i=m.focus.indexOf(k);if(i>=0){m.focus.splice(i,1);if(m.focusRe)delete m.focusRe[k];}else{m.focus.push(k);if(unitAllStars(k)){m.focusRe=m.focusRe||{};m.focusRe[k]=FOCUS_RE_N;toast('별을 다 모은 단원이에요! 다시 100문제만 풀어 봐요');}}autoSave();renderMap();});
  $('#view').querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{sfx('tap');startTraining({pool:map[b.dataset.pk],n:8});});}
 
 // ---- 설정 ----
@@ -20496,7 +20504,7 @@ const TH=[
  {g1:'#cbc4f2',g2:'#b8b0e6',g3:'#8478c8',g4:'#58509c',t1:'#6a60c0',t2:'#a49cf0',t3:'#403a88',ol:'#221e4c',p1:'#f4ecff',p2:'#dcd0f2',p3:'#bcb0dc',w1:'#7ab0ff',w2:'#c8e0ff',w3:'#4a7ad8',fl:['#ffd0f0','#fff4a0','#ffffff'],rk1:'#d0ccec',rk2:'#9890c4',ponds:1,tint:'rgba(150,120,255,.08)'},
  {g1:'#4c8a6c',g2:'#3e7a5e',g3:'#2c6050',g4:'#1c3e38',t1:'#2a5e58',t2:'#4a8e84',t3:'#183c3c',ol:'#0c1e24',p1:'#8c9ab0',p2:'#78869e',p3:'#5e6c84',w1:'#2e5ec0',w2:'#6c9cf0',w3:'#1a3c8c',fl:['#ff8ab0','#ffe87a','#d8f0ff'],rk1:'#7c849c',rk2:'#545c78',ponds:1,tint:'rgba(10,10,70,.34)'}
 ];
-const TL={GRASS:0,PATH:1,TALL:2,TREE:3,WATER:4,FLOWER:5,ROCK:6,CARPET:7,PILLAR:8,GYM:9,MARBLE:10,DAIS:11,MBLK:12,CLOUD:13};
+const TL={GRASS:0,PATH:1,TALL:2,TREE:3,WATER:4,FLOWER:5,ROCK:6,CARPET:7,PILLAR:8,GYM:9,MARBLE:10,DAIS:11,MBLK:12,CLOUD:13,CLOUDF:14}; // CLOUD=막힌 구름, CLOUDF=걸을 수 있는 구름 바닥(상자가 놓이는 곳)
 const BLOCK=new Set([TL.TREE,TL.WATER,TL.ROCK,TL.PILLAR,TL.GYM,TL.MBLK,TL.CLOUD]); // GYM: 체육관 건물 자리 (바닥은 풀로 그려져요)
 
 // ---------- 타일 시트 (손으로 찍는 16×16 도트) ----------
@@ -20626,7 +20634,7 @@ function genMap(run){
     if(!ok)continue;
     const bad=new Set(ring.concat(inner,lake)),r=search(hy*W+apx,bad,true);
     if(!r)continue;
-    inner.forEach(k=>t[k]=TL.GRASS);ring.concat(lake).forEach(k=>t[k]=RT);if(!ride)t[hy*W+hx+dir*2]=TL.GRASS;dig(r);
+    if(loc==='cloud'){for(let dy=-2;dy<=2;dy++)for(let u=-2;u<=4;u++){const k=(hy+dy)*W+hx+dir*u,ay=Math.abs(dy);if(ay<=1&&u>=-1&&u<=1){t[k]=TL.CLOUDF;continue;}const must=(ay<=1&&(u===-2||u===2))||(ay===2&&u>=-1&&u<=1)||(dy===0&&u>=2&&u<=4),corner=ay===2&&(u===-2||u===2||u===4);if(must||rng()<(corner?.25:.7))t[k]=TL.CLOUD;}}else{inner.forEach(k=>t[k]=TL.GRASS);ring.concat(lake).forEach(k=>t[k]=RT);}if(!ride)t[hy*W+hx+dir*2]=TL.GRASS;dig(r);
     if(ride)ents.push({k:'gate',g:loc,x:hx+dir*4,y:hy,dir,rd:dir,ride:1,out:1},{k:'gate',g:loc,x:hx+dir*2,y:hy,dir,rd:dir,ride:1,out:0});
     else ents.push({k:'gate',g:loc,x:hx+dir*2,y:hy,dir});
     ents.push({k:'chest',h:1,x:hx,y:hy,dir:0,i:-1});placed=true;}}
@@ -20849,7 +20857,20 @@ function script(n,inf,run){
   case 'shop':pages=['어서 오세요! 떠돌이 상인의 가게입니다!',tg,'물건을 둘러볼래요?'];menu=['구경한다','다음에요'];break;
   case 'rand':pages=['수상한 풀숲이 바스락바스락 흔들린다…','무엇이 튀어나올지 아무도 모른다.','들어가 볼까?'];menu=['들어간다','그만둔다'];break;
   case 'trial':pages=['시험관이 문제지를 흔들며 말한다.\n「문제 3개! 도전해 보겠나?」',tg,'도전할까?'];menu=['도전한다','다음에'];break;
-  default:{const wd=n.ev==='wanderer';pages=[wd?(n.ws?'낯익은 뒷모습이 손을 흔든다. 그 여행자다!':'길가에서 낯선 여행자가 손을 흔든다.'):'길 위에 누군가 서 있다… 뭔가 사건이 일어날 것 같다!',tg,'다가가 볼까?'];menu=['다가간다','지나간다'];}
+  default:{const wd=n.ev==='wanderer',EI={ // 사람이 아닌 사건은 '누가 서 있다' 대신 그 장소·물건에 맞는 말로 시작해요
+    spring:'숲 한가운데 맑은 샘이 반짝이고 있다. 물에서 따뜻한 빛이 올라온다.',
+    chest:'덤불 속에 낡은 보물상자가 놓여 있다.',
+    stray:'덤불 속에서 가늘게 떠는 기척이 느껴진다. 다친 포켓몬들이 있는 것 같다…',
+    evolve:'하늘에서 반짝이는 빛줄기가 길 위로 내려오고 있다!',
+    lab:'길가에 낡은 연구소가 덩그러니 남아 있다. 안에서 기계 소리가 윙윙 들린다.',
+    thorns:'가시덤불이 길을 가로막고 있다. 덤불 너머에서 무언가 반짝인다!',
+    ruins:'이끼 낀 고대 비석이 길 한가운데 솟아 있다. 글자가 새겨져 있다.',
+    festival:'멀리서 음악 소리와 맛있는 냄새가 풍겨 온다. 축제가 한창인 것 같다!',
+    egg:'낡은 둥지 속에서 은은하게 빛나는 알이 보인다.',
+    altar:'오래된 제단 위에서 세 갈래의 빛이 빙글빙글 돌고 있다.',
+    trader:'망토를 두른 수상한 상인이 길가에서 손짓한다.',
+    gambler:'동전을 튕기던 사람이 눈이 마주치자 씩 웃는다.'},person=wd||n.ev==='trader'||n.ev==='gambler';
+   pages=[wd?(n.ws?'낯익은 뒷모습이 손을 흔든다. 그 여행자다!':'길가에서 낯선 여행자가 손을 흔든다.'):(EI[n.ev]||'길 위에서 뭔가 일이 벌어질 것 같다…'),tg,person?'다가가 볼까?':'살펴볼까?'];menu=person?['다가간다','지나간다']:['살펴본다','지나간다'];}
  }
  return{pages:pages.filter(Boolean),menu};
 }
@@ -20907,11 +20928,46 @@ function mount(run){
  const anim=[];let af=0;
  const isP=v=>v===TL.PATH||v===TL.CARPET;
  function paint(x,y){const id=M.t[y*W+x];let si=0;
-  switch(id){case TL.GRASS:si=(x*7+y*13)%3;break;case TL.PATH:si=3+((x+y)&1);break;case TL.TALL:si=5+af;break;case TL.TREE:si=7;break;case TL.WATER:si=8+af;break;case TL.FLOWER:si=10+af;break;case TL.ROCK:si=12;break;case TL.CARPET:si=13;break;case TL.PILLAR:si=14;break;case TL.MARBLE:case TL.MBLK:si=17+((x+y)&1);break;case TL.DAIS:si=19;break;case TL.CLOUD:si=20+((x+y)&1);break;}
+  switch(id){case TL.GRASS:si=(x*7+y*13)%3;break;case TL.PATH:si=3+((x+y)&1);break;case TL.TALL:si=5+af;break;case TL.TREE:si=7;break;case TL.WATER:si=8+af;break;case TL.FLOWER:si=10+af;break;case TL.ROCK:si=12;break;case TL.CARPET:si=13;break;case TL.PILLAR:si=14;break;case TL.MARBLE:case TL.MBLK:si=17+((x+y)&1);break;case TL.DAIS:si=19;break;case TL.CLOUD:case TL.CLOUDF:si=(x*7+y*13)%3;break;}
   bg.drawImage(sheet,si*T,0,T,T,x*T,y*T,T,T);
   const nb=(dx,dy)=>{const a=x+dx,b=y+dy;return a<0||b<0||a>=W||b>=H?-1:M.t[b*W+a];};
   if(id===TL.PATH){bg.fillStyle=th.p3;if(!isP(nb(0,-1)))bg.fillRect(x*T,y*T,T,1);if(!isP(nb(0,1)))bg.fillRect(x*T,y*T+15,T,1);if(!isP(nb(-1,0)))bg.fillRect(x*T,y*T,1,T);if(!isP(nb(1,0)))bg.fillRect(x*T+15,y*T,1,T);}
-  if(id===TL.WATER){bg.fillStyle=th.w3;if(nb(0,-1)!==TL.WATER)bg.fillRect(x*T,y*T,T,2);if(nb(0,1)!==TL.WATER)bg.fillRect(x*T,y*T+14,T,2);if(nb(-1,0)!==TL.WATER)bg.fillRect(x*T,y*T,2,T);if(nb(1,0)!==TL.WATER)bg.fillRect(x*T+14,y*T,2,T);}}
+  if(id===TL.WATER){bg.fillStyle=th.w3;if(nb(0,-1)!==TL.WATER)bg.fillRect(x*T,y*T,T,2);if(nb(0,1)!==TL.WATER)bg.fillRect(x*T,y*T+14,T,2);if(nb(-1,0)!==TL.WATER)bg.fillRect(x*T,y*T,2,T);if(nb(1,0)!==TL.WATER)bg.fillRect(x*T+14,y*T,2,T);}
+  cloudPaint(x,y);}
+ // ===== 구름: 둥근 덩어리를 겹쳐 만든 뭉게구름 (칸마다 덩어리 하나, 월드 좌표로 계산해서 이웃 칸과 매끄럽게 이어져요) =====
+ function cloudAt(tx,ty){if(tx<0||ty<0||tx>=W||ty>=H)return false;const v=M.t[ty*W+tx];return v===TL.CLOUD||v===TL.CLOUDF;}
+ function cLobe(tx,ty){const h=(Math.imul(tx+11,73856093)^Math.imul(ty+7,19349663))>>>0;
+  const rr=n=>((h>>>n)&15)/15;let r=11+rr(0)*3;
+  // 바깥으로 툭 튀어나온 모서리 칸은 덩어리를 작게 해서 둥글게 깎아요
+  if(!cloudAt(tx-1,ty)&&!cloudAt(tx,ty-1)||!cloudAt(tx+1,ty)&&!cloudAt(tx,ty-1)||!cloudAt(tx-1,ty)&&!cloudAt(tx,ty+1)||!cloudAt(tx+1,ty)&&!cloudAt(tx,ty+1))r-=2.2;
+  return[tx*T+8+(rr(4)-.5)*5,ty*T+8+(rr(8)-.5)*5,r];}
+ function cDepth(wx,wy){ // 덩어리 안쪽으로 얼마나 들어와 있는지 (음수 = 구름 밖)
+  const tx=Math.floor(wx/T),ty=Math.floor(wy/T);let best=-99;
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!cloudAt(tx+dx,ty+dy))continue;
+   const o=cLobe(tx+dx,ty+dy),d=o[2]-Math.hypot(wx+.5-o[0],wy+.5-o[1]);if(d>best)best=d;}
+  return best;}
+ function cIn(wx,wy){const tx=Math.floor(wx/T),ty=Math.floor(wy/T);
+  if(cSolid(tx,ty))return true;
+  return cDepth(wx,wy)>=0;}
+ function cSolid(tx,ty){return cloudAt(tx,ty)&&cloudAt(tx-1,ty)&&cloudAt(tx+1,ty)&&cloudAt(tx,ty-1)&&cloudAt(tx,ty+1);}
+ function cloudPaint(x,y){
+  let near=false;for(let dy=-1;dy<=1&&!near;dy++)for(let dx=-1;dx<=1;dx++)if(cloudAt(x+dx,y+dy)){near=true;break;}
+  if(!near)return;
+  for(let py=0;py<T;py++)for(let px=0;px<T;px++){
+   const wx=x*T+px,wy=y*T+py;let c=null;
+   if(cIn(wx,wy)){
+    if(!cIn(wx,wy+1))c='#86a8d2';                                   // 아래 테두리
+    else if(!cIn(wx-1,wy)||!cIn(wx+1,wy))c='#a9c5e6';                // 옆 테두리
+    else if(!cIn(wx,wy-1))c='#e4effb';                               // 윗 테두리(밝게)
+    else if(!cIn(wx,wy+2)||!cIn(wx,wy+3))c='#c9ddf3';                // 아래쪽 그늘
+    else{ // 덩어리 사이의 얕은 주름 + 가끔 반짝이는 점
+     const tx=Math.floor(wx/T),ty=Math.floor(wy/T);let fold=false;
+     for(let dy=-1;dy<=1&&!fold;dy++)for(let dx=-1;dx<=1;dx++){if(!cloudAt(tx+dx,ty+dy)||cSolid(tx+dx,ty+dy))continue;const o=cLobe(tx+dx,ty+dy),d=o[2]-Math.hypot(wx+.5-o[0],wy+.5-o[1]);
+      if(d>=0&&d<1.1&&(wx+.5-o[0])+(wy+.5-o[1])>3&&cDepth(wx-1,wy-1)>2.5){fold=true;break;}}
+     c=fold?'#dbe9f8':((wx*31+wy*17)%29===0?'#eaf3fc':'#ffffff');}
+    bg.fillStyle=c;bg.fillRect(wx,wy,1,1);
+   }else if(cIn(wx-2,wy-3)){bg.fillStyle='rgba(30,55,100,.22)';bg.fillRect(wx,wy,1,1);} // 땅에 드리운 그림자
+  }}
  for(let y=0;y<H;y++)for(let x=0;x<W;x++){paint(x,y);const v=M.t[y*W+x];if(v===TL.TALL||v===TL.WATER||v===TL.FLOWER)anim.push([x,y]);}
  // 그림 불러오기
  const imgs={};const getImg=src=>{if(!src)return null;let m=imgs[src];if(!m){m=imgs[src]=new Image();m.src=src;}return m.complete&&m.naturalWidth?m:null;};
@@ -21070,7 +21126,7 @@ function mount(run){
  let gbV=null,gbT=0;const gbSm=t=>{const n=tms,dt=Math.min(60,Math.max(0,n-gbT));gbT=n;if(gbV===null)gbV=t;else gbV+=(t-gbV)*(1-Math.exp(-dt/220));return gbV;};
  function drawEnt(e){
   if(e.k==='sign'){g.drawImage(sheet,15*T,0,T,T,e.x*T,e.y*T,T,T);return;}
-  if(e.k==='gate'){if(e.hide)return;const si=e.g==='water'?8+(((tms/450)|0)&1):e.g==='tree'?7:e.g==='rock'?12:20+((e.x+e.y)&1),f=e.gfx;
+  if(e.k==='gate'){if(e.hide||e.g==='cloud')return;const si=e.g==='water'?8+(((tms/450)|0)&1):e.g==='tree'?7:e.g==='rock'?12:20+((e.x+e.y)&1),f=e.gfx;
    if(f&&f.k==='fall'){g.save();g.globalAlpha=Math.max(0,1-f.u*.75);g.translate(e.x*T+8,e.y*T+15);g.rotate(f.u*f.u*1.45*(e.dir>0?-1:1));g.drawImage(sheet,si*T,0,T,T,-8,-15,T,T);g.restore();return;}
    g.drawImage(sheet,si*T,0,T,T,e.x*T+(f&&f.k==='shake'?(((tms/40)|0)%2?1:-1):0),e.y*T,T,T);return;}
   if(e.k==='chest'||e.k==='dex'){const x=e.x*T,y=e.y*T,sp=e.k==='chest'?propSheet('chest'):dexSheet(),pw=sp.width,ph=sp.height,bob=Math.round(Math.sin(tms/320+e.x*1.3)),ty=y+16-ph;
