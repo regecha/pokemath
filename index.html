@@ -599,6 +599,9 @@ html.lowfx .card .holo{animation:none;mix-blend-mode:normal;opacity:.25}
 #pvSpec .pvsQ{background:#dceeff;border:2px solid #74b6f4;border-radius:12px;padding:6px 8px;box-shadow:0 3px 0 #a8d4ff}#pvSpec .pvsSk{font-size:11px;color:#4f7fb8}#pvSpec .pvsText{font-size:15px;font-weight:700;margin:2px 0}
 #pvSpec .pvsPic{max-height:110px;overflow:hidden}
 #pvSpec.canHelp{pointer-events:auto}#pvSpec .pvsHelp{margin:0 0 5px;padding:3px 8px;border-radius:8px;background:#ffe8f0;color:#c2305f;font-size:12px;font-weight:700}#pvSpec.canHelp .pvsC{cursor:pointer;padding:6px 14px}#pvSpec .pvsC.heart{border-color:#ff5a8a;background:#ffe3ec}#pvSpec .pvsC.heart::after{content:' ❤️'}.ch.hh{position:relative;border-color:#ff5a8a!important;box-shadow:0 5px 0 #ff9ab8!important}.ch.hh::after{content:'❤️';position:absolute;top:-12px;right:-6px;font-size:30px;line-height:1;animation:hhPop .45s ease-out,hhBeat 1s ease-in-out .45s infinite;filter:drop-shadow(0 2px 0 rgba(255,255,255,.9))}@keyframes hhPop{0%{transform:scale(.2) rotate(-20deg);opacity:0}70%{transform:scale(1.35) rotate(8deg);opacity:1}100%{transform:scale(1) rotate(0)}}@keyframes hhBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+/* 4인 보스전: 구경하는 친구마다 ❤️ 1개씩, 푸는 친구 보기 안쪽에 작게 (최대 3개) */
+.ch .hhs{position:absolute;top:3px;right:6px;z-index:3;display:flex;gap:1px;line-height:1;pointer-events:none}
+.ch .hhs i{font-style:normal;font-size:15px;line-height:1;filter:drop-shadow(0 1px 0 rgba(255,255,255,.95));animation:hhPop .45s ease-out,hhBeat 1.1s ease-in-out .45s infinite}
 #pvSpec .pvsCh{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}#pvSpec .pvsC{padding:3px 10px;border-radius:8px;background:#fff;border:2px solid #a8d4ff}
 #pvSpec .pvsC.ok{background:#2f9e5b;border-color:#1f7a45;color:#fff}#pvSpec .pvsC.no{background:#d9393f;border-color:#a82a30;color:#fff}
 #pvSpec.k-atk{background:#fff0ee;color:#4a1f1f;border-color:#ee8a82;box-shadow:inset 0 2px 0 #fff,0 3px 0 #f7b8b2,0 8px 20px rgba(200,60,50,.3)}
@@ -2902,6 +2905,48 @@ html.megaBusy #comboFire{visibility:hidden}
 :root{--gmz:1.55}
 #myLane.gmaxLane .unit .sp img,#foeLane.gmaxLane .unit .sp img{transform:scale(var(--gmz))!important;transform-origin:50% 100%!important;pointer-events:none}
 #foeLane.gmaxLane .unit .sp img{transform-origin:50% 72%!important}
+</style>
+<style id="wildIntroFx">
+/* 야생 포켓몬 등장 연출: 수풀이 흔들리다가 포켓몬이 튀어나온 뒤 전투 화면으로 전환 */
+#wildIntro{position:fixed;inset:0;z-index:240;overflow:hidden;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+ background:linear-gradient(180deg,#9fd8ff 0%,#d9f4c4 33%,#6cb85f 34%,#3b8248 70%,#2a6035 100%)}
+#wildIntro.out{animation:wiOut .45s ease forwards;pointer-events:none}
+@keyframes wiOut{to{opacity:0}}
+#wildIntro .wiRow{position:absolute;left:-6%;right:-6%;display:flex;justify-content:space-around;align-items:flex-end;pointer-events:none}
+#wildIntro .wiRow.a{bottom:37%;height:12vh;z-index:1}
+#wildIntro .wiRow.b{bottom:25%;height:16vh;z-index:1}
+#wildIntro .wiRow.c{bottom:-3%;height:25vh;z-index:4}
+#wildIntro .wiTuft{position:relative;width:var(--w);height:var(--h);flex:none;transform-origin:50% 100%;animation:wiSway var(--t) ease-in-out var(--d) infinite}
+#wildIntro .wiTuft i,#wildIntro .wiHot i{position:absolute;bottom:0;left:var(--l);width:34%;height:var(--bh);background:linear-gradient(to top,var(--c1),var(--c2));clip-path:polygon(50% 0,100% 100%,0 100%);transform-origin:50% 100%;transform:rotate(var(--r))}
+@keyframes wiSway{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+@keyframes wiShake{0%{transform:translateX(-50%) rotate(-7deg)}25%{transform:translateX(-46%) rotate(5deg)}50%{transform:translateX(-54%) rotate(-5deg)}75%{transform:translateX(-47%) rotate(7deg)}100%{transform:translateX(-50%) rotate(-7deg)}}
+#wildIntro.p2 .wiTuft{animation-duration:.3s}
+#wildIntro .wiHot{position:absolute;left:var(--x);bottom:27%;width:min(24vw,140px);height:17vh;transform:translateX(-50%);transform-origin:50% 100%;z-index:3;animation:wiSway 1.1s ease-in-out infinite}
+#wildIntro.p2 .wiHot{animation:wiShake .11s linear infinite}
+#wildIntro.p3 .wiHot{animation:wiPop .35s ease-out forwards}
+@keyframes wiPop{0%{opacity:1;transform:translateX(-50%) scale(1.25,1.1)}100%{opacity:0;transform:translateX(-50%) scale(.6,.2)}}
+#wildIntro .wiBang{position:absolute;left:var(--x);bottom:calc(27% + 17vh);transform:translate(-50%,10px) scale(0);opacity:0;z-index:5;font-family:"Black Han Sans",Jua,sans-serif;font-size:clamp(44px,12vw,72px);line-height:1;color:#ff3b3b;-webkit-text-stroke:5px #fff;paint-order:stroke fill;text-shadow:0 4px 0 rgba(0,0,0,.3);pointer-events:none}
+#wildIntro.bang .wiBang{animation:wiBang .3s cubic-bezier(.3,1.6,.5,1) forwards}
+#wildIntro.p3 .wiBang{opacity:0;animation:none}
+@keyframes wiBang{to{opacity:1;transform:translate(-50%,0) scale(1)}}
+#wildIntro .wiMon{position:absolute;left:var(--x);bottom:30%;width:min(44vw,250px);aspect-ratio:1;transform:translate(-50%,40px) scale(.2);opacity:0;z-index:2;pointer-events:none;filter:drop-shadow(0 8px 6px rgba(0,0,0,.3))}
+#wildIntro.two .wiMon{width:min(36vw,200px)}
+#wildIntro .wiMon img{width:100%;height:100%;object-fit:contain;display:block}
+#wildIntro.p3 .wiMon{animation:wiLeap .8s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes wiLeap{0%{opacity:0;transform:translate(-50%,40px) scale(.2)}12%{opacity:1}55%{opacity:1;transform:translate(-50%,-22vh) scale(1.12)}100%{opacity:1;transform:translate(-50%,-8vh) scale(1.28)}}
+#wildIntro .wiLeaf{position:absolute;left:var(--x);bottom:var(--y);width:14px;height:20px;border-radius:0 100% 0 100%;background:linear-gradient(135deg,#9be58b,#3f9a4b);z-index:5;pointer-events:none;animation:wiLeaf .95s ease-out forwards}
+@keyframes wiLeaf{0%{opacity:1;transform:translate(0,0) rotate(0) scale(.6)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--r)) scale(1.1)}}
+#wildIntro .wiDim{position:absolute;inset:0;background:#06260f;opacity:0;transition:opacity .6s;z-index:5;pointer-events:none}
+#wildIntro.p2 .wiDim{opacity:.2}
+#wildIntro .wiFlash{position:absolute;inset:0;background:#fff;opacity:0;z-index:6;pointer-events:none}
+#wildIntro.p3 .wiFlash{animation:wiPulse .3s ease-out}
+@keyframes wiPulse{0%{opacity:.75}100%{opacity:0}}
+#wildIntro.flash .wiFlash{animation:none;opacity:1;transition:opacity .16s}
+#wildIntro .wiTxt{position:absolute;left:0;right:0;bottom:calc(var(--sb,0px) + 7%);z-index:7;text-align:center;pointer-events:none;font-family:Jua,sans-serif;font-size:clamp(17px,4.6vw,26px);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.5),0 0 8px rgba(0,0,0,.45);letter-spacing:.5px}
+#wildIntro .wiTxt small{display:block;margin-top:4px;font-size:12px;opacity:.75}
+#wildIntro.low .wiTuft,#wildIntro.low .wiHot{animation:none!important}
+#wildIntro.low.p2 .wiHot{animation:wiShake .16s linear infinite!important}
+#wildIntro.low .wiDim{transition:none}
 </style>
 </head>
 <body>
@@ -5310,6 +5355,50 @@ function scheduleWildCapturePrompt(){
  if(B.busy||B.side!=='me'){setTimeout(scheduleWildCapturePrompt,180);return;}
  askWildCapture();
 }
+/* 야생 포켓몬 등장 연출 — 수풀 흔들림 → 포켓몬 점프 → 하얗게 번쩍 → 전투 화면. 탭하면 건너뛰기 */
+function wildEncounterIntro(ids){
+ return new Promise(resolve=>{
+  let done=false,stage=0,rustle=null;const timers=[];
+  const finish=()=>{if(done)return;done=true;clearInterval(rustle);timers.forEach(clearTimeout);resolve();};
+  try{
+   if(window.__sim||!document.body){finish();return;}
+   const low=!!(S.meta&&S.meta.settings&&S.meta.settings.lowfx),k=low?.55:1;
+   const old=document.getElementById('wildIntro');if(old)old.remove();
+   ids=[].concat(ids);const xs=ids.length>1?[30,70]:[50];
+   ids.forEach(id=>{try{const im=new Image();im.src=spriteURL(id,'front');}catch(e){}});
+   const R=(a,b)=>a+Math.random()*(b-a);
+   const GR=[['#2f8a3c','#7fd06a'],['#3a9a45','#93df78'],['#277a35','#6cc45f'],['#43a84d','#a6ea86']];
+   const blades=(n)=>Array.from({length:n},(_,j)=>{const c=GR[(Math.random()*GR.length)|0];return `<i style="--l:${(j*(66/(n-1||1))).toFixed(1)}%;--bh:${(R(62,100)).toFixed(0)}%;--r:${(R(-14,14)).toFixed(0)}deg;--c1:${c[0]};--c2:${c[1]}"></i>`;}).join('');
+   const row=(cls,n,w,h)=>`<div class="wiRow ${cls}">${Array.from({length:n},()=>`<div class="wiTuft" style="--w:${R(w[0],w[1]).toFixed(1)}vw;--h:${R(h[0],h[1]).toFixed(1)}vh;--t:${R(1.6,2.6).toFixed(2)}s;--d:${(-R(0,2)).toFixed(2)}s">${blades(5)}</div>`).join('')}</div>`;
+   const root=document.createElement('div');root.id='wildIntro';root.className='p1'+(low?' low':'')+(xs.length>1?' two':'');
+   root.innerHTML=row('a',9,[11,16],[8,12])+row('b',7,[14,20],[11,16])
+    +xs.map((x,i)=>`<div class="wiMon" style="--x:${x}%">${monImg(ids[i]!=null?ids[i]:ids[0],'front')}</div><div class="wiHot" style="--x:${x}%">${blades(7)}</div><div class="wiBang" style="--x:${x}%">!</div>`).join('')
+    +row('c',6,[20,28],[16,24])
+    +'<div class="wiDim"></div><div class="wiFlash"></div><div class="wiTxt"><span>수풀이 바스락거린다…</span><small>화면을 누르면 건너뛰어요</small></div>';
+   document.body.appendChild(root);
+   const T=(fn,ms)=>{timers.push(setTimeout(fn,ms*k));};
+   const txt=()=>root.querySelector('.wiTxt span');
+   const cover=(ms)=>{
+    if(stage>=4)return;stage=4;clearInterval(rustle);timers.forEach(clearTimeout);timers.length=0;
+    root.classList.add('flash');
+    setTimeout(()=>{finish();root.classList.add('out');setTimeout(()=>{try{root.remove();}catch(e){}},520);},ms);
+   };
+   const burst=()=>{
+    stage=3;clearInterval(rustle);root.classList.remove('bang');root.classList.add('p3');
+    try{sfx('slam');sfx('crit');}catch(e){}
+    const t=txt();if(t)t.textContent=ids.length>1?'야생 포켓몬들이 튀어나왔다!':'야생 포켓몬이 튀어나왔다!';
+    if(!low){root.insertAdjacentHTML('beforeend',xs.map(x=>Array.from({length:12},()=>`<b class="wiLeaf" style="--x:${x}%;--y:36%;--dx:${R(-150,150).toFixed(0)}px;--dy:${R(-220,40).toFixed(0)}px;--r:${R(-540,540).toFixed(0)}deg"></b>`).join('')).join(''));}
+    T(()=>cover(200),1000);
+   };
+   T(()=>{if(stage>=1)return;stage=2;root.classList.remove('p1');root.classList.add('p2');
+    rustle=setInterval(()=>{try{sfx('shake');}catch(e){}},low?240:130);},600);
+   T(()=>{if(stage!==2)return;root.classList.add('bang');try{sfx('rare');}catch(e){}},1350);
+   T(()=>{if(stage>=3)return;burst();},1700);
+   root.addEventListener('click',()=>{if(stage<4)cover(120);},{once:false});
+   T(()=>cover(120),4200); // 안전장치
+  }catch(e){try{const r=document.getElementById('wildIntro');if(r)r.remove();}catch(_){}finish();}
+ });
+}
 function endlessEncounter(n,rars){return new Promise(resolve=>{
  rars=[].concat(rars);const id=rollEndlessWildId(rars[0]),wildIds=[id],wild=MON[id],m=S.meta;
  const doubleEncounter=rars.length>1;
@@ -5321,11 +5410,14 @@ function endlessEncounter(n,rars){return new Promise(resolve=>{
  wildIds.forEach((wid,k)=>{const wm=MON[wid],u=mkUnit(wid),wi=wildSlots[k];u.hp=wm.hp*10;u.max=wm.hp*10;u.atk=wm.atk;u.att=0;u.fresh=0;u.wildEncounter=1;foe.board[wi]=u;});
  for(let i=0;i<3;i++)draw(me,true);
  const st={rescuePool:S.rescueCtx||null,n,id,ids:wildIds.slice(),resolve,finished:false,caughtNew:false,caughtIds:[],caughtNewIds:[],captureModalOpen:false,note:'',previousScreen:S.screen};
+ const beginWildBattle=()=>{
  B={gi:-2,g:{n:'야생 포켓몬 사냥',ldr:'야생 포켓몬',c:TYPE_COL[wild.types[0]]||'#ffc93c'},diff:Math.max(1,Math.ceil(lvOf(m.xp).lv/2)),turn:0,round:0,side:'me',me,foe,sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:false,over:false,wildMode:true,wildId:id,wildSlot:wildSlots[0],wildIds:wildIds.slice(),wildSlots:wildSlots.slice(),wildState:st,capturePrompted:false};
  S.screen='battle';
  $('#bq').classList.remove('on');closeInfo();$('#battle').innerHTML='';$('#battle').classList.add('on');startBgm('battle');
  renderBattle();banner(wildIds.length===2?'야생 포켓몬 2마리 등장!':'야생 포켓몬 등장!',`${wildIds.map(x=>esc(MON[x].name)).join(' · ')} · 포획에 도전해요!`,1600);
  startTurn('me');
+ };
+ wildEncounterIntro(wildIds).then(beginWildBattle,beginWildBattle);
  });}
 async function endlessCheck(n,c,rars,got){sfx('level');const wildResult=await endlessEncounter(n,rars);
  return new Promise(res=>{const gotIds=wildResult?(wildResult.caughtIds||((wildResult.caught&&wildResult.id!=null)?[wildResult.id]:[])):[];const newIds=wildResult?(wildResult.caughtNewIds||[!!wildResult.caughtNew]):[];const catchHtml=gotIds.length?`<div class=explain style="text-align:left;font-size:14px;background:#eafbe9;border-color:#9be0a2"><b>포획 성공! ${gotIds.length}마리를 원래 능력치로 도감에 등록했어요.</b><br>${gotIds.map((id,i)=>`${monImg(id,'front')} <b>${esc(MON[id].name)}</b> · ${newIds[i]?'새 포켓몬 등록':'카드 추가'}`).join('<br>')}</div>`:'';M(`<div style="text-align:center"><h2>${n}문제 돌파!</h2><div style="display:flex;justify-content:center;height:90px">${monImg(partnerId(),'anim')}</div>
@@ -6431,6 +6523,7 @@ function targetsFor(si){const r={units:[],hero:false};if(si<0||!B||B.side!=='me'
 // 효과음은 sfx('legend')(사각파 칩튠). 연출은 Math.random만 써서 친구 대전의 씨앗 난수는 건드리지 않아요.
 async function legendFx(P,slot,name){
  if(window.__sim)return;
+ try{bossFxSend({k:'lg',l:t2L(P),i:slot,n:String(name||'')});}catch(e){} // 전설 출전 연출을 친구 화면에도 보내요
  const low=!!(S.meta&&S.meta.settings&&S.meta.settings.lowfx);
  let cx=VW()/2,cy=VH()/2;
  try{const el=unitEl(P,slot);if(el){const r=el.getBoundingClientRect(),z=ZM();cx=(r.left+r.width/2)/z;cy=(r.top+r.height/2)/z;}}catch(e){}
@@ -11197,7 +11290,7 @@ function bossFxEl(d){if(!d)return null;
  if(d.l){const q=`#${d.l==='m'?'myLane':'foeLane'} .slot[data-i="${d.i}"]`;return $(q+' .unit')||$(q);}
  return null;}
 function bossFxSend(o){if(!BC.host||!B||!B.coop||window.__sim||!BC.conn||!BC.conn.open)return;
- if(o.k==='sk'?!(o.f&&o.e):(o.k!=='fa'&&o.k!=='sl'&&!o.e))return;
+ if(o.k==='sk'?!(o.f&&o.e):(o.k!=='fa'&&o.k!=='sl'&&o.k!=='lg'&&!o.e))return;
  bossSend(Object.assign({t:'boss-fx'},o));}
 // 도트 이펙트(특성·트레이너 스킬 등)도 방장 화면에서 일어나면 친구 화면에서 똑같이 재생해요
 const BOSS_PX=['bossWarnFx','bossAoeFx','kwFx','pxEmberFx','trainerAtkFx','trainerCheerFx','trainerHealFx','trainerCounterReadyFx','trainerManaFx','sunFx','quakeFx','heroBlockFx','fightAuraFx','sneakFx','wingFx','dragonFangFx'];
@@ -11214,6 +11307,9 @@ function bossFxPlay(d,tries=0){if(!B||!B.coop||BC.host||!d||window.__sim)return;
   else if(d.k==='im'){const el=bossFxEl(d.e);if(el){mark(350);impact(el,d.d,d.op||{});}}
   else if(d.k==='sk'){const to=bossFxEl(d.e);if(to){mark(900);const A=t2PL(d.lf);skillMove(A,d.si,to,d.ok,d.cb,{id:d.id}).catch(()=>{});}}
   else if(d.k==='fa'){const P=t2PL(d.l);mark(520);faintFx(P,d.i);}
+  else if(d.k==='lg'){const P=t2PL(d.l);
+   if($(`#${t2LaneL(d.l)} .slot[data-i="${d.i}"] .unit`)){mark(1200);legendFx(P,d.i,String(d.n||'')).catch(()=>{});}
+   else if(tries<12)setTimeout(()=>bossFxPlay(d,tries+1),120);}
   else if(d.k==='sl'){const P=t2PL(d.l);
    // 친구가 방금 낸 카드는 화면 갱신이 오기 전이라 칸이 아직 비어 있을 수 있어요 → 잠시 뒤 다시 시도
    if(unitEl(P,d.i)&&$(`#${t2LaneL(d.l)} .slot[data-i="${d.i}"] .unit`)){mark(450);slamFx(P,d.i);}
@@ -11356,11 +11452,24 @@ function pvBind(c){
 function pvSpecShow(q,k,nm0){try{pvSpecHide();clearTimeout(window.__pvsT);window.__pvsT=setTimeout(pvSpecHide,90000);if(!q||!Array.isArray(q.ch))return;const nm=esc(nm0||(PV.foe&&PV.foe.name)||'친구');const el=document.createElement('div');el.id='pvSpec';el.className='k-'+(k||'def');
  const sk=SKM[q.sk]?esc(SKM[q.sk].n):'';
  el.innerHTML=`<div class=pvsHead>${k==='atk'?'⚔️':k==='pow'?'📚':'🛡️'} <b>${nm}</b>님이 ${k==='atk'?'공격':k==='pow'?'공부 기술':'방어'} 문제를 푸는 중… <span class=pvsSt>생각하는 중 🤔</span></div><div class=pvsQ>${sk?`<div class=pvsSk>${sk}</div>`:''}<div class=pvsText>${fmtMath(q.q||'')}</div>${q.pic?`<div class=pvsPic>${q.pic}</div>`:''}<div class=pvsCh>${q.ch.map((c,i)=>`<span class=pvsC data-i="${i}">${fmtMath(esc(c))}</span>`).join('')}</div></div>`;
- try{const me=B&&B.coop&&B.coop.players&&B.coop.players[BC.localIndex];if(me&&me.hp<=0&&!(PV&&PV.on)){el.classList.add('canHelp');const hd=el.querySelector('.pvsHead');if(hd)hd.insertAdjacentHTML('afterend','<div class=pvsHelp>👆 쓰러진 나는 답을 눌러 ❤️ 로 친구를 도와줄 수 있어요</div>');
-  el.querySelectorAll('.pvsC').forEach(c=>c.onclick=()=>{if(c.classList.contains('ok')||c.classList.contains('no'))return;el.querySelectorAll('.pvsC.heart').forEach(x=>x.classList.remove('heart'));c.classList.add('heart');try{sfx('tap');}catch(e){}try{bossSend({t:'boss-heart',i:+c.dataset.i});}catch(e){}});}}catch(e){}
+ try{const me=B&&B.coop&&B.coop.players&&B.coop.players[BC.localIndex];const b4=!!(k==='def'&&typeof t2Active==='function'&&t2Active()&&B.t2&&B.t2.boss);if(b4||(me&&me.hp<=0&&!(PV&&PV.on))){el.classList.add('canHelp');const hd=el.querySelector('.pvsHead');if(hd)hd.insertAdjacentHTML('afterend',b4?'<div class=pvsHelp>👆 답이라고 생각하는 보기를 눌러 ❤️ 로 푸는 친구를 응원해요</div>':'<div class=pvsHelp>👆 쓰러진 나는 답을 눌러 ❤️ 로 친구를 도와줄 수 있어요</div>');
+  el.querySelectorAll('.pvsC').forEach(c=>c.onclick=()=>{if(c.classList.contains('ok')||c.classList.contains('no')||el.querySelector('.pvsC.ok,.pvsC.no'))return;el.querySelectorAll('.pvsC.heart').forEach(x=>x.classList.remove('heart'));c.classList.add('heart');try{sfx('tap');}catch(e){}try{bossSend({t:'boss-heart',i:+c.dataset.i});}catch(e){}});}}catch(e){}
  document.body.appendChild(el);}catch(e){}}
 // 친구(쓰러진 트레이너)가 눌러 준 답에 ❤️ 표시
-function bossHeartShow(i,tries){try{const host=$('#bqHost');const chs=host?host.querySelectorAll('.ch'):[];if(!chs.length){if((tries||0)<8)setTimeout(()=>bossHeartShow(i,(tries||0)+1),250);return;}document.querySelectorAll('#bqHost .ch.hh').forEach(x=>x.classList.remove('hh'));const c=host.querySelector(`.ch[data-i="${i}"]`);if(c){c.classList.add('hh');try{sfx('heal');}catch(e){}}}catch(e){}}
+function bossHeartShow(i,tries,from){try{const host=$('#bqHost');
+ if(from!=null){ // 4인 보스전: 구경하는 친구 한 명당 ❤️ 1개 (다른 보기를 누르면 옮겨 가요, 최대 3개)
+  if(!host)return;
+  const chs4=host.querySelectorAll('.ch');
+  if(!chs4.length){if((tries||0)<8)setTimeout(()=>bossHeartShow(i,(tries||0)+1,from),250);return;}
+  if(host.querySelector('.ch.ok,.ch.no'))return;
+  const key=String(from);
+  host.querySelectorAll('.hhs i').forEach(x=>{if(x.dataset.f===key)x.remove();});
+  host.querySelectorAll('.hhs').forEach(x=>{if(!x.children.length)x.remove();});
+  const c4=host.querySelector(`.ch[data-i="${i}"]`);
+  if(c4){let box=c4.querySelector('.hhs');if(!box){box=document.createElement('span');box.className='hhs';c4.appendChild(box);}
+   if(box.children.length<3){const h=document.createElement('i');h.dataset.f=key;h.textContent='❤️';box.appendChild(h);try{sfx('heal');}catch(e){}}}
+  return;}
+ const chs=host?host.querySelectorAll('.ch'):[];if(!chs.length){if((tries||0)<8)setTimeout(()=>bossHeartShow(i,(tries||0)+1),250);return;}document.querySelectorAll('#bqHost .ch.hh').forEach(x=>x.classList.remove('hh'));const c=host.querySelector(`.ch[data-i="${i}"]`);if(c){c.classList.add('hh');try{sfx('heal');}catch(e){}}}catch(e){}}
 function pvSpecResult(i,ok){try{const el=$('#pvSpec');if(!el)return;const c=el.querySelector(`.pvsC[data-i="${i}"]`);if(c)c.classList.add(ok?'ok':'no');const st=el.querySelector('.pvsSt');if(st){const kk=(el.className.match(/k-(\w+)/)||[])[1];st.textContent=ok?(kk==='def'?'정답! ⭕ 방어 성공':kk==='pow'?'정답! ⭕ 카드 +1':'정답! ⭕'):'오답… ❌';st.classList.add(ok?'ok':'no');}ok?sfx('ok',1):sfx('wrong');}catch(e){}}
 function pvSpecHide(){try{const el=$('#pvSpec');if(el)el.remove();}catch(e){}}
 async function pvpPump(){if(PV.busy)return;PV.busy=true;
@@ -19851,7 +19960,7 @@ html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{padding:4px 7px}
    try{const old=BC.conn;BC.conn=null;if(old)try{old.close();}catch(e){}const cc=peer.connect(PID(),{reliable:true});BC.conn=cc;bossBind(cc);}catch(e){}
   }}
  window.bossRecover=function(){
-  if(!inBattle()||BC.left||BC.resultHandled||BC.reconnecting)return;
+  if(BC.t2||!inBattle()||BC.left||BC.resultHandled||BC.reconnecting)return;
   BC.reconnecting=true;BC.recoSince=Date.now();BC.tryAt=0;
   BC.recoTimer=setInterval(tick,2500);tick();};
  window.bossResumed=function(){
@@ -19867,13 +19976,13 @@ html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{padding:4px 7px}
  setInterval(()=>{try{
   const act=inBattle()&&!!BC.peer,lobby=S.screen==='bosscoop'&&BC.ready&&!!BC.peer;
   if(act||lobby)wlOn();else wlOff();
-  if(!BC.conn||!BC.peer||BC.left)return;
+  if(BC.t2||!BC.conn||!BC.peer||BC.left)return;
   if(!act&&!lobby)return;
   if(BC.conn.open){try{BC.conn.send({t:'boss-ping'});}catch(e){}
    if(act&&!document.hidden&&!BC.reconnecting&&Date.now()-(BC.lastRx||Date.now())>(iceOk(BC.conn)?90000:30000)){try{BC.conn.close();}catch(e){}bossRecover();}}
   else if(act&&!BC.reconnecting)bossRecover();
  }catch(e){}},4000);
- document.addEventListener('visibilitychange',()=>{try{if(document.hidden)return;BC.lastRx=Date.now();if(inBattle()&&BC.peer){wlOn();if(!BC.conn||!BC.conn.open)bossRecover();}}catch(e){}});
+ document.addEventListener('visibilitychange',()=>{try{if(document.hidden)return;BC.lastRx=Date.now();if(inBattle()&&BC.peer){wlOn();if(!BC.t2&&(!BC.conn||!BC.conn.open))bossRecover();}}catch(e){}});
 })();
 </script>
 <script id="pvp-reco">
@@ -21513,6 +21622,7 @@ window.GF={mount,destroy,genMap,get st(){return ST;}};
    - 방장이 판정(권위 호스트)하고, 모든 화면에는 '내 팀이 아래' 시점으로 상태를 보내요
    =================================================================== */
 const T2_VER=1;
+const T2_RECO_MAX=90000; // 연결이 끊긴 친구를 기다려 주는 시간(90초)
 const T2={mode:'pvp',peer:null,host:false,code:'',members:[],lobby:null,started:false,queue:[],pumping:false,proc:false,
  defWait:null,defSeq:0,bt:null,dirty:false,nextId:2,myId:1,charged:false,resDone:false,conn:null,tries:0};
 window.T2=T2;
@@ -21557,14 +21667,16 @@ function t2Box(h){const b=$('#t2Box');if(!b)return;b.style.display='block';b.inn
 function t2Leave(){const inBattle=t2Active()&&!B.over,md=T2.mode;t2Close();if(inBattle){B=null;try{$('#battle').classList.remove('on');$('#battle').innerHTML='';}catch(e){}}t2Home(md);}
 
 /* ------------------------------ 연결 정리 ------------------------------ */
-function t2Close(){try{clearTimeout(T2.bt);}catch(e){}
+function t2Close(){try{if(T2.started&&!T2.host&&T2.conn&&T2.conn.open&&t2Active()&&!B.over&&!B.t2.fin)T2.conn.send({t:'t2-quit'});}catch(e){}
+ try{t2RecoReset();}catch(e){}
+ try{clearTimeout(T2.bt);}catch(e){}
  try{T2.members.forEach(m=>{try{m.conn&&m.conn.close();}catch(e){}});}catch(e){}
  try{T2.conn&&T2.conn.close();}catch(e){}try{T2.peer&&T2.peer.destroy();}catch(e){}
  try{if(BC&&BC.t2){BC.conn=null;BC.peer=null;BC.host=false;BC.t2=false;}}catch(e){}
- Object.assign(T2,{mode:'pvp',peer:null,host:false,code:'',members:[],lobby:null,started:false,queue:[],pumping:false,proc:false,defWait:null,bt:null,dirty:false,nextId:2,myId:1,charged:false,resDone:false,conn:null,tries:0});}
+ Object.assign(T2,{mode:'pvp',peer:null,host:false,code:'',members:[],lobby:null,started:false,queue:[],pumping:false,proc:false,defWait:null,bt:null,dirty:false,nextId:2,myId:1,charged:false,resDone:false,conn:null,tries:0,tok:'',reco:null,gTimer:0,recoTimer:0,lastRx:0,lastEnd:null});}
 
 /* ------------------------------ 내 정보 ------------------------------ */
-function t2MyHi(){const L=trainerSkillLevels();return{t:'t2-hi',v:T2_VER,mode:T2.mode,name:String(S.meta.name||'').trim()||'친구',av:partnerId(),vit:vitBonus(),mana:Number(L.mana)||0,study:Number(L.study)||0,hand:Number(L.hand)||0,evo:Number(L.evo)||0,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number)};}
+function t2MyHi(){const L=trainerSkillLevels();return{t:'t2-hi',v:T2_VER,tok:T2.tok||'',mode:T2.mode,name:String(S.meta.name||'').trim()||'친구',av:partnerId(),vit:vitBonus(),mana:Number(L.mana)||0,study:Number(L.study)||0,hand:Number(L.hand)||0,evo:Number(L.evo)||0,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number)};}
 
 /* ------------------------------ 방장: 방 만들기 ------------------------------ */
 async function t2Host(mode){mode=mode||'pvp';const m=S.meta;if(mode==='pvp'&&m.coins<PVP_COST){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
@@ -21589,22 +21701,32 @@ function t2RelayPvp(srcMid,d){try{const T=B&&B.t2;if(!T||T.boss)return;const ps=
  T.teams[ps.t].forEach((p,j)=>{if(j===ps.i)return;const dead=p.hp<=0;if(d.t==='boss-heart'?dead:!dead)return;
   if(p.mid===hm){if(d.t==='boss-heart'){try{bossHeartShow(+d.i);}catch(e){}}else t2Spec(d);}
   else{const m=T2.members.find(x=>x.id===p.mid);t2SendTo(m,d.t==='boss-heart'?{t:'boss-heart',i:d.i}:d);}});}catch(e){}}
-function t2Raw(o){if(!o||!o.t)return;if(T2.mode!=='boss'&&(o.t==='boss-dq'||o.t==='boss-dqr'||o.t==='boss-heart')){t2RelayPvp(t2HostMid(),o);return;}if(!(o.t==='boss-fx'||o.t==='boss-banner'||o.t==='boss-megafx'||/^t2-/.test(o.t)||(T2.mode==='boss'&&(o.t==='boss-heart'||((o.t==='boss-dq'||o.t==='boss-dqr')&&(o.t==='boss-dqr'||o.k==='def'))))))return;
+function t2Raw(o){if(!o||!o.t)return;if(T2.mode==='boss'&&o.t==='boss-heart'&&o.f==null)o=Object.assign({},o,{f:t2HostMid()});if(o.t==='t2-result'||o.t==='t2-abort')T2.lastEnd=o;if(T2.mode!=='boss'&&(o.t==='boss-dq'||o.t==='boss-dqr'||o.t==='boss-heart')){t2RelayPvp(t2HostMid(),o);return;}if(!(o.t==='boss-fx'||o.t==='boss-banner'||o.t==='boss-megafx'||/^t2-/.test(o.t)||(T2.mode==='boss'&&(o.t==='boss-heart'||((o.t==='boss-dq'||o.t==='boss-dqr')&&(o.t==='boss-dqr'||o.k==='def'))))))return;
  T2.members.forEach(m=>{if(!m.host&&m.conn&&m.conn.open){try{m.conn.send(o);}catch(e){}}});}
 function t2SendTo(m,o){try{if(m&&m.conn&&m.conn.open)m.conn.send(o);}catch(e){}}
 const t2Pub=m=>({id:m.id,name:m.name,av:m.av,team:m.team,pos:m.pos,host:!!m.host});
 function t2PushLobby(){if(!T2.host)return;const ms=T2.members.filter(m=>m.hi).map(t2Pub);
  T2.lobby={you:1,members:ms,mode:T2.mode};T2.members.forEach(m=>{if(!m.host&&m.hi)t2SendTo(m,{t:'t2-lobby',you:m.id,members:ms,mode:T2.mode});});t2DrawLobby();}
 function t2OnIncoming(c){
- if(T2.started||T2.members.length>=4){c.on('open',()=>{try{c.send({t:'t2-full',started:T2.started});}catch(e){}setTimeout(()=>{try{c.close();}catch(e){}},500);});return;}
+ if(T2.started){ // 전투 중에는 '다시 들어오기'만 받아요 (끊겼던 친구가 같은 방 번호 + 자기 표식으로 다시 연결)
+  c.on('data',d=>{try{
+   if(c.__m){t2HostRx(c.__m,d);return;}
+   if(d&&d.t==='t2-rejoin'){const m=T2.members.find(x=>!x.host&&x.id===d.id&&x.tok&&x.tok===String(d.tok||''));
+    if(m&&T2.lastEnd){try{c.send(T2.lastEnd);}catch(e){}setTimeout(()=>{try{c.close();}catch(e){}},500);return;} // 끊긴 사이 끝난 전투: 진짜 결과 화면을 보내 줘요
+    if(m&&t2Active()&&!B.over&&!B.t2.fin){t2Rebind(m,c);return;}
+    try{c.send({t:'t2-norejoin'});}catch(e){}setTimeout(()=>{try{c.close();}catch(e){}},500);return;}
+   try{c.send({t:'t2-full',started:true});}catch(e){}setTimeout(()=>{try{c.close();}catch(e){}},500);
+  }catch(e){console.error('t2 rejoin',e);}});
+  c.on('error',()=>{});return;}
+ if(T2.members.length>=4){c.on('open',()=>{try{c.send({t:'t2-full',started:false});}catch(e){}setTimeout(()=>{try{c.close();}catch(e){}},500);});return;}
  const m={id:T2.nextId++,host:false,name:'',av:25,team:null,pos:null,conn:c,hi:null};T2.members.push(m);
  c.on('data',d=>{try{t2HostRx(m,d);}catch(e){console.error('t2 host rx',e);}});
- c.on('close',()=>t2HostClosed(m));c.on('error',()=>{});}
-function t2HostClosed(m){const i=T2.members.indexOf(m);if(i<0)return;
- if(T2.started){if(t2Active()&&!B.over&&!B.t2.fin){t2Abort(`${m.name||'친구'}님의 연결이 끊어졌어요`);}return;}
+ c.on('close',()=>t2HostClosed(m,c));c.on('error',()=>{});}
+function t2HostClosed(m,c){const i=T2.members.indexOf(m);if(i<0)return;if(c&&m.conn&&m.conn!==c)return;
+ if(T2.started){if(t2Active()&&!B.over&&!B.t2.fin){try{t2MemberDown(m);}catch(e){console.error('t2 down',e);t2Abort(`${m.name||'친구'}님의 연결이 끊어졌어요`);}}return;}
  T2.members.splice(i,1);t2PushLobby();}
-function t2HostRx(m,d){if(!d||typeof d!=='object')return;
- if(d.t==='t2-hi'){if(d.v!==T2_VER||(d.mode||'pvp')!==T2.mode){t2SendTo(m,{t:'t2-ver'});setTimeout(()=>{try{m.conn.close();}catch(e){}},500);const i=T2.members.indexOf(m);if(i>=0)T2.members.splice(i,1);return;}
+function t2HostRx(m,d){if(!d||typeof d!=='object')return;m.lastRx=Date.now();if(d.t==='t2-ping')return;
+ if(d.t==='t2-hi'){m.tok=String(d.tok||'').slice(0,40);if(d.v!==T2_VER||(d.mode||'pvp')!==T2.mode){t2SendTo(m,{t:'t2-ver'});setTimeout(()=>{try{m.conn.close();}catch(e){}},500);const i=T2.members.indexOf(m);if(i>=0)T2.members.splice(i,1);return;}
   m.name=String(d.name||'친구').slice(0,12);m.av=MON[d.av]?d.av:25;m.hi={name:m.name,av:m.av,vit:t2clamp(d.vit,0,5),mana:t2clamp(d.mana,0,5),study:t2clamp(d.study,0,5),hand:t2clamp(d.hand,0,5),evo:t2clamp(d.evo,0,5),deck:Array.isArray(d.deck)?d.deck.slice(0,60):[],owned:Array.isArray(d.owned)?d.owned.slice(0,600):[]};
   t2PushLobby();return;}
  if(!m.hi)return;
@@ -21612,7 +21734,7 @@ function t2HostRx(m,d){if(!d||typeof d!=='object')return;
  if(d.t==='t2-act'&&T2.started){if(!t2Active()||B.over)return;const T=B.t2;let team=-1,idx=-1;T.teams.forEach((tm,t)=>tm.forEach((p,i)=>{if(p.mid===m.id){team=t;idx=i;}}));if(team<0)return;
   T2.queue.push({team,idx,a:d.a||{},seq:d.seq});t2Pump();return;}
  if((d.t==='boss-heart'||d.t==='boss-dq'||d.t==='boss-dqr')&&T2.mode!=='boss'&&T2.started){t2RelayPvp(m.id,d);return;}
- if(d.t==='boss-heart'&&T2.mode==='boss'&&T2.started){T2.members.forEach(x=>{if(x!==m&&!x.host)t2SendTo(x,{t:'boss-heart',i:d.i});});try{bossHeartShow(+d.i);}catch(e){}return;}
+ if(d.t==='boss-heart'&&T2.mode==='boss'&&T2.started){T2.members.forEach(x=>{if(x!==m&&!x.host)t2SendTo(x,{t:'boss-heart',i:d.i,f:m.id});});try{bossHeartShow(+d.i,0,m.id);}catch(e){}return;}
  if((d.t==='boss-dq'||d.t==='boss-dqr')&&T2.mode==='boss'&&T2.started){if(d.t==='boss-dq'&&d.k!=='def')return;T2.members.forEach(x=>{if(x!==m&&!x.host)t2SendTo(x,d);});t2Spec(d);return;}
  if(d.t==='boss-defa'){const w=T2.defWait;if(w&&w.id===d.id&&w.mid===m.id){T2.defWait=null;w.res(d.skip?null:{ok:!!d.ok,sv:!!d.sv&&!!d.ok,hint:!!d.hint});}return;}
  if(d.t==='t2-quit'&&T2.started){if(!t2Active()||B.over)return;if(B.t2.boss){t2FinishBoss('lose','quit',m.name);return;}let team=-1;B.t2.teams.forEach((tm,t)=>tm.forEach(p=>{if(p.mid===m.id)team=t;}));if(team>=0)t2Finish(team,'quit',m.name);return;}}
@@ -21624,7 +21746,7 @@ const t2CanStart=()=>T2.members.filter(m=>m.hi&&m.team!=null).length===4&&[0,1].
 
 /* ------------------------------ 친구: 방 들어가기 ------------------------------ */
 async function t2Join(code,mode){mode=mode||'pvp';const m=S.meta;if(mode==='pvp'&&m.coins<PVP_COST){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
- t2Close();T2.mode=mode;T2.host=false;T2.code=code;t2Box(`<p>연결 준비 중…</p><button class="btn ghost" id=t2Cancel>취소</button>`);
+ t2Close();T2.tok=Math.random().toString(36).slice(2,12)+Date.now().toString(36);T2.mode=mode;T2.host=false;T2.code=code;t2Box(`<p>연결 준비 중…</p><button class="btn ghost" id=t2Cancel>취소</button>`);
  try{await loadPeer();}catch(e){t2Box(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);return;}
  let peer;try{peer=new Peer(PO());}catch(e){t2Box(`<p style="color:#d9393f">연결을 시작하지 못했어요</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);return;}
  T2.peer=peer;BC.host=false;BC.t2=true;BC.peer=peer;
@@ -21637,9 +21759,12 @@ async function t2Join(code,mode){mode=mode||'pvp';const m=S.meta;if(mode==='pvp'
   c.on('close',()=>t2GuestClosed(c));c.on('error',()=>{});
   setTimeout(()=>{try{if(T2.conn===c&&!c.open&&!T2.lobby&&t2Scr())t2Box(netErrHTML('방장과 연결되지 않았어요','timeout','t2Cancel'));}catch(e){}},20000);});}
 function t2GuestClosed(c){if(T2.conn&&T2.conn!==c)return;
- if(T2.started){if(t2Active()&&!B.over&&!B.t2.fin)t2OnAbort({reason:'방장과 연결이 끊어졌어요'});return;}
+ if(T2.started){if(t2Active()&&!B.over&&!B.t2.fin)t2GuestRecover();return;}
  if(t2Scr()&&!T2.resDone){T2.lobby=null;t2Box(`<p>방장과 연결이 끊어졌어요.</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);}}
-function t2GuestRx(d){if(!d||typeof d!=='object')return;
+function t2GuestRx(d){if(!d||typeof d!=='object')return;T2.lastRx=Date.now();if(d.t==='t2-ping')return;
+ if(d.t==='t2-resume'){t2GuestResumed();return;}
+ if(d.t==='t2-wait'){t2WaitShow(d.names||[],null);return;}
+ if(d.t==='t2-norejoin'){if(T2.reco)t2OnAbort({reason:'방장이 다시 이어 주지 못했어요'});return;}
  if(d.t==='t2-lobby'){T2.lobby={you:d.you,members:d.members};T2.mode=d.mode||'pvp';T2.myId=d.you;t2DrawLobby();}
  else if(d.t==='t2-full'){t2Box(`<p style="color:#d9393f">${d.started?'이미 전투가 시작된 방이에요.':'방이 가득 찼어요. (4명까지)'}</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);}
  else if(d.t==='t2-ver'){t2Box(`<p style="color:#d9393f">방장과 게임 버전이 달라요. 모두 최신 파일로 열어 주세요.</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);}
@@ -21649,7 +21774,7 @@ function t2GuestRx(d){if(!d||typeof d!=='object')return;
  else if(d.t==='boss-megafx'){try{megaCine(+d.b,+d.m,String(d.n||''));}catch(e){}}
  else if(d.t==='boss-defq'){bossAnswerDefense(d);}
  else if(d.t==='boss-dq'||d.t==='boss-dqr'){t2Spec(d);}
- else if(d.t==='boss-heart'){try{bossHeartShow(+d.i);}catch(e){}}
+ else if(d.t==='boss-heart'){try{bossHeartShow(+d.i,0,d.f);}catch(e){}}
  else if(d.t==='t2-turn'){if(t2Active()){t2TurnBanner(d.team);}}
  else if(d.t==='t2-result'){if(d.boss)t2OnBossResult(d);else t2OnResult(d);}
  else if(d.t==='t2-abort'){t2OnAbort(d);}}
@@ -21846,8 +21971,11 @@ async function t2Defend(def,a){const res={red:0,dh:0,ctr:0};const mem=T2.members
  else r=await t2AskDefense(mem,def,a);
  if(r){res.dh=r.hint?1:0;if(r.ok){res.red=r.sv?2:1;qcUp(def);try{fx(heroEl(def),r.sv?'슈퍼세이브! -2':'방어 성공! -1',r.sv?'crit':'txt');heroBlockFx(heroEl(def));}catch(e){}if(def.ctr>0){res.ctr=def.ctr;def.ctr=0;}}else{try{fx(heroEl(def),'방어 실패','txt');}catch(e){}}}
  return res;}
-function t2AskDefense(mem,def,a){return new Promise(res=>{if(!mem||!mem.conn||!mem.conn.open){res(null);return;}const id=++T2.defSeq;T2.defWait={id,res,mid:mem.id};
- t2SendTo(mem,{t:'boss-defq',id,who:def.av,what:`방어! ${esc(MON[a.id].name)}의 공격을 막아요`});
+function t2AskDefense(mem,def,a){return new Promise(async res=>{
+ if(mem&&!mem.host&&!(mem.conn&&mem.conn.open)){const t0=Date.now(); // 연결이 끊긴 친구는 다시 들어올 때까지 기다려요
+  while(!(mem.conn&&mem.conn.open)&&T2.members.includes(mem)&&t2Active()&&!B.over&&Date.now()-t0<T2_RECO_MAX)await new Promise(r=>setTimeout(r,400));}
+ if(!mem||!mem.conn||!mem.conn.open){res(null);return;}const id=++T2.defSeq;const q={t:'boss-defq',id,who:def.av,what:`방어! ${esc(MON[a.id].name)}의 공격을 막아요`};T2.defWait={id,res,mid:mem.id,q};
+ t2SendTo(mem,q);
  setTimeout(()=>{if(T2.defWait&&T2.defWait.id===id){T2.defWait=null;res(null);}},90000);});}
 async function t2ResolveAttack(me,fo,si,tg,ok,cb,crit,hint){let red=0,dh=0,ctr=0;const a=me.board[si];
  if(tg&&tg.hero&&a){const r=await t2Defend(fo,a);red=r.red;dh=r.dh;ctr=r.ctr;}
@@ -21865,10 +21993,10 @@ async function t2Quit(){if(!B||!B.t2)return;if(BC.host){if(B.t2.boss)t2FinishBos
  try{BC.conn.send({t:'t2-quit'});}catch(e){}B.over=true;
  setTimeout(()=>{if(!T2.resDone&&t2Active()){t2OnAbort({reason:'대전에서 나갔어요'});}},4000);}
 function t2Abort(reason){if(!B||!B.t2||B.t2.fin)return;B.t2.fin=1;B.over=true;t2Raw({t:'t2-abort',reason});t2OnAbort({reason});}
-function t2Done(){try{pvSpecHide();}catch(e){}try{const q=$('#bq');if(q){q.classList.remove('on');q.innerHTML='';}}catch(e){}closeInfo();}
-function t2OnAbort(d){if(T2.resDone)return;T2.resDone=true;t2Done();startBgm('adventure');const me=S.meta;if(T2.charged){me.coins+=Math.round(PVP_COST/2);T2.charged=false;}autoSave();
+function t2Done(){try{t2RecoReset();}catch(e){}try{pvSpecHide();}catch(e){}try{const q=$('#bq');if(q){q.classList.remove('on');q.innerHTML='';}}catch(e){}closeInfo();}
+function t2OnAbort(d){if(T2.resDone)return;T2.resDone=true;t2Done();startBgm('adventure');const me=S.meta;let refunded=false;if(T2.charged){me.coins+=Math.round(PVP_COST/2);T2.charged=false;refunded=true;}autoSave();
  try{if(B&&B.t2)B.over=true;}catch(e){}
- M(`<div style="text-align:center"><h2 style="font-size:28px">대전이 멈췄어요</h2><p>${esc(d.reason||'연결이 끊어졌어요')}</p><p class=mut>코인 ${Math.round(PVP_COST/2)}개를 돌려받았어요.</p><div class=mbtns><button class="btn gold" data-a=x>확인</button></div></div>`,
+ M(`<div style="text-align:center"><h2 style="font-size:28px">${T2.mode==='boss'?'보스전이 멈췄어요':'대전이 멈췄어요'}</h2><p>${esc(d.reason||'연결이 끊어졌어요')}</p>${refunded?`<p class=mut>코인 ${Math.round(PVP_COST/2)}개를 돌려받았어요.</p>`:''}<div class=mbtns><button class="btn gold" data-a=x>확인</button></div></div>`,
   {x:()=>t2AfterResult(),_close:()=>{}});}
 function t2OnResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const me=S.meta;const T=B&&B.t2;const vt=T?T.vt:0,li=BC.localIndex;
  const win=d.win===vt;const mine=T?T.teams[vt][li]:null;const qc=mine?(mine.qc||0):0;
@@ -21945,7 +22073,7 @@ renderBossCoop=function(keep){_renderBossCoop.apply(this,arguments);try{const p=
 function renderBoss4(){S.screen='bosscoop';bossClose();t2Close();const m=S.meta;ensureDeck();
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">👥 4인 협동 보스전</h2><span class=hudSp></span><button class="btn ghost sm" id=b4Back>← 돌아가기</button></div>
   <p style="line-height:1.65;margin-top:8px">방장이 방을 열고 친구 <b>3명</b>이 같은 번호로 들어오면 시작해요. 보스는 <b>항상 전설 포켓몬 2마리</b>예요.</p>
-  <div class=explain style="margin-top:10px;font-size:14px;line-height:1.7">• 4명 모두 <b>동시에</b> 행동하고, 모두 <b>차례 끝</b>을 누르면 보스 차례가 돼요.<br>• 8칸 필드와 <b>트레이너 체력은 모두가 함께</b> 써요. 체력은 <b>30</b> + 각자의 체력증강 레벨 합(모두 5레벨이면 <b>50</b>)이에요.<br>• 트레이너 스킬은 <b>각자</b> 쓸 수 있어요.<br>• 보스는 <b>각각 2회</b> 공격해요. 체력이 <b>25% 이하</b>면 +1회, 우리 필드에 포켓몬이 <b>5마리 이상</b>이면 +1회 (최대 4회).<br>• 보스가 트레이너를 공격하면 <b>방어 문제가 한 명씩 돌아가며</b> 나와요. 다른 친구들은 그 친구가 고른 답을 보고, 결과가 <b>❤️ / 💔</b>로 나와요.<br>• 보스를 쓰러뜨리면 보스 1마리당 조각 ${typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:4}개를 받아요. 코인은 들지 않아요.</div>
+  <div class=explain style="margin-top:10px;font-size:14px;line-height:1.7">• 4명 모두 <b>동시에</b> 행동하고, 모두 <b>차례 끝</b>을 누르면 보스 차례가 돼요.<br>• 8칸 필드와 <b>트레이너 체력은 모두가 함께</b> 써요. 체력은 <b>30</b> + 각자의 체력증강 레벨 합(모두 5레벨이면 <b>50</b>)이에요.<br>• 트레이너 스킬은 <b>각자</b> 쓸 수 있어요.<br>• 보스는 <b>각각 2회</b> 공격해요. 체력이 <b>25% 이하</b>면 +1회, 우리 필드에 포켓몬이 <b>5마리 이상</b>이면 +1회 (최대 4회).<br>• 보스가 트레이너를 공격하면 <b>방어 문제가 한 명씩 돌아가며</b> 나와요. 다른 친구들은 그 친구가 고른 답을 보고, 결과가 <b>❤️ / 💔</b>로 나와요. 내 차례가 아닐 땐 <b>답이라고 생각하는 보기를 눌러 ❤️ 로 응원</b>할 수 있어요. 푸는 친구 화면에 작은 ❤️ 가 최대 3개 떠요.<br>• 보스를 쓰러뜨리면 보스 1마리당 조각 ${typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:4}개를 받아요. 코인은 들지 않아요.</div>
   <div class=row style="margin-top:12px"><button class="btn red big" id=b4Host>방 만들기 (방장)</button><button class="btn blue big" id=b4Join>방 들어가기</button></div>
   <div class=row style="margin-top:8px;align-items:center"><input class="inp codeIn" id=b4Code maxlength=4 inputmode=numeric placeholder="방 번호 4자리" style="flex:1"></div>
   <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요해요. 학교 와이파이는 작동하지 않을 수 있어요. <a href="#" id=b4Net style="color:inherit">📶 연결 시험</a> · 내 덱 ${m.deck.length}장</p></div>
@@ -22055,5 +22183,107 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
 .b4mates{display:flex;gap:3px;flex-wrap:wrap}.b4m{font-size:11px;font-weight:900;background:#fff;border:2px solid #9fb0d4;border-radius:8px;padding:0 5px;color:#334155}.b4m.me{border-color:#3d7bff;background:#eaf2ff}.b4m.dn{background:#dff6e6;border-color:#3cc47c}
 .b4heart{position:fixed;left:50%;top:38%;font-size:90px;z-index:400;pointer-events:none;transform:translate(-50%,-50%);animation:b4h 1.4s ease-out forwards}
 @keyframes b4h{0%{opacity:0;transform:translate(-50%,-30%) scale(.4)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}100%{opacity:0;transform:translate(-50%,-110%) scale(1)}}`;document.head.appendChild(st);}
+</script>
+<script id="team2-reco">
+/* 2:2 팀 대전 · 4인 협동 보스전 재접속: 친구 연결이 끊겨도 바로 끝내지 않고 90초 동안 다시 이어 붙여요.
+   - 방장: 끊긴 친구를 '기다리는 중'으로 표시하고, 친구가 같은 방 번호로 다시 들어오면 그 자리(팀·덱·손패)에 그대로 앉혀 지금 상태를 다시 보내 줘요.
+   - 친구: 끊기면 방장에게 자동으로 다시 연결해요. 연결 서버가 죽었으면 새로 만들어요.
+   - 방장이 끊긴 경우에도 방장이 같은 방 번호로 다시 열고, 친구들이 다시 찾아 들어와요. */
+(function(){
+ const MAX=T2_RECO_MAX;
+ const hostId=()=>(T2.mode==='boss'?'pkteam2b-v':'pkteam2-v')+T2_VER+'-'+T2.code;
+ const live=()=>!!(t2Active()&&B&&!B.over&&B.t2&&!B.t2.fin&&!T2.resDone);
+ const card='background:#fffaf1;color:#3a2e3f;border:3px solid #8a7650;border-radius:16px;padding:18px 22px;max-width:86vw;box-shadow:0 8px 0 rgba(0,0,0,.25)';
+ function ov(html){let o=document.getElementById('t2Reco');
+  if(!o){o=document.createElement('div');o.id='t2Reco';o.style.cssText='position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(20,24,44,.62);text-align:center';
+   o.innerHTML='<div style="'+card+'"><div style="font-size:22px;margin-bottom:6px;font-family:Jua,sans-serif">📶 연결이 끊겼어요</div><div id="t2RecoTx" style="font-size:15px;line-height:1.6"></div><button class="btn ghost" id="t2RecoX" style="margin-top:12px">포기하고 나가기</button></div>';
+   document.body.appendChild(o);o.querySelector('#t2RecoX').onclick=()=>{stopGuest();if(t2Active()&&!B.over)t2OnAbort({reason:'연결이 끊겨서 나갔어요'});};}
+  o.querySelector('#t2RecoTx').innerHTML=html;}
+ function hooks(p){try{p.on('disconnected',()=>{try{if(!p.destroyed)p.reconnect();}catch(e){}});}catch(e){}}
+ function stopGuest(){try{clearInterval(T2.gTimer);}catch(e){}T2.gTimer=0;T2.reco=null;const o=document.getElementById('t2Reco');if(o)o.remove();}
+ function stopHost(){try{clearInterval(T2.recoTimer);}catch(e){}T2.recoTimer=0;}
+ window.t2RecoReset=function(){stopGuest();stopHost();const o=document.getElementById('t2Wait');if(o)o.remove();};
+
+ /* 위쪽 안내줄: 누가 끊겨서 기다리는 중인지 (방장·다른 친구 화면) */
+ window.t2WaitShow=function(names,el){let o=document.getElementById('t2Wait');
+  if(!names||!names.length||!live()){if(o)o.remove();return;}
+  if(!o){o=document.createElement('div');o.id='t2Wait';o.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:290;background:#fffaf1;color:#3a2e3f;border:3px solid #8a7650;border-radius:14px;padding:8px 14px;font-size:14px;line-height:1.5;box-shadow:0 4px 0 rgba(0,0,0,.25);text-align:center;max-width:92vw';document.body.appendChild(o);}
+  o.innerHTML='📶 <b>'+names.map(esc).join(', ')+'</b>님의 연결이 끊겼어요. 다시 들어오기를 기다리는 중…'+(el!=null?' ('+el+'초)':'')+(T2.host?'<div><button class="btn ghost sm" id="t2WaitX" style="margin-top:6px">기다리지 않고 끝내기</button></div>':'');
+  const x=o.querySelector('#t2WaitX');if(x)x.onclick=()=>{t2Abort('연결이 끊긴 친구를 기다리지 않고 끝냈어요');};};
+
+ /* ---------- 방장 쪽 ---------- */
+ const downNames=()=>T2.members.filter(x=>!x.host&&x.down).map(x=>x.name||'친구');
+ window.t2MemberDown=function(m){
+  if(m.down)return;m.down=true;m.downSince=Date.now();
+  const n=downNames();t2Raw({t:'t2-wait',names:n});t2WaitShow(n,0);
+  if(!T2.recoTimer)T2.recoTimer=setInterval(hostTick,2000);};
+ function remakeHost(){let peer;try{peer=new Peer(hostId(),PO());}catch(e){return;}
+  T2.peer=peer;BC.peer=peer;hooks(peer);peer.on('connection',t2OnIncoming);peer.on('error',()=>{});}
+ function hostTick(){
+  if(!T2.host||!live()){stopHost();return;}
+  const down=T2.members.filter(x=>!x.host&&x.down);
+  if(!down.length){stopHost();t2WaitShow([],null);return;}
+  const now=Date.now(),old=down.find(x=>now-x.downSince>MAX);
+  if(old){stopHost();t2Abort((old.name||'친구')+'님과 연결이 끊어졌어요');return;}
+  t2WaitShow(down.map(x=>x.name||'친구'),Math.round((now-Math.min(...down.map(x=>x.downSince)))/1000));
+  const peer=T2.peer;
+  if(!peer||peer.destroyed){remakeHost();return;}
+  if(peer.disconnected){try{peer.reconnect();}catch(e){}}}
+ function sendSnap(m){if(!B||!B.t2)return;let team=-1,idx=-1;
+  B.t2.teams.forEach((tm,t)=>tm.forEach((p,i)=>{if(p.mid===m.id){team=t;idx=i;}}));if(team<0)return;
+  try{m.conn.send({t:'t2-snap',init:0,state:t2ViewFor(team,idx)});}catch(e){console.error('t2 resnap',e);}}
+ window.t2Rebind=function(m,c){
+  const old=m.conn;m.conn=c;c.__m=m;m.lastRx=Date.now();m.down=false;
+  if(old&&old!==c){try{old.close();}catch(e){}}
+  c.on('close',()=>t2HostClosed(m,c));
+  t2SendTo(m,{t:'t2-resume'});sendSnap(m);
+  if(T2.defWait&&T2.defWait.mid===m.id&&T2.defWait.q)t2SendTo(m,T2.defWait.q); // 풀던 방어 문제가 있었다면 다시 보내요
+  toast((m.name||'친구')+'님이 다시 연결됐어요!');
+  const n=downNames();t2Raw({t:'t2-wait',names:n});t2WaitShow(n,null);if(!n.length)stopHost();};
+
+ /* ---------- 친구 쪽 ---------- */
+ function remakeGuest(){let peer;try{peer=new Peer(PO());}catch(e){return;}T2.peer=peer;BC.peer=peer;hooks(peer);peer.on('error',()=>{});}
+ function bindGuest(c){
+  c.on('open',()=>{try{c.send({t:'t2-rejoin',id:T2.myId,tok:T2.tok});}catch(e){}});
+  c.on('data',d=>{try{t2GuestRx(d);}catch(e){console.error('t2 guest rx',e);}});
+  c.on('close',()=>t2GuestClosed(c));c.on('error',()=>{});}
+ function guestTick(){
+  if(!T2.reco)return;
+  if(!live()){stopGuest();return;}
+  const el=Math.round((Date.now()-T2.reco.since)/1000);
+  if(Date.now()-T2.reco.since>MAX){stopGuest();t2OnAbort({reason:'방장과 연결이 끊어졌어요'});return;}
+  ov('방장에게 다시 연결하는 중… ('+el+'초)<br><small>화면을 켜 둔 채 잠시만 기다려 주세요</small>');
+  const peer=T2.peer;
+  if(!peer||peer.destroyed){remakeGuest();return;}
+  if(peer.disconnected){try{peer.reconnect();}catch(e){}}
+  if(peer.open&&!peer.disconnected){
+   if(T2.conn&&T2.conn.open)return;
+   if(T2.reco.tryAt&&Date.now()-T2.reco.tryAt<7000)return;
+   T2.reco.tryAt=Date.now();
+   try{const old=T2.conn;const c=peer.connect(hostId(),{reliable:true});T2.conn=c;BC.conn=c;bindGuest(c);if(old&&old!==c)try{old.close();}catch(e){}}catch(e){}}}
+ window.t2GuestRecover=function(){
+  if(T2.host||T2.reco||!live())return;
+  T2.reco={since:Date.now(),tryAt:0};T2.gTimer=setInterval(guestTick,2000);guestTick();};
+ window.t2GuestResumed=function(){const was=!!T2.reco;stopGuest();T2.lastRx=Date.now();if(was)toast('다시 연결됐어요!');};
+
+ /* ---------- 하트비트: 4초마다 신호, 30초(연결이 살아 보이면 90초) 조용하면 끊긴 것으로 봐요 ---------- */
+ function iceOk(c){try{const s=c.peerConnection&&c.peerConnection.iceConnectionState;return s==='connected'||s==='completed';}catch(e){return false;}}
+ setInterval(()=>{try{
+  if(!T2.started||!live())return;
+  const hid=document.hidden,now=Date.now();
+  if(T2.host){
+   T2.members.forEach(m=>{if(m.host||m.down)return;
+    if(m.conn&&m.conn.open){try{m.conn.send({t:'t2-ping'});}catch(e){}
+     if(!hid&&now-(m.lastRx||now)>(iceOk(m.conn)?90000:30000)){const c=m.conn;try{c.close();}catch(e){}t2HostClosed(m,c);}}
+    else t2HostClosed(m,m.conn);});
+  }else{
+   if(T2.reco)return;
+   if(T2.conn&&T2.conn.open){try{T2.conn.send({t:'t2-ping'});}catch(e){}
+    if(!hid&&now-(T2.lastRx||now)>(iceOk(T2.conn)?90000:30000)){try{T2.conn.close();}catch(e){}t2GuestRecover();}}
+   else t2GuestRecover();}
+ }catch(e){}},4000);
+ document.addEventListener('visibilitychange',()=>{try{if(document.hidden)return;const now=Date.now();T2.lastRx=now;T2.members.forEach(m=>{m.lastRx=now;});
+  if(live()&&!T2.host&&!T2.reco&&(!T2.conn||!T2.conn.open))t2GuestRecover();}catch(e){}});
+})();
 </script>
 </body></html>
