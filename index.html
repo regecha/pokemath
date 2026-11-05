@@ -20915,7 +20915,7 @@ function genMap(run){
   let placed=false;
   if(loc){ // 막힌 곳 뒤: 상자를 물·나무·바위·구름 울타리 안에 두고 길 쪽을 '문'으로 막아요. 물·구름은 3칸 넓이라 포켓몬을 타고 건너요
    const ride=loc==='water'||loc==='cloud',RT={water:TL.WATER,tree:TL.TREE,rock:TL.ROCK,cloud:TL.CLOUD}[loc],OKT=new Set([TL.GRASS,TL.FLOWER,TL.TALL,TL.TREE,TL.WATER,TL.ROCK]);
-   const cand=base,ex=ride?5:3;
+   const cand=loc==='cloud'?base.filter(b=>b[1]<=6).concat(base.filter(b=>b[1]>6).sort((a,b)=>a[1]-b[1])):base,ex=ride?5:3; // 구름은 맵 상단(위쪽 줄)에 먼저 놓고, 자리가 없을 때만 가까운 아래쪽으로
    for(let c=0;c<cand.length*2&&!placed;c++){const hx=cand[c>>1][0],hy=cand[c>>1][1],dir=((c&1)?-1:1)*(hx<W/2?1:-1),apx=hx+dir*ex;
     if(apx<2||apx>=W-2||ents.some(q=>Math.abs(q.y-hy)<=3&&(dir>0?(q.x>=hx-3&&q.x<=apx+1):(q.x<=hx+3&&q.x>=apx-1))))continue;
     const ring=[],inner=[],lake=[];let ok=true;
@@ -21006,7 +21006,7 @@ function hallSheets(){if(HALL)return HALL;
 // ---------- 분기점별 건물·소품 ----------
 const BLD={gym:{w:80,h:64,fx:2,fy:3},school:{w:64,h:48,fx:1,fy:2},mart:{w:64,h:48,fx:1,fy:2},shrine:{w:64,h:48,fx:1,fy:2},lab:{w:64,h:48,fx:1,fy:2},fest:{w:64,h:48,fx:1,fy:2}};
 function bkey(n){if(!n)return null;switch(n.t){case 'gym':return'gym';case 'trial':return'school';case 'shop':return'mart';case 'relic':return'shrine';case 'event':return n.ev==='lab'?'lab':n.ev==='festival'?'fest':null;}return null;}
-const PROPS={altar:[32,32],spring:[32,24],ruins:[24,30],chest:[20,16],egg:[24,24]};
+const PROPS={altar:[32,32],spring:[32,24],ruins:[24,30],chest:[22,18],chestOpen:[22,26],egg:[24,24]};
 function pkey(n){return n&&n.t==='event'&&PROPS[n.ev]?n.ev:null;}
 const BLD_CACHE={};
 function bldSheet(key,n){if(key==='gym'){const G=GYMS[n.gi|0];return gymSheet((G&&G.c)||'#c8b48e');}if(key==='school')return schoolSheet();
@@ -21064,7 +21064,47 @@ function propSheet(key){if(PROP_CACHE[key])return PROP_CACHE[key];
  if(key==='altar'){R(3,27,26,5,OL);R(4,27,24,4,'#b4b4c8');R(4,27,24,1,'#e0e0ee');R(6,23,20,5,OL);R(7,23,18,4,'#a0a0b8');R(7,23,18,1,'#d4d4e4');R(12,12,8,12,OL);R(13,12,6,11,'#8e8ea8');R(13,12,2,11,'#c4c4d8');R(10,9,12,4,OL);R(11,9,10,3,'#b4b4c8');R(11,9,10,1,'#e0e0ee');R(14,24,4,1,'#e8c850');}
  else if(key==='spring'){R(2,13,28,10,OL);R(3,12,26,9,'#b4b4c8');R(3,12,26,2,'#e0e0ee');g.fillStyle='#4aa0f0';g.beginPath();g.ellipse(16,16,11,4,0,0,6.283);g.fill();g.fillStyle='#9ad4ff';g.beginPath();g.ellipse(16,15,8,2.4,0,0,6.283);g.fill();R(14,3,4,12,OL);R(15,3,2,11,'#bfe4ff');R(12,5,1,1,'#fff');R(19,6,1,1,'#fff');R(11,8,1,1,'#bfe4ff');R(20,9,1,1,'#bfe4ff');R(13,2,6,2,'#e4f6ff');R(2,21,28,3,'rgba(20,20,40,.25)');}
  else if(key==='ruins'){R(4,3,16,26,OL);R(5,4,14,25,'#9a9aae');R(5,4,3,25,'#c4c4d8');R(15,4,4,25,'#6e6e88');R(7,2,10,2,OL);R(8,3,8,1,'#b4b4c8');R(2,26,20,4,OL);R(3,26,18,3,'#8a8a9e');R(7,9,10,1,'#6ae0e0');R(9,9,1,5,'#6ae0e0');R(13,12,4,1,'#6ae0e0');R(8,17,6,1,'#6ae0e0');R(11,17,1,5,'#6ae0e0');R(6,23,3,2,'#6aa84a');R(14,5,4,1,'#6aa84a');}
- else if(key==='chest'){R(2,6,16,10,OL);R(3,7,14,8,'#a8743c');R(3,7,14,2,'#c9944f');R(3,12,14,1,'#7a5228');R(2,3,16,5,OL);R(3,4,14,4,'#b8844a');R(3,4,14,1,'#d8a45f');R(8,5,4,6,'#ffd23a');R(9,8,2,3,OL);R(2,13,16,1,'#e8c850');}
+ else if(key==='chest'||key==='chestOpen'){ // 보물상자: 나무 몸통 + 금 띠 + 금 자물쇠 / 열린 상자: 뚜껑이 뒤로 젖혀지고 금화·보석이 가득
+  const WD='#a8693a',WL='#c98b4c',WH='#e8b06a',WS='#8a5430',WK='#6e3f24',GD='#ffd23a',GH='#fff0a0',GS='#c89a20';
+  if(key==='chest'){
+   // 몸통
+   R(1,8,20,10,OL);R(2,9,18,8,WD);R(2,9,18,1,WL);R(2,13,18,1,WS);R(2,16,18,1,WK);R(18,9,2,7,'#8f5a31');R(2,10,1,6,'#b87c46');
+   // 둥근 뚜껑
+   R(3,1,16,1,OL);R(2,2,18,1,OL);R(1,3,20,6,OL);
+   R(3,2,16,1,WH);R(2,3,18,1,'#dba05c');R(2,4,18,2,'#b8783f');R(2,6,18,1,'#a56b38');R(2,7,18,1,'#9a6232');R(2,8,18,1,WK);R(2,4,1,4,'#d49a58');R(18,3,2,5,'#9a6232');
+   // 금 띠 두 줄
+   for(const bx of [4,15]){R(bx,2,4,15,OL);R(bx+1,2,2,15,GD);R(bx+1,2,1,15,GH);R(bx+2,2,1,15,GS);R(bx+1,5,2,1,GS);R(bx+1,12,2,1,GS);}
+   // 금 자물쇠
+   R(8,6,6,7,OL);R(9,7,4,5,GD);R(9,7,4,1,GH);R(9,11,4,1,GS);R(12,8,1,3,GS);R(10,8,2,2,OL);R(10,10,2,1,'#7a5a10');
+   // 반짝 포인트
+   R(7,3,1,1,'#fff');R(16,4,1,1,'#fff0c8');
+  }else{
+   // 뒤로 젖혀진 뚜껑(안쪽 붉은 벨벳)
+   R(2,2,18,12,OL);R(3,1,16,1,OL);R(3,2,16,11,'#b8783f');R(3,2,16,1,WH);R(3,3,1,10,'#d49a58');R(18,3,1,10,'#9a6232');
+   R(8,4,7,8,'#8a2f45');R(8,4,7,1,'#a8405a');R(8,11,7,1,'#6a2236');R(8,4,1,8,'#7a2a3e');
+   for(const bx of [4,15]){R(bx,2,4,11,OL);R(bx+1,2,2,11,GD);R(bx+1,2,1,11,GH);R(bx+2,2,1,11,GS);}
+   // 상자 속 어둠 + 새어 나오는 금빛
+   R(2,13,18,3,'#3a2418');
+   g.save();const gr=g.createRadialGradient(11,13,1,11,13,13);gr.addColorStop(0,'rgba(255,244,160,.95)');gr.addColorStop(.5,'rgba(255,214,80,.45)');gr.addColorStop(1,'rgba(255,214,80,0)');g.fillStyle=gr;g.fillRect(0,0,22,26);g.restore();
+   // 금화 더미 (윤곽선은 자동으로)
+   const pile=[[10,2],[9,4],[8,6],[7,8],[6,10],[5,12],[4,14],[3,16]],fill=new Set();
+   pile.forEach(([x0,w],r)=>{for(let x=x0;x<x0+w;x++)fill.add((8+r)*100+x);});
+   for(let y=7;y<=16;y++)for(let x=2;x<=19;x++){if(fill.has(y*100+x))continue;if(fill.has(y*100+x-1)||fill.has(y*100+x+1)||fill.has((y-1)*100+x)||fill.has((y+1)*100+x))R(x,y,1,1,OL);}
+   pile.forEach(([x0,w],r)=>R(x0,8+r,w,1,GD));
+   [[10,8],[9,9],[8,10],[7,11],[6,12],[5,13],[14,13],[15,14],[4,14],[11,14]].forEach(([x,y])=>R(x,y,1,1,GH));
+   [[12,9],[13,10],[11,11],[13,12],[8,13],[16,13],[6,14],[17,14],[9,15],[12,15],[15,15]].forEach(([x,y])=>R(x,y,1,1,GS));
+   [[5,15],[10,14],[14,15]].forEach(([x,y])=>R(x,y,2,1,'#e0b020'));
+   // 보석
+   const gem=(x,y,c,h)=>{R(x,y-1,2,4,OL);R(x-1,y,4,2,OL);R(x,y,2,2,c);R(x,y,1,1,h);};
+   gem(9,11,'#e8434f','#ffb0b6');gem(13,12,'#4aa0f0','#d4efff');gem(6,13,'#4cc46a','#c8f6d0');
+   // 앞쪽 몸통 (윗면 테두리는 밝게)
+   R(1,16,20,10,OL);R(2,17,18,8,WD);R(2,17,18,1,WH);R(2,18,18,1,WL);R(2,21,18,1,WS);R(2,24,18,1,WK);R(18,17,2,7,'#8f5a31');R(2,18,1,6,'#b87c46');
+   for(const bx of [4,15]){R(bx,17,1,8,OL);R(bx+3,17,1,8,OL);R(bx+1,17,2,8,GD);R(bx+1,17,1,8,GH);R(bx+2,17,1,8,GS);R(bx+1,21,2,1,GS);}
+   // 풀린 자물쇠 판
+   R(8,17,6,5,OL);R(9,18,4,3,GD);R(9,18,4,1,GH);R(9,20,4,1,GS);R(10,19,2,1,OL);
+   // 반짝 포인트
+   R(4,6,1,1,'#fff');R(17,8,1,1,'#fff');R(11,5,1,1,'#fff0c8');R(2,9,1,1,'#fff0c8');
+  }}
  else if(key==='egg'){}
  return PROP_CACHE[key]=c;}
 // 의문의 알: 포켓몬 정원의 알 그림(gdEggSVG)을 그대로 가져와 둥지 위에 올려요
@@ -21505,9 +21545,9 @@ function mount(run){
   if(e.k==='gate'){if(e.hide||e.g==='cloud')return;const si=e.g==='water'?8+(((tms/450)|0)&1):e.g==='tree'?7:e.g==='rock'?12:20+((e.x+e.y)&1),f=e.gfx;
    if(f&&f.k==='fall'){g.save();g.globalAlpha=Math.max(0,1-f.u*.75);g.translate(e.x*T+8,e.y*T+15);g.rotate(f.u*f.u*1.45*(e.dir>0?-1:1));g.drawImage(sheet,si*T,0,T,T,-8,-15,T,T);g.restore();return;}
    g.drawImage(sheet,si*T,0,T,T,e.x*T+(f&&f.k==='shake'?(((tms/40)|0)%2?1:-1):0),e.y*T,T,T);return;}
-  if(e.k==='chest'||e.k==='dex'){const x=e.x*T,y=e.y*T,sp=e.k==='chest'?propSheet('chest'):dexSheet(),pw=sp.width,ph=sp.height,bob=Math.round(Math.sin(tms/320+e.x*1.3)),ty=y+16-ph;
+  if(e.k==='chest'||e.k==='dex'){const x=e.x*T,y=e.y*T,sp=e.k==='chest'?propSheet(e.h&&e.done?'chestOpen':'chest'):dexSheet(),pw=sp.width,ph=sp.height,bob=Math.round(Math.sin(tms/320+e.x*1.3)),ty=y+16-ph;
    shadow(x+8,y+14,Math.min(10,pw/2-1));g.drawImage(sp,x+8-pw/2,ty);
-   if(((tms/300)|0)%5===0){g.fillStyle='#fff';g.fillRect(x+12,ty+1,1,3);g.fillRect(x+11,ty+2,3,1);}
+   if(((tms/300)|0)%5===0){const od=e.k==='chest'&&e.h&&e.done,sx=od?x+14:x+12,sy=od?ty+7:ty+1;g.fillStyle='#fff';g.fillRect(sx,sy,1,3);g.fillRect(sx-1,sy+1,3,1);}
    const im=e.mark?marker(e.mark):null;if(im)g.drawImage(im,x,ty-17+(bob>0?1:0),16,16);return;}
   const x=e.x*T,y=e.y*T,lk=e.lk,bob=Math.round(Math.sin(tms/320+e.i*1.7));let top=y;
   if(lk.v==='mon'){const sp=monSpr(spriteURL(e.n.id,'front'));
