@@ -593,11 +593,11 @@ html.lowfx .card .holo{animation:none;mix-blend-mode:normal;opacity:.25}
 @keyframes dmgUp{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}15%{opacity:1;transform:translate(-50%,-60%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-160%) scale(1)}}
 .shake{animation:bShake .25s}
 @keyframes bShake{25%{transform:translate(4px,-3px)}50%{transform:translate(-4px,2px)}75%{transform:translate(2px,3px)}}
-#pvSpec{position:fixed;left:50%;transform:translateX(-50%);width:min(440px,calc(100vw - 16px));top:calc(8px + env(safe-area-inset-top,0px));z-index:60;background:#edf6ff;color:#1d2f4a;border:2px solid #74b6f4;border-radius:16px;padding:8px 10px;box-shadow:inset 0 2px 0 #fff,0 3px 0 #a8d4ff,0 8px 20px rgba(47,98,181,.3);max-height:44vh;overflow:auto;pointer-events:none;font-size:13px}
+#pvSpec{position:fixed;left:50%;transform:translateX(-50%);width:min(440px,calc(100vw - 16px));top:calc(8px + env(safe-area-inset-top,0px));z-index:60;background:#edf6ff;color:#1d2f4a;border:2px solid #74b6f4;border-radius:16px;padding:8px 10px;box-shadow:inset 0 2px 0 #fff,0 3px 0 #a8d4ff,0 8px 20px rgba(47,98,181,.3);max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);overflow:auto;pointer-events:none;font-size:13px}
 #pvSpec .pvsHead{font-size:13px;margin-bottom:5px}#pvSpec .pvsSt{margin-left:4px;padding:1px 8px;border-radius:99px;background:#cfe4fb;color:#2f62b5;font-weight:700;white-space:nowrap}
 #pvSpec .pvsSt.ok{background:#2f9e5b;color:#fff}#pvSpec .pvsSt.no{background:#d9393f;color:#fff}
 #pvSpec .pvsQ{background:#dceeff;border:2px solid #74b6f4;border-radius:12px;padding:6px 8px;box-shadow:0 3px 0 #a8d4ff}#pvSpec .pvsSk{font-size:11px;color:#4f7fb8}#pvSpec .pvsText{font-size:15px;font-weight:700;margin:2px 0}
-#pvSpec .pvsPic{max-height:110px;overflow:hidden}
+#pvSpec .pvsPic{text-align:center;margin:4px 0}#pvSpec .pvsPic svg,#pvSpec .pvsPic img,#pvSpec .pvsPic canvas{max-width:100%;height:auto;max-height:40vh}
 #pvSpec.canHelp{pointer-events:auto}#pvSpec .pvsHelp{margin:0 0 5px;padding:3px 8px;border-radius:8px;background:#ffe8f0;color:#c2305f;font-size:12px;font-weight:700}#pvSpec.canHelp .pvsC{cursor:pointer;padding:6px 14px}#pvSpec .pvsC.heart{border-color:#ff5a8a;background:#ffe3ec}#pvSpec .pvsC.heart::after{content:' ❤️'}.ch.hh{position:relative;border-color:#ff5a8a!important;box-shadow:0 5px 0 #ff9ab8!important}.ch.hh::after{content:'❤️';position:absolute;top:-12px;right:-6px;font-size:30px;line-height:1;animation:hhPop .45s ease-out,hhBeat 1s ease-in-out .45s infinite;filter:drop-shadow(0 2px 0 rgba(255,255,255,.9))}@keyframes hhPop{0%{transform:scale(.2) rotate(-20deg);opacity:0}70%{transform:scale(1.35) rotate(8deg);opacity:1}100%{transform:scale(1) rotate(0)}}@keyframes hhBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 details.bossHow>summary::-webkit-details-marker{display:none}
 /* 4인 보스전: 구경하는 친구마다 ❤️ 1개씩, 푸는 친구 보기 안쪽에 작게 (최대 3개) */
@@ -746,7 +746,7 @@ body:has(.modal.on) #autoCast{z-index:90}
 #autoCast .acl b{color:#ffd23f}
 #autoCast .acl .sup{color:#ff9d6e}
 #autoCast .acl .weak{color:#b8c2d6}
-#battle .unit.acHit,.slot .acHit{outline:3px solid #ff3b3b;outline-offset:1px;border-radius:12px;animation:acHitP .55s ease-in-out 2;position:relative;z-index:3}
+#battle .unit.acHit,.slot .acHit{outline:3px solid #ff3b3b;outline-offset:1px;border-radius:12px;animation:acHitP .55s ease-in-out 2;z-index:3}
 @keyframes acHitP{0%,100%{box-shadow:0 0 0 0 rgba(255,59,59,.0)}50%{box-shadow:0 0 14px 6px rgba(255,59,59,.85)}}
 body:has(#autoCast.on) #banner{top:calc(var(--vt) + var(--vh) * .14)}
 
@@ -5927,7 +5927,7 @@ const FB={};
 function fallbackSprite(id){if(FB[id])return FB[id];const m=MON[id];const c=m?TYPE_COL[m.types[0]]:'#aaa';const c2=m&&m.types[1]!=null?TYPE_COL[m.types[1]]:c;
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><circle cx="48" cy="52" r="30" fill="${c}" stroke="#3a2e3f" stroke-width="4"/><path d="M18 52a30 30 0 0 1 60 0z" fill="${c2}" opacity=".6"/><circle cx="38" cy="48" r="4" fill="#3a2e3f"/><circle cx="58" cy="48" r="4" fill="#3a2e3f"/><path d="M42 60q6 5 12 0" stroke="#3a2e3f" stroke-width="3" fill="none"/><text x="48" y="92" font-size="12" text-anchor="middle" fill="#3a2e3f">${m?m.id:''}</text></svg>`;
  return FB[id]='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);}
-function imgFail(el){const id=+el.dataset.id;if(id>=GM_BASE&&id<GM_BASE+2000){gmaxImgFail(el,id-GM_BASE);return;}if(id>10000&&MEGAB[id]&&el.dataset.mf!=='1'){if(!el.dataset.mf&&el.dataset.k&&el.dataset.k!=='front'&&/\.gif/.test(el.getAttribute('src')||'')){el.dataset.mf='p';el.src=(el.dataset.k==='back'?SPR_BASE+'back/':SPR_BASE)+id+'.png';return;}el.dataset.mf='1';el.dataset.id=MEGAB[id];el.classList.add('mgFb');el.removeAttribute('data-shifted');el.src=spriteURL(MEGAB[id],el.dataset.k||'front',true);return;}if((el.getAttribute('src')||'').indexOf('/shiny/')>=0){el.removeAttribute('data-shifted');el.src=spriteURL(id,el.dataset.k||'front',true);return;}if(el.dataset.f==='1'){el.src=fallbackSprite(id);el.dataset.f='2';return;}
+function imgFail(el){const id=+el.dataset.id;if(id>=GM_BASE&&id<GM_BASE+2000){gmaxImgFail(el,id-GM_BASE);return;}if(id>10000&&MEGAB[id]&&el.dataset.mf!=='1'){if(!el.dataset.mf&&el.dataset.k&&el.dataset.k!=='front'&&/\.gif/.test(el.getAttribute('src')||'')){el.dataset.mf='p';el.classList.add('idle');el.src=(el.dataset.k==='back'?SPR_BASE+'back/':SPR_BASE)+id+'.png';return;} /* GIF가 없는 메가는 도트 그림으로 바꾸되, GIF처럼 가만히 있지 않게 숨쉬기 움직임을 줘요 */el.dataset.mf='1';el.dataset.id=MEGAB[id];el.classList.add('mgFb');el.removeAttribute('data-shifted');el.src=spriteURL(MEGAB[id],el.dataset.k||'front',true);return;}if((el.getAttribute('src')||'').indexOf('/shiny/')>=0){el.removeAttribute('data-shifted');el.src=spriteURL(id,el.dataset.k||'front',true);return;}if(el.dataset.f==='1'){el.src=fallbackSprite(id);el.dataset.f='2';return;}
  if(el.dataset.k&&el.dataset.k!=='front'){el.dataset.f='1';el.src=SPR_BASE+id+'.png';return;}el.dataset.f='2';el.src=fallbackSprite(id);}
 function monImg(id,kind='front',cls='',ns){if((kind==='anim'||kind==='back')&&S.meta.settings.anim!=='gif')cls=(cls?cls+' ':'')+'idle';return `<img class="${cls}" style="--d:${(id%7)*.17}s" src="${spriteURL(id,kind,ns)}" data-id="${id}" data-k="${kind}" alt="" loading="lazy" draggable="false" onerror="imgFail(this)">`;}
 /* ===== 전투 칸의 포켓몬 그림: 그림 파일 아래쪽의 투명한 여백을 없애 발이 바닥에 닿게 해요 ===== */
@@ -19461,7 +19461,7 @@ function gdRow2HTML(g,pets){const st=gdMisState();return `<div class=gdBtns2><bu
 .padBtn:active{transform:translateY(2px);box-shadow:0 0 0 #c9a24a}
 .padBtn.on{background:#ffd966;color:#4a3300}
 .qCard.hasPad .qSk{padding:0 70px}
-#padPop{position:fixed;left:8px;right:8px;margin:0 auto;max-width:760px;z-index:41;display:none;flex-direction:column;background:#fffdf3;border:3px solid #c9a24a;border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(60,40,0,.32);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#padPop{position:fixed;left:8px;right:8px;margin:0 auto;max-width:760px;z-index:2147483000;display:none;flex-direction:column;background:#fffdf3;border:3px solid #c9a24a;border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(60,40,0,.32);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 #padPop.on{display:flex}
 #padPop.bottom{bottom:calc(8px + var(--sb,0px))}
 #padPop .padBar{flex:0 0 auto;display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:5px 6px;background:#f6e7b8;border-bottom:2px solid #c9a24a}
