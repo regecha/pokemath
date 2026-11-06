@@ -6780,9 +6780,9 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
   const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),sp=Math.max(0,Math.min(P.sunMana||0,P.mana-bp)),bl=P.mana-bp-sp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}${Array.from({length:sp},()=>'<i class="on sun"></i>').join('')}<b>${bl}${bp+sp?`<span class=manaPlus>+${bp+sp}</span>`:''}/${den}</b></div>`;};
  $('#battle').innerHTML=`
   <div class=bTop>${B.t2?t2TopHTML(valid,me):B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?((B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:(B.coop?`<button class="btn ghost sm waitCatch" data-wild-catch-slot="${i}" title="체력이 30% 이하라 포획할 수 있어요. 내 차례에 시도해요">🔴 포획 가능</button>`:'')):''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:calc(100% + 2px);left:4px;transform:none;flex-direction:column;align-items:flex-start;z-index:50">${(u=>{const n=Math.max(1,Math.ceil(u.atk*rlBoost(u))+(B.combo>=2?1:0)+quakeB(u)+dragonMod(u));return `<b class=dmgp>-${n}</b>`+(B.pvp?`<b class=dmgp style="color:#2f62b5">방어 성공 시 -${Math.max(0,n-1)}</b>`:'');})(me.board[B.sel])}</div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front','',true)}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill title="상대 손에 든 카드 수">${I('cards')} ${fo.hand.length}</span><span class=pill title="상대 남은 덱 카드 수">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<div class=bMenuCol><button class="btn ghost sm" id=bMenu>메뉴</button><button class="btn ghost sm fsBtn" id=bFull title="전체 화면" aria-label="전체 화면">${I('full','fsO')}${I('fullx','fsX')}</button></div></div>
-  <div class="lane${B.t2&&!B.wildMode?' coopLane':''}${B.wildMode?` wildLane wildCount${fo.board.filter(Boolean).length}`:''}${fo.gmx?' gmaxLane':''}" id=foeLane>${fo.board.map((u,i)=>B.wildMode&&!u?'':`<div class=slot data-i="${i}">${unitH(u,fo,i)}</div>`).join('')}</div>
+  <div class="lane${B.t2&&!B.wildMode?' coopLane':''}${B.t2&&!B.wildMode&&fo.board.length>=10?' c10':''}${B.wildMode?` wildLane wildCount${fo.board.filter(Boolean).length}`:''}${fo.gmx?' gmaxLane':''}" id=foeLane>${fo.board.map((u,i)=>B.wildMode&&!u?'':`<div class=slot data-i="${i}">${unitH(u,fo,i)}</div>`).join('')}</div>
   <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class="pill cmbPill ${B.combo>=10?'t10':B.combo>=7?'t7':B.combo>=5?'t5':''}" style="--lv:${Math.min(B.combo,14)};color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}${(!B.tut&&!B.tutReal)?`<span class=pill id=evoPill title="정답을 모으면 메가 진화·원시회귀·거다이맥스를 쓸 수 있어요. 필요한 정답 수는 포켓몬 코스트에 따라 5~10개예요. 쓰면 처음부터 다시 모아요" style="color:${mgProg()>=evoPillNeed()?'#d97800':'#2f62b5'};${mgProg()>=evoPillNeed()?'border-color:#ffb100;background:#fff3d6':''}">${mgProg()>=evoPillNeed()?'✨':'🔷'} 진화 ${Math.min(Math.max(0,mgProg()),evoPillNeed())}/${evoPillNeed()}</span>`:''}${my&&B.sel>=0&&megaCan(B.me,B.sel)?`<button class="btn gold sm" id=bMega>🔷 ${PRIMAL[B.me.board[B.sel].id]?'원시':'메가'}</button>`:''}${my&&B.sel>=0&&gmaxCan(B.me,B.sel,1)?`<button class="btn red sm" id=bGmax>🌋 맥스</button>`:''}${my&&!B.coop&&B.sel>=0&&evoLeft(B.me,B.sel)?`<button class="btn sm" id=bEvoOut style="opacity:.6">🔒 진화</button>`:''}</div>
-  <div class="lane${B.coop?' coopLane':''}${me.gmx?' gmaxLane':''}" id=myLane>${me.board.map((u,i)=>`<div class="slot${B.pick>=0&&!u&&!isItemCard(me.hand[B.pick])?' can':''}" data-i="${i}">${unitH(u,me,i)}</div>`).join('')}</div>
+  <div class="lane${B.coop?' coopLane':''}${B.t2&&me.board.length>=10?' c10':''}${me.gmx?' gmaxLane':''}" id=myLane>${me.board.map((u,i)=>`<div class="slot${B.pick>=0&&!u&&!isItemCard(me.hand[B.pick])?' can':''}" data-i="${i}">${unitH(u,me,i)}</div>`).join('')}</div>
   ${B.coop?`<div class="bBot coopHeroes">${heroH(loc,'heroMe',B.side==='me'&&B.coop.active===BC.localIndex)}${ally?heroH(ally,'heroAlly',B.side==='me'&&B.coop.active!==BC.localIndex):''}</div>`:''}<div class=bBot>${B.coop?'':heroH(me,'heroMe',false)}${mana(loc)}
    <button class="btn purple sm" id=bPower ${my&&(loc.powerUses||0)>0?'':'disabled'} title="남은 사용 횟수 ${Math.max(0,loc.powerUses||0)}회: 문제를 맞히면 카드 1장">${I('book')} 공부 기술 <small style="font-size:11px">${Math.max(0,loc.powerUses||0)}회</small></button>
    <span class=hudSp></span><span class=pill title="내 남은 덱 카드 수">${I('book')} ${loc.deck.length}</span>${(!B.coop&&!B.pvp&&!B.tut&&!B.tutReal)?`<button class="btn ${AUTO.on?'gold':'ghost'} sm" id=bAuto title="전투만 자동으로 해요. 문제는 직접 풀어요">${AUTO.on?'⏹ 자동전투 ON':'▶ 자동전투'}</button>`:''}${B.pvp?'<button class="btn ghost sm" id=bEmo title="친구에게 응원 말 보내기">💬 응원</button>':''}<button class="btn red endBtn" id=bEnd ${my?'':'disabled'}>차례 끝</button></div>
@@ -22086,7 +22086,7 @@ window.GF={mount,destroy,genMap,get st(){return ST;}};
 /* ===================================================================
    2:2 팀 대전 (친구 대전 → 2:2)
    - 방장이 방을 열고 3명이 같은 코드로 접속 → 팀(A/B)당 2칸에 앉으면 방장이 시작
-   - 팀마다 8칸 공유 필드, 한 팀의 두 사람은 동시에 행동, 둘 다 '차례 끝'이면 다음 팀 차례
+   - 팀마다 10칸 공유 필드, 한 팀의 두 사람은 동시에 행동, 둘 다 '차례 끝'이면 다음 팀 차례
    - 방장이 판정(권위 호스트)하고, 모든 화면에는 '내 팀이 아래' 시점으로 상태를 보내요
    =================================================================== */
 const T2_VER=1;
@@ -22103,7 +22103,7 @@ function renderPvp(){S.screen='pvp';pvpClose();t2Close();const m=S.meta;
   <p style="line-height:1.6">대전 방식을 골라요. 두 방식 모두 인터넷으로 연결되고, 한 판에 <b>코인 ${PVP_COST}개</b>가 들어요. (이기면 ${PVP_WIN}개, 져도 ${PVP_LOSE}개를 돌려받아요)</p>
   <div class=t2modes>
    <button class="t2mode m1" id=pvM1><span class=t2mi>⚔️</span><b>1:1 대전</b><small>친구 한 명과 일대일로 겨뤄요</small></button>
-   <button class="t2mode m2" id=pvM2><span class=t2mi>🤝</span><b>2:2 팀 대전</b><small>4명이 두 팀으로 나뉘어 팀마다 8칸을 함께 써요</small></button>
+   <button class="t2mode m2" id=pvM2><span class=t2mi>🤝</span><b>2:2 팀 대전</b><small>4명이 두 팀으로 나뉘어 팀마다 10칸을 함께 써요</small></button>
   </div>
   <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요해요. <b>학교 와이파이는 작동하지 않을 수 있어요.</b> 모두 같은 버전의 게임 파일을 써 주세요. (지금 코인 ${m.coins}개)</p></div></div>`;
  bindHud();
@@ -22116,7 +22116,7 @@ renderPvp1=function(){_renderPvp1.apply(this,arguments);try{const p=document.que
 
 function renderPvp2(){S.screen='pvp';pvpClose();t2Close();const m=S.meta;ensureDeck();const can=m.coins>=PVP_COST;
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('teacher')} 2:2 팀 대전</h2><span class=hudSp></span><button class="btn ghost sm" id=t2Back>← 모드 선택</button></div>
-  <p style="line-height:1.65;margin-top:8px">4명이 모여 <b>두 팀(2명씩)</b>으로 싸워요. 팀마다 <b>8칸 필드를 함께</b> 쓰고, 한 팀의 두 사람이 <b>동시에</b> 행동해요. 두 사람이 모두 <b>차례 끝</b>을 누르면 다음 팀의 두 사람이 동시에 시작해요. 상대 트레이너를 공격할 때는 <b>둘 중 한 명</b>을 골라요. 한 명의 체력이 0이 되어도 남은 한 명이 쓰러진 친구의 포켓몬까지 모두 조종하며 전투를 이어가요. <b>팀원 둘 다</b> 체력이 0이 되면 그 팀이 져요.</p>
+  <p style="line-height:1.65;margin-top:8px">4명이 모여 <b>두 팀(2명씩)</b>으로 싸워요. 팀마다 <b>10칸 필드를 함께</b> 쓰고, 한 팀의 두 사람이 <b>동시에</b> 행동해요. 두 사람이 모두 <b>차례 끝</b>을 누르면 다음 팀의 두 사람이 동시에 시작해요. 상대 트레이너를 공격할 때는 <b>둘 중 한 명</b>을 골라요. 한 명의 체력이 0이 되어도 남은 한 명이 쓰러진 친구의 포켓몬까지 모두 조종하며 전투를 이어가요. <b>팀원 둘 다</b> 체력이 0이 되면 그 팀이 져요.</p>
   <div class=explain style="font-size:14px">${I('coin')} 한 판에 <b>코인 ${PVP_COST}개</b> · 이기면 ${PVP_WIN}개, 져도 ${PVP_LOSE}개를 돌려받아요. (지금 <b>${m.coins}개</b>)</div>
   ${can?'':`<p style="color:#d9393f;margin-top:8px">코인이 ${PVP_COST-m.coins}개 모자라요. 공부해서 코인을 모아 와요!</p>`}
   <div class=row style="margin-top:12px"><button class="btn red big" id=t2Host ${can?'':'disabled'}>방 만들기 (방장)</button><button class="btn blue big" id=t2Join ${can?'':'disabled'}>방 들어가기</button></div>
@@ -22277,7 +22277,7 @@ function t2StartMatch(){if(!T2.host||T2.started||!t2CanStart())return;
  if(S.meta.coins<PVP_COST){toast('코인이 모자라요');return;}
  const seats=[[null,null],[null,null]];T2.members.forEach(m=>{if(m.team!=null)seats[m.team][m.pos]=m;});
  const used={};const nameOf=m=>{let n=m.name||'친구';if(used[n]){used[n]++;n+=' '+'②③④'[used[n]-2];}else used[n]=1;return n;};
- const boards=[Array(8).fill(null),Array(8).fill(null)];
+ const boards=[Array(10).fill(null),Array(10).fill(null)];
  const teams=seats.map((tm,t)=>tm.map((m,i)=>{const hi=m.hi;const hp=m.host?heroHpMax():HERO_HP+t2clamp(hi.vit,0,5);
   const p=mkPlayer(nameOf(m),hi.deck,hp,MON[hi.av]?hi.av:25,false,hi.owned,true);
   p.manaLv=t2clamp(hi.mana,0,5);p.studyLv=t2clamp(hi.study,0,5);p.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(p.studyLv));p.handLv=t2clamp(hi.hand,0,5);p.evoLv=t2clamp(hi.evo,0,5);
@@ -22406,7 +22406,7 @@ async function t2Exec(d){if(!B||!B.t2||B.over)return;const T=B.t2,team=d.team,id
    banner.local=1;t2Rest();B.busy=false;renderBattle();return;}
   const ownU=si=>{const u=P.board[Number(si)];return(u&&Number(u.coopOwner??0)===idx)?u:null;};
   if(a.type==='summon'){const s=Number(a.s),h=Number(a.h);
-   if(!Number.isInteger(s)||s<0||s>=8||!Number.isInteger(h)||h<0||h>=P.hand.length||P.board[s]||(!MON[P.hand[h]]&&!isRandomMonCard(P.hand[h])))return;
+   if(!Number.isInteger(s)||s<0||s>=P.board.length||!Number.isInteger(h)||h<0||h>=P.hand.length||P.board[s]||(!MON[P.hand[h]]&&!isRandomMonCard(P.hand[h])))return;
    B.busy=false;await summon(P,h,s);}
   else if(a.type==='item'){const h=Number(a.h);if(!Number.isInteger(h)||h<0||h>=P.hand.length)return;const card=P.hand[h];
    if(!isItemCard(card))return;if(card.item==='thunder'&&!ownU(a.target))return;
@@ -22424,7 +22424,7 @@ async function t2Exec(d){if(!B||!B.t2||B.over)return;const T=B.t2,team=d.team,id
    else if(sk==='attack'){const u=B.foe.board[slot];if(!u||u.hp<=0)return;U.attack=true;try{await trainerAtkFx(heroEl(P),unitEl(B.foe,slot),lv);}catch(e){}await dealUnit(B.foe,slot,lv);checkEnd();}
    else if(sk==='cheer'){const u=ownU(slot);if(!u||u.hp<=0)return;const ca=CHEER_ATK[lv]||0,cs=CHEER_SHIELD[lv]||0;u.atk+=ca;u.shield=(u.shield||0)+cs;U.cheer=true;fx(unitEl(P,slot),`공격 +${ca} · 방어막 +${cs}`,'txt');try{trainerCheerFx(unitEl(P,slot));}catch(e){}}}
  }catch(e){console.error('t2 exec',e);}
- finally{T2.proc=false;if(B&&B.t2&&B.coop){B.coop.processing=false;if(!B.t2.fin||true){try{t2Sync();t2Rest();}catch(e){}}B.busy=B.over?false:prevBusy&&!T2.queue.length?prevBusy:false;banner.local=0;renderBattle();t2Broadcast(true);}}}
+ finally{T2.proc=false;if(B&&B.t2&&B.coop){B.coop.processing=false;if(!B.t2.fin||true){try{t2Sync();t2Rest();}catch(e){}}B.busy=false;banner.local=0;renderBattle();t2Broadcast(true);}}}
 
 /* ------------------------------ 팀 차례 시작 ------------------------------ */
 // 2:2: 한 명이 쓰러지면 남은 팀원이 필드의 포켓몬을 모두 대신 조종해요
@@ -22503,7 +22503,31 @@ window.t2TopHTML=t2TopHTML;window.t2Msg=t2Msg;window.t2Done1=t2Done1;window.t2Re
 // 상대 트레이너를 눌러서 공격할 사람을 골라요 (둘 중 한 명)
 const _bindBattle=bindBattle;
 bindBattle=function(){_bindBattle.apply(this,arguments);if(!(B&&B.t2))return;
- [['heroFoe',0],['heroFoeB',1]].forEach(([id,hi])=>{const el=document.getElementById(id);if(!el)return;el.onclick=()=>t2HeroAttack(hi);});};
+ [['heroFoe',0],['heroFoeB',1]].forEach(([id,hi])=>{const el=document.getElementById(id);if(!el)return;el.onclick=()=>t2HeroAttack(hi);});
+ // 차례 끝: B.busy·active 값에 막히지 않고, '우리 팀 차례이고 아직 안 눌렀을 때'만 확인해요 (방장 포함 모두 같은 길)
+ try{const be=document.getElementById('bEnd');if(be){const T=B.t2;const can=!B.over&&T.turn===T.vt&&!t2Done1();be.disabled=!can;
+  be.onclick=()=>{if(!B||!B.t2||B.over)return;const T=B.t2;if(T.turn!==T.vt)return;if(t2Done1()){toast('이미 차례 끝을 눌렀어요. 다른 친구를 기다리는 중이에요');return;}
+   sfx('tap');B.sel=-1;B.pick=-1;B.trainerSkillTarget=null;bossSubmit({type:'end'});};
+  if(BC.host&&!document.getElementById('t2Force')){const fb=document.createElement('button');fb.id='t2Force';fb.className='btn gold sm';fb.textContent='⏩ 강제 진행';fb.title='방장 전용: 멈췄을 때 차례를 강제로 넘겨요';fb.onclick=t2ForceClick;be.insertAdjacentElement('beforebegin',fb);}}}catch(e){console.warn('t2 end btn',e);}};
+
+/* ---- 방장 전용: 멈춘 전투 풀기 / 강제 진행 ---- */
+function t2Unstick(){T2.queue.length=0;try{if(T2.defWait){const w=T2.defWait;T2.defWait=null;w.res(null);}}catch(e){}
+ T2.pumping=false;T2.proc=false;if(B){B.busy=false;if(B.coop)B.coop.processing=false;}try{const q=document.getElementById('bq');if(q){q.classList.remove('on');q.innerHTML='';}}catch(e){}}
+async function t2Force(){if(!B||!B.t2||B.over||!BC.host)return;const T=B.t2,turn=T.turn;t2Unstick();
+ try{
+  if(T.boss&&turn===1){await t2BossNext();}   // 보스 차례에서 멈췄으면 우리 새 차례로
+  else{T.done[turn]=T.done[turn].map(()=>1);T.teams[turn].forEach(p=>{p.t2done=1;});B.sel=-1;B.pick=-1;
+   if(T.boss)await t2BossTurn();else await t2BeginTeam(1-turn);}
+ }catch(e){console.error('t2 force',e);T2.proc=false;try{t2Rest();renderBattle();t2Broadcast(true);}catch(_){}}
+ try{renderBattle();t2Broadcast(true);}catch(e){}}
+function t2ForceClick(){if(!B||!B.t2||B.over||!BC.host)return;sfx('tap');
+ const T=B.t2;const msg=(T.boss&&T.turn===1)?'보스 차례가 멈췄다면 우리 새 차례로 넘길까요?':'아직 차례 끝을 안 누른 사람까지 모두 끝낸 것으로 하고 다음으로 넘길까요?';
+ if(confirm('⏩ 강제 진행\n'+msg))t2Force();}
+// 알아서 풀기: 처리 중이 아닌데 방장 화면이 잠겨 있거나, 처리가 너무 오래 멈춰 있으면 풀어 줘요
+setInterval(()=>{try{if(!B||!B.t2||!BC.host||B.over)return;const now=Date.now();const q=document.getElementById('bq');const qOpen=!!(q&&q.classList.contains('on'));
+ if(B.busy&&!T2.proc&&!T2.pumping&&!qOpen){T2.bz=T2.bz||now;if(now-T2.bz>4000){T2.bz=0;B.busy=false;renderBattle();t2Broadcast(true);}}else T2.bz=0;
+ if(T2.proc&&!T2.defWait&&!qOpen){T2.pz=T2.pz||now;if(now-T2.pz>150000){T2.pz=0;t2Unstick();toast('멈춰 있던 처리를 풀었어요');renderBattle();t2Broadcast(true);}}else T2.pz=0;
+ if(T2.queue.length&&!T2.pumping&&!T2.proc)t2Pump();}catch(e){}},2000);
 function t2HeroAttack(hi){if(!B||!B.t2||B.busy||B.sel<0||B.side!=='me'||t2Done1())return;closeInfo();const si=B.sel,me=B.me,u=me.board[si];if(!u)return;
  if(!targetsFor(si).hero){toast(gmxIdx(B.foe).length?'거다이맥스 포켓몬이 지키고 있어요! 먼저 쓰러뜨려야 해요':'바위 벽 포켓몬이 막고 있어요');return;}
  if(B.coop.foeTeam[hi]&&B.coop.foeTeam[hi].hp<=0&&B.coop.foeTeam[1-hi]&&B.coop.foeTeam[1-hi].hp>0)hi=1-hi;const P=B.coop.foeTeam[hi];B.busy=true;const q=pickQ({cyc:1});
@@ -22531,14 +22555,17 @@ if(typeof document!=='undefined'){const st=document.createElement('style');st.id
 .hero.t2h{padding:2px 8px 2px 2px;gap:5px;min-width:0;flex:0 1 auto}
 .hero.t2h .av{width:34px;height:34px;border-width:2px}.hero.t2h .av img,.hero.t2h .av svg{width:30px;height:30px}
 .hero.t2h .hn{font-size:12px;max-width:24vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hero.t2h .hhp{font-size:17px}
+.lane.coopLane.c10{grid-template-columns:repeat(10,minmax(0,1fr))}
+#t2Force{font-size:12px;padding:5px 8px;margin-right:4px}
 @media(max-width:560px){
+ .lane.coopLane.c10{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
  #foeLane.coopLane,#myLane.coopLane{flex:1 1 0}
  #foeLane.coopLane .slot{aspect-ratio:auto!important;height:100%!important;max-height:100%!important;min-height:0!important}
  body:has(#heroFoeB) #foeLane.coopLane{min-height:0}
 }`;document.head.appendChild(st);}
 
 /* ===================================================================
-   4인 협동 보스전: 4명이 한 팀(8칸 공유 필드), 전설 보스 2마리, 트레이너 체력 공유
+   4인 협동 보스전: 4명이 한 팀(10칸 공유 필드), 전설 보스 2마리, 트레이너 체력 공유
    =================================================================== */
 const B4_HP=30; // 기본 공유 체력 (각자 체력증강 레벨만큼 더해요: 모두 5레벨이면 30+20=50)
 const _renderBossCoop=renderBossCoop;
@@ -22561,11 +22588,11 @@ function renderBoss4(){S.screen='bosscoop';bossClose();t2Close();const m=S.meta;
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">👥 4인 협동 보스전</h2><span class=hudSp></span><button class="btn ghost sm" id=b4Back>← 모드 선택</button></div>
   <p style="line-height:1.65;margin-top:8px">방장이 방을 열고 친구 <b>3명</b>이 같은 번호로 들어오면 시작해요. 보스는 <b>항상 전설 포켓몬 2마리</b>예요.</p>
   <div class=tiles style="margin-top:12px"><div class=tile><span class=ti>✨</span><span class=tn>5성 보스 100%</span><span class=td>항상 전설 포켓몬</span></div><div class=tile><span class=ti>👹</span><span class=tn>보스 2마리</span><span class=td>한꺼번에 등장해요</span></div></div>
-  <details class=bossHow style="margin-top:10px"><summary class="btn ghost sm" style="cursor:pointer;list-style:none">📖 설명 보기 / 접기</summary><div class=explain style="margin-top:8px;font-size:14px;line-height:1.7">• 4명 모두 <b>동시에</b> 행동하고, 모두 <b>차례 끝</b>을 누르면 보스 차례가 돼요.<br>• 8칸 필드와 <b>트레이너 체력은 모두가 함께</b> 써요. 체력은 <b>30</b> + 각자의 체력증강 레벨 합(모두 5레벨이면 <b>50</b>)이에요.<br>• 트레이너 스킬은 <b>각자</b> 쓸 수 있어요.<br>• 보스는 <b>각각 2회</b> 공격해요. 체력이 <b>25% 이하</b>면 +1회, 우리 필드에 포켓몬이 <b>5마리 이상</b>이면 +1회 (최대 4회).<br>• 보스가 트레이너를 공격하면 <b>방어 문제가 한 명씩 돌아가며</b> 나와요. 다른 친구들은 그 친구가 고른 답을 보고, 결과가 <b>❤️ / 💔</b>로 나와요. 내 차례가 아닐 땐 <b>답이라고 생각하는 보기를 눌러 ❤️ 로 응원</b>할 수 있어요. 푸는 친구 화면에 작은 ❤️ 가 최대 3개 떠요.<br>• 보스를 쓰러뜨리면 보스 1마리당 조각 ${typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:4}개를 받아요. 코인은 들지 않아요.</div></details>
+  <details class=bossHow style="margin-top:10px"><summary class="btn ghost sm" style="cursor:pointer;list-style:none">📖 설명 보기 / 접기</summary><div class=explain style="margin-top:8px;font-size:14px;line-height:1.7">• 4명 모두 <b>동시에</b> 행동하고, 모두 <b>차례 끝</b>을 누르면 보스 차례가 돼요.<br>• 10칸 필드와 <b>트레이너 체력은 모두가 함께</b> 써요. 체력은 <b>30</b> + 각자의 체력증강 레벨 합(모두 5레벨이면 <b>50</b>)이에요.<br>• 트레이너 스킬은 <b>각자</b> 쓸 수 있어요.<br>• 보스는 <b>각각 2회</b> 공격해요. 체력이 <b>25% 이하</b>면 +1회, 우리 필드에 포켓몬이 <b>5마리 이상</b>이면 +1회 (최대 4회).<br>• 보스가 트레이너를 공격하면 <b>방어 문제가 한 명씩 돌아가며</b> 나와요. 다른 친구들은 그 친구가 고른 답을 보고, 결과가 <b>❤️ / 💔</b>로 나와요. 내 차례가 아닐 땐 <b>답이라고 생각하는 보기를 눌러 ❤️ 로 응원</b>할 수 있어요. 푸는 친구 화면에 작은 ❤️ 가 최대 3개 떠요.<br>• 보스를 쓰러뜨리면 보스 1마리당 조각 ${typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:4}개를 받아요. 코인은 들지 않아요.</div></details>
   <div class=row style="margin-top:12px"><button class="btn red big" id=b4Host>방 만들기 (방장)</button><button class="btn blue big" id=b4Join>방 들어가기</button></div>
   <div class=row style="margin-top:8px;align-items:center"><input class="inp codeIn" id=b4Code maxlength=4 inputmode=numeric placeholder="방 번호 4자리" style="flex:1"></div>
   <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요해요. 학교 와이파이는 작동하지 않을 수 있어요. <a href="#" id=b4Net style="color:inherit">📶 연결 시험</a> · 내 덱 ${m.deck.length}장</p></div>
-  <div class=panel id=t2Box style="display:none;text-align:center"></div><div class=panel><h3>협동 규칙</h3><ul style="line-height:1.8;padding-left:20px"><li>4명이 한 팀 · 모두 동시에 행동</li><li>모두 <b>차례 끝</b>을 누르면 보스 차례</li><li>각자 자기 손패와 덱으로 행동</li><li>8칸 필드와 트레이너 체력은 모두가 함께 사용</li><li>문제는 행동한 플레이어가 풀고, 결과를 호스트가 판정·반영</li><li>보스 행동과 방어 문제(한 명씩 돌아가며)는 호스트가 한 번만 처리해 모든 화면에 전파</li></ul></div></div>`;
+  <div class=panel id=t2Box style="display:none;text-align:center"></div><div class=panel><h3>협동 규칙</h3><ul style="line-height:1.8;padding-left:20px"><li>4명이 한 팀 · 모두 동시에 행동</li><li>모두 <b>차례 끝</b>을 누르면 보스 차례</li><li>각자 자기 손패와 덱으로 행동</li><li>10칸 필드와 트레이너 체력은 모두가 함께 사용</li><li>문제는 행동한 플레이어가 풀고, 결과를 호스트가 판정·반영</li><li>보스 행동과 방어 문제(한 명씩 돌아가며)는 호스트가 한 번만 처리해 모든 화면에 전파</li></ul></div></div>`;
  bindHud();
  $('#b4Back').onclick=()=>{sfx('tap');renderBossMode();};
  $('#b4Net').onclick=e=>{e.preventDefault();sfx('tap');showNetTest();};
@@ -22597,7 +22624,7 @@ function t2StartBoss(){if(!T2.host||T2.started||T2.mode!=='boss')return;const ms
   p.manaLv=t2clamp(hi.mana,0,5);p.studyLv=t2clamp(hi.study,0,5);p.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(p.studyLv));p.handLv=t2clamp(hi.hand,0,5);p.evoLv=t2clamp(hi.evo,0,5);
   p.team=0;p.tix=i;p.mid=m.id;p.tsUsed={};p.ctr=0;p.t2done=0;p.qc=0;
   Object.defineProperty(p,'hp',{get:()=>sh.hp,set:v=>{sh.hp=v;},enumerable:true,configurable:true});Object.defineProperty(p,'max',{get:()=>sh.max,set:v=>{sh.max=v;},enumerable:true,configurable:true});return p;});
- const board=Array(8).fill(null);players.forEach(p=>{p.board=board;for(let i=0;i<3;i++)draw(p,true);});
+ const board=Array(10).fill(null);players.forEach(p=>{p.board=board;for(let i=0;i<3;i++)draw(p,true);});
  const ids=t2BossPick(ms.map(m=>m.hi));const slots=[1,3];
  const foe=mkPlayer(ids.map(x=>MON[x].name).join(' · '),[],1,ids[0],true,[],false);foe.team=1;foe.tix=0;foe.mid=0;
  ids.forEach((wid,k)=>{const u=mkUnit(wid);u.hp=MON[wid].hp*15;u.max=u.hp;u.atk=MON[wid].atk;u.att=0;u.fresh=0;u.wildEncounter=1;foe.board[slots[k]]=u;});
@@ -22666,6 +22693,13 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
 {const st=document.createElement('style');st.id='t2bcss';st.textContent=`
 .t2b4grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .t2b4grid .t2seat{cursor:default}
+#wildStatus{flex-wrap:wrap}
+#wildStatus .wildRoster{flex:1 1 100%;flex-wrap:nowrap;gap:4px}
+#wildStatus .wildEntry{flex:1 1 0;min-width:0;gap:4px;padding:3px 4px}
+#wildStatus .wildEntry .av{width:30px;height:30px}
+#wildStatus .wtInfo{min-width:0}
+#wildStatus .wtName,#wildStatus .wtHp{font-size:12px}
+#wildStatus .b4bar{flex:1 1 100%;margin-top:4px}
 #wildStatus .b4bar{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:3px;flex-wrap:wrap}
 .b4hp{font-family:'Jua';font-size:14px;background:rgba(255,255,255,.9);border:2px solid #e8434f;border-radius:10px;padding:0 8px}.b4hp b{color:#e8434f;font-size:17px}
 .b4mates{display:flex;gap:3px;flex-wrap:wrap}.b4m{font-size:11px;font-weight:900;background:#fff;border:2px solid #9fb0d4;border-radius:8px;padding:0 5px;color:#334155}.b4m.me{border-color:#3d7bff;background:#eaf2ff}.b4m.dn{background:#dff6e6;border-color:#3cc47c}
