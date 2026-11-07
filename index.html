@@ -24948,6 +24948,177 @@ window.GF={mount,destroy,genMap,get st(){return ST;}};
 })();
 
 </script>
+<style id="rl-title-css">
+/* ===== 로그라이크 모험 · 타이틀 화면 (새 게임이 시작되는 것처럼 검정 화면 + 메뉴) ===== */
+#rlTitle{--s:3;position:fixed;left:0;right:0;top:var(--vt);height:var(--vh);z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(6,4,14,.96);animation:rltIn .22s ease-out;-webkit-tap-highlight-color:transparent;user-select:none}
+@keyframes rltIn{from{opacity:0}to{opacity:1}}
+#rlTitle .rlt-shell{padding:10px 10px 12px;background:#1d1630;border-radius:18px;box-shadow:inset 0 0 0 2px #5a4a86,0 4px 0 #0c0818,0 0 0 200vmax rgba(6,4,14,.5)}
+#rlTitle .rlt-screen{position:relative;width:calc(var(--s) * 160px);height:calc(var(--s) * 144px);background:#000;overflow:hidden;border-radius:6px;font-family:'Galmuri11','Jua','Noto Sans KR',sans-serif;color:#fff}
+#rlTitle .rlt-cv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;animation:rltFade 1.1s ease-out both}
+@keyframes rltFade{from{opacity:0}40%{opacity:0}to{opacity:1}}
+#rlTitle .rlt-logo{position:absolute;left:0;right:0;top:calc(var(--s) * 7px);text-align:center;line-height:1;animation:rltLogo .9s .35s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes rltLogo{from{opacity:0;transform:translateY(calc(var(--s) * -6px))}to{opacity:1;transform:none}}
+#rlTitle .rlt-logo small{display:block;font-size:calc(var(--s) * 8px);letter-spacing:calc(var(--s) * .6px);color:#ffd23f;text-shadow:0 calc(var(--s) * 1px) 0 #7a4a00}
+#rlTitle .rlt-logo b{display:block;margin-top:calc(var(--s) * 3px);font-family:'Jua','Galmuri11',sans-serif;font-weight:400;font-size:calc(var(--s) * 20px);letter-spacing:calc(var(--s) * 1px);color:#fff7d6;text-shadow:calc(var(--s) * 1px) 0 0 #2b2140,calc(var(--s) * -1px) 0 0 #2b2140,0 calc(var(--s) * -1px) 0 #2b2140,0 calc(var(--s) * 1px) 0 #2b2140,calc(var(--s) * 2px) calc(var(--s) * 2px) 0 #b8283a,calc(var(--s) * 1px) calc(var(--s) * 2px) 0 #b8283a}
+#rlTitle .rlt-logo i{display:block;margin-top:calc(var(--s) * 4px);font-style:normal;font-size:calc(var(--s) * 5.6px);color:#9aa6bd;letter-spacing:calc(var(--s) * 2px)}
+#rlTitle .rlt-menu{position:absolute;left:50%;bottom:calc(var(--s) * 11px);transform:translateX(-50%);width:calc(var(--s) * 104px);padding:calc(var(--s) * 2px) calc(var(--s) * 4px);background:#000;border:calc(var(--s) * 1.6px) solid #fff;border-radius:calc(var(--s) * 2px);box-shadow:0 0 0 calc(var(--s) * 1px) #000,calc(var(--s) * 1px) calc(var(--s) * 1.5px) 0 calc(var(--s) * 1.5px) rgba(255,255,255,.18);animation:rltMenu .5s .9s both}
+@keyframes rltMenu{from{opacity:0;transform:translate(-50%,calc(var(--s) * 4px))}to{opacity:1;transform:translateX(-50%)}}
+#rlTitle .rlt-it{all:unset;box-sizing:border-box;display:block;position:relative;width:100%;padding:calc(var(--s) * 2.4px) 0 calc(var(--s) * 2.4px) calc(var(--s) * 9px);font:inherit;font-size:calc(var(--s) * 8px);line-height:1.15;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#rlTitle .rlt-it .cur{position:absolute;left:calc(var(--s) * 1px);top:calc(var(--s) * 2.4px);visibility:hidden;color:#ffd23f}
+#rlTitle .rlt-it.on{color:#ffd23f}
+#rlTitle .rlt-it.on .cur{visibility:visible;animation:rltBlink .8s steps(2,jump-none) infinite}
+@keyframes rltBlink{50%{opacity:.25}}
+#rlTitle .rlt-it small{display:block;margin-top:calc(var(--s) * 1.2px);font-size:calc(var(--s) * 4.8px);color:#9aa6bd}
+#rlTitle .rlt-it.on small{color:#ffe9a0}
+#rlTitle .rlt-it.off{color:#4a4a58;cursor:default}
+#rlTitle .rlt-it.off small{color:#3e3e4c}
+#rlTitle .rlt-hint{position:absolute;left:0;right:0;bottom:calc(var(--s) * 3px);text-align:center;font-size:calc(var(--s) * 4.2px);color:#6f6a88;animation:rltMenu .5s 1.1s both;transform:none}
+@media (prefers-reduced-motion:reduce){#rlTitle,#rlTitle *{animation-duration:.01s!important;animation-delay:0s!important}}
+</style>
+<script id="rl-title-js">
+/* ===== 로그라이크 모험 진입 방식 =====
+   모험 메뉴 → (크게 보기와 같은 팝업) 검정 타이틀 화면: 새로하기 · 이어하기 · 그만두기
+   새로하기 → 덱 고르기 → 「모험 시작」 → 프롤로그 없이 바로 필드 모험을 전체 화면(크게)으로 시작
+   이어하기 → 진행 중이던 모험을 필드 전체 화면으로 계속 */
+(function(){
+'use strict';
+let ov=null,timer=0,keyH=null,resH=null;
+const gfKeep=()=>{try{window.__gfKeep={t:Date.now(),big:true,y:0};}catch(e){}};
+function closeTitle(){
+ if(timer){clearInterval(timer);timer=0;}
+ if(keyH){window.removeEventListener('keydown',keyH,true);keyH=null;}
+ if(resH){window.removeEventListener('resize',resH);resH=null;}
+ if(ov){ov.remove();ov=null;}
+}
+function fitTitle(){
+ if(!ov)return;
+ const z=(typeof FIT!=='undefined'&&FIT&&FIT.z)||1,vw=innerWidth/z;
+ const vh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh'))||innerHeight/z;
+ const s=Math.min((vw-44)/160,(vh-48)/144);
+ ov.style.setProperty('--s',Math.min(8,Math.max(1.5,Math.floor(s*20)/20)));
+}
+// 검정 바탕 + 반짝이는 별 + 도감 페이지가 날아가는 도트 연출
+function paint(cv){
+ const g=cv.getContext('2d');g.imageSmoothingEnabled=false;
+ let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+ const stars=Array.from({length:44},()=>({x:Math.floor(rnd()*160),y:Math.floor(rnd()*84),p:Math.floor(rnd()*4),b:rnd()<.22}));
+ const pages=Array.from({length:5},(_,i)=>({x:92+i*11+Math.floor(rnd()*4),y:70+Math.floor(rnd()*10),p:i}));
+ let t=0;
+ const draw=()=>{
+  g.fillStyle='#000';g.fillRect(0,0,160,144);
+  stars.forEach(s=>{const on=(t+s.p)%4;if(on===3)return;g.fillStyle=on===0?'#ffffff':'#7d86a8';g.fillRect(s.x,s.y,s.b?2:1,s.b?2:1);});
+  // 멀리 보이는 길과 땅
+  g.fillStyle='#120e22';g.fillRect(0,80,160,2);
+  g.fillStyle='#1b1533';g.fillRect(0,82,160,3);
+  g.fillStyle='#241c45';g.fillRect(62,80,36,2);g.fillRect(58,82,44,1);
+  // 주인공 (도트 시트가 준비돼 있으면)
+  try{const k=window.__RLKIT;if(k&&k.atlas&&k.atlas.complete&&k.atlas.naturalWidth&&k.hero){
+   g.fillStyle='#0d0a1a';g.fillRect(68,80,24,2);
+   g.drawImage(k.atlas,k.hero()*16,0,16,16,64,50,32,32);}}catch(e){}
+  // 보스의 붉은 눈 (가끔 깜빡)
+  if((t%9)<7){g.fillStyle='#ff3b4a';g.fillRect(130,63,3,2);g.fillRect(138,63,3,2);g.fillStyle='#ffb3b8';g.fillRect(131,63,1,1);g.fillRect(139,63,1,1);}
+  // 지워지는 도감 페이지들
+  pages.forEach(p=>{const yy=p.y-((t*2+p.p*3)%22),a=1-((t*2+p.p*3)%22)/22;g.globalAlpha=Math.max(.15,a);g.fillStyle='#f4efe0';g.fillRect(p.x,yy,3,4);g.fillStyle='#c9b98a';g.fillRect(p.x,yy+3,3,1);});
+  g.globalAlpha=1;
+  t++;
+ };
+ draw();return setInterval(draw,420);
+}
+function rlTitle(){
+ closeTitle();
+ const rl=rlMeta(),run=rl.run;
+ // 뒤 화면과 음악은 모험 입구와 같게 맞춰 둬요 (화면은 비워 두고 위에 타이틀을 덮어요)
+ try{rlSetBg('',run?run.bg:(rl.lastBg!=null?rl.lastBg:4));rlShell('',{noRun:true,screen:'scenarioRLEntry'});}catch(e){}
+ const sub=run?`${run.floor||1}층 ${Math.min(run.step+1,RL.steps+1)}단계 · HP ${run.hp}/${run.max}`:'';
+ ov=document.createElement('div');ov.id='rlTitle';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','좌삼몬스터디 로그라이크');
+ ov.innerHTML='<div class="rlt-shell"><div class="rlt-screen"><canvas class="rlt-cv" width="160" height="144"></canvas>'
+  +'<div class="rlt-logo"><small>좌삼몬스터디</small><b>로그라이크</b><i>끝없는 길</i></div>'
+  +'<div class="rlt-menu" role="menu">'
+  +'<button type="button" class="rlt-it" data-a="new" role="menuitem"><span class="cur">▶</span>새로하기</button>'
+  +'<button type="button" class="rlt-it'+(run?'':' off')+'" data-a="cont" role="menuitem" aria-disabled="'+(run?'false':'true')+'"><span class="cur">▶</span>이어하기'+(run?'<small>'+sub+'</small>':'')+'</button>'
+  +'<button type="button" class="rlt-it" data-a="quit" role="menuitem"><span class="cur">▶</span>그만두기</button>'
+  +'</div><div class="rlt-hint">↑↓ 고르기 · Enter 확인 · Esc 그만두기</div></div></div>';
+ document.body.appendChild(ov);
+ fitTitle();resH=()=>fitTitle();window.addEventListener('resize',resH);
+ timer=paint(ov.querySelector('.rlt-cv'));
+ try{sfx('page');}catch(e){}
+ const items=[...ov.querySelectorAll('.rlt-it')],ok=i=>!items[i].classList.contains('off');
+ let sel=run?1:0;
+ const mark=()=>items.forEach((b,i)=>b.classList.toggle('on',i===sel));
+ const move=d=>{let i=sel;for(let n=0;n<items.length;n++){i=(i+d+items.length)%items.length;if(ok(i))break;}if(i!==sel){sel=i;mark();try{sfx('tap');}catch(e){}}};
+ mark();
+ const act=async a=>{
+  if(a==='cont'){
+   if(!run)return;
+   try{sfx('tap');}catch(e){}closeTitle();gfKeep();
+   if(run.cur)rlEnter(run.cur);else rlRenderMap();
+  }else if(a==='new'){
+   try{sfx('tap');}catch(e){}
+   if(run){
+    const ask=await confirmBox('진행 중인 모험이 있어요.<br>새로 시작하면 <b>지금 모험은 포기</b>하고<br>간 만큼의 작은 보상만 받아요.','새로 시작','취소');
+    if(!ask)return;
+    const R=rlRewardCalc(run,false);
+    rlEnd(false,'abandon');
+    try{toast(`🏳️ 포기한 모험 보상 · 경험치 +${R.xp} · 코인 +${R.coins}`);}catch(e){}
+   }
+   closeTitle();RL_SEL=[];rlRenderEntry();
+  }else if(a==='quit'){
+   try{sfx('tap');}catch(e){}closeTitle();scBackToHub();
+  }
+ };
+ items.forEach((b,i)=>{
+  b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'&&ok(i)&&sel!==i){sel=i;mark();}});
+  b.addEventListener('click',e=>{e.stopPropagation();if(!ok(i)){try{toast('진행 중인 모험이 없어요');}catch(er){}return;}sel=i;mark();act(b.dataset.a);});
+ });
+ keyH=e=>{
+  if(!ov)return;
+  const k=e.key;
+  if(k==='ArrowDown'||k==='s'||k==='S'){move(1);}
+  else if(k==='ArrowUp'||k==='w'||k==='W'){move(-1);}
+  else if(k==='Enter'||k===' '||k==='z'||k==='Z'){act(items[sel].dataset.a);}
+  else if(k==='Escape'||k==='x'||k==='X'){act('quit');}
+  else return;
+  e.preventDefault();e.stopImmediatePropagation();
+ };
+ window.addEventListener('keydown',keyH,true);
+}
+window.rlTitle=rlTitle;
+
+// ---- 기존 흐름에 끼워 넣기 ----
+// 1) 로그라이크 모험 메뉴를 들어가면 바로 타이틀 화면
+rlLaunch=function(){const m=S.meta;if(!codeValid()||!m.name||!m.starter)return scLaunch();rlMeta();RL_SEL=[];rlTitle();};
+// 2) 모험 시작 → 프롤로그 없이 바로 필드 모험 전체 화면
+rlPrologue=function(){
+ const run=RUN();if(!run)return;
+ gfKeep();rlSetBg('');
+ try{toast(`🃏 시작 덱 ${run.deck.length}장으로 출발!`);}catch(e){}
+ rlRenderMap();
+};
+// 3) 덱 고르기 화면의 뒤로 가기는 타이틀 화면으로
+const __shell=rlShell;
+rlShell=function(inner,opt){
+ __shell.apply(this,arguments);
+ try{if(opt&&opt.noRun&&opt.screen==='scenarioRLEntry'&&!RUN()&&!document.getElementById('rlTitle')){
+  const b=document.getElementById('rlBack');
+  if(b){b.textContent='← 처음 화면';b.onclick=()=>{try{sfx('tap');}catch(e){}rlTitle();};}}}catch(e){}
+};
+// 4) 모험이 끝난 뒤 「다시 도전」도 타이틀 화면으로
+const __end=rlEnd;
+rlEnd=function(){
+ const r=__end.apply(this,arguments);
+ try{const a=document.getElementById('rlAgain');if(a)a.onclick=()=>{try{sfx('tap');}catch(e){}rlTitle();};}catch(e){}
+ return r;
+};
+// 5) 쉬운 사용법(튜토리얼)은 타이틀을 건너뛰고 모험 입구 화면에서 안내
+const __tut=rlTutorial;
+rlTutorial=function(){
+ closeTitle();
+ try{if(S.screen!=='scenarioRLEntry'||!document.querySelector('#rlStart,#rlResume')){rlMeta();RL_SEL=[];rlRenderEntry();}}catch(e){console.warn('rl tut',e);}
+ return wait(250).then(()=>coach(rlCoachSteps()));
+};
+})();
+</script>
+
 <script id="team2v2">
 /* ===================================================================
    2:2 팀 대전 (친구 대전 → 2:2)
