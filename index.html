@@ -12129,6 +12129,11 @@ function gpCss(){if(document.getElementById('gp-css'))return;const st=document.c
 .gpWrap.castle .gpObj .gpLb,.gpWrap.castle .gpDoorLb{background:rgba(20,18,42,.92)}
 .gpWrap.castle .gpE.gpMonE::before{display:block}
 .gpExt{position:absolute;left:0;top:0;width:100%;height:63.636%;z-index:5;overflow:hidden;pointer-events:none}
+.gpFlash{position:absolute;inset:0;z-index:50;pointer-events:none;background:radial-gradient(ellipse at 20% 15%,#fff,rgba(214,206,255,.85) 55%,rgba(150,130,255,.6));animation:gpFlashK .9s linear forwards}
+.gpFlash canvas{position:absolute;left:10%;top:0;width:18%;height:52%;image-rendering:pixelated;filter:drop-shadow(0 0 6px #c8b6ff)}
+@keyframes gpFlashK{0%{opacity:0}5%{opacity:.95}14%{opacity:.18}24%{opacity:.8}55%{opacity:.1}100%{opacity:0}}
+.gpStage.gpShake{animation:gpShk .55s linear}
+@keyframes gpShk{0%{transform:translate(0,0)}10%{transform:translate(-4px,2px)}22%{transform:translate(4px,-3px)}34%{transform:translate(-3px,-1px)}46%{transform:translate(3px,2px)}62%{transform:translate(-2px,1px)}80%{transform:translate(1px,0)}100%{transform:translate(0,0)}}
 .gpExtBeam{position:absolute;left:22%;right:22%;bottom:0;height:100%;background:linear-gradient(to top,rgba(255,190,215,.6),rgba(255,190,215,0));clip-path:polygon(46% 100%,54% 100%,100% 0,0 0);animation:gpBeamP 1.6s ease-in-out infinite alternate}
 @keyframes gpBeamP{from{opacity:.5}to{opacity:1}}
 .gpCastle{position:absolute;inset:0;z-index:870;pointer-events:none;overflow:hidden}
@@ -13591,8 +13596,8 @@ function castleIntro(){
   const E=(7/11*100).toFixed(3),TR='transform 4.8s cubic-bezier(.5,0,.25,1)';
   [cv,ent].forEach(n=>{n.style.transition='none';n.style.transform='translateY('+E+'%)';});
   wrap.style.transition='none';wrap.style.transform='translateY(0)';void el.offsetHeight;
-  let done=false,tm=0;
-  const finish=()=>{if(done)return;done=true;clearTimeout(tm);el.removeEventListener('pointerdown',sk,true);window.removeEventListener('keydown',kk,true);
+  let done=false,tm=0,tt=0;
+  const finish=()=>{if(done)return;done=true;clearTimeout(tm);clearTimeout(tt);el.querySelectorAll('.gpFlash').forEach(e=>e.remove());el.classList.remove('gpShake');el.removeEventListener('pointerdown',sk,true);window.removeEventListener('keydown',kk,true);
    [cv,ent].forEach(n=>{n.style.transition='none';n.style.transform='';});wrap.remove();
    if(!GP||!GP.open)return;GP.busy=false;try{S.meta.castleSeen=1;autoSave();}catch(e){}
    const tc=document.createElement('div');tc.className='gpTitle';tc.innerHTML='<b>'+th.emoji+' '+th.out.title+'</b><small>'+th.out.sub+'</small>';GP.el.appendChild(tc);setTimeout(()=>tc.remove(),2300);};
@@ -13601,6 +13606,15 @@ function castleIntro(){
   el.addEventListener('pointerdown',sk,true);window.addEventListener('keydown',kk,true);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{if(done)return;[cv,ent,wrap].forEach(n=>{n.style.transition=TR;});cv.style.transform=ent.style.transform='translateY(0)';wrap.style.transform='translateY(-100%)';}));
   tm=setTimeout(finish,5300);
+  const thunder=()=>{if(done||!GP||!GP.open)return;
+   const f=document.createElement('div');f.className='gpFlash';const bc=document.createElement('canvas');bc.width=24;bc.height=48;const g=bc.getContext('2d');
+   const pts=[[14,0],[9,10],[15,16],[7,28],[13,33],[4,47]];
+   for(let i=0;i<pts.length-1;i++){const [ax,ay]=pts[i],[bx,by]=pts[i+1],n=Math.max(Math.abs(bx-ax),Math.abs(by-ay));for(let t=0;t<=n;t++){const x=Math.round(ax+(bx-ax)*t/n),y=Math.round(ay+(by-ay)*t/n);g.fillStyle='rgba(190,170,255,.55)';g.fillRect(x-2,y,5,1);g.fillStyle='#ffffff';g.fillRect(x-1,y,2,1);}}
+   for(let t=0;t<9;t++){g.fillStyle='rgba(190,170,255,.5)';g.fillRect(15+t,16+t,3,1);g.fillStyle='#fff';g.fillRect(16+t,16+t,1,1);}
+   f.appendChild(bc);el.appendChild(f);el.classList.add('gpShake');
+   try{if(S.meta.settings.sound){noise(.16,.34,7000,0);tone(70,1.4,'sine',.3,.05,26);noise(1.6,.3,260,.28);noise(1.1,.18,170,.95);}}catch(e){}
+   setTimeout(()=>{f.remove();el.classList.remove('gpShake');},1000);};
+  tt=setTimeout(thunder,1400);
  }catch(e){try{GP.busy=false;}catch(_){}}}
 function gpCastleFx(th){
  if(!GP||!GP.el)return;GP.el.querySelectorAll('.gpCastle').forEach(e=>e.remove());if(!th.castle)return;
@@ -13639,12 +13653,12 @@ function gpOpen(gi,resume){
  w.innerHTML=`<div class=gpBox><div class=gpHead><h3 id=gpTt></h3><button type=button tabindex=-1 class="gpChip gpChipB" id=gpC1>🃏 덱</button><button type=button tabindex=-1 class="gpChip gpChipB" id=gpC2>🛡️ 스킬</button><button class=gpX id=gpX aria-label=닫기>✕</button></div>
  <div class=gpStage id=gpStage><canvas id=gpCv width=${GP_C*GP_T} height=${GP_R*GP_T}></canvas><div class=gpEnt id=gpEnt></div><div class=gpFade id=gpFade></div><div class="gf-box" id=gpBx><span id=gpTx></span><i class="gf-more" id=gpMore>▼</i></div><div class="gf-menu" id=gpMn></div></div>
  <div class="gf-pad"><div class="gf-joy" id=gpJoy aria-label="이동 조이스틱"><span class="ja u">▲</span><span class="ja d">▼</span><span class="ja l">◀</span><span class="ja r">▶</span><div class="gf-knob"></div></div><div class="gf-ab"><button data-k="b">B</button><button data-k="a">A</button></div></div>
- <div class=gpHint><span class=pc>방향키·WASD 이동 · 스페이스/Enter/Z 말 걸기·확인 · X/Esc 취소 · </span>터치는 왼쪽 조이스틱, 화면을 톡 누르면 그 자리까지 자동 이동, 꾹 누른 채 끌면 그 방향으로 걸어요</div></div>`;
+ <div class=gpHint><span class=pc>방향키·WASD 이동 · 스페이스/Enter/Z 말 걸기·확인 · X/Esc 취소 · </span>터치는 아래 빈 공간 아무 데나 눌러 조이스틱, 화면을 톡 누르면 그 자리까지 자동 이동, 꾹 누른 채 끌면 그 방향으로 걸어요</div></div>`;
  document.body.appendChild(w);
  GP.box=w.querySelector('.gpBox');GP.cv=$('#gpCv');GP.el=$('#gpStage');GP.ent=$('#gpEnt');GP.bx=$('#gpBx');GP.tx=$('#gpTx');GP.mo=$('#gpMore');GP.mn=$('#gpMn');
  const fitBox=()=>{try{if(!GP||!GP.box)return;const z=(typeof FIT!=='undefined'&&FIT&&FIT.z)||1,vh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh'))||innerHeight/z,vw=innerWidth/z;
   const hh=s=>{const e=GP.box.querySelector(s);return e&&getComputedStyle(e).display!=='none'?e.offsetHeight:0;};
-  const pd=GP.box.querySelector('.gf-pad'),padH=pd&&getComputedStyle(pd).position==='fixed'?0:hh('.gf-pad');
+  const pd=GP.box.querySelector('.gf-pad'),padH=pd&&getComputedStyle(pd).position==='fixed'?0:150;
   const used=hh('.gpHead')+padH+hh('.gpHint')+30,w=Math.floor((vh-used)*13/11);
   GP.box.style.width=w>=vw?'100%':Math.max(220,w)+'px';}catch(e){}};
  const fit=()=>{fitBox();if(GP&&GP.el){GP.el.style.setProperty('--tw',(GP.el.clientWidth/GP_C)+'px');GP.box.style.setProperty('--gs',(GP.el.clientWidth/160).toFixed(3));try{gpMonRefit();}catch(e){}}};
@@ -14043,19 +14057,8 @@ function gpKu(e){if(!GP||!GP.open)return;if(e.key in GP_KM)gpSetHeld(GP_KM[e.key
 // ---------- 입력: 조이스틱 · A/B · 화면 터치(끌기 / 톡 누르기) ----------
 function gpBindInput(w){
  w.querySelectorAll('.gf-ab button').forEach(b=>{const k=b.dataset.k;b.addEventListener('pointerdown',ev=>{ev.preventDefault();ev.stopPropagation();if(k==='a')gpAction();else gpBack();});b.addEventListener('contextmenu',e=>e.preventDefault());});
- const joy=w.querySelector('#gpJoy'),knob=joy.querySelector('.gf-knob');let jid=null,jdir=-1,jax='';
- const knobTo=(x,y)=>{knob.style.setProperty('--jx',x+'px');knob.style.setProperty('--jy',y+'px');};
- const jset=d=>{if(d===jdir)return;if(jdir>=0)gpSetHeld(jdir,false);jdir=d;joy.dataset.d=d<0?'':String(d);
-  if(d>=0){if(GP.D.state==='menu')gpMoveMenu(d===0||d===3?1:-1);else if(!GP.D.on)gpSetHeld(d,true);}};
- const jmove=ev=>{const r=joy.getBoundingClientRect(),R=r.width/2,dx=ev.clientX-(r.left+R),dy=ev.clientY-(r.top+R),ax=Math.abs(dx),ay=Math.abs(dy),lim=R*.5,len=Math.hypot(dx,dy),k=len>lim?lim/len:1;
-  knobTo(dx*k,dy*k);
-  if(len<R*.18){jax='';jset(-1);return;}
-  if(jax==='x'&&ay>ax*1.15)jax='y';else if(jax==='y'&&ax>ay*1.15)jax='x';else if(!jax)jax=ax>=ay?'x':'y';
-  jset(jax==='x'?(dx<0?2:3):(dy<0?1:0));};
- const jend=ev=>{if(jid===null||(ev&&ev.pointerId!==undefined&&ev.pointerId!==jid))return;jid=null;jax='';jset(-1);knobTo(0,0);joy.classList.remove('on');};
- joy.addEventListener('pointerdown',ev=>{ev.preventDefault();if(jid!==null)return;jid=ev.pointerId;joy.classList.add('on');try{joy.setPointerCapture(ev.pointerId);}catch(e){}jmove(ev);});
- joy.addEventListener('pointermove',ev=>{if(ev.pointerId===jid){ev.preventDefault();jmove(ev);}});
- joy.addEventListener('pointerup',jend);joy.addEventListener('pointercancel',jend);joy.addEventListener('lostpointercapture',jend);joy.addEventListener('contextmenu',e=>e.preventDefault());
+ {const joy=w.querySelector('#gpJoy'),pad=w.querySelector('.gf-pad');let pj=-1;
+  gfFloatJoy(pad,joy,d=>{if(pj>=0)gpSetHeld(pj,false);pj=d;if(d>=0){if(GP.D.state==='menu')gpMoveMenu(d===0||d===3?1:-1);else if(!GP.D.on)gpSetHeld(d,true);}},()=>{if(GP.D.on&&GP.D.state!=='menu')gpAdvance();});}
  const cv=GP.cv;let gid=null,sx0=0,sy0=0,ax=0,ay=0,mode='',gdir=-1,gax='';
  const tileAt=ev=>{const r=cv.getBoundingClientRect();return [Math.floor((ev.clientX-r.left)/r.width*GP_C),Math.floor((ev.clientY-r.top)/r.height*GP_R)];};
  const gset=d=>{if(d===gdir)return;if(gdir>=0)gpSetHeld(gdir,false);gdir=d;if(d>=0&&!GP.D.on&&!GP.busy)gpSetHeld(d,true);};
@@ -14074,7 +14077,7 @@ function gpBindInput(w){
  GP.blur=()=>{if(GP){GP.held.length=0;}};window.addEventListener('blur',GP.blur);}
 // ---------- 대사창 (필드 모험과 같은 상자 · 한 글자씩 · ▼ · ▶ 메뉴) ----------
 function gpSay(pages,opt){const D=GP.D;D.on=true;D.pages=pages.slice();D.pi=0;D.opt=opt||{};D.sel=0;gpShowPage();sfx('tap');}
-function gpShowPage(){const D=GP.D;D.ch=Array.from(D.pages[D.pi]||'');D.shown=0;D.lastN=-1;D.state='type';GP.bx.style.display='block';GP.mn.style.display='none';GP.mo.style.visibility='hidden';GP.tx.textContent='';}
+function gpShowPage(){const D=GP.D;D.ch=Array.from(D.pages[D.pi]||'');D.shown=0;D.lastN=-1;D.state='type';GP.bx.style.display='block';GP.mn.style.display='none';GP.mo.style.visibility='hidden';GP.tx.textContent='';gfSizeBox(GP.bx,GP.tx,D.ch.join(''));}
 function gpCloseDlg(cb){const D=GP.D;D.on=false;D.state='';GP.bx.style.display='none';GP.mn.style.display='none';if(cb)cb();}
 function gpOpenMenu(){const D=GP.D;D.state='menu';D.sel=0;GP.mn.innerHTML=D.opt.menu.map((l,i)=>'<div data-i="'+i+'"'+(i===0?' class="on"':'')+'>'+esc(l)+'</div>').join('');GP.mn.style.display='block';
  GP.mn.querySelectorAll('div').forEach(d=>{d.addEventListener('pointerdown',ev=>ev.stopPropagation());d.onclick=ev=>{ev.stopPropagation();D.sel=+d.dataset.i;gpPickMenu();};});}
@@ -23760,7 +23763,64 @@ body.gfBig .gf-help{display:none}body.gfBig #bq{z-index:75}
 @keyframes gfBigIn{from{opacity:.4;transform:translate(-50%,-50%) scale(.92)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 .gf-help{margin:10px auto 0;max-width:calc(var(--gs)*160px + 8px);font-size:13px;line-height:1.6;color:var(--mut);text-align:center}
 @media (hover:hover) and (pointer:fine){.gf-pad{opacity:.85}}
+/* 대사창: 글이 길면 높이가 자동으로 늘어나요 (JS가 --gbh 를 맞춰 줘요). 글자가 잘리지 않아요 */
+.gf-box{height:var(--gbh,calc(var(--gs)*40px));max-height:calc(var(--gs)*86px);padding-bottom:calc(var(--gs)*6px);padding-right:calc(var(--gs)*15px);overflow-y:auto;overscroll-behavior:contain}
+.gf-menu{bottom:calc(var(--gbh,calc(var(--gs)*40px)) + var(--gs)*2px)}
+/* 떠 있는 조이스틱: 아래 빈 공간 아무 데나 손가락을 대면 거기에 조이스틱이 생겨요 */
+.gf-pad.gf-fl{position:relative;display:block;width:100%;max-width:none;height:150px;margin:8px 0 0;opacity:1}
+.gf-zone{position:absolute;inset:0;box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;border-radius:18px;background:rgba(143,136,176,.12);border:2px dashed rgba(143,136,176,.4)}
+.gf-zone::after{content:'👆 아무 데나\A눌러서 이동';white-space:pre;position:absolute;left:150px;right:140px;top:50%;transform:translateY(-50%);text-align:center;font-size:12px;line-height:1.5;color:rgba(143,136,176,.95);pointer-events:none;transition:opacity .15s}
+.gf-zone.act::after{opacity:0}
+.gf-zone .gf-joy{position:absolute;left:var(--fx,80px);top:var(--fy,50%);transform:translate(-50%,-50%);opacity:.55;transition:opacity .12s;cursor:default}
+.gf-zone .gf-joy.on{opacity:1}
+.gf-pad.gf-fl .gf-ab{position:absolute;right:16px;top:50%;margin:0;transform:translateY(-50%) rotate(-14deg);z-index:2}
+.gpBox .gf-pad.gf-fl{flex:1 1 auto;min-height:150px;height:auto;width:auto;margin:6px 8px 8px}
+@media (orientation:landscape) and (max-height:520px){
+ .gpBox .gf-pad.gf-fl{position:fixed;left:0;right:0;top:auto;bottom:0;width:auto;height:72%;min-height:0;margin:0;padding:0;pointer-events:none;z-index:5;flex:none}
+ .gpBox .gf-pad.gf-fl .gf-zone{right:auto;width:46%;pointer-events:auto;background:rgba(143,136,176,.08)}
+ .gpBox .gf-pad.gf-fl .gf-ab{pointer-events:auto;right:max(16px,env(safe-area-inset-right));top:auto;bottom:18px;transform:rotate(-14deg)}
+}
 </style>
+<script id="float-joy-js">
+/* 대사창 높이 자동 맞춤 + 떠 있는 조이스틱 (체육관 · 로그라이크 필드 공용) */
+function gfSizeBox(box,txt,full){
+ try{const host=box.parentNode;if(!host)return;
+  txt.textContent=full;
+  box.style.height='calc(var(--gs)*40px)';box.style.maxHeight='none';const ref=box.offsetHeight;
+  box.style.height='auto';const need=box.offsetHeight;
+  box.style.height='';box.style.maxHeight='';
+  if(ref>0&&need>0){const n=Math.min(86,Math.max(40,Math.ceil(need/ref*40)+1));host.style.setProperty('--gbh','calc(var(--gs)*'+n+'px)');}
+  box.scrollTop=0;
+ }catch(e){}
+ try{txt.textContent='';}catch(e){}
+}
+function gfFloatJoy(pad,joy,onDir,onTap){
+ if(!pad||!joy||joy.dataset.fl)return;joy.dataset.fl='1';
+ const knob=joy.querySelector('.gf-knob'),zone=document.createElement('div');
+ zone.className='gf-zone';pad.classList.add('gf-fl');pad.insertBefore(zone,pad.firstChild);zone.appendChild(joy);
+ let jid=null,jdir=-1,jax='',ox=0,oy=0,sx=0,sy=0,t0=0,moved=false;
+ const knobTo=(x,y)=>{if(!knob)return;knob.style.setProperty('--jx',x+'px');knob.style.setProperty('--jy',y+'px');};
+ const jset=d=>{if(d===jdir)return;jdir=d;joy.dataset.d=d<0?'':String(d);try{onDir(d);}catch(e){}};
+ const home=()=>{joy.style.removeProperty('--fx');joy.style.removeProperty('--fy');};
+ const cl=(v,lo,hi)=>hi<lo?(lo+hi)/2:Math.min(hi,Math.max(lo,v));
+ const place=ev=>{const zr=zone.getBoundingClientRect(),R=joy.getBoundingClientRect().width/2;
+  ox=cl(ev.clientX,zr.left+R,zr.right-R);oy=cl(ev.clientY,zr.top+R,zr.bottom-R);
+  joy.style.setProperty('--fx',((ox-zr.left)/zr.width*100).toFixed(2)+'%');joy.style.setProperty('--fy',((oy-zr.top)/zr.height*100).toFixed(2)+'%');};
+ const jmove=ev=>{const R=joy.getBoundingClientRect().width/2,dx=ev.clientX-ox,dy=ev.clientY-oy,ax=Math.abs(dx),ay=Math.abs(dy),lim=R*.5,len=Math.hypot(dx,dy),k=len>lim?lim/len:1;
+  knobTo(dx*k,dy*k);
+  if(len<R*.18){jax='';jset(-1);return;}
+  if(jax==='x'&&ay>ax*1.15)jax='y';else if(jax==='y'&&ax>ay*1.15)jax='x';else if(!jax)jax=ax>=ay?'x':'y';
+  jset(jax==='x'?(dx<0?2:3):(dy<0?1:0));};
+ const jend=ev=>{if(jid===null||(ev&&ev.pointerId!==undefined&&ev.pointerId!==jid))return;
+  const tap=!!ev&&ev.type==='pointerup'&&!moved&&Date.now()-t0<300;
+  jid=null;jax='';jset(-1);knobTo(0,0);joy.classList.remove('on');zone.classList.remove('act');home();
+  if(tap&&onTap){try{onTap();}catch(e){}}};
+ zone.addEventListener('pointerdown',ev=>{ev.preventDefault();if(jid!==null)return;jid=ev.pointerId;sx=ev.clientX;sy=ev.clientY;t0=Date.now();moved=false;
+  place(ev);joy.classList.add('on');zone.classList.add('act');try{zone.setPointerCapture(ev.pointerId);}catch(e){}jmove(ev);});
+ zone.addEventListener('pointermove',ev=>{if(ev.pointerId!==jid)return;ev.preventDefault();if(Math.hypot(ev.clientX-sx,ev.clientY-sy)>10)moved=true;jmove(ev);});
+ zone.addEventListener('pointerup',jend);zone.addEventListener('pointercancel',jend);zone.addEventListener('lostpointercapture',jend);zone.addEventListener('contextmenu',e=>e.preventDefault());
+}
+</script>
 <script id="field-mode-js">
 /* ===== 필드 모험 · 포켓몬 골드풍 도트 맵 =====
    분기점 선택 화면(rlRenderMap)만 '걸어 다니는 맵'으로 바꿔요.
@@ -24428,7 +24488,7 @@ function mount(run){
  const wrap=document.createElement('div');wrap.className='gf-wrap';
  wrap.innerHTML='<div class="gf-frame"><canvas id="gfCv" width="640" height="576"></canvas><div class="gf-tools"><button type="button" tabindex="-1" class="gf-big" id="gfBig">🖥 크게</button><button type="button" tabindex="-1" class="gf-zoom" id="gfZoom">확대 ×1</button></div><div class="gf-box" id="gfBox"><span id="gfTxt"></span><i class="gf-more" id="gfMore">▼</i></div><div class="gf-menu" id="gfMenu"></div></div>'+
   '<div class="gf-pad"><div class="gf-joy" id="gfJoy" aria-label="이동 조이스틱"><span class="ja u">▲</span><span class="ja d">▼</span><span class="ja l">◀</span><span class="ja r">▶</span><div class="gf-knob"></div></div><div class="gf-ab"><button data-k="b">B</button><button data-k="a">A</button></div></div>'+
-  '<p class="gf-help">방향키·WASD 이동 · Z/Enter/Space 말 걸기·확인 · X/Esc 취소 · +/- 확대<br>🖥 크게: 필드 창을 화면에 꽉 차게 키워요 · 터치는 왼쪽 조이스틱, 또는 화면을 톡 누르면 그 자리까지 자동 이동 · 꾹 누른 채 끌면 그 방향으로 걸어요! 길을 따라 걷다 보면 분기점이 기다리고 있어요.<br>🏺 아래쪽 샛길의 보물상자는 내 유물 · 📖 도감은 내 덱 포켓몬! 말을 걸어 보세요.</p>';
+  '<p class="gf-help">방향키·WASD 이동 · Z/Enter/Space 말 걸기·확인 · X/Esc 취소 · +/- 확대<br>🖥 크게: 필드 창을 화면에 꽉 차게 키워요 · 터치는 필드 아래 빈 공간 아무 데나 눌러서 조이스틱, 또는 화면을 톡 누르면 그 자리까지 자동 이동 · 꾹 누른 채 끌면 그 방향으로 걸어요! 길을 따라 걷다 보면 분기점이 기다리고 있어요.<br>🏺 아래쪽 샛길의 보물상자는 내 유물 · 📖 도감은 내 덱 포켓몬! 말을 걸어 보세요.</p>';
  holder.replaceWith(wrap);
  const note=q('#view .rl-mapcard .sc-note');if(note)note.style.display='none';
  const cv=q('#gfCv'),g=cv.getContext('2d'),box=q('#gfBox'),txt=q('#gfTxt'),more=q('#gfMore'),menuEl=q('#gfMenu');
@@ -24569,7 +24629,7 @@ function mount(run){
  const setHeld=(d,on)=>{const i=held.indexOf(d);if(on){if(i<0){held.push(d);just=true;pend=d;}}else if(i>=0)held.splice(i,1);};
  const curDir=()=>held.length?held[held.length-1]:-1;
  function say(pages,opt){D.on=true;D.pages=pages.slice();D.pi=0;D.opt=opt||{};D.sel=0;showPage();sfx('tap');}
- function showPage(){D.full=D.pages[D.pi]||'';D.shown=0;D.lastN=-1;D.state='type';box.style.display='block';menuEl.style.display='none';more.style.visibility='hidden';txt.textContent='';}
+ function showPage(){D.full=D.pages[D.pi]||'';D.shown=0;D.lastN=-1;D.state='type';box.style.display='block';menuEl.style.display='none';more.style.visibility='hidden';txt.textContent='';gfSizeBox(box,txt,D.full);}
  function closeDlg(cb){D.on=false;D.state='';box.style.display='none';menuEl.style.display='none';if(cb)cb();}
  function openMenu(){D.state='menu';D.sel=0;menuEl.innerHTML=D.opt.menu.map((l,i)=>'<div data-i="'+i+'"'+(i===0?' class="on"':'')+'>'+esc(l)+'</div>').join('');menuEl.style.display='block';
   menuEl.querySelectorAll('div').forEach(d=>{d.onclick=ev=>{ev.stopPropagation();D.sel=+d.dataset.i;pickMenu();};});}
@@ -24866,21 +24926,8 @@ function mount(run){
   b.addEventListener('pointerdown',dn);b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);b.addEventListener('contextmenu',e=>e.preventDefault());});
 
  // 조이스틱: 가장 크게 기울인 축 하나만 써서 상하좌우로만 움직여요 (대각선 없음)
- {const joy=wrap.querySelector('#gfJoy'),knob=joy&&joy.querySelector('.gf-knob');
-  if(joy){let jid=null,jdir=-1,jax='';
-   const knobTo=(x,y)=>{knob.style.setProperty('--jx',x+'px');knob.style.setProperty('--jy',y+'px');};
-   const jset=d=>{if(d===jdir)return;if(jdir>=0)setHeld(jdir,false);jdir=d;joy.dataset.d=d<0?'':String(d);
-    if(d>=0){if(D.state==='menu')moveMenu(d===0||d===3?1:-1);else if(!D.on)setHeld(d,true);}};
-   const jmove=ev=>{const r=joy.getBoundingClientRect(),R=r.width/2,dx=ev.clientX-(r.left+R),dy=ev.clientY-(r.top+R),ax=Math.abs(dx),ay=Math.abs(dy),lim=R*.5,len=Math.hypot(dx,dy),k=len>lim?lim/len:1;
-    knobTo(dx*k,dy*k); // 손잡이는 손가락을 따라 자유롭게 움직여요(방향 판정은 상하좌우)
-    if(len<R*.18){jax='';jset(-1);return;} // 살짝만 기울여도 바로 반응
-    if(jax==='x'&&ay>ax*1.15)jax='y';else if(jax==='y'&&ax>ay*1.15)jax='x';else if(!jax)jax=ax>=ay?'x':'y';
-    jset(jax==='x'?(dx<0?2:3):(dy<0?1:0));};
-   const jend=ev=>{if(jid===null||(ev&&ev.pointerId!==undefined&&ev.pointerId!==jid))return;jid=null;jax='';jset(-1);knobTo(0,0);joy.classList.remove('on');};
-   joy.addEventListener('pointerdown',ev=>{ev.preventDefault();if(jid!==null)return;jid=ev.pointerId;joy.classList.add('on');try{joy.setPointerCapture(ev.pointerId);}catch(e){}jmove(ev);});
-   joy.addEventListener('pointermove',ev=>{if(ev.pointerId===jid){ev.preventDefault();jmove(ev);}});
-   joy.addEventListener('pointerup',jend);joy.addEventListener('pointercancel',jend);joy.addEventListener('lostpointercapture',jend);joy.addEventListener('contextmenu',e=>e.preventDefault());
-  }}
+ {const joy=wrap.querySelector('#gfJoy'),pad=wrap.querySelector('.gf-pad');let pj=-1;
+  gfFloatJoy(pad,joy,d=>{if(pj>=0)setHeld(pj,false);pj=d;if(d>=0){if(D.state==='menu')moveMenu(d===0||d===3?1:-1);else if(!D.on)setHeld(d,true);}},()=>{if(D.on&&D.state!=='menu')advance();});}
  // 터치 이동: ① 화면 어디든 손가락을 대고 끌면 그 방향으로 계속 걸어요(떠 있는 조이스틱) ② 한 번 톡 누르면 그 칸까지 자동으로 걸어가요(사물·사람이면 옆까지 가서 말 걸기)
  function ptalk0(e){const dx=e.x-p.x,dy=e.y-p.y;return Math.abs(dx)>=Math.abs(dy)?(dx<0?2:3):(dy<0?1:0);}
  function tileAt(ev){const r=cv.getBoundingClientRect();return [Math.floor((CAM.x+(ev.clientX-r.left)/r.width*VW)/T),Math.floor((CAM.y+(ev.clientY-r.top)/r.height*VH)/T)];}
