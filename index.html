@@ -11702,24 +11702,25 @@ GP_THEMES[3]={key:'forest',cls:'forest',forest:1,noSign:1,emoji:'🌳',
     "tww,.....,wwt",
     "tww,.....,wwt",
     "ttttttttttttt"]},
-  in:{title:'숲 체육관',sub:'관장이 숲 한가운데서 기다리고 있어요',start:[6,9],
+  in:{title:'숲 체육관',sub:'반딧불이의 빛 순서를 기억해요',start:[6,9],
+   puz4:{shrooms:[[3,8,'#ff5a6a'],[5,8,'#ffd23f'],[7,8,'#5ab4ff'],[9,8,'#c37aff']],stump:[5,9],gate:[6,5]},
    map:[
     "WWWWWWWWWWWWW",
     "MMNMMMMMMMNMM",
     "Pk....r....kP",
     "RR....r....RR",
     "R,....r....,R",
-    "wwwwwwbwwwwww",
+    "wwwwwwTwwwwww",
     "R,....r....,R",
     "RR.t..r..t.RR",
     "RR....r....RR",
-    "R,.k..r..k.,R",
+    "R,.t..r..t.,R",
     "WWWWWWDWWWWWW"]},
   objs:[
    {id:'deck',x:4,y:6,ic:'🃏',label:'덱 짜기',col:'#ffe066'},
    {id:'skill',x:8,y:6,ic:'🛡️',label:'트레이너 스킬',col:'#9df0a0'}],
   monsOut:[[69,2,5],[46,10,6],[102,3,9],[12,9,7]],
-  monsIn:[[69,3,2],[46,9,2],[114,2,4],[12,10,6],[102,3,8]],
+  monsIn:[[69,3,2],[46,9,2],[114,2,4],[12,10,6],[102,10,8]],
   leader:{x:6,y:2,partner:43,px:7,py:2,look:{hair:'#3fae5a',skin:'#f6d3b0',top:'#4ea04a',pants:'#8a5a2a',shoe:'#6b4a2a',cap:'#2f8f4e',brim:'#1f6a38',long:1,band:'#ffe066'}},
   talk:{
    first:['어서 와, 도전자! 나는 숲 체육관 관장 {n}이야. 🌳','여기선 모든 게 천천히 자란단다. 포켓몬도, 트레이너도 말이야.','광합성으로 힘을 모으고 쑥쑥 자라나는 포켓몬들, 쉽게 쓰러지지 않을걸?','덱이랑 트레이너 스킬은 점검했니? 준비됐다면 승부해 보자!'],
@@ -11777,25 +11778,25 @@ GP_THEMES[4]={key:'mist',cls:'mist',mist:1,fog:1,noSign:1,emoji:'🌫️',
     "twww.....wwwt",
     "tww,.....,wwt",
     "ttttttttttttt"]},
-  in:{title:'안개 체육관',sub:'짙은 안개 속에서 관장을 찾아요',start:[6,9],
+  in:{title:'안개 체육관',sub:'짙은 안개 속에서 길을 잃지 말아요',start:[6,9],puz5:1,
    map:[
     "WWWWWWWWWWWWW",
     "MMNMMMMMMMNMM",
     "Pk....r....kP",
-    "RR....r....RR",
-    "RR.....RRRRRR",
-    "RR.RRRRRRRRRR",
-    "RR.........RR",
+    "RR..x......RR",
     "RRRRRRRRRR.RR",
-    "RRRRRR.....RR",
-    "RR.w.....w.RR",
+    "RR.......R.RR",
+    "RR.RRRRR.R.RR",
+    "RR.R..x....RR",
+    "RR.RRRRRRR.RR",
+    "RR.....R..xRR",
     "WWWWWWDWWWWWW"]},
   objs:[
    {id:'deck',x:4,y:6,ic:'🃏',label:'덱 짜기',col:'#e0c2ff'},
    {id:'skill',x:8,y:6,ic:'🛡️',label:'트레이너 스킬',col:'#a8f0d6'}],
   swimOut:[[109,2,8],[200,10,8]],
   monsOut:[[92,3,6],[41,9,6]],
-  monsIn:[[41,3,3],[200,9,3],[88,2,9],[109,10,9]],
+  monsIn:[[41,3,2],[200,9,2],[88,4,2],[109,8,2]],
   leader:{x:6,y:2,partner:93,px:7,py:2,look:{hair:'#b07cff',skin:'#f6dcc8',top:'#5a3a8a',pants:'#2a2040',shoe:'#1a1428',cap:'#6b3fa0',brim:'#4a2a78',long:1,band:'#ffd1ff'}},
   talk:{
    first:['후후… 안개 속에서 길을 잃지 않고 잘도 왔네. 나는 안개 체육관 관장 {n}야. 🌫️','독과 유령은 보이지 않는 곳에서 슬금슬금 다가오지… 조심하는 게 좋을 거야.','덱이랑 트레이너 스킬은 점검했어? 준비됐다면… 안개 속에서 승부하자!'],
@@ -11815,25 +11816,25 @@ GP_THEMES[5]={key:'dream',cls:'dream',dream:1,noSign:1,emoji:'🔮',
     "tww,.....,wwt",
     "tww,.....,wwt",
     "ttttttttttttt"]},
-  in:{title:'환상 체육관',sub:'무지갯빛 카펫 끝에서 관장이 기다려요',start:[6,9],
+  in:{title:'환상 체육관',sub:'거울 너머로 이어지는 꿈의 발판을 찾아요',start:[6,9],puz6:1,
    map:[
     "WWWWWWWWWWWWW",
     "MMNMMMNMMMNMM",
     "Pk....r....kP",
-    "Y..z..r..z..Y",
-    "Y.....r.....Y",
-    "Y.zz..r..zz.Y",
-    "Y.....r.....Y",
-    "Y..z..r..z..Y",
-    "Y.....r.....Y",
-    "Y.k...r...k.Y",
+    "Y..z..r....%Y",
+    "YYYYYYYYYYYYY",
+    "Y.#...r.&...Y",
+    "Y...%z.....@Y",
+    "YYYYYYYYYYYYY",
+    "Y..@..r..#..Y",
+    "Y$....r...&$Y",
     "WWWWWWDWWWWWW"]},
   objs:[
    {id:'deck',x:4,y:4,ic:'🃏',label:'덱 짜기',col:'#ffb3e6'},
    {id:'skill',x:8,y:4,ic:'🛡️',label:'트레이너 스킬',col:'#b3e6ff'}],
   swimOut:[[196,2,8],[63,10,9]],
   monsOut:[[35,3,6],[39,9,6]],
-  monsIn:[[35,2,4],[39,10,4],[64,2,8],[122,10,8]],
+  monsIn:[[35,3,2],[39,9,2],[64,4,2],[122,8,2]],
   leader:{x:6,y:2,partner:65,px:7,py:2,look:{hair:'#ff9ad5',skin:'#ffe4d4',top:'#c9a6ff',pants:'#6a4aa8',shoe:'#ffffff',cap:'#ffb3e6',brim:'#ff8ad0',long:1,band:'#ffffff'}},
   talk:{
    first:['어서 와요, 꿈꾸는 도전자님. 나는 환상 체육관 관장 {n}예요. 🔮','여기선 카드가 춤추고, 상처는 반짝이는 빛 속에서 스르르 사라져요.','덱이랑 트레이너 스킬은 챙겼나요? 환상이 깨지기 전에… 승부해요!'],
@@ -11853,16 +11854,16 @@ GP_THEMES[6]={key:'fire',cls:'fire',fire:1,noSign:1,emoji:'🔥',
     "tww,.....,wwt",
     "tww,.....,wwt",
     "ttttttttttttt"]},
-  in:{title:'불꽃 체육관',sub:'용암이 끓는 대장간 끝에서 관장이 기다려요',start:[6,9],
+  in:{title:'불꽃 체육관',sub:'가라앉는 돌 발판으로 용암을 건너요',start:[6,9],puz7:{gate:'G',gy:3,need:3},
    map:[
     "WWWWWWWWWWWWW",
     "MMNMMMNMMMNMM",
     "Pk....r....kP",
-    "w..A..r..A..w",
-    "w.....r.....w",
-    "w..k..r..k..w",
-    "w.....r.....w",
-    "w..A..r..A..w",
+    "wGGGGGGGGGGGw",
+    "w^~~^^^^~~~^w",
+    "w~!^~^^^^~!^w",
+    "w~^^^^^~^^^^w",
+    "w~^^^^^~~~!^w",
     "w.....r.....w",
     "w.k...r...k.w",
     "WWWWWWDWWWWWW"]},
@@ -11872,7 +11873,7 @@ GP_THEMES[6]={key:'fire',cls:'fire',fire:1,noSign:1,emoji:'🔥',
   swimOut:[[219,2,8],[218,10,9]],
   monsOut:[[77,3,7],[58,9,7]],
   swimIn:[[219,0,5],[218,12,7]],
-  monsIn:[[77,2,4],[58,10,4],[126,2,8],[240,10,8]],
+  monsIn:[[77,3,2],[58,9,2],[126,2,8],[240,10,8]],
   leader:{x:6,y:2,partner:59,px:7,py:2,look:{hair:'#ff5a2a',skin:'#ffdcc0',top:'#c4301c',pants:'#3a2a30',shoe:'#ffd23f',cap:'#c4301c',brim:'#8a1a10',long:1,band:'#ffd23f'}},
   talk:{
    first:['으하하! 잘 왔다, 도전자! 나는 불꽃 체육관 관장 {n}이다! 🔥','여긴 용암이 끓는 대장간이야. 불씨와 주먹으로 승부한다!','덱이랑 트레이너 스킬은 달궈 왔나? 준비됐다면 활활 붙어 보자!'],
@@ -11892,12 +11893,13 @@ GP_THEMES[7]={key:'dragon',cls:'dragon',dragon:1,noSign:1,emoji:'🐲',
     "tww,.....,wwt",
     "tww,.....,wwt",
     "ttttttttttttt"]},
-  in:{title:'용의 체육관',sub:'용의 숨결이 감도는 신전 끝에서 관장이 기다려요',start:[6,9],
+  in:{title:'용의 체육관',sub:'용의 비늘 문양을 맞춰 봉인을 풀어요',start:[6,9],
+   puz8:{gy:3,dials:[[3,6],[5,6],[7,6],[9,6]],plaque:[5,4],rules:[[1,0,2,0],[2,1,0,0],[0,0,1,2],[0,2,0,1]],init:[3,2,1,1],target:[0,1,0,3]},
    map:[
     "WWWWWWWWWWWWW",
     "MMNMMMNMMMNMM",
     "PA....r....AP",
-    "w.k...r...k.w",
+    "wGGGGGGGGGGGw",
     "w.....r.....w",
     "w..A..r..A..w",
     "w.....r.....w",
@@ -11958,7 +11960,7 @@ GP_THEMES[8]={key:'champion',cls:'champion',champion:1,noSign:1,emoji:'🏆',
 };
 let GP=null;
 const gpRnd=(x,y,k)=>{let h=(x*374761393+y*668265263+k*2147483647)|0;h=Math.imul(h^(h>>>13),1274126177);return(((h^(h>>>16))>>>0)%100000)/100000;};
-const GP_WALK=new Set(['.',',','f','r','b','g','d','p','q']);
+const GP_WALK=new Set(['.',',','f','r','b','g','d','p','q','x','@','#','$','%','&','~','^','!']);
 function gpCss(){if(document.getElementById('gp-css'))return;const st=document.createElement('style');st.id='gp-css';st.textContent=`
 .gpWrap{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:0;background:radial-gradient(ellipse at 50% 30%,rgba(30,80,140,.74),rgba(8,18,42,.9));backdrop-filter:blur(3px);animation:gpIn .25s ease-out;font-family:'Jua','Galmuri11',sans-serif;color:#fff}
 @keyframes gpIn{from{opacity:0}to{opacity:1}}
@@ -12406,6 +12408,11 @@ function gpTileForest(ctx,map,x,y,scene,fr){
   case 'R':r('#2f7a40',0,0,16,16);for(let k=0;k<6;k++){const a=(R(50+k)*12)|0,b=(R(60+k)*11)|0;r('#4fb866',a,b,3,2);r('#1f5e30',a+1,b+2,3,1);}if(R(9)<.4){r('#ff5a6a',(R(10)*12)|0,(R(11)*10)|0,2,2);}
    if(at(0,-1)!=='R')r('#7fd08a',0,0,16,2);if(at(0,1)!=='R'){r('#1f4e2c',0,12,16,4);}if(at(-1,0)!=='R')r('#1f4e2c',0,0,1,16);if(at(1,0)!=='R')r('#1f4e2c',15,0,1,16);break;
   case 'k':dirt();r('#00000026',3,13,10,2);r('#f5efdf',7,8,2,5);r('#e8416b',5,5,6,4);r('#ff7aa8',5,5,6,1);r('#ffffff',6,6,1,1);r('#f5efdf',3,10,1,3);r('#ffb347',2,8,3,3);r('#f5efdf',11,10,1,3);r('#8a6af0',10,8,3,3);if(fr%2)r('#ffffa0',8,3,1,1);break;
+  case 'T':{const m2=map.slice();m2[y]=m2[y].slice(0,x)+'w'+m2[y].slice(x+1);gpTile(ctx,m2,x,y,scene,fr);
+   r('#1f5e30',0,0,16,16);for(let k=0;k<5;k++){const a=(R(50+k)*11)|0,b=(R(60+k)*11)|0;r('#2f8f4e',a,b,5,3);r('#4fb866',a+1,b,2,1);}
+   for(let yy=1;yy<16;yy+=3){r('#14401f',0,yy,16,1);}
+   for(const[a,b]of[[2,2],[11,3],[5,7],[12,9],[3,12],[9,13]]){r('#ff5a6a',a,b,2,2);r('#ffb0b8',a,b,1,1);}
+   r('#14401f',0,0,16,1);r('#14401f',0,15,16,1);if(fr%2){r('#a8f0a0',7,4,1,1);r('#a8f0a0',4,10,1,1);}break;}
   case 'r':dirt();r('#3f9a52',1,0,14,16);r('#6fc06a',7,2,2,12);r('#6fc06a',4,7,8,2);r('#ffe066',1,0,1,16);r('#ffe066',14,0,1,16);r('#c9f2a0',7,7,2,2);break;
   default:gpTile(ctx,map,x,y,scene,fr);
  }
@@ -12740,6 +12747,7 @@ function gpTileMist(ctx,map,x,y,scene,fr){
   case 'f':grass();for(let i=0;i<3;i++){const fx=2+((R(60+i)*10)|0),fy=2+((R(70+i)*10)|0),c=['#c77dff','#8a5ac8','#ff9ad5','#e8d0ff'][(R(80+i)*4)|0];r(c,fx,fy,2,2);r('#ffe066',fx,fy,1,1);}break;
   case 't':grass();r('#00000030',2,12,12,3);r('#2f2230',7,6,3,9);r('#4a3a4c',7,6,1,9);r('#2f2230',4,5,4,2);r('#2f2230',2,3,3,3);r('#2f2230',9,4,4,2);r('#2f2230',12,2,2,3);r('#2f2230',7,3,2,3);r('#2f2230',5,1,2,3);if(R(2)<.5)r('#8a5ac8',2,4,1,1);r('#4a3a4c',4,5,1,1);break;
   case 'o':if(out&&at(0,-1)==='.')floor();else grass();ctx.fillStyle='#00000030';ctx.fillRect(X+6,Y+26,20,4);ctx.fillStyle='#8f89a2';ctx.fillRect(X+9,Y+10,14,17);ctx.beginPath();ctx.arc(X+16,Y+11,7,Math.PI,0);ctx.fill();ctx.fillStyle='#b3aec4';ctx.fillRect(X+9,Y+10,3,17);ctx.fillStyle='#6a6580';ctx.fillRect(X+15,Y+9,2,9);ctx.fillRect(X+12,Y+12,8,2);ctx.fillStyle='#5d7a6e';ctx.fillRect(X+9,Y+24,6,3);break;
+  case 'x':floor();ctx.save();ctx.globalAlpha=.3+.3*(fr%2);r('#d9c2ff',3+(fr%2),5,2,1);r('#d9c2ff',9,10-(fr%2),3,1);r('#d9c2ff',6,2+(fr%2),1,2);ctx.restore();break;
   case 'w':poison();break;
   case 'B':{r('#4b3a72',0,0,16,16);for(let yy=0;yy<16;yy+=4){r('#35275a',0,yy+3,16,1);for(let xx=(yy%8?0:4);xx<16;xx+=8)r('#35275a',xx,yy,1,3);r('#7a62a8',(yy%8?1:5),yy,3,1);}
    if(at(0,-1)!=='B')r('#a68cd8',0,0,16,2);if(at(0,1)!=='B'){r('#251a42',0,13,16,3);r('#150e2a',0,15,16,1);}break;}
@@ -12821,6 +12829,10 @@ function gpTileDream(ctx,map,x,y,scene,fr){
   case 'Y':{ // 거울 패널 (막힘)
    floor();r('#00000030',1,13,14,3);r('#b89ad8',1,0,14,15);r('#ffe6f6',2,1,12,13);const gr=ctx.createLinearGradient(X+4,Y+2,X+28,Y+28);gr.addColorStop(0,'#fdfbff');gr.addColorStop(.5,'#d4ecff');gr.addColorStop(1,'#f3d4ff');ctx.fillStyle=gr;ctx.fillRect(X+6,Y+4,20,22);
    ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillRect(X+9,Y+6,3,12);ctx.fillRect(X+14,Y+8,2,8);ctx.fillStyle='#d9b86a';ctx.fillRect(X+2,Y+0,28,3);ctx.fillRect(X+2,Y+27,28,3);if(((fr+x+y)&3)<2){ctx.fillStyle='#fff';ctx.fillRect(X+20,Y+8,2,2);ctx.fillRect(X+19,Y+9,4,1);}break;}
+  case '@':case '#':case '$':case '%':case '&':{floor();const col={'@':'#ff6a8a','#':'#6ab4ff','$':'#6ae6a0','%':'#ffe066','&':'#c48aff'}[ch];
+   const pu=.5+.5*Math.sin((fr+x*2+y)*1.3);ctx.save();const gg=ctx.createRadialGradient(X+16,Y+16,2,X+16,Y+16,17);gg.addColorStop(0,col);gg.addColorStop(1,'rgba(255,255,255,0)');ctx.globalAlpha=.55+.35*pu;ctx.fillStyle=gg;ctx.beginPath();ctx.arc(X+16,Y+16,17,0,7);ctx.fill();ctx.restore();
+   ctx.strokeStyle='#ffffff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(X+16,Y+16,10,0,7);ctx.stroke();ctx.strokeStyle=col;ctx.lineWidth=3;ctx.beginPath();ctx.arc(X+16,Y+16,7,0,7);ctx.stroke();
+   r('#ffffff',7,7,2,2);r(col,6+(fr%2),3,1,1);r('#ffffff',3,8+(fr%2),1,1);r('#ffffff',12,6,1,1);break;}
   case 'z':floor();r('#00000020',2,13,12,2);ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(X+10,Y+20,7,0,7);ctx.arc(X+19,Y+17,8,0,7);ctx.arc(X+24,Y+22,5,0,7);ctx.arc(X+14,Y+23,6,0,7);ctx.fill();ctx.fillStyle='#ffe0f2';ctx.beginPath();ctx.arc(X+20,Y+23,5,0,7);ctx.fill();ctx.fillStyle='#ffd0ea';ctx.fillRect(X+8,Y+26,18,2);ctx.fillStyle='#fff';ctx.fillRect(X+8+((fr%2)*2),Y+12,2,2);break;
   case 'k':floor();r('#00000028',4,13,8,2);ctx.save();const g4=ctx.createRadialGradient(X+16,Y+14,2,X+16,Y+14,17);g4.addColorStop(0,'rgba(255,230,140,.7)');g4.addColorStop(1,'rgba(255,230,140,0)');ctx.fillStyle=g4;ctx.fillRect(X-2,Y-2,36,36);ctx.restore();
    {const by=fr%2?-1:0;ctx.fillStyle='#d9b86a';ctx.fillRect(X+14,Y+20,4,7);ctx.fillRect(X+10,Y+26,12,3);ctx.fillStyle='#ffe066';ctx.beginPath();const cx=X+16,cy=Y+12+by*2;for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?4:9;ctx.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.fillStyle='#fff7c0';ctx.fillRect(X+14,Y+9+by*2,3,3);}break;
@@ -12925,6 +12937,14 @@ function gpTileFire(ctx,map,x,y,scene,fr){
     r('#ffd23f',6,3,4,1);r('#ffd23f',5,4,1,6);r('#ffd23f',10,4,1,6);r('#ffd23f',6,10,4,1);fl(8,10,6,k,3);}break;}
   case 'P':floor();r('rgba(0,0,0,.25)',3,13,11,2);r('#2a1814',5,7,6,7);r('#6a5450',5,7,2,7);r('#8a7a86',3,6,10,1);r('#4a424a',4,7,8,1);fl(8,6,5,k,5);break;
   case 'k':floor();r('rgba(255,140,30,.22)',1,1,14,14);r('rgba(0,0,0,.28)',3,13,10,2);r('#3a3238',4,8,8,2);r('#6a5e68',4,8,8,1);r('#2a2228',6,10,4,3);r('#3a3238',4,13,8,2);r('#ff9a2a',5,8,6,1);fl(8,8,7,k+(x&1),6);break;
+  case '~':case '^':case '!':{r(out?'#ff6a1c':'#f0561a',0,0,16,16);if(R(7)<.6)r('#d8400f',(R(8)*9)|0,(R(9)*12)|0,6,3);
+   for(let q=0;q<3;q++){const sx=((((R(50+q)*16)|0)+fr*2+q*3)%16);r(q?'#ffd23f':'#ffb43a',sx,2+q*5+((fr+q)&1),Math.min(5,16-sx),1);}
+   if(ch==='~'){if(R(12)<.4&&((fr+x)&3)===0)r('#fff2b0',2+((R(13)*11)|0),2+((R(14)*11)|0),1,1);break;}
+   r('rgba(0,0,0,.3)',1,14,14,2);r('#1e1618',1,1,14,13);r('#4a3c42',2,2,12,11);r('#6a5860',2,2,12,2);r('#33262c',2,11,12,2);r('#5a4850',4,6,3,1);r('#33262c',9,7,3,1);
+   if(ch==='!'){const pu=(fr+x)&1;r('#2a1010',6,4,4,7);r('#ff5a2a',7,3,2,7);r(pu?'#ffd23f':'#ffb43a',7,5,2,3);r('#fff2b0',7,4,1,2);r('rgba(255,140,30,.3)',3,2,10,10);}
+   else if(R(21)<.5){r('#ff8a2a',5,5,1,1);r('#ff8a2a',10,9,1,1);}
+   break;}
+  case 'G':{floor();r('#1a1210',0,0,16,16);r('#3a3238',0,0,16,2);r('#3a3238',0,14,16,2);for(let xx=1;xx<16;xx+=3)r('#7a6e78',xx,2,2,12);r('#a69aa6',1,2,1,12);r('#5a4e58',0,7,16,2);r((fr+x)&1?'#ff7a1c':'#e8481c',0,13,16,1);r('#ffd23f',3,5,1,1);r('#ffd23f',11,10,1,1);break;}
   case 'A':floor();r('rgba(0,0,0,.28)',2,13,12,2);r('#2a2630',4,12,8,2);r('#3a3640',6,9,4,3);r('#5a5664',2,6,12,3);r('#8a8696',2,6,12,1);r('#5a5664',1,7,2,1);r('#ff8a2a',6,5,4,1);r('#ffd23f',7,5,2,1);if(k){r('#ffd23f',9,3,1,1);r('#ff7a1c',5,2,1,1);}break;
   case 'r':floor();r('#7a1a14',1,0,14,16);r('#b82a18',2,0,12,16);r('#ffd23f',1,0,1,16);r('#ffd23f',14,0,1,16);r('#8a1a10',3,0,1,16);r('#8a1a10',12,0,1,16);if(y%2===0){r('#ffb43a',7,5,2,1);r('#ffd23f',6,6,4,2);r('#ffb43a',7,8,2,1);}break;
   default:gpTile(ctx,map,x,y,scene,fr);
@@ -13015,6 +13035,7 @@ function gpTileDragon(ctx,map,x,y,scene,fr){
     r('#6be3ff',7,3,2,1);r('#6be3ff',6,4,4,2);r('#6be3ff',7,6,2,1);r('#f4feff',7,4,2,1);r('#ffd23f',4,5,2,1);r('#ffd23f',10,5,2,1);r('#ffd23f',4,7,3,1);r('#ffd23f',9,7,3,1);r('#f4f0ff',7,8,2,3);}break;}
   case 'P':floor();r('rgba(0,0,0,.25)',3,13,11,2);r('#2a2554',4,10,8,4);r('#5a52a0',4,10,8,1);r('#8a86c0',6,4,4,6);r('#b8b4e0',5,2,6,3);r('#ffd23f',4,0,1,3);r('#ffd23f',11,0,1,3);r('#6be3ff',6,3,1,1);r('#6be3ff',9,3,1,1);r('#f4f0ff',6,5,1,1);r('#f4f0ff',9,5,1,1);break;
   case 'k':floor();r('rgba(80,180,255,.22)',1,1,14,14);r('rgba(0,0,0,.28)',3,13,10,2);r('#3a3560',4,8,8,2);r('#8a86c0',4,8,8,1);r('#241f48',6,10,4,3);r('#3a3560',4,13,8,2);r('#6be3ff',5,8,6,1);fl(8,8,7,k+(x&1),6);break;
+  case 'G':{floor();r('#0c0a24',0,0,16,16);r('#2a2670',0,0,16,2);r('#2a2670',0,14,16,2);for(let xx=1;xx<16;xx+=3)r('#4a42b0',xx,2,2,12);r('#8a86e0',1,2,1,12);r('#ffd23f',0,2,16,1);r('#ffd23f',0,13,16,1);r((fr+x)&1?'#6be3ff':'#3a7aff',0,7,16,2);r('#f4feff',(fr*3+x*5)%14,7,2,1);break;}
   case 'A':floor();if(k)r('rgba(150,120,255,.22)',2,1,12,12);r('rgba(0,0,0,.28)',2,13,12,2);r('#2a2554',4,12,8,2);r('#5a52a0',4,11,8,1);
    r('#7a5ae8',6,3,4,1);r('#7a5ae8',5,4,6,1);r('#9a7aff',4,5,8,5);r('#7a5ae8',5,10,6,1);r('#5a3ec0',11,6,1,4);r('#ffd23f',6,6,2,1);r('#ffd23f',9,8,2,1);r('#ffd23f',5,9,1,1);r('#e8dcff',5,5,1,2);break;
   case 'r':floor();r('#1e1560',1,0,14,16);r('#2e22a0',2,0,12,16);r('#ffd23f',1,0,1,16);r('#ffd23f',14,0,1,16);r('#140e48',3,0,1,16);r('#140e48',12,0,1,16);if(y%2===0){r('#ffd23f',7,4,2,1);r('#6be3ff',6,5,4,2);r('#f4feff',7,5,2,1);r('#ffd23f',7,7,2,1);}break;
@@ -13722,6 +13743,9 @@ function gpBuild(first){
   if(sc.puz)gpPuzSetup(sc);
   if(sc.puz2)gpWaveSetup(sc);
   if(sc.puz3)gpElecSetup(sc);
+  if(sc.puz4)gpForestSetup(sc);
+  if(sc.puz7)gpFireSetup(sc);
+  if(sc.puz8)gpDragonSetup(sc);
   const ex=gpFind(sc.map,'D');GP.exitAt=ex;GP.act[ex[0]+','+ex[1]]={k:'exit'};
   if(th.castle)sc.map.forEach((row,yy)=>{for(let xx=0;xx<row.length;xx++)if(row[xx]==='U'){GP.solid[xx+','+yy]=1;GP.act[xx+','+yy]={k:'stairs'};}});
   const lb=document.createElement('i');lb.className='gpDoorLb';lb.textContent=(th.castle&&GP.fl>0)?'아래층':'나가기';const dl=mk('gpExit','',ex[0],ex[1]);dl.style.zIndex=1;dl.style.pointerEvents='none';dl.appendChild(lb);lb.style.top='auto';lb.style.bottom='100%';lb.style.marginBottom='1px';lb.style.marginTop='0';lb.style.zIndex='3';
@@ -13847,6 +13871,110 @@ function gpElecPanel(n){
  if(n===Q.seq+1){Q.seq++;if(Q.seq===3){Q.open2=true;gpElecRows();gpDrawMap();gpElecPanels();try{sfx('rare');}catch(e){}gpToast('⚡ 회로 완성! 위쪽 철문이 열렸어요');}else{gpElecPanels();try{sfx('tap');}catch(e){}gpToast('딸깍! '+Q.seq+'번까지 켜졌어요');}}
  else{Q.seq=0;gpElecPanels(true);try{sfx('hit');}catch(e){}gpToast('찌지직! 순서가 틀렸어요. 1번부터 다시!');}
 }
+
+const GP_SHR={};
+function gpShroomURL(col,on){const k=col+on;if(GP_SHR[k])return GP_SHR[k];const c=document.createElement('canvas');c.width=16;c.height=16;const g=c.getContext('2d');
+ const P=(cl,x,y,w,h)=>{g.fillStyle=cl;g.fillRect(x,y,w||1,h||1);};
+ P('rgba(0,0,0,.28)',3,14,10,2);P('#f2ead2',6,9,4,5);P('#c9bf9f',9,9,1,5);
+ const body=on?col:'#4a5a52',rim='#1c2a22';
+ P(rim,3,4,10,1);P(rim,2,5,1,4);P(rim,13,5,1,4);P(rim,3,9,10,1);P(rim,5,3,6,1);
+ P(body,3,5,10,4);P(body,5,4,6,1);
+ P(on?'#fff':'#6f8078',5,5,2,2);P(on?'#fff':'#6f8078',9,6,2,1);P(on?'#fff9':'#5f7068',4,7,1,1);
+ if(on){P('#ffffff66',1,3,1,1);P('#ffffff66',14,2,1,1);P('#ffffff66',2,10,1,1);}
+ return GP_SHR[k]=c.toDataURL();}
+function gpFireflyURL(){if(GP_SHR.f)return GP_SHR.f;const c=document.createElement('canvas');c.width=16;c.height=16;const g=c.getContext('2d');
+ const P=(cl,x,y,w,h)=>{g.fillStyle=cl;g.fillRect(x,y,w||1,h||1);};
+ P('rgba(0,0,0,.28)',2,14,12,2);P('#3e2412',3,8,10,6);P('#8a5a2e',4,8,8,5);P('#a8723a',4,8,8,1);P('#6e4624',6,10,1,3);P('#6e4624',10,9,1,4);
+ P('#1c2a22',4,2,8,1);P('#1c2a22',3,3,1,5);P('#1c2a22',12,3,1,5);P('#cfeeff55',4,3,8,5);
+ P('#ffe066',6,4,1,1);P('#fff6a8',9,5,1,1);P('#ffe066',7,6,1,1);P('#fff6a8',10,3,1,1);
+ return GP_SHR.f=c.toDataURL();}
+function gpForestRows(){const sc=GP.sc,Q=GP.puz4,P=sc.puz4;if(!sc.map0)sc.map0=sc.map.slice();sc.map=sc.map0.slice();
+ if(Q.open){const g=P.gate;sc.map[g[1]]=sc.map[g[1]].slice(0,g[0])+'b'+sc.map[g[1]].slice(g[0]+1);}}
+function gpForestSetup(sc){
+ if(!sc.map0)sc.map0=sc.map.slice();const P=sc.puz4;
+ if(!GP.puz4){const a=[0,1,2,3];for(let i=3;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}GP.puz4={seq:a,pos:0,open:false,busy:false};}
+ const Q=GP.puz4;P.el=[];
+ P.shrooms.forEach(([x,y,col],i)=>{const e=GP.mkEnt('gpValve','',x,y);e.style.backgroundImage='url('+gpShroomURL(col,0)+')';GP.solid[x+','+y]=1;GP.act[x+','+y]={k:'shroom:'+i};P.el.push(e);});
+ {const [x,y]=P.stump;const e=GP.mkEnt('gpValve','',x,y);e.style.backgroundImage='url('+gpFireflyURL()+')';GP.solid[x+','+y]=1;GP.act[x+','+y]={k:'firefly'};}
+ gpForestRows();
+}
+function gpShroomLight(i,ms){const P=GP.sc.puz4,[x,y,col]=P.shrooms[i],e=P.el[i];e.style.backgroundImage='url('+gpShroomURL(col,1)+')';e.classList.add('on');
+ setTimeout(()=>{if(!GP||!GP.sc||GP.sc.puz4!==P)return;e.style.backgroundImage='url('+gpShroomURL(col,0)+')';e.classList.remove('on');},ms);}
+function gpForestShow(){
+ const Q=GP.puz4;if(Q.busy||Q.open)return;Q.busy=true;const P=GP.sc.puz4;
+ Q.seq.forEach((i,n)=>setTimeout(()=>{if(!GP||GP.puz4!==Q||GP.sc.puz4!==P)return;gpShroomLight(i,520);try{sfx('tap');}catch(e){}},500+n*750));
+ setTimeout(()=>{if(GP&&GP.puz4===Q)Q.busy=false;},500+Q.seq.length*750);
+}
+function gpForestShroom(i){
+ const Q=GP.puz4,P=GP.sc.puz4;if(Q.open){gpToast('덩굴이 이미 물러났어요');return;}if(Q.busy)return;
+ gpShroomLight(i,380);
+ if(Q.seq[Q.pos]===i){Q.pos++;
+  if(Q.pos>=Q.seq.length){Q.open=true;gpForestRows();gpDrawMap();try{sfx('rare');}catch(e){}gpToast('🌿 덩굴이 물러났어요! 다리가 열렸어요');}
+  else gpToast('반짝! '+Q.pos+'/'+Q.seq.length);}
+ else{Q.pos=0;try{sfx('crit');}catch(e){}gpToast('시들시들… 순서가 틀렸어요! 그루터기를 다시 봐요');}
+}
+function gpMistStep(x,y){
+ const sc=GP.sc;if(!sc||!sc.puz5||sc.map[y][x]!=='x'||GP.busy)return;
+ GP.mistFall=(GP.mistFall||0)+1;const n=GP.mistFall;try{sfx('crit');}catch(e){}
+ const st=GP_THEMES[GP.gi].in.start;
+ gpFade(()=>{GP.x=st[0];GP.y=st[1];GP.dir='up';gpBuild();gpToast(n>=3?'속삭임: 바닥이 희미하게 일렁이는 곳은 밟지 마…':'안개에 홀려 입구로 돌아왔어요…');});
+}
+function gpDreamStep(x,y){
+ const sc=GP.sc;if(!sc||!sc.puz6||GP.busy)return;const ch=sc.map[y][x];if('@#$%&'.indexOf(ch)<0)return;
+ let tx=-1,ty=-1;sc.map.forEach((row,yy)=>{for(let xx=0;xx<row.length;xx++)if(row[xx]===ch&&!(xx===x&&yy===y)){tx=xx;ty=yy;}});if(tx<0)return;
+ try{sfx('rare');}catch(e){}
+ gpFade(()=>{GP.x=tx;GP.y=ty;gpBuild();gpToast('✨ 꿈결처럼 반짝— 순간이동!');});
+}
+function gpFireRows(){const sc=GP.sc,Q=GP.puz7;if(!sc.map0)sc.map0=sc.map.slice();sc.map=sc.map0.slice();
+ const set=(x,y,ch)=>{sc.map[y]=sc.map[y].slice(0,x)+ch+sc.map[y].slice(x+1);};
+ for(const k in Q.got){const[a,b]=k.split(',').map(Number);set(a,b,'^');}
+ for(const k in Q.sunk){const[a,b]=k.split(',').map(Number);set(a,b,'~');}
+ if(Q.open){const gy=sc.puz7.gy;for(let xx=1;xx<=11;xx++)set(xx,gy,'.');}}
+function gpFireSetup(sc){if(!sc.map0)sc.map0=sc.map.slice();if(!GP.puz7)GP.puz7={sunk:{},got:{},open:false};gpFireRows();}
+function gpFireStep(x,y){
+ const sc=GP.sc,Q=GP.puz7;if(!sc||!sc.puz7||!Q||GP.busy)return;
+ const pv=GP.pt,m0=sc.map0,cur=sc.map;let changed=false;
+ if(pv&&'^!'.indexOf(m0[pv.y][pv.x])>=0&&cur[pv.y][pv.x]!=='~'&&!(pv.x===x&&pv.y===y)){Q.sunk[pv.x+','+pv.y]=1;changed=true;}
+ if(cur[y][x]==='~'||Q.sunk[x+','+y]){
+  try{sfx('crit');}catch(e){}const st=GP_THEMES[GP.gi].in.start;GP.puz7=null;
+  gpFade(()=>{GP.x=st[0];GP.y=st[1];GP.dir='up';gpBuild();gpToast('앗, 뜨거워! 발판이 처음 모습으로 돌아왔어요');});return;}
+ if(m0[y][x]==='!'&&!Q.got[x+','+y]){Q.got[x+','+y]=1;const n=Object.keys(Q.got).length;changed=true;
+  if(n>=sc.puz7.need){Q.open=true;try{sfx('rare');}catch(e){}gpToast('🔥 불씨 수정 '+n+'/'+n+'! 위쪽 철창이 열렸어요');}else{try{sfx('tap');}catch(e){}gpToast('불씨 수정 '+n+'/'+sc.puz7.need+'을 모았어요');}}
+ if(changed){gpFireRows();gpDrawMap();}
+}
+
+const GP_DCOL=['#ff5a5a','#ffd23f','#4ad8ff','#b48aff'],GP_DIMG={};
+function gpDialURL(c){const k='d'+c;if(GP_DIMG[k])return GP_DIMG[k];const cv=document.createElement('canvas');cv.width=16;cv.height=16;const g=cv.getContext('2d');
+ const P=(cl,x,y,w,h)=>{g.fillStyle=cl;g.fillRect(x,y,w||1,h||1);};const col=GP_DCOL[c];
+ P('rgba(0,0,0,.3)',2,14,12,2);P('#120e2c',3,10,10,5);P('#5a52a0',4,10,8,4);P('#8a86c0',4,10,8,1);P('#2a2554',4,13,8,1);
+ P('#120e2c',4,2,8,1);P('#120e2c',3,3,10,7);P('#120e2c',4,10,8,1);
+ P(col,4,3,8,7);P(col,5,2,6,1);P('#0004',4,8,8,2);P('#ffffff55',5,3,2,2);
+ for(let yy=0;yy<3;yy++)for(let xx=0;xx<3;xx++){P('#0003',5+xx*2+(yy%2),4+yy*2,1,1);}
+ P('#ffd23f',7,0,2,2);P('#ffd23f',3,6,1,2);P('#ffd23f',12,6,1,2);
+ return GP_DIMG[k]=cv.toDataURL();}
+function gpPlaqueURL(t){const k='p'+t.join('');if(GP_DIMG[k])return GP_DIMG[k];const cv=document.createElement('canvas');cv.width=48;cv.height=16;const g=cv.getContext('2d');
+ const P=(cl,x,y,w,h)=>{g.fillStyle=cl;g.fillRect(x,y,w||1,h||1);};
+ P('rgba(0,0,0,.3)',2,14,44,2);P('#120e2c',1,1,46,13);P('#ffd23f',2,2,44,11);P('#241f48',3,3,42,9);
+ t.forEach((c,i)=>{const x=6+i*10;P('#120e2c',x-1,4,9,8);P(GP_DCOL[c],x,5,7,6);P('#ffffff55',x+1,6,2,2);P('#0003',x+1,9,5,1);});
+ P('#ffd23f',1,0,3,2);P('#ffd23f',44,0,3,2);
+ return GP_DIMG[k]=cv.toDataURL();}
+function gpDragonRows(){const sc=GP.sc,Q=GP.puz8,P=sc.puz8;if(!sc.map0)sc.map0=sc.map.slice();sc.map=sc.map0.slice();
+ if(Q.open)sc.map[P.gy]='w'+'.'.repeat(11)+'w';}
+function gpDragonSetup(sc){
+ if(!sc.map0)sc.map0=sc.map.slice();const P=sc.puz8;
+ if(!GP.puz8)GP.puz8={d:P.init.slice(),open:false};const Q=GP.puz8;P.el=[];
+ P.dials.forEach(([x,y],i)=>{const e=GP.mkEnt('gpValve','',x,y);e.style.backgroundImage='url('+gpDialURL(Q.d[i])+')';GP.solid[x+','+y]=1;GP.act[x+','+y]={k:'dial:'+i};P.el.push(e);});
+ {const [x,y]=P.plaque;const e=GP.mkEnt('gpValve','',x,y);e.style.width=(300/GP_C)+'%';e.style.backgroundImage='url('+gpPlaqueURL(P.target)+')';for(let k=0;k<3;k++){GP.solid[(x+k)+','+y]=1;GP.act[(x+k)+','+y]={k:'plaque'};}}
+ gpDragonRows();
+}
+function gpDragonTurn(i){
+ const Q=GP.puz8,P=GP.sc.puz8;if(Q.open){gpToast('봉인은 이미 풀렸어요');return;}
+ P.rules[i].forEach((v,j)=>{Q.d[j]=(Q.d[j]+v)%4;});
+ P.el.forEach((e,j)=>{e.style.backgroundImage='url('+gpDialURL(Q.d[j])+')';});
+ const n=Q.d.filter((c,j)=>c===P.target[j]).length;
+ if(n===Q.d.length){Q.open=true;gpDragonRows();gpDrawMap();try{sfx('rare');}catch(e){}gpToast('🐲 비늘 문양 완성! 봉인이 풀렸어요');}
+ else{try{sfx('tap');}catch(e){}gpToast('비늘 '+n+'/'+Q.d.length+' 일치');}
+}
 function gpPuzReset(){const th=GP_THEMES[GP.gi],st=th.in.start;GP.puz=null;gpFade(()=>{GP.x=st[0];GP.y=st[1];GP.dir='up';gpBuild();gpToast('바위가 처음 자리로 돌아왔어요');});}
 function gpPush(d,nx,ny){ // 바위를 향해 걸어가면 한 칸 밀어요. 구덩이에 들어가면 메워져요.
  const Q=GP.puz;if(!Q)return false;const b=Q.b.find(o=>o.x===nx&&o.y===ny);if(!b)return false;
@@ -13884,7 +14012,7 @@ function gpUpdate(dt){
  if(GP.busy)return;
  let guard=2;
  while(guard--){
-  if(p.moving){p.t+=dt/GP_MS;dt=0;if(p.t>=1){p.x=p.nx;p.y=p.ny;p.moving=false;p.par^=1;p.px=p.x;p.py=p.y;GP.x=p.x;GP.y=p.y;GP.dir=GP_DN[p.dir];GP.pt={x:GP.pb[0],y:GP.pb[1]};if(GP.sc&&GP.sc.puz3)gpElecStep(p.x,p.y);}else{p.px=p.x+(p.nx-p.x)*p.t;p.py=p.y+(p.ny-p.y)*p.t;break;}}
+  if(p.moving){p.t+=dt/GP_MS;dt=0;if(p.t>=1){p.x=p.nx;p.y=p.ny;p.moving=false;p.par^=1;p.px=p.x;p.py=p.y;GP.x=p.x;GP.y=p.y;GP.dir=GP_DN[p.dir];GP.pt={x:GP.pb[0],y:GP.pb[1]};if(GP.sc&&GP.sc.puz3)gpElecStep(p.x,p.y);if(GP.sc&&GP.sc.puz5)gpMistStep(p.x,p.y);if(GP.sc&&GP.sc.puz6)gpDreamStep(p.x,p.y);if(GP.sc&&GP.sc.puz7)gpFireStep(p.x,p.y);}else{p.px=p.x+(p.nx-p.x)*p.t;p.py=p.y+(p.ny-p.y)*p.t;break;}}
   if(!p.moving&&!D.on){let d=gpCurDir();if(d>=0)GP.path.length=0;else if(GP.pend>=0)d=GP.pend;GP.pend=-1;if(d<0&&GP.path.length)d=GP.path.shift();
    if(d<0&&GP.ptalk&&!GP.path.length){const a=GP.ptalk;GP.ptalk=null;p.dir=gpDirTo(a.x,a.y);if(Math.abs(a.x-p.x)+Math.abs(a.y-p.y)===1)gpInteract(a.k);break;}
    if(d>=0){gpStart(d);if(!p.moving){GP.path.length=0;GP.ptalk=null;}}else break;if(!p.moving)break;}else break;}
@@ -13977,6 +14105,10 @@ function gpInteract(k){
  else if(k.startsWith('mon:')){const a=k.split(':');gpTalkMon(+a[1],+a[2],+a[3]);}
  else if(k.indexOf('valve:')===0){gpWaveTurn(k.slice(6));}
  else if(k.indexOf('panel:')===0){gpElecPanel(+k.slice(6));}
+ else if(k.indexOf('shroom:')===0){gpForestShroom(+k.slice(7));}
+ else if(k==='firefly'){gpSay(['반딧불이가 든 그루터기다.\n불빛이 반짝이는 순서를 잘 기억하자!'],{menu:['빛을 본다','그만둔다'],pick:i=>{if(i===0)setTimeout(gpForestShow,300);}});}
+ else if(k.indexOf('dial:')===0){gpDragonTurn(+k.slice(5));}
+ else if(k==='plaque'){gpSay(['용의 비늘 문양이 새겨진 석판이다.\n네 개의 비늘 보주를 이 색 순서와 똑같이 맞추면 봉인이 풀릴 것 같다.\n(보주를 돌리면 다른 보주도 함께 돌아간다!)']);}
  else if(k==='pit'){gpSay(['바닥이 깊게 갈라져 있다!\n저 바위를 밀어서 구덩이에 빠뜨리면 건널 수 있겠어.\n(막히면 위쪽 🔄 바위 리셋)']);}
  else if(k==='exit'){gpFade(()=>{const d=gpFind(th.out.map,'D');GP.scene='out';GP.x=d[0];GP.y=d[1]+1;GP.dir='down';gpBuild();});}
  else if(k==='leader'){gpFaceLeader();
@@ -13984,7 +14116,12 @@ function gpInteract(k){
   lines.push('타입: '+(g.types?g.types.map(t=>TYPE_KO[t]).join('·'):'모든 타입')+'  Lv.'+g.lv+'\n'+g.d+'\n도전해 볼까?');
   gpSay(lines,{menu:['전투 시작!','조금 더 준비한다'],pick:i=>{if(i===0)gpFight();}});}
 }
-function gpEnterGym(){gpFade(()=>{const st=GP_THEMES[GP.gi].in.start;GP.scene='in';GP.x=st[0];GP.y=st[1];GP.dir='up';gpBuild();sfx('page');const ip=GP_THEMES[GP.gi].in;if(ip.puz3&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['철문 두 개가 전류를 막고 있다!\n① 아래 방: 노란 발판 3개를 모두 밟아야 해. 금방 꺼지니까 재빨리!\n② 위 방: 번호 패널을 1→2→3 순서로 눌러라. (패널을 향해 걸으면 눌러져요)']);},900);}
+function gpEnterGym(){gpFade(()=>{const st=GP_THEMES[GP.gi].in.start;GP.scene='in';GP.x=st[0];GP.y=st[1];GP.dir='up';gpBuild();sfx('page');const ip=GP_THEMES[GP.gi].in;if(ip.puz8&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['관장에게 가는 길이 용의 봉인으로 막혀 있다!\n위쪽 석판의 비늘 색과 똑같이 네 보주를 맞춰라.\n보주를 향해 걸으면 돌아가는데, 어떤 보주는 옆 보주까지 함께 돌려! 규칙을 찾아봐요.']);},900);}
+ else if(ip.puz7&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['용암 위에 식은 돌 발판이 흩어져 있다!\n발판은 밟고 지나가면 가라앉아서 다시는 못 써. 불씨가 박힌 수정 3개를 모두 모으면 위쪽 철창이 열린대.\n용암에 빠지면 처음부터 다시! (돌 위에서만 길을 찾아요)']);},900);}
+ else if(ip.puz6&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['거울 벽이 방을 세 칸으로 나누고 있다…\n빛나는 발판을 밟으면 같은 색의 짝꿍 발판으로 순간이동한대!\n소문으로는, 노란 별빛이 관장님께 이어진다고 해. (위로 가는 길을 찾아봐요)']);},900);}
+ else if(ip.puz5&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['안개 속에 복잡한 미로가 펼쳐져 있다…\n잘못된 길로 들어서면 안개에 홀려 입구로 되돌아온다고 해.\n길을 외워 두자. (바닥이 희미하게 일렁이는 곳을 조심!)']);},900);}
+ else if(ip.puz4&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['다리가 가시덩굴로 뒤덮여 있다!\n입구 쪽 반딧불이 그루터기를 조사하면 버섯이 반짝이는 순서를 보여 줘.\n그 순서대로 버섯을 건드리면 덩굴이 물러날 거야. (버섯을 향해 걸으면 건드려져요)']);},900);}
+ else if(ip.puz3&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['철문 두 개가 전류를 막고 있다!\n① 아래 방: 노란 발판 3개를 모두 밟아야 해. 금방 꺼지니까 재빨리!\n② 위 방: 번호 패널을 1→2→3 순서로 눌러라. (패널을 향해 걸으면 눌러져요)']);},900);}
  else if(ip.puz2&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['물길이 세 줄로 가로막고 있다!\n수문 3개를 돌리면 물길이 열리거나 잠긴다.\n(수문마다 움직이는 물길이 달라요. 물길 옆 색깔 불빛이 힌트! 수문을 향해 걸으면 돌려요)']);},900);}
  else if(ip.puz&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['길 한가운데가 깊게 갈라져 있다!\n바위를 앞으로 밀어서 구덩이를 메우면 관장에게 갈 수 있겠어.\n(바위를 향해 걸으면 밀려요 · 막히면 위쪽 🔄 바위 리셋)']);},900);}});}
 function gpFight(){const gi=GP.gi;gpClose();GP.keep=false;startBattle(gi);}
