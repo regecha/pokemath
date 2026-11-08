@@ -14722,12 +14722,12 @@ function gpOpen(gi,resume){
  GP.held=[];GP.pend=-1;GP.just=false;GP.path=[];GP.ptalk=null;GP.last=0;GP._sk=null;
  GP.D={on:false,pages:[],pi:0,ch:[],shown:0,lastN:-1,state:'',opt:{},sel:0};
  const w=document.createElement('div');w.className='gpWrap '+(th.cls||'');w.id='gpWrap';
- w.innerHTML=`<div class=gpBox><div class=gpHead><h3 id=gpTt></h3><button type=button tabindex=-1 class="gpChip gpChipB" id=gpC1>🃏 덱</button><button type=button tabindex=-1 class="gpChip gpChipB" id=gpC2>🛡️ 스킬</button><button class=gpX id=gpX aria-label=닫기>✕</button></div>
+ w.innerHTML=`<div class=gpBox><div class=gpHead><h3 id=gpTt></h3><button type=button tabindex=-1 class="gpChip gpChipB" id=gpC1>🃏 덱</button><button type=button tabindex=-1 class="gpChip gpChipB" id=gpC2>🛡️ 스킬</button><button type=button tabindex=-1 class="gpChip gpChipB gfPadTog">⌨ 키패드</button><button class=gpX id=gpX aria-label=닫기>✕</button></div>
  <div class=gpStage id=gpStage><canvas id=gpCv width=${GP_C*GP_T} height=${GP_R*GP_T}></canvas><div class=gpEnt id=gpEnt></div><div class=gpFade id=gpFade></div><div class="gf-box" id=gpBx><span id=gpTx></span><i class="gf-more" id=gpMore>▼</i></div><div class="gf-menu" id=gpMn></div></div>
- <div class="gf-pad"><div class="gf-joy" id=gpJoy aria-label="이동 조이스틱"><span class="ja u">▲</span><span class="ja d">▼</span><span class="ja l">◀</span><span class="ja r">▶</span><div class="gf-knob"></div></div><div class="gf-ab"><button data-k="b">B</button><button data-k="a">A</button></div></div>
- <div class=gpHint><span class=pc>방향키·WASD 이동 · 스페이스/Enter/Z 말 걸기·확인 · X/Esc 취소 · </span>터치는 아래 빈 공간 아무 데나 눌러 조이스틱, 화면을 톡 누르면 그 자리까지 자동 이동, 꾹 누른 채 끌면 그 방향으로 걸어요</div></div>`;
+ <div class="gf-pad"><div class="gf-joy" id=gpJoy aria-label="이동 조이스틱"><span class="ja u">▲</span><span class="ja d">▼</span><span class="ja l">◀</span><span class="ja r">▶</span><div class="gf-knob"></div></div>${gfDpadHTML()}<div class="gf-ab"><button data-k="b">B</button><button data-k="a">A</button></div></div>
+ <div class=gpHint><span class=pc>방향키·WASD 이동 · 스페이스/Enter/Z 말 걸기·확인 · X/Esc 취소 · </span>터치는 아래 빈 공간 아무 데나 눌러 조이스틱(⌨ 키패드 버튼으로 십자키 전환), 화면을 톡 누르면 그 자리까지 자동 이동, 꾹 누른 채 끌면 그 방향으로 걸어요</div></div>`;
  document.body.appendChild(w);
- GP.box=w.querySelector('.gpBox');GP.cv=$('#gpCv');GP.el=$('#gpStage');GP.ent=$('#gpEnt');GP.bx=$('#gpBx');GP.tx=$('#gpTx');GP.mo=$('#gpMore');GP.mn=$('#gpMn');
+ try{gfPadApply();}catch(e){}GP.box=w.querySelector('.gpBox');GP.cv=$('#gpCv');GP.el=$('#gpStage');GP.ent=$('#gpEnt');GP.bx=$('#gpBx');GP.tx=$('#gpTx');GP.mo=$('#gpMore');GP.mn=$('#gpMn');
  const fitBox=()=>{try{if(!GP||!GP.box)return;const z=(typeof FIT!=='undefined'&&FIT&&FIT.z)||1,vh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh'))||innerHeight/z,vw=innerWidth/z;
   const hh=s=>{const e=GP.box.querySelector(s);return e&&getComputedStyle(e).display!=='none'?e.offsetHeight:0;};
   const pd=GP.box.querySelector('.gf-pad'),padH=pd&&getComputedStyle(pd).position==='fixed'?0:150;
@@ -15190,6 +15190,7 @@ function gpBindInput(w){
  w.querySelectorAll('.gf-ab button').forEach(b=>{const k=b.dataset.k;b.addEventListener('pointerdown',ev=>{ev.preventDefault();ev.stopPropagation();if(k==='a')gpAction();else gpBack();});b.addEventListener('contextmenu',e=>e.preventDefault());});
  {const joy=w.querySelector('#gpJoy'),pad=w.querySelector('.gf-pad');let pj=-1;
   gfFloatJoy(pad,joy,d=>{if(pj>=0)gpSetHeld(pj,false);pj=d;if(d>=0){if(GP.D.state==='menu')gpMoveMenu(d===0||d===3?1:-1);else if(!GP.D.on)gpSetHeld(d,true);}},()=>{if(GP.D.on&&GP.D.state!=='menu')gpAdvance();});}
+ gfDpadBind(w.querySelector('.gf-pad'),d=>{if(GP.D.state==='menu'){gpMoveMenu(d===0||d===3?1:-1);return;}if(GP.D.on)return;gpSetHeld(d,true);},d=>gpSetHeld(d,false));
  const cv=GP.cv;let gid=null,sx0=0,sy0=0,ax=0,ay=0,mode='',gdir=-1,gax='';
  const tileAt=ev=>{const r=cv.getBoundingClientRect();return [Math.floor((ev.clientX-r.left)/r.width*GP_C),Math.floor((ev.clientY-r.top)/r.height*GP_R)];};
  const gset=d=>{if(d===gdir)return;if(gdir>=0)gpSetHeld(gdir,false);gdir=d;if(d>=0&&!GP.D.on&&!GP.busy)gpSetHeld(d,true);};
@@ -24971,6 +24972,23 @@ body.gfBig .gf-help{display:none}body.gfBig #bq{z-index:75}
  .gpBox .gf-pad.gf-fl .gf-zone{right:auto;width:46%;pointer-events:auto;background:rgba(143,136,176,.08)}
  .gpBox .gf-pad.gf-fl .gf-ab{pointer-events:auto;right:max(16px,env(safe-area-inset-right));top:auto;bottom:18px;transform:rotate(-14deg)}
 }
+/* ===== 조이스틱 ↔ 키패드 전환 (위쪽 ⌨ 키패드 / 🕹 조이스틱 버튼) ===== */
+.gf-pad .gf-dpad{display:none}
+body.gfKeypad .gf-pad .gf-dpad{display:grid}
+.gf-pad.gf-fl .gf-dpad{position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:3;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.gf-dpad button{-webkit-tap-highlight-color:transparent}
+body.gfKeypad .gf-zone{pointer-events:none!important}
+body.gfKeypad .gf-zone .gf-joy{display:none!important}
+.gfPadTog{font:700 13px/1.2 "Jua","Noto Sans KR",sans-serif;color:#fff;background:rgba(43,33,64,.78);border:2px solid #fff;border-radius:999px;padding:4px 11px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.3);-webkit-tap-highlight-color:transparent;white-space:nowrap}
+.gfPadTog:active{transform:translateY(1px)}
+body.gfKeypad .gfPadTog{background:#3a86d8}
+#rlTitle .rlt-x.gfPadTog{background:#3a86d8;margin-right:8px}
+body.gfKeypad #rlTitle .rlt-x.gfPadTog{background:#7a54d8}
+.gpHead .gfPadTog{padding:5px 12px;font-size:14px}
+@media (max-width:430px){.gpHead .gpChipB{padding:5px 8px;font-size:12px}}
+@media (orientation:landscape) and (max-height:520px){
+ .gpBox .gf-pad.gf-fl .gf-dpad,body.gfBig .gf-pad.gf-fl .gf-dpad,#rlTitle .gf-pad.gf-fl .gf-dpad{left:max(16px,env(safe-area-inset-left));top:auto;bottom:18px;transform:none;pointer-events:auto}
+}
 </style>
 <script id="float-joy-js">
 /* 대사창 높이 자동 맞춤 + 떠 있는 조이스틱 (체육관 · 로그라이크 필드 공용) */
@@ -24985,6 +25003,20 @@ function gfSizeBox(box,txt,full){
  }catch(e){}
  try{txt.textContent='';}catch(e){}
 }
+/* 조이스틱 ↔ 키패드 전환: 위쪽 버튼(.gfPadTog)을 누르면 십자 키패드 ↔ 떠 있는 조이스틱이 바뀌어요 (고른 방식은 기억해요) */
+var GF_KEYPAD=false;try{GF_KEYPAD=localStorage.getItem('gfKeypad')==='1';}catch(e){}
+function gfPadApply(){try{if(!document.body)return;document.body.classList.toggle('gfKeypad',GF_KEYPAD);
+ document.querySelectorAll('.gfPadTog').forEach(b=>{b.textContent=GF_KEYPAD?'🕹 조이스틱':'⌨ 키패드';b.setAttribute('aria-pressed',GF_KEYPAD?'true':'false');});}catch(e){}}
+function gfPadToggle(){GF_KEYPAD=!GF_KEYPAD;try{localStorage.setItem('gfKeypad',GF_KEYPAD?'1':'0');}catch(e){}gfPadApply();try{sfx('tap');}catch(e){}}
+function gfDpadHTML(){return '<div class="gf-dpad" aria-label="이동 키패드"><i></i><button type="button" tabindex="-1" data-k="up">▲</button><i></i><button type="button" tabindex="-1" data-k="left">◀</button><i class="c"></i><button type="button" tabindex="-1" data-k="right">▶</button><i></i><button type="button" tabindex="-1" data-k="down">▼</button><i></i></div>';}
+function gfDpadBind(pad,onDown,onUp){if(!pad)return;const KB={up:1,down:0,left:2,right:3};
+ pad.querySelectorAll('.gf-dpad button').forEach(b=>{const d=KB[b.dataset.k];if(d===undefined)return;let on=false;
+  const dn=ev=>{ev.preventDefault();ev.stopPropagation();if(on)return;on=true;b.classList.add('dn');try{b.setPointerCapture(ev.pointerId);}catch(e){}try{onDown&&onDown(d);}catch(e){}};
+  const up=()=>{if(!on)return;on=false;b.classList.remove('dn');try{onUp&&onUp(d);}catch(e){}};
+  b.addEventListener('pointerdown',dn);b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('lostpointercapture',up);b.addEventListener('contextmenu',e=>e.preventDefault());});}
+document.addEventListener('pointerdown',e=>{const b=e.target&&e.target.closest&&e.target.closest('.gfPadTog');if(b)e.stopPropagation();},true);
+document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('.gfPadTog');if(!b)return;e.preventDefault();e.stopPropagation();gfPadToggle();try{b.blur();}catch(er){}},true);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',gfPadApply);else gfPadApply();
 function gfFloatJoy(pad,joy,onDir,onTap){
  if(!pad||!joy||joy.dataset.fl)return;joy.dataset.fl='1';
  const knob=joy.querySelector('.gf-knob'),zone=document.createElement('div');
@@ -25006,7 +25038,7 @@ function gfFloatJoy(pad,joy,onDir,onTap){
   const tap=!!ev&&ev.type==='pointerup'&&!moved&&Date.now()-t0<300;
   jid=null;jax='';jset(-1);knobTo(0,0);joy.classList.remove('on');zone.classList.remove('act');home();
   if(tap&&onTap){try{onTap();}catch(e){}}};
- zone.addEventListener('pointerdown',ev=>{ev.preventDefault();if(jid!==null)return;jid=ev.pointerId;sx=ev.clientX;sy=ev.clientY;t0=Date.now();moved=false;
+ zone.addEventListener('pointerdown',ev=>{if(document.body.classList.contains('gfKeypad'))return;ev.preventDefault();if(jid!==null)return;jid=ev.pointerId;sx=ev.clientX;sy=ev.clientY;t0=Date.now();moved=false;
   place(ev);joy.classList.add('on');zone.classList.add('act');try{zone.setPointerCapture(ev.pointerId);}catch(e){}jmove(ev);});
  zone.addEventListener('pointermove',ev=>{if(ev.pointerId!==jid)return;ev.preventDefault();if(Math.hypot(ev.clientX-sx,ev.clientY-sy)>10)moved=true;jmove(ev);});
  zone.addEventListener('pointerup',jend);zone.addEventListener('pointercancel',jend);zone.addEventListener('lostpointercapture',jend);zone.addEventListener('contextmenu',e=>e.preventDefault());
@@ -25677,10 +25709,10 @@ function mount(run){
  const holder=q('#view .rl-opts');if(!holder||!run||!run.opts)return;
  const th=TH[run.bg]||TH[0],M=genMap(run),W=M.W,H=M.H,sheet=makeSheet(th),tufts=makeTufts(th);
  const wrap=document.createElement('div');wrap.className='gf-wrap';
- wrap.innerHTML='<div class="gf-frame"><canvas id="gfCv" width="640" height="576"></canvas><div class="gf-tools"><button type="button" tabindex="-1" class="gf-big" id="gfBig">🖥 크게</button><button type="button" tabindex="-1" class="gf-zoom" id="gfZoom">확대 ×1</button></div><div class="gf-box" id="gfBox"><span id="gfTxt"></span><i class="gf-more" id="gfMore">▼</i></div><div class="gf-menu" id="gfMenu"></div></div>'+
-  '<div class="gf-pad"><div class="gf-joy" id="gfJoy" aria-label="이동 조이스틱"><span class="ja u">▲</span><span class="ja d">▼</span><span class="ja l">◀</span><span class="ja r">▶</span><div class="gf-knob"></div></div><div class="gf-ab"><button data-k="b">B</button><button data-k="a">A</button></div></div>'+
-  '<p class="gf-help">방향키·WASD 이동 · Z/Enter/Space 말 걸기·확인 · X/Esc 취소 · +/- 확대<br>🖥 크게: 필드 창을 화면에 꽉 차게 키워요 · 터치는 필드 아래 빈 공간 아무 데나 눌러서 조이스틱, 또는 화면을 톡 누르면 그 자리까지 자동 이동 · 꾹 누른 채 끌면 그 방향으로 걸어요! 길을 따라 걷다 보면 분기점이 기다리고 있어요.<br>🏺 아래쪽 샛길의 보물상자는 내 유물 · 📖 도감은 내 덱 포켓몬! 말을 걸어 보세요.</p>';
- holder.replaceWith(wrap);
+ wrap.innerHTML='<div class="gf-frame"><canvas id="gfCv" width="640" height="576"></canvas><div class="gf-tools"><button type="button" tabindex="-1" class="gfPadTog gf-padtog">⌨ 키패드</button><button type="button" tabindex="-1" class="gf-big" id="gfBig">🖥 크게</button><button type="button" tabindex="-1" class="gf-zoom" id="gfZoom">확대 ×1</button></div><div class="gf-box" id="gfBox"><span id="gfTxt"></span><i class="gf-more" id="gfMore">▼</i></div><div class="gf-menu" id="gfMenu"></div></div>'+
+  '<div class="gf-pad"><div class="gf-joy" id="gfJoy" aria-label="이동 조이스틱"><span class="ja u">▲</span><span class="ja d">▼</span><span class="ja l">◀</span><span class="ja r">▶</span><div class="gf-knob"></div></div>'+gfDpadHTML()+'<div class="gf-ab"><button data-k="b">B</button><button data-k="a">A</button></div></div>'+
+  '<p class="gf-help">방향키·WASD 이동 · Z/Enter/Space 말 걸기·확인 · X/Esc 취소 · +/- 확대<br>🖥 크게: 필드 창을 화면에 꽉 차게 키워요 · 터치는 필드 아래 빈 공간 아무 데나 눌러서 조이스틱(위쪽 ⌨ 키패드 버튼을 누르면 십자키로 바뀌어요), 또는 화면을 톡 누르면 그 자리까지 자동 이동 · 꾹 누른 채 끌면 그 방향으로 걸어요! 길을 따라 걷다 보면 분기점이 기다리고 있어요.<br>🏺 아래쪽 샛길의 보물상자는 내 유물 · 📖 도감은 내 덱 포켓몬! 말을 걸어 보세요.</p>';
+ holder.replaceWith(wrap);try{gfPadApply();}catch(e){}
  // 크게 보기 위쪽 한 줄 HUD: 체력 · 골드 · 덱 · 유물 · 진행도(누르면 지도)
  try{const hud=document.createElement('div');hud.className='gf-hud';
   const fl=run.floor||1,st=Math.min(run.step+1,RL.steps+1);
@@ -26339,7 +26371,7 @@ function rlTitle(){
  try{rlSetBg('',run?run.bg:(rl.lastBg!=null?rl.lastBg:4));rlShell('',{noRun:true,screen:'scenarioRLEntry'});}catch(e){}
  const sub=run?`${run.floor||1}층 ${Math.min(run.step+1,RL.steps+1)}단계 · HP ${run.hp}/${run.max}`:'';
  ov=document.createElement('div');ov.id='rlTitle';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','좌삼몬스터디 로그라이크');
- ov.innerHTML='<div class="rlt-top"><button type="button" class="rlt-x" id="rltX">✕ 닫기</button></div>'
+ ov.innerHTML='<div class="rlt-top"><button type="button" tabindex="-1" class="rlt-x gfPadTog">⌨ 키패드</button><button type="button" class="rlt-x" id="rltX">✕ 닫기</button></div>'
   +'<div class="rlt-screen"><canvas class="rlt-cv" width="160" height="144"></canvas>'
   +'<div class="rlt-logo"><span class="rlt-glow"></span><span class="rlt-rb">좌삼몬스터디</span><br><b data-t="로그라이크"><span>로그라이크</span></b><i><em></em>끝없는 길<em></em></i><span class="sp s1"></span><span class="sp s2"></span><span class="sp s3"></span></div>'
   +'<div class="rlt-menu" role="menu">'
@@ -26347,8 +26379,8 @@ function rlTitle(){
   +'<button type="button" class="rlt-it'+(run?'':' off')+'" data-a="cont" role="menuitem" aria-disabled="'+(run?'false':'true')+'"><span class="cur">▶</span>이어하기'+(run?'<small>'+sub+'</small>':'')+'</button>'
   +'<button type="button" class="rlt-it" data-a="quit" role="menuitem"><span class="cur">▶</span>그만두기</button>'
   +'</div></div>'
-  +'<div class="gf-pad"><div class="gf-joy" aria-label="조이스틱"><span class="ja u">▲</span><span class="ja d">▼</span><span class="ja l">◀</span><span class="ja r">▶</span><div class="gf-knob"></div></div><div class="gf-ab"><button type="button" data-k="b">B</button><button type="button" data-k="a">A</button></div></div>';
- document.body.appendChild(ov);document.body.classList.add('rltOpen');
+  +'<div class="gf-pad"><div class="gf-joy" aria-label="조이스틱"><span class="ja u">▲</span><span class="ja d">▼</span><span class="ja l">◀</span><span class="ja r">▶</span><div class="gf-knob"></div></div>'+gfDpadHTML()+'<div class="gf-ab"><button type="button" data-k="b">B</button><button type="button" data-k="a">A</button></div></div>';
+ document.body.appendChild(ov);document.body.classList.add('rltOpen');try{gfPadApply();}catch(e){}
  ov.addEventListener('touchmove',e=>{e.preventDefault();},{passive:false});
  fitTitle();resH=()=>fitTitle();window.addEventListener('resize',resH);
  timer=paint(ov.querySelector('.rlt-cv'));
@@ -26384,6 +26416,7 @@ function rlTitle(){
  ov.querySelector('#rltX').addEventListener('click',e=>{e.stopPropagation();act('quit');});
  // 떠 있는 조이스틱: 아래 빈 공간 아무 데나 대고 위·아래로 밀면 메뉴 커서가 움직여요
  try{gfFloatJoy(ov.querySelector('.gf-pad'),ov.querySelector('.gf-joy'),d=>{if(d===0)move(1);else if(d===1)move(-1);},null);}catch(e){console.warn('title joy',e);}
+  try{gfDpadBind(ov.querySelector('.gf-pad'),d=>{if(d===0)move(1);else if(d===1)move(-1);},null);}catch(e){console.warn('title dpad',e);}
  ov.querySelectorAll('.gf-ab button').forEach(b=>{
   b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(b.dataset.k==='a')act(items[sel].dataset.a);else act('quit');});
   b.addEventListener('contextmenu',e=>e.preventDefault());
