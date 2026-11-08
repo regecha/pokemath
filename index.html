@@ -777,14 +777,12 @@ html.lowfx .cmbPill{animation:none!important}
 .confetti{position:fixed;width:10px;height:14px;z-index:260;pointer-events:none;animation:cf 1.6s ease-out forwards;border-radius:2px}
 @keyframes cf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--rr));opacity:0}}
 /* 코치 안내 */
-#coach{position:fixed;inset:0;z-index:200;display:none;touch-action:none}#coach.on{display:block;animation:coFade .24s ease-out}
-@keyframes coFade{from{opacity:0}to{opacity:1}}
+#coach{position:fixed;inset:0;z-index:200;display:none;touch-action:none}#coach.on{display:block}
 #coHole{position:fixed;border-radius:16px;box-shadow:0 0 0 220vmax rgba(30,30,56,.72);transition:left .35s,top .35s,width .35s,height .35s;pointer-events:none}
-#coHole:not(.none)::after{content:'';position:absolute;inset:-4px;border:3px solid #ffe27a;border-radius:inherit;animation:coP 1.4s ease-in-out infinite;will-change:transform,opacity}
-@keyframes coP{50%{transform:scale(1.03);opacity:.4}}
+#coHole:not(.none)::after{content:'';position:absolute;inset:-4px;border:3px solid #ffe27a;border-radius:inherit;animation:coP 1.1s ease-in-out infinite}
+@keyframes coP{50%{transform:scale(1.04);opacity:.6}}
 #coBub{position:fixed;left:50%;width:min(440px,92vw);background:#fdfcfa;border:3px solid #ffd166;border-radius:18px;padding:12px 14px;box-shadow:0 6px 0 #e0a83a,0 16px 40px rgba(0,0,0,.35)}
-#coBub.pop{animation:coBubIn .26s ease-out both}
-@keyframes coBubIn{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
+#coBub.pop{animation:popIn .3s cubic-bezier(.3,1.6,.5,1)}
 .coHead{display:flex;align-items:center;gap:6px;font-family:'Jua';font-size:19px}.coHead .coN{margin-left:auto;font-size:13px;color:var(--mut)}
 .coHead img,.coHead svg{width:34px;height:34px;image-rendering:pixelated}
 .coT{font-size:16px;line-height:1.55;margin:6px 0 10px}
@@ -3511,8 +3509,7 @@ function coachNext(){if(!CO)return;const st=CO.q.shift();if(!st)return coachEnd(
  if(el&&el.getClientRects().length){try{el.scrollIntoView({block:'nearest'});}catch(e){}const b=zRect(el);if(b.width&&b.height)r=b;}
  if(st.el&&!r&&(st._try||0)<4){st._try=(st._try||0)+1;CO.q.unshift(st);CO.i--;CO.busy=1;setTimeout(()=>{if(CO){CO.busy=0;coachNext();}},300);return;}
  const pad=6,hole=$('#coHole'),bub=$('#coBub'),vh=VH();
- const first=!CO.placed;CO.placed=1;
- if(r){hole.className='';hole.style.cssText=`left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px`;if(first){hole.style.transition='none';void hole.offsetWidth;hole.style.transition='';}}
+ if(r){hole.className='';hole.style.cssText=`left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px`;}
  else{hole.className='none';hole.style.cssText='left:50%;top:50%;width:0;height:0';}
  bub.innerHTML=`<div class=coHead>${st.img?`<img src="${st.img}" alt="">`:I(st.ic||'ball')}<b>${st.h||'안내'}</b><span class=coN>${CO.i}/${CO.tot}</span></div>${st.pic?`<div class="coPic${(st.pic.match(/<img/g)||[]).length>3?' p4':''}">${st.pic}</div>`:''}<div class=coT>${st.t}</div>
   <div class=coBtns><button class="btn ghost sm" data-c=skip>${CO.q.length?'건너뛰기':''}</button><button class="btn gold big" data-c=next>${CO.q.length?'다음 ▶':'알겠어요!'}</button></div>`;
@@ -4947,7 +4944,7 @@ sk('21e','3-1',2,'두 바늘이 직각인 시계',R=>{const want=R.r()<.7,others
  if(want){const o1=R.p(others),o2=R.p(others.filter(x=>x!==o1));hs=sh(R,[R.p([3,9]),o1,o2]);ans=labs[hs.findIndex(h=>h===3||h===9)];}
  else{const o=R.p(others);hs=sh(R,[3,9,o]);ans=labs[hs.indexOf(o)];}
  const pic=`<div style="display:flex;gap:8px;justify-content:center">${hs.map((h,i)=>`<div style="flex:1;max-width:150px;text-align:center">${MODEL.clock(h,0)}<div style="font-size:18px;font-weight:800">${labs[i]}</div></div>`).join('')}</div>`;
- return{q:`긴바늘과 짧은바늘이 직각을 이${want?'루는':'루지 않는'} 시계는 어느 것일까요?`,pic,a:ans,ch:labs,e:`3시와 9시에는 긴바늘이 12, 짧은바늘이 3(또는 9)을 가리켜서 두 바늘이 직각(ㄴ 모양)을 이루어요. 다른 정각에서는 직각이 되지 않아요.`};});
+ return{q:`긴바늘과 짧은바늘이 직각을 이${want?'루는':'루지 않는'} 시계는 어느 것일까요?`,pic,a:ans,ch:labs,e:`${labs.map((l,i)=>`${l}는 ${hs[i]}시`).join(', ')}를 가리켜요. 3시와 9시에는 긴바늘이 12, 짧은바늘이 3(또는 9)에 있어서 직각(ㄴ 모양)을 이루고, 다른 정각에서는 직각이 되지 않아요. 그래서 ${want?'직각을 이루는':'직각을 이루지 않는'} 시계는 ${ans}예요.`};});
 sk('21f','3-1',2,'도형의 성질로 이름·설명 찾기',R=>{
  const D={'정사각형':{d:'네 각이 모두 직각이고 네 변의 길이가 모두 같은 도형',t:['네 변의 길이가 모두 같아요','직각이 4개 있어요','변이 4개, 꼭짓점이 4개예요'],f:['직각이 2개뿐이에요','변이 3개예요','네 변의 길이가 모두 달라요','직각이 하나도 없어요']},
   '직사각형':{d:'네 각이 모두 직각이고 마주 보는 변의 길이만 같은(이웃한 두 변의 길이는 다른) 도형',t:['네 각이 모두 직각이에요','변이 4개, 꼭짓점이 4개예요','마주 보는 변의 길이가 같아요'],f:['직각이 하나도 없어요','변이 3개예요','직각이 2개뿐이에요','꼭짓점이 5개예요']},
@@ -4964,7 +4961,7 @@ sk('21g','3-1',2,'직사각형·정사각형의 변의 길이(그림)',R=>{const
 
 // ---------- 3-1 · 나눗셈 ----------
 sk('21h','3-1',3,'이야기로 나눗셈(몇 개씩 담으면?)',R=>{const k=R.i(2,9),q=R.i(3,9),N=k*q;const X=R.p([['사탕','개','봉지'],['구슬','개','상자'],['쿠키','개','접시'],['색연필','자루','통'],['딸기','개','바구니'],['색종이','장','묶음']]);
- let qs;if(R.r()<.2)qs=`학생 ${N}명이 한 모둠에 ${k}명씩 앉으면 모두 몇 모둠일까요?`;else qs=`${X[0]} ${N}${X[1]}를 한 ${X[2]}에 ${k}${X[1]}씩 담으면 모두 몇 ${X[2]}가 될까요?`;
+ let qs;if(R.r()<.2)qs=`학생 ${N}명이 한 모둠에 ${k}명씩 앉으면 모두 몇 모둠일까요?`;else qs=`${X[0]} ${josa(N+X[1],'을를')} 한 ${X[2]}에 ${k}${X[1]}씩 담으면 모두 ${josa('몇 '+X[2],'이가')} 될까요?`;
  const c=choicesNum(q,[N-k,k,q+1,q-1],R.r,String);return{q:qs,...c,e:`${N} ÷ ${k} = ${q}. (${k} × ${q} = ${N}이니까 ${q}이에요.)`};});
 sk('21i','3-1',3,'나눗셈식에서 □ 구하기',R=>{const k=R.i(2,9),q=R.i(2,9),n=k*q,t=R.i(0,2);let qs,ans,e,cand;
  if(t===0){qs=`${n} ÷ □ = ${q}에서 □는?`;ans=k;e=`□ × ${q} = ${n}이니까 □ = ${k}`;cand=[q,n-q,k+1,k-1];}
@@ -5091,7 +5088,7 @@ sk('22m','3-2',3,'원 안에서 가장 긴 선분(그림)',R=>{const cx=130,cy=8
   const mx=(p[0]+q[0])/2,my=(p[1]+q[1])/2,dx=q[0]-p[0],dy=q[1]-p[1],L=Math.hypot(dx,dy),nx=-dy/L,ny=dx/L,sg=ci===0?-1:((mx-cx)*nx+(my-cy)*ny>=0?1:-1);
   s+=tx((mx+nx*sg*13).toFixed(1),(my+ny*sg*13+5).toFixed(1),labs[pos],{s:17,c:cols[pos]});if(ci===0)ans=labs[pos];});
  s+=`<circle cx="${cx}" cy="${cy}" r="3.5" fill="${INK}"/>`;
- return{q:'원 안에 세 선분 ㄱ, ㄴ, ㄷ을 그었어요. 가장 긴 선분은 어느 것일까요?',pic:SV(260,164,s,300),a:ans,ch:labs,e:'원의 중심을 지나는 선분이 지름이고, 지름은 원 안에 그을 수 있는 가장 긴 선분이에요. 중심(검은 점)을 지나는 선분을 찾아요.'};});
+ return{q:'원 안에 세 선분 ㄱ, ㄴ, ㄷ을 그었어요. 가장 긴 선분은 어느 것일까요?',pic:SV(260,164,s,300),a:ans,ch:labs,e:'원의 중심을 지나는 선분이 지름이고, 지름은 원 안에 그을 수 있는 가장 긴 선분이에요. 중심(검은 점)을 지나는 선분이 가장 길어요. 정답: 선분 '+ans};});
 sk('22n','3-2',3,'맞닿은 원에서 길이 구하기(그림)',R=>{const t=R.i(0,2);
  if(t===0){let r1=R.i(2,8),r2=R.i(2,8);if(r1===r2)r2=r2<8?r2+1:r2-1;const sc=Math.min(10,230/(2*(r1+r2))),x1=14+r1*sc,x2=x1+(r1+r2)*sc,cy=14+Math.max(r1,r2)*sc,W=x2+r2*sc+14,H=2*Math.max(r1,r2)*sc+28;
   const s=`<circle cx="${x1}" cy="${cy}" r="${r1*sc}" fill="#bbdefb" stroke="${INK}" stroke-width="3"/><circle cx="${x2}" cy="${cy}" r="${r2*sc}" fill="#ffe0b2" stroke="${INK}" stroke-width="3"/><line x1="${x1}" y1="${cy}" x2="${x2}" y2="${cy}" stroke="${RED}" stroke-width="3.5"/><circle cx="${x1}" cy="${cy}" r="4" fill="${INK}"/><circle cx="${x2}" cy="${cy}" r="4" fill="${INK}"/>${tx(x1,cy-8,'ㄱ',{s:15})}${tx(x2,cy-8,'ㄴ',{s:15})}`;
@@ -5143,7 +5140,7 @@ sk('22w','3-2',5,'단위가 다른 들이·무게 비교하기',R=>{const k=R.i(
 sk('22x','3-2',5,'같은 양이 여러 개일 때(들이·무게)',R=>{const vol=R.r()<.5,U=vol?['L','mL']:['kg','g'],each=R.p([150,200,250,300,400,500,600,750]),n=R.i(3,9),tot=each*n;if(tot<1000||tot%1000===0)return null;
  const k=Math.floor(tot/1000),m=tot%1000,f=(kk,mm)=>`${kk} ${U[0]} ${mm} ${U[1]}`,a=f(k,m),alt=m>=500?m-100:m+100;
  const ch=uniq([a,f(k+1,m),k>1?f(k-1,m):f(k+2,m),f(k,alt)]);const item=vol?['주스','병']:['밀가루','봉지'];
- return{q:`${item[0]} 한 ${item[1]}은 ${each} ${U[1]}예요. ${n}${item[1]}은 모두 몇 ${U[0]} 몇 ${U[1]}일까요?`,a,ch,e:`${each} × ${n} = ${nf(tot)} ${U[1]}예요. 1000 ${U[1]} = 1 ${U[0]}이니까 ${nf(tot)} ${U[1]} = ${a}.`};});
+ return{q:`${item[0]} ${josa('한 '+item[1],'은는')} ${each} ${U[1]}예요. ${josa(n+item[1],'은는')} 모두 몇 ${U[0]} 몇 ${U[1]}일까요?`,a,ch,e:`${each} × ${n} = ${nf(tot)} ${U[1]}예요. 1000 ${U[1]} = 1 ${U[0]}이니까 ${nf(tot)} ${U[1]} = ${a}.`};});
 sk('22y','3-2',5,'비커 눈금 읽기(그림)',R=>{const lv=R.i(2,19)*50,H=lv*.15,y0=172;let s=`<rect x="92" y="${(y0-H).toFixed(1)}" width="76" height="${H.toFixed(1)}" fill="#7fc8ff" opacity=".85"/><path d="M90 20 L90 170 Q90 175 96 175 L164 175 Q170 175 170 170 L170 20" fill="none" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
  for(let v=50;v<=1000;v+=50){const y=y0-v*.15,major=v%100===0;s+=`<line x1="90" y1="${y.toFixed(1)}" x2="${major?108:100}" y2="${y.toFixed(1)}" stroke="${INK}" stroke-width="${major?2:1.4}"/>`;if(v%200===0)s+=tx(84,y+4,v===1000?'1 L':v,{s:12,a:'end',w:700});}
  const c=choicesNum(lv,[lv+50,lv-50,lv+100,lv-100],R.r,x=>nf(x)+' mL');return{q:'비커에 물이 담겨 있어요. 물의 양은 몇 mL일까요? (눈금 한 칸은 50 mL, 1 L = 1000 mL)',pic:SV(260,186,s,260),...c,e:`눈금 한 칸이 50 mL예요. 물의 높이를 눈금에서 읽으면 ${nf(lv)} mL예요.`};});
@@ -5212,7 +5209,7 @@ sk('23p','5-1',6,'높이가 같을 때 넓이 비교',R=>{const a=R.i(3,8),k=R.i
 
 // ---------- 5-2 ----------
 sk('24a','5-2',1,'이상·이하·초과·미만 범위 안의 수',R=>{const lo=R.i(10,60),hi=lo+R.i(4,9),li=R.r()<.5,hu=R.r()<.5,inR=x=>(li?x>=lo:x>lo)&&(hu?x<=hi:x<hi),pool=[];for(let x=lo;x<=hi;x++)if(inR(x))pool.push(x);const a=R.p(pool),wr=sh(R,[lo-1,hi+1,li?lo-2:lo,hu?hi+2:hi]).slice(0,3);
- return{q:`${lo} ${li?'이상':'초과'} ${hi} ${hu?'이하':'미만'}인 수는?`,a,ch:[a,...wr],e:`${lo} ${li?'이상은 '+lo+'을 포함하고':'초과는 '+lo+'을 포함하지 않고'}, ${hi} ${hu?'이하는 '+hi+'을 포함해요':'미만은 '+hi+'을 포함하지 않아요'}.`};});
+ return{q:`${lo} ${li?'이상':'초과'} ${hi} ${hu?'이하':'미만'}인 수는?`,a,ch:[a,...wr],e:`${lo} ${li?'이상은 '+lo+'을 포함하고':'초과는 '+lo+'을 포함하지 않고'}, ${hi} ${hu?'이하는 '+hi+'을 포함해요':'미만은 '+hi+'을 포함하지 않아요'}. 그래서 ${li?lo:lo+1}부터 ${hu?hi:hi-1}까지의 수예요. 정답: ${a}`};});
 sk('24b','5-2',1,'올림으로 해결하는 이야기',R=>{const k=R.i(4,12);let n=R.i(20,95);if(n%k===0)n++;const a=Math.ceil(n/k),c=choicesNum(a,[Math.floor(n/k),a+1,Math.round(n/k),n-k],R.r);
  return{q:`학생 ${n}명이 모두 타려면 ${k}인승 승합차가 적어도 몇 대 필요할까요?`,...c,e:`${n} ÷ ${k} = ${(n/k).toFixed(1)}…이에요. 남은 학생도 타야 하므로 올림해서 ${a}대예요.`};});
 sk('24c','5-2',1,'버림으로 해결하는 이야기',R=>{const p=R.p([300,400,600,700,800,1200]);let m=R.i(20,99)*100;if(m%p===0)m+=100;const a=Math.floor(m/p),c=choicesNum(a,[a+1,Math.round(m/p),a-1,Math.floor(m/p/10)],R.r);
@@ -5224,7 +5221,7 @@ sk('24e','5-2',2,'곱하는 수에 따라 달라지는 곱의 크기',R=>{const 
 sk('24f','5-2',2,'분수만큼 쓰고 남은 양',R=>{const b=R.i(3,8),a=R.i(1,b-1),k=R.i(2,6),L=b*k,use=a*k,rem=L-use,c=choicesNum(rem,[use,k,L-a,rem+k],R.r);
  return{q:`길이가 ${L} m인 끈의 ${J(a+'/'+b,'을를')} 사용했어요. 남은 끈은 몇 m일까요?`,...c,e:`${L}의 ${a}/${b} = ${L} × ${a}/${b} = ${use}(m)를 사용했어요. 남은 끈은 ${L} − ${use} = ${rem}(m).`};});
 const SYM=[['선대칭도형에서 대응점을 이은 선분과 대칭축이 만나서 이루는 각의 크기는?','90°',['45°','60°','180°']],['점대칭도형에서 대칭의 중심은 대응점을 이은 선분을 어떻게 나누나요?','똑같이 둘로 나누어요',['1 : 2로 나누어요','나누지 않아요','대응점과 상관없어요']],['점대칭도형은 대칭의 중심을 기준으로 몇 °돌렸을 때 처음 도형과 완전히 겹치나요?','180°',['45°','60°','120°']],['선대칭도형을 대칭축으로 접었을 때 서로 겹치는 점을 무엇이라고 할까요?','대응점',['꼭짓점','대칭축','중심']]];
-sk('24g','5-2',3,'선대칭·점대칭의 성질 알기',R=>{const t=R.i(0,5);if(t<4){const s=SYM[t];return{q:s[0],a:s[1],ch:[s[1],...s[2]],e:'선대칭도형은 대칭축을 따라 접으면 완전히 겹치고, 점대칭도형은 대칭의 중심을 기준으로 180° 돌리면 완전히 겹쳐요.'};}
+sk('24g','5-2',3,'선대칭·점대칭의 성질 알기',R=>{const t=R.i(0,5);if(t<4){const s=SYM[t];return{q:s[0],a:s[1],ch:[s[1],...s[2]],e:['선대칭도형에서 대응점을 이은 선분은 대칭축과 수직으로 만나요(90°).','점대칭도형에서 대칭의 중심은 대응점을 이은 선분을 똑같이 둘로 나누어요.','점대칭도형은 대칭의 중심을 기준으로 180° 돌렸을 때 처음 도형과 완전히 겹쳐요.','선대칭도형을 대칭축으로 접으면 서로 겹치는 점이 대응점이에요.'][t]};}
  const d=R.i(2,9);if(t===4){const c=choicesNum(d*2,[d,d+2,d*3,d*2+1],R.r);return{q:`선대칭도형에서 점 ㄱ과 대응점을 이은 선분이 대칭축과 만나는 점을 점 ㅇ이라 해요. 선분 ㄱㅇ이 ${d} cm이면 점 ㄱ과 대응점 사이의 거리는 몇 cm일까요?`,...c,e:`대칭축은 대응점을 이은 선분을 똑같이 둘로 나누어요. ${d} × 2 = ${d*2}(cm)`};}
  const c=choicesNum(d,[d*2,d+2,d*3,d-1],R.r);return{q:`점대칭도형에서 대칭의 중심 ㅇ에서 점 ㄱ까지의 거리가 ${d} cm이면, 대칭의 중심에서 점 ㄱ의 대응점까지의 거리는 몇 cm일까요?`,...c,e:`대칭의 중심에서 각 대응점까지의 거리는 같아요 → ${d} cm`};});
 const dec=(P,s)=>{let t=String(P);if(s>0){t=t.padStart(s+1,'0');t=t.slice(0,-s)+'.'+t.slice(-s);t=t.replace(/0+$/,'').replace(/\.$/,'');}return t;};
@@ -5233,7 +5230,7 @@ sk('24h','5-2',4,'곱의 소수점 위치 정하기',R=>{let A,B,s1,s2,t=0;do{A=
 sk('24i','5-2',4,'이야기로 소수의 곱셈(값 구하기)',R=>{const p=R.p([1200,1500,2400,3000,4500,6000,8000]),W=R.p([12,15,18,25,35,45]),it=R.p(['돼지고기','밀가루','사과','쌀']),cost=p*W/10,c=choicesNum(cost,[cost*10,cost/10,cost+p,p*Math.floor(W/10)],R.r);
  return{q:`${it} 1 kg의 값이 ${nf(p)}원일 때, ${W/10} kg의 값은 얼마일까요?`,...c,e:`${nf(p)} × ${W/10} = ${nf(cost)}(원)`};});
 const FAC=[['직육면체의 겨냥도에서 보이는 모서리는 모두 몇 개일까요?',9],['직육면체의 겨냥도에서 보이지 않는(점선) 모서리는 모두 몇 개일까요?',3],['직육면체의 겨냥도에서 보이는 면은 모두 몇 개일까요?',3],['직육면체의 겨냥도에서 보이는 꼭짓점은 모두 몇 개일까요?',7],['직육면체에서 한 면과 수직인 면은 모두 몇 개일까요?',4],['직육면체에서 한 면과 평행한 면은 모두 몇 개일까요?',1],['직육면체에서 한 꼭짓점에서 만나는 모서리는 모두 몇 개일까요?',3],['직육면체에서 한 모서리에서 만나는 면은 모두 몇 개일까요?',2]];
-sk('24j','5-2',5,'직육면체의 겨냥도와 성질 수 세기',R=>{const f=R.p(FAC),c=choicesNum(f[1],[12,6,8,9,3,7,1,4,2],R.r);return{q:f[0],...c,e:'직육면체는 면 6개, 모서리 12개, 꼭짓점 8개예요. 겨냥도에서는 보이는 모서리 9개, 보이지 않는 모서리 3개를 그려요.'};});
+sk('24j','5-2',5,'직육면체의 겨냥도와 성질 수 세기',R=>{const f=R.p(FAC),c=choicesNum(f[1],[12,6,8,9,3,7,1,4,2],R.r);return{q:f[0],...c,e:['겨냥도에서는 모서리 12개 중 가려진 3개를 뺀 9개가 실선으로 보여요.','가려서 보이지 않는 모서리는 점선으로 그리는 3개예요.','한 꼭짓점에서 만나는 3개의 면(앞·옆·위)이 보이고, 나머지 3개 면은 가려져요.','꼭짓점 8개 중 가려진 1개를 뺀 7개가 보여요.','한 면은 마주 보는 면과 평행하고, 나머지 4개 면과 수직이에요.','한 면과 평행한 면은 마주 보는 면 1개뿐이에요.','한 꼭짓점에서는 모서리 3개가 만나요(가로·세로·높이).','한 모서리에서는 면 2개가 만나요.'][FAC.indexOf(f)]+` 정답: ${f[1]}개`};});
 sk('24k','5-2',5,'마주 보는 면의 눈의 수',R=>{const x=R.i(1,6),c=choicesNum(7-x,[x,7,6,x+1,x-1],R.r);return{q:`마주 보는 두 면의 눈의 수의 합이 7인 주사위에서 눈이 ${x}인 면과 마주 보는 면의 눈은 몇일까요?`,...c,e:`마주 보는 면은 서로 평행해요. 합이 7이므로 7 − ${x} = ${7-x}`};});
 sk('24l','5-2',6,'한 명이 더 들어오면 평균은?',R=>{const n=R.p([3,4,5]),a=R.i(60,90),b=a+R.i(-4,4),x=(n+1)*b-n*a;if(x<30||x>100)return null;const c=choicesNum(b,[a,Math.round((a+x)/2),x,b+1],R.r);
  return{q:`${n}명의 평균 점수가 ${a}점이에요. 한 명이 더 들어와 점수가 ${x}점일 때, ${n+1}명의 평균 점수는 몇 점일까요?`,...c,e:`(${a} × ${n} + ${x}) ÷ ${n+1} = ${(a*n+x)} ÷ ${n+1} = ${b}(점)`};});
@@ -5294,8 +5291,8 @@ sk('25j','6-1',2,'각뿔의 모든 모서리 길이의 합',R=>{const n=R.i(3,8)
 sk('25k','6-1',2,'각기둥·각뿔의 틀린 설명 찾기',R=>{const n=R.i(3,9),N=KN[n];
  const T=[`${N}각기둥의 옆면은 모두 직사각형이에요.`,`${N}각뿔의 밑면은 1개예요.`,'각뿔의 옆면은 모두 삼각형이에요.',`${N}각기둥의 꼭짓점은 ${2*n}개예요.`,'각기둥의 두 밑면은 서로 평행하고 합동이에요.',`${N}각뿔의 옆면은 ${n}개예요.`];
  const F=[`${N}각기둥의 모서리는 ${2*n}개예요.`,'각뿔의 옆면은 모두 직사각형이에요.','각기둥의 밑면은 1개예요.',`${N}각뿔의 꼭짓점은 ${n}개예요.`,`${N}각기둥의 면은 ${n}개예요.`];
- const w=R.p(F),ts=sh(R,T).slice(0,3);
- return{q:'각기둥과 각뿔에 대한 설명으로 틀린 것을 찾아보세요.',a:w,ch:sh(R,[w,...ts]),e:'각기둥: 면 n+2개·모서리 3n개·꼭짓점 2n개, 각뿔: 면 n+1개·모서리 2n개·꼭짓점 n+1개예요. 옆면은 각기둥은 직사각형, 각뿔은 삼각형이에요.'};});
+ const w=R.p(F),ts=sh(R,T).slice(0,3),FC=[`${N}각기둥의 모서리는 3 × ${n} = ${3*n}개예요.`,'각뿔의 옆면은 모두 삼각형이에요.','각기둥의 밑면은 2개예요.',`${N}각뿔의 꼭짓점은 ${n} + 1 = ${n+1}개예요.`,`${N}각기둥의 면은 ${n} + 2 = ${n+2}개예요(옆면 ${n}개 + 밑면 2개).`];
+ return{q:'각기둥과 각뿔에 대한 설명으로 틀린 것을 찾아보세요.',a:w,ch:sh(R,[w,...ts]),e:'틀린 설명은 "'+w+'"예요. 바르게 고치면: '+FC[F.indexOf(w)]};});
 sk('25l','6-1',2,'두 입체도형의 면·모서리·꼭짓점 수 비교',R=>{const n1=R.i(3,9),n2=R.i(3,9),p1=R.r()<.5,p2=R.r()<.5,k=R.p(['면','모서리','꼭짓점']),c1=cnt(n1,p1,k),c2=cnt(n2,p2,k);
  const nm=(n,p)=>`${KN[n]}${p?'각기둥':'각뿔'}`,A=nm(n1,p1),B=nm(n2,p2);if(c1===c2||A===B)return null;const more=R.r()<.5,ans=(more===(c1>c2))?A:B;
  return{q:`${A}과 ${B} 중 ${josa(k,'이가')} 더 ${more?'많은':'적은'} 도형은?`,a:ans,ch:[A,B],e:`${A}의 ${k} 수는 ${c1}개, ${B}의 ${k} 수는 ${c2}개예요.`};});
@@ -5340,9 +5337,9 @@ sk('25y','6-1',4,'분수·소수·백분율의 크기 비교',R=>{const vs=sh(R,
  return{q:`다음 세 수 중 가장 ${big?'큰':'작은'} 수는?`,a:t.s,ch:it.map(x=>x.s),e:`모두 백분율로 바꾸어 비교해요. ${it.map(x=>`${x.s} = ${x.v}%`).join(', ')}이므로 ${t.s}이 가장 ${big?'커요':'작아요'}.`};});
 sk('25z','6-1',4,'비율과 백분율의 뜻 바르게 이해하기',R=>{const p=R.p([20,25,40,60,75]),T=R.p([40,80,120,200,400]),P=R.i(2,15)*1000,r=R.p([0.2,0.35,0.4,0.6,0.75]),x=T*p/100,y=P*p/100;if(!Number.isInteger(x)||!Number.isInteger(y))return null;
  const tr=[`합격률이 ${p}%인 시험에 ${T}명이 지원하면 ${x}명이 합격해요.`,`정가 ${nf(P)}원의 ${p}%를 할인하면 ${nf(y)}원이 깎여요.`,`비율이 ${r}이면 기준량이 100일 때 비교하는 양은 ${Math.round(r*100)}이에요.`],
-  fa=[`합격률이 ${p}%인 시험에 ${T}명이 지원하면 ${T-x}명이 합격해요.`,`정가 ${nf(P)}원의 ${p}%를 할인하면 ${nf(P-y)}원이 깎여요.`,`비율이 ${r}이면 기준량이 100일 때 비교하는 양은 ${Math.round(r*10)}이에요.`,`${p}%는 기준량을 10으로 볼 때 비교하는 양이 ${p}라는 뜻이에요.`];
- const t=R.p(tr),f=sh(R,fa).slice(0,3);
- return{q:'다음 중 바르게 설명한 것은?',a:t,ch:sh(R,[t,...f]),e:'백분율은 기준량을 100으로 볼 때의 비율이에요. (비교하는 양) = (기준량) × (비율)로 구해요. 할인 금액과 할인된 가격을 구별해요.'};});
+  fa=[`합격률이 ${p}%인 시험에 ${T}명이 지원하면 ${T-x}명이 합격해요.`,`정가 ${nf(P)}원의 ${p}%를 할인하면 ${nf(P-y)}원이 깎여요.`,`비율이 ${r}이면 기준량이 100일 때 비교하는 양은 ${Math.round(r*10)}이에요.`,`${p}%는 기준량을 10으로 볼 때 비교하는 양이 ${p}${p%10===5?'':'이'}라는 뜻이에요.`];
+ const t=R.p(tr),f=sh(R,fa).slice(0,3),TE=[`${T} × ${p}/100 = ${x}(명)이 합격해요.`,`${nf(P)} × ${p}/100 = ${nf(y)}(원)이 깎여요. 할인된 가격은 ${nf(P-y)}원이에요.`,`${r} × 100 = ${Math.round(r*100)}이므로 기준량이 100일 때 비교하는 양은 ${Math.round(r*100)}이에요(${Math.round(r*100)}%).`];
+ return{q:'다음 중 바르게 설명한 것은?',a:t,ch:sh(R,[t,...f]),e:'백분율은 기준량을 100으로 볼 때의 비율이에요. (비교하는 양) = (기준량) × (비율)로 구해요. '+TE[tr.indexOf(t)]+' 나머지 설명은 계산이 맞지 않아요.'};});
 
 // ---------- 6-1 단원5: 여러 가지 그래프 ----------
 const CATS=[['동화책','만화책','과학책','위인전'],['축구','야구','농구','피구'],['사과','귤','포도','딸기'],['국어','수학','영어','과학']];
@@ -5376,15 +5373,15 @@ sk('25ai','6-1',6,'상자에 쌓기나무 빈틈없이 쌓기',R=>{const e=R.p([
 sk('25aj','6-1',6,'뚜껑 없는 상자의 겉넓이',R=>{const a=R.i(3,12),b=R.i(3,12),h=R.i(2,9),full=2*(a*b+b*h+h*a),ans=full-a*b;
  return{q:`가로 ${a} cm, 세로 ${b} cm, 높이 ${h} cm인 직육면체 모양의 상자에서 윗면이 뚫려 있어요(뚜껑이 없어요). 이 상자의 겉면의 넓이는 몇 cm²일까요?`,...choicesNum(ans,[full,full-2*a*b,a*b+2*(b*h+h*a)+a*b,2*(b*h+h*a)],R.r),e:`직육면체의 겉넓이는 ${full} cm²이고, 없는 윗면 ${a} × ${b} = ${a*b}(cm²)를 빼요. ${full} − ${a*b} = ${ans}(cm²)`};});
 sk('25ak','6-1',6,'직육면체·정육면체의 틀린 설명 찾기',R=>{const T=['직육면체는 면이 6개, 모서리가 12개, 꼭짓점이 8개예요.','직육면체에서 마주 보는 면은 서로 합동이에요.','정육면체는 모든 모서리의 길이가 같아요.','직육면체의 부피는 (가로)×(세로)×(높이)로 구해요.','1 m³는 1000000 cm³예요.','직육면체에서 한 꼭짓점에서 만나는 모서리는 3개예요.'],
-  F=['직육면체의 모든 면은 정사각형이에요.','정육면체의 겉넓이는 한 면의 넓이의 4배예요.','1 m³는 1000 cm³예요.','직육면체의 모서리는 8개예요.','부피의 단위 cm³는 넓이를 나타내는 단위예요.'],w=R.p(F),ts=sh(R,T).slice(0,3);
- return{q:'직육면체와 정육면체에 대한 설명으로 틀린 것을 찾아보세요.',a:w,ch:sh(R,[w,...ts]),e:'직육면체는 면 6개, 모서리 12개, 꼭짓점 8개예요. 정육면체의 겉넓이는 한 면의 넓이의 6배이고, 1 m³ = 100 cm × 100 cm × 100 cm = 1000000 cm³예요.'};});
+  F=['직육면체의 모든 면은 정사각형이에요.','정육면체의 겉넓이는 한 면의 넓이의 4배예요.','1 m³는 1000 cm³예요.','직육면체의 모서리는 8개예요.','부피의 단위 cm³는 넓이를 나타내는 단위예요.'],w=R.p(F),ts=sh(R,T).slice(0,3),FC=['직육면체의 면은 직사각형이에요. 모든 면이 정사각형인 것은 정육면체예요.','정육면체는 면이 6개이고 모두 합동이라서 겉넓이는 한 면의 넓이의 6배예요.','1 m³ = 100 cm × 100 cm × 100 cm = 1,000,000 cm³예요.','직육면체의 모서리는 12개예요(꼭짓점이 8개).','cm³는 부피의 단위예요. 넓이의 단위는 cm²예요.'];
+ return{q:'직육면체와 정육면체에 대한 설명으로 틀린 것을 찾아보세요.',a:w,ch:sh(R,[w,...ts]),e:'틀린 설명은 "'+w+'"예요. 바르게 고치면: '+FC[F.indexOf(w)]};});
 
 // ---------- 6-2 단원1: 분수의 나눗셈 ----------
 const pf=R=>{const d=R.i(2,10),n=R.i(1,d-1);return gcd(n,d)===1?[n,d]:null;};
 sk('26a','6-2',1,'(분수)÷(분수)의 몫이 1보다 큰지 어림하기',R=>{const x=pf(R),y=pf(R);if(!x||!y||x[0]*y[1]===y[0]*x[1])return null;const big=x[0]*y[1]>y[0]*x[1];
  return{q:`${x[0]}/${x[1]} ÷ ${y[0]}/${y[1]}의 몫은 1보다 클까요, 작을까요?`,a:big?'1보다 커요':'1보다 작아요',ch:['1보다 커요','1보다 작아요','1과 같아요'],e:`나누어지는 수가 나누는 수보다 ${big?'크므로':'작으므로'} 몫은 1보다 ${big?'커요':'작아요'}. (${x[0]}/${x[1]}과 ${y[0]}/${y[1]}을 통분하면 ${x[0]*y[1]}/${x[1]*y[1]}과 ${y[0]*x[1]}/${x[1]*y[1]})`};});
 sk('26b','6-2',1,'이야기로 (분수)÷(분수) 몇 번 덜어 내기',R=>{const[it,u]=R.p([['물','L'],['주스','L'],['끈','m'],['리본','m']]),c=R.i(1,5),d=R.i(c+1,10);if(gcd(c,d)!==1)return null;const k=R.i(2,9),tn=k*c,td=d,g=gcd(tn,td),A=`${tn/g}/${td/g}`;if(td/g===1)return null;
- return{q:`${it} ${frm(tn,td)} ${u}를 ${c}/${d} ${u}씩 덜어 낼 때, 모두 몇 번 덜어 낼 수 있을까요?`,...choicesNum(k,[k+1,k-1,k*2,Math.max(1,k-2)],R.r,v=>v+'번'),e:`${frm(tn,td)}${frm(tn,td)!==imp(tn,td)?` = ${imp(tn,td)}`:''}이므로 ${imp(tn,td)} ÷ ${c}/${d} = ${imp(tn,td)} × ${iv(c,d)} = ${k}(번)`};});
+ return{q:`${it} ${frm(tn,td)} ${u}를 ${c}/${d} ${u}씩 덜어 낼 때, 모두 몇 번 덜어 낼 수 있을까요?`,...choicesNum(k,[k+1,k-1,k*2,Math.max(1,k-2)],R.r,v=>v+'번'),e:`${it} ${frm(tn,td)} ${u}를 ${c}/${d} ${u}씩 덜어 내는 횟수는 ${imp(tn,td)} ÷ ${c}/${d} = ${imp(tn,td)} × ${iv(c,d)} = ${k}(번)`};});
 sk('26c','6-2',1,'역수 구하기',R=>{const t=R.i(0,2);if(t===0){const x=pf(R);if(!x)return null;return{q:`${x[0]}/${x[1]}의 역수는?`,...mk(imp(x[1],x[0]),[imp(x[0],x[1]),imp(x[1],x[0]+x[1]),imp(1,x[0]*x[1]),imp(x[0]+x[1],x[0]),imp(x[1]+1,x[0])]),e:`곱해서 1이 되는 두 수를 서로 역수라고 해요. 분자와 분모를 바꾸면 ${imp(x[1],x[0])}이에요.`};}
  const n=R.i(2,12);if(t===1)return{q:`${n}의 역수는?`,...mk(`1/${n}`,[`${n}`,`${n}/${n+1}`,`1/${n+1}`]),e:`${n} = ${n}/1이므로 역수는 1/${n}이에요. ${n} × 1/${n} = 1`};
  return{q:`역수가 ${n}인 수는?`,...mk(`1/${n}`,[`${n}`,`${n}/${n+1}`,`1/${n+1}`]),e:`${n} × □ = 1이므로 □ = 1/${n}이에요.`};});
@@ -5411,7 +5408,7 @@ sk('26i','6-2',2,'위에서 본 모양으로 앞에서 본 모양 알기',R=>{co
  const svg=tabR(g.map(r=>r.map(v=>`<b>${v}</b>`)));
  return{q:'위에서 본 모양에 각 자리에 쌓은 쌓기나무의 수를 쓴 거예요. 앞에서 보면 왼쪽부터 몇 층씩 보일까요?',pic:svg,m:svg,...mk(ans,vr(R,mx,f,[f(sum),f(rev),f(alt)])),e:`앞에서 보면 각 세로줄에서 가장 높게 쌓인 층이 보여요. 세로줄마다 가장 큰 수를 찾으면 ${ans}예요.`};});
 sk('26j','6-2',2,'겉면을 칠한 쌓기나무 정육면체 세어 보기',R=>{const n=R.i(3,5),k=R.i(0,3),L=['한 면도 칠해지지 않은','한 면만 칠해진','두 면만 칠해진','세 면이 칠해진'],V=[(n-2)**3,6*(n-2)**2,12*(n-2),8],ans=V[k];
- return{q:`쌓기나무를 한 모서리에 ${n}개씩 쌓아 정육면체를 만들고 겉면을 모두 빨간색으로 칠했어요. ${L[k]} 쌓기나무는 모두 몇 개일까요?`,...choicesNum(ans,V.filter((v,i)=>i!==k).concat([ans+n]),R.r,v=>v+'개'),e:`모서리 끝 8개는 세 면, 모서리 가운데 ${12*(n-2)}개는 두 면, 면의 가운데 ${6*(n-2)**2}개는 한 면이 칠해지고, 안쪽 ${(n-2)**3}개는 칠해지지 않아요.`};});
+ return{q:`쌓기나무를 한 모서리에 ${n}개씩 쌓아 정육면체를 만들고 겉면을 모두 빨간색으로 칠했어요. ${L[k]} 쌓기나무는 모두 몇 개일까요?`,...choicesNum(ans,V.filter((v,i)=>i!==k).concat([ans+n]),R.r,v=>v+'개'),e:`모서리 끝 8개는 세 면, 모서리 가운데 ${12*(n-2)}개는 두 면, 면의 가운데 ${6*(n-2)**2}개는 한 면이 칠해지고, 안쪽 ${(n-2)**3}개는 칠해지지 않아요. 그래서 ${L[k]} 쌓기나무는 ${ans}개예요.`};});
 
 // ---------- 6-2 단원3: 소수의 나눗셈 ----------
 sk('26k','6-2',3,'소수의 나눗셈을 자연수의 나눗셈으로 바꾸기',R=>{const k=R.i(1,2),a=R.i(11,98),b=R.i(2,9);if(a%10===0)return null;
@@ -5437,7 +5434,7 @@ sk('26r','6-2',3,'1 kg(1 L)의 값 구하기',R=>{const w=R.i(2,9),unit=R.i(2,20
 sk('26s','6-2',4,'비례식의 외항과 내항 찾기',R=>{const a=R.i(2,9),b=R.i(2,9),k=R.i(2,5),c=a*k,d=b*k;if(new Set([a,b,c,d]).size<4)return null;const out=R.r()<.5,P=(x,y)=>`${J(x,'와과')} ${y}`;
  return{q:`비례식 ${a} : ${b} = ${c} : ${d}에서 ${out?'외항':'내항'}을 모두 찾으면?`,a:out?P(a,d):P(b,c),ch:[P(a,d),P(b,c),P(a,b),P(c,d)],e:`비례식 ${a} : ${b} = ${c} : ${d}에서 바깥쪽 두 수 ${a}, ${d}가 외항이고, 안쪽 두 수 ${b}, ${c}가 내항이에요.`};});
 sk('26t','6-2',4,'비례식이 되는 식 찾기',R=>{const a=R.i(2,9),b=R.i(2,9),k=R.i(2,5);if(a===b)return null;const ok=`${a} : ${b} = ${a*k} : ${b*k}`,w=[`${a} : ${b} = ${a*k} : ${b*k+1}`,`${a} : ${b} = ${a+k} : ${b+k}`,`${a} : ${b} = ${b*k} : ${a*k}`];
- return{q:'다음 중 비례식인 것은?',a:ok,ch:sh(R,[ok,...w]),e:`비례식은 두 비의 비율이 같아야 해요. ${a} : ${b}의 앞뒤 항에 ${k}를 곱한 ${a*k} : ${b*k}와는 비율이 같아서 비례식이에요. 외항의 곱과 내항의 곱도 같아요: ${a} × ${b*k} = ${b} × ${a*k}`};});
+ return{q:'다음 중 비례식인 것은?',a:ok,ch:sh(R,[ok,...w]),e:`비례식은 두 비의 비율이 같아야 해요. ${a} : ${b}의 앞뒤 항에 ${k}를 곱한 ${a*k} : ${b*k}도 비율이 같아서 비례식이에요. 외항의 곱과 내항의 곱도 같아요: ${a} × ${b*k} = ${b} × ${a*k}`};});
 sk('26u','6-2',4,'세 사람에게 비례배분하기',R=>{const[x,y,z]=sh(R,NM2).slice(0,3),a=R.i(1,5),b=R.i(1,5),c=R.i(1,5),k=R.i(2,9),s=a+b+c;if(new Set([a,b,c]).size<3||gcd(gcd(a,b),c)!==1)return null;const T=s*k,v=[a,b,c],i=R.i(0,2),nm=[x,y,z];
  return{q:`사탕 ${T}개를 ${nm[0]}, ${nm[1]}, ${josa(nm[2],'이가')} ${a} : ${b} : ${c}의 비로 나누어 가지려고 해요. ${josa(nm[i],'이가')} 가지는 사탕은 몇 개일까요?`,...choicesNum(v[i]*k,[Number.isInteger(T/3)?T/3:null,v[i],v[(i+1)%3]*k,v[(i+2)%3]*k],R.r,q=>q+'개'),e:`전체 비의 합은 ${a}+${b}+${c} = ${s}이므로 ${josa(nm[i],'은는')} 전체의 ${v[i]}/${s}예요. ${T} × ${v[i]}/${s} = ${v[i]*k}(개)`};});
 sk('26v','6-2',4,'둘레가 주어진 직사각형의 가로·세로 구하기',R=>{const a=R.i(1,6),b=R.i(1,6),k=R.i(2,6);if(a===b||gcd(a,b)!==1)return null;const P=2*k*(a+b),askW=R.r()<.5,ans=askW?a*k:b*k;
@@ -5472,16 +5469,16 @@ sk('26ah','6-2',6,'원기둥 전개도에서 옆면의 넓이',R=>{const r=R.i(2
  return{q:`밑면의 반지름이 ${r} cm, 높이가 ${h} cm인 원기둥의 전개도에서 옆면(직사각형)의 넓이는 몇 cm²일까요? (원주율: 3.14)`,...mk(D(628*r*h,2),[D(314*r*h,2),D(314*r*r,2),D(628*(r+h),2),D(628*r*r,2),D(314*(r+h),2)]),e:`옆면의 가로는 밑면의 둘레인 ${2*r} × 3.14 = ${D(628*r,2)}(cm), 세로는 높이 ${h} cm예요. ${D(628*r,2)} × ${h} = ${D(628*r*h,2)}(cm²)`};});
 sk('26ai','6-2',6,'평면도형을 돌려서 만든 입체도형',R=>{const t=R.i(0,2);if(t===0)return{q:'직각삼각형의 한 직각변을 기준으로 한 바퀴 돌려 만든 입체도형은?',...mk('원뿔',['원기둥','구','각뿔']),e:'직각삼각형을 직각을 낀 한 변을 축으로 돌리면 원뿔이 돼요. 직사각형은 원기둥, 반원은 구가 돼요.'};
  const a=R.i(2,9),b=R.i(2,9);if(a===b)return null;const rad=R.r()<.5;
- return{q:`가로 ${a} cm, 세로 ${b} cm인 직사각형을 세로 변을 기준으로 한 바퀴 돌려 원기둥을 만들었어요. 이 원기둥의 ${rad?'밑면의 반지름':'높이'}은 몇 cm일까요?`,...choicesNum(rad?a:b,[rad?b:a,2*(rad?a:b),a+b],R.r),e:`돌리는 기준인 세로 변이 원기둥의 높이(${b} cm)가 되고, 가로 변이 밑면의 반지름(${a} cm)이 돼요.`};});
+ return{q:`가로 ${a} cm, 세로 ${b} cm인 직사각형을 세로 변을 기준으로 한 바퀴 돌려 원기둥을 만들었어요. 이 원기둥의 ${rad?'밑면의 반지름은':'높이는'} 몇 cm일까요?`,...choicesNum(rad?a:b,[rad?b:a,2*(rad?a:b),a+b],R.r),e:`돌리는 기준인 세로 변이 원기둥의 높이(${b} cm)가 되고, 가로 변이 밑면의 반지름(${a} cm)이 돼요.`};});
 sk('26aj','6-2',6,'입체도형을 자른 단면의 모양',R=>{const Q=[['원기둥을 밑면과 평행하게 자른 단면의 모양은?','원'],['원기둥을 밑면에 수직으로 자른 단면의 모양은?','직사각형'],['원뿔을 꼭짓점을 지나고 밑면에 수직으로 자른 단면의 모양은?','삼각형'],['원뿔을 밑면과 평행하게 자른 단면의 모양은?','원'],['구를 어떤 방향으로 잘라도 단면의 모양은?','원']],it=R.p(Q);
- return{q:it[0],...mk(it[1],['원','직사각형','삼각형','사다리꼴']),e:'원기둥·원뿔을 밑면과 평행하게 자르면 원이 나오고, 원기둥을 수직으로 자르면 직사각형, 원뿔을 꼭짓점을 지나게 수직으로 자르면 삼각형이 나와요. 구는 어느 방향으로 잘라도 원이에요.'};});
+ return{q:it[0],...mk(it[1],['원','직사각형','삼각형','사다리꼴']),e:['밑면과 평행하게 자르면 밑면과 같은 크기의 원이 나와요.','밑면에 수직으로(세로로) 자르면 직사각형이 나와요.','꼭짓점을 지나 밑면에 수직으로 자르면 이등변삼각형이 나와요.','밑면과 평행하게 자르면 밑면보다 작은 원이 나와요.','구는 어느 방향으로 잘라도 원이에요.'][Q.indexOf(it)]+` 정답: ${it[1]}`};});
 sk('26ak','6-2',6,'반지름과 지름으로 구의 크기 비교',R=>{const r=R.i(2,10),d=R.i(3,20);if(2*r===d)return null;const ans=2*r>d?'가 구':'나 구';
  return{q:`가 구의 반지름은 ${r} cm이고, 나 구의 지름은 ${d} cm예요. 더 큰 구는?`,a:ans,ch:['가 구','나 구'],e:`가 구의 지름은 ${r} × 2 = ${2*r}(cm), 나 구의 지름은 ${d} cm예요. 지름이 더 큰 구가 더 커요.`};});
 sk('26al','6-2',6,'옆면의 가로로 밑면의 반지름 구하기',R=>{const r=R.i(2,12);
  return{q:`원기둥의 전개도에서 옆면의 가로가 ${D(628*r,2)} cm예요. 이 원기둥의 밑면의 반지름은 몇 cm일까요? (원주율: 3.14)`,...choicesNum(r,[2*r,4*r,r+2,r*r],R.r),e:`옆면의 가로는 밑면의 원주와 같아요. 지름 = ${D(628*r,2)} ÷ 3.14 = ${2*r}(cm)이므로 반지름은 ${r} cm예요.`};});
 sk('26am','6-2',6,'원기둥·원뿔·구의 틀린 설명 찾기',R=>{const T=['원기둥의 두 밑면은 서로 평행하고 합동이에요.','원뿔에서 꼭짓점과 밑면의 둘레 위의 한 점을 이은 선분을 모선이라고 해요.','구의 중심에서 구의 겉면의 한 점까지의 거리는 모두 같아요.','원기둥을 앞에서 보면 직사각형 모양이에요.','원뿔의 밑면은 원 모양이에요.'],
-  F=['원기둥의 옆면은 평면이 아닌 두 개의 원이에요.','원뿔은 밑면이 2개예요.','구는 꼭짓점이 1개 있어요.','원기둥의 전개도에서 옆면은 원 모양이에요.','구는 어느 방향에서 보아도 모양이 서로 달라요.'],w=R.p(F),ts=sh(R,T).slice(0,3);
- return{q:'원기둥, 원뿔, 구에 대한 설명으로 틀린 것을 찾아보세요.',a:w,ch:sh(R,[w,...ts]),e:'원기둥의 옆면은 굽은 면이고 전개도에서는 직사각형이에요. 원뿔의 밑면은 1개, 구에는 꼭짓점이 없어요. 구는 어느 방향에서 보아도 원이에요.'};});
+  F=['원기둥의 옆면은 평면이 아닌 두 개의 원이에요.','원뿔은 밑면이 2개예요.','구는 꼭짓점이 1개 있어요.','원기둥의 전개도에서 옆면은 원 모양이에요.','구는 어느 방향에서 보아도 모양이 서로 달라요.'],w=R.p(F),ts=sh(R,T).slice(0,3),FC=['원기둥의 옆면은 굽은 면이고, 원 모양인 것은 두 밑면이에요.','원뿔의 밑면은 1개예요.','구에는 꼭짓점이 없어요.','원기둥의 전개도에서 옆면은 직사각형이에요.','구는 어느 방향에서 보아도 원 모양이에요.'];
+ return{q:'원기둥, 원뿔, 구에 대한 설명으로 틀린 것을 찾아보세요.',a:w,ch:sh(R,[w,...ts]),e:'틀린 설명은 "'+w+'"예요. 바르게 고치면: '+FC[F.indexOf(w)]};});
 }
 
 
@@ -5570,7 +5567,7 @@ sk('27p','4-1',5,'눈금 칸 수와 자료의 값',R=>{const pc=R.p([2,5,10,20,5
  const c=choicesNum(k*pc,[k+pc,k*pc+pc,k*pc-pc,k*2],R.r,x=>x+'명');return{q:`눈금 한 칸이 ${pc}명을 나타내는 막대그래프에서 막대의 길이가 ${k}칸이에요. 이 막대가 나타내는 학생은 몇 명일까요?`,...c,e:`${pc} × ${k} = ${k*pc}(명)`};});
 sk('27q','4-1',5,'막대그래프에서 몇 배인 항목 찾기',R=>{const pc=R.p([2,5,10]),cat=R.p(Object.keys(NAMES4)),names=sh(R,NAMES4[cat]).slice(0,4),mult=R.p([2,3]),m=R.i(1,Math.floor(10/mult)),cells=[m,m*mult];let g=0;const pool=[];for(let i=1;i<=10;i++)if(i>m&&i!==m*mult)pool.push(i);const rest=sh(R,pool).slice(0,2);if(rest.length<2)return null;
  const all=sh(R,[...cells.map((c,i)=>[c,i]),...rest.map(c=>[c,2])]);const names2=all.map((_,i)=>names[i]),vals=all.map(x=>x[0]*pc);const small=names2[all.findIndex(x=>x[0]===m)],ans=names2[all.findIndex(x=>x[0]===m*mult)];
- return{q:`${unitOf(cat)}별 학생 수를 나타낸 막대그래프예요. 가장 적은 학생이 좋아하는 것(${small})의 ${mult}배인 학생이 좋아하는 것은?`,pic:barPic(names2,vals,pc),a:ans,ch:names2,e:`가장 적은 ${small}은 ${m*pc}명이에요. ${m*pc} × ${mult} = ${m*mult*pc}(명)이니까 ${ans}.`};});
+ return{q:`${unitOf(cat)}별 학생 수를 나타낸 막대그래프예요. 가장 적은 학생이 좋아하는 것(${small})의 ${mult}배인 학생이 좋아하는 것은?`,pic:barPic(names2,vals,pc),a:ans,ch:names2,e:`가장 적은 ${josa(small,'은는')} ${m*pc}명이에요. ${m*pc} × ${mult} = ${m*mult*pc}(명)이니까 ${ans}.`};});
 sk('27r','4-1',5,'막대그래프를 보고 알맞은 설명 찾기',R=>{const D=barData(R),{names,vals,pc}=D,idx=vals.map((v,i)=>i),mx=Math.max(...vals),mn=Math.min(...vals),nm=i=>names[i],mxi=vals.indexOf(mx),mni=vals.indexOf(mn);const [i,j]=sh(R,idx).slice(0,2),tot=vals.reduce((a,b)=>a+b,0);
  const T=[`가장 많은 것은 ${nm(mxi)}${hasJong(nm(mxi))?'이에요':'예요'}`,`가장 적은 것은 ${nm(mni)}${hasJong(nm(mni))?'이에요':'예요'}`,`${josa(nm(i),'은는')} ${nm(j)}보다 ${Math.abs(vals[i]-vals[j])}명 ${vals[i]>vals[j]?'많아요':'적어요'}`,`조사한 학생은 모두 ${tot}명이에요`];
  const bad=n=>n+pc*R.p([1,2,3]);const Fz=[`가장 많은 것은 ${nm(mni)}${hasJong(nm(mni))?'이에요':'예요'}`,`가장 적은 것은 ${nm(mxi)}${hasJong(nm(mxi))?'이에요':'예요'}`,`${josa(nm(i),'은는')} ${nm(j)}보다 ${bad(Math.abs(vals[i]-vals[j]))}명 ${vals[i]>vals[j]?'많아요':'적어요'}`,`조사한 학생은 모두 ${tot+pc*R.p([1,2,3])}명이에요`];
@@ -12763,14 +12760,14 @@ GP_THEMES[8]={key:'champion',cls:'champion',champion:1,noSign:1,emoji:'🏆',
     "WWWWWWWWWWWWW",
     "MMNMMMNMMMNMM",
     "P....ddd....P",
-    "0.....r.....4",
-    ".P....r....P.",
+    "0GGGGGGGGGGG4",
+    ".P.*..*..*.P.",
     "1...k.r.k...5",
-    ".P....r....P.",
-    "2...k.r.k...6",
-    ".P....r....P.",
+    ".P..*.r.*..P.",
+    "2*..k.*.k...6",
+    ".P.*..r....P.",
     "3.....r.....7",
-    "WWWWWWDWWWWWW"]},
+    "WWWWWWDWWWWWW"],puz14:{plates:[[8,6],[1,7],[6,4],[9,4],[3,8],[3,4],[6,7],[4,6]],gy:3}},
   objs:[
    {id:'deck',x:4,y:8,ic:'🃏',label:'덱 짜기',col:'#ffd66b'},
    {id:'skill',x:8,y:8,ic:'🛡️',label:'트레이너 스킬',col:'#ff9aa8'}],
@@ -12785,7 +12782,7 @@ GP_THEMES[8]={key:'champion',cls:'champion',champion:1,noSign:1,emoji:'🏆',
 };
 let GP=null;
 const gpRnd=(x,y,k)=>{let h=(x*374761393+y*668265263+k*2147483647)|0;h=Math.imul(h^(h>>>13),1274126177);return(((h^(h>>>16))>>>0)%100000)/100000;};
-const GP_WALK=new Set(['.',',','f','r','b','g','d','p','q','x','@','#','$','%','&','~','^','!']);
+const GP_WALK=new Set(['.',',','f','r','b','g','d','p','q','x','@','#','$','%','&','~','^','!','=',';','*','+']);
 function gpCss(){if(document.getElementById('gp-css'))return;const st=document.createElement('style');st.id='gp-css';st.textContent=`
 .gpWrap{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:0;background:radial-gradient(ellipse at 50% 30%,rgba(30,80,140,.74),rgba(8,18,42,.9));backdrop-filter:blur(3px);animation:gpIn .25s ease-out;font-family:'Jua','Galmuri11',sans-serif;color:#fff}
 @keyframes gpIn{from{opacity:0}to{opacity:1}}
@@ -12800,7 +12797,7 @@ function gpCss(){if(document.getElementById('gp-css'))return;const st=document.c
 .gpStage::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:900;background:radial-gradient(ellipse at 50% 50%,transparent 58%,rgba(0,10,40,.38) 100%)}
 .gpEnt{position:absolute;inset:0;pointer-events:none}
 .gpE{position:absolute;transition:left .15s linear,top .15s linear}
-.gpValve.zap{animation:gpZap .35s steps(2) 2}@keyframes gpZap{0%{filter:brightness(3) hue-rotate(40deg)}100%{filter:none}}.gpValve{background-size:100% 100%;background-repeat:no-repeat;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.3));cursor:pointer}.gpValve.on{filter:drop-shadow(0 0 5px #fff) drop-shadow(0 2px 0 rgba(0,0,0,.3))}.gpLamp{display:flex;align-items:center;justify-content:center;gap:2px;pointer-events:none}.gpLamp i{display:block;width:30%;aspect-ratio:1;border-radius:50%;border:1px solid #0008;box-shadow:0 0 3px #fff8}.gpLamp.open i{box-shadow:0 0 5px #7dffa8}.gpBoulder{background-size:100% 100%;background-repeat:no-repeat;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.3))}.gpBoulder.fall{transition:left .15s linear,top .15s linear,transform .35s ease-in,opacity .35s;transform:scale(.3);opacity:0}
+.gpShade{background-size:100% 100%;background-repeat:no-repeat;image-rendering:pixelated;pointer-events:none;opacity:.88;filter:drop-shadow(0 0 6px #b79bff);animation:gpShF 1.6s ease-in-out infinite alternate}@keyframes gpShF{0%{margin-top:0}100%{margin-top:-2px}}.gpValve.zap{animation:gpZap .35s steps(2) 2}@keyframes gpZap{0%{filter:brightness(3) hue-rotate(40deg)}100%{filter:none}}.gpValve{background-size:100% 100%;background-repeat:no-repeat;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.3));cursor:pointer}.gpValve.on{filter:drop-shadow(0 0 5px #fff) drop-shadow(0 2px 0 rgba(0,0,0,.3))}.gpLamp{display:flex;align-items:center;justify-content:center;gap:2px;pointer-events:none}.gpLamp i{display:block;width:30%;aspect-ratio:1;border-radius:50%;border:1px solid #0008;box-shadow:0 0 3px #fff8}.gpLamp.open i{box-shadow:0 0 5px #7dffa8}.gpBoulder{background-size:100% 100%;background-repeat:no-repeat;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.3))}.gpBoulder.fall{transition:left .15s linear,top .15s linear,transform .35s ease-in,opacity .35s;transform:scale(.3);opacity:0}
 .gpToast{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:900;background:rgba(40,24,10,.92);color:#ffe9b8;border:2px solid #d9a24a;border-radius:10px;padding:5px 12px;font-size:calc(var(--gs,1)*7.5px + 6px);white-space:nowrap;pointer-events:none;animation:gpToastA 1.9s ease forwards}@keyframes gpToastA{0%{opacity:0;transform:translate(-50%,6px)}12%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0}}
 #gpRst{background:#8a5a1c!important;color:#fff!important}
 .gpE img.gpSpr{position:absolute;left:-12%;bottom:-6%;width:124%;image-rendering:pixelated;filter:drop-shadow(1px 0 0 #2d2236) drop-shadow(-1px 0 0 #2d2236) drop-shadow(0 1px 0 #2d2236) drop-shadow(0 -1px 0 #2d2236)}
@@ -13978,6 +13975,8 @@ function gpTileChamp(ctx,map,x,y,scene,fr){
   case 'P':floor();r('rgba(0,0,0,.3)',3,13,11,2);r('#cdbf95',4,12,8,2);r(GO2,4,12,8,1);r(IV,5,3,6,9);r('#fffaf0',5,3,2,9);r('#cdbf95',9,3,2,9);r('#b8a878',10,3,1,9);r(GO,3,1,10,2);r(GO2,3,3,10,1);r(GO,4,13,8,1);break;
   case 'd':floor();r('rgba(0,0,0,.3)',0,13,16,3);r(GO2,0,3,16,13);r(GO,0,3,16,1);r(CR,1,4,14,9);r(CR3,1,4,14,1);r(CR2,1,12,14,1);r(GO,0,13,16,2);r(GO2,0,15,16,1);r(GO,7,7,2,3);r(GO,6,8,4,1);r(GO3,7,8,1,1);if(((fr+x)&3)===1)r('#ffffff',3,6,1,1);break;
   case 'r':floor();r(CR,1,0,14,16);r(CR3,2,0,2,16);r(CR2,12,0,2,16);r(GO,0,0,1,16);r(GO,15,0,1,16);r(GO2,1,0,1,16);r(GO2,14,0,1,16);if(y%2===0){r(GO,7,3,2,1);r(GO,6,4,4,1);r(GO3,7,4,2,1);r(GO,7,5,2,1);}else{r(GO2,5,9,1,1);r(GO2,10,9,1,1);}break;
+  case '*':case '+':{floor();const on=ch==='+';r('rgba(0,0,0,.25)',1,2,14,14);r(on?GO2:NV2,1,1,14,14);r(on?GO:NV,2,2,12,12);r(on?GO3:'#0c1230',3,3,10,10);r(on?'#ffe48a':'#222c66',4,4,8,8);if(!on){r(GO2,4,4,8,1);r(GO2,4,11,8,1);r(GO2,4,4,1,8);r(GO2,11,4,1,8);}else if(((fr+x+y)&1)){r('#ffffff',3,3,1,1);r('#ffffff',12,12,1,1);}break;}
+  case 'G':{floor();r('rgba(0,0,0,.3)',0,13,16,3);r(NV2,0,1,16,14);r(GO2,0,1,16,1);r(GO2,0,13,16,1);for(let i=0;i<4;i++){r(GO,i*4+1,2,2,11);r(GO3,i*4+1,2,1,11);r(GO2,i*4+2,2,1,11);}r(GO,0,6,16,2);r(GO2,0,8,16,1);if(x===6){r(NV2,6,5,4,5);r(GO,7,6,2,3);}break;}
   default:if(ch>='0'&&ch<='7'){const i=+ch;let on=false;try{on=!!(S.meta&&S.meta.gyms&&S.meta.gyms[i]);}catch(e){}const col=(typeof GYMS!=='undefined'&&GYMS[i]&&GYMS[i].c)||'#ffd23f';
    floor();r('rgba(0,0,0,.3)',2,13,12,2);if(on)r('rgba(255,215,90,.20)',0,0,16,14);
    r(GO2,3,10,10,4);r(GO,3,10,10,1);r(NV,4,11,8,2);r(GO3,7,12,2,1);
@@ -14073,18 +14072,66 @@ const CASTLE_MAP=[
  ".P....r....P.",
  "......r......",
  "WWWWWWDWWWWWW"];
+const CASTLE_MAP_ICE=[
+ "WWWWWWWWWWWWW",
+ "MMNMMUUUMMNMM",
+ "P....rrr....P",
+ "tc=c====c===t",
+ "t=ccc=c;===ct",
+ "t====c===c==t",
+ "t==c===c====t",
+ "tc;=;=cc===ct",
+ "t===c===c=c=t",
+ "t.....r.....t",
+ "WWWWWWDWWWWWW"];
+const CASTLE_MAP_EARTH=[
+ "WWWWWWWWWWWWW",
+ "MMNMMUUUMMNMM",
+ "P....rrr....P",
+ "tGGGGGGGGGGGt",
+ "t..*.....*..t",
+ "tAA.A....AA.t",
+ "t..........*t",
+ "t.AA........t",
+ "t.A.......A.t",
+ "t.....r.....t",
+ "WWWWWWDWWWWWW"];
+const CASTLE_MAP_SHADE=[
+ "WWWWWWWWWWWWW",
+ "MMNMMUUUMMNMM",
+ "P....rrr....P",
+ "tGGGGGGGGGGGt",
+ "t...A.m.A...t",
+ "t.A...mA..A.t",
+ "t.....m.A..*t",
+ "t*A.A.m.AA..t",
+ "tAA...m...A.t",
+ "t.....r.....t",
+ "WWWWWWDWWWWWW"];
+const CASTLE_MAP_DRAGON=[
+ "WWWWWWWWWWWWW",
+ "MMNMMUUUMMNMM",
+ "P....rrr....P",
+ "tGGGGGGGGGGGt",
+ "t....A.AY.A.t",
+ "t...........t",
+ "tS...T......t",
+ "t...........t",
+ "t..T..AAA...t",
+ "t.....r.....t",
+ "WWWWWWDWWWWWW"];
 const CASTLE_MAP_MASTER=[
  "WWWWWWWWWWWWW",
  "MNMMNMMMNMMNM",
  "P...rrrrr...P",
- "k..Prrrrr.P.k",
+ "kGGGGGGGGGGGk",
  ".P..rrrrr..P.",
- "A...rrrrr...A",
- ".P..rrrrr..P.",
- "k...rrrrr...k",
+ "A...@@@@@...A",
+ ".P..@@@@@..P.",
+ "k...@@@@@...k",
  ".P..rrrrr..P.",
  "....rrrrr....",
- "WWWWWWDWWWWWW"]; // 마스터의 방: 더 올라가는 계단 없음, 넓은 금빛 카펫
+ "WWWWWWDWWWWWW"]; // 마스터의 방: 바닥의 문장 퍼즐
 const CASTLE_PAL=[
  {a:'#7fd6ff',a2:'#2f8fd0',fa:'#262c4a',fb:'#20263f',wl:'#2d3558',wd:'#1a2040',f1:'#4fd0ff',f2:'#d6f6ff',tag:'ice'},
  {a:'#f0a85a',a2:'#a85e24',fa:'#3a2d28',fb:'#32261f',wl:'#4a3a30',wd:'#2a1f18',f1:'#ff7a1a',f2:'#ffe08a',tag:'rock'},
@@ -14092,37 +14139,37 @@ const CASTLE_PAL=[
  {a:'#9fb4ff',a2:'#4a58c8',fa:'#1c2244',fb:'#161b38',wl:'#2a3470',wd:'#101535',f1:'#5a7aff',f2:'#dde4ff',tag:'dragon'},
  {a:'#ffd23f',a2:'#c8102e',fa:'#2a1620',fb:'#221018',wl:'#4a2030',wd:'#180810',f1:'#ffb02e',f2:'#fff2b0',tag:'master'}];
 const CASTLE_FLOORS=[
- {title:'포켓몬 성 1층 · 얼음의 방',sub:'1천왕 서리가 차가운 숨을 내쉬며 기다려요',start:[6,9],front:[6,5],map:CASTLE_MAP,
-  swimIn:[],monsIn:[[131,2,5],[87,10,5],[473,2,8],[365,10,8]],
+ {title:'포켓몬 성 1층 · 얼음의 방',sub:'1천왕 서리가 차가운 숨을 내쉬며 기다려요',start:[6,9],front:[6,3],map:CASTLE_MAP_ICE,puz9:1,
+  swimIn:[],monsIn:[[131,1,7],[87,11,7],[473,4,8],[365,8,8]],
   leader:{x:6,y:2,partner:130,px:7,py:3,look:{hair:'#bfeaff',skin:'#ffe6d8',top:'#e8f6ff',pants:'#2f6fb0',shoe:'#7fd6ff',cap:'#7fd6ff',brim:'#e8f6ff',long:1,band:'#ffffff'}},
   talk:{first:['…차가운 바람이 불어오는군. 잘 왔다, 도전자여. ❄️','나는 사천왕의 첫 번째, {n}! 포켓몬 성의 문턱은 내가 지킨다.','물과 얼음의 파도를 넘어 봐라. 덱과 트레이너 스킬은 단단히 챙겼나?'],
    win:['훌륭하다… 얼음처럼 차가운 내 마음도 흔들렸다. ❄️','넌 2층으로 갈 자격이 있다. 뒤의 철창이 열렸으니 계단을 올라가라.'],
    again:['또 왔구나. 넌 2층으로 갈 자격이 있다. ❄️','계단은 열려 있다. 다시 겨루고 싶다면 언제든 환영이다.'],
    lose:['아직 얼음 한 겹도 깨지 못했구나… 덱을 가다듬고 다시 와라. ❄️']}},
- {title:'포켓몬 성 2층 · 대지의 방',sub:'2천왕 돌주먹이 주먹을 불끈 쥐고 기다려요',start:[6,9],front:[6,5],map:CASTLE_MAP,
+ {title:'포켓몬 성 2층 · 대지의 방',sub:'2천왕 돌주먹이 주먹을 불끈 쥐고 기다려요',start:[6,9],front:[6,3],map:CASTLE_MAP_EARTH,puz10:{plates:[[3,4],[11,6],[9,4]],boulders:[[4,7],[6,5],[8,6]],gy:3},
   swimIn:[],monsIn:[[68,2,5],[95,10,5],[76,2,8],[534,10,8]],
   leader:{x:6,y:2,partner:448,px:7,py:3,look:{hair:'#3a2418',skin:'#f0c09a',top:'#c8782a',pants:'#4a3426',shoe:'#7a5a3a',cap:'#c8782a',brim:'#7a5a3a',long:0,band:'#ffd9a0'}},
   talk:{first:['크하하! 여기까지 올라오다니 제법이군! 👊','나는 사천왕의 두 번째, {n}! 내 주먹과 대지의 힘을 받아 봐라!','격투와 땅, 바위의 묵직한 한 방을 버틸 수 있겠나?'],
    win:['으하하! 좋은 주먹이다! 내 몸이 다 울렸다! 👊','넌 3층으로 갈 자격이 있다. 철창이 열렸으니 계단을 올라가라!'],
    again:['또 왔구나! 넌 3층으로 갈 자격이 있다. 👊','다시 한판 붙고 싶으면 말해라. 몸은 항상 달아올라 있다!'],
    lose:['크하하, 아직 한참 멀었다! 덱을 단단히 고쳐서 다시 와라! 👊']}},
- {title:'포켓몬 성 3층 · 그림자의 방',sub:'3천왕 그림자가 어둠 속에서 조용히 기다려요',start:[6,9],front:[6,5],map:CASTLE_MAP,
+ {title:'포켓몬 성 3층 · 그림자의 방',sub:'3천왕 그림자가 어둠 속에서 조용히 기다려요',start:[6,9],front:[6,3],map:CASTLE_MAP_SHADE,puz11:{plates:[[1,7],[11,6]],gy:3},
   swimIn:[],monsIn:[[93,2,5],[197,10,5],[169,2,8],[354,10,8]],
   leader:{x:6,y:2,partner:94,px:7,py:3,look:{hair:'#7a5ae0',skin:'#e8d8f0',top:'#3a2a6a',pants:'#1a1230',shoe:'#b79bff',cap:'#2a1f50',brim:'#b79bff',long:1,band:'#b79bff'}},
   talk:{first:['…후후. 조용히 따라 들어왔구나. 👻','나는 사천왕의 세 번째, {n}. 어둠 속에서는 모든 것이 거짓이 되지…','유령과 악, 독의 그림자를 헤치고 나를 찾아낼 수 있을까?'],
    win:['…놀랍군. 그림자 속에서도 길을 잃지 않다니. 👻','넌 4층으로 갈 자격이 있다. 철창은 이미 사라졌다. 올라가라…'],
    again:['…또 왔구나. 넌 4층으로 갈 자격이 있다. 👻','그림자와 다시 놀고 싶다면, 말만 해라…'],
    lose:['…후후, 그림자도 밟지 못했구나. 덱을 다듬고 다시 오라. 👻']}},
- {title:'포켓몬 성 4층 · 용의 방',sub:'마지막 사천왕 용아가 위풍당당하게 기다려요',start:[6,9],front:[6,5],map:CASTLE_MAP,
+ {title:'포켓몬 성 4층 · 용의 방',sub:'마지막 사천왕 용아가 위풍당당하게 기다려요',start:[6,9],front:[6,3],map:CASTLE_MAP_DRAGON,puz12:{em:[1,6],mir:[[4,7],[3,5],[10,6],[6,5],[10,7],[6,7]],init:[0,0,0,0,0,0],sol:[0,0,1,1,0,1],gy:3},
   swimIn:[],monsIn:[[148,2,5],[212,10,5],[376,2,8],[230,10,8]],
   leader:{x:6,y:2,partner:373,px:7,py:3,look:{hair:'#a99bff',skin:'#ffdcc0',top:'#33357a',pants:'#1f2147',shoe:'#ffd23f',cap:'#5a45c8',brim:'#ffd23f',long:1,band:'#ffd23f'}},
   talk:{first:['여기까지 오다니, 정말 대단하구나. 🐉','나는 사천왕의 마지막, {n}! 용의 기세와 강철의 갑옷을 보여 주마!','이 방 위에는 포켓몬 마스터의 방이 있다. 전력으로 와라!'],
    win:['…훌륭하다! 용도 고개를 숙일 만한 실력이다. 🐉','넌 마스터의 방으로 갈 자격이 있다. 철창이 열렸으니 계단을 올라가라!'],
    again:['또 왔구나! 넌 마스터의 방으로 갈 자격이 있다. 🐉','용의 기세는 한 번 졌다고 꺾이지 않는다. 다시 겨뤄 볼까?'],
    lose:['아직 용의 비늘 하나 꿰뚫지 못했구나! 덱을 단단히 하고 다시 와라! 🐉']}},
- {title:'포켓몬 성 5층 · 마스터',sub:'모든 트레이너의 정점, 포켓몬 마스터 레이가 왕좌 앞에서 기다려요',start:[6,9],front:[6,5],map:CASTLE_MAP_MASTER,
+ {title:'포켓몬 성 5층 · 마스터',sub:'모든 트레이너의 정점, 포켓몬 마스터 레이가 왕좌 앞에서 기다려요',start:[6,9],front:[6,3],map:CASTLE_MAP_MASTER,puz13:{x0:4,y0:5,w:5,h:3,init:15273,gy:3},
   swimIn:[],monsIn:[[384,2,5],[249,10,5],[483,2,8],[487,10,8]],
-  leader:{x:6,y:2,partner:150,px:7,py:3,look:{hair:'#dad9e0',skin:'#ffe2cc',top:'#181428',pants:'#181428',shoe:'#f0b820',cap:'#dad9e0',brim:'#dad9e0',long:1,band:'#d83a58'}},
+  leader:{x:6,y:2,partner:150,px:7,py:2,look:{hair:'#dad9e0',skin:'#ffe2cc',top:'#181428',pants:'#181428',shoe:'#f0b820',cap:'#dad9e0',brim:'#dad9e0',long:1,band:'#d83a58'}},
   talk:{first:['…드디어 여기까지 왔구나. 👑','나는 이 성의 주인, {n}. 사천왕을 모두 이긴 트레이너만이 이 문을 넘는다.','모든 타입, 최강의 덱. 네 모든 실력과 트레이너 스킬을 꺼내 봐라!'],
    win:['…완벽한 승부였다. 이 자리의 주인은 이제 너다. 👑','포켓몬 마스터, 그 이름을 받아라!'],
    again:['또 왔구나, 챔피언. 👑','왕좌는 네 것이지만, 승부라면 언제든 받아 주겠다.'],
@@ -14155,6 +14202,184 @@ GP_THEMES[9]={key:'castle',cls:'castle',castle:1,noSign:1,emoji:'🏰',
 };
 const gpKingName=hi=>HARD[hi].ldr.replace(/^사천왕\s*/,'');
 const gpKingLocked=hi=>!(S.meta.hard&&S.meta.hard[hi]);
+function gpIceStep(x,y){
+ const sc=GP.sc;if(!sc||!sc.puz9)return;
+ if(GP.iceOff||!GP.p){GP.icelock=-1;return;}
+ if(sc.map[y][x]==='='){GP.icelock=GP.p.dir;GP.path.length=0;GP.ptalk=null;}else GP.icelock=-1;
+}
+function gpIceReset(){const again=!!GP.iceOff;GP.iceForce=true;gpFade(()=>{GP.x=6;GP.y=9;GP.dir='up';GP.icelock=-1;gpBuild();gpToast(again?'얼음이 다시 얼어붙었어요! 퍼즐 시작':'얼음 입구로 돌아왔어요');});}
+function gpIceSetup(sc){
+ GP.icelock=-1;const beaten=!gpKingLocked(0);GP.iceOff=!GP.iceForce&&!!(beaten||GP.y!==9||GP.x!==6);
+ let rb=document.getElementById('gpRst');
+ const hd=GP.box.querySelector('.gpHead');
+ if(!rb){rb=document.createElement('button');rb.type='button';rb.tabIndex=-1;rb.id='gpRst';rb.className='gpChip gpChipB';hd.insertBefore(rb,document.getElementById('gpX'));}
+ rb.textContent=GP.iceOff?'🧊 퍼즐 다시':'🔄 처음으로';rb.onclick=()=>{if(GP&&GP.open&&!GP.busy){sfx('tap');gpIceReset();}};
+ if(!GP.iceOff&&!GP.iceHint){GP.iceHint=1;setTimeout(()=>{if(GP&&GP.open&&GP.gi===9&&!GP.fl&&!GP.D.on)gpSay(['바닥이 온통 얼음이다…!\n한 번 미끄러지면 얼음 수정이나 벽, 포켓몬에 부딪힐 때까지 멈추지 않아.\n눈꽃이 새겨진 칸에서는 멈출 수 있어! 위쪽 길을 찾아 1천왕에게 가자.\n(막히면 위쪽 🔄 버튼으로 입구에서 다시 시작할 수 있어요)']);},900);}
+}
+function gpSokRows(){const sc=GP.sc,Q=GP.puz10,P=sc.puz10;if(!sc.map0)sc.map0=sc.map.slice();sc.map=sc.map0.slice();
+ const set=(x,y,ch)=>{sc.map[y]=sc.map[y].slice(0,x)+ch+sc.map[y].slice(x+1);};
+ P.plates.forEach(([x,y])=>set(x,y,Q.b.some(o=>o.x===x&&o.y===y)?'+':'*'));
+ if(Q.open)for(let xx=1;xx<=11;xx++)set(xx,P.gy,'.');}
+function gpSokSetup(sc){
+ if(!sc.map0)sc.map0=sc.map.slice();const P=sc.puz10;
+ const beaten=!gpKingLocked(1);const solved=!GP.sokForce&&!!(beaten||GP.y!==9||GP.x!==6);
+ if(solved)GP.puz10={b:P.plates.map(a=>({x:a[0],y:a[1]})),open:true,solved:true};
+ else if(!GP.puz10||GP.puz10.solved)GP.puz10={b:P.boulders.map(a=>({x:a[0],y:a[1]})),open:false};
+ const Q=GP.puz10;Q.b.forEach(b=>{b.el=GP.mkEnt('gpBoulder','',b.x,b.y);b.el.style.backgroundImage='url('+gpBoulderURL()+')';GP.solid[b.x+','+b.y]=1;});
+ gpSokRows();
+ let rb=document.getElementById('gpRst');const hd=GP.box.querySelector('.gpHead');
+ if(!rb){rb=document.createElement('button');rb.type='button';rb.tabIndex=-1;rb.id='gpRst';rb.className='gpChip gpChipB';hd.insertBefore(rb,document.getElementById('gpX'));}
+ rb.textContent=Q.solved?'🪨 퍼즐 다시':'🔄 처음으로';rb.onclick=()=>{if(GP&&GP.open&&!GP.busy){sfx('tap');gpSokReset();}};
+ if(!Q.solved&&!GP.sokHint){GP.sokHint=1;setTimeout(()=>{if(GP&&GP.open&&GP.gi===9&&GP.fl===1&&!GP.D.on)gpSay(['바닥에 빛나는 발판이 세 개 보인다!\n바위를 밀어서 발판 위에 모두 올려 놓으면 위쪽 철창이 열릴 것 같다.\n바위는 밀기만 할 수 있고, 모서리에 끼면 못 움직여. 조심해서 밀어라!\n(막히면 위쪽 🔄 버튼으로 처음부터 다시 할 수 있어요)']);},900);}
+}
+function gpSokReset(){const again=!!(GP.puz10&&GP.puz10.solved);GP.sokForce=true;GP.puz10=null;gpFade(()=>{GP.x=6;GP.y=9;GP.dir='up';gpBuild();gpToast(again?'바위가 제자리로! 퍼즐 시작':'바위가 처음 자리로 돌아왔어요');});}
+function gpSokPush(d,nx,ny){
+ const Q=GP.puz10;if(!Q||Q.solved&&0)return false;const b=Q.b.find(o=>o.x===nx&&o.y===ny);if(!b)return false;
+ const tx=nx+GP_DX[d],ty=ny+GP_DY[d],m=GP.sc.map;let ok=false;
+ if(tx>=0&&tx<GP_C&&ty>=0&&ty<=8){const ch=m[ty][tx];ok=(ch==='.'||ch==='*'||ch==='+')&&!GP.solid[tx+','+ty]&&!GP.act[tx+','+ty]&&!(GP.p&&GP.p.x===tx&&GP.p.y===ty);}
+ if(!ok){if(GP.just){GP.just=false;gpToast('꿈쩍도 안 해요!');}return true;}
+ delete GP.solid[nx+','+ny];b.x=tx;b.y=ty;gpPlace(b.el,tx,ty);GP.solid[tx+','+ty]=1;
+ const P=GP.sc.puz10,was=Q.open;const n=P.plates.filter(([x,y])=>Q.b.some(o=>o.x===x&&o.y===y)).length;
+ if(n===P.plates.length)Q.open=true;
+ gpSokRows();gpDrawMap();
+ if(Q.open&&!was){try{sfx('rare');}catch(e){}gpToast('쿵! 발판이 모두 켜졌어요! 철창이 열렸어요');}
+ else{try{sfx('tap');}catch(e){}if(n>0)gpToast('발판 '+n+'/'+P.plates.length+' 켜짐');}
+ return false;}
+function gpShadeURL(){if(GP_SHR&&GP_SHR.shade)return GP_SHR.shade;const cv=document.createElement('canvas');cv.width=16;cv.height=16;const g=cv.getContext('2d');
+ const P=(cl,x,y,w,h)=>{g.fillStyle=cl;g.fillRect(x,y,w||1,h||1);};
+ P('rgba(0,0,0,.25)',3,14,10,2);P('#120a2a',4,2,8,1);P('#120a2a',3,3,1,8);P('#120a2a',12,3,1,8);
+ P('#2a1a5a',4,3,8,8);P('#4a2e96',4,3,3,8);P('#6a4ac0',4,3,1,6);
+ P('#120a2a',3,11,1,2);P('#2a1a5a',4,11,2,3);P('#120a2a',6,13,1,1);P('#2a1a5a',7,11,2,2);P('#2a1a5a',10,11,2,3);P('#120a2a',9,12,1,2);P('#120a2a',12,11,1,2);
+ P('#f0e0ff',5,5,2,2);P('#f0e0ff',9,5,2,2);P('#ff5ad8',6,6,1,1);P('#ff5ad8',10,6,1,1);P('#120a2a',7,9,2,1);
+ return (GP_SHR.shade=g.canvas.toDataURL());}
+function gpShadeRows(){const sc=GP.sc,Q=GP.shade,P=sc.puz11;if(!sc.map0)sc.map0=sc.map.slice();sc.map=sc.map0.slice();
+ const set=(x,y,ch)=>{sc.map[y]=sc.map[y].slice(0,x)+ch+sc.map[y].slice(x+1);};
+ const occ=([x,y])=>(GP.p&&GP.p.x===x&&GP.p.y===y&&!GP.p.moving)||(Q.sx===x&&Q.sy===y);
+ P.plates.forEach(c=>set(c[0],c[1],(Q.solved||occ(c))?'+':'*'));
+ if(Q.open)for(let xx=1;xx<=11;xx++)set(xx,P.gy,'.');}
+function gpShadeSetup(sc){
+ if(!sc.map0)sc.map0=sc.map.slice();const P=sc.puz11;
+ const beaten=!gpKingLocked(2);const solved=!GP.shForce&&!!(beaten||GP.y!==9||GP.x!==6);
+ if(solved)GP.shade={sx:11,sy:6,open:true,solved:true};
+ else if(!GP.shade||GP.shade.solved)GP.shade={sx:6,sy:9,open:false};
+ const Q=GP.shade;
+ const e=GP.mkEnt('gpShade','',Q.sx,Q.sy);e.style.backgroundImage='url('+gpShadeURL()+')';e.style.transition='left '+GP_MS+'ms linear,top '+GP_MS+'ms linear';GP.shEl=e;
+ gpShadeRows();
+ let rb=document.getElementById('gpRst');const hd=GP.box.querySelector('.gpHead');
+ if(!rb){rb=document.createElement('button');rb.type='button';rb.tabIndex=-1;rb.id='gpRst';rb.className='gpChip gpChipB';hd.insertBefore(rb,document.getElementById('gpX'));}
+ rb.textContent=Q.solved?'👤 퍼즐 다시':'🔄 처음으로';rb.onclick=()=>{if(GP&&GP.open&&!GP.busy){sfx('tap');gpShadeReset();}};
+ if(!Q.solved&&!GP.shHint){GP.shHint=1;setTimeout(()=>{if(GP&&GP.open&&GP.gi===9&&GP.fl===2&&!GP.D.on)gpSay(['…그림자가 너를 따라 움직인다.\n네가 걸으면 그림자는 거울처럼 좌우가 반대로 움직여. 가운데 유리벽은 둘 다 넘을 수 없다.\n두 개의 빛나는 발판을 너와 그림자가 동시에 밟아야 철창이 열린다…\n(막히면 위쪽 🔄 버튼으로 처음부터 다시 할 수 있어요)']);},900);}
+}
+function gpShadeReset(){const again=!!(GP.shade&&GP.shade.solved);GP.shForce=true;GP.shade=null;gpFade(()=>{GP.x=6;GP.y=9;GP.dir='up';gpBuild();gpToast(again?'그림자가 돌아왔어요! 퍼즐 시작':'그림자와 함께 처음 자리로 돌아왔어요');});}
+function gpShadeGo(d){
+ const Q=GP.shade;if(!Q||Q.solved||Q.open)return;
+ const nx=Q.sx-GP_DX[d],ny=Q.sy+GP_DY[d];
+ if(gpWalkable(nx,ny)&&!GP.act[nx+','+ny]){Q.sx=nx;Q.sy=ny;gpPlace(GP.shEl,nx,ny);}
+}
+function gpShadeStep(x,y){
+ const Q=GP.shade,P=GP.sc.puz11;if(!Q||Q.solved||Q.open)return;
+ const was=P.plates.filter(c=>(c[0]===x&&c[1]===y)||(c[0]===Q.sx&&c[1]===Q.sy)).length;
+ if(was===P.plates.length){Q.open=true;try{sfx('rare');}catch(e){}gpToast('👻 두 발판이 동시에 켜졌어요! 철창 열림');}
+ else if(was>0){try{sfx('tap');}catch(e){}gpToast('발판 '+was+'/'+P.plates.length+' 켜짐');}
+ gpShadeRows();gpDrawMap();
+}
+const GP_MIRI={};
+function gpMirURL(o){if(GP_MIRI[o])return GP_MIRI[o];const cv=document.createElement('canvas');cv.width=16;cv.height=16;const g=cv.getContext('2d');
+ const P=(cl,x,y,w,h)=>{g.fillStyle=cl;g.fillRect(x,y,w||1,h||1);};
+ P('rgba(0,0,0,.28)',2,14,12,2);P('#120e2c',2,2,12,12);P('#8a6a2a',3,3,10,10);P('#2a2554',4,4,8,8);P('#ffd23f',3,3,2,1);P('#ffd23f',11,3,2,1);P('#ffd23f',3,12,2,1);P('#ffd23f',11,12,2,1);
+ for(let i=0;i<8;i++){const x=o?4+i:11-i,y=4+i;P('#9fe8ff',x,y,1,1);P('#ffffff',o?x+1:x-1,y,1,1);P('#4a9fe0',o?x-1:x+1,y,1,1);}
+ return GP_MIRI[o]=cv.toDataURL();}
+function gpBeamTrace(){
+ const sc=GP.sc,Q=GP.puz12,P=sc.puz12,m=sc.map0||sc.map,segs=[],lit={};
+ const mirAt=(x,y)=>P.mir.findIndex(a=>a[0]===x&&a[1]===y);
+ const stack=[[P.em[0],P.em[1],1,0]],seen={};
+ while(stack.length){let[x,y,dx,dy]=stack.pop();let n=0;
+  while(n++<80){const nx=x+dx,ny=y+dy;
+   if(nx<1||nx>11||ny<4||ny>8){segs.push([x,y,x+dx*.5,y+dy*.5]);break;}
+   const ch=m[ny][nx],mi=mirAt(nx,ny);
+   if(ch!=='.'&&ch!=='T'&&ch!=='L'&&ch!=='Y'&&mi<0){segs.push([x,y,x+dx*.5,y+dy*.5]);break;}
+   const key=nx+','+ny+','+dx+','+dy;if(seen[key])break;seen[key]=1;
+   segs.push([x,y,nx,ny]);x=nx;y=ny;
+   if(ch==='T'||ch==='L')lit[x+','+y]=1;
+   if(mi>=0){const o=Q.ori[mi];const t=o===0?[-dy,-dx]:[dy,dx];dx=t[0];dy=t[1];continue;}
+   if(ch==='Y'){stack.push([x,y,dy,dx]);stack.push([x,y,-dy,-dx]);break;}
+  }}
+ return{segs,lit};}
+function gpBeamDraw(segs){
+ const cv=GP.beamCv,g=cv.getContext('2d'),T=GP_T;g.clearRect(0,0,cv.width,cv.height);g.lineCap='round';
+ const L=(w,col,al)=>{g.lineWidth=w;g.strokeStyle=col;g.globalAlpha=al;g.beginPath();segs.forEach(s=>{g.moveTo((s[0]+.5)*T,(s[1]+.5)*T);g.lineTo((s[2]+.5)*T,(s[3]+.5)*T);});g.stroke();};
+ L(13,'#4ad8ff',.22);L(7,'#7ee8ff',.5);L(2.5,'#ffffff',.95);g.globalAlpha=1;}
+function gpBeamRows(lit){const sc=GP.sc,Q=GP.puz12,P=sc.puz12;if(!sc.map0)sc.map0=sc.map.slice();sc.map=sc.map0.slice();
+ const set=(x,y,ch)=>{sc.map[y]=sc.map[y].slice(0,x)+ch+sc.map[y].slice(x+1);};
+ for(let y=4;y<=8;y++)for(let x=1;x<=11;x++)if(sc.map0[y][x]==='T')set(x,y,(Q.solved||lit[x+','+y])?'L':'T');
+ if(Q.open)for(let xx=1;xx<=11;xx++)set(xx,P.gy,'.');}
+function gpBeamRefresh(init){
+ const Q=GP.puz12,P=GP.sc.puz12;const r=gpBeamTrace();const total=Object.keys(r.lit).length;
+ const need=[...GP.sc.map0.slice(4,9).join('')].filter(c=>c==='T').length;
+ const was=Q.open;if(!Q.solved&&total>=need)Q.open=true;
+ gpBeamRows(r.lit);gpBeamDraw(r.segs);gpDrawMap();
+ if(!init){if(Q.open&&!was){try{sfx('rare');}catch(e){}gpToast('🐉 수정이 모두 빛나요! 철창 열림');}else{try{sfx('tap');}catch(e){}gpToast('빛의 수정 '+total+'/'+need+' 점등');}}
+}
+function gpBeamSetup(sc){
+ if(!sc.map0)sc.map0=sc.map.slice();const P=sc.puz12;
+ const beaten=!gpKingLocked(3);const solved=!GP.bmForce&&!!(beaten||GP.y!==9||GP.x!==6);
+ if(solved)GP.puz12={ori:P.sol.slice(),open:true,solved:true};
+ else if(!GP.puz12||GP.puz12.solved)GP.puz12={ori:P.init.slice(),open:false};
+ const Q=GP.puz12;P.el=[];
+ const be=GP.mkEnt('gpBeam','',0,0);be.style.left='0';be.style.top='0';be.style.width='100%';be.style.height='100%';be.style.zIndex=2;be.style.transition='none';be.style.pointerEvents='none';
+ const cv=document.createElement('canvas');cv.width=GP_C*GP_T;cv.height=GP_R*GP_T;cv.style.cssText='width:100%;height:100%;display:block;image-rendering:auto';be.appendChild(cv);GP.beamCv=cv;
+ P.mir.forEach(([x,y],i)=>{const e=GP.mkEnt('gpValve','',x,y);e.style.backgroundImage='url('+gpMirURL(Q.ori[i])+')';GP.solid[x+','+y]=1;GP.act[x+','+y]={k:'mir:'+i};P.el.push(e);});
+ gpBeamRefresh(true);
+ let rb=document.getElementById('gpRst');const hd=GP.box.querySelector('.gpHead');
+ if(!rb){rb=document.createElement('button');rb.type='button';rb.tabIndex=-1;rb.id='gpRst';rb.className='gpChip gpChipB';hd.insertBefore(rb,document.getElementById('gpX'));}
+ rb.textContent=Q.solved?'🐉 퍼즐 다시':'🔄 거울 초기화';rb.onclick=()=>{if(GP&&GP.open&&!GP.busy){sfx('tap');gpBeamReset();}};
+ if(!Q.solved&&!GP.bmHint){GP.bmHint=1;setTimeout(()=>{if(GP&&GP.open&&GP.gi===9&&GP.fl===3&&!GP.D.on)gpSay(['용의 입에서 푸른 빛줄기가 뿜어져 나온다!\n황금 거울을 향해 걸으면 거울이 돌아가서 빛이 꺾여.\n빛으로 두 개의 용의 수정을 모두 밝히면 위쪽 철창이 열린다. 석상은 빛을 막아!\n(막히면 위쪽 🔄 버튼으로 거울을 처음으로 되돌려요)']);},900);}
+}
+function gpBeamReset(){const again=!!(GP.puz12&&GP.puz12.solved);GP.bmForce=true;GP.puz12=null;gpFade(()=>{GP.x=6;GP.y=9;GP.dir='up';gpBuild();gpToast(again?'거울이 제자리로! 퍼즐 시작':'거울을 처음 방향으로 되돌렸어요');});}
+function gpBeamTurn(i){
+ const Q=GP.puz12,P=GP.sc.puz12;if(Q.open&&!Q.solved){}if(Q.solved){gpToast('이미 풀린 퍼즐이에요');return;}
+ Q.ori[i]=Q.ori[i]?0:1;P.el[i].style.backgroundImage='url('+gpMirURL(Q.ori[i])+')';
+ gpBeamRefresh(false);}
+function gpRuneRows(){const sc=GP.sc,Q=GP.rune,P=sc.puz13;if(!sc.map0)sc.map0=sc.map.slice();sc.map=sc.map0.slice();
+ const set=(x,y,ch)=>{sc.map[y]=sc.map[y].slice(0,x)+ch+sc.map[y].slice(x+1);};
+ for(let j=0;j<P.h;j++)for(let i=0;i<P.w;i++)set(P.x0+i,P.y0+j,(Q.m>>(j*P.w+i))&1?'#':'@');
+ if(Q.open)for(let xx=1;xx<=11;xx++)set(xx,P.gy,'.');}
+function gpRuneSetup(sc){
+ if(!sc.map0)sc.map0=sc.map.slice();const P=sc.puz13,FULL=(1<<(P.w*P.h))-1;
+ const beaten=!gpKingLocked(4);const solved=!GP.rnForce&&!!(beaten||GP.y!==9||GP.x!==6);
+ if(solved)GP.rune={m:FULL,open:true,solved:true};
+ else if(!GP.rune||GP.rune.solved)GP.rune={m:P.init,open:false};
+ const Q=GP.rune;gpRuneRows();
+ let rb=document.getElementById('gpRst');const hd=GP.box.querySelector('.gpHead');
+ if(!rb){rb=document.createElement('button');rb.type='button';rb.tabIndex=-1;rb.id='gpRst';rb.className='gpChip gpChipB';hd.insertBefore(rb,document.getElementById('gpX'));}
+ rb.textContent=Q.solved?'👑 퍼즐 다시':'🔄 처음으로';rb.onclick=()=>{if(GP&&GP.open&&!GP.busy){sfx('tap');gpRuneReset();}};
+ if(!Q.solved&&!GP.rnHint){GP.rnHint=1;setTimeout(()=>{if(GP&&GP.open&&GP.gi===9&&GP.fl===4&&!GP.D.on)gpSay(['…마스터의 문장이다.\n바닥의 문장 15개를 모두 금빛으로 밝혀야 한다.\n문장을 밟으면 그 문장과 위·아래·양옆 문장이 함께 켜지고 꺼진다.\n지나가기만 해도 밟은 것이다. 잘 생각해서 걸어라!\n(꼬이면 위쪽 🔄 버튼으로 처음 자리에서 다시 시작)']);},900);}
+}
+function gpRuneReset(){const again=!!(GP.rune&&GP.rune.solved);GP.rnForce=true;GP.rune=null;gpFade(()=>{GP.x=6;GP.y=9;GP.dir='up';gpBuild();gpToast(again?'문장이 꺼졌어요! 퍼즐 시작':'문장을 처음 상태로 되돌렸어요');});}
+function gpRuneStep(x,y){
+ const Q=GP.rune,P=GP.sc.puz13;if(!Q||Q.solved||Q.open)return;
+ const i=x-P.x0,j=y-P.y0;if(i<0||j<0||i>=P.w||j>=P.h)return;
+ let m=Q.m;[[0,0],[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const a=i+dx,b=j+dy;if(a>=0&&b>=0&&a<P.w&&b<P.h)m^=1<<(b*P.w+a);});
+ Q.m=m;const n=P.w*P.h,on=[...Array(n)].filter((_,k)=>(m>>k)&1).length;
+ if(on===n){Q.open=true;try{sfx('rare');}catch(e){}gpToast('👑 문장이 모두 빛나요! 철창 열림');}
+ else{try{sfx('tap');}catch(e){}gpToast('빛나는 문장 '+on+'/'+n);}
+ gpRuneRows();gpDrawMap();}
+function gpChRows(){const sc=GP.sc,Q=GP.puz14,P=sc.puz14;if(!sc.map0)sc.map0=sc.map.slice();sc.map=sc.map0.slice();
+ const set=(x,y,ch)=>{sc.map[y]=sc.map[y].slice(0,x)+ch+sc.map[y].slice(x+1);};
+ P.plates.forEach((c,i)=>set(c[0],c[1],i<Q.n?'+':'*'));
+ if(Q.open){for(let xx=1;xx<=11;xx++)set(xx,P.gy,xx===6?'r':'.');}
+ (P.el||[]).forEach((e,i)=>{e.style.opacity=i<Q.n?'1':'.62';e.style.filter=i<Q.n?'drop-shadow(0 0 6px #ffd23f)':'none';});}
+function gpChSetup(sc){
+ if(!sc.map0)sc.map0=sc.map.slice();const P=sc.puz14;
+ if(!GP.puz14)GP.puz14={n:0,open:false};P.el=[];
+ P.plates.forEach((c,i)=>{const e=GP.mkEnt('gpPlt',GP_THEMES[i].emoji||'⭐',c[0],c[1]);e.style.display='flex';e.style.alignItems='center';e.style.justifyContent='center';e.style.fontSize=Math.round(GP_T*.7)+'px';e.style.pointerEvents='none';e.style.zIndex=2;e.style.lineHeight='1';P.el.push(e);});
+ gpChRows();}
+function gpChStep(x,y){
+ const Q=GP.puz14,P=GP.sc.puz14;if(!Q||Q.open)return;
+ const k=P.plates.findIndex(c=>c[0]===x&&c[1]===y);if(k<0||k<Q.n)return;
+ if(k===Q.n){Q.n++;if(Q.n===P.plates.length){Q.open=true;try{sfx('rare');}catch(e){}gpToast('🏆 8개의 문장이 모두 빛나요! 철창 열림');}else{try{sfx('tap');}catch(e){}gpToast('배지 문장 '+Q.n+'/'+P.plates.length);}}
+ else{Q.n=0;try{sfx('crit');}catch(e){}gpToast('❌ 순서가 틀렸어요! 문장이 꺼졌어요');}
+ gpChRows();gpDrawMap();}
 function castleOpen(hi,opt){opt=opt||{};const me=S.meta;
  const beaten=!!(me.hard&&me.hard[hi]);let init=null;
  if(opt.after||hi>0||beaten){const f=CASTLE_FLOORS[hi];init={fl:hi,scene:'in',x:f.front[0],y:f.front[1],dir:'up'};}
@@ -14227,6 +14452,24 @@ function gpTileCastle(ctx,map,x,y,scene,fr){
   case 'P':floor();r('rgba(0,0,0,.3)',2,13,13,2);r(P.wd,3,11,10,3);r(P.a,4,11,8,1);r(OL,4,-15,8,27);r(P.wl,5,-14,6,25);r(P.fa,5,-14,2,25);r(P.wd,9,-14,2,25);for(let i=-12;i<10;i+=4)r(P.wd,5,i,6,1);r(OL,3,-19,10,5);r(P.a,3,-18,10,2);r(P.a2,4,-16,8,1);break;
   case 'A':floor();r('rgba(0,0,0,.3)',2,13,12,2);r(P.wd,4,12,8,2);r(P.wl,5,6,6,6);r('#8a8fa8',6,3,4,3);r(P.wd,7,4,2,1);r(P.a,6,2,4,1);r(P.a,7,0,2,2);r('#8a8fa8',4,7,1,5);r('#8a8fa8',11,7,1,5);r(P.a2,7,8,2,3);break;
   case 'r':{floor();const L=at(-1,0)!=='r',Rr=at(1,0)!=='r';r(P.a2,0,0,16,16);if(L){r(P.a,0,0,1,16);r(P.f2,1,0,1,16);r(P.a,2,0,2,16);}if(Rr){r(P.a,15,0,1,16);r(P.f2,14,0,1,16);r(P.wd,12,0,2,16);}if(y%2===0){r(P.f2,7,3,2,1);r(P.a,6,4,4,1);r(P.f2,7,5,2,1);}if(fl===4&&!out)r('rgba(255,210,63,.18)',0,(y%2)*8,16,1);break;}
+  case '=':{if(GP.iceOff){floor();r('#dfeaf5',0,0,16,1);r('#dfeaf5',0,0,1,16);r('#b9d6ea',3+((R(2)*8)|0),4+((R(3)*7)|0),4,1);break;}
+   r((x+y)%2?'#bfe6fb':'#b2dcf5',0,0,16,16);r('#e8f8ff',0,0,16,1);r('#e8f8ff',0,0,1,16);r('#8ec4e6',0,15,16,1);r('#8ec4e6',15,0,1,16);
+   const sx=(x*5+y*3)%7;r('#ffffff',2+sx,2,5,1);r('#f4fcff',3+sx,3,3,1);r('#ffffffcc',9,10-(sx>>1),3,1);
+   if(R(1)<.35){const a=3+((R(2)*8)|0),b=4+((R(3)*7)|0);r('#8ec4e6',a,b,3,1);r('#8ec4e6',a+2,b+1,2,1);r('#8ec4e6',a+3,b+2,1,2);}
+   if(((fr+x*2+y)&3)===0)r('#ffffff',2+((R(5)*11)|0),2+((R(6)*11)|0),1,1);break;}
+  case ';':{floor();r('#dfeaf5',0,0,16,16);r('#c3d6e6',0,0,16,1);r('#c3d6e6',0,0,1,16);r('#9db6cc',0,15,16,1);r('#9db6cc',15,0,1,16);
+   r('#6aa6d4',7,3,2,10);r('#6aa6d4',3,7,10,2);r('#6aa6d4',4,4,1,1);r('#6aa6d4',11,4,1,1);r('#6aa6d4',4,11,1,1);r('#6aa6d4',11,11,1,1);r('#ffffff',7,7,2,2);if(k)r('#ffffff',7,2,2,1);break;}
+  case 'c':{r((x+y)%2?'#bfe6fb':'#b2dcf5',0,0,16,16);r('#e8f8ff',0,0,16,1);r('#e8f8ff',0,0,1,16);r('rgba(20,60,110,.28)',2,13,13,2);
+   r('#14325a',3,5,10,9);r('#2f7fc0',4,4,8,9);r('#6cc3f2',4,4,3,9);r('#c8f1ff',5,5,1,6);r('#14325a',6,0,4,5);r('#4aa8e0',7,1,2,5);r('#d6f6ff',7,1,1,3);r('#14325a',2,6,3,4);r('#4aa8e0',3,7,2,3);r('#14325a',11,7,3,4);r('#4aa8e0',11,8,2,3);r('#9edcff',9,6,1,5);if(k)r('#ffffff',7,2,1,1);break;}
+  case '*':case '+':{floor();const on=ch==='+';r(P.wd,2,2,12,12);r(on?P.f2:P.a2,3,3,10,10);r(P.wd,4,4,8,8);r(on?P.f1:P.wl,5,5,6,6);r(on?'#ffffff':P.a,7,3,2,1);r(on?'#ffffff':P.a,7,12,2,1);r(on?'#ffffff':P.a,3,7,1,2);r(on?'#ffffff':P.a,12,7,1,2);if(on&&k)r('#ffffff',7,7,2,2);else if(!on)r(P.a2,7,7,2,2);break;}
+  case 'G':{floor();r(OL,0,0,16,16);r(P.wd,1,1,14,14);for(let xx=1;xx<16;xx+=3){r('#6a5a4a',xx,1,2,14);r(P.a,xx,1,1,14);}r(P.a2,0,6,16,2);r(P.a,0,6,16,1);r(P.a2,0,12,16,2);r(P.a,0,12,16,1);r(P.f1,0,15,16,1);if(((fr+x)&3)===0)r(P.f2,3+((R(4)*9)|0),3,1,1);break;}
+  case 'm':{floor();r(OL,2,0,12,16);r(P.wd,3,0,10,16);r(P.a2,4,1,8,14);r(P.a,4,1,2,14);r('#ffffff55',6,2,1,5);r('#ffffff33',7,5,1,6);r('#ffffff44',9,9,1,4);r(P.wl,10,1,2,14);if(((fr+y)&3)===0)r(P.f2,5+((R(3)*5)|0),2+((R(4)*10)|0),1,1);break;}
+  case 'S':{floor();r(OL,2,3,12,11);r(P.wd,3,4,10,9);r(P.a2,3,4,10,2);r(P.a,3,4,10,1);r('#1a1010',9,6,5,4);r(P.wl,4,7,6,5);r('#ffd23f',10,7,3,2);r((fr&1)?'#fff2b0':'#ffb43a',12,7,2,2);r(OL,5,6,1,1);r('#ff5a2a',5,8,2,1);r(P.a,4,12,8,1);break;}
+  case 'T':case 'L':{floor();const on=ch==='L';r('rgba(0,0,0,.28)',3,13,10,2);r(OL,4,10,8,4);r(P.wl,5,10,6,3);r(P.a,5,10,6,1);
+   r(OL,5,2,6,9);r(on?'#8cf3ff':'#2f4a60',6,3,4,7);r(on?'#e8ffff':'#4a6a86',6,3,2,6);r(on?'#4ad0ff':'#1f3446',9,5,1,5);if(on){r('#ffffff',7,4,1,3);r('rgba(120,235,255,.35)',3,1,10,11);if(fr&1)r('#ffffff',3,2,1,1);else r('#ffffff',12,4,1,1);}break;}
+  case 'Y':{floor();r('rgba(0,0,0,.28)',3,13,10,2);r(OL,4,10,8,4);r(P.wl,5,10,6,3);r(P.a,5,10,6,1);r(OL,3,3,10,8);r('#e8d8ff',4,4,8,6);r('#ff8ab8',4,4,3,6);r('#8aeaff',7,4,2,6);r('#ffe48a',9,4,3,6);r('#ffffff',5,5,1,3);r(OL,7,2,2,2);if((fr+x)&1)r('#ffffff',10,5,1,1);break;}
+  case '@':case '#':{floor();const on=ch==='#';r('rgba(0,0,0,.25)',1,2,14,14);r(OL,1,1,14,14);r(on?'#7a5a10':P.wd,2,2,12,12);r(on?'#ffd23f':P.wl,3,3,10,10);r(on?'#fff2b0':P.wd,4,4,8,8);r(on?'#ffb43a':'#1a1630',5,5,6,6);
+   r(on?'#ffffff':P.a2,5,7,6,2);r(on?'#7a1a10':OL,7,7,2,2);r(on?'#ffffff':P.a,7,3,2,1);r(on?'#ffffff':P.a,7,12,2,1);if(on&&((fr+x+y)&1))r('#ffffff',3,3,1,1);break;}
   case 'U':{ // 위층으로 가는 계단 (잠겨 있으면 철창)
    const locked=gpKingLocked(fl);r(OL,0,0,16,16);r(P.wd,0,0,16,16);
    for(let i=0;i<5;i++){r(i%2?P.wl:P.fa,1,1+i*3,14,2);r(P.wd,1,3+i*3,14,1);}
@@ -14606,7 +14849,7 @@ function gpTalkMon(id,x,y){const m=MON[id];if(!m){return;}
 // ---------- 장면 구성 ----------
 function gpBuild(first){
  const th=GP_THEMES[GP.gi],sc=th[GP.scene],g=GYMS[GP.gi];GP.sc=sc;GP.ents=[];GP.monEl={};
- $('#gpTt').textContent=th.emoji+' '+sc.title;{const rb0=document.getElementById('gpRst');if(rb0&&!(GP.scene==='in'&&sc.puz))rb0.remove();}
+ $('#gpTt').textContent=th.emoji+' '+sc.title;{const rb0=document.getElementById('gpRst');if(rb0&&!(GP.scene==='in'&&(sc.puz||sc.puz9||sc.puz10||sc.puz11||sc.puz12||sc.puz13)))rb0.remove();}
  $('#gpC1').classList.toggle('ok',!!GP.chk.deck);$('#gpC2').classList.toggle('ok',!!GP.chk.skill);
  $('#gpC1').textContent=(GP.chk.deck?'✔ ':'')+'🃏 덱';$('#gpC2').textContent=(GP.chk.skill?'✔ ':'')+'🛡️ 스킬';
  gpDrawMap();
@@ -14621,22 +14864,28 @@ function gpBuild(first){
   const sg=document.createElement('div');sg.className='gpSign';if(th.noSign)sg.style.display='none';sg.innerHTML=th.emoji+' '+(GYMS[GP.gi]||{n:''}).n;sg.style.cssText+=`left:${(dr[0]-2.7)/GP_C*100}%;top:${1.35/GP_R*100}%;width:${6.4/GP_C*100}%;height:${.95/GP_R*100}%;`;ent.appendChild(sg);
   const dg=document.createElement('div');dg.className='gpDoorGlow';dg.style.cssText=`left:${(dr[0]-.8)/GP_C*100}%;top:${(dr[1]+.2)/GP_R*100}%;width:${1.6/GP_C*100}%;height:${1.6/GP_R*100}%;`;ent.appendChild(dg);
   th.objs.forEach(o=>{mk('gpObj',`<div class=gpPed></div><span class=gpIc>${o.ic}</span><i class=gpLb>${o.label}</i>`,o.x,o.y).style.setProperty('--c',o.col);GP.solid[o.x+','+o.y]=1;GP.act[o.x+','+o.y]={k:o.id};});
-  (th.swimOut||[]).forEach(([id,x,y])=>{if(!mon(id))return;gpMonAct(mk('gpSwim',gpMonHTML(id),x,y),id,x,y);});
-  (th.monsOut||[]).forEach(([id,x,y])=>{if(!mon(id))return;gpMonAct(mk('gpNpc gpMonE',gpMonHTML(id),x,y),id,x,y);});
+  [].forEach(([id,x,y])=>{if(!mon(id))return;gpMonAct(mk('gpSwim',gpMonHTML(id),x,y),id,x,y);});
+  [].forEach(([id,x,y])=>{if(!mon(id))return;gpMonAct(mk('gpNpc gpMonE',gpMonHTML(id),x,y),id,x,y);});
   GP.act[dr[0]+','+dr[1]]={k:'door'};
  }else{
   const L=th.leader;
   mk('gpNpc',`<img class="gpSpr${gpAtlasOK()?' gpAtl':''}" src="${gpLeadSpr(GP.gi,'down')}" alt="">`,L.x,L.y);GP.solid[L.x+','+L.y]=1;GP.act[L.x+','+L.y]={k:'leader'};
   if(mon(L.partner)){gpMonAct(mk('gpNpc',`<span class=gpIdle style="display:block;width:100%;height:100%">${gpMonHTML(L.partner)}</span>`,L.px,L.py),L.partner,L.px,L.py);}
-  (th.swimIn||[]).forEach(([id,x,y])=>{if(!mon(id))return;gpMonAct(mk('gpSwim',gpMonHTML(id),x,y),id,x,y);});
-  (th.monsIn||[]).forEach(([id,x,y])=>{if(!mon(id))return;gpMonAct(mk('gpNpc gpMonE',gpMonHTML(id),x,y),id,x,y);});
+  [].forEach(([id,x,y])=>{if(!mon(id))return;gpMonAct(mk('gpSwim',gpMonHTML(id),x,y),id,x,y);});
+  [].forEach(([id,x,y])=>{if(!mon(id))return;gpMonAct(mk('gpNpc gpMonE',gpMonHTML(id),x,y),id,x,y);});
   if(th.champion){sc.map.forEach((row,yy)=>{for(let xx=0;xx<row.length;xx++){const c=row[xx];if(c>='0'&&c<='7'){GP.solid[xx+','+yy]=1;GP.act[xx+','+yy]={k:'badge:'+c};}}});}
   if(sc.puz)gpPuzSetup(sc);
   if(sc.puz2)gpWaveSetup(sc);
   if(sc.puz3)gpElecSetup(sc);
   if(sc.puz4)gpForestSetup(sc);
   if(sc.puz7)gpFireSetup(sc);
+  if(sc.puz9)gpIceSetup(sc);
+  if(sc.puz10)gpSokSetup(sc);
+  if(sc.puz11)gpShadeSetup(sc);
+  if(sc.puz12)gpBeamSetup(sc);
+  if(sc.puz13)gpRuneSetup(sc);
   if(sc.puz8)gpDragonSetup(sc);
+  if(sc.puz14)gpChSetup(sc);
   const ex=gpFind(sc.map,'D');GP.exitAt=ex;GP.act[ex[0]+','+ex[1]]={k:'exit'};
   if(th.castle)sc.map.forEach((row,yy)=>{for(let xx=0;xx<row.length;xx++)if(row[xx]==='U'){GP.solid[xx+','+yy]=1;GP.act[xx+','+yy]={k:'stairs'};}});
   const lb=document.createElement('i');lb.className='gpDoorLb';lb.textContent=(th.castle&&GP.fl>0)?'아래층':'나가기';const dl=mk('gpExit','',ex[0],ex[1]);dl.style.zIndex=1;dl.style.pointerEvents='none';dl.appendChild(lb);lb.style.top='auto';lb.style.bottom='100%';lb.style.marginBottom='1px';lb.style.marginTop='0';lb.style.zIndex='3';
@@ -14894,19 +15143,20 @@ const gpCurDir=()=>GP.held.length?GP.held[GP.held.length-1]:-1;
 function gpSetHeld(d,on){const i=GP.held.indexOf(d);if(on){if(i<0){GP.held.push(d);GP.just=true;GP.pend=d;}}else if(i>=0)GP.held.splice(i,1);}
 function gpStart(d){const p=GP.p;p.dir=d;const nx=p.x+GP_DX[d],ny=p.y+GP_DY[d],a=GP.act[nx+','+ny];
  if(GP.puz&&gpPush(d,nx,ny))return;
+ if(GP.puz10&&GP.sc&&GP.sc.puz10&&gpSokPush(d,nx,ny))return;
  if(a){if(GP.just){GP.just=false;gpInteract(a.k);}return;}
  if(!gpWalkable(nx,ny))return;
- p.moving=true;p.t=0;p.nx=nx;p.ny=ny;GP.pa=[GP.pt.x,GP.pt.y];GP.pb=[p.x,p.y];}
+ p.moving=true;p.t=0;p.nx=nx;p.ny=ny;GP.pa=[GP.pt.x,GP.pt.y];GP.pb=[p.x,p.y];if(GP.sc&&GP.sc.puz11)gpShadeGo(d);}
 const gpDirTo=(x,y)=>{const p=GP.p,dx=x-p.x,dy=y-p.y;return Math.abs(dx)>=Math.abs(dy)?(dx<0?2:3):(dy<0?1:0);};
 function gpUpdate(dt){
  const p=GP.p,D=GP.D;gpTypeTick(dt);
  if(GP.busy)return;
  let guard=2;
  while(guard--){
-  if(p.moving){p.t+=dt/GP_MS;dt=0;if(p.t>=1){p.x=p.nx;p.y=p.ny;p.moving=false;p.par^=1;p.px=p.x;p.py=p.y;GP.x=p.x;GP.y=p.y;GP.dir=GP_DN[p.dir];GP.pt={x:GP.pb[0],y:GP.pb[1]};if(GP.sc&&GP.sc.puz3)gpElecStep(p.x,p.y);if(GP.sc&&GP.sc.puz5)gpMistStep(p.x,p.y);if(GP.sc&&GP.sc.puz6)gpDreamStep(p.x,p.y);if(GP.sc&&GP.sc.puz7)gpFireStep(p.x,p.y);}else{p.px=p.x+(p.nx-p.x)*p.t;p.py=p.y+(p.ny-p.y)*p.t;break;}}
-  if(!p.moving&&!D.on){let d=gpCurDir();if(d>=0)GP.path.length=0;else if(GP.pend>=0)d=GP.pend;GP.pend=-1;if(d<0&&GP.path.length)d=GP.path.shift();
+  if(p.moving){p.t+=dt/(GP.icelock>=0?GP_MS*.6:GP_MS);dt=0;if(p.t>=1){p.x=p.nx;p.y=p.ny;p.moving=false;p.par^=1;p.px=p.x;p.py=p.y;GP.x=p.x;GP.y=p.y;GP.dir=GP_DN[p.dir];GP.pt={x:GP.pb[0],y:GP.pb[1]};if(GP.sc&&GP.sc.puz3)gpElecStep(p.x,p.y);if(GP.sc&&GP.sc.puz5)gpMistStep(p.x,p.y);if(GP.sc&&GP.sc.puz6)gpDreamStep(p.x,p.y);if(GP.sc&&GP.sc.puz7)gpFireStep(p.x,p.y);if(GP.sc&&GP.sc.puz9)gpIceStep(p.x,p.y);if(GP.sc&&GP.sc.puz11)gpShadeStep(p.x,p.y);if(GP.sc&&GP.sc.puz13)gpRuneStep(p.x,p.y);if(GP.sc&&GP.sc.puz14)gpChStep(p.x,p.y);}else{p.px=p.x+(p.nx-p.x)*p.t;p.py=p.y+(p.ny-p.y)*p.t;break;}}
+  if(!p.moving&&!D.on){let d=(GP.icelock>=0)?GP.icelock:gpCurDir();if(d>=0)GP.path.length=0;else if(GP.pend>=0)d=GP.pend;GP.pend=-1;if(d<0&&GP.path.length)d=GP.path.shift();
    if(d<0&&GP.ptalk&&!GP.path.length){const a=GP.ptalk;GP.ptalk=null;p.dir=gpDirTo(a.x,a.y);if(Math.abs(a.x-p.x)+Math.abs(a.y-p.y)===1)gpInteract(a.k);break;}
-   if(d>=0){gpStart(d);if(!p.moving){GP.path.length=0;GP.ptalk=null;}}else break;if(!p.moving)break;}else break;}
+   if(d>=0){gpStart(d);if(!p.moving){GP.path.length=0;GP.ptalk=null;if(GP.icelock>=0)GP.icelock=-1;}}else break;if(!p.moving)break;}else break;}
  if(!p.moving){p.px=p.x;p.py=p.y;}
  if(!GP.held.length)GP.just=false;
  gpPlace(GP.me,p.px,p.py);gpSpr();GP.me.classList.toggle('walk',p.moving);
@@ -14989,6 +15239,7 @@ function gpInteract(k){
  else if(k==='firefly'){gpSay(['반딧불이가 든 그루터기다.\n불빛이 반짝이는 순서를 잘 기억하자!'],{menu:['빛을 본다','그만둔다'],pick:i=>{if(i===0)setTimeout(gpForestShow,300);}});}
  else if(k.indexOf('dial:')===0){gpDragonTurn(+k.slice(5));}
  else if(k==='plaque'){gpSay(['용의 비늘 문양이 새겨진 석판이다.\n네 개의 비늘 보주를 이 색 순서와 똑같이 맞추면 봉인이 풀릴 것 같다.\n(보주를 돌리면 다른 보주도 함께 돌아간다!)']);}
+ else if(k.indexOf('mir:')===0){gpBeamTurn(+k.slice(4));}
  else if(k==='pit'){gpSay(['바닥이 깊게 갈라져 있다!\n저 바위를 밀어서 구덩이에 빠뜨리면 건널 수 있겠어.\n(막히면 위쪽 🔄 바위 리셋)']);}
  else if(k==='exit'){gpFade(()=>{const d=gpFind(th.out.map,'D');GP.scene='out';GP.x=d[0];GP.y=d[1]+1;GP.dir='down';gpBuild();});}
  else if(k==='leader'){gpFaceLeader();
@@ -14996,7 +15247,8 @@ function gpInteract(k){
   lines.push('타입: '+(g.types?g.types.map(t=>TYPE_KO[t]).join('·'):'모든 타입')+'  Lv.'+g.lv+'\n'+g.d+'\n도전해 볼까?');
   gpSay(lines,{menu:['전투 시작!','조금 더 준비한다'],pick:i=>{if(i===0)gpFight();}});}
 }
-function gpEnterGym(){gpFade(()=>{const st=GP_THEMES[GP.gi].in.start;GP.scene='in';GP.x=st[0];GP.y=st[1];GP.dir='up';gpBuild();sfx('page');const ip=GP_THEMES[GP.gi].in;if(ip.puz8&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['관장에게 가는 길이 용의 봉인으로 막혀 있다!\n위쪽 석판의 비늘 색과 똑같이 네 보주를 맞춰라.\n보주를 향해 걸으면 돌아가는데, 어떤 보주는 옆 보주까지 함께 돌려! 규칙을 찾아봐요.']);},900);}
+function gpEnterGym(){gpFade(()=>{const st=GP_THEMES[GP.gi].in.start;GP.scene='in';GP.x=st[0];GP.y=st[1];GP.dir='up';gpBuild();sfx('page');const ip=GP_THEMES[GP.gi].in;if(ip.puz14&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['챔피언에게 가는 길이 황금 철창으로 막혀 있다!\n바닥의 8개 문장은 각 체육관의 상징이다.\n네가 도전해 온 순서대로, 바위 → 물결 → 번개 → 숲 → 안개 → 환상 → 불꽃 → 용 차례로 밟아라.\n순서가 틀리면 문장이 모두 꺼진다. 켜진 문장은 다시 밟아도 괜찮다!']);},900);}
+ else if(ip.puz8&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['관장에게 가는 길이 용의 봉인으로 막혀 있다!\n위쪽 석판의 비늘 색과 똑같이 네 보주를 맞춰라.\n보주를 향해 걸으면 돌아가는데, 어떤 보주는 옆 보주까지 함께 돌려! 규칙을 찾아봐요.']);},900);}
  else if(ip.puz7&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['용암 위에 식은 돌 발판이 흩어져 있다!\n발판은 밟고 지나가면 가라앉아서 다시는 못 써. 불씨가 박힌 수정 3개를 모두 모으면 위쪽 철창이 열린대.\n용암에 빠지면 처음부터 다시! (돌 위에서만 길을 찾아요)']);},900);}
  else if(ip.puz6&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['거울 벽이 방을 세 칸으로 나누고 있다…\n빛나는 발판을 밟으면 같은 색의 짝꿍 발판으로 순간이동한대!\n소문으로는, 노란 별빛이 관장님께 이어진다고 해. (위로 가는 길을 찾아봐요)']);},900);}
  else if(ip.puz5&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['안개 속에 복잡한 미로가 펼쳐져 있다…\n잘못된 길로 들어서면 안개에 홀려 입구로 되돌아온다고 해.\n길을 외워 두자. (바닥이 희미하게 일렁이는 곳을 조심!)']);},900);}
@@ -19212,7 +19464,7 @@ function rlRenderEntry(){
   const deckHTML=`<div class="rl-deck"><div class="rl-dk-h"><span>⭐ 내 포켓몬</span><b id="rlCnt">${RL_SEL.length}/${need}</b></div><div class="rl-dk-row mine" id="rlMine">${mineHTML()}</div><div class="rl-dk-plus"><i></i><span>＋ 시작하면 자동으로 더해져요</span><i></i></div><div class="rl-dk-h rnd"><span>🎲 완전 랜덤 ${RL.rand}장</span></div><div class="rl-dk-row rnd">${randHTML}</div></div>`;
   const ready=RL_SEL.length>=need;
   body=`<div class="scv-card"><span class="sc-tag">🎲 모험 준비</span><h3>데려갈 내 포켓몬 고르기</h3><p class="sc-note">내가 가진 포켓몬 중 <b>${RL.pick}장</b>을 골라요. 고른 카드는 모험에서 바로 쓸 수 있고, 시작하면 <b>완전 랜덤 ${RL.rand}장</b>이 더해져 총 ${RL.pick+RL.rand}장으로 출발해요. (같은 카드를 여러 장 가져가진 못해요)</p>${deckHTML}${owned.length?`${starBarHTML(RLPICK_STAR,owned)}${filters}<div class="colGrid" id="rlStGrid">${owned.map(id=>cardHTML(id,{size:'deck',cnt:col[id],cls:RL_SEL.indexOf(id)>=0?'rl-selected':''})).join('')}</div>`:'<p class="mut" style="text-align:center;margin:12px">아직 가진 포켓몬이 없어요. 그대로 시작하면 덱 8장이 모두 랜덤이에요.</p>'}<div class="mbtns rlBar"><button class="btn blue sm" id="rlAutoSel">자동 선택</button><button class="btn ghost sm" id="rlClrSel">선택 해제</button><button class="btn red big" id="rlStart" ${ready?'':'disabled'}>🎲 모험 시작<span id="rlNeed">${ready?'':` (${need-RL_SEL.length}장 더 골라요)`}</span></button></div></div>`;}
- rlShell(`<div class="scv-card rl-intro"><h3 class="rl-ttl">끝없는 길</h3><p class="sc-line rl-story">📖 도감의 글씨가 하나둘 지워지고 있다. 길 끝의 보스가 우리 기록을 삼키고 있기 때문이다. <b>보스를 쓰러뜨릴 때마다 먹힌 포켓몬이 도감으로 돌아온다. 되찾으러 가자!</b></p><div id="rlIntroBody"${rl.runs>=1?' class="hidden"':''}>${rules}</div>${stats}<div class="mbtns"><button class="btn ghost sm" id="rlIntroTg">${rl.runs>=1?'📖 설명 펼치기':'📖 설명 접기'}</button><button class="btn purple sm" id="rlDex">📖 유물 도감</button><button class="btn ghost sm" id="rlHelp">❓ 쉬운 사용법</button></div></div>${body}`,{noRun:true,screen:'scenarioRLEntry'});
+ rlShell(`<div class="scv-card rl-intro"><h3 class="rl-ttl">끝없는 길</h3><p class="sc-line rl-story">📖 도감의 글씨가<br>하나둘 지워지고 있다.<br>길 끝의 보스가 우리 기록을<br>삼키고 있기 때문이다.<br><b>보스를 쓰러뜨릴 때마다<br>먹힌 포켓몬이 도감으로 돌아온다.<br>되찾으러 가자!</b></p><div id="rlIntroBody"${rl.runs>=1?' class="hidden"':''}>${rules}</div>${stats}<div class="mbtns"><button class="btn ghost sm" id="rlIntroTg">${rl.runs>=1?'📖 설명 펼치기':'📖 설명 접기'}</button><button class="btn purple sm" id="rlDex">📖 유물 도감</button><button class="btn ghost sm" id="rlHelp">❓ 쉬운 사용법</button></div></div>${body}`,{noRun:true,screen:'scenarioRLEntry'});
  $('#rlDex').onclick=()=>{sfx('tap');rlRelicDex();};
  {const tg=$('#rlIntroTg'),bd=$('#rlIntroBody');if(tg&&bd)tg.onclick=()=>{sfx('tap');const h=bd.classList.toggle('hidden');tg.textContent=h?'📖 설명 펼치기':'📖 설명 접기';};} // 2번째 도전부터는 설명이 접혀 있어요
  {const hb=$('#rlHelp');if(hb)hb.onclick=()=>{sfx('tap');rlTutorial();};}
@@ -23915,13 +24167,21 @@ const R=(t,ids)=>({t,ids:ids.split(' ')});
  const NUMJ='013678';
  function jong(ch){if(!ch)return null;const c=ch.charCodeAt(0);if(c>=0xAC00&&c<=0xD7A3)return (c-0xAC00)%28;if(/[0-9]/.test(ch))return NUMJ.includes(ch)?(ch==='1'||ch==='7'||ch==='8'?8:1):0;return null;}
  function fix(t){if(typeof t!=='string'||!t)return t;
-  t=t.replace(/(이\(가\)|을\(를\)|은\(는\)|와\(과\)|으로\(로\))/g,(m,j,off)=>{const prev=t.slice(0,off).replace(/(?:<[^>]*>|&[a-z]+;)+$/g,'').slice(-1);const J=jong(prev);const pr=PAIR[j];
+  t=t.replace(/(이\(가\)|을\(를\)|은\(는\)|와\(과\)|으로\(로\))/g,(m,j,off)=>{const prev=t.slice(0,off).replace(/(?:<[^>]*>|&[a-z]+;)+$/g,'').slice(-1);const fm=t.slice(0,off).match(/(\d+)\/\d+$/);const J=jong(fm?fm[1].slice(-1):prev);const pr=PAIR[j];
    if(j==='으로(로)'){return (J===null||J===0||J===8)?'로':'으로';}
    return J===null?pr[1]:(J>0?pr[0]:pr[1]);}); // 받침 있으면 첫째, 없으면 둘째 (그림 글자 뒤에는 받침 없는 형태)
+  t=t.replace(/([가-힣0-9])\(으\)로/g,(m0,c)=>{const J=jong(c);return c+((J===null||J===0||J===8)?'로':'으로');});
+  t=t.replace(/([가-힣])예요/g,(m0,c)=>{const J=jong(c);return J>0?c+'이에요':m0;});
   t=t.replace(/(몇\s?|\d\s?)(장|권|명|병|판|줄|잔|봉)가(?=[\s.,?!<]|$)/g,'$1$2이');
   t=t.replace(/(분|시간)로(?=\s?바꿔요)/g,(m,u)=>u==='분'?'분으로':'시간으로');
   t=t.replace(/([가-힣]\s?수)을(?=\s)/g,'$1를');
-  t=t.replace(/(모서리|꼭짓점)은(?=\s?모두)/g,'$1는');
+  t=t.replace(/(모서리)은(?=\s?모두)/g,'$1는');
+  // 숫자 바로 뒤에 붙은 조사를 읽는 소리(받침)에 맞춰 바로잡아요: 84을→84를, 13를→13을, 5/3가→5/3가(분자 기준), 24으로→24로, 5이에요→5예요
+  const NJ=x=>{const m=x.match(/(\d+)\/\d+$/);const d=(m?m[1]:x).replace(/[^0-9]/g,'').slice(-1);return NUMJ.includes(d);};
+  const NUM='(\\d+\\/\\d+|\\d[\\d,]*(?:\\.\\d+)?)';
+  t=t.replace(new RegExp(NUM+'(은|는|이|가|을|를|과|와)(?=[\\s,.)?!<…]|$)','g'),(m0,n,p)=>{const j=NJ(n);const A={'은':['은','는'],'는':['은','는'],'이':['이','가'],'가':['이','가'],'을':['을','를'],'를':['을','를'],'과':['과','와'],'와':['과','와']}[p];return n+(j?A[0]:A[1]);});
+  t=t.replace(new RegExp(NUM+'(으로|로)(?=[\\s,.)?!<]|$)','g'),(m0,n,p)=>{const d=n.replace(/[^0-9]/g,'').slice(-1);return n+('2459178'.includes(d)&&d!=='0'&&!'36'.includes(d)?'로':'으로');});
+  t=t.replace(new RegExp(NUM+'이에요','g'),(m0,n)=>n+(NJ(n)?'이에요':'예요'));
   return t;}
  function fixQ(q){try{if(q&&typeof q==='object'){if(q.q)q.q=fix(q.q);if(q.e)q.e=fix(q.e);}}catch(e){}return q;}
  window.josaFix=fix;
@@ -24691,7 +24951,7 @@ body.gfBig .gf-help{display:none}body.gfBig #bq{z-index:75}
 /* 떠 있는 조이스틱: 아래 빈 공간 아무 데나 손가락을 대면 거기에 조이스틱이 생겨요 */
 .gf-pad.gf-fl{position:relative;display:block;width:100%;max-width:none;height:150px;margin:8px 0 0;opacity:1}
 .gf-zone{position:absolute;inset:0;box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;border-radius:18px;background:rgba(143,136,176,.12);border:2px dashed rgba(143,136,176,.4)}
-.gf-zone::after{content:'👆 아무 데나\A눌러서 이동';white-space:pre;position:absolute;left:150px;right:140px;top:50%;transform:translateY(-50%);text-align:center;font-size:12px;line-height:1.5;color:rgba(143,136,176,.95);pointer-events:none;transition:opacity .15s}
+.gf-zone::after{content:'';display:none;white-space:pre;position:absolute;left:150px;right:140px;top:50%;transform:translateY(-50%);text-align:center;font-size:12px;line-height:1.5;color:rgba(143,136,176,.95);pointer-events:none;transition:opacity .15s}
 .gf-zone.act::after{opacity:0}
 .gf-zone .gf-joy{position:absolute;left:var(--fx,80px);top:var(--fy,50%);transform:translate(-50%,-50%);opacity:.55;transition:opacity .12s;cursor:default}
 .gf-zone .gf-joy.on{opacity:1}
@@ -25930,8 +26190,8 @@ window.GF={mount,destroy,genMap,get st(){return ST;}};
 </script>
 <style id="rl-entry-css">
 /* ===== 로그라이크 입구: 소개 · 통계 한 줄 · 덱 고르기 슬롯 ===== */
-.rl-intro .rl-story{max-width:none;margin:6px 0 12px!important;text-align:left;font-size:13px!important;line-height:1.55!important}
-.rl-intro .rl-story img{height:1.3em!important;width:auto!important;vertical-align:-.25em}
+.rl-intro .rl-ttl{text-align:center;margin-bottom:2px}
+.rl-intro .rl-story{max-width:16em;margin:6px auto 12px!important;text-align:center;line-height:1.75}
 .rl-intro .rl-stats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;margin-top:10px}
 .rl-intro .rl-stats .sc-reward{min-width:0;padding:8px 2px;font-size:11.5px;white-space:nowrap}
 .rl-intro .rl-stats .sc-reward strong{font-size:16px;margin-bottom:1px}
@@ -26970,19 +27230,16 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
   {sel:'[data-f="ach"]',t:'🏅 도전 과제',d:'열심히 한 만큼 배지가 생겨요.'}
  ];
  const st=document.createElement('style');
- st.textContent='.tourHi{position:relative}'
-  +'#tourDim{position:fixed;z-index:140;border-radius:18px;box-shadow:0 0 0 3px #ffd23f,0 0 0 9999px rgba(18,14,40,.55);pointer-events:none;display:none;opacity:0;transition:opacity .24s ease-out}'
-  +'#tourDim.on{opacity:1}'
-  +'#tourDim::after{content:"";position:absolute;inset:-7px;border:3px solid rgba(255,210,63,.85);border-radius:inherit;animation:tourRing 1.4s ease-in-out infinite;will-change:transform,opacity}'
-  +'@keyframes tourRing{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.035);opacity:.3}}'
-  +'#tourBub{position:fixed;z-index:150;width:min(300px,90vw);box-sizing:border-box;background:#fffbe8;color:#3a2f10;border:3px solid #ffd166;border-radius:16px;padding:8px 12px;box-shadow:0 4px 0 #e0a83a,0 10px 24px rgba(0,0,0,.35);font-size:14px;line-height:1.5;display:none;pointer-events:none;text-align:left;opacity:0;translate:0 6px;transition:opacity .24s ease-out,translate .24s ease-out}'
-  +'#tourBub.on{opacity:1;translate:0 0}'
+ st.textContent='.tourHi{animation:tourPulse 1.1s ease-in-out infinite!important;position:relative}'
+  +'@keyframes tourPulse{50%{filter:brightness(1.12)}}'
+  +'#tourDim{position:fixed;z-index:140;border-radius:18px;box-shadow:0 0 0 4px #ffd23f,0 0 18px 6px rgba(255,210,63,.9),0 0 0 9999px rgba(18,14,40,.55);pointer-events:none;display:none;transition:left .12s,top .12s,width .12s,height .12s}'
+  +'#tourBub{position:fixed;z-index:150;width:min(300px,90vw);box-sizing:border-box;background:#fffbe8;color:#3a2f10;border:3px solid #ffd166;border-radius:16px;padding:8px 12px;box-shadow:0 4px 0 #e0a83a,0 10px 24px rgba(0,0,0,.35);font-size:14px;line-height:1.5;display:none;pointer-events:none;text-align:left}'
   +'#tourBub b{font-size:16px;display:block}#tourBub .tbOk{font-size:12px;color:#2a8a4a;font-weight:700}#tourBub .tbN{font-size:11px;color:#8a7430;margin-top:3px}'
   +'#tourBub .tbf{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 8px;margin-top:3px}'
   +'#tourBub button{pointer-events:auto;border:0;background:transparent;color:#8a7430;text-decoration:underline;font-size:12px;cursor:pointer;padding:4px 2px;white-space:nowrap}'
   +'#tourBub button.tbMain{background:#ffd23f;color:#3a2f10;text-decoration:none;font-weight:700;font-size:13px;padding:5px 12px;border-radius:12px}'
-  +'#tourBub .tbA{position:absolute;left:50%;font-size:22px;margin-left:-11px;animation:tourBob .8s ease-in-out infinite alternate}'
-  +'@keyframes tourBob{to{transform:translateY(4px)}}';
+  +'#tourBub .tbA{position:absolute;left:50%;font-size:22px;margin-left:-11px;animation:tourBob .7s ease-in-out infinite alternate}'
+  +'@keyframes tourBob{to{transform:translateY(5px)}}';
  document.head.appendChild(st);
  const bub=document.createElement('div');bub.id='tourBub';document.body.appendChild(bub);
  const dim=document.createElement('div');dim.id='tourDim';document.body.appendChild(dim);
@@ -27000,18 +27257,10 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
   let el=find(t.sel);
   if(!el&&!redirect&&s.hub&&S.screen==='hub'){el=find(s.hub);viaHub=true;t=Object.assign({},s,{t:s.hubT||s.t,d:s.hubD||s.d});}
   return {s,t,el,redirect,viaHub};}
- let cur=null,miss=0,key='',scrolledFor='',lastR='',shown=false,settleUntil=0,raf=0;
- function unHi(){if(cur){cur.classList.remove('tourHi');cur=null;}bub.classList.remove('on');dim.classList.remove('on');bub.style.display='none';dim.style.display='none';key='';lastR='';shown=false;}
- // 안내를 따라 다른 화면으로 가면 새 화면은 항상 맨 위에서 시작해요
- function fixScroll(prev){const f=()=>{try{const vw=document.getElementById('view');if(vw&&S.screen!==prev&&vw.scrollTop>0)vw.scrollTop=0;}catch(e){}};setTimeout(f,60);setTimeout(f,350);}
- function adv(i,after){const prev=S.screen;set(i+1);unHi();fixScroll(prev);if(after)setTimeout(after,700);}
- // 대상이 이미 화면 안에 있으면 그대로 두고, 밖에 있을 때만 한 번에(부드러운 스크롤 없이) 가운데로 옮겨요
- function ensureVisible(el){try{const r=zRect(el),z=ZM(),vh=innerHeight/z,hud=document.querySelector('.hud');
-  const top=hud?(zRect(hud).top+zRect(hud).height+8):8,bot=vh-8;
-  if(r.top>=top&&r.top+r.height<=bot)return;
-  el.scrollIntoView({block:'center'});}catch(e){}}
+ let cur=null,miss=0,key='';
+ function unHi(){if(cur){cur.classList.remove('tourHi');cur=null;}bub.style.display='none';dim.style.display='none';key='';}
+ function adv(i,after){set(i+1);unHi();if(after)setTimeout(after,700);}
  function tick(){try{
-  if(document.hidden)return;
   if(!ready()){unHi();return;}
   const i=get();if(i<0){unHi();addRe();return;}
   addRe();
@@ -27022,13 +27271,9 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
    if(S.screen==='hub'&&!s.soft&&!v.redirect){if(++miss>8){miss=0;set(i+1);}}
    return;}
   miss=0;
-  if(cur!==el){if(cur)cur.classList.remove('tourHi');cur=el;el.classList.add('tourHi');}
-  const sk=i+'|'+S.screen+'|'+(v.redirect?1:0)+'|'+(v.viaHub?1:0);
-  if(scrolledFor!==sk){scrolledFor=sk;ensureVisible(el);settleUntil=performance.now()+120;shown=false;lastR='';bub.classList.remove('on');dim.classList.remove('on');}
-  if(performance.now()<settleUntil)return;
+  if(cur!==el){if(cur)cur.classList.remove('tourHi');cur=el;el.classList.add('tourHi');
+   try{el.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}}
   const k=i+'|'+(v.redirect?1:0)+'|'+(v.viaHub?1:0);
-  const r=zRect(el),rs=Math.round(r.left)+','+Math.round(r.top)+','+Math.round(r.width)+','+Math.round(r.height);
-  if(k===key&&rs===lastR&&shown)return; // 아무것도 안 바뀌었으면 다시 그리지 않아요
   if(k!==key){key=k;
    bub.innerHTML='<span class=tbA></span>'+(i>0&&!v.redirect?'<div class=tbOk>✅ 앞 단계 완료! 다음 차례예요</div>':'')+'<b>'+t.t+'</b>'+t.d
     +'<div class=tbN>안내 '+(i+1)+' / '+STEPS.length+'</div>'
@@ -27037,10 +27282,9 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
    const ok=bub.querySelector('#tourOk');if(ok)ok.onclick=()=>adv(i);
    bub.querySelector('#tourNext').onclick=()=>{set(i+1);unHi();};
    bub.querySelector('#tourSkip').onclick=()=>{set(DONE);unHi();try{toast('안내를 끝냈어요. 홈 맨 아래 「안내 다시 보기」로 다시 볼 수 있어요');}catch(e){}};}
-  lastR=rs;
-  bub.style.display='block';dim.style.display='block';
-  const z=ZM(),vw=innerWidth/z,vh=innerHeight/z,bw=bub.offsetWidth,bh=bub.offsetHeight;
-  dim.style.left=(r.left-4)+'px';dim.style.top=(r.top-4)+'px';dim.style.width=(r.width+8)+'px';dim.style.height=(r.height+8)+'px';
+  bub.style.display='block';
+  const r=zRect(el),z=ZM(),vw=innerWidth/z,vh=innerHeight/z,bw=bub.offsetWidth,bh=bub.offsetHeight;
+  dim.style.display='block';dim.style.left=(r.left-4)+'px';dim.style.top=(r.top-4)+'px';dim.style.width=(r.width+8)+'px';dim.style.height=(r.height+8)+'px';
   const hud=document.querySelector('.hud'),minTop=hud?(zRect(hud).top+zRect(hud).height+6):6;
   const sAbove=r.top-minTop-16,sBelow=vh-(r.top+r.height)-16;
   let top,arrow='';
@@ -27052,7 +27296,6 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
   let left=r.left+r.width/2-bw/2;left=Math.max(8,Math.min(vw-bw-8,left));
   bub.style.left=left+'px';bub.style.top=top+'px';
   const a=bub.querySelector('.tbA');if(a){a.style.display=arrow?'block':'none';a.textContent=arrow==='above'?'👇':'👆';a.style.cssText='display:'+(arrow?'block':'none')+';'+(arrow==='above'?'bottom:-30px':'top:-30px');}
-  if(!shown){shown=true;requestAnimationFrame(()=>{dim.classList.add('on');bub.classList.add('on');});}
  }catch(e){}}
  function addRe(){try{if(S.screen!=='hub')return;const hc=document.getElementById('hCode');if(!hc||document.getElementById('tourRe'))return;
   const a=document.createElement('a');a.id='tourRe';a.href='#';a.style.color='inherit';a.textContent='🔦 안내 다시 보기';
@@ -27060,8 +27303,7 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
   hc.parentNode.appendChild(document.createTextNode(' · '));hc.parentNode.appendChild(a);}catch(e){}}
  document.addEventListener('click',e=>{try{if(!ready())return;const i=get();if(i<0)return;const v=view(i);
   if(v.el&&!v.redirect&&!v.viaHub&&!v.s.manual&&v.el.contains(e.target))adv(i,v.s.after);}catch(x){}},true);
- {const vwEl=document.getElementById('view');if(vwEl)vwEl.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;tick();});},{passive:true});}
- setInterval(tick,250);
+ setInterval(tick,150);
  window.tourReset=()=>{set(0);};
 })();
 </script>
