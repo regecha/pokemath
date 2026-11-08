@@ -7525,8 +7525,9 @@ const HARD=[
  {n:'사천왕 · 그림자 숲',ldr:'사천왕 그림자',types:[13,15,7],av:94,c:'#b79bff',deckN:24,hp:54,mana:3,hand:5,mt:5,gt:8,d:'고스트·악·독이 끈질기게 괴롭혀요'},
  {n:'사천왕 · 용과 강철',ldr:'사천왕 용아',types:[14,16],av:373,c:'#9fb4ff',deckN:26,hp:60,mana:3,hand:5,mt:5,gt:7,d:'용의 기세와 강철 갑옷, 마지막 사천왕'},
  {n:'포켓몬 마스터',ldr:'포켓몬 마스터 레이',types:null,av:150,c:'#ffd23f',deckN:32,hp:70,mana:4,hand:6,mt:4,gt:6,primal:1,d:'모든 타입 최강 덱 · 4턴에 원시회귀, 6턴에 무한다이맥스'}];
-const HARD_RW={coins:[300,400,500,600,1000],candy:[200,300,400,500,800],packs:[3,3,3,3,6],legend:[1,1,1,1,2],rc:[100,130,160,190,300],rd:[60,80,100,120,200]};
-const hardOpen=i=>{const m=S.meta;return !!m.gyms[8]&&(i===0||!!(m.hard&&m.hard[i-1]));};
+HARD.push(...GYMS.map((g,k)=>({n:'하드 · '+g.n,ldr:g.ldr,types:g.types,av:g.av,c:g.c,deckN:34+k,hp:72+k*3,mana:0,hand:6,mt:0,gt:0,gym:1,hg:1,gi:k,d:'마스터급 덱 · 돌 카드·랜덤 볼·만렙 스킬·메가·거다이맥스'})));
+const HARD_RW={coins:[300,400,500,600,1000,500,550,600,650,700,750,800,900,1500],candy:[200,300,400,500,800,300,330,360,390,420,450,480,520,900],packs:[3,3,3,3,6,4,4,4,4,5,5,5,5,8],legend:[1,1,1,1,2,1,1,1,1,1,1,1,1,2],rc:[100,130,160,190,300,150,160,170,180,190,200,210,220,350],rd:[60,80,100,120,200,90,95,100,105,110,115,120,125,220]};
+const hardOpen=i=>{const m=S.meta;if(i>=5)return !!(m.hard&&m.hard[i===5?4:i-1]);return !!m.gyms[8]&&(i===0||!!(m.hard&&m.hard[i-1]));};
 function hardDeck(h){ // 테마 타입 + 전투 기여도 + 메가 가능 여부로 큰 덱을 만들어요 (같은 카드는 최대 2장)
  const bonus={double:13,taunt:8,armor:8,dodge:7,grow:7,freeze:6,quake:6,poison:5,fight:5,rush:5,wing:5,heal:4,fairy:4,draw:4,wave:4,ember:3,tough:4};
  const pool=MON_IDS.filter(id=>{const m=MON[id];if(m.cost>6)return false;if(h.types&&!m.types.some(t=>h.types.includes(t)))return false;return true;});
@@ -7540,7 +7541,7 @@ function hardDeck(h){ // 테마 타입 + 전투 기여도 + 메가 가능 여부
   for(let pass=0;pass<2&&need>0&&p.length;pass++)for(const id of p){if(need<=0)break;if((cnt[id]||0)>pass)continue;add(id);need--;}}
  const ranked=pool.slice().sort((a,b)=>score(b)-score(a));
  for(let pass=0;d.length<n&&pass<3;pass++)for(const id of ranked){if(d.length>=n)break;if((cnt[id]||0)>=2)continue;add(id);}
- if(h.gt){const out=d.slice(0,n);let have=out.filter(x=>GMAX[x]).length;ranked.filter(id=>GMAX[id]&&MON[id].cost>=3).forEach(id=>{if(have>=2||out.includes(id))return;let wi=-1,ws=1e9;out.forEach((x,k)=>{const sc=score(x);if(!GMAX[x]&&!PRIMAL[x]&&MON[x].cost===MON[id].cost&&sc<ws){ws=sc;wi=k;}});if(wi>=0){out[wi]=id;have++;}});return shuffle(out);}
+ if(h.gt||h.hg){const out=d.slice(0,n);let have=out.filter(x=>GMAX[x]).length;ranked.filter(id=>GMAX[id]&&MON[id].cost>=3).forEach(id=>{if(have>=2||out.includes(id))return;let wi=-1,ws=1e9;out.forEach((x,k)=>{const sc=score(x);if(!GMAX[x]&&!PRIMAL[x]&&MON[x].cost===MON[id].cost&&sc<ws){ws=sc;wi=k;}});if(wi>=0){out[wi]=id;have++;}});return shuffle(out);}
  return shuffle(d.slice(0,n));}
 let B=null;
 const HERO_HP=20;const foeHP=d=>Math.round(13+d*1.3);
@@ -7635,7 +7636,7 @@ function megaCine(baseId,megaId,name,onFlash,title){return new Promise(res=>{
  setTimeout(()=>{o.classList.add('out');},3000);
  setTimeout(()=>{o.remove();if(!document.getElementById('megaFx'))document.documentElement.classList.remove('megaBusy');res();},3450);});}
 async function megaDo(P,i,fromRemote){const u=P&&P.board[i];if(!B||!u||!MEGA[u.id]||u.mg||P.mgUsed)return false;
- P.mgN=(P.mgN||0)+1;P.mgUsed=P.mgN>=mgMax(P);if(B.coop)P.mgBase=P.qc||0;else if(P===B.me)B.mgBase=B.qc||0;u.mg=MEGA[u.id];{const sh=evoShield(P);if(sh)u.shield=(u.shield||0)+sh;}{const mb=megaBonus(u.id);u.atk+=mb;u.max+=mb;u.hp+=mb;}u.att=0;B.sel=-1;B.pick=-1;
+ P.mgN=(P.mgN||0)+1;P.mgUsed=P.mgN>=mgMax(P);if(B.coop)P.mgBase=P.qc||0;else if(P===B.me)B.mgBase=B.qc||0;else if(hgOn()&&P===B.foe)P.mgBase=P.qc||0;u.mg=MEGA[u.id];{const sh=evoShield(P);if(sh)u.shield=(u.shield||0)+sh;}{const mb=megaBonus(u.id);u.atk+=mb;u.max+=mb;u.hp+=mb;}u.att=0;B.sel=-1;B.pick=-1;
  B.busy=true;try{try{if(BC&&BC.host&&B.coop)bossSend({t:'boss-megafx',b:u.id,m:u.mg,n:megaName(u.id)});}catch(e){}await megaCine(u.id,u.mg,megaName(u.id),()=>{renderBattle();});renderBattle();const el=unitEl(P,i);if(el){el.classList.add('megaGo');fx(el,`공격 +${megaBonus(u.id)} · 체력 +${megaBonus(u.id)}`,'txt');}if(!window.__sim)confetti(50);await wait(500);}catch(e){}
  B.busy=false;renderBattle();return true;}
 // ===== 거다이맥스 =====
@@ -7660,7 +7661,7 @@ const mgProg=()=>mgProgK('m'); // 진화 게이지는 메가·다이맥스가 �
 const evoBase=id=>Math.min(10,Math.max(5,(Number(MON[id]&&MON[id].cost)||1)+4));
 const evoNeedU=id=>evoNeed(evoBase(id));
 // 진화 연구 Lv.5: 진화할 때 방어막 +1
-const evoShield=P=>{try{if(window.__sim||!B||B.tut||B.tutReal||P===B.foe)return 0;if(B.coop)return Number(P&&P.evoLv)>=5?1:0;return P===B.me&&(Number(trainerSkillLevels().evo)||0)>=5?1:0;}catch(e){return 0;}};
+const evoShield=P=>{try{if(window.__sim||!B||B.tut||B.tutReal)return 0;if(P===B.foe)return hgOn()?1:0;if(B.coop)return Number(P&&P.evoLv)>=5?1:0;return P===B.me&&(Number(trainerSkillLevels().evo)||0)>=5?1:0;}catch(e){return 0;}};
 // 필드에서 진화할 수 있는 포켓몬 중 가장 적게 필요한 정답 수(게이지 표시용). 후보가 없으면 가장 낮은 5개 기준
 const evoPillNeed=()=>{try{let m=99;((B&&B.me&&B.me.board)||[]).forEach(u=>{if(u&&u.hp>0&&!u.mg&&!u.gm&&(megaOk(u.id)||(gmaxOk(u.id)&&!gmaxOff())))m=Math.min(m,evoNeedU(u.id));});return m<99?m:evoNeed(5);}catch(e){return evoNeed(5);}};
 const gmaxOff=()=>!B||B.tut||B.tutReal;
@@ -7674,7 +7675,7 @@ const EVO_OUT_MSG='이번 판에 사용할 수 있는 진화 횟수를 모두 �
 function gmaxCan(P,i,show){try{const u=P&&P.board[i];if(gmaxOff()||!u||u.gm||u.mg||u.hp<=0||P.gmUsed||P.gmx||!gmaxOk(u.id)||!(u.att>0)||u.frozen)return false;if(B.coop){if(!show)return false;if(Number(u.coopOwner??0)!==BC.localIndex)return false;}return mgProg('g')>=evoNeedU(u.id);}catch(e){return false;}}
 function gmaxCand(P){try{if(gmaxOff()||P.gmx||P.gmUsed)return false;return P.board.some(u=>u&&!u.gm&&!u.mg&&u.hp>0&&gmaxOk(u.id));}catch(e){return false;}}
 async function gmaxDo(P,i){const u=P&&P.board[i];if(!B||!u||!GMAX[u.id]||u.gm||u.mg||P.gmUsed||P.gmx)return false;
- if(P===B.foe)P.gmUsed=true;if(B.coop)P.mgBase=P.qc||0;else if(P===B.me)B.mgBase=B.qc||0;B.sel=-1;B.pick=-1;B.busy=true;
+ if(P===B.foe)P.gmUsed=true;if(B.coop)P.mgBase=P.qc||0;else if(P===B.me)B.mgBase=B.qc||0;else if(hgOn()&&P===B.foe)P.mgBase=P.qc||0;B.sel=-1;B.pick=-1;B.busy=true;
  let done=false;const flip=()=>{if(done)return;done=true;const orig=P.board,max0=u.max;{const sh=evoShield(P);if(sh)u.shield=(u.shield||0)+sh;}u.gm=1;u.max=max0*3;u.hp=Math.max(1,u.max-Math.max(0,max0-u.hp));u.att=0;P.gmx={board:orig,si:i,turns:3,max0};P.board=[u];};
  try{await megaCine(u.id,GM_BASE+u.id,gmWord(u.id)+' '+MON[u.id].name,()=>{flip();renderBattle();},u.id===890?'ETERNAMAX!':'GIGANTAMAX!');}catch(e){}
  flip();renderBattle();
@@ -7719,6 +7720,7 @@ function startBattle(gi,hi){const me=S.meta;const H=hi!=null?HARD[hi]:null;if(gi
   sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:false,over:false};
  if(g){const leaderStartMana=Math.min(3,1+Math.floor(gi/3));B.foe.maxMana=leaderStartMana;B.foe.mana=leaderStartMana;}
  if(H){B.foe.maxMana=H.mana;B.foe.mana=H.mana;B.ft=0;}
+ if(H&&H.hg){const f=B.foe;f.owned=MON_IDS.slice();f.specials=true;f.powerUses=3;f.manaLv=5;f.evoLv=5;f.studyLv=5;f.handLv=5;f.qc=0;f.mgBase=0;f.skUsed={};f.fcounter=0;}
  for(let i=0;i<3;i++)draw(B.me,true);for(let i=0;i<(H?(H.hand||5):g?5:4);i++)draw(B.foe,true);
  S.screen='battle';$('#view').innerHTML='';$('#battle').classList.add('on');startBgm('battle');
  renderBattle();
@@ -11825,7 +11827,7 @@ async function resolveAttack(A,D,si,tg,ok,cb,defReduce=0,crit=false,hint=0,defHi
  const dm=dragonMod(a);if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);a.att--;a.fresh=0;
  await preAtkFx(A,si,a,tg);acAtk(A,D,a,tg,ok,crit);
  if(crit&&ok){fx(unitEl(A,si),'크리티컬! +1','crit');sfx('crit');}
- if(tg.hero){dmg+=quakeB(a);if(a.gm)dmg=Math.max(1,dmg-2);if(defReduce>0){dmg=Math.max(0,dmg-defReduce);note+=`방어 문제 정답 -${defReduce}! `;}if(hint>0){dmg=Math.max(0,dmg-hint);note+=`💡힌트 사용 -${hint} `;}if(defHint>0){dmg+=defHint;note+=`💡방어 힌트 +${defHint} `;}const el=heroEl(D);window.__sd=dmg;await skillMove(A,si,el,ok,cb);window.__sd=null;if(quakeB(a)>0)await quakeFx(el);D.hp-=dmg;recHit(A,a,dmg);acHero(dmg,D);if(dmg>0){impact(el,dmg,{hero:1,col:'#ff5a5f'});fx(el,'-'+dmg,ok?'crit big':'');}else fx(el,'공격을 막았다!','txt');if(ok&&dmg>0)sfx('crit');if(note)fx(unitEl(A,si),note,'txt');}
+ if(tg.hero){dmg+=quakeB(a);if(a.gm)dmg=Math.max(1,dmg-2);if(defReduce>0){dmg=Math.max(0,dmg-defReduce);note+=`방어 문제 정답 -${defReduce}! `;}if(hint>0){dmg=Math.max(0,dmg-hint);note+=`💡힌트 사용 -${hint} `;}if(defHint>0){dmg+=defHint;note+=`💡방어 힌트 +${defHint} `;}const el=heroEl(D);window.__sd=dmg;await skillMove(A,si,el,ok,cb);window.__sd=null;if(quakeB(a)>0)await quakeFx(el);D.hp-=dmg;recHit(A,a,dmg);acHero(dmg,D);if(dmg>0){impact(el,dmg,{hero:1,col:'#ff5a5f'});fx(el,'-'+dmg,ok?'crit big':'');}else fx(el,'공격을 막았다!','txt');if(ok&&dmg>0)sfx('crit');if(note)fx(unitEl(A,si),note,'txt');if(D===B.foe&&D.fcounter>0&&A.board[si]&&A.board[si].hp>0){const cv=D.fcounter;await wait(200);fx(heroEl(D),`반격 -${cv}`,'txt');await dealUnit(A,si,cv);}}
  else{const d=D.board[tg.u];if(!d){return;}
   dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a.id,d.id);dmg=Math.max(1,applyType(dmg,k));if(hint>0){dmg=Math.max(0,dmg-hint);fx(unitEl(A,si),`💡힌트 사용 -${hint}`,'txt');}
   await skillMove(A,si,unitEl(D,tg.u),ok,cb);
@@ -12047,6 +12049,7 @@ async function startTurn(side){if(!B||B.over)return;closeInfo();try{if(B.coop&&B
  P.maxMana=Math.min(6,P.maxMana+1);P.mana=P.maxMana;P.bonusMana=0;P.sunMana=0;B.defUsed=false;  if(side==='me'&&!B.coop&&!B.pvp&&!window.__sim&&!B.studyUsesSet){B.studyUsesSet=1;const sx=studyExtraUses(trainerSkillLevels().study);P.powerUses=STUDY_BASE+sx+((B.rl&&typeof rlHas==='function'&&rlHas('studybook'))?2:0);}
  if(side==='me'&&!B.pvp&&!window.__sim){const ml=B.coop?(Number(P.manaLv)||0):(Number(trainerSkillLevels().mana)||0);if(ml>0&&rnd()*100<manaChance(ml)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.manaBonusFx=1;}}
  else if(B.pvp&&!window.__sim){const ml=Number(P.manaLv)||0;if(ml>0&&P.passRng()*100<manaChance(ml)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.manaBonusFx=1;}}
+ if(side==='foe'){P.fcounter=0;if(hgOn()&&rnd()*100<manaChance(5)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;}}
  const wildAliveCount=B.wildMode&&side==='foe'?B.foe.board.filter(u=>u&&u.hp>0).length:0;
  P.board.forEach((u,ix)=>{if(!u)return;if(B.coop&&side==='me'&&Number(u.coopOwner??0)!==B.coop.active)return;u.fresh=0;u.att=u.frozen?0:(B.wildMode&&P===B.foe?((u.rlAtt!=null?u.rlAtt:(((S.meta.settings.easy&&!B.coop)||(wildAliveCount>=2&&!(B.t2&&B.t2.boss&&B.t2.boards[0].length>8)))?1:2))+(u.kw==='double'?1:0)):(u.kw==='double'?2:1));u.attTot=u.att;if(u.frozen&&side==='me'){}if(u.kw==='grow'&&u.grow<growCap(u)){u.grow++;u.atk++;setTimeout(()=>kwFx('grow',unitEl(P,ix)),90);if(isLeg(u)){u.hp++;u.max++;}}});
  if(B.coop&&B.wildMode&&side==='foe'&&P===B.foe){try{(B.t2&&B.t2.boss&&B.t2.boards[0].length>8?bossEscalate4:bossEscalate)(P);}catch(e){console.warn('bossEscalate',e);}try{bossIceCut(P);}catch(e){console.warn('bossIceCut',e);}}
@@ -12127,7 +12130,7 @@ function auSummonPick(me){const slots=me.board.filter(x=>!x).length;if(!slots)re
  if(!best)return -1;let pj=-1,pv=-1e9;for(let j=0;j<n;j++)if(best&(1<<j)&&L[j].v>pv){pv=L[j].v;pj=j;}return L[pj].i;}
 const auAlive=P=>P.board.filter(u=>u&&u.hp>0);
 // 화염의 돌(상대 전체 피해 2)이 값어치 있는지
-function auFireWorth(){const f=auAlive(B.foe);if(!f.length)return false;const kills=f.filter(u=>u.hp<=2&&!u.dodge&&!(u.shield>0)).length;return kills>=2||f.length>=3||(kills>=1&&f.length>=2);}
+function auFireWorth(E){const f=auAlive(E||B.foe);if(!f.length)return false;const kills=f.filter(u=>u.hp<=2&&!u.dodge&&!(u.shield>0)).length;return kills>=2||f.length>=3||(kills>=1&&f.length>=2);}
 // 공격할 (포켓몬, 대상)을 통째로 비교해서 가장 좋은 한 쌍을 골라요
 function auAttackPick(me,reserved){const fo=B.foe;const att=[];me.board.forEach((u,i)=>{if(u&&u.hp>0&&u.att>0&&!u.frozen&&i!==reserved&&!AUB.skip[i])att.push(i);});if(!att.length)return null;
  let faceAll=true,faceDmg=0;att.forEach(i=>{if(!targetsFor(i).hero)faceAll=false;faceDmg+=remDmg(me.board[i]);});
@@ -12152,15 +12155,17 @@ function auPlanTurn(me){const fo=B.foe;AUB.skip={};AUB.tries={};AUB.plan={gm:-1}
 // 메가진화: 이미 공격을 마쳤거나 쉬는 포켓몬에게 써요(공격 기회를 버리지 않도록)
 function auMegaPick(me){try{if(me.mgUsed||mgProg('m')<evoNeed(5))return -1;let bi=-1,bs=-1;me.board.forEach((u,i)=>{if(!u||!megaCan(me,i))return;if(u.att>0&&!u.frozen)return;const s=u.atk+u.hp;if(s>bs){bs=s;bi=i;}});return bi;}catch(e){return -1;}}
 // 트레이너 스킬: 체력 회복(위험할 때) · 응원(가장 센 포켓몬) · 공격(쓰러뜨릴 수 있는 상대) · 반격(상대가 여럿이거나 위험할 때)
-async function auSkill(me,when){try{const lv=trainerSkillLevels(),used=B.trainerSkillUsed||(B.trainerSkillUsed={}),fo=B.foe;const can=k=>(lv[k]||0)>0&&!used[k];
- if(can('heal')&&me.hp<me.max&&(me.hp<=me.max*.5||(me.max-me.hp>=lv.heal&&me.hp<=me.max*.7))){activateTrainerSkill('heal');return true;}
- if(when==='pre'&&can('cheer')){let bi=-1,bs=-1;me.board.forEach((u,i)=>{if(u&&u.hp>0&&!u.gm&&u.atk+u.hp*.3>bs){bs=u.atk+u.hp*.3;bi=i;}});if(bi>=0){activateTrainerSkill('cheer');resolveTrainerSkillTarget('me',bi);return true;}}
+// 공통 두뇌: 트레이너 스킬을 언제·누구에게 쓸지 정해요 (자동전투와 하드 모드 관장이 같은 규칙을 써요)
+function abSkillDecide(P,E,lv,used,when,rd){const can=k=>(lv[k]||0)>0&&!used[k];
+ if(can('heal')&&P.hp<P.max&&(P.hp<=P.max*.5||(P.max-P.hp>=lv.heal&&P.hp<=P.max*.7)))return{k:'heal'};
+ if(when==='pre'&&can('cheer')){let bi=-1,bs=-1;P.board.forEach((u,i)=>{if(u&&u.hp>0&&!u.gm&&u.atk+u.hp*.3>bs){bs=u.atk+u.hp*.3;bi=i;}});if(bi>=0)return{k:'cheer',ti:bi};}
  if(when==='post'){
-  if(can('attack')){const f=auAlive(fo);let ti=-1,bv=-1;fo.board.forEach((u,i)=>{if(u&&u.hp>0&&u.hp<=lv.attack&&auVal(u.id)>bv){bv=auVal(u.id);ti=i;}});
-   if(ti<0&&f.length&&(B.round||0)>=4){fo.board.forEach((u,i)=>{if(u&&u.hp>0&&u.atk>bv){bv=u.atk;ti=i;}});}
-   if(ti>=0){activateTrainerSkill('attack');resolveTrainerSkillTarget('foe',ti);return true;}}
-  if(can('counter')){const f=auAlive(fo);if(f.length&&f.some(u=>u.atk>0)&&(me.hp<=me.max*.7||f.length>=2)){activateTrainerSkill('counter');return true;}}}
- }catch(e){console.warn('auSkill',e);}return false;}
+  if(can('attack')){const f=auAlive(E);let ti=-1,bv=-1;E.board.forEach((u,i)=>{if(u&&u.hp>0&&u.hp<=lv.attack&&auVal(u.id)>bv){bv=auVal(u.id);ti=i;}});
+   if(ti<0&&f.length&&(rd||0)>=4){E.board.forEach((u,i)=>{if(u&&u.hp>0&&u.atk>bv){bv=u.atk;ti=i;}});}
+   if(ti>=0)return{k:'attack',ti};}
+  if(can('counter')){const f=auAlive(E);if(f.length&&f.some(u=>u.atk>0)&&(P.hp<=P.max*.7||f.length>=2))return{k:'counter'};}}
+ return null;}
+async function auSkill(me,when){try{const d=abSkillDecide(me,B.foe,trainerSkillLevels(),B.trainerSkillUsed||(B.trainerSkillUsed={}),when,B.round||0);if(!d)return false;activateTrainerSkill(d.k);if(d.ti!=null)resolveTrainerSkillTarget(d.k==='attack'?'foe':'me',d.ti);return true;}catch(e){console.warn('auSkill',e);}return false;}
 async function autoRun(){let idle=0,guard=0;AUB.open=false;
  const ok=()=>AUTO.on&&B&&!B.over&&!B.coop&&!B.pvp&&!B.tut&&!B.tutReal&&document.getElementById('bAuto');
  while(ok()&&guard++<3000){
@@ -12180,7 +12185,8 @@ async function autoRun(){let idle=0,guard=0;AUB.open=false;
   if(await auSkill(me,'pre')){await wait(300);continue;}
   // 3) 공격: 쓰러뜨릴 수 있는 상대 · 유리한 상성 · 반격에 안 지는 상대를 먼저
   {const r=auAttackPick(me,AUB.plan?AUB.plan.gm:-1);if(r){const u0=me.board[r.i],att0=u0&&u0.att;await playerAttack(r.i,r.tg);const u1=B&&B.me.board[r.i];if(u1&&u0===u1&&u1.att>=att0){AUB.tries[r.i]=(AUB.tries[r.i]||0)+1;if(AUB.tries[r.i]>=3)AUB.skip[r.i]=1;}await acPace(250);continue;}}
-  // 4) 전기의 돌: 공격력이 가장 센 포켓몬을 다시 움직이게
+  // 4) 메가진화를 먼저(진화한 포켓몬이 전기의 돌로 바로 공격할 수 있어요) → 전기의 돌
+  {const mi0=auMegaPick(me);if(mi0>=0){await megaDo(me,mi0);renderBattle();await wait(300);continue;}}
   {const th=hasItem('thunder');if(th>=0){let ti=-1,bs=-1;me.board.forEach((u,i)=>{if(u&&u.hp>0&&u.att<=0&&!u.frozen&&!u.fresh&&u.atk>bs){bs=u.atk;ti=i;}});
    if(ti>=0&&(auAlive(fo).length||!B.wildMode)){const r=await playItem(me,th,ti);renderBattle();await wait(300);if(r!==false)continue;}}}
   // 5) 거다이맥스(미리 정해 둔 포켓몬) → 아니면 메가진화
@@ -12265,14 +12271,57 @@ async function hardMega(){if(!B)return;const fo=B.foe,H=B.hard!=null?HARD[B.hard
  const idle=pool.filter(x=>x.idle);if(idle.length)pool=idle; // 이미 공격할 수 있는 포켓몬은 변신하면 그 턴을 쉬므로, 쉬는 포켓몬을 먼저 골라요
  pool.sort((a,b)=>b.v-a.v);fo.mgUsed=false;
  const ok=await megaDo(fo,pool[0].i);if(ok){fo.mgCnt=1;fo.mgAt=B.ft;}B.busy=true;await wait(250);}
+// ===== 하드 모드 체육관 관장 AI: 자동전투와 같은 두뇌(공부·태양의 돌·화염의 돌·소환·스킬·메가·전기의 돌·거다이맥스·달/물의 돌) =====
+function hgOn(){return !!(B&&B.hard!=null&&HARD[B.hard]&&HARD[B.hard].hg&&!B.coop&&!B.pvp);}
+const hgProg=()=>Math.max(0,(B.foe.qc||0)-(B.foe.mgBase||0));
+async function hgSkill(when){const fo=B.foe,me=B.me,used=fo.skUsed||(fo.skUsed={});
+ const d=abSkillDecide(fo,me,{heal:5,counter:5,attack:5,cheer:5},used,when,B.round||0);if(!d)return false;used[d.k]=true;
+ try{if(d.k==='heal'){const b=fo.hp;fo.hp=Math.min(fo.max,fo.hp+5);fx(heroEl(fo),`+${fo.hp-b} 회복`,'heal');try{trainerHealFx(heroEl(fo));}catch(e){}}
+  else if(d.k==='counter'){fo.fcounter=5;fx(heroEl(fo),'반격 준비! 5','txt');try{trainerCounterReadyFx(heroEl(fo));}catch(e){}}
+  else if(d.k==='cheer'){const u=fo.board[d.ti];if(u){u.atk+=CHEER_ATK[5];u.shield=(u.shield||0)+CHEER_SHIELD[5];fx(unitEl(fo,d.ti),`응원! 공격 +${CHEER_ATK[5]} · 방어막 +${CHEER_SHIELD[5]}`,'txt');try{trainerCheerFx(unitEl(fo,d.ti));}catch(e){}}}
+  else if(d.k==='attack'){try{await trainerAtkFx(heroEl(fo),unitEl(me,d.ti),5);}catch(e){}await dealUnit(me,d.ti,5);try{cleanup();}catch(e){}}
+ }catch(e){console.warn('hgSkill',e);}
+ try{fx($('#battle'),`${B.g.ldr}의 스킬: ${TRAINER_SKILL_INFO[d.k].n}!`,'txt');}catch(e){}
+ renderBattle();B.busy=true;await wait(450);checkEnd();return true;}
+async function hgStudy(){const fo=B.foe;let n=0;
+ while((fo.powerUses||0)>0&&fo.hand.length<handMax(fo)&&n++<3&&!B.over){fo.powerUses--;fo.qc=(fo.qc||0)+1;draw(fo,true);if(rnd()*100<studyChance(5)&&fo.hand.length<handMax(fo))draw(fo,true);fx(heroEl(fo),'공부 기술! 카드 +1','txt');B.busy=true;renderBattle();await wait(300);}}
+async function hgPre(){const fo=B.foe,me=B.me;await hgStudy();
+ const has=k=>fo.hand.findIndex(v=>isItemCard(v)&&v.item===k&&battleCost(v)<=fo.mana);
+ for(let g=0;g<14&&!B.over;g++){let did=false;
+  const si=has('sun');
+  if(si>=0){await playItem(fo,si,-1);did=true;}
+  else{const fi=has('fire');
+   if(fi>=0&&auFireWorth(me)){await playItem(fo,fi,-1);did=true;}
+   else{const i=auSummonPick(fo);
+    if(i>=0&&fo.board.includes(null)){await summon(fo,i,fo.board.indexOf(null));did=true;}
+    else if(await hgSkill('pre'))did=true;}}
+  B.busy=true;if(!did)break;await wait(300);}}
+// 첫 공격이 끝난 뒤: 메가진화(이미 공격을 마친 포켓몬) → 전기의 돌로 한 번 더 공격
+async function hgMid(ph){const fo=B.foe;let thunder=false;if(B.over)return false;
+ if(!fo.mgUsed){let bi=-1,bs=-1;fo.board.forEach((u,i)=>{if(!u||u.hp<=0||!MEGA[u.id]||u.mg||u.gm)return;if(u.att>0&&!u.frozen)return;if(hgProg()<evoNeedFor(evoBase(u.id),fo))return;const sc=u.atk+u.hp+(PRIMAL[u.id]?3:0);if(sc>bs){bs=sc;bi=i;}});
+  if(bi>=0){await megaDo(fo,bi);B.busy=true;await wait(250);}}
+ if(B.over)return false;
+ const th=fo.hand.findIndex(v=>isItemCard(v)&&v.item==='thunder'&&battleCost(v)<=fo.mana);
+ if(th>=0){let ti=-1,bs=0;fo.board.forEach((u,i)=>{if(u&&u.hp>0&&u.att<=0&&!u.frozen&&!u.gm&&!u.fresh&&u.atk>bs){bs=u.atk;ti=i;}});
+  if(ti>=0){const r=await playItem(fo,th,ti);B.busy=true;await wait(250);if(r!==false)thunder=true;}}
+ return thunder;}
+// 공격이 모두 끝난 뒤: 스킬(공격·반격) → 거다이맥스 → 달의 돌 → 물의 돌
+async function hgEnd(){const fo=B.foe,me=B.me;
+ await hgSkill('post');if(B.over)return;
+ if(!fo.gmUsed&&!fo.gmx&&(auAlive(me).length>=2||me.hp<=me.max*.45)){let bi=-1,bs=-1;fo.board.forEach((u,i)=>{if(u&&u.hp>0&&GMAX[u.id]&&!u.gm&&!u.mg&&hgProg()>=evoNeedFor(evoBase(u.id),fo)){const sc=u.atk*2+u.hp;if(sc>bs){bs=sc;bi=i;}}});
+  if(bi>=0){B.busy=true;await gmaxDo(fo,bi);B.busy=true;await wait(300);}}
+ if(B.over)return;
+ for(let g=0;g<3&&!B.over;g++){const mo=fo.hand.findIndex(v=>isItemCard(v)&&v.item==='moon'&&battleCost(v)<=fo.mana);if(mo<0)break;let ti=-1,bs=1;me.board.forEach((u,i)=>{if(u&&u.hp>0&&!u.frozen&&u.atk>bs){bs=u.atk;ti=i;}});if(ti<0)break;await playItem(fo,mo,ti);B.busy=true;await wait(250);}
+ for(let g=0;g<2&&!B.over;g++){const wa=fo.hand.findIndex(v=>isItemCard(v)&&v.item==='water'&&battleCost(v)<=fo.mana);if(wa<0||auAlive(fo).length<2)break;await playItem(fo,wa,-1);B.busy=true;await wait(250);}}
 async function foeTurn(){const fo=B.foe,me=B.me;B.busy=true;renderBattle();if(B.hard!=null)B.ft=(B.ft||0)+1;
  if((B.coop||(B.rl&&B.rl.kind==='boss'))&&B.wildMode&&!B.over){try{await bossAoe();}catch(e){console.warn('bossAoe',e);}try{cleanup();renderBattle();}catch(e){}B.busy=true;if(B.over)return;}
  // 1) 카드는 단순히 가장 비싼 것부터 내지 않고, 스탯·특성·현재 필드 시너지를 함께 평가해요.
- if(!B.wildMode&&B.hard!=null){await hardPlay();if(B.over)return;await hardMega();if(B.over)return;}
+ if(!B.wildMode&&B.hard!=null&&hgOn()){await hgPre();if(B.over)return;}else if(!B.wildMode&&B.hard!=null){await hardPlay();if(B.over)return;await hardMega();if(B.over)return;}
  if(!B.wildMode&&B.hard==null){let played=true;while(played){played=false;const slot=fo.board.indexOf(null);if(slot<0)break;
   const h=fo.hand.map((id,i)=>({id,i})).filter(x=>MON[x.id]&&MON[x.id].cost<=fo.mana).sort((a,b)=>aiCardValue(b.id,fo)-aiCardValue(a.id,fo));
   if(h.length){await summon(fo,h[0].i,slot);B.busy=true;played=true;await wait(350);if(B.over)return;}}}
  // 2) 공격: 남은 공격 횟수와 실제 방어 효과를 반영해 트레이너 처치 가능성을 계산해요.
+ for(let ph=0;ph<3&&!B.over;ph++){if(ph>0){if(!hgOn()||!(await hgMid(ph)))break;}
  const atkOrder=fo.board.map((x,i)=>i);if(B.hard!=null)atkOrder.sort((a,b)=>((fo.board[b]&&fo.board[b].atk)||0)-((fo.board[a]&&fo.board[a].atk)||0));
  for(const i of atkOrder){let u=fo.board[i];while(u&&u.att>0&&!u.frozen&&!B.over){
    if(u.gm&&me.board.some(x=>x&&x.hp>0)){await resolveGmaxAll(fo,me,i,true,false,false,0);u=fo.board[i];await acPace(330);continue;}
@@ -12298,10 +12347,10 @@ async function foeTurn(){const fo=B.foe,me=B.me;B.busy=true;renderBattle();if(B.
     tChance=Math.min(.42,tChance);
     const canHitUnit=best!=null&&bv>-4;                             // 반격에 쓰러지는 헛공격만 아니면 포켓몬을 노려요
     if(mustUnit&&best!=null)tg={u:best};else if(canHitUnit&&rnd()>=tChance)tg={u:best};else tg=bossPickTrainer(faceDmg);}
-   await foeAttack(i,tg);u=fo.board[i];await acPace(330);}}
- if(B.over)return;try{await foeGmaxMaybe();}catch(e){console.warn('foeGmax',e);}
+   await foeAttack(i,tg);u=fo.board[i];await acPace(330);}}}
+ if(B.over)return;if(hgOn()){await hgEnd();if(B.over)return;}try{await foeGmaxMaybe();}catch(e){console.warn('foeGmax',e);}
  if(B.over)return;B.busy=false;await wait(250);if(B.t2&&B.t2.boss){await t2BossNext();return;}if(B.coop)bossSetActive((B.coop.players[0]&&B.coop.players[0].hp<=0&&B.coop.players[1]&&B.coop.players[1].hp>0)?1:0);startTurn('me');}
-async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)return;if(tg&&tg.hero&&!B.coop){const gx=gmxIdx(me);if(gx.length)tg={u:gx[0]};}const dm=dragonMod(a);a.att--;
+async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)return;if(hgOn())fo.qc=(fo.qc||0)+1;if(tg&&tg.hero&&!B.coop){const gx=gmxIdx(me);if(gx.length)tg={u:gx[0]};}const dm=dragonMod(a);a.att--;
  let dmg=a.atk;if(dm&&dmg>0)dmg=Math.max(1,dmg+dm);
  await preAtkFx(fo,i,a,tg);acAtk(fo,me,a,tg,true,false);
  if(tg.hero){dmg+=quakeB(a);if(a.gm)dmg=Math.max(1,dmg-2);
@@ -12344,20 +12393,20 @@ async function endHard(win){const me=S.meta,hi=B.hard,H=HARD[hi];me.hard=me.hard
  if(win&&B.me.hp<=5)me.stats.comeback=(me.stats.comeback||0)+1;
  if(win&&B.qn>=5&&B.qc>=B.qn)me.stats.flawless=(me.stats.flawless||0)+1;
  me.stats.candyAll=(me.stats.candyAll||0)+candy;if(win)me.stats.hardWin=(me.stats.hardWin||0)+1;
- if(first){me.hard[hi]=today();if(hi===4)me.hardMaster=today();
-  const all5=MON_IDS.filter(id=>MON[id].rar===5);
-  for(let k=0;k<HARD_RW.legend[hi];k++){let p=all5.filter(id=>!me.col[id]&&!legends.some(l=>l.id===id));if(!p.length)p=all5;const id=rpick(p);legends.push({id,isNew:!me.col[id]});addCard(id);}}
+ if(first){me.hard[hi]=today();if(hi===4)me.hardMaster=today();if(hi===13)me.hardChamp=today();
+  const all5=MON_IDS.filter(id=>MON[id].rar===5);const pool5=(H.hg&&H.types?all5.filter(id=>MON[id].types.some(t=>H.types.includes(t))):all5);const base5=pool5.length?pool5:all5;
+  for(let k=0;k<HARD_RW.legend[hi];k++){let p=base5.filter(id=>!me.col[id]&&!legends.some(l=>l.id===id));if(!p.length)p=base5.filter(id=>!legends.some(l=>l.id===id));if(!p.length)p=base5;const id=rpick(p);legends.push({id,isNew:!me.col[id]});addCard(id);}}
  me.coins+=coins;me.candy+=candy;me.packs+=packs;gainXP(win?70:20);autoSave();
  sfx(win?'win':'lose');if(win)confetti(80);
  $('#bq').classList.remove('on');
- if(legends.length){try{await cardRewardFx(legends,{title:hi===4?'👑 포켓몬 마스터 기념 5성 카드!':'🏆 사천왕 격파 5성 카드!',logo:hi===4?'MASTER':'ELITE 4'});}catch(e){}}
+ if(legends.length){try{await cardRewardFx(legends,{title:H.hg?'🔥 '+H.ldr+' 격파! 전설 포켓몬':hi===4?'👑 포켓몬 마스터 기념 5성 카드!':'🏆 사천왕 격파 5성 카드!',logo:H.hg?'HARD':hi===4?'MASTER':'ELITE 4'});}catch(e){}}
  M(`<div style="text-align:center"><h2 style="font-size:34px">${win?(hi===4&&first?'포켓몬 마스터!':'승리!'):'아쉬워요…'}</h2>
   <div style="display:flex;justify-content:center">${monImg(win?me.starter||25:B.foe.av,'anim')}</div>
   <p style="margin:6px 0">배틀에서 푼 문제 <b>${B.qn}</b>개 중 <b>${B.qc}</b>개 정답!</p>${recapHTML()}
-  ${first?`<div class=explain style="text-align:center"><b>${esc(H.ldr)}</b>를 처음으로 이겼어요!${legends.length?`<br>5성 카드: <b>${legends.map(l=>esc(MON[l.id].name)).join(', ')}</b>`:''}${hi===4?'<br>👑 이제 당신이 <b>포켓몬 마스터</b>예요!':`<br>다음 상대가 열렸어요.`}</div>`:''}
+  ${first?`<div class=explain style="text-align:center"><b>${esc(H.ldr)}</b>를 처음으로 이겼어요!${legends.length?`<br>5성 카드: <b>${legends.map(l=>esc(MON[l.id].name)).join(', ')}</b>`:''}${H.hg?(hi===13?'<br>🏆 하드 모드를 모두 정복했어요!':'<br>다음 관장이 열렸어요.'):hi===4?'<br>👑 이제 당신이 <b>포켓몬 마스터</b>예요!':`<br>다음 상대가 열렸어요.`}</div>`:''}
   <div class=row style="justify-content:center;gap:8px;margin-top:8px"><span class=pill>${I('coin')} +${coins}</span><span class=pill>${I('candy')} +${candy}</span>${packs?`<span class=pill>${I('ball')} 카드팩 +${packs}</span>`:''}</div>
   ${win?'':`<p class=mut style="margin-top:8px">메가 진화로 역전할 수 있어요. 정답을 모아(코스트별 5~10개, 진화 연구로 줄어요) 변신 버튼을 눌러 봐요. 덱을 고쳐서 다시 도전해요!</p>`}
-  <div class=mbtns><button class="btn gold big" data-a=x>확인</button></div></div>`,{rcCopy:recapCopy,x:()=>{closeM();B=null;$('#battle').classList.remove('on');$('#battle').innerHTML='';if(S.lvUp)levelUpFx();LGT='h';renderLeague();if(window.__castleFrom===hi&&hi<5){window.__castleFrom=null;setTimeout(()=>castleOpen(hi,{after:win?'win':'lose'}),50);}},_close:()=>{}});}
+  <div class=mbtns><button class="btn gold big" data-a=x>확인</button></div></div>`,{rcCopy:recapCopy,x:()=>{closeM();B=null;$('#battle').classList.remove('on');$('#battle').innerHTML='';if(S.lvUp)levelUpFx();LGT=H.hg?'x':'h';renderLeague();if(window.__castleFrom===hi&&hi<5){window.__castleFrom=null;setTimeout(()=>castleOpen(hi,{after:win?'win':'lose'}),50);}},_close:()=>{}});}
 // ---- 리그 화면 ----
 let LGT='n';
 function gymNeed(i){return GYMS[i].lv;}
@@ -12382,7 +12431,7 @@ const STUDY_BASE=0; // 기본 공부 기술 횟수 (0이면 '공부 강화' 스�
 const studyExtraUses=n=>[0,1,1,2,2,3][Math.max(0,Math.min(5,Number(n)||0))]||0;
 const HAND_BASE=6;
 const handBonusOf=n=>{n=Math.max(0,Math.min(5,Number(n)||0));return n>=3?2:n>=1?1:0;};
-function handMax(P){let lv=0;try{if(!P||window.__sim||typeof B==='undefined'||!B)return HAND_BASE;if(B.coop||B.pvp)lv=Number(P.handLv)||0;else if(P===B.me)lv=Number(trainerSkillLevels().hand)||0;}catch(e){}return HAND_BASE+handBonusOf(lv);}
+function handMax(P){let lv=0;try{if(typeof B!=='undefined'&&B&&B.hard!=null&&P===B.foe&&HARD[B.hard]&&HARD[B.hard].hg)return HAND_BASE+handBonusOf(5);if(!P||window.__sim||typeof B==='undefined'||!B)return HAND_BASE;if(B.coop||B.pvp)lv=Number(P.handLv)||0;else if(P===B.me)lv=Number(trainerSkillLevels().hand)||0;}catch(e){}return HAND_BASE+handBonusOf(lv);}
 function spendMana(P,n){const b=Math.min(P.bonusMana||0,n);P.bonusMana=(P.bonusMana||0)-b;const s=Math.min(P.sunMana||0,n-b);P.sunMana=(P.sunMana||0)-s;P.mana-=n;}
 const studyBonusDraw=P=>{if(window.__sim||!P||P.hand.length>=handMax(P))return false;const shared=B.coop||B.pvp;const lv=shared?(Number(P.studyLv)||0):(Number(trainerSkillLevels().study)||0);if(lv<=0)return false;const r=B.pvp?P.passRng():rnd();if(r*100<studyChance(lv)){draw(P);return true;}return false;};
 const manaChance=n=>n>0?Math.min(70,20+10*n):0;
@@ -12409,22 +12458,27 @@ function resolveTrainerSkillTarget(side,i){if(!B||!B.trainerSkillTarget)return f
  B.busy=true;renderBattle();(async()=>{const name=MON[u.id].name;await trainerAtkFx(heroEl(B.me),unitEl(B.foe,i),t.level);await dealUnit(B.foe,i,t.level);try{cleanup();}catch(e){}B.busy=false;renderBattle();checkEnd();toast(`${name}에게 ${t.level} 피해!`);})();return true;}
 
 function hardLeagueHTML(){const me=S.meta;const open0=!!me.gyms[8];
- const head=`<div class=explain style="margin-bottom:12px;line-height:1.7;font-size:14px"><b>🔥 하드 모드</b> · 사천왕 4명을 차례로 이기고 <b>포켓몬 마스터</b>에 도전해요. 상대는 <b>큰 덱</b>(20~32장)과 높은 체력, 똑똑한 AI를 가졌고 <b>메가 진화</b>도 써요! 한 명씩 차례로 열려요.<br>처음 이기면 <b>코인 · 카드팩 · 사탕 · 5성 랜덤 카드</b>를 받아요. 자동 전투도 쓸 수 있어요.${open0?'':'<br><b style="color:#d9393f">🔒 일반 리그의 챔피언 리그를 이기면 열려요.</b>'}</div>`;
- const cards=HARD.map((h,i)=>{const op=hardOpen(i),won=me.hard&&me.hard[i];const rw=`코인 ${HARD_RW.coins[i]} · 카드팩 ${HARD_RW.packs[i]} · 사탕 ${HARD_RW.candy[i]} · 5성 카드 ${HARD_RW.legend[i]}장`;
+ const head=`<div class=explain style="margin-bottom:12px;line-height:1.7;font-size:14px"><b>🏰 사천왕</b> · 사천왕 4명을 차례로 이기고 <b>포켓몬 마스터</b>에 도전해요. 상대는 <b>큰 덱</b>(20~32장)과 높은 체력, 똑똑한 AI를 가졌고 <b>메가 진화</b>도 써요! 한 명씩 차례로 열려요.<br>처음 이기면 <b>코인 · 카드팩 · 사탕 · 5성 랜덤 카드</b>를 받아요. 자동 전투도 쓸 수 있어요.${open0?'':'<br><b style="color:#d9393f">🔒 일반 리그의 챔피언 리그를 이기면 열려요.</b>'}</div>`;
+ const cards=HARD.slice(0,5).map((h,i)=>{const op=hardOpen(i),won=me.hard&&me.hard[i];const rw=`코인 ${HARD_RW.coins[i]} · 카드팩 ${HARD_RW.packs[i]} · 사탕 ${HARD_RW.candy[i]} · 5성 카드 ${HARD_RW.legend[i]}장`;
   return `<div class="hcard${op?'':' lock'}${won?' won':''}${i===4?' boss':''}" data-h="${i}"><div class=gi style="background:${h.c}">${op||won?monImg(h.av,'front'):I('lock')}</div><div style="min-width:0"><div class=gn>${esc(h.n)}</div><div class=gd>${esc(h.ldr)} · ${esc(h.d)}</div><div class=hst><span class=hb>덱 ${h.deckN}장</span><span class=hb>체력 ${h.hp}</span>${h.mt?`<span class=hb>${h.primal?'원시회귀':'메가'} ${h.mt}턴</span>`:''}${h.gt?`<span class=hb>${h.primal?'무한다이맥스':'거다이맥스'} ${h.gt}턴</span>`:''}</div><div class=hst>🎁 처음 승리: ${rw}</div><div class=hst style="font-weight:700">${won?'✔ 클리어 '+esc(String(me.hard[i])):op?'도전할 수 있어요!':(!open0?'챔피언 리그를 이기면 열려요':'앞 상대를 이기면 열려요')}</div></div></div>`;}).join('');
  return head+`<div class=hgrid>${cards}</div>`+(me.hardMaster?`<div class=explain style="margin-top:12px;text-align:center">👑 <b>포켓몬 마스터</b> 달성 (${esc(String(me.hardMaster))})</div>`:'');}
+function hgLeagueHTML(){const me=S.meta,open0=!!(me.hard&&me.hard[4]);
+ const head=`<div class=explain style="margin-bottom:12px;line-height:1.7;font-size:14px"><b>🔥 하드 모드</b> · 포켓몬 마스터를 이긴 뒤, 바위 체육관부터 챔피언 리그까지 <b>처음부터 다시</b> 도전해요. 체육관 안의 <b>퍼즐도 훨씬 어려운 하드 버전</b>이에요! 관장은 마스터급 큰 덱과 높은 체력을 가지고, 나와 똑같이 <b>메가진화·거다이맥스</b>(행동할 때마다 문제 1개를 푼 것으로 계산), <b>돌 카드·랜덤 볼</b>, <b>만렙 트레이너 스킬</b>, <b>마나 연구·태양의 돌</b>을 자유롭게 써요.<br>처음 이기면 보스 속성에 맞는 <b>전설 포켓몬</b>을 받아요. 한 명씩 차례로 열려요. 자동 전투도 같은 두뇌로 움직여요.${open0?'':'<br><b style="color:#d9393f">🔒 사천왕 탭의 포켓몬 마스터를 이기면 열려요.</b>'}</div>`;
+ const cards=HARD.slice(5).map((h,k)=>{const i=5+k,op=hardOpen(i),won=me.hard&&me.hard[i];const rw=`코인 ${HARD_RW.coins[i]} · 카드팩 ${HARD_RW.packs[i]} · 사탕 ${HARD_RW.candy[i]} · 전설 포켓몬 ${HARD_RW.legend[i]}마리`;
+  return `<div class="hcard${op?'':' lock'}${won?' won':''}${k===8?' boss':''}" data-h="${i}"><div class=gi style="background:${h.c}">${op||won?monImg(h.av,'front'):I('lock')}</div><div style="min-width:0"><div class=gn>${esc(h.n)}</div><div class=gd>${esc(h.ldr)} · ${esc(h.d)}</div><div class=hst><span class=hb>덱 ${h.deckN}장</span><span class=hb>체력 ${h.hp}</span><span class=hb>만렙 스킬</span><span class=hb>메가·거다이맥스</span></div><div class=hst>🎁 처음 승리: ${rw}</div><div class=hst style="font-weight:700">${won?'✔ 클리어 '+esc(String(me.hard[i])):op?'도전할 수 있어요!':(!open0?'포켓몬 마스터를 이기면 열려요':'앞 관장을 이기면 열려요')}</div></div></div>`;}).join('');
+ return head+`<div class=hgrid>${cards}</div>`+(me.hardChamp?`<div class=explain style="margin-top:12px;text-align:center">🏆 <b>하드 모드 정복</b> (${esc(String(me.hardChamp))})</div>`:'');}
 function renderLeague(){S.screen='league';const me=S.meta;const L=lvOf(me.xp).lv;
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${I('trophy')} 배틀 리그</h2><span class=hudSp></span><span class=pill>${I('medal')} 배지 ${Object.keys(me.gyms).length}/9</span><span class=pill>${me.battles.w}승 ${me.battles.l}패</span></div>
   ${me.bsave?`<div class=explain style="margin-bottom:10px;display:flex;align-items:center;gap:10px">${I('disk')} 저장해 둔 배틀이 있어요 <span class=hudSp></span><button class="btn green sm" id=gResume>이어서 배틀하기</button><button class="btn ghost sm" id=gDrop>그만두기</button></div>`:''}
-  <div class=lgTabs style="margin-top:10px"><button class="lgTab${LGT==='n'?' on':''}" data-lgt=n>⚔️ 일반 리그</button><button class="lgTab hd${LGT==='h'?' on':''}" data-lgt=h>🔥 하드 모드${me.hardMaster?' 👑':''}</button></div>
-  ${LGT==='h'?hardLeagueHTML():`<p class=mut style="font-size:13px;margin:6px 0 12px">체육관은 앞 체육관을 이기고 <b>트레이너 레벨</b>이 되어야 열려요. 레벨은 문제를 풀수록 올라가요!</p>
+  <div class=lgTabs style="margin-top:10px"><button class="lgTab${LGT==='n'?' on':''}" data-lgt=n>⚔️ 일반 리그</button><button class="lgTab hd${LGT==='h'?' on':''}" data-lgt=h>🏰 사천왕${me.hardMaster?' 👑':''}</button><button class="lgTab hd${LGT==='x'?' on':''}" data-lgt=x>🔥 하드 모드${me.hardChamp?' 🏆':''}</button></div>
+  ${LGT==='h'?hardLeagueHTML():LGT==='x'?hgLeagueHTML():`<p class=mut style="font-size:13px;margin:6px 0 12px">체육관은 앞 체육관을 이기고 <b>트레이너 레벨</b>이 되어야 열려요. 레벨은 문제를 풀수록 올라가요!</p>
   <div class=gyms><div class=gym id=gWild><div class=gi style="background:#e9f7ff">${I('map')}</div><div><div class=gn>연습 대전</div><div class=gd>아무 때나 할 수 있어요. 코인·사탕을 모아요.</div></div></div>
   ${GYMS.map((g,i)=>{const op=gymOpen(i);return `<div class="gym${op?'':' lock'}${me.gyms[i]?' won':''}" data-g="${i}"><div class=gi style="background:${g.c}">${op||me.gyms[i]?monImg(g.av,'front'):I('lock')}</div><div><div class=gn>${esc(g.n)}</div><div class=gd>${esc(g.ldr)} · ${esc(g.d)}<br>${op?'도전할 수 있어요!':`Lv.${g.lv} 필요${i>0&&!me.gyms[i-1]?' · 앞 체육관 승리':''}`}</div></div></div>`;}).join('')}</div>
   `}
   <div class=mbtns><button class="btn ghost" id=gDeck>${I('cards')} 덱 고치기</button></div></div></div>`;
  bindHud();
  $('#view').querySelectorAll('[data-lgt]').forEach(b=>b.onclick=()=>{sfx('tap');LGT=b.dataset.lgt;renderLeague();});
- $('#view').querySelectorAll('[data-h]').forEach(e=>e.onclick=()=>{const i=+e.dataset.h;if(!hardOpen(i)){toast(!me.gyms[8]?'일반 리그의 챔피언을 먼저 이겨요':'앞 상대를 먼저 이겨요');return;}sfx('tap');if(i<5){try{castleOpen(i);}catch(e){startBattle(-1,i);}}else startBattle(-1,i);});
+ $('#view').querySelectorAll('[data-h]').forEach(e=>e.onclick=()=>{const i=+e.dataset.h;if(!hardOpen(i)){toast(!me.gyms[8]?'일반 리그의 챔피언을 먼저 이겨요':'앞 상대를 먼저 이겨요');return;}sfx('tap');if(i<5){try{castleOpen(i);}catch(e){startBattle(-1,i);}}else hgEnter(i);});
  if($('#gWild'))$('#gWild').onclick=()=>{sfx('tap');startBattle(-1);};
  if($('#gResume'))$('#gResume').onclick=()=>{sfx('tap');try{B=JSON.parse(me.bsave);}catch(e){B=null;}me.bsave=null;autoSave();if(!B){toast('저장한 배틀을 불러오지 못했어요');renderLeague();return;}[B.me,B.foe].forEach(P=>{if(P&&Array.isArray(P.board))while(P.board.length<BOARD_N)P.board.push(null);});B.busy=false;S.screen='battle';$('#view').innerHTML='';$('#battle').classList.add('on');startBgm('battle');renderBattle();banner('이어서 배틀!','',1200);};
  if($('#gDrop'))$('#gDrop').onclick=async()=>{if(await confirmBox('저장한 배틀을 그만둘까요?','그만두기','아니요')){me.bsave=null;me.battles.l++;autoSave();renderLeague();}};
@@ -12434,7 +12488,7 @@ function renderLeague(){S.screen='league';const me=S.meta;const L=lvOf(me.xp).lv
 // ================= 체육관 필드맵 팝업 (로그라이크 필드맵 스타일) =================
 // 리그 화면에서 체육관을 누르면 → 입구(덱·트레이너 스킬 오브젝트 + 문) → 체육관 내부 → 관장에게 말 걸기 → 전투
 // 새 체육관은 GP_THEMES[체육관번호] 에 맵·오브젝트·대사만 추가하면 같은 흐름으로 열려요.
-const GP_C=13,GP_R=11,GP_T=32;
+let GP_C=13,GP_R=11;const GP_T=32;
 const GP_THEMES={
  1:{key:'wave',wave:1,noSign:1,emoji:'🌊',
   out:{title:'물결 체육관 입구',sub:'물결치는 수족관 궁전 앞에서 덱과 트레이너 스킬을 점검해요',start:[6,9],
@@ -13613,7 +13667,7 @@ function gpMistFx(th){
  if(GP.scene!=='in'||!th.fog)return;
  const cv=document.createElement('canvas');cv.className='gpFogCv';cv.width=GP_C*GP_T;cv.height=GP_R*GP_T;GP.el.appendChild(cv);
  const candles=[],map=th.in.map;for(let y=0;y<GP_R;y++)for(let x=0;x<GP_C;x++)if(map[y][x]==='k')candles.push([x,y]);
- const f=GP.fog={cv,x:GP.x,y:GP.y,candles,t:0,lead:[th.leader.x,th.leader.y]};
+ const f=GP.fog={cv,x:GP.x,y:GP.y,candles,t:0,r:th.in.fogR||1,lead:[th.leader.x,th.leader.y]};
  const loop=()=>{if(!GP||!GP.open||GP.fog!==f)return;const dx=GP.x-f.x,dy=GP.y-f.y;f.x+=dx*.3;f.y+=dy*.3;f.t++;if(Math.abs(dx)+Math.abs(dy)>.004||f.t%8===0||f.t<3)gpFogDraw(f);f.raf=requestAnimationFrame(loop);};
  loop();}
 function gpFogDraw(f){
@@ -13624,7 +13678,7 @@ function gpFogDraw(f){
  const fl=.9+.1*Math.sin(f.t/9);
  f.candles.forEach(([cx,cy])=>hole((cx+.5)*T,(cy+.5)*T,.5*T,2.7*T,.8*fl));
  hole((f.lead[0]+.5)*T,(f.lead[1]+.6)*T,.8*T,2.6*T,.55);
- hole((f.x+.5)*T,(f.y+.5)*T,2.1*T,5.0*T,1);
+ hole((f.x+.5)*T,(f.y+.5)*T,2.1*T*(f.r||1),5.0*T*(f.r||1),1);
  ctx.globalCompositeOperation='source-over';}
 function gpTileDream(ctx,map,x,y,scene,fr){
  const ch=map[y][x],X=x*GP_T,Y=y*GP_T,out=scene==='out';
@@ -13981,7 +14035,7 @@ function gpTileChamp(ctx,map,x,y,scene,fr){
   case 'r':floor();r(CR,1,0,14,16);r(CR3,2,0,2,16);r(CR2,12,0,2,16);r(GO,0,0,1,16);r(GO,15,0,1,16);r(GO2,1,0,1,16);r(GO2,14,0,1,16);if(y%2===0){r(GO,7,3,2,1);r(GO,6,4,4,1);r(GO3,7,4,2,1);r(GO,7,5,2,1);}else{r(GO2,5,9,1,1);r(GO2,10,9,1,1);}break;
   case '*':case '+':{floor();const on=ch==='+';r('rgba(0,0,0,.25)',1,2,14,14);r(on?GO2:NV2,1,1,14,14);r(on?GO:NV,2,2,12,12);r(on?GO3:'#0c1230',3,3,10,10);r(on?'#ffe48a':'#222c66',4,4,8,8);if(!on){r(GO2,4,4,8,1);r(GO2,4,11,8,1);r(GO2,4,4,1,8);r(GO2,11,4,1,8);}else if(((fr+x+y)&1)){r('#ffffff',3,3,1,1);r('#ffffff',12,12,1,1);}break;}
   case 'G':{floor();r('rgba(0,0,0,.3)',0,13,16,3);r(NV2,0,1,16,14);r(GO2,0,1,16,1);r(GO2,0,13,16,1);for(let i=0;i<4;i++){r(GO,i*4+1,2,2,11);r(GO3,i*4+1,2,1,11);r(GO2,i*4+2,2,1,11);}r(GO,0,6,16,2);r(GO2,0,8,16,1);if(x===6){r(NV2,6,5,4,5);r(GO,7,6,2,3);}break;}
-  default:if(ch>='0'&&ch<='7'){const i=+ch;let on=false;try{on=!!(S.meta&&S.meta.gyms&&S.meta.gyms[i]);}catch(e){}const col=(typeof GYMS!=='undefined'&&GYMS[i]&&GYMS[i].c)||'#ffd23f';
+  default:if(ch>='0'&&ch<='7'){const i=+ch;let on=false;try{on=(typeof GP!=='undefined'&&GP&&GP.hzB)?!!GP.hzB[i]:!!(S.meta&&S.meta.gyms&&S.meta.gyms[i]);}catch(e){}const col=(typeof GYMS!=='undefined'&&GYMS[i]&&GYMS[i].c)||'#ffd23f';
    floor();r('rgba(0,0,0,.3)',2,13,12,2);if(on)r('rgba(255,215,90,.20)',0,0,16,14);
    r(GO2,3,10,10,4);r(GO,3,10,10,1);r(NV,4,11,8,2);r(GO3,7,12,2,1);
    r(on?'rgba(190,225,255,.40)':'rgba(120,130,170,.28)',3,2,10,8);r(on?GO:'#8a86a0',3,2,10,1);r(on?GO:'#8a86a0',3,2,1,8);r(on?GO:'#8a86a0',12,2,1,8);
@@ -14731,7 +14785,7 @@ function gpOpen(gi,resume){
  const fitBox=()=>{try{if(!GP||!GP.box)return;const z=(typeof FIT!=='undefined'&&FIT&&FIT.z)||1,vh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh'))||innerHeight/z,vw=innerWidth/z;
   const hh=s=>{const e=GP.box.querySelector(s);return e&&getComputedStyle(e).display!=='none'?e.offsetHeight:0;};
   const pd=GP.box.querySelector('.gf-pad'),padH=pd&&getComputedStyle(pd).position==='fixed'?0:150;
-  const used=hh('.gpHead')+padH+hh('.gpHint')+30,w=Math.floor((vh-used)*13/11);
+  const used=hh('.gpHead')+padH+hh('.gpHint')+30,w=Math.floor((vh-used)*GP_C/GP_R);
   GP.box.style.width=w>=vw?'100%':Math.max(220,w)+'px';}catch(e){}};
  const fit=()=>{fitBox();if(GP&&GP.el){GP.el.style.setProperty('--tw',(GP.el.clientWidth/GP_C)+'px');GP.box.style.setProperty('--gs',(GP.el.clientWidth/160).toFixed(3));try{gpMonRefit();}catch(e){}}};
  try{GP.ro=new ResizeObserver(fit);GP.ro.observe(GP.el);}catch(e){}
@@ -14748,6 +14802,25 @@ function gpClose(silent){
  if(GP){clearInterval(GP.tm);clearInterval(GP.tw);try{GP.ro&&GP.ro.disconnect();}catch(e){}if(GP.kh)window.removeEventListener('keydown',GP.kh,true);cancelAnimationFrame(GP.raf);if(GP.ku)window.removeEventListener('keyup',GP.ku,true);if(GP.blur)window.removeEventListener('blur',GP.blur);if(GP.rz)window.removeEventListener('resize',GP.rz);GP.open=false;GP.dlg=null;}
  const w=document.getElementById('gpWrap');if(w)w.remove();
  if(!silent&&GP)GP.keep=false;}
+
+// ===== 하드 모드 체육관: 같은 컨셉의 어려운 퍼즐 (GP_THEMES[10+체육관번호]) =====
+const gpBi=()=>{const t=GP_THEMES[GP.gi];return t&&t.base!=null?t.base:GP.gi;};
+const gpG=()=>GYMS[gpBi()];
+const gpWon=()=>{const t=GP_THEMES[GP.gi],me=S.meta;return t&&t.hard?!!(me.hard&&me.hard[5+t.base]):!!me.gyms[GP.gi];};
+function hgEnter(hi){const gi=10+(hi-5);if(GP_THEMES[gi]){try{gpOpen(gi);return;}catch(e){console.error('hard gym popup',e);try{gpClose();}catch(_){}}}startBattle(-1,hi);}
+/*HZ_BEGIN*/
+const GP_HARD_IN={"rock":{"title":"하드 · 바위 체육관","sub":"좁은 통로를 막은 구덩이 셋 — 바위를 밀어 길을 만들어요","start":[7,13],"cols":15,"rows":15,"puz":{"boulders":[[2,11],[2,9],[2,12],[11,12]]},"map":["WWWWWWWWWWWWWWW","MMNMMMMMMMMMNMM","Pk.....r.....kP","RR.....r.....RR","RRRRRRR.RRRRRRR","RRRRRRRhRRRRRRR","RRRRRRRhRRRRRRR","RRRRRRRhRRRRRRR","R.............R","R....RR.......R","RR...R.R......R","R....R........R","R....R.R......R","R.R...R..R....R","WWWWWWWDWWWWWWW"],"hint":["바위가 훨씬 많아졌다…!\n좁은 통로 앞에 구덩이가 세 개나 뚫려 있다.\n바위는 밀 수만 있으니, 구석에 박히지 않게 순서를 잘 생각하자!\n(막히면 위쪽 🔄 바위 리셋)"],"monsIn":[[74,3,2],[75,11,2],[111,10,3],[185,4,3]]},"wave":{"title":"하드 · 물결 체육관","sub":"수문 여섯 개로 네 줄의 물길을 한꺼번에 열어요","start":[7,15],"cols":15,"rows":17,"puz2":{"sx":2,"valves":[{"id":"R","x":1,"y":5,"col":"#ff5a5a","name":"빨강"},{"id":"Y","x":13,"y":8,"col":"#ffd23f","name":"노랑"},{"id":"B","x":1,"y":14,"col":"#4aa8ff","name":"파랑"},{"id":"G","x":13,"y":9,"col":"#5adb6a","name":"초록"},{"id":"P","x":1,"y":11,"col":"#c37aff","name":"보라"},{"id":"O","x":13,"y":12,"col":"#ff9a3c","name":"주황"}],"ch":[{"y":13,"by":["R","B","O"]},{"y":10,"by":["R","Y","O"]},{"y":7,"by":["G","P","O"]},{"y":4,"by":["Y","G","O"]}]},"map":["WWWWWWWWWWWWWWW","MMNMMMMMMMMMNMM","Pc.....r.....cP","ww.....r.....ww","wwvvvvvvvvvvvww","w.............w","w.............w","wwvvvvvvvvvvvww","w.............w","w.............w","wwvvvvvvvvvvvww","w.............w","w.............w","wwvvvvvvvvvvvww","w.............w","w.............w","WWWWWWWDWWWWWWW"],"hint":["수문이 여섯 개, 물길이 네 줄이다!\n물길 양옆 램프에는 그 물길을 움직이는 수문 색이 표시돼 있어.\n수문은 같은 구역 안에서만 돌릴 수 있고, 켠 수문이 홀수 개인 물길만 열린대.\n물길을 모두 한꺼번에 열어야 관장에게 갈 수 있어!"],"monsIn":[[74,3,2],[75,11,2]]},"elec":{"title":"하드 · 전기 체육관","sub":"빠른 길을 계산해 발판을 밟고, 패널의 비밀을 풀어요","start":[7,13],"cols":15,"rows":15,"puz3":{"plates":[[1,11],[13,11],[9,12],[4,13]],"gate1":[11,9],"gate2":[7,4],"panels":[[2,6,1],[4,6,2],[6,6,3],[8,6,4],[10,6,5],[12,6,6]],"tog":[[0,1],[0,1,2],[1,2,3],[2,3,4],[3,4,5],[4,5]],"init":[1,0,1,0,0,0],"ms":3300},"map":["WWWWWWWWWWWWWWW","MMNMMMMMMMMMNMM","Pk.....r.....kP","RR.....r.....RR","RRRRRRRGRRRRRRR","RR...........RR","RR...........RR","RR...........RR","RRRRRRRRRRRrRRR","RRRRRRRRRRRGRRR","R...R.......R.R","Rp..R.R......pR","R...R..RRp....R","R...p.........R","WWWWWWWDWWWWWWW"],"hint":["발판 네 개를 3초 안에 모두 밟아야 전류가 이어진대!\n벽을 피해 가장 빨리 도는 순서를 계산해 보자.\n(위쪽 패널은 누르면 자신과 양옆 패널의 불이 함께 바뀐다고 해…)"],"monsIn":[[81,3,2],[100,11,2],[25,4,3],[179,10,3]]},"forest":{"title":"하드 · 숲 체육관","sub":"그루터기의 단서로 버섯이 빛날 순서를 추리해요","start":[7,13],"cols":15,"rows":15,"puz4":{"shrooms":[[10,9,"#ff5a6a"],[4,8,"#ffd23f"],[7,10,"#5ab4ff"],[4,11,"#c37aff"],[10,12,"#5adb6a"]],"stump":[6,12],"gate":[7,5],"fixed":[1,4,3,2,0],"clues":["반딧불이가 그루터기 위에서 속삭인다…\n「다섯 버섯은 단 하나의 순서로만 빛난단다.」\n「빨강·노랑·파랑·보라·초록, 내가 아는 단서를 알려 줄게.」","🍄 단서\n1. 노랑은 파랑보다 먼저 빛나요.\n2. 빨강은 파랑이 빛난 바로 다음에 빛나요.\n3. 보라는 빨강보다 먼저 빛나요.\n4. 노랑과 파랑은 서로 이어서 빛나지 않아요.\n5. 초록은 2번째로 빛나요.","「순서가 틀리면 버섯이 시들어 처음부터 다시야.\n단서를 모두 만족하는 순서는 딱 하나뿐이란다!」"]},"map":["WWWWWWWWWWWWWWW","MMNMMMMMMMMMNMM","Pk.....r.....kP","RR.....r.....RR","R,.....r.....,R","wwwwwwwTwwwwwww","R,.....r.....,R","R,.t...r...t.,R","R,.....r.....,R","R,.....r.....,R","R,.....r.....,R","R,.....r.....,R","R,.t...r...t.,R","R,.....r.....,R","WWWWWWWDWWWWWWW"],"hint":["버섯이 다섯 개나 된다…!\n그루터기에게 말을 걸면 빛나는 순서의 단서를 알려 준대.\n단서를 모두 만족하는 단 하나의 순서를 추리해 보자!"],"monsIn":[[69,3,2],[46,11,2],[114,2,4],[12,12,4]]},"mist":{"title":"하드 · 안개 체육관","sub":"시야가 거의 닫힌 안개 미로 — 함정을 피해 길을 찾아요","start":[7,15],"cols":15,"rows":17,"puz5":1,"fogR":0.55,"map":["WWWWWWWWWWWWWWW","MMNMMMMMMMMMNMM","Pk.....r.....kP","RR.....r.....RR","RRRRRRR.RRRRRRR","R.....R.......R","R.RRR.R.R.RRR.R","R...R..xR.....R","R.R.R.R.R.R.RxR","R.xx....R.....R","R.R.R.RRRRRRR.R","R.R.....R...R.R","R.RRR.R.R.R.R.R","R.R..xR...R...R","R.R.R.RRRRR.R.R","R.........x.R.R","WWWWWWWDWWWWWWW"],"hint":["안개가 훨씬 짙어졌다… 시야가 아주 좁아!\n지름길처럼 보이는 곳일수록 바닥이 희미하게 일렁인다.\n잘못 밟으면 입구로 돌아오니, 길을 잘 외우자."],"monsIn":[[41,3,2],[200,11,2]]},"dream":{"title":"하드 · 환상 체육관","sub":"거울 미궁 속 짝꿍 발판을 이어 출구를 찾아요","start":[7,15],"cols":15,"rows":17,"puz6":1,"map":["WWWWWWWWWWWWWWW","MMNMMMMNMMMMNMM","Pk.....r.....kP","Y..z...r...z..Y","YYYYYYY.YYYYYYY","YY..Y.Y.Y@.YYYY","Y..%&YY..Y..YYY","Y.YYYY..Y..YY.Y","Y.....Y$..Y.Y.Y","Y...YY.YYYY.Y.Y","Y.YYY...YY$.Y.Y","YY.Y.....YYY%YY","Y.#Y.Y.....Y#YY","YY.Y@.YY&Y.YYYY","YYYYYYY..Y....Y","YY..Y....Y.YYYY","WWWWWWWDWWWWWWW"],"hint":["거울 벽이 방을 잘게 나누고 있다…\n발판은 같은 모양끼리 짝꿍이라서, 밟으면 반대편으로 순간이동해!\n어느 짝꿍을 어떤 순서로 밟아야 위로 갈 수 있을지 생각해 보자."],"monsIn":[[35,3,2],[39,11,2]]},"fire":{"title":"하드 · 불꽃 체육관","sub":"징검돌은 한 번 밟으면 가라앉아요 — 수정 다섯 개를 모두 모아요","start":[7,13],"cols":15,"rows":15,"puz7":{"gate":"G","gy":3,"need":5},"map":["WWWWWWWWWWWWWWW","MMNMMMMNMMMMNMM","Pk.....r.....kP","wGGGGGGGGGGGGGw","w~~^~~~~~~~^~~w","w~^^~~~~~~~~~~w","w~^~~~~~~~^~~~w","w^!~^~~~~~~~~~w","w^^^!~~!^^~^~~w","w^^^^^^^~^~~~~w","w!~~!^~~~^^~~~w","w^^^^^~~~^~~~~w","w......r......w","w.k.........k.w","WWWWWWWDWWWWWWW"],"hint":["불씨 수정이 다섯 개다!\n징검돌은 한 번 밟고 떠나면 가라앉아 다시 못 밟는대.\n수정을 모두 모은 뒤 위쪽 철창 앞까지 닿는 길을 미리 그려 보자!\n용암에 빠지면 처음부터 다시!"],"monsIn":[[77,3,2],[58,11,2],[126,2,12],[240,12,12]]},"dragon":{"title":"하드 · 용 체육관","sub":"다섯 개의 비늘 보주를 석판의 색 순서와 똑같이 맞춰요","start":[7,13],"cols":15,"rows":15,"puz8":{"gy":3,"dials":[[3,8],[5,8],[7,8],[9,8],[11,8]],"plaque":[5,4],"rules":[[1,0,3,3,2],[0,1,3,2,0],[0,0,1,3,0],[0,0,0,1,0],[0,1,1,1,1]],"init":[1,0,3,3,3],"target":[0,2,3,1,0]},"map":["WWWWWWWWWWWWWWW","MMNMMMMNMMMMNMM","PA.....r.....AP","wGGGGGGGGGGGGGw","w......r......w","w..A...r...A..w","w......r......w","w......r......w","w......r......w","w......r......w","w.k....r....k.w","w..A...r...A..w","w......r......w","w......r......w","WWWWWWWDWWWWWWW"],"hint":["비늘 보주가 다섯 개다!\n보주를 돌리면 다른 보주도 함께 돌아가는데, 어느 보주가 어디에 영향을 주는지 살펴보자.\n석판의 색 순서와 똑같이 맞추면 봉인이 풀려!"],"monsIn":[[148,2,5],[445,12,5],[373,2,12],[887,12,12]]},"champion":{"title":"하드 · 챔피언의 전당","sub":"여덟 배지의 불을 모두 밝혀야 챔피언의 문이 열려요","start":[7,13],"cols":15,"rows":15,"puzH":{"init":[1,0,0,1,0,0,0,0],"gate":[7,4]},"map":["WWWWWWWWWWWWWWW","MMNMMMMNMMMMNMM","P.....ddd.....P",".P.....r.....P.","WWWWWWWXWWWWWWW","0......r......7",".P.....r.....P.","1...k..r..k...6",".P.....r.....P.","2......r......5",".P.....r.....P.","3......r......4",".......r.......",".......r.......","WWWWWWWDWWWWWWW"],"hint":["여덟 개의 배지가 둥글게 이어져 있다.\n배지를 누르면 자신과 양옆 배지의 불이 함께 켜지거나 꺼져!\n8개의 불을 모두 밝히면 챔피언의 문이 열려."],"monsIn":[[3,3,3],[65,11,3],[248,2,12],[94,12,12]]}};
+(function gpMakeHard(){for(let k=0;k<9;k++){const b=GP_THEMES[k];if(!b)continue;const hd=GP_HARD_IN[b.key];if(!hd)continue;const mi=hd.monsIn;delete hd.monsIn;
+ GP_THEMES[10+k]=Object.assign({},b,{hard:1,base:k,in:hd,monsIn:[],swimIn:[],leader:Object.assign({},b.leader,{x:7,y:2,px:8,py:2})});}})();
+/*HZ_END*/
+function gpChampRows(){const sc=GP.sc,Q=GP.puzH,P=sc.puzH;sc.map=sc.map0.slice();if(Q.open){const [gx,gy]=P.gate;sc.map[gy]=sc.map[gy].slice(0,gx)+'r'+sc.map[gy].slice(gx+1);}}
+function gpChampSetup(sc){const P=sc.puzH;if(!sc.map0)sc.map0=sc.map.slice();if(!GP.puzH)GP.puzH={on:P.init.slice(),open:false};GP.hzB=GP.puzH.on;
+ for(let y=0;y<sc.map0.length;y++)for(let x=0;x<sc.map0[y].length;x++){const c=sc.map0[y][x];if(c>='0'&&c<='7'){GP.solid[x+','+y]=1;GP.act[x+','+y]={k:'hzb:'+c};}}
+ gpChampRows();}
+function gpChampPress(c){const Q=GP.puzH;if(!Q)return;if(Q.open){gpToast('봉인은 이미 풀렸어요');return;}
+ [c,(c+7)%8,(c+1)%8].forEach(i=>{Q.on[i]=Q.on[i]?0:1;});GP.hzB=Q.on;const all=Q.on.every(Boolean);
+ if(all){Q.open=true;gpChampRows();}gpDrawMap();try{sfx(all?'rare':'tap');}catch(e){}
+ gpToast(all?'🏆 8개의 배지가 모두 빛나요! 챔피언의 문이 열렸어요':'배지 불빛 '+Q.on.filter(Boolean).length+'/8');}
 function gymEnter(i){if(GP_THEMES[i]){try{gpOpen(i);return;}catch(e){console.error('gym popup',e);try{gpClose();}catch(_){}}}startBattle(i);}
 
 // ---------- 포켓몬 크기·도트 ----------
@@ -14852,7 +14925,8 @@ function gpTalkMon(id,x,y){const m=MON[id];if(!m){return;}
 
 // ---------- 장면 구성 ----------
 function gpBuild(first){
- const th=GP_THEMES[GP.gi],sc=th[GP.scene],g=GYMS[GP.gi];GP.sc=sc;GP.ents=[];GP.monEl={};
+ const th=GP_THEMES[GP.gi],sc=th[GP.scene],g=gpG();GP.sc=sc;GP.ents=[];GP.monEl={};
+ GP_C=sc.cols||13;GP_R=sc.rows||11;if(GP.cv&&(GP.cv.width!==GP_C*GP_T||GP.cv.height!==GP_R*GP_T)){GP.cv.width=GP_C*GP_T;GP.cv.height=GP_R*GP_T;}if(GP.el)GP.el.style.aspectRatio=GP_C+'/'+GP_R;
  $('#gpTt').textContent=th.emoji+' '+sc.title;{const rb0=document.getElementById('gpRst');if(rb0&&!(GP.scene==='in'&&(sc.puz||sc.puz9||sc.puz10||sc.puz11||sc.puz12||sc.puz13)))rb0.remove();}
  $('#gpC1').classList.toggle('ok',!!GP.chk.deck);$('#gpC2').classList.toggle('ok',!!GP.chk.skill);
  $('#gpC1').textContent=(GP.chk.deck?'✔ ':'')+'🃏 덱';$('#gpC2').textContent=(GP.chk.skill?'✔ ':'')+'🛡️ 스킬';
@@ -14865,7 +14939,7 @@ function gpBuild(first){
  GP.solid={};GP.act={};
  if(GP.scene==='out'){
   const dr=gpFind(sc.map,'D');GP.door=dr;
-  const sg=document.createElement('div');sg.className='gpSign';if(th.noSign)sg.style.display='none';sg.innerHTML=th.emoji+' '+(GYMS[GP.gi]||{n:''}).n;sg.style.cssText+=`left:${(dr[0]-2.7)/GP_C*100}%;top:${1.35/GP_R*100}%;width:${6.4/GP_C*100}%;height:${.95/GP_R*100}%;`;ent.appendChild(sg);
+  const sg=document.createElement('div');sg.className='gpSign';if(th.noSign)sg.style.display='none';sg.innerHTML=th.emoji+' '+(gpG()||{n:''}).n;sg.style.cssText+=`left:${(dr[0]-2.7)/GP_C*100}%;top:${1.35/GP_R*100}%;width:${6.4/GP_C*100}%;height:${.95/GP_R*100}%;`;ent.appendChild(sg);
   const dg=document.createElement('div');dg.className='gpDoorGlow';dg.style.cssText=`left:${(dr[0]-.8)/GP_C*100}%;top:${(dr[1]+.2)/GP_R*100}%;width:${1.6/GP_C*100}%;height:${1.6/GP_R*100}%;`;ent.appendChild(dg);
   th.objs.forEach(o=>{mk('gpObj',`<div class=gpPed></div><span class=gpIc>${o.ic}</span><i class=gpLb>${o.label}</i>`,o.x,o.y).style.setProperty('--c',o.col);GP.solid[o.x+','+o.y]=1;GP.act[o.x+','+o.y]={k:o.id};});
   [].forEach(([id,x,y])=>{if(!mon(id))return;gpMonAct(mk('gpSwim',gpMonHTML(id),x,y),id,x,y);});
@@ -14873,7 +14947,7 @@ function gpBuild(first){
   GP.act[dr[0]+','+dr[1]]={k:'door'};
  }else{
   const L=th.leader;
-  mk('gpNpc',`<img class="gpSpr${gpAtlasOK()?' gpAtl':''}" src="${gpLeadSpr(GP.gi,'down')}" alt="">`,L.x,L.y);GP.solid[L.x+','+L.y]=1;GP.act[L.x+','+L.y]={k:'leader'};
+  mk('gpNpc',`<img class="gpSpr${gpAtlasOK()?' gpAtl':''}" src="${gpLeadSpr(gpBi(),'down')}" alt="">`,L.x,L.y);GP.solid[L.x+','+L.y]=1;GP.act[L.x+','+L.y]={k:'leader'};
   if(mon(L.partner)){gpMonAct(mk('gpNpc',`<span class=gpIdle style="display:block;width:100%;height:100%">${gpMonHTML(L.partner)}</span>`,L.px,L.py),L.partner,L.px,L.py);}
   [].forEach(([id,x,y])=>{if(!mon(id))return;gpMonAct(mk('gpSwim',gpMonHTML(id),x,y),id,x,y);});
   [].forEach(([id,x,y])=>{if(!mon(id))return;gpMonAct(mk('gpNpc gpMonE',gpMonHTML(id),x,y),id,x,y);});
@@ -14890,6 +14964,7 @@ function gpBuild(first){
   if(sc.puz13)gpRuneSetup(sc);
   if(sc.puz8)gpDragonSetup(sc);
   if(sc.puz14)gpChSetup(sc);
+  if(sc.puzH)gpChampSetup(sc);
   const ex=gpFind(sc.map,'D');GP.exitAt=ex;GP.act[ex[0]+','+ex[1]]={k:'exit'};
   if(th.castle)sc.map.forEach((row,yy)=>{for(let xx=0;xx<row.length;xx++)if(row[xx]==='U'){GP.solid[xx+','+yy]=1;GP.act[xx+','+yy]={k:'stairs'};}});
   const lb=document.createElement('i');lb.className='gpDoorLb';lb.textContent=(th.castle&&GP.fl>0)?'아래층':'나가기';const dl=mk('gpExit','',ex[0],ex[1]);dl.style.zIndex=1;dl.style.pointerEvents='none';dl.appendChild(lb);lb.style.top='auto';lb.style.bottom='100%';lb.style.marginBottom='1px';lb.style.marginTop='0';lb.style.zIndex='3';
@@ -14901,7 +14976,7 @@ function gpBuild(first){
  gpFace(GP.dir);gpFieldInit();
  const tc=document.createElement('div');tc.className='gpTitle';tc.innerHTML=`<b>${th.emoji} ${sc.title}</b><small>${sc.sub}</small>`;GP.el.appendChild(tc);setTimeout(()=>tc.remove(),2300);
  gpMistFx(th);gpDreamFx(th);gpFireFx(th);gpDragonFx(th);gpChampFx(th);gpCastleFx(th);gpForestFx(th);gpElecFx(th);gpWaveFx(th);gpRockFx(th);if(GP.el)GP.el.style.setProperty('--tw',(GP.el.clientWidth/GP_C)+'px');
- GP.mfn=0;gpMonRefit();
+ GP.mfn=0;gpMonRefit();try{if(GP.rz)GP.rz();}catch(e){}
 }
 // 로그라이크 '필드 모험'에서 쓰는 도트 시트(window.__RLKIT.atlas)의 캐릭터를 그대로 가져와요.
 // 한 칸 = 16×16, 줄 0·1·2 = 아래·위·왼쪽 서기, 줄 3·4·5 = 걷기 (오른쪽은 왼쪽을 뒤집어서). 관장은 SPR.lead+체육관번호, 주인공은 kit.hero().
@@ -14914,7 +14989,7 @@ function gpHeroSpr(dir,walk,flip){const d=dir==='right'?'left':dir;if(gpAtlasOK(
 function gpLeadSpr(gi,dir){const d=dir==='right'?'left':dir;if(GP_THEMES[gi]&&GP_THEMES[gi].castle){if(gpAtlasOK()){try{return gpAtlasFrame(window.__RLKIT.spr.castle+(GP.fl||0),d,0,0);}catch(e){}}return gpTrainer(CASTLE_FLOORS[GP.fl||0].leader.look,d);}if(gpAtlasOK()){try{return gpAtlasFrame(window.__RLKIT.spr.lead+gi,d,0,0);}catch(e){}}return gpTrainer(GP_THEMES[gi].leader.look,d);}
 function gpWalkFrame(w){const img=GP&&GP.me&&GP.me.querySelector('img.gpSpr');if(!img)return;const d=GP.dir==='right'?'left':GP.dir;img.src=gpHeroSpr(d,w,w&&(d==='up'||d==='down')&&GP.par);}
 function gpFaceLeader(){const L=GP_THEMES[GP.gi].leader,dx=GP.x-L.x,dy=GP.y-L.y,d=Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down');
- const img=GP.ent.querySelector('.gpNpc img.gpSpr');if(!img)return;img.src=gpLeadSpr(GP.gi,d);img.classList.toggle('fl',d==='right');}
+ const img=GP.ent.querySelector('.gpNpc img.gpSpr');if(!img)return;img.src=gpLeadSpr(gpBi(),d);img.classList.toggle('fl',d==='right');}
 function gpFace(d){GP.dir=d;const img=GP.me&&GP.me.querySelector('img.gpSpr');if(!img)return;img.src=gpHeroSpr(d,0,0);img.classList.toggle('gpAtl',gpAtlasOK());img.classList.toggle('fl',d==='right');}
 function gpFade(fn){GP.busy=true;GP.q=[];const f=$('#gpFade');f.classList.add('on');setTimeout(()=>{if(!GP||!GP.open)return;fn();f.classList.remove('on');setTimeout(()=>{if(GP)GP.busy=false;},260);},280);}
 
@@ -14955,14 +15030,14 @@ function gpValveURL(col,on){const k=col+on;if(GP_VURL[k])return GP_VURL[k];const
  if(on){P('#9ff0b4',6,9,4,1);}else{P('#d86a6a',6,9,4,1);}
  return GP_VURL[k]=c.toDataURL();}
 function gpWaveRows(){const sc=GP.sc,Q=GP.puz2,P=sc.puz2;if(!sc.map0)sc.map0=sc.map.slice();sc.map=sc.map0.slice();
- P.ch.forEach(c=>{const open=gpWaveOpen(c);sc.map[c.y]='w'+(open?'d':'v').repeat(11)+'w';});}
+ P.ch.forEach(c=>{const open=gpWaveOpen(c);const a=P.sx||1;sc.map[c.y]='w'.repeat(a)+(open?'d':'v').repeat(GP_C-2*a)+'w'.repeat(a);});}
 function gpWaveOpen(c){let n=0;c.by.forEach(id=>{if(GP.puz2.v[id])n++;});return n%2===1;}
 function gpWaveStates(){return GP.sc.puz2.ch.map(gpWaveOpen);}
 function gpWaveSetup(sc){
  if(!sc.map0)sc.map0=sc.map.slice();
- if(!GP.puz2)GP.puz2={v:{R:0,Y:0,B:0}};
+ if(!GP.puz2){const v0={};sc.puz2.valves.forEach(o=>v0[o.id]=0);GP.puz2={v:v0};}
  const P=sc.puz2;P.valves.forEach(v=>{const e=GP.mkEnt('gpValve','',v.x,v.y);v.el=e;e.style.backgroundImage='url('+gpValveURL(v.col,GP.puz2.v[v.id])+')';e.classList.toggle('on',!!GP.puz2.v[v.id]);GP.solid[v.x+','+v.y]=1;GP.act[v.x+','+v.y]={k:'valve:'+v.id};});
- P.lamps=[];P.ch.forEach(c=>{[0,12].forEach(lx=>{const l=GP.mkEnt('gpLamp','',lx,c.y);l.innerHTML=c.by.map(id=>'<i style="background:'+P.valves.find(v=>v.id===id).col+'"></i>').join('');P.lamps.push([l,c]);});});
+ P.lamps=[];P.ch.forEach(c=>{[0,GP_C-1].forEach(lx=>{const l=GP.mkEnt('gpLamp','',lx,c.y);l.innerHTML=c.by.map(id=>'<i style="background:'+P.valves.find(v=>v.id===id).col+'"></i>').join('');P.lamps.push([l,c]);});});
  gpWaveRows();gpWaveLamps();
 }
 function gpWaveLamps(){const P=GP.sc.puz2;(P.lamps||[]).forEach(([l,c])=>l.classList.toggle('open',gpWaveOpen(c)));}
@@ -14972,7 +15047,7 @@ function gpWaveTurn(id){
  const blocked=P.ch.some(c=>c.y===GP.y&&!gpWaveOpen(c));
  if(blocked){Q.v[id]=nv?0:1;gpToast('지금 서 있는 곳이 물에 잠겨요! 평지로 올라가요');return;}
  gpWaveRows();v.el.style.backgroundImage='url('+gpValveURL(v.col,nv)+')';v.el.classList.toggle('on',!!nv);
- P.ch.forEach(c=>{const y=c.y;if(gpWaveOpen(c)){for(let x=1;x<=11;x++)GP.act[x+','+y]=undefined;}});
+ P.ch.forEach(c=>{const y=c.y;if(gpWaveOpen(c)){for(let x=(P.sx||1);x<GP_C-(P.sx||1);x++)GP.act[x+','+y]=undefined;}});
  gpWaveLamps();gpDrawMap();
  const st=gpWaveStates(),names=['가까운','가운데','먼'],txt='물길 '+st.map((o,i)=>(i+1)+'번 '+(o?'열림':'잠김')).join(' · ');
  const all=st.every(Boolean);try{sfx(all?'rare':'tap');}catch(e){}
@@ -14984,7 +15059,7 @@ function gpPanelURL(n,on){const k=n+':'+on;if(GP_PNL[k])return GP_PNL[k];const c
  const P=(cl,x,y,w,h)=>{g.fillStyle=cl;g.fillRect(x,y,w||1,h||1);};
  P('rgba(0,0,0,.28)',2,14,12,2);P('#1a1d2a',1,1,14,13);P('#5b6684',2,2,12,11);P('#2a2e3e',3,3,10,7);
  P(on?'#ffe066':'#16202e',4,4,9,5);
- const D={1:['010','110','010','010','111'],2:['111','001','111','100','111'],3:['111','001','111','001','111']}[n];
+ const D={1:['010','110','010','010','111'],2:['111','001','111','100','111'],3:['111','001','111','001','111'],4:['101','101','111','001','001'],5:['111','100','111','001','111'],6:['111','100','111','101','111']}[n];
  D.forEach((row,yy)=>{for(let xx=0;xx<3;xx++)if(row[xx]==='1')P(on?'#2b2140':'#ffd23f',7+xx,4+yy,1,1);});
  P('#ffd23f',3,11,10,1);P(on?'#7dffa8':'#d86a6a',6,12,4,1);
  return GP_PNL[k]=c.toDataURL();}
@@ -14994,17 +15069,18 @@ function gpElecRows(){const sc=GP.sc,Q=GP.puz3,P=sc.puz3;if(!sc.map0)sc.map0=sc.
  if(Q.open1)set(P.gate1[0],P.gate1[1],'r');if(Q.open2)set(P.gate2[0],P.gate2[1],'r');}
 function gpElecSetup(sc){
  if(!sc.map0)sc.map0=sc.map.slice();
- if(!GP.puz3)GP.puz3={lit:{},open1:false,open2:false,seq:0};
+ if(!GP.puz3)GP.puz3={lit:{},open1:false,open2:false,seq:0,on:(sc.puz3.init||[]).slice()};
  const Q=GP.puz3,P=sc.puz3;P.pn=[];
- P.panels.forEach(([x,y,n])=>{const e=GP.mkEnt('gpValve','',x,y);e.style.backgroundImage='url('+gpPanelURL(n,Q.open2||n<=Q.seq?1:0)+')';GP.solid[x+','+y]=1;GP.act[x+','+y]={k:'panel:'+n};P.pn.push([e,n]);});
+ P.panels.forEach(([x,y,n])=>{const e=GP.mkEnt('gpValve','',x,y);e.style.backgroundImage='url('+gpPanelURL(n,gpPnOn(n))+')';GP.solid[x+','+y]=1;GP.act[x+','+y]={k:'panel:'+n};P.pn.push([e,n]);});
  gpElecRows();
 }
-function gpElecPanels(zap){const Q=GP.puz3,P=GP.sc.puz3;P.pn.forEach(([e,n])=>{e.style.backgroundImage='url('+gpPanelURL(n,Q.open2||n<=Q.seq?1:0)+')';if(zap){e.classList.remove('zap');void e.offsetWidth;e.classList.add('zap');}});}
+function gpPnOn(n){const Q=GP.puz3,P=GP.sc.puz3;return P.tog?((Q.open2||Q.on[n-1])?1:0):((Q.open2||n<=Q.seq)?1:0);}
+function gpElecPanels(zap){const Q=GP.puz3,P=GP.sc.puz3;P.pn.forEach(([e,n])=>{e.style.backgroundImage='url('+gpPanelURL(n,gpPnOn(n))+')';if(zap){e.classList.remove('zap');void e.offsetWidth;e.classList.add('zap');}});}
 function gpElecStep(x,y){
  const Q=GP.puz3,P=GP.sc.puz3;if(!Q||!P||Q.open1)return;
  if(!P.plates.some(a=>a[0]===x&&a[1]===y))return;
  const k=x+','+y;Q.lit[k]=1;clearTimeout(Q['t'+k]);
- Q['t'+k]=setTimeout(()=>{if(GP&&GP.puz3===Q&&!Q.open1){delete Q.lit[k];if(GP.sc&&GP.sc.puz3===P){gpElecRows();gpDrawMap();}}},3500);
+ Q['t'+k]=setTimeout(()=>{if(GP&&GP.puz3===Q&&!Q.open1){delete Q.lit[k];if(GP.sc&&GP.sc.puz3===P){gpElecRows();gpDrawMap();}}},(P.ms||3500));
  const n=P.plates.filter(a=>Q.lit[a[0]+','+a[1]]).length;
  if(n===P.plates.length){Q.open1=true;try{sfx('rare');}catch(e){}gpToast('⚡ 전류가 이어졌어요! 철문이 열렸어요');}
  else{try{sfx('tap');}catch(e){}gpToast('찌릿! 발판 '+n+'/'+P.plates.length+' (금방 꺼져요!)');}
@@ -15012,6 +15088,7 @@ function gpElecStep(x,y){
 }
 function gpElecPanel(n){
  const Q=GP.puz3,P=GP.sc.puz3;if(Q.open2){gpToast('이미 전류가 흐르고 있어요');return;}
+ if(P.tog){P.tog[n-1].forEach(i=>{Q.on[i]=Q.on[i]?0:1;});const all=Q.on.every(Boolean);if(all){Q.open2=true;gpElecRows();gpDrawMap();}gpElecPanels(true);try{sfx(all?'rare':'tap');}catch(e){}gpToast(all?'⚡ 회로 완성! 위쪽 철문이 열렸어요':'딸깍! 켜진 패널 '+Q.on.filter(Boolean).length+'/'+Q.on.length);return;}
  if(n===Q.seq+1){Q.seq++;if(Q.seq===3){Q.open2=true;gpElecRows();gpDrawMap();gpElecPanels();try{sfx('rare');}catch(e){}gpToast('⚡ 회로 완성! 위쪽 철문이 열렸어요');}else{gpElecPanels();try{sfx('tap');}catch(e){}gpToast('딸깍! '+Q.seq+'번까지 켜졌어요');}}
  else{Q.seq=0;gpElecPanels(true);try{sfx('hit');}catch(e){}gpToast('찌지직! 순서가 틀렸어요. 1번부터 다시!');}
 }
@@ -15036,7 +15113,7 @@ function gpForestRows(){const sc=GP.sc,Q=GP.puz4,P=sc.puz4;if(!sc.map0)sc.map0=s
  if(Q.open){const g=P.gate;sc.map[g[1]]=sc.map[g[1]].slice(0,g[0])+'b'+sc.map[g[1]].slice(g[0]+1);}}
 function gpForestSetup(sc){
  if(!sc.map0)sc.map0=sc.map.slice();const P=sc.puz4;
- if(!GP.puz4){const a=[0,1,2,3];for(let i=3;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}GP.puz4={seq:a,pos:0,open:false,busy:false};}
+ if(!GP.puz4){let a=[0,1,2,3];if(P.fixed)a=P.fixed.slice();else for(let i=3;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}GP.puz4={seq:a,pos:0,open:false,busy:false};}
  const Q=GP.puz4;P.el=[];
  P.shrooms.forEach(([x,y,col],i)=>{const e=GP.mkEnt('gpValve','',x,y);e.style.backgroundImage='url('+gpShroomURL(col,0)+')';GP.solid[x+','+y]=1;GP.act[x+','+y]={k:'shroom:'+i};P.el.push(e);});
  {const [x,y]=P.stump;const e=GP.mkEnt('gpValve','',x,y);e.style.backgroundImage='url('+gpFireflyURL()+')';GP.solid[x+','+y]=1;GP.act[x+','+y]={k:'firefly'};}
@@ -15055,7 +15132,7 @@ function gpForestShroom(i){
  if(Q.seq[Q.pos]===i){Q.pos++;
   if(Q.pos>=Q.seq.length){Q.open=true;gpForestRows();gpDrawMap();try{sfx('rare');}catch(e){}gpToast('🌿 덩굴이 물러났어요! 다리가 열렸어요');}
   else gpToast('반짝! '+Q.pos+'/'+Q.seq.length);}
- else{Q.pos=0;try{sfx('crit');}catch(e){}gpToast('시들시들… 순서가 틀렸어요! 그루터기를 다시 봐요');}
+ else{Q.pos=0;try{sfx('crit');}catch(e){}gpToast(P.clues?'시들시들… 순서가 틀렸어요! 그루터기의 단서를 다시 읽어 봐요':'시들시들… 순서가 틀렸어요! 그루터기를 다시 봐요');}
 }
 function gpMistStep(x,y){
  const sc=GP.sc;if(!sc||!sc.puz5||sc.map[y][x]!=='x'||GP.busy)return;
@@ -15073,7 +15150,7 @@ function gpFireRows(){const sc=GP.sc,Q=GP.puz7;if(!sc.map0)sc.map0=sc.map.slice(
  const set=(x,y,ch)=>{sc.map[y]=sc.map[y].slice(0,x)+ch+sc.map[y].slice(x+1);};
  for(const k in Q.got){const[a,b]=k.split(',').map(Number);set(a,b,'^');}
  for(const k in Q.sunk){const[a,b]=k.split(',').map(Number);set(a,b,'~');}
- if(Q.open){const gy=sc.puz7.gy;for(let xx=1;xx<=11;xx++)set(xx,gy,'.');}}
+ if(Q.open){const gy=sc.puz7.gy;for(let xx=1;xx<GP_C-1;xx++)set(xx,gy,'.');}}
 function gpFireSetup(sc){if(!sc.map0)sc.map0=sc.map.slice();if(!GP.puz7)GP.puz7={sunk:{},got:{},open:false};gpFireRows();}
 function gpFireStep(x,y){
  const sc=GP.sc,Q=GP.puz7;if(!sc||!sc.puz7||!Q||GP.busy)return;
@@ -15096,19 +15173,19 @@ function gpDialURL(c){const k='d'+c;if(GP_DIMG[k])return GP_DIMG[k];const cv=doc
  for(let yy=0;yy<3;yy++)for(let xx=0;xx<3;xx++){P('#0003',5+xx*2+(yy%2),4+yy*2,1,1);}
  P('#ffd23f',7,0,2,2);P('#ffd23f',3,6,1,2);P('#ffd23f',12,6,1,2);
  return GP_DIMG[k]=cv.toDataURL();}
-function gpPlaqueURL(t){const k='p'+t.join('');if(GP_DIMG[k])return GP_DIMG[k];const cv=document.createElement('canvas');cv.width=48;cv.height=16;const g=cv.getContext('2d');
+function gpPlaqueURL(t){const k='p'+t.join('');if(GP_DIMG[k])return GP_DIMG[k];const pw=16*Math.ceil((8+10*t.length)/16);const cv=document.createElement('canvas');cv.width=pw;cv.height=16;const g=cv.getContext('2d');
  const P=(cl,x,y,w,h)=>{g.fillStyle=cl;g.fillRect(x,y,w||1,h||1);};
- P('rgba(0,0,0,.3)',2,14,44,2);P('#120e2c',1,1,46,13);P('#ffd23f',2,2,44,11);P('#241f48',3,3,42,9);
+ P('rgba(0,0,0,.3)',2,14,pw-4,2);P('#120e2c',1,1,pw-2,13);P('#ffd23f',2,2,pw-4,11);P('#241f48',3,3,pw-6,9);
  t.forEach((c,i)=>{const x=6+i*10;P('#120e2c',x-1,4,9,8);P(GP_DCOL[c],x,5,7,6);P('#ffffff55',x+1,6,2,2);P('#0003',x+1,9,5,1);});
- P('#ffd23f',1,0,3,2);P('#ffd23f',44,0,3,2);
+ P('#ffd23f',1,0,3,2);P('#ffd23f',pw-4,0,3,2);
  return GP_DIMG[k]=cv.toDataURL();}
 function gpDragonRows(){const sc=GP.sc,Q=GP.puz8,P=sc.puz8;if(!sc.map0)sc.map0=sc.map.slice();sc.map=sc.map0.slice();
- if(Q.open)sc.map[P.gy]='w'+'.'.repeat(11)+'w';}
+ if(Q.open)sc.map[P.gy]='w'+'.'.repeat(GP_C-2)+'w';}
 function gpDragonSetup(sc){
  if(!sc.map0)sc.map0=sc.map.slice();const P=sc.puz8;
  if(!GP.puz8)GP.puz8={d:P.init.slice(),open:false};const Q=GP.puz8;P.el=[];
  P.dials.forEach(([x,y],i)=>{const e=GP.mkEnt('gpValve','',x,y);e.style.backgroundImage='url('+gpDialURL(Q.d[i])+')';GP.solid[x+','+y]=1;GP.act[x+','+y]={k:'dial:'+i};P.el.push(e);});
- {const [x,y]=P.plaque;const e=GP.mkEnt('gpValve','',x,y);e.style.width=(300/GP_C)+'%';e.style.backgroundImage='url('+gpPlaqueURL(P.target)+')';for(let k=0;k<3;k++){GP.solid[(x+k)+','+y]=1;GP.act[(x+k)+','+y]={k:'plaque'};}}
+ {const [x,y]=P.plaque;const e=GP.mkEnt('gpValve','',x,y);const nt=Math.ceil((8+10*P.target.length)/16);e.style.width=(nt*100/GP_C)+'%';e.style.backgroundImage='url('+gpPlaqueURL(P.target)+')';for(let k=0;k<nt;k++){GP.solid[(x+k)+','+y]=1;GP.act[(x+k)+','+y]={k:'plaque'};}}
  gpDragonRows();
 }
 function gpDragonTurn(i){
@@ -15225,7 +15302,7 @@ function gpAdvance(){const D=GP.D;if(!D.on)return;
 function gpCancel(){const D=GP.D;if(!D.on)return;if(D.state==='menu'){D.sel=D.opt.menu.length-1;gpPickMenu();}else gpAdvance();}
 // ---------- 상호작용 ----------
 function gpInteract(k){
- const me=S.meta,th=GP_THEMES[GP.gi],g=GYMS[GP.gi];sfx('tap');
+ const me=S.meta,th=GP_THEMES[GP.gi],g=gpG();sfx('tap');
  if(th.castle&&gpCastleInteract(k,me,th))return;
  if(k==='deck'){const n=me.deck.length,N=deckN();
   gpSay(['카드 정리대다. 내 덱을 확인하고 고칠 수 있다.\n지금 덱: '+n+'/'+N+'장'],{menu:['덱을 연다','그냥 둔다'],pick:i=>{if(i===0)gpLeave('deck');}});}
@@ -15241,18 +15318,21 @@ function gpInteract(k){
  else if(k.indexOf('valve:')===0){gpWaveTurn(k.slice(6));}
  else if(k.indexOf('panel:')===0){gpElecPanel(+k.slice(6));}
  else if(k.indexOf('shroom:')===0){gpForestShroom(+k.slice(7));}
+ else if(k==='firefly'&&GP.sc.puz4&&GP.sc.puz4.clues){gpSay(GP.sc.puz4.clues);}
+ else if(k.indexOf('hzb:')===0){gpChampPress(+k.slice(4));}
  else if(k==='firefly'){gpSay(['반딧불이가 든 그루터기다.\n불빛이 반짝이는 순서를 잘 기억하자!'],{menu:['빛을 본다','그만둔다'],pick:i=>{if(i===0)setTimeout(gpForestShow,300);}});}
  else if(k.indexOf('dial:')===0){gpDragonTurn(+k.slice(5));}
- else if(k==='plaque'){gpSay(['용의 비늘 문양이 새겨진 석판이다.\n네 개의 비늘 보주를 이 색 순서와 똑같이 맞추면 봉인이 풀릴 것 같다.\n(보주를 돌리면 다른 보주도 함께 돌아간다!)']);}
+ else if(k==='plaque'){gpSay(['용의 비늘 문양이 새겨진 석판이다.\n비늘 보주를 이 색 순서와 똑같이 맞추면 봉인이 풀릴 것 같다.\n(보주를 돌리면 다른 보주도 함께 돌아간다!)']);}
  else if(k.indexOf('mir:')===0){gpBeamTurn(+k.slice(4));}
  else if(k==='pit'){gpSay(['바닥이 깊게 갈라져 있다!\n저 바위를 밀어서 구덩이에 빠뜨리면 건널 수 있겠어.\n(막히면 위쪽 🔄 바위 리셋)']);}
  else if(k==='exit'){gpFade(()=>{const d=gpFind(th.out.map,'D');GP.scene='out';GP.x=d[0];GP.y=d[1]+1;GP.dir='down';gpBuild();});}
  else if(k==='leader'){gpFaceLeader();
-  const won=!!me.gyms[GP.gi],lines=(won?th.talk.again:th.talk.first).map(s=>s.replace('{n}',g.ldr.replace(/^관장\s*/,'')).replace('{b}',String([0,1,2,3,4,5,6,7].filter(i=>me.gyms[i]).length)));
+  const won=gpWon(),lines=(won?th.talk.again:th.talk.first).map(s=>s.replace('{n}',g.ldr.replace(/^관장\s*/,'')).replace('{b}',String([0,1,2,3,4,5,6,7].filter(i=>me.gyms[i]).length)));
   lines.push('타입: '+(g.types?g.types.map(t=>TYPE_KO[t]).join('·'):'모든 타입')+'  Lv.'+g.lv+'\n'+g.d+'\n도전해 볼까?');
   gpSay(lines,{menu:['전투 시작!','조금 더 준비한다'],pick:i=>{if(i===0)gpFight();}});}
 }
-function gpEnterGym(){gpFade(()=>{const st=GP_THEMES[GP.gi].in.start;GP.scene='in';GP.x=st[0];GP.y=st[1];GP.dir='up';gpBuild();sfx('page');const ip=GP_THEMES[GP.gi].in;if(ip.puz14&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['챔피언에게 가는 길이 황금 철창으로 막혀 있다!\n바닥의 8개 문장은 각 체육관의 상징이다.\n네가 도전해 온 순서대로, 바위 → 물결 → 번개 → 숲 → 안개 → 환상 → 불꽃 → 용 차례로 밟아라.\n순서가 틀리면 문장이 모두 꺼진다. 켜진 문장은 다시 밟아도 괜찮다!']);},900);}
+function gpEnterGym(){gpFade(()=>{const st=GP_THEMES[GP.gi].in.start;GP.scene='in';GP.x=st[0];GP.y=st[1];GP.dir='up';gpBuild();sfx('page');const ip=GP_THEMES[GP.gi].in;if(ip.hint&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(ip.hint);},900);}
+ else if(ip.puz14&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['챔피언에게 가는 길이 황금 철창으로 막혀 있다!\n바닥의 8개 문장은 각 체육관의 상징이다.\n네가 도전해 온 순서대로, 바위 → 물결 → 번개 → 숲 → 안개 → 환상 → 불꽃 → 용 차례로 밟아라.\n순서가 틀리면 문장이 모두 꺼진다. 켜진 문장은 다시 밟아도 괜찮다!']);},900);}
  else if(ip.puz8&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['관장에게 가는 길이 용의 봉인으로 막혀 있다!\n위쪽 석판의 비늘 색과 똑같이 네 보주를 맞춰라.\n보주를 향해 걸으면 돌아가는데, 어떤 보주는 옆 보주까지 함께 돌려! 규칙을 찾아봐요.']);},900);}
  else if(ip.puz7&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['용암 위에 식은 돌 발판이 흩어져 있다!\n발판은 밟고 지나가면 가라앉아서 다시는 못 써. 불씨가 박힌 수정 3개를 모두 모으면 위쪽 철창이 열린대.\n용암에 빠지면 처음부터 다시! (돌 위에서만 길을 찾아요)']);},900);}
  else if(ip.puz6&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['거울 벽이 방을 세 칸으로 나누고 있다…\n빛나는 발판을 밟으면 같은 색의 짝꿍 발판으로 순간이동한대!\n소문으로는, 노란 별빛이 관장님께 이어진다고 해. (위로 가는 길을 찾아봐요)']);},900);}
@@ -15261,7 +15341,7 @@ function gpEnterGym(){gpFade(()=>{const st=GP_THEMES[GP.gi].in.start;GP.scene='i
  else if(ip.puz3&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['철문 두 개가 전류를 막고 있다!\n① 아래 방: 노란 발판 3개를 모두 밟아야 해. 금방 꺼지니까 재빨리!\n② 위 방: 번호 패널을 1→2→3 순서로 눌러라. (패널을 향해 걸으면 눌러져요)']);},900);}
  else if(ip.puz2&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['물길이 세 줄로 가로막고 있다!\n수문 3개를 돌리면 물길이 열리거나 잠긴다.\n(수문마다 움직이는 물길이 달라요. 물길 옆 색깔 불빛이 힌트! 수문을 향해 걸으면 돌려요)']);},900);}
  else if(ip.puz&&!GP.puzHint){GP.puzHint=1;setTimeout(()=>{if(GP&&GP.open&&!GP.D.on)gpSay(['길 한가운데가 깊게 갈라져 있다!\n바위를 앞으로 밀어서 구덩이를 메우면 관장에게 갈 수 있겠어.\n(바위를 향해 걸으면 밀려요 · 막히면 위쪽 🔄 바위 리셋)']);},900);}});}
-function gpFight(){const gi=GP.gi;gpClose();GP.keep=false;startBattle(gi);}
+function gpFight(){const gi=GP.gi,t=GP_THEMES[gi];gpClose();GP.keep=false;if(t&&t.hard)startBattle(-1,5+t.base);else startBattle(gi);}
 function gpLeave(kind){ // 덱·스킬 화면으로 나갔다가 '체육관으로 돌아가기'로 이어서 와요
  GP.chk[kind]=1;GP.keep=true;const gi=GP.gi;gpClose(true);
  document.body.classList.add('gpFromField'); // 이 화면에서는 위쪽 메뉴·다른 이동 버튼을 숨기고 '체육관으로 돌아가기'만 남겨요
@@ -26317,6 +26397,31 @@ body.rltOpen #view{overflow:hidden!important}
  #rlTitle .gf-pad.gf-fl .gf-ab{pointer-events:auto;right:max(16px,env(safe-area-inset-right));top:auto;bottom:18px;transform:rotate(-14deg)}
 }
 @media (prefers-reduced-motion:reduce){#rlTitle,#rlTitle *{animation-duration:.01s!important;animation-delay:0s!important}}
+
+/* 상단 정렬 + 버튼 줄 분리 + 키패드 확대: 로그라이크 초기화면·필드(크게)·배틀 리그 필드 공통 */
+.gf-pad.gf-fl .gf-dpad{grid-template-columns:repeat(3,var(--kp,46px));grid-template-rows:repeat(3,var(--kp,46px))}
+.gf-pad.gf-fl .gf-dpad button{font-size:calc(var(--kp,46px) * .4)}
+.gf-pad.gf-fl .gf-ab button{width:var(--abs,54px);height:var(--abs,54px);font-size:calc(var(--abs,54px) * .38)}
+.gf-pad.gf-fl .gf-ab button:last-child{margin-top:calc(var(--abs,54px) * -.26)}
+.gf-pad.gf-fl .gf-zone .gf-joy{width:var(--jd,132px);height:var(--jd,132px)}
+.gf-pad.gf-fl .gf-knob{width:calc(var(--jd,132px) * .42);height:calc(var(--jd,132px) * .42);margin:calc(var(--jd,132px) * -.21) 0 0 calc(var(--jd,132px) * -.21)}
+@media (min-height:521px),(orientation:portrait){
+ /* 필드(크게): 위로 올리고, [조이스틱·닫기·확대] 줄을 HUD(체력·골드)와 필드 사이에 둠 */
+ body.gfBig .gf-wrap{--gup:max(0px,min(calc(var(--vh) * .12),calc(var(--vh) / 2 - var(--fh) / 2 - 156px)));
+  --kp:clamp(46px,calc((var(--vh) / 2 - var(--fh) / 2 - 70px + var(--gup)) / 3),68px);--abs:clamp(54px,calc(var(--kp) * 1.15),78px);--jd:clamp(132px,calc(var(--kp) * 2.8),184px)}
+ body.gfBig .gf-frame{top:calc(50% - var(--gup))!important}
+ body.gfBig .gf-tools{top:auto;bottom:calc(100% + 16px);left:0;right:0;justify-content:center;gap:8px}
+ body.gfBig .gf-tools button{font-size:15px;padding:6px 15px}
+ body.gfBig .gf-hud{bottom:calc(50% + var(--fh) / 2 + 66px + var(--gup))!important}
+ body.gfBig .gf-pad.gf-fl{top:calc(50% + var(--fh) / 2 + 22px - var(--gup))!important}
+ /* 로그라이크 초기화면 */
+ #rlTitle{--rup:max(0px,min(calc(var(--vh) * .12),calc(var(--vh) / 2 - var(--s) * 72px - 66px)));
+  --kp:clamp(46px,calc((var(--vh) / 2 - var(--s) * 72px - 70px + var(--rup)) / 3),68px);--abs:clamp(54px,calc(var(--kp) * 1.15),78px);--jd:clamp(132px,calc(var(--kp) * 2.8),184px)}
+ #rlTitle::before,#rlTitle .rlt-screen{top:calc(50% - var(--rup))!important}
+ #rlTitle .gf-pad.gf-fl{top:calc(50% + var(--s) * 72px + 22px - var(--rup))!important}
+ /* 배틀 리그 필드(체육관): 같은 크기 규칙 */
+ .gpBox{--kp:clamp(46px,calc((var(--vh) - 44px - min(100vw,(var(--vh) - 230px) * 13 / 11) * 11 / 13 - 40px) / 3),66px);--abs:clamp(54px,calc(var(--kp) * 1.15),76px);--jd:clamp(132px,calc(var(--kp) * 2.8),176px)}
+}
 </style>
 <script id="rl-title-js">
 /* ===== 로그라이크 모험 진입 방식 =====
