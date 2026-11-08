@@ -432,6 +432,71 @@ html.lowfx .card .holo{animation:none;mix-blend-mode:normal;opacity:.25}
 .battleOrb.power{--ballTop:#48a5ff;background:linear-gradient(to bottom,#48a5ff 0 44%,#302845 44% 56%,#fff 56% 100%)}
 .battleOrb.poke{--ballTop:#ff5a5f;background:linear-gradient(to bottom,#ff5a5f 0 44%,#302845 44% 56%,#fff 56% 100%)}
 .battleOrb b{position:absolute;z-index:2;right:0;top:0;color:#ffe66a;font:bold 13px 'Black Han Sans';text-shadow:0 1px 2px #302845}
+/* 포획 게이지 v2: 다크 글래스 트랙 + FAIL / GOOD / PERFECT 구간 */
+.cgLegend{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:8px 0 2px}
+.cgLegend span{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 8px;border-radius:999px;font:12px 'Jua',sans-serif;color:#302845;background:#fffdf5;border:2px solid #302845;box-shadow:0 2px 0 rgba(48,40,69,.3)}
+.cgLegend i{width:10px;height:10px;border-radius:50%;display:inline-block;border:1.5px solid rgba(0,0,0,.35)}
+.cgLegend .f i{background:#ff5d6c}.cgLegend .g i{background:#2fd3a0}.cgLegend .p i{background:#ffc928}
+.cgJudge{height:52px;display:flex;align-items:center;justify-content:center;font:900 30px/1 'Black Han Sans','Jua',sans-serif;letter-spacing:2px;color:#8f86a8;-webkit-text-stroke:0;margin-top:6px}
+.cgJudge small{font:14px 'Jua',sans-serif;letter-spacing:0;color:#8f86a8}
+.cgJudge.pop{animation:cgJudgePop .5s cubic-bezier(.2,1.6,.4,1) both}
+.cgJudge.P{color:#ffc928;text-shadow:0 2px 0 #9a5d00,0 0 18px rgba(255,201,40,.85)}
+.cgJudge.G{color:#2fd3a0;text-shadow:0 2px 0 #0b6b4f,0 0 14px rgba(47,211,160,.6)}
+.cgJudge.F{color:#ff5d6c;text-shadow:0 2px 0 #7d1824}
+.cgJudge em{font-style:normal;font:15px 'Jua',sans-serif;letter-spacing:0;margin-left:10px;padding:2px 9px;border-radius:999px;background:#302845;color:#fff;text-shadow:none;-webkit-text-stroke:0}
+@keyframes cgJudgePop{0%{transform:scale(.3) translateY(10px);opacity:0}60%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+.cgBar{position:relative;height:56px;margin:8px 22px 0;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.cgTrk{position:absolute;inset:0;border-radius:999px;overflow:hidden;box-shadow:0 0 0 3px #302845,0 6px 0 3px rgba(48,40,69,.32),inset 0 4px 8px rgba(0,0,0,.55)}
+.cgTrk:after{content:'';position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(rgba(255,255,255,.28),rgba(255,255,255,.04));pointer-events:none}
+.cgTrk{background:linear-gradient(90deg,#d6334b 0%,#ee5a55 11%,#f7a63b 20%,#a6e07a 31%,#33d6a2 38%,#c9f06a 44%,#ffe14d 48%,#ffc21f 50%,#ffe14d 52%,#c9f06a 56%,#33d6a2 62%,#a6e07a 69%,#f7a63b 80%,#ee5a55 89%,#d6334b 100%)}
+.cgTrk:before{content:'';position:absolute;left:50%;top:0;bottom:0;width:22%;transform:translateX(-50%);background:radial-gradient(ellipse at center,rgba(255,255,255,.55),rgba(255,255,255,0) 70%);animation:cgPulse .7s ease-in-out infinite alternate}
+@keyframes cgPulse{to{opacity:.35}}
+.cgLbl{position:relative;height:20px;margin:10px 22px 0}
+.cgLbl b{position:absolute;top:0;transform:translateX(-50%);font:11px 'Jua',sans-serif;letter-spacing:1px;white-space:nowrap}
+.cgLbl .f{color:#d1394f}.cgLbl .g{color:#13896a}.cgLbl .p{color:#b97800}
+.cgBar .cgBall{position:absolute;top:50%;left:0;width:44px;height:44px;margin:-22px 0 0 -22px;z-index:3;pointer-events:none;display:flex;align-items:center;justify-content:center;background:none!important;box-shadow:none!important;filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 4px 4px rgba(0,0,0,.5))}
+.cgBar .cgBall .mballPx{width:40px;height:40px}
+.cgBar .cgBall:after{content:'';position:absolute;left:50%;top:100%;width:3px;height:0}
+.cgBar.hitP .cgTrk{animation:cgFlashP .6s ease-out}
+.cgBar.hitG .cgTrk{animation:cgFlashG .5s ease-out}
+.cgBar.hitF{animation:cgShake .4s}
+.cgBar.hit .cgBall{animation:cgBallPop .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes cgFlashP{0%{box-shadow:0 0 0 3px #302845,0 0 0 3px #302845,0 0 0 0 rgba(255,214,70,.95),inset 0 4px 8px rgba(0,0,0,.55)}100%{box-shadow:0 0 0 3px #302845,0 0 0 3px #302845,0 0 0 26px rgba(255,214,70,0),inset 0 4px 8px rgba(0,0,0,.55)}}
+@keyframes cgFlashG{0%{box-shadow:0 0 0 3px #302845,0 0 0 3px #302845,0 0 0 0 rgba(47,211,160,.9),inset 0 4px 8px rgba(0,0,0,.55)}100%{box-shadow:0 0 0 3px #302845,0 0 0 3px #302845,0 0 0 20px rgba(47,211,160,0),inset 0 4px 8px rgba(0,0,0,.55)}}
+@keyframes cgShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@keyframes cgBallPop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.cgSpark{position:absolute;top:50%;z-index:4;pointer-events:none;font-size:16px;color:#ffe066;text-shadow:0 0 6px #ff9d00;animation:cgSpark .7s ease-out forwards}
+@keyframes cgSpark{0%{transform:translate(-50%,-50%) scale(.4);opacity:1}100%{transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy))) scale(1.2);opacity:0}}
+html body #mbox.cgFree{background:none!important;background-color:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;padding:0!important;overflow:visible}
+html body #modal.cgDim{background:rgba(18,12,38,.68)!important}
+.mbox.cgFree:before,.mbox.cgFree:after{display:none!important}
+.cgFree .cgBar{height:36px;margin:6px 26px 0}
+.cgFree .cgBar .cgBall{width:46px;height:46px;margin:-23px 0 0 -23px}
+.cgFree .cgBar .cgBall .mballPx{width:44px;height:44px}
+.cgFree .cgJudge{height:64px;font-size:40px;-webkit-text-stroke:2px #302845;paint-order:stroke fill}
+.cgThrow{display:block;margin:30px auto 0;padding:0;width:84px;height:84px;border:0;border-radius:50%;background:none;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 6px 8px rgba(0,0,0,.55));animation:cgThrowPulse 1.1s ease-in-out infinite}
+.cgThrow .mballPx.lg,.cgThrow .mballPx{width:84px;height:84px;display:block;margin:0 auto}
+.cgThrow:active{transform:scale(.88)}
+.cgThrow:disabled{opacity:.45;animation:none}
+@keyframes cgThrowPulse{50%{transform:scale(1.08)}}
+.cgFree .cgBar{margin-top:42px}
+.cgFree .cgTrk{box-shadow:0 0 0 2px #8a5a00,0 0 0 5px #f6c744,0 0 0 6.5px #fff1a6,0 0 0 8px #b57a0c,0 0 14px 6px rgba(255,200,60,.5),0 6px 10px 6px rgba(0,0,0,.35)!important}
+.cgMark{position:absolute;left:50%;top:-40px;width:34px;height:30px;margin-left:-17px;z-index:5;pointer-events:none;overflow:visible;filter:drop-shadow(0 0 4px #ffe14d) drop-shadow(0 0 10px #ffb800);animation:cgMarkBob .7s ease-in-out infinite alternate}
+@keyframes cgMarkBob{from{transform:translateY(-3px);filter:drop-shadow(0 0 3px #ffe14d) drop-shadow(0 0 7px #ffb800)}to{transform:translateY(3px);filter:drop-shadow(0 0 7px #fff27a) drop-shadow(0 0 16px #ffb800)}}
+.cgRate{margin:10px 0 4px;font:16px 'Jua',sans-serif;min-height:24px}
+.cgRate b{font-size:20px}
+.mballPx{display:inline-block;flex:none;width:20px;height:20px;vertical-align:-4px;image-rendering:pixelated}.mballPx.lg{width:34px;height:34px}
+#ballGet{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9999;pointer-events:none;display:flex;align-items:center;gap:8px;padding:6px 16px 6px 10px;border:3px solid #302845;border-radius:999px;background:#fffdf5;color:#302845;font-family:'Jua',sans-serif;font-size:17px;box-shadow:0 4px 0 rgba(48,40,69,.35);animation:ballGet 1.7s ease forwards}
+#ballGet .mballPx{width:26px;height:26px}
+@keyframes ballGet{0%{opacity:0;transform:translate(-50%,16px) scale(.8)}14%{opacity:1;transform:translate(-50%,0) scale(1.06)}24%{transform:translate(-50%,0) scale(1)}78%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
+.mball{display:inline-block;flex:none;width:20px;height:20px;border:2.5px solid #302845;border-radius:50%;position:relative;overflow:hidden;vertical-align:-4px;background:linear-gradient(to bottom,var(--b1,#ff5a5f) 0 42%,#302845 42% 58%,#fff 58% 100%);box-shadow:0 1px 3px #30284544}
+.mball:after{content:'';position:absolute;left:50%;top:50%;width:6px;height:6px;transform:translate(-50%,-50%);border-radius:50%;background:#fff;border:2px solid #302845}
+.mball.lg{width:34px;height:34px;border-width:3.5px}.mball.lg:after{width:10px;height:10px;border-width:3px}
+.ballBtn{display:flex;align-items:center;gap:10px;width:100%;margin:6px 0 0;padding:8px 12px;border:2px solid #e3c87a;border-radius:14px;background:linear-gradient(#fffdf5,#fbf1d9);box-shadow:0 3px 0 rgba(138,100,32,.3);cursor:pointer;font-family:inherit;color:#4a3a1a;text-align:left}
+.ballBtn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(138,100,32,.3)}
+.ballBtn .bbN{flex:1;font-family:'Jua',sans-serif;font-size:16px;line-height:1.25}.ballBtn .bbN small{display:block;font-size:12px;color:#8a7650;font-family:inherit}
+.ballBtn .bbN small.hit{color:#c4491f;font-weight:700}
+.ballBtn .bbC{font-size:13px;color:#8a7650}.ballBtn .bbP{min-width:48px;text-align:right;font-family:'Black Han Sans','Jua',sans-serif;font-size:20px;color:#c4491f}
 .stoneOrb{width:48px;height:54px;display:flex;align-items:center;justify-content:center;clip-path:polygon(50% 0,88% 18%,100% 62%,70% 100%,25% 94%,0 52%,18% 15%);border:0;color:#fff;font-size:25px;text-shadow:0 2px 3px #30284588;filter:drop-shadow(0 3px 2px #30284566)}
 .stoneOrb.fire{background:linear-gradient(135deg,#ffe56d,#ff642f 55%,#bd2144)}
 .stoneOrb.water{background:linear-gradient(135deg,#e4fbff,#57c8ff 50%,#2466ca)}
@@ -1278,6 +1343,18 @@ html body #bq .sheet.heavy.defense .bqHead .who{background:#dbe2ff}
 .gfBox{background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px;margin-top:10px}
 .gfQty{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
 .gfQty input{width:84px;text-align:center;font-size:24px;font-weight:900}
+
+/* 포획 연출 스타일 */
+.capBall{position:fixed;z-index:99998;width:46px;height:46px;pointer-events:none;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 4px 4px rgba(0,0,0,.45))}
+.capBall .mballPx,.capBall .mballPx.lg{width:46px;height:46px;display:block}
+.capFlash{position:fixed;z-index:99997;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff 0,rgba(255,255,255,.85) 25%,rgba(255,255,255,0) 70%);animation:capFlashA .4s ease-out forwards}
+@keyframes capFlashA{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.3);opacity:0}}
+.capGlow{position:fixed;z-index:99997;width:200px;height:200px;margin:-100px 0 0 -100px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,240,150,.95) 0,rgba(255,200,60,.55) 35%,rgba(255,200,60,0) 70%);animation:capGlowA .8s ease-out forwards}
+@keyframes capGlowA{0%{transform:scale(.3);opacity:0}30%{opacity:1}100%{transform:scale(1.2);opacity:0}}
+.capRing{position:fixed;z-index:99997;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;border:5px solid #ffe066;box-sizing:border-box;pointer-events:none;animation:capRingA .7s ease-out forwards}
+@keyframes capRingA{0%{transform:scale(.3);opacity:1}100%{transform:scale(3.2);opacity:0}}
+.capSpark{position:fixed;z-index:99999;font-size:20px;line-height:1;color:#fff6a8;text-shadow:0 0 8px #ffb800;pointer-events:none;animation:capSparkA .8s ease-out forwards}
+@keyframes capSparkA{0%{transform:translate(-50%,-50%) scale(.4);opacity:1}100%{transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy))) scale(1.3);opacity:0}}
 </style>
 
 <style id="wild-layout-overlap-fix">
@@ -3555,7 +3632,7 @@ function defaultMeta(){return{ver:SAVE_VER,name:'',pg:'m',code:'',gs:'',cls:'',f
  xp:0,lp:0,lpRetrofit:false,lpBonus5Done:false,trainerSkills:{heal:0,counter:0,attack:0,cheer:0,mana:0,study:0,vit:0,hand:0},coins:0,candy:0,packs:0,dust:0,pity:{p4:0,p5:0},col:{},seen:{},dexSeen:{},deck:[],
  sk:{},days:{},hist:[],train:{last:'',best:0,count:0,lastRes:null,daily:''},
  badges:{},gyms:{},battles:{w:0,l:0},stats:{q:0,c:0,streak:0,bestCombo:0,bestStreak:0,guessWrong:0,guessAlert:0,careful:0,lowerStar:0,shardDone:0,crafted:0,foundDone:0,superEff:0,gymTry:0,retryOk:0,bounce:0,fast:0,better:0,perfect:0,quickTrain:0,practice:0,comeback:0,flawless:0,defOk:0,candyAll:0,evolved:0,opened:0},
- unl:{},unlNew:{},ach:{},partner:0,bond:{},stoneSeen:null,card:null,uMaxAt:'',shard:{},dust:0,season:null,seasons:[],bsave:null,thist:[],first20:null,first20t:null,found:{},endless:{best:0,total:0,runs:0,caught:0},pvp:{n:0,w:0,l:0,gg:0,foes:{},last:0},tod:{m:0,a:0,e:0},firstPlay:0,scenario:{chapter:0,unlocked:0,cleared:[],seenIntro:false},settings:{anim:'gif',sound:true,bgm:true,lowfx:false,homeLite:true,easy:false,safe:'auto',zoom:(/Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent)||(window.matchMedia&&matchMedia('(pointer:coarse)').matches)?'0.85':'auto'),fit:'auto',imgs:true,defq:true,iq:true}};}
+ unl:{},unlNew:{},ach:{},partner:0,bond:{},stoneSeen:null,card:null,uMaxAt:'',shard:{},dust:0,season:null,seasons:[],bsave:null,thist:[],first20:null,first20t:null,found:{},balls:{},endless:{best:0,total:0,runs:0,caught:0},pvp:{n:0,w:0,l:0,gg:0,foes:{},last:0},tod:{m:0,a:0,e:0},firstPlay:0,scenario:{chapter:0,unlocked:0,cleared:[],seenIntro:false},settings:{anim:'gif',sound:true,bgm:true,lowfx:false,homeLite:true,easy:false,safe:'auto',zoom:(/Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent)||(window.matchMedia&&matchMedia('(pointer:coarse)').matches)?'0.85':'auto'),fit:'auto',imgs:true,defq:true,iq:true}};}
 function mergeMeta(m){const d=defaultMeta();if(!m||typeof m!=='object')return d;for(const k in d){if(!(k in m))continue;if(d[k]&&typeof d[k]==='object'&&!Array.isArray(d[k]))d[k]=Object.assign(d[k],m[k]);else d[k]=m[k];}for(const k in m){if(!(k in d))d[k]=m[k];}return d;}  // 기본값에 없는 키(예: 로그라이크 rl 기록)도 버리지 않고 그대로 이어받아요
 function upgradeMeta(m){
  // v1 → v2: 처음 20문제 기록·개념별 최근 기록이 생겼어요. 옛 기록에서 알 수 있는 만큼 채워요.
@@ -6219,7 +6296,7 @@ function rxHint(){try{const rx=buildRx();return rx?`<br>🎯 오늘의 처방: <
 async function startTraining(opt={}){
  const m=S.meta;if(!allowedSkills().length){toast('이 학기에는 아직 연습할 단원이 없어요');return;}
  S.screen='train';S.newStars=[];S.newBadges=[];S.lvUp=0;S.foundMsg='';
- const endless=!!opt.endless;const rescue=opt.rescue||null;S.rqQuiet=!!rescue;S.rescueCtx=(endless&&rescue&&rescue.pool&&rescue.pool.length)?rescue.pool:null;S.trainEndless=endless;S.trainSpray=!!(endless&&rescue&&window.RESQ&&RESQ.R().spray);const N=endless?Infinity:(opt.n||trainN());const ghost=(opt.pool||endless)?null:lastTrain();
+ S.ballGot={};const endless=!!opt.endless;const rescue=opt.rescue||null;S.rqQuiet=!!rescue;S.rescueCtx=(endless&&rescue&&rescue.pool&&rescue.pool.length)?rescue.pool:null;S.trainEndless=endless;S.trainSpray=!!(endless&&rescue&&window.RESQ&&RESQ.R().spray);const N=endless?Infinity:(opt.n||trainN());const ghost=(opt.pool||endless)?null:lastTrain();
  const rx=(!opt.pool&&!endless)?buildRx():null;
  const v=$('#view');
  let idx=0,correct=0,combo=0,maxCombo=0,candy=0,rt=0,gw=0;let wRars=endless?rollEndlessSet():[],wBase=0;const wNeed=()=>Math.max(0,...wRars);const retryQ=[];let revN=0,revOk=0,revSolved=0;const dueRev=(!opt.pool&&!endless&&!focusLock())?wbDueList(m):[];const revAt=new Set();{const R=Math.min(dueRev.length,Math.max(1,Math.ceil((isFinite(N)?N:0)*.3)));if(isFinite(N)&&N>=4)for(let k=0;k<R;k++)revAt.add(Math.floor((k+.5)*N/R));}const wbPool=(endless&&!rescue)?shuffle(wbList(m).filter(e=>!e.d&&wbKindOf(e)==='math')):[];
@@ -6250,7 +6327,7 @@ async function startTraining(opt={}){
   if(rx&&q.rxKind&&!retry){const e=rx.res[q.rxKind]||(rx.res[q.rxKind]={n:0,c:0});e.n++;if(r.ok)e.c++;const k=rx.sk[q.sk]||(rx.sk[q.sk]={n:0,c:0});k.n++;if(r.ok)k.c++;}
   {const b=$('#tBub');if(b){const nm=MON[partnerId()].name;b.innerHTML=esc(nm)+': '+(S.foundMsg?S.foundMsg:r.ok?rpick(retry?['다시 해서 해냈다!','이제 네 거야!','역시!']:q.found?['기초가 단단해지고 있어!','기초가 한 층 올라갔어!']:['좋아!','멋져!','바로 그거야!','최고야!','계속 가자!']):rpick(['괜찮아, 같이 다시 보자!','틀려도 괜찮아!','조금 뒤에 다시 해 보자!']));S.foundMsg='';b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}partnerReact(r.ok?(combo>=2?'party':'yay'):'hug');}
   if(r.guess)gw++;
-  if(r.ok){candy+=retry?2:1;if(retry)rt++;combo++;streakFx(combo);maxCombo=Math.max(maxCombo,combo);if(!retry)correct++;
+  if(r.ok){if(!retry&&!rescue&&!opt.pool)ballDrop();candy+=retry?2:1;if(retry)rt++;combo++;streakFx(combo);maxCombo=Math.max(maxCombo,combo);if(!retry)correct++;
    }
   else{combo=0;if(!retry||rnd()<.5)retryQ.push({q:Object.assign({},q,{retry:false}),at:idx+2});}
   if(!retry){idx++;}prog();if(!retry){
@@ -6332,33 +6409,211 @@ function finishEndlessWild(outcome,note=''){
 }
 /* 야생·시나리오 전투에서 지면: 쉬운 전투 안내 팝업 (이미 켜져 있으면 안 떠요) */
 function easyHint(){try{const st=S.meta.settings;if(!st||st.easy)return;setTimeout(()=>{if(S.meta.settings.easy)return;M(`<div style="text-align:center"><h2>💡 도움말</h2><p style="font-size:17px;line-height:1.8;margin:10px 0">전투가 어려웠나요?<br><b>설정</b>에서 <b>쉬운 전투</b>를 켜 보세요.<br>야생 포켓몬이 <b>1회만 공격</b>합니다.</p><div class=mbtns><button class="btn gold big" data-a=set>⚙ 설정 열기</button><button class="btn ghost" data-a=x>닫기</button></div></div>`,{set:()=>{closeM(1);showSettings(1);},x:()=>closeM(1),_close:()=>closeM(1)},{layer2:1});},800);}catch(e){}}
-function wildCatchChance(slot=null){
+/* ===== 몬스터볼 시스템 =====
+   · 문제를 맞히면 볼이 나와요 (몬스터 20% · 슈퍼 10% · 하이퍼 5% · 마스터 1% · 타입별 볼 3%씩, 나머지는 꽝)
+   · 포획은 체력 30% 이하에서만, 볼이 있어야만, 한 턴에 한 번 (던지면 내 턴이 끝나요)
+   · 몬스터볼 성공률 = 상대 체력이 줄어든 만큼 올라가 (0% → ★1 100% · ★2 90% · ★3 80% · ★4 70% · ★5 60%) */
+const BALLS={
+ monster:{n:'몬스터볼',c:'#ff5a5f',add:0,drop:20,d:'기본 볼'},
+ super:{n:'슈퍼볼',c:'#3f8cff',add:5,drop:10,d:'성공률 +5%'},
+ hyper:{n:'하이퍼볼',c:'#3a3a46',add:10,drop:5,d:'성공률 +10%'},
+ master:{n:'마스터볼',c:'#a24cff',drop:1,sure:1,d:'반드시 포획!'},
+ speed:{n:'스피드볼',c:'#f5d233',types:[4,9],drop:3},
+ net:{n:'네트볼',c:'#34b98c',types:[11,3],drop:3},
+ dive:{n:'다이브볼',c:'#2c8ce0',types:[2,5],drop:3},
+ dark:{n:'다크볼',c:'#4a4358',types:[15,13,7],drop:3},
+ heavy:{n:'헤비볼',c:'#7d8da3',types:[16,12],drop:3},
+ ultra:{n:'울트라볼',c:'#3558c8',types:[8,6],drop:3},
+ love:{n:'러브볼',c:'#f06aa8',types:[17,10],drop:3},
+ friend:{n:'프렌드볼',c:'#6ac04f',types:[0],drop:3},
+ luxury:{n:'럭셔리볼',c:'#e0572f',types:[1,14],drop:3}
+};
+const BALL_ORDER=['monster','super','hyper','master','speed','net','dive','dark','heavy','ultra','love','friend','luxury'];
+const BALL_MAX={1:100,2:90,3:80,4:70,5:60}; // 몬스터볼: 체력 0%일 때의 성공률(별 개수별)
+function ballsOf(){const m=S.meta;if(!m.balls||typeof m.balls!=='object')m.balls={};return m.balls;}
+function ballN(k){return Math.max(0,+ballsOf()[k]||0);}
+function ballTotal(){return BALL_ORDER.reduce((a,k)=>a+ballN(k),0);}
+const BALL_PX=(()=>{const N=13,c=6,rows=[];for(let y=0;y<N;y++){let r='';for(let x=0;x<N;x++){const dx=x-c,dy=y-c,d=Math.sqrt(dx*dx+dy*dy);let ch='.';
+ if(d<=6.4){ch=d>5.3?'o':(y<c?'c':y>c?'w':'o');
+  if(d<=2.6)ch=d>1.6?'o':'w';
+  else if(ch==='c'&&((x===3&&y===2)||(x===4&&y===2)||(x===3&&y===3)))ch='h';
+  else if(ch==='w'&&d>4.2&&dx>=1)ch='s';}
+ r+=ch;}rows.push(r);}return rows;})();
+const _R=(y,a,b)=>{const o=[];for(let x=a;x<=b;x++)o.push([x,y]);return o;};
+const _V=[[3,2],[4,3],[5,4],[9,2],[8,3],[7,4],[3,3],[4,4],[9,3],[8,4]]; // 양쪽 브이(V)자 무늬
+/* 볼 겉모양: t=윗부분 색, bot/botS=아랫부분 색(기본 흰색), m=[색,[좌표들]] 무늬 */
+const BALL_VIS={
+ monster:{},
+ super:{t:'#3f7fe0',m:[['#e8423f',[3,3,4,3,3,4,4,4,3,5,4,5].reduce((a,v,i,r)=>i%2?a:a.concat([[v,r[i+1]]]),[]).concat([8,3,9,3,8,4,9,4,8,5,9,5].reduce((a,v,i,r)=>i%2?a:a.concat([[v,r[i+1]]]),[]))]]},
+ hyper:{t:'#3a3a46',m:[['#f2c230',_V]]},
+ master:{t:'#9a4ff0',m:[['#ff7ab8',[[2,3],[3,3],[2,4],[3,4],[9,3],[10,3],[9,4],[10,4]]],['#fff',[[5,3],[7,3],[6,4],[5,2],[7,2]]]]},
+ speed:{t:'#f5d233',m:[['#302845',[[3,3],[3,4],[4,5],[9,3],[9,4],[8,5],[3,2],[9,2]]]]},
+ net:{t:'#2fb58a',m:[['#146b4f',[].concat(...[2,3,4].map(y=>[4,5,6,7,8].filter(x=>(x+y)%2===0).map(x=>[x,y])))]]},
+ dive:{t:'#2a7fd8',m:[['#9ad8ff',[[3,4],[4,3],[5,4],[6,3],[7,4],[8,3],[9,4],[5,2],[7,2]]]]},
+ dark:{t:'#3f3a4d',m:[['#7be07b',[[4,3],[5,4],[7,4],[8,3],[6,3]]]]},
+ heavy:{t:'#6f86a6',bot:'#566074',botS:'#434b5c',m:[['#c5d0e0',_R(3,3,9).concat(_R(4,4,8))]]},
+ ultra:{beast:1,t:'#3558c8'},
+ love:{t:'#f27ab0',m:[['#fff',[[4,2],[5,2],[7,2],[8,2],[4,3],[5,3],[6,3],[7,3],[8,3],[5,4],[6,4],[7,4],[6,5]]]]},
+ friend:{t:'#63bd4a',m:[['#d6f5c4',[[4,3],[8,3],[6,2],[5,4],[7,4],[6,4]]]]},
+ luxury:{t:'#26222f',m:[['#f2c230',_R(3,3,9).concat([[2,4],[10,4],[6,2]])]]}
+};
+/* 울트라볼(울트라비스트볼): 남색 구체에 하늘색 격자, 네 모서리의 노란 뿔 */
+function beastBallSVG(lg){const N=13,c=6,g=[];
+ for(let y=0;y<N;y++){g.push([]);for(let x=0;x<N;x++){const dx=x-c,dy=y-c,d=Math.sqrt(dx*dx+dy*dy);let col=null;
+  if(d<=6.4){col=d>5.3?'#302845':'#3558c8';
+   if(d<=5.3&&(x===4||x===8||y===4||y===8))col='#8ec5ff';
+   if(d<=5.3&&d>4.4&&dx+dy>3)col='#27439c';
+   if((x===3&&y===3)||(x===4&&y===2)||(x===2&&y===4))col='#e6f3ff';
+   if(d<=2.6)col=d>1.6?'#302845':'#fff';}
+  g[y].push(col);}}
+ const wing=[[0,0],[1,0],[0,1],[1,1],[2,1],[1,2],[2,2],[3,2],[2,3]],edge=[[1,0],[0,1],[3,2],[2,3]]; // 모서리 4곳에서 구체로 이어지는 뿔
+ const put=(x,y,col)=>{if(g[y]&&x>=0&&x<N)g[y][x]=col;};
+ const four=(x,y,col)=>{put(x,y,col);put(N-1-x,y,col);put(x,N-1-y,col);put(N-1-x,N-1-y,col);}; // 뿔 4개: 네 모서리
+ wing.forEach(([x,y])=>four(x,y,'#f2d77a'));
+ edge.forEach(([x,y])=>four(x,y,'#c99a2e'));
+ let r='';g.forEach((row,y)=>row.forEach((col,x)=>{if(col)r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${col}"/>`;}));
+ return `<svg class="mballPx${lg?' lg':''}" viewBox="0 0 13 13" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
+function ballIcon(k,lg){const b=BALLS[k],v=BALL_VIS[k]||{};if(v.beast)return beastBallSVG(lg);const g=BALL_PX.map(r=>r.split(''));
+ (v.m||[]).forEach(([col,pts])=>pts.forEach(([x,y])=>{const q=g[y]&&g[y][x];if(q==='c'||q==='h')g[y][x]='m'+col;}));
+ const pal={o:'#302845',c:v.t||b.c,w:v.bot||'#fff',s:v.botS||'#d6cfc2',h:'#fff'};let r='';
+ g.forEach((row,y)=>row.forEach((ch,x)=>{const col=ch.length>1?ch.slice(1):pal[ch];if(col)r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${col}"/>`;}));
+ return `<svg class="mballPx${lg?' lg':''}" viewBox="0 0 13 13" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
+function ballPop(k){try{const old=document.getElementById('ballGet');if(old)old.remove();const d=document.createElement('div');d.id='ballGet';
+ d.innerHTML=`${ballIcon(k,1)}<span>${BALLS[k].n} 획득!</span>`;document.body.appendChild(d);setTimeout(()=>{if(d.isConnected)d.remove();},1700);}catch(e){}}
+function ballTypeNames(k){return (BALLS[k].types||[]).map(t=>TYPE_KO[t]).join('·');}
+function ballRoll(){let r=rnd()*100;for(const k of BALL_ORDER){r-=BALLS[k].drop;if(r<0)return k;}return null;}
+function ballDrop(){ // 정답일 때마다 한 번 굴려요
+ try{if(!S.meta)return null;const k=ballRoll();if(!k)return null;
+  const g=ballsOf();g[k]=ballN(k)+1;S.ballGot=S.ballGot||{};S.ballGot[k]=(S.ballGot[k]||0)+1;
+  ballPop(k);try{sfx('coin');}catch(e){}saveLocal();return k;}catch(e){console.warn('ballDrop',e);return null;}}
+function ballGotHTML(){const g=S.ballGot||{};S.ballGot={};const ks=BALL_ORDER.filter(k=>g[k]);if(!ks.length)return '';
+ return `<div class=explain style="text-align:left;font-size:14px;margin-top:10px;background:#fff4f4;border-color:#f0a3a3"><b style="color:#b8283c">🔴 이번에 얻은 볼</b><div class=row style="gap:6px;margin-top:6px;flex-wrap:wrap">${ks.map(k=>`<span class=pill>${ballIcon(k)} ${BALLS[k].n} ×${g[k]}</span>`).join('')}</div><div class=mut style="margin-top:4px">지금 가진 볼 ${ballTotal()}개 · 야생 포켓몬을 포획할 때 써요</div></div>`;}
+/* 포획 성공률(%) = 몬스터볼 기본값 + 볼 보너스. 타입볼: 상대 타입이 맞으면 +10, 아니면 +5 */
+function ballChance(k,u){const b=BALLS[k];if(!b||!u)return 0;if(b.sure)return 100;
+ const w=MON[u.id],mx=BALL_MAX[w.rar]||BALL_MAX[3],lost=Math.max(0,Math.min(1,1-u.hp/u.max));
+ let c=mx*lost;if(b.types)c+=b.types.some(t=>(w.types||[]).includes(t))?10:5;else c+=b.add||0;
+ return Math.max(0,Math.min(100,Math.round(c)));}
+function ballTypeHit(k,u){const b=BALLS[k];return !!(b&&b.types&&u&&b.types.some(t=>(MON[u.id].types||[]).includes(t)));}
+function wildCatchChance(slot=null,ball='monster'){
  if(!B||!B.wildMode)return 0;
  const targetSlot=selectWildCaptureSlot(slot),u=targetSlot==null?null:B.foe.board[targetSlot];
  if(!u)return 0;
- const w=MON[u.id],base={1:48,2:38,3:28,4:18,5:10}[w.rar]||25;
- return Math.min(93,base+Math.round((1-u.hp/u.max)*60));
+ if(B.coop){const w=MON[u.id],base={1:48,2:38,3:28,4:18,5:10}[w.rar]||25;return Math.min(93,base+Math.round((1-u.hp/u.max)*60));} // 협동 모드는 예전 방식 그대로
+ return ballChance(ball,u);
 }
+/* 볼 던지기 게이지: 볼이 좌우로 빠르게 왔다갔다 → 가운데 PERFECT +6% · 그 옆 GOOD +3% · 양끝 FAIL -5% */
+function captureGauge(targetSlot,k){
+ const st=B.wildState,u=B.foe.board[targetSlot];if(!u){st.captureModalOpen=false;return;}
+ st.captureModalOpen=true;
+ const base=ballChance(k,u);let done=false,raf=0,t0=performance.now(),pos=0;
+ const PER=.075,FAILW=.2,BON={P:5,G:0,F:-5},NAME={P:'PERFECT!',G:'GOOD!',F:'FAIL…'};
+ const zone=p=>Math.abs(p-.5)<=PER?'P':(p<=FAILW||p>=1-FAILW)?'F':'G';
+ const pc=x=>(x*100).toFixed(2)+'%';
+ M(`<div style="text-align:center">
+  <div id=cgJudge class=cgJudge></div>
+  <div id=cgBar class=cgBar><svg class=cgMark viewBox="0 0 30 26" aria-hidden="true"><path d="M3 3 H27 L15 23 Z" fill="#ffd21f" stroke="#fff3a0" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 5 H23 L15 18 Z" fill="#ffe96b"/></svg><div class=cgTrk></div><span id=cgBall class=cgBall>${ballIcon(k,1)}</span></div>
+  <button class=cgThrow data-a=stop id=cgStop aria-label="던지기">${ballIcon(k,1)}</button></div>`,{stop:()=>stop(),_close:()=>{}},{wide:1});
+ {const mb=document.getElementById('mbox'),md=document.getElementById('modal');if(mb){mb.classList.remove('panel');mb.classList.add('cgFree');}if(md)md.classList.add('cgDim');}
+ const el=()=>document.getElementById('cgBall');
+ const tick=now=>{if(done)return;const ph=((now-t0)/520)%2;pos=ph<1?ph:2-ph;const e=el();if(e)e.style.left=(pos*100)+'%';raf=requestAnimationFrame(tick);};
+ raf=requestAnimationFrame(tick);
+ const bar=document.getElementById('cgBar');if(bar)bar.onclick=()=>stop();
+ function stop(){if(done)return;done=true;cancelAnimationFrame(raf);
+  const z=BALLS[k].sure?'P':zone(pos),bonus=BON[z],fin=Math.max(0,Math.min(100,base+bonus));
+  const j=document.getElementById('cgJudge');if(j){j.className='cgJudge pop '+z;j.textContent=NAME[z];}
+  if(bar){bar.classList.add('hit','hit'+z);if(z!=='F'){const n=z==='P'?10:5;for(let i=0;i<n;i++){const s=document.createElement('span');s.className='cgSpark';s.textContent='✦';s.style.left=(pos*100)+'%';s.style.setProperty('--sx',((Math.random()-.5)*150)+'px');s.style.setProperty('--sy',(-20-Math.random()*50)+'px');s.style.animationDelay=(Math.random()*.08)+'s';bar.appendChild(s);}}}
+  const b=document.getElementById('cgStop');if(b)b.disabled=true;try{sfx(z==='P'?'rare':z==='G'?'coin':'hit');}catch(e){}
+  setTimeout(()=>{closeM();{const md=document.getElementById('modal');if(md)md.classList.remove('cgDim');}if(B&&B.wildMode){B.wildState.captureModalOpen=false;window.__capJudge=z;tryCatchWildPokemon(targetSlot,k,bonus);}},1100);}
+}
+/* 포획 연출: 볼이 날아가 → 실패하면 튕겨 나가고, 성공하면 포켓몬이 볼에 빨려 들어가며 중앙에서 반짝여요 */
+function captureFx(slot,k,ok){return new Promise(res=>{
+ let fin=false;const els=[];const done=()=>{if(fin)return;fin=true;els.forEach(e=>{try{e.remove();}catch(_){}});res();};
+ try{
+  const ue=unitEl(B.foe,slot),tgt=ue&&(ue.querySelector('.sp img')||ue.querySelector('img')||ue);
+  if(!ue||!tgt){res();return;}
+  const r=zRect(tgt);if(!r.width||!r.height){res();return;}
+  const tx=r.left+r.width/2,ty=r.top+r.height/2,hero=document.getElementById('heroMe'),hr=hero&&hero.getBoundingClientRect&&hero.getBoundingClientRect().width?zRect(hero):null;
+  const sx=hr?hr.left+hr.width/2:VW()/2,sy=hr?hr.top+hr.height/2:VH()-70;
+  const add=(cls,html,l,t)=>{const d=document.createElement('div');d.className=cls;if(html)d.innerHTML=html;d.style.left=l+'px';d.style.top=t+'px';document.body.appendChild(d);els.push(d);return d;};
+  const ball=add('capBall',ballIcon(k,1),sx,sy);
+  const dx=tx-sx,dy=ty-sy,arc=Math.min(150,Math.max(70,Math.abs(dy)*.5+50));
+  const J=window.__capJudge||'G';window.__capJudge=null;const miss=(J==='F'&&!ok),sd0=Math.random()<.5?-1:1;
+  const ex=miss?dx+sd0*(r.width*.55+45):dx,ey=miss?dy+r.height*.12:dy;
+  const GOLD='sepia(1) saturate(8) hue-rotate(-15deg) brightness(1.35)';
+  const perfectFx=()=>{add('capFlash','',tx,ty);const f2=add('capFlash','',tx,ty);f2.style.filter=GOLD;f2.style.transform='translate(-50%,-50%) scale(1.5)';
+   const rg=add('capRing','',tx,ty);rg.style.filter=GOLD;
+   for(let i=0;i<10;i++){const a=i/10*Math.PI*2,d=add('capSpark','✦',tx,ty);d.style.color='#ffd21f';d.style.textShadow='0 0 8px #ffb000';d.style.setProperty('--sx',Math.cos(a)*(50+Math.random()*40)+'px');d.style.setProperty('--sy',Math.sin(a)*(50+Math.random()*40)+'px');}};
+  try{sfx('tap');}catch(_){}
+  const flyKF=[{transform:'translate(-50%,-50%) translate(0,0) rotate(0) scale(1)'},{transform:`translate(-50%,-50%) translate(${dx*.5+(ex-dx)*.5}px,${dy*.5-arc}px) rotate(360deg) scale(1.15)`,offset:.5},{transform:`translate(-50%,-50%) translate(${ex}px,${ey}px) rotate(720deg) scale(.9)`}];
+  const flyDur=J==='P'?460:miss?700:650;
+  if(J==='P'){[1,2,3].forEach(i=>{const g=add('capBall',ballIcon(k,1),sx,sy);g.style.pointerEvents='none';g.style.opacity=0;g.style.filter='drop-shadow(0 0 6px #ffd21f) drop-shadow(0 0 12px #ffb000) brightness(1.3)';
+    const ga=g.animate(flyKF.map(q=>Object.assign({},q,{opacity:[.55,.35,.2][i-1]})),{duration:flyDur,delay:i*45,easing:'cubic-bezier(.3,.1,.5,1)',fill:'both'});ga.onfinish=()=>{try{g.remove();}catch(_){}};});
+   ball.style.filter='drop-shadow(0 0 8px #ffd21f) drop-shadow(0 0 16px #ffb000) brightness(1.25)';}
+  const fly=ball.animate(flyKF,{duration:flyDur,easing:'cubic-bezier(.3,.1,.5,1)',fill:'forwards'});
+  fly.onfinish=()=>{
+   if(miss){ // 빗나가요: 옆으로 떨어져 굴러가요
+    try{sfx('hit');}catch(_){}
+    const T=`translate(-50%,-50%) translate(${ex}px,`;
+    const drop=ball.animate([{transform:`${T}${ey}px) rotate(720deg) scale(.9)`,opacity:1},{transform:`${T}${ey+70}px) rotate(${720+sd0*160}deg) scale(.95)`,opacity:1,offset:.45},{transform:`translate(-50%,-50%) translate(${ex+sd0*40}px,${ey+55}px) rotate(${720+sd0*300}deg) scale(.95)`,opacity:1,offset:.7},{transform:`translate(-50%,-50%) translate(${ex+sd0*90}px,${ey+60}px) rotate(${720+sd0*520}deg) scale(.9)`,opacity:0}],{duration:900,easing:'ease-out',fill:'forwards'});
+    drop.onfinish=done;return;}
+   if(J==='P')perfectFx();
+   if(!ok){ // 튕겨 나가요
+    const side=Math.random()<.5?-1:1;try{sfx('hit');}catch(_){}
+    add('capFlash','',tx,ty);
+    try{tgt.animate([{transform:'translateX(0)'},{transform:'translateX(-7px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:260});}catch(_){}
+    const out=ball.animate([{transform:`translate(-50%,-50%) translate(${dx}px,${dy}px) rotate(720deg) scale(.9)`,opacity:1},{transform:`translate(-50%,-50%) translate(${dx+side*70}px,${dy-110}px) rotate(${720+side*200}deg) scale(1)`,opacity:1,offset:.45},{transform:`translate(-50%,-50%) translate(${dx+side*210}px,${dy+90}px) rotate(${720+side*560}deg) scale(.8)`,opacity:0}],{duration:800,easing:'ease-out',fill:'forwards'});
+    out.onfinish=done;return;}
+   // 성공: 포켓몬이 볼에 빨려 들어가고 → 볼이 흔들리고 → 중앙에서 반짝!
+   try{tgt.animate([{filter:'brightness(1)',transform:'scale(1)',opacity:1},{filter:'brightness(4) saturate(0)',transform:'scale(.9)',opacity:1,offset:.45},{filter:'brightness(6) saturate(0)',transform:'scale(.12)',opacity:0}],{duration:520,easing:'ease-in',fill:'forwards'});}catch(_){}
+   const shake=ball.animate([{transform:`translate(-50%,-50%) translate(${dx}px,${dy}px) rotate(0)`},{transform:`translate(-50%,-50%) translate(${dx}px,${dy}px) rotate(-22deg)`,offset:.25},{transform:`translate(-50%,-50%) translate(${dx}px,${dy}px) rotate(20deg)`,offset:.55},{transform:`translate(-50%,-50%) translate(${dx}px,${dy}px) rotate(0)`}],{duration:620,delay:380,fill:'both'});
+   shake.onfinish=()=>{
+    try{sfx('rare');}catch(_){}
+    add('capGlow','',tx,ty);add('capRing','',tx,ty);
+    for(let i=0;i<12;i++){const a=i/12*Math.PI*2,d=add('capSpark','✦',tx,ty);d.style.setProperty('--sx',Math.cos(a)*(60+Math.random()*40)+'px');d.style.setProperty('--sy',Math.sin(a)*(60+Math.random()*40)+'px');d.style.animationDelay=(Math.random()*.1)+'s';}
+    ball.animate([{opacity:1,filter:'brightness(1)'},{opacity:1,filter:'brightness(3)',offset:.3},{opacity:0,filter:'brightness(4)'}],{duration:700,fill:'forwards'});
+    setTimeout(done,800);};
+  };
+  setTimeout(done,3500); // 안전장치
+ }catch(e){console.warn('captureFx',e);done();}
+});}
 function askWildCapture(slot=null){
- if(!B||!B.wildMode||B.over)return;
+ if(!B||!B.wildMode||B.over||B.coop)return; // 협동 보스전은 포획 없이 쓰러뜨리기
  if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex)){toast(B.coop&&B.coop.active!==BC.localIndex?'지금은 친구 차례예요. 내 차례가 되면 포획할 수 있어요':'내 차례가 되면 포획을 시도할 수 있어요');return;}
  const targetSlot=selectWildCaptureSlot(slot),st=B.wildState,u=targetSlot==null?null:B.foe.board[targetSlot];
  if(!u||u.hp<=0){toast('야생 포켓몬이 이미 쓰러졌어요');return;}
  if(u.hp>u.max*.3){toast('체력이 30% 이하일 때 포획할 수 있어요');return;}
  const id=u.id,w=MON[id];st.captureModalOpen=true;st.targetSlot=targetSlot;B.wildCaptureTargetSlot=targetSlot;
- const chance=wildCatchChance(targetSlot),pct=Math.round(u.hp/u.max*100);
- M(`<div style="text-align:center"><div class="endWildImg" style="width:115px;height:105px;margin:0 auto 5px">${monImg(id,'art')}</div><h2>${esc(w.name)} 포획하기</h2><p style="font-size:15px;line-height:1.6">야생 포켓몬의 체력이 <b>${pct}%</b> 남았어요.<br>이번 포획 성공 확률은 약 <b>${chance}%</b>예요.</p><div class="endWildHp" style="height:12px"><i class="${pct<30?'low':''}" style="width:${100-pct}%"></i></div><p class="mut" style="font-size:12px">실패하면 ${esc(w.name)}이(가) 공격하고, 다시 전투를 이어갑니다.</p><div class="mbtns"><button class="btn red big" data-a=catch>🔴 포획 시도</button><button class="btn ghost" data-a=keep>계속 싸우기</button></div></div>`,{
-  catch:()=>{closeM();if(B&&B.wildMode){B.wildState.captureModalOpen=false;if(B.coop&&!BC.host){bossSubmit({type:'catch',slot:targetSlot});return;}tryCatchWildPokemon(targetSlot);}},
-  keep:()=>{closeM();if(B&&B.wildMode)B.wildState.captureModalOpen=false;},
-  _close:()=>{if(B&&B.wildMode)B.wildState.captureModalOpen=false;closeM();}
- },{wide:1});
+ const pct=Math.round(u.hp/u.max*100);
+ const head=`<div class="endWildImg" style="width:115px;height:105px;margin:0 auto 5px">${monImg(id,'art')}</div><h2>${esc(w.name)} 포획하기</h2><p style="font-size:15px;line-height:1.6;margin:4px 0">야생 포켓몬의 체력이 <b>${pct}%</b> 남았어요.</p><div class="endWildHp" style="height:12px"><i class="${pct<30?'low':''}" style="width:${100-pct}%"></i></div>`;
+ if(B.coop){ // 협동 모드: 기존 방식(볼 없이)
+  const chance=wildCatchChance(targetSlot);
+  M(`<div style="text-align:center">${head}<p style="font-size:15px;line-height:1.6">이번 포획 성공 확률은 약 <b>${chance}%</b>예요.</p><p class="mut" style="font-size:12px">실패하면 ${esc(w.name)}이(가) 공격하고, 다시 전투를 이어갑니다.</p><div class="mbtns"><button class="btn red big" data-a=catch>🔴 포획 시도</button><button class="btn ghost" data-a=keep>계속 싸우기</button></div></div>`,{
+   catch:()=>{closeM();if(B&&B.wildMode){B.wildState.captureModalOpen=false;if(!BC.host){bossSubmit({type:'catch',slot:targetSlot});return;}tryCatchWildPokemon(targetSlot);}},
+   keep:()=>{closeM();if(B&&B.wildMode)B.wildState.captureModalOpen=false;},
+   _close:()=>{if(B&&B.wildMode)B.wildState.captureModalOpen=false;closeM();}
+  },{wide:1});return;}
+ const owned=BALL_ORDER.filter(k=>ballN(k)>0);
+ const hd={keep:()=>{closeM();if(B&&B.wildMode)B.wildState.captureModalOpen=false;},_close:()=>{if(B&&B.wildMode)B.wildState.captureModalOpen=false;closeM();}};
+ let body;
+ if(!owned.length){
+  body=`<p style="font-size:15px;line-height:1.6;margin:10px 0"><b>가지고 있는 볼이 없어요!</b><br>문제를 맞히면 볼을 얻을 수 있어요.<br>볼이 생길 때까지 계속 싸워 봐요.</p><div class="mbtns"><button class="btn ghost big" data-a=keep>계속 싸우기</button></div>`;
+ }else{
+  const rows=owned.map(k=>{const b=BALLS[k],hit=ballTypeHit(k,u);
+   const tag=b.types?(hit?`<small class=hit>★ ${ballTypeNames(k)} 타입 일치! +10%</small>`:`<small>${ballTypeNames(k)} 타입 특화 · 지금은 +5%</small>`):`<small>${b.d}</small>`;
+   hd['ball_'+k]=()=>{closeM();if(B&&B.wildMode){captureGauge(targetSlot,k);}};
+   return `<button class=ballBtn data-a="ball_${k}">${ballIcon(k,1)}<span class=bbN>${b.n}${tag}</span><span class=bbC>×${ballN(k)}</span><b class=bbP>${ballChance(k,u)}%</b></button>`;}).join('');
+  body=`<p class="mut" style="font-size:13px;margin:8px 0 2px">던질 볼을 골라요. <b>볼은 한 턴에 한 번</b>, 던지면 내 턴이 끝나요.</p>${rows}<div class="mbtns"><button class="btn ghost" data-a=keep>계속 싸우기</button></div>`;
+ }
+ M(`<div style="text-align:center">${head}${body}<p class="mut" style="font-size:12px;margin-top:6px">실패하면 ${esc(w.name)}이(가) 공격해요.</p></div>`,hd,{wide:1});
 }
-function tryCatchWildPokemon(slot=null){
- if(!B||!B.wildMode||B.over||B.busy||B.side!=='me')return;
+function tryCatchWildPokemon(slot=null,ball='monster',bonus=0){
+ if(!B||!B.wildMode||B.over||B.busy||B.side!=='me'||B.coop)return;
  const st=B.wildState,targetSlot=selectWildCaptureSlot(slot??st.targetSlot),u=targetSlot==null?null:B.foe.board[targetSlot];if(!u||u.hp<=0)return;
  if(u.hp>u.max*.3){toast('체력이 30% 이하일 때 포획할 수 있어요');return;}
- const id=u.id,w=MON[id],chance=wildCatchChance(targetSlot);
- if(rnd()*100<chance){
+ if(!B.coop){if(!BALLS[ball]||ballN(ball)<=0){toast('그 볼이 없어요. 문제를 맞혀서 볼을 모아 봐요!');return;}ballsOf()[ball]=ballN(ball)-1;saveLocal();} // 볼은 던지면 성공·실패와 관계없이 하나 써요
+ const id=u.id,w=MON[id],chance0=wildCatchChance(targetSlot,ball),chance=(B.coop||(BALLS[ball]&&BALLS[ball].sure))?chance0:Math.max(0,Math.min(100,chance0+(+bonus||0)));
+ const __ok=rnd()*100<chance;
+ const __go=()=>{if(__ok){
   const wasNew=!S.meta.col[id];if(!B.coop){addCard(id);if(S.meta.shard)delete S.meta.shard[id];}
   if(!st.scenarioMode&&!B.coop){S.meta.endless=S.meta.endless||{best:0,total:0,runs:0,caught:0};S.meta.endless.caught=(S.meta.endless.caught||0)+1;}
   st.caughtIds=st.caughtIds||[];st.caughtNewIds=st.caughtNewIds||[];st.caughtIds.push(id);st.caughtNewIds.push(wasNew);st.caughtNew=wasNew;
@@ -6369,14 +6624,15 @@ function tryCatchWildPokemon(slot=null){
   const cont=()=>{
   const remaining=syncWildPrimary();
   if(!remaining.length){if(B.coop){bossFinish('win');return;}B.over=true;finishEndlessWild('caught',st.note);return;}
-  B.busy=false;B.sel=-1;B.pick=-1;renderBattle();toast(B.coop?`${w.name} 포획 성공! 남은 보스와 전투를 이어가요.`:`${w.name} 포획 성공! 원래 능력치로 도감에 등록했어요. 남은 야생 포켓몬과 전투를 이어가요.`);checkEnd();};
+  B.busy=false;B.sel=-1;B.pick=-1;renderBattle();toast(B.coop?`${w.name} 포획 성공! 남은 보스와 전투를 이어가요.`:`${w.name} 포획 성공! 원래 능력치로 도감에 등록했어요. 볼을 던졌으니 내 턴은 끝나요.`);if(!checkEnd()&&!B.coop&&!B.over){startTurn('foe');}};
   if(B.coop){cont();}
   else{B.busy=true;cardRewardFx([{id,isNew:wasNew}],{title:`✨ ${w.name} 포획 성공!`,logo:'CAPTURE!',direct:true}).then(()=>{try{cont();}catch(e){console.warn(e);}});}
  }else{
-  st.note=`포획 실패! (성공률 약 ${chance}%) ${w.name}이(가) 공격합니다.`;
+  st.note=`${B.coop?'':BALLS[ball].n+' · '}포획 실패! (성공률 약 ${chance}%) ${w.name}이(가) 공격합니다.`;
   toast(st.note);if(B.coop){try{const nm=(B.coop.players[B.coop.active]||{}).name||'친구';bossLog(B.coop.active,`포획 실패 (성공률 ${chance}%)`);banner('💥 포획 실패!',`${esc(nm)}의 포획이 실패했어요 · 성공률 약 ${chance}%`,2400);}catch(e){}}B.capturePrompted=true;B.wildState.captureModalOpen=false;B.wildCaptureTargetSlot=null;
   B.busy=false;B.sel=-1;B.pick=-1;startTurn('foe');
- }
+ }};
+ if(B.coop||window.__sim)__go();else{B.busy=true;captureFx(targetSlot,ball,__ok).then(__go,__go);}
 }
 function scheduleWildCapturePrompt(){
  if(!B||!B.wildMode||B.over||!B.capturePrompted||B.wildState.captureModalOpen)return;
@@ -6839,7 +7095,7 @@ function praise(res,gh){const msgs=[];const rtm=res.rt?`틀렸던 문제 <b>${re
  return msgs;}
 async function showTrainResult(res,gh,rw){const m=S.meta;S.screen='result';setTimeout(tsAuto,2500);sfx('win');if(res.c>=res.n*.8)confetti();
  const ns=[...new Set(S.newStars||[])];const nb=S.newBadges||[];const sec=v=>secTxt(v).replace('초','').replace('약 ','');
- const fd=Object.keys(m.found||{});const rxh=S.rxResult||'';S.rxResult=null;
+ const fd=Object.keys(m.found||{});const rxh=(S.rxResult||'')+ballGotHTML();S.rxResult=null;
  $('#view').innerHTML=`<div class=wrap><div class="panel" style="text-align:center">
   <h2>${rw.endless?'야생 포켓몬 포획 기록':rw.pool?'연습 끝!':'오늘의 훈련 끝!'}</h2>
   <div style="font-family:'Black Han Sans';font-size:54px;color:var(--red2)">${res.c} / ${res.n}</div>
@@ -7843,7 +8099,7 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
  const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=(B.coop&&!(B.t2&&B.t2.boss))?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front','',P===B.foe)}</div><div><div class=hn>${esc(P.name)}${P.t2done?' ✔':''}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
   const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),sp=Math.max(0,Math.min(P.sunMana||0,P.mana-bp)),bl=P.mana-bp-sp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}${Array.from({length:sp},()=>'<i class="on sun"></i>').join('')}${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}<b>${bl}${bp+sp?`<span class=manaPlus>+${bp+sp}</span>`:''}/${den}</b></div>`;};
  $('#battle').innerHTML=`
-  <div class=bTop>${B.t2?t2TopHTML(valid,me):B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&!B.over&&!(B.wildState&&B.wildState.scenarioMode)?((B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획</button>`:(B.coop?`<button class="btn ghost sm waitCatch" data-wild-catch-slot="${i}" title="체력이 30% 이하라 포획할 수 있어요. 내 차례에 시도해요">🔴 포획 가능</button>`:'')):''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:calc(100% + 2px);left:4px;transform:none;flex-direction:column;align-items:flex-start;z-index:50">${(u=>{const n=Math.max(1,Math.ceil(u.atk*rlBoost(u))+(B.combo>=2?1:0)+quakeB(u)+dragonMod(u));return `<b class=dmgp>-${n}</b>`+(B.pvp?`<b class=dmgp style="color:#2f62b5">방어 성공 시 -${Math.max(0,n-1)}</b>`:'');})(me.board[B.sel])}</div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front','',true)}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill title="상대 손에 든 카드 수">${I('cards')} ${fo.hand.length}</span><span class=pill title="상대 남은 덱 카드 수">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<div class=bMenuCol><button class="btn ghost sm" id=bMenu>메뉴</button><button class="btn ghost sm fsBtn" id=bFull title="전체 화면" aria-label="전체 화면">${I('full','fsO')}${I('fullx','fsX')}</button></div></div>
+  <div class=bTop>${B.t2?t2TopHTML(valid,me):B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&!B.over&&!B.coop&&!(B.wildState&&B.wildState.scenarioMode)?((B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획${B.coop?'':` <small>(볼 ${ballTotal()})</small>`}</button>`:(B.coop?`<button class="btn ghost sm waitCatch" data-wild-catch-slot="${i}" title="체력이 30% 이하라 포획할 수 있어요. 내 차례에 시도해요">🔴 포획 가능</button>`:'')):''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:calc(100% + 2px);left:4px;transform:none;flex-direction:column;align-items:flex-start;z-index:50">${(u=>{const n=Math.max(1,Math.ceil(u.atk*rlBoost(u))+(B.combo>=2?1:0)+quakeB(u)+dragonMod(u));return `<b class=dmgp>-${n}</b>`+(B.pvp?`<b class=dmgp style="color:#2f62b5">방어 성공 시 -${Math.max(0,n-1)}</b>`:'');})(me.board[B.sel])}</div>`:''}<div class=av style="background:${B.g.c}">${monImg(fo.av,'front','',true)}</div><div><div class=hn>${esc(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill title="상대 손에 든 카드 수">${I('cards')} ${fo.hand.length}</span><span class=pill title="상대 남은 덱 카드 수">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<div class=bMenuCol><button class="btn ghost sm" id=bMenu>메뉴</button><button class="btn ghost sm fsBtn" id=bFull title="전체 화면" aria-label="전체 화면">${I('full','fsO')}${I('fullx','fsX')}</button></div></div>
   <div class="lane${B.t2&&!B.wildMode?' coopLane':''}${B.t2&&!B.wildMode&&fo.board.length>=10?' c10':''}${B.wildMode?` wildLane wildCount${fo.board.filter(Boolean).length}`:''}${fo.gmx?' gmaxLane':''}" id=foeLane>${fo.board.map((u,i)=>B.wildMode&&!u?'':`<div class=slot data-i="${i}">${unitH(u,fo,i)}</div>`).join('')}</div>
   <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class="pill cmbPill ${B.combo>=10?'t10':B.combo>=7?'t7':B.combo>=5?'t5':''}" style="--lv:${Math.min(B.combo,14)};color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}${(!B.tut&&!B.tutReal)?`<span class=pill id=evoPill title="정답을 모으면 메가 진화·원시회귀·거다이맥스를 쓸 수 있어요. 필요한 정답 수는 포켓몬 코스트에 따라 5~10개예요. 쓰면 처음부터 다시 모아요" style="color:${mgProg()>=evoPillNeed()?'#d97800':'#2f62b5'};${mgProg()>=evoPillNeed()?'border-color:#ffb100;background:#fff3d6':''}">${mgProg()>=evoPillNeed()?'✨':'🔷'} 진화 ${Math.min(Math.max(0,mgProg()),evoPillNeed())}/${evoPillNeed()}</span>`:''}${my&&B.sel>=0&&megaCan(B.me,B.sel)?`<button class="btn gold sm" id=bMega>🔷 ${PRIMAL[B.me.board[B.sel].id]?'원시':'메가'}</button>`:''}${my&&B.sel>=0&&gmaxCan(B.me,B.sel,1)?`<button class="btn red sm" id=bGmax>🌋 맥스</button>`:''}${my&&!B.coop&&B.sel>=0&&evoLeft(B.me,B.sel)?`<button class="btn sm" id=bEvoOut style="opacity:.6">🔒 진화</button>`:''}</div>
   <div class="lane${B.coop?' coopLane':''}${B.t2&&me.board.length>=10?' c10':''}${me.gmx?' gmaxLane':''}" id=myLane>${me.board.map((u,i)=>`<div class="slot${B.pick>=0&&!u&&!isItemCard(me.hand[B.pick])?' can':''}" data-i="${i}">${unitH(u,me,i)}</div>`).join('')}</div>
@@ -12035,7 +12291,7 @@ async function usePower(){const me=B.me;if(B.busy||(me.powerUses||0)<=0)return;B
 async function battleQ(q,opt){B.qn++;window.__hqT0=Date.now();window.__hqTok=(window.__hqTok||0)+1;let bonusNote='';if(q&&q.tier==='H')bonusNote=opt.power?'🔥 맞히면 카드 +1 더':opt.defense?'🔥 맞히면 슈퍼세이브 +1':'🔥 맞히면 크리티컬 +1';if(window.__sim)return{ok:rnd()<SIM.p,ms:3000};const box=$('#bq');box.innerHTML=`<div class="sheet${opt.defense?' defense':''}${q&&q.tier==='H'?' heavy':''}"><div class=bqHead><span class=who>${monImg(opt.who,'front')}${esc(MON[opt.who]?MON[opt.who].name:'')}</span><span>${opt.what}</span></div>${bonusNote?`<div class=bqNote>${bonusNote}</div>`:''}<div id=bqHost></div></div>`;box.classList.add('on');
  if((opt.defense||opt.power||opt.hint==='atk')&&B&&B.coop&&q){try{bossSend({t:'boss-dq',k:opt.defense?'def':opt.power?'pow':'atk',name:S.meta.name,q:{q:q.q,ch:q.ch,sk:q.sk,pic:q.pic,tier:q.tier}});}catch(e){}}
  if((opt.defense||opt.power||opt.hint==='atk')&&B&&B.pvp&&q){try{pvpSend({t:'dq',k:opt.defense?'def':opt.power?'pow':'atk',q:{q:q.q,ch:q.ch,sk:q.sk,pic:q.pic,tier:q.tier}});}catch(e){}}
- const r=await askQ($('#bqHost'),q,{fast:true,noRetry:true,hint:opt.hint,onPick:(i,ok)=>{if((opt.defense||opt.power||opt.hint==='atk')&&B&&B.coop){try{bossSend({t:'boss-dqr',i,ok});}catch(e){}}if((opt.defense||opt.power||opt.hint==='atk')&&B&&B.pvp){try{pvpSend({t:'dqr',i,ok});}catch(e){}}}});recordAnswer(q,r.ok,r.ms,{choice:r.choice,guess:r.guess});box.classList.remove('on');box.innerHTML='';
+ const r=await askQ($('#bqHost'),q,{fast:true,noRetry:true,hint:opt.hint,onPick:(i,ok)=>{if((opt.defense||opt.power||opt.hint==='atk')&&B&&B.coop){try{bossSend({t:'boss-dqr',i,ok});}catch(e){}}if((opt.defense||opt.power||opt.hint==='atk')&&B&&B.pvp){try{pvpSend({t:'dqr',i,ok});}catch(e){}}}});recordAnswer(q,r.ok,r.ms,{choice:r.choice,guess:r.guess});if(r.ok&&B&&B.wildMode&&!B.coop&&!B.pvp)ballDrop();box.classList.remove('on');box.innerHTML='';
  /* 미션! 포켓몬 구출하기 집계는 recordAnswer 에서 모든 모드가 함께 처리해요 */
  if(!r.ok){B.retryQ=q;}return r;}
 function cleanup(){[B.me,B.foe].forEach(P=>P.board.forEach((u,i)=>{if(u&&u.hp<=0){P.board[i]=null;}}));try{if(B){[B.me,B.foe].forEach(P=>{if(P&&P.gmx&&!P.board[0])gmaxEnd(P,'faint');});}}catch(e){}if(B&&B.wildMode)syncWildPrimary();}
