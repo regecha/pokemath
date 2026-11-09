@@ -3145,7 +3145,18 @@ const GAME={id:'poke-math',title:'좌삼몬스터디',file:'좌삼몬스터디',
 const BUILD_ID='2026-11-09b';
 // 교사 코드: 학년도마다 바뀌어요. 아래 SECRET을 바꾸면 우리 학교만의 코드가 돼요(README 참고).
 const CODE_SECRET='hada-pokemath-2026';
-const TEACHER_PW='teacher'; // 교사 화면 비밀번호(README에서 바꾸는 법 안내)
+// 교사 화면 비밀번호: 평문 대신 해시만 저장해요. 바꾸려면 게임을 연 브라우저 콘솔에서 teacherHash('새비밀번호')를 실행하고, 나온 값을 TEACHER_HASH에 붙여 넣으세요.
+const TEACHER_SALT='pm-t3a9c71e5';const TEACHER_ITER=5000;
+function __sha256(m){const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+ let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];const l=m.length,n=((l+9+63)>>6)<<6,b=new Uint8Array(n);b.set(m);b[l]=128;const dv=new DataView(b.buffer);dv.setUint32(n-4,(l*8)>>>0);dv.setUint32(n-8,Math.floor(l*8/4294967296));
+ const w=new Uint32Array(64),r=(x,k)=>(x>>>k)|(x<<(32-k));
+ for(let o=0;o<n;o+=64){for(let i=0;i<16;i++)w[i]=dv.getUint32(o+i*4);for(let i=16;i<64;i++){const a=r(w[i-15],7)^r(w[i-15],18)^(w[i-15]>>>3),c=r(w[i-2],17)^r(w[i-2],19)^(w[i-2]>>>10);w[i]=(w[i-16]+a+w[i-7]+c)>>>0;}
+  let [a,b2,c,d,e,f,g,h]=H;for(let i=0;i<64;i++){const s1=r(e,6)^r(e,11)^r(e,25),ch=(e&f)^(~e&g),t1=(h+s1+ch+K[i]+w[i])>>>0,s0=r(a,2)^r(a,13)^r(a,22),mj=(a&b2)^(a&c)^(b2&c),t2=(s0+mj)>>>0;h=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b2;b2=a;a=(t1+t2)>>>0;}
+  H=[H[0]+a,H[1]+b2,H[2]+c,H[3]+d,H[4]+e,H[5]+f,H[6]+g,H[7]+h].map(x=>x>>>0);}
+ const out=new Uint8Array(32),ov=new DataView(out.buffer);H.forEach((x,i)=>ov.setUint32(i*4,x));return out;}
+function teacherHash(pw){const E=new TextEncoder(),s=E.encode(TEACHER_SALT);let h=__sha256(E.encode(TEACHER_SALT+':'+String(pw)));for(let i=0;i<TEACHER_ITER;i++){const t=new Uint8Array(h.length+s.length);t.set(h);t.set(s,h.length);h=__sha256(t);}return Array.from(h,x=>x.toString(16).padStart(2,'0')).join('');}
+const TEACHER_HASH='d3e0e90c97abdb1d895612835c02af34cb86485e1a4e242ade422150468cc4aa';
+function teacherPwOk(v){try{return teacherHash(v)===TEACHER_HASH;}catch(e){return false;}}
 
 // ===== 유틸 =====
 const $=s=>document.querySelector(s);
@@ -3689,7 +3700,7 @@ function saveLocal(){if(window.__sim)return;try{localStorage.setItem(SAVE_KEY,__
 function loadLocal(){try{const s=localStorage.getItem(SAVE_KEY);if(!s)return;const o=JSON.parse(s);S.meta=upgradeMeta(mergeMeta(o.meta));}catch(e){}}
 // 새 버전을 처음 열면 저사양 모드를 풀어요. (기기가 정말 느리면 전투 중에 다시 자동으로 켜져요)
 function buildCheck(){try{const m=S.meta;if(!m||!m.settings||m.buildSeen===BUILD_ID)return;const was=!!m.settings.lowfx;m.settings.lowfx=false;m.buildSeen=BUILD_ID;saveLocal();if(was)setTimeout(()=>{try{toast('새 버전이에요! <b>저사양 모드</b>를 풀었어요. (설정에서 다시 켤 수 있어요)');}catch(e){}},900);}catch(e){}}
-let _asT=0;function autoSave(){clearTimeout(_asT);_asT=setTimeout(()=>{saveLocal();if(typeof achCheck==='function')achCheck();try{window.__rlHudPing&&window.__rlHudPing();}catch(e){}},1500);}
+let _asT=0;function autoSave(){clearTimeout(_asT);_asT=setTimeout(()=>{const _run=()=>{saveLocal();if(typeof achCheck==='function')achCheck();try{window.__rlHudPing&&window.__rlHudPing();}catch(e){}};if(window.requestIdleCallback)requestIdleCallback(_run,{timeout:3000});else _run();},1500);}
 const slotKey=i=>GAME.id+'-slot'+i;
 function slotGet(i){try{const s=localStorage.getItem(slotKey(i));return s?JSON.parse(s):null;}catch(e){return null;}}
 function saveSummary(){const m=S.meta;return `${semName(m.gs)} · Lv.${lvOf(m.xp).lv} · 카드 ${Object.keys(m.col).length}종`;}
@@ -3697,12 +3708,42 @@ function slotSave(i){try{localStorage.setItem(slotKey(i),__J({t:Date.now(),sum:s
 function fmtWhen(t){const d=new Date(t);return `${d.getMonth()+1}월 ${d.getDate()}일 ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;}
 function b64u(u){let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
 function ub64u(t){t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';const b=atob(t);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+// ===== 저장코드 서명 (코드 글자를 직접 고쳐 불러오는 조작을 막아요) =====
+// 서명이 없는 예전 코드는 SAVE_UNSIGNED_UNTIL(2026-11-23 23:59, 한국 시간)까지만 불러올 수 있어요. 연장하려면 이 날짜를 바꾸세요.
+const SAVE_SIGN_KEY='pm-sv-7f3c19ab52e0d468';const SAVE_UNSIGNED_UNTIL=new Date('2026-11-23T23:59:59+09:00').getTime();
+function __hmac(key,msg){const E=new TextEncoder();let k=E.encode(key);if(k.length>64)k=__sha256(k);const ip=new Uint8Array(64+msg.length),op=new Uint8Array(96);for(let i=0;i<64;i++){const c=k[i]||0;ip[i]=c^0x36;op[i]=c^0x5c;}ip.set(msg,64);op.set(__sha256(ip),64);return __sha256(op);}
+function saveSig(str){return b64u(__hmac(SAVE_SIGN_KEY,new TextEncoder().encode(String(str))).subarray(0,16));}
+function sigUnsignedOk(){if(Date.now()>SAVE_UNSIGNED_UNTIL)throw new Error('서명이 없는 예전 저장 코드는 더 이상 쓸 수 없어요. 선생님께 문의해 주세요');}
+function sigCheckObj(o){if(o&&o.sig!==undefined){const c=Object.assign({},o);delete c.sig;if(saveSig(JSON.stringify(c))!==o.sig)throw new Error('기록이 고쳐졌거나 깨졌어요 (서명이 달라요)');}else sigUnsignedOk();}
+function mdJson(m){const o={game:GAME.id,v:1,saved:Date.now(),meta:m,tl:(window.tradeLedgerOut?window.tradeLedgerOut():undefined)};o.sig=saveSig(JSON.stringify(o));return JSON.stringify(o);}
+// ===== 불가능한 기록 감지 (선생님 표에 ⚠로 알려 줘요. 막지는 않고 확인만 해요) =====
+function recSanity(m){const w=[];try{const num=v=>typeof v==='number'&&isFinite(v);const st=m.stats||{},q=+st.q||0,c=+st.c||0;
+ const L={xp:'경험치',coins:'코인',candy:'사탕',packs:'카드팩',dust:'가루',lp:'포인트'};
+ for(const k in L){const v=m[k];if(v!==undefined&&(!num(v)||v<0))w.push(L[k]+' 값이 이상해요');}
+ if(c>q)w.push('맞힌 문제가 푼 문제보다 많아요');
+ const days=m.days||{};let sn=0,sc=0,sms=0,bad=0,big=0,fut=0;
+ for(const k in days){const d=days[k]||{},n=+d.n||0,cc=+d.c||0;sn+=n;sc+=cc;sms+=+d.ms||0;if(cc>n)bad++;if(n>3000)big++;if(/^\d{4}-\d\d-\d\d$/.test(k)&&dayDiff(today(),k)>1)fut++;}
+ if(bad)w.push('하루 정답이 푼 문제보다 많은 날이 있어요');
+ if(big)w.push('하루에 3000문제 넘게 푼 날이 있어요');
+ if(fut)w.push('미래 날짜의 기록이 있어요');
+ if(sn>q+20)w.push('날짜별 합계가 전체 푼 문제보다 많아요');
+ if(sc>=50&&sms/sc<600)w.push('정답당 걸린 시간이 너무 짧아요');
+ const ev=(+(m.battles&&m.battles.w)||0)+(+(m.battles&&m.battles.l)||0)+(+(m.pvp&&m.pvp.n)||0)+(+(m.endless&&m.endless.runs)||0)+(((m.scenario&&m.scenario.cleared)||[]).length||0);
+ const rlRuns=+(m.rl&&m.rl.runs)||0;
+ if(num(m.xp)&&m.xp>10*q+150*ev+1000*rlRuns+20000)w.push('경험치가 활동량에 비해 너무 많아요');
+ if(num(m.coins)&&m.coins>30*q+500*ev+2000*rlRuns+20000)w.push('코인이 활동량에 비해 너무 많아요');
+ const ids=Object.keys(m.col||{}),unk=ids.filter(id=>!MON[id]).length;if(unk)w.push('없는 카드 번호가 '+unk+'개 있어요');
+ if(ids.some(id=>{const v=m.col[id];return !num(v)||v<0||v>999;}))w.push('카드 장수가 이상해요');
+ const now=Date.now()+864e5;if((+m.created||0)>now||(+m.firstPlay||0)>now)w.push('시작 시각이 미래예요');
+ if((+st.bestStreak||0)>q+20)w.push('최고 연속 정답이 푼 문제보다 많아요');
+ }catch(e){}return w;}
 async function makeCode(){let b=new TextEncoder().encode(__J({game:GAME.id,v:1,meta:S.meta,tl:(window.tradeLedgerOut?window.tradeLedgerOut():undefined)})),tag='A';
  if(window.CompressionStream){try{b=new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());tag='Z';}catch(e){}}
- return 'PKMT'+tag+':'+b64u(b);}
+ const p=b64u(b);return 'PKMT'+tag+':'+p+'.'+saveSig(tag+':'+p);}
 async function readAny(text){text=String(text||'').trim();if(!text)throw new Error('코드를 붙여 넣어 주세요');
- if(/```json/.test(text)){const m=text.match(/```json\s*([\s\S]*?)```/);const o=JSON.parse(m[1]);if(o.game!==GAME.id)throw new Error(GAME.title+' 기록이 아니에요');return o;}
- const m=text.replace(/\s+/g,'').match(/PKMT([AZ]):([A-Za-z0-9_-]+)/);if(!m)throw new Error('저장 코드 모양이 아니에요 (PKMT로 시작해요)');
+ if(/```json/.test(text)){const m=text.match(/```json\s*([\s\S]*?)```/);const o=JSON.parse(m[1]);if(o.game!==GAME.id)throw new Error(GAME.title+' 기록이 아니에요');sigCheckObj(o);return o;}
+ const m=text.replace(/\s+/g,'').match(/PKMT([AZ]):([A-Za-z0-9_-]+)(?:\.([A-Za-z0-9_-]{22}))?/);if(!m)throw new Error('저장 코드 모양이 아니에요 (PKMT로 시작해요)');
+ if(m[3]){if(saveSig(m[1]+':'+m[2])!==m[3])throw new Error('코드가 고쳐졌거나 일부가 빠졌어요 (서명이 달라요)');}else sigUnsignedOk();
  let b=ub64u(m[2]);if(m[1]==='Z'){if(!window.DecompressionStream)throw new Error('이 브라우저는 이 코드를 읽지 못해요');b=new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());}
  const o=JSON.parse(new TextDecoder().decode(b));if(o.game!==GAME.id)throw new Error(GAME.title+' 코드가 아니에요');return o;}
 function applyLoaded(o,msg){S.meta=upgradeMeta(mergeMeta(o.meta));try{if(window.tradeLedgerMerge)window.tradeLedgerMerge(o&&o.tl);if(window.tradeReconcile)window.tradeReconcile();}catch(e){}buildCheck();saveLocal();applySafe();closeM();closeM(1);toast(msg||'불러왔어요!');goStart();}
@@ -3712,7 +3753,7 @@ async function copyText(t,ta){try{await navigator.clipboard.writeText(t);toast('
 function buildMD(){const m=S.meta,L=lvOf(m.xp);const d=new Date();
  const days=Object.keys(m.days).sort().slice(-14).map(k=>{const v=m.days[k];return `| ${k} | ${v.n} | ${v.c} | ${v.n?Math.round(v.c/v.n*100):0}% | ${v.c?(v.ms/v.c/1000).toFixed(1):'-'}초 |`;}).join('\n');
  const sks=Object.keys(m.sk).map(id=>{const s=SKM[id];const v=m.sk[id];return s?`| ${s.s} | ${esc(s.n)} | ${'★'.repeat(v.st||0)} | ${v.c}/${v.c+v.x} |`:'';}).filter(Boolean).join('\n');
- return `# ${GAME.title} 기록 — ${m.name}\n\n> 이 파일을 게임 화면에 끌어다 놓거나 「저장 · 불러오기 → .md 불러오기」로 이어서 할 수 있어요. 맨 아래 저장 데이터 블록은 고치지 마세요.\n\n| 항목 | 값 |\n|---|---|\n| 닉네임 | ${m.name} |\n| 학년·학기 | ${semName(m.gs)} |\n| 저장 시각 | ${d.toLocaleString('ko-KR')} |\n| 트레이너 레벨 | Lv.${L.lv} (${L.title}) |\n| 푼 문제 / 맞힌 문제 | ${m.stats.q} / ${m.stats.c} |\n| 모은 카드 | ${Object.keys(m.col).length}종 |\n| 체육관 배지 | ${Object.keys(m.gyms).length}개 |\n| 도전 과제 배지 | ${ACH.reduce((s,a)=>s+((m.ach[a.k]&&m.ach[a.k].t)||0),0)}개 |\n| 나의 강점 | ${strengths(m).slice(0,2).map(x=>STR[x.k].t).join(', ')||'찾는 중'} |\n| 플레이 스타일 | ${playStyle(m).map(t=>'#'+t[0]).join(' ')||'-'} |\n\n## 최근 공부 기록\n| 날짜 | 푼 문제 | 맞힌 문제 | 정답률 | 문제당 시간 |\n|---|---|---|---|---|\n${days||'| - | - | - | - | - |'}\n\n## 개념별 별\n| 학기 | 개념 | 별 | 맞힘/전체 |\n|---|---|---|---|\n${sks||'| - | - | - | - |'}\n\n> 좌삼초.\n\n## 저장 데이터\n\`\`\`json\n${JSON.stringify({game:GAME.id,v:1,saved:Date.now(),meta:m,tl:(window.tradeLedgerOut?window.tradeLedgerOut():undefined)})}\n\`\`\`\n`;}
+ return `# ${GAME.title} 기록 — ${m.name}\n\n> 이 파일을 게임 화면에 끌어다 놓거나 「저장 · 불러오기 → .md 불러오기」로 이어서 할 수 있어요. 맨 아래 저장 데이터 블록은 고치지 마세요.\n\n| 항목 | 값 |\n|---|---|\n| 닉네임 | ${m.name} |\n| 학년·학기 | ${semName(m.gs)} |\n| 저장 시각 | ${d.toLocaleString('ko-KR')} |\n| 트레이너 레벨 | Lv.${L.lv} (${L.title}) |\n| 푼 문제 / 맞힌 문제 | ${m.stats.q} / ${m.stats.c} |\n| 모은 카드 | ${Object.keys(m.col).length}종 |\n| 체육관 배지 | ${Object.keys(m.gyms).length}개 |\n| 도전 과제 배지 | ${ACH.reduce((s,a)=>s+((m.ach[a.k]&&m.ach[a.k].t)||0),0)}개 |\n| 나의 강점 | ${strengths(m).slice(0,2).map(x=>STR[x.k].t).join(', ')||'찾는 중'} |\n| 플레이 스타일 | ${playStyle(m).map(t=>'#'+t[0]).join(' ')||'-'} |\n\n## 최근 공부 기록\n| 날짜 | 푼 문제 | 맞힌 문제 | 정답률 | 문제당 시간 |\n|---|---|---|---|---|\n${days||'| - | - | - | - | - |'}\n\n## 개념별 별\n| 학기 | 개념 | 별 | 맞힘/전체 |\n|---|---|---|---|\n${sks||'| - | - | - | - |'}\n\n> 좌삼초.\n\n## 저장 데이터\n\`\`\`json\n${mdJson(m)}\n\`\`\`\n`;}
 async function saveMD(){const md=buildMD();const nm=(S.meta.name||'트레이너').replace(/[\\/:*?"<>|\s]/g,'');const d=new Date();
  const fn=`${GAME.file}_${nm}_${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}_${pad2(d.getHours())}${pad2(d.getMinutes())}.md`;
  if(window.showSaveFilePicker&&window.self===window.top){try{const h=await showSaveFilePicker({suggestedName:fn,types:[{description:'마크다운 기록',accept:{'text/markdown':['.md']}}]});const w=await h.createWritable();await w.write(md);await w.close();markBackup();toast('저장했어요: '+esc(h.name));return;}catch(e){if(e&&e.name==='AbortError')return;}}
@@ -17300,7 +17341,7 @@ function askUnit(next,again){const m=S.meta;const us=UNITS[m.gs]||[];const set=v
 
 // ---- 선생님 ----
 async function teacherLogin(){M(`<h2>${I('teacher')} 선생님 화면</h2><p class=mut style="font-size:14px">비밀번호를 넣어 주세요.</p><input class=inp id=tPw type=password><div class=mbtns><button class="btn blue" data-a=ok>들어가기</button><button class="btn ghost" data-a=x>닫기</button></div>`,
- {ok:()=>{if($('#tPw').value===TEACHER_PW){closeM();renderTeacher();}else{toast('비밀번호가 달라요');}},x:()=>closeM(),_close:()=>closeM()});
+ {ok:()=>{if(teacherPwOk($('#tPw').value)){closeM();renderTeacher();}else{toast('비밀번호가 달라요');}},x:()=>closeM(),_close:()=>closeM()});
  setTimeout(()=>{const p=$('#tPw');if(p){p.focus();p.onkeydown=e=>{if(e.key==='Enter')$('#mbox [data-a=ok]').click();};}},100);}
 // ===== 선생님용 학급 영역 요약: 학생 저장 코드를 모아 학급 영역별 현황·공통 약점·공통 오개념을 보여 줘요 =====
 function rxStats(m){const all=Array.isArray(m.rxLog)?m.rxLog:[];const wk=all.filter(x=>x&&x.d&&dayDiff(x.d,today())<7);
@@ -17523,9 +17564,9 @@ function renderTeacher(){S.screen='teacher';const y=schoolYear();
  list();
  $('#tcBack').onclick=()=>{sfx('tap');renderTitle();};
  try{tcOpInit();}catch(e){console.warn('tcOp',e);}
- const rows=[],metas=[];const add=o=>{const m=upgradeMeta(mergeMeta(o.meta));metas.push(m);for(const a of ACH){const t=achTier(a,m);if(t>((m.ach[a.k]&&m.ach[a.k].t)||0))m.ach[a.k]={t,d:[]};}const sk=Object.entries(m.sk);const weak=sk.filter(([id,v])=>SKM[id]&&v.x>=2&&v.x>=v.c/2).map(([id])=>SKM[id].n).slice(0,3);
+ const rows=[],metas=[];const add=o=>{const m=upgradeMeta(mergeMeta(o.meta));metas.push(m);const _rw=recSanity(m);if(!(+m.xp<=1e9))m.xp=Math.min(Math.max(+m.xp||0,0),1e9);for(const a of ACH){const t=achTier(a,m);if(t>((m.ach[a.k]&&m.ach[a.k].t)||0))m.ach[a.k]={t,d:[]};}const sk=Object.entries(m.sk);const weak=sk.filter(([id,v])=>SKM[id]&&v.x>=2&&v.x>=v.c/2).map(([id])=>SKM[id].n).slice(0,3);
   const last7=Object.keys(m.days).filter(k=>dayDiff(k,today())<7).reduce((s,k)=>s+m.days[k].n,0);
-  rows.push(`<tr><td>${esc(m.name)}</td><td>${esc(semName(m.gs))}</td><td>${lvOf(m.xp).lv}</td><td>${m.stats.q}</td><td class="${(()=>{if(!m.stats.q)return '';const a=m.stats.c/m.stats.q;return a>=.85?'hG':a>=.65?'hY':'hR';})()}"><b>${m.stats.q?Math.round(m.stats.c/m.stats.q*100):0}%</b></td><td>${(m.enStats&&m.enStats.q)?m.enStats.q+'문제 · '+Math.round(m.enStats.c/m.enStats.q*100)+'%':'-'}</td><td>${last7}</td><td>${Object.keys(m.days).length}</td><td>${Object.keys(m.badges).length}</td><td>${(()=>{const h=m.hist||[];if(h.length<40&&!m.first20)return '-';const p=(m.first20||h.slice(0,20)).reduce((a,x)=>a+x,0),r=h.slice(-20).reduce((a,x)=>a+x,0);return `${p} → <b>${r}</b>`;})()}</td><td class=tx>${esc(Object.keys(m.found||{}).map(F=>SKM[F]?SKM[F].n:'').filter(Boolean).concat(enFoundList(m)).join(', ')||'-')}</td><td class=tx>${esc(weak.concat(enWeakList(m)).slice(0,4).join(', ')||'-')}</td><td>${m.stats.guessWrong||0}회${m.stats.guessAlert?` (천천히 안내 ${m.stats.guessAlert})`:''}</td><td>${ACH.reduce((s,a)=>s+((m.ach[a.k]&&m.ach[a.k].t)||0),0)}</td><td class=tx>${esc(strengths(m).slice(0,2).map(x=>STR[x.k].n).join(', ')||'-')}${playStyle(m).length?'<br><span class=mut>'+esc(playStyle(m).map(t=>'#'+t[0]).join(' '))+'</span>':''}</td></tr>`);};
+  rows.push(`<tr><td>${esc(m.name)}${_rw.length?`<div style="font-size:11px;line-height:1.35;color:#b3261e;font-weight:700;margin-top:2px">⚠ 기록 확인: ${_rw.map(esc).join(' · ')}</div>`:''}</td><td>${esc(semName(m.gs))}</td><td>${lvOf(m.xp).lv}</td><td>${m.stats.q}</td><td class="${(()=>{if(!m.stats.q)return '';const a=m.stats.c/m.stats.q;return a>=.85?'hG':a>=.65?'hY':'hR';})()}"><b>${m.stats.q?Math.round(m.stats.c/m.stats.q*100):0}%</b></td><td>${(m.enStats&&m.enStats.q)?m.enStats.q+'문제 · '+Math.round(m.enStats.c/m.enStats.q*100)+'%':'-'}</td><td>${last7}</td><td>${Object.keys(m.days).length}</td><td>${Object.keys(m.badges).length}</td><td>${(()=>{const h=m.hist||[];if(h.length<40&&!m.first20)return '-';const p=(m.first20||h.slice(0,20)).reduce((a,x)=>a+x,0),r=h.slice(-20).reduce((a,x)=>a+x,0);return `${p} → <b>${r}</b>`;})()}</td><td class=tx>${esc(Object.keys(m.found||{}).map(F=>SKM[F]?SKM[F].n:'').filter(Boolean).concat(enFoundList(m)).join(', ')||'-')}</td><td class=tx>${esc(weak.concat(enWeakList(m)).slice(0,4).join(', ')||'-')}</td><td>${m.stats.guessWrong||0}회${m.stats.guessAlert?` (천천히 안내 ${m.stats.guessAlert})`:''}</td><td>${ACH.reduce((s,a)=>s+((m.ach[a.k]&&m.ach[a.k].t)||0),0)}</td><td class=tx>${esc(strengths(m).slice(0,2).map(x=>STR[x.k].n).join(', ')||'-')}${playStyle(m).length?'<br><span class=mut>'+esc(playStyle(m).map(t=>'#'+t[0]).join(' '))+'</span>':''}</td></tr>`);};
  const tcStatus=(ok,bad,total)=>{const el=$('#tcRep');if(!el)return;const msg=!total?'<p class=mut>코드를 붙여 넣은 뒤 눌러 주세요.</p>':`<div class=explain style="font-size:14px;margin:0 0 8px;background:${bad.length?'#fff0f0':'#eaf8ee'};border-color:${bad.length?'#e8a0a0':'#8fd3a0'}"><b>${ok}명</b>의 기록을 읽었어요.${bad.length?` <b style="color:#b3261e">${bad.length}줄은 읽지 못했어요</b> (${bad.slice(0,6).join(', ')}번째 줄). 코드가 중간에 잘렸거나 다른 게임 코드는 아닌지 확인해 주세요.`:''}${ok?` 표 아래에 <b>학급 영역 요약</b>이 있어요 ↓`:''}</div>`;el.insertAdjacentHTML('afterbegin',msg);};
  const classPanel=()=>{const box=$('#tcDom');if(!box)return;box.innerHTML=classSummaryHTML(metas);const b=$('#tcCsv');if(b)b.onclick=()=>{const blob=new Blob([classCsv(metas)],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`학급_영역요약_${today()}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);};};
  const show=()=>{$('#tcRep').innerHTML=rows.length?`<table class=rep><tr><th>닉네임</th><th>학기</th><th>Lv</th><th>푼 문제(전 과목)</th><th>정답률(전 과목)</th><th>영어</th><th>최근 7일</th><th>공부한 날</th><th>단원 배지</th><th>처음 20 → 최근 20</th><th>기초 쌓는 중</th><th>더 연습할 개념</th><th>찍기 의심</th><th>도전 배지</th><th>강점 · 스타일</th></tr>${rows.join('')}</table>`:'<p class=mut>읽을 수 있는 기록이 없어요</p>';try{classPanel();}catch(e){console.warn('classPanel',e);}try{const cm=$('#tcCmp'),rp=$('#tcRpt');let cmp={};if(cm){cmp=rows.length?tcCompare(metas):{};cm.innerHTML=rows.length?tcCmpHTML(metas,cmp):'';const hb=$('#tcHistClear');if(hb)hb.onclick=()=>{if(!confirm('이 기기에 저장된 비교 기록을 모두 지울까요? (학생 기기의 기록은 그대로예요)'))return;try{localStorage.removeItem(TC_HK);}catch(e){}window.TC_CMP={};cm.innerHTML='<div class=panel><p class=mut style="margin:0">비교 기록을 지웠어요. 다음에 표를 만들면 새로 쌓여요.</p></div>';};}if(rp){rp.innerHTML=rows.length?tcRptHTML(metas):'';rp.onclick=ev=>{const b=ev.target.closest('button');if(!b)return;const i=b.dataset.rp!=null?+b.dataset.rp:b.dataset.rd!=null?+b.dataset.rd:-1;const m=metas[i];if(!m)return;const html=tcReportDoc(m,window.TC_CMP||{});if(b.dataset.rp!=null){tcPrintDoc(html);}else{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));a.download=`학습요약_${m.name||'학생'}_${today()}.html`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}};}}catch(e){console.warn('tcCmp',e);}try{const a=$('#tcAttn');if(a)a.innerHTML=rows.length?tcAttnHTML(metas):'';}catch(e){console.warn('tcAttn',e);}try{const w=$('#tcWb');if(w)w.innerHTML=rows.length?tcWbHTML(metas):'';}catch(e){console.warn('tcWb',e);}};
@@ -20102,7 +20143,7 @@ init();
  function skin(el,color,icon,label,cap){if(!el)return;el.className='btn pxb '+color;const w=color.indexOf('pxw')>=0;el.innerHTML=(w?I(icon):`<i class="gem">${I(icon)}</i>`)+`<span class="tx"><b>${label}</b>${cap?`<small>${cap}</small>`:''}</span><i class="cur"></i><i class="sh"></i>`;}
 
  /* ---- 도트 로고: 글자를 작은 격자에 찍어 픽셀 단위로 가공한 뒤 정수 배율로 확대 ---- */
- const LOGO_FONT="900 {F}px 'Black Han Sans','Jua','Noto Sans KR','Noto Sans CJK KR',sans-serif";
+ const LOGO_FONT="900 {F}px sans-serif";
  const PAL=['#fff8d2','#ffe56a','#ffc936','#f59a24','#d9741c'],OUT='#2c47b8',OUT2='#18246e',SHADOW='#101a55';
  function rasterText(lines,F,font){font=font||LOGO_FONT;
   const c=document.createElement('canvas'),x=c.getContext('2d',{willReadFrequently:true});
@@ -26213,43 +26254,58 @@ function mount(run){
     let c;if(th.volc){c='#2e2624';if(u>.35)c='#463a38';if(u>.8)c='#645652';if(u>1.25)c='#8a7a74';if(u>1.6)c='#b0a098';if(n>.99)c='#ff8a2a';}else if(th.night){c='#2a2048';if(u>.35)c='#3e3068';if(u>.8)c='#5a4a88';if(u>1.25)c='#8a78b8';if(u>1.6)c='#c8b8f0';if(n>.992)c='#ff8a9a';}else{c='#14123a';if(u>.35)c='#241e62';if(u>.8)c='#3a2a88';if(u>1.25)c='#5a3aa8';if(u>1.55)c='#c86ae0';if(n>.985)c='#ffffff';else if(n>.965)c='#bfe8ff';else if(n>.955&&u>.3)c='#ffd0f0';}
     bg.fillStyle=c;bg.fillRect(wx,wy,1,1);}
    bg.fillStyle=th.night?'#a890d8':th.volc?'#8a7a74':'#8a7af0';if(!gv(0,-1))bg.fillRect(x*T,y*T,16,1);if(!gv(0,1))bg.fillRect(x*T,y*T+15,16,1);if(!gv(-1,0))bg.fillRect(x*T,y*T,1,16);if(!gv(1,0))bg.fillRect(x*T+15,y*T,1,16);}
-  cloudPaint(x,y);}
+  }
  // ===== 구름: 둥근 덩어리를 겹쳐 만든 뭉게구름 (칸마다 덩어리 하나, 월드 좌표로 계산해서 이웃 칸과 매끄럽게 이어져요) =====
  function cloudAt(tx,ty){if(tx<0||ty<0||tx>=W||ty>=H)return false;const v=M.t[ty*W+tx];return v===TL.CLOUD||v===TL.CLOUDF;}
+ const LB=new Array(W*H),DC=new Float32Array(W*T*H*T).fill(-1e9); // 구름 계산 결과 캐시 (같은 값을 수십 번 다시 계산하던 것을 한 번만)
+ // 구름은 '칸마다 둥근 덩어리 하나'를 겹쳐 만들어요. 예전엔 픽셀마다 덩어리 9개와 거리를 다시 재서 느렸어요 →
+ // 이제 덩어리를 한 번만 도장 찍듯 찍어서(모양 마스크 + 깊이) 만들고, 칠할 땐 마스크만 읽어요. 결과 그림은 똑같아요.
+ const PAD=24,PW=W*T+PAD*2,PH=H*T+PAD*2;let CIN=null,CDP=null,CFD=null;
  function cLobe(tx,ty){const h=(Math.imul(tx+11,73856093)^Math.imul(ty+7,19349663))>>>0;
   const rr=n=>((h>>>n)&15)/15;let r=11+rr(0)*3;
   // 바깥으로 툭 튀어나온 모서리 칸은 덩어리를 작게 해서 둥글게 깎아요
   if(!cloudAt(tx-1,ty)&&!cloudAt(tx,ty-1)||!cloudAt(tx+1,ty)&&!cloudAt(tx,ty-1)||!cloudAt(tx-1,ty)&&!cloudAt(tx,ty+1)||!cloudAt(tx+1,ty)&&!cloudAt(tx,ty+1))r-=2.2;
   return[tx*T+8+(rr(4)-.5)*5,ty*T+8+(rr(8)-.5)*5,r];}
- function cDepth(wx,wy){ // 덩어리 안쪽으로 얼마나 들어와 있는지 (음수 = 구름 밖)
-  const tx=Math.floor(wx/T),ty=Math.floor(wy/T);let best=-99;
-  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!cloudAt(tx+dx,ty+dy))continue;
-   const o=cLobe(tx+dx,ty+dy),d=o[2]-Math.hypot(wx+.5-o[0],wy+.5-o[1]);if(d>best)best=d;}
-  return best;}
- function cIn(wx,wy){const tx=Math.floor(wx/T),ty=Math.floor(wy/T);
-  if(cSolid(tx,ty))return true;
-  return cDepth(wx,wy)>=0;}
  function cSolid(tx,ty){return cloudAt(tx,ty)&&cloudAt(tx-1,ty)&&cloudAt(tx+1,ty)&&cloudAt(tx,ty-1)&&cloudAt(tx,ty+1);}
+ function buildClouds(){
+  CIN=new Uint8Array(PW*PH);CDP=new Float32Array(PW*PH).fill(-99);CFD=new Uint8Array(PW*PH);
+  const lobes=[];
+  for(let ty=0;ty<H;ty++)for(let tx=0;tx<W;tx++){if(!cloudAt(tx,ty))continue;
+   const o=cLobe(tx,ty),sol=cSolid(tx,ty);lobes.push([tx,ty,o,sol]);
+   if(sol)for(let y=ty*T;y<ty*T+T;y++){const b=(y+PAD)*PW+PAD+tx*T;for(let x=0;x<T;x++)CIN[b+x]=1;}}
+  // 덩어리를 찍어요: 깊이는 '그 픽셀 칸의 이웃 3×3 칸' 덩어리 중 가장 깊은 값 (예전 계산과 같은 규칙)
+  const stamp=(L,fn)=>{const tx=L[0],ty=L[1],o=L[2],r=o[2],x0=Math.max(-PAD,Math.max((tx-1)*T,Math.floor(o[0]-r)-1)),x1=Math.min(W*T+PAD-1,Math.min((tx+2)*T-1,Math.ceil(o[0]+r)+1)),
+    y0=Math.max(-PAD,Math.max((ty-1)*T,Math.floor(o[1]-r)-1)),y1=Math.min(H*T+PAD-1,Math.min((ty+2)*T-1,Math.ceil(o[1]+r)+1));
+   for(let wy=y0;wy<=y1;wy++)for(let wx=x0;wx<=x1;wx++)fn(wx,wy,(wy+PAD)*PW+wx+PAD,r-Math.hypot(wx+.5-o[0],wy+.5-o[1]),o);};
+  lobes.forEach(L=>stamp(L,(wx,wy,k,d)=>{if(d>CDP[k])CDP[k]=d;if(d>=0)CIN[k]=1;}));
+  lobes.forEach(L=>{if(L[3])return;stamp(L,(wx,wy,k,d,o)=>{
+   if(d>=0&&d<1.1&&(wx+.5-o[0])+(wy+.5-o[1])>3&&CDP[((wy-1)+PAD)*PW+(wx-1)+PAD]>2.5)CFD[k]=1;});});}
  function cloudPaint(x,y){
   if(th.city||th.obs||th.night||th.volc)return;
   let near=false;for(let dy=-1;dy<=1&&!near;dy++)for(let dx=-1;dx<=1;dx++)if(cloudAt(x+dx,y+dy)){near=true;break;}
   if(!near)return;
+  if(!CIN)buildClouds();
+  const inn=(wx,wy)=>CIN[(wy+PAD)*PW+wx+PAD]===1;
   for(let py=0;py<T;py++)for(let px=0;px<T;px++){
-   const wx=x*T+px,wy=y*T+py;let c=null;
-   if(cIn(wx,wy)){
-    if(!cIn(wx,wy+1))c='#86a8d2';                                   // 아래 테두리
-    else if(!cIn(wx-1,wy)||!cIn(wx+1,wy))c='#a9c5e6';                // 옆 테두리
-    else if(!cIn(wx,wy-1))c='#e4effb';                               // 윗 테두리(밝게)
-    else if(!cIn(wx,wy+2)||!cIn(wx,wy+3))c='#c9ddf3';                // 아래쪽 그늘
-    else{ // 덩어리 사이의 얕은 주름 + 가끔 반짝이는 점
-     const tx=Math.floor(wx/T),ty=Math.floor(wy/T);let fold=false;
-     for(let dy=-1;dy<=1&&!fold;dy++)for(let dx=-1;dx<=1;dx++){if(!cloudAt(tx+dx,ty+dy)||cSolid(tx+dx,ty+dy))continue;const o=cLobe(tx+dx,ty+dy),d=o[2]-Math.hypot(wx+.5-o[0],wy+.5-o[1]);
-      if(d>=0&&d<1.1&&(wx+.5-o[0])+(wy+.5-o[1])>3&&cDepth(wx-1,wy-1)>2.5){fold=true;break;}}
-     c=fold?'#dbe9f8':((wx*31+wy*17)%29===0?'#eaf3fc':'#ffffff');}
-    bg.fillStyle=c;bg.fillRect(wx,wy,1,1);
-   }else if(cIn(wx-2,wy-3)){bg.fillStyle='rgba(30,55,100,.22)';bg.fillRect(wx,wy,1,1);} // 땅에 드리운 그림자
+   const wx=x*T+px,wy=y*T+py;
+   if(inn(wx,wy)){let c;
+    if(!inn(wx,wy+1))c='#86a8d2';                                   // 아래 테두리
+    else if(!inn(wx-1,wy)||!inn(wx+1,wy))c='#a9c5e6';                // 옆 테두리
+    else if(!inn(wx,wy-1))c='#e4effb';                               // 윗 테두리(밝게)
+    else if(!inn(wx,wy+2)||!inn(wx,wy+3))c='#c9ddf3';                // 아래쪽 그늘
+    else c=CFD[(wy+PAD)*PW+wx+PAD]?'#dbe9f8':((wx*31+wy*17)%29===0?'#eaf3fc':'#ffffff'); // 덩어리 사이의 얕은 주름 + 가끔 반짝이는 점
+    cg.fillStyle=c;cg.fillRect(wx,wy,1,1);
+   }else if(inn(wx-2,wy-3)){cg.fillStyle='rgba(30,55,100,.22)';cg.fillRect(wx,wy,1,1);} // 땅에 드리운 그림자
   }}
  for(let y=0;y<H;y++)for(let x=0;x<W;x++){paint(x,y);const v=M.t[y*W+x];if(v===TL.WATER||v===TL.FLOWER)anim.push([x,y,0]);}
+ // 구름: 필드를 열 때 한꺼번에 계산하지 않고, 프레임마다 3ms씩만 나눠 칠해요. 다 칠해지면 0.9초 동안 서서히 밝아져요
+ let cloudCv=null,cg=null,cloudQ=null,cloudQi=0,cloudDone=0;const CLOUD_FADE=900;
+ if(!(th.city||th.obs||th.night||th.volc)){const q=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++){let near=false;for(let dy=-1;dy<=1&&!near;dy++)for(let dx=-1;dx<=1;dx++)if(cloudAt(x+dx,y+dy)){near=true;break;}if(near)q.push([x,y]);}
+  if(q.length){cloudCv=document.createElement('canvas');cloudCv.width=W*T;cloudCv.height=H*T;cg=cloudCv.getContext('2d');cg.imageSmoothingEnabled=false;cloudQ=q;}}
+ function cloudStep(){if(!cloudQ||cloudDone)return;const t0=performance.now();
+  while(cloudQi<cloudQ.length&&performance.now()-t0<3){const t=cloudQ[cloudQi++];cloudPaint(t[0],t[1]);}
+  if(cloudQi>=cloudQ.length)cloudDone=performance.now();}
+ const cloudBusy=()=>!!cloudQ&&(!cloudDone||performance.now()-cloudDone<CLOUD_FADE+80);
  // 그림 불러오기
  const imgs={};const getImg=src=>{if(!src)return null;let m=imgs[src];if(!m){m=imgs[src]=new Image();m.src=src;}return m.complete&&m.naturalWidth?m:null;};
  const marker=icon;
@@ -26400,7 +26456,8 @@ function mount(run){
   try{rlSave();}catch(er){}
   sfx('rare');showReward(rk,ric);say(['끼이이익… 상자가 열렸다!',msg]);}
  function go(e){try{const vv=q('#view');window.__gfKeep={big:BIG,y:vv?vv.scrollTop:0,t:Date.now()};}catch(er){}locked=true;const fight=e.n.t==='normal'||e.n.t==='elite'||e.n.t==='boss'||e.n.t==='gym';sfx(fight?'summon':'rare');
-  fx={type:fight?'battle':'out',t:0,dur:fight?760:420,cb:()=>{try{rlPick(e.i);}catch(err){console.warn('field pick',err);locked=false;fx=null;}}};}
+  fx={type:fight?'battle':'out',t:0,dur:fight?760:420,cb:()=>{try{teardownForText();rlPick(e.i);}catch(err){console.warn('field pick',err);try{rlRenderMap();}catch(e2){}}}};}
+ function teardownForText(){try{dispose();}catch(er){}try{wrap.remove();}catch(er){}try{if(gfSp&&gfSp.parentNode)gfSp.remove();}catch(er){}document.body.classList.remove('gfBig');ST=null;window.__rlHudPing=null;}
  function action(){if(locked||fx||gact)return;if(D.on){advance();return;}const t=[p.x+DX[p.dir],p.y+DY[p.dir]],e=entAt(t[0],t[1]);if(e&&!p.moving)talk(e);}
  function back(){if(D.on)cancel();}
  // 이동
@@ -26418,7 +26475,7 @@ function mount(run){
   if(locked||fx&&fx.type!=='in')return;
   let guard=2;
   while(guard--){
-   if(p.moving){p.t+=dt/MOVE_MS;dt=0;if(!p.rs&&p.t>=.4){p.rs=1;if(tallAt(p.nx,p.ny))startRustle(p.nx,p.ny);}if(p.t>=1){p.x=p.nx;p.y=p.ny;p.moving=false;p.par^=1;p.px=p.x*T;p.py=p.y*T;}else{p.px=(p.x+(p.nx-p.x)*p.t)*T;p.py=(p.y+(p.ny-p.y)*p.t)*T;break;}}
+   if(p.moving){p.t+=dt/MOVE_MS;dt=0;if(!p.rs&&p.t>=.4){p.rs=1;if(tallAt(p.nx,p.ny))startRustle(p.nx,p.ny);}if(p.t>=1){dt=Math.min(40,(p.t-1)*MOVE_MS);p.x=p.nx;p.y=p.ny;p.moving=false;p.par^=1;p.px=p.x*T;p.py=p.y*T;}else{p.px=(p.x+(p.nx-p.x)*p.t)*T;p.py=(p.y+(p.ny-p.y)*p.t)*T;break;}}
    if(!p.moving&&!D.on){let d=curDir();if(d>=0)path.length=0;else if(pend>=0)d=pend;pend=-1;if(d<0&&path.length)d=path.shift();if(d<0&&ptalk&&!path.length){const e=ptalk.e;ptalk=null;p.dir=ptalk0(e);if(Math.abs(e.x-p.x)+Math.abs(e.y-p.y)===1)talk(e);break;}if(d>=0){startMove(d);if(!p.moving){path.length=0;ptalk=null;}}else break;if(!p.moving)break;}else break;}
   if(!p.moving){p.px=p.x*T;p.py=p.y*T;}
   if(!held.length)just=false;
@@ -26522,8 +26579,9 @@ function mount(run){
  function draw(){
   g.setTransform(K,0,0,K,0,0);g.imageSmoothingEnabled=false;
   KE=Math.max(K,Math.round(K*ZM));VW=CW*K/KE;VH=CH*K/KE;g.setTransform(KE,0,0,KE,0,0);g.imageSmoothingEnabled=false;
-  const vw=Math.ceil(VW),vh=Math.ceil(VH),cx=clamp(Math.round(p.px+8-VW/2),0,W*T-vw),cy=clamp(Math.round(p.py+8-VH/2),0,H*T-vh);CAM.x=cx;CAM.y=cy;
+  const vw=Math.ceil(VW),vh=Math.ceil(VH),cx=clamp(Math.round(p.px)+8-Math.floor(VW/2),0,W*T-vw),cy=clamp(Math.round(p.py)+8-Math.floor(VH/2),0,H*T-vh);CAM.x=cx;CAM.y=cy;
   g.drawImage(bgc,cx,cy,vw,vh,0,0,vw,vh);
+   if(cloudDone){const ca=Math.min(1,(performance.now()-cloudDone)/CLOUD_FADE);if(ca>0){g.globalAlpha=ca;g.drawImage(cloudCv,cx,cy,vw,vh,0,0,vw,vh);g.globalAlpha=1;}}
   g.save();g.translate(-cx,-cy);if(M.boss)drawHallBack();drawRustle();
   const list=ents.map(e=>({y:e.y*T,e})).concat(ents.filter(e=>e.n&&bkey(e.n)).map(e=>({y:e.y*T-1,gym:e})),(M.decor||[]).map(d=>({y:d.y*T+(d.k==='pil'?9:7),dec:d})),[{y:p.py+(p.moving?0:0),p:1},{y:p.py+.5,ov:1}]).sort((a,b)=>a.y-b.y);
   const vis=q=>q.x==null||q.y==null||(q.x*T+8>cx-128&&q.x*T<cx+vw+128&&q.y*T+8>cy-128&&q.y*T<cy+vh+260);
@@ -26542,12 +26600,12 @@ function mount(run){
     else{const pr=Math.min(1,(fx.t-300)/(fx.dur-300));g.fillStyle='#101018';for(let r=0;r<18;r++){const w=Math.ceil(CW*pr);if(r%2)g.fillRect(CW-w,r*8,w,8);else g.fillRect(0,r*8,w,8);}}}}
  }
  // 반복
- let last=0,lastDraw=0,raf=0,alive=true;
+ let last=0,lastDraw=0,raf=0,alive=true,dAvg=0;
  /* 무입력 절전: 30초 동안 터치·키 입력이 없으면 그리기를 더 줄이고 장식 애니메이션을 멈춰요. 건드리면 바로 돌아와요 */
  window.__lastIn=performance.now();
  if(!window.__inHook){window.__inHook=1;['pointerdown','keydown','touchstart','wheel'].forEach(ev=>addEventListener(ev,()=>{window.__lastIn=performance.now();document.documentElement.classList.remove('idleSleep');},{capture:true,passive:true}));}
  const loop=ts=>{if(!alive)return;if(!cv.isConnected){destroy();return;}const dt=Math.min(60,last?ts-last:16);last=ts;
-  try{update(dt);const idle=!p.moving&&!fx&&!D.on&&!gact&&!path.length&&!held.length&&!leaves.length&&!rwPop&&!locked;const sl=idle&&performance.now()-window.__lastIn>30000;document.documentElement.classList.toggle('idleSleep',sl);if(!document.hidden&&ts-lastDraw>=(idle?(sl?500:200):29)){lastDraw=ts;draw();} /* 가만히 있을 땐 초당 5번(오래 가만히면 2번), 움직일 땐 일정하게 30번만 그려요 (29ms 기준이라 프레임이 불규칙하게 건너뛰지 않아요) */}catch(e){console.warn('field loop',e);}raf=requestAnimationFrame(loop);};
+  try{update(dt);cloudStep();const idle=!p.moving&&!fx&&!D.on&&!gact&&!path.length&&!held.length&&!leaves.length&&!rwPop&&!locked&&!cloudBusy();const sl=idle&&performance.now()-window.__lastIn>30000;document.documentElement.classList.toggle('idleSleep',sl);if(!document.hidden&&(idle?ts-lastDraw>=(sl?500:200):(dAvg>11?ts-lastDraw>=29:true))){lastDraw=ts;const _d0=performance.now();draw();dAvg=dAvg*.9+(performance.now()-_d0)*.1;} /* 가만히 있을 땐 초당 5번(오래 가만히면 2번), 움직일 땐 일정하게 30번만 그려요 (29ms 기준이라 프레임이 불규칙하게 건너뛰지 않아요) */}catch(e){console.warn('field loop',e);}raf=requestAnimationFrame(loop);};
  // 키보드·터치
  const modal=()=>!!document.querySelector('.modal.on,#coach.on,#unlock.on');
  const KM={ArrowDown:0,s:0,S:0,ArrowUp:1,w:1,W:1,ArrowLeft:2,a:2,A:2,ArrowRight:3,d:3,D:3};
