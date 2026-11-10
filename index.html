@@ -8704,24 +8704,29 @@ const SKILL=[
  {n:'강철 베기',m:'melee',fx:'steel',c:'#ffffff',c2:'#8a8aa8'},
  {n:'반짝반짝 빛',m:'proj',fx:'fairy',c:'#ffe1f1',c2:'#e05aa0'}];
 // ===== 대표 포켓몬 전용 기술 (26마리): 번호 → {기술 이름, 이펙트 키, 색} =====
-const SIG={6:{n:'불대문자',fx:'daimonji',c:'#ffe27a',c2:'#ff7a2e'},25:{n:'10만볼트',fx:'thunder100k',c:'#fff59a',c2:'#f7b500'},150:{n:'사이코키네시스',fx:'psycho',c:'#ffd1ec',c2:'#ff6bb5'},94:{n:'섀도볼',fx:'shadowball',c:'#c9a6ff',c2:'#5b2a8c'},130:{n:'파괴광선',fx:'hyperbeam',c:'#ffd45c',c2:'#ff7a2e'},489:{n:'물의파동',fx:'bubblepulse',c:'#c4f4ff',c2:'#2a86e8'},448:{n:'파동탄',fx:'aurasphere',c:'#d9f1ff',c2:'#3d8bff'},658:{n:'물수리검',fx:'shuriken',c:'#bfeaff',c2:'#1e6fd9'},445:{n:'용성군',fx:'dracometeor',c:'#e9d6ff',c2:'#8f6bff'},815:{n:'화염볼',fx:'pyroball',c:'#ffe27a',c2:'#ff7a2e'},384:{n:'용의 승천',fx:'dragonascent',c:'#b6ffd6',c2:'#1fb877'},9:{n:'하이드로캐논',fx:'hydrocannon',c:'#bfeaff',c2:'#1e6fd9'},3:{n:'솔라빔',fx:'solarbeam',c:'#fff7a0',c2:'#8fd13a'},143:{n:'지진',fx:'earthquake',c:'#e8c078',c2:'#6b4a2b'},149:{n:'역린',fx:'outrage',c:'#ffd45c',c2:'#d9381a'},131:{n:'냉동빔',fx:'icebeam',c:'#d9f6ff',c2:'#2a9bd8'},248:{n:'스톤에지',fx:'stoneedge',c:'#e8e8f4',c2:'#7a7a88'},376:{n:'코멧펀치',fx:'cometpunch',c:'#c9dcff',c2:'#3a4a70'},470:{n:'리프블레이드',fx:'leafblade',c:'#c8f27a',c2:'#2f8f2a'},134:{n:'파도타기',fx:'surf',c:'#bfeaff',c2:'#0f4aa8'},135:{n:'번개',fx:'stormbolt',c:'#fff59a',c2:'#5b7bd8'},136:{n:'오버히트',fx:'overheat',c:'#ffd45c',c2:'#d9381a'},197:{n:'악의파동',fx:'darkpulse',c:'#e0c0ff',c2:'#3a1a6e'},151:{n:'고대의 힘',fx:'ancientpower',c:'#ffe28a',c2:'#7a664a'},383:{n:'단애의 칼',fx:'precipice',c:'#ffd45c',c2:'#b3200f'},382:{n:'근원의 파동',fx:'originpulse',c:'#bfeaff',c2:'#1e6fd9'},133:{n:'스피드스타',fx:'swift',c:'#fff59a',c2:'#f0a800'},398:{n:'브레이브버드',fx:'bravebird',c:'#e8f6ff',c2:'#3a86e8'},12:{n:'벌레의 야단법석',fx:'bugbuzz',c:'#e6f58a',c2:'#7d9a10'},123:{n:'시저크로스',fx:'xscissor',c:'#dff77a',c2:'#3f6b0c'},214:{n:'메가혼',fx:'megahorn',c:'#f3e6c0',c2:'#4f7a14'},89:{n:'오물폭탄',fx:'sludgebomb',c:'#d89cff',c2:'#6a1fa0'},24:{n:'크로스포이즌',fx:'crosspoison',c:'#e8c4ff',c2:'#7a2fb8'},890:{n:'무한다이빔',fx:'eternabeam',c:'#ff7aa0',c2:'#c0143c'},804:{n:'맹독 파동',fx:'venomblast',c:'#ff9ae8',c2:'#8a1fa8'},36:{n:'문포스',fx:'moonblast',c:'#ffe1f1',c2:'#e05aa0'},249:{n:'에어로블라스트',fx:'aeroblast',c:'#d8eeff',c2:'#5aa0e8'},250:{n:'성스러운 불꽃',fx:'sacredfire',c:'#ffd45c',c2:'#ff4a2a'},484:{n:'공간격',fx:'spacialrend',c:'#c9a6ff',c2:'#3a1a7a'},483:{n:'시간의 포효',fx:'roartime',c:'#d6eeff',c2:'#2f6fd0'},800:{n:'포톤 게이저',fx:'photongeyser',c:'#ffe27a',c2:'#7a5cff'},638:{n:'성스러운 칼',fx:'sacredsword',c:'#cfe4ff',c2:'#2a5cc8'},1007:{n:'퓨전 플레어',fx:'fusionflare',c:'#ffd45c',c2:'#c9300f'},802:{n:'인파이트',fx:'closecombat',c:'#ffd45c',c2:'#c9300f'},717:{n:'악몽의 발톱',fx:'nightclaw',c:'#c45cf0',c2:'#2a0f4a'},480:{n:'염동 폭풍',fx:'psyorb',c:'#ffd1ec',c2:'#b43cd8'},490:{n:'해류포',fx:'aquaspiral',c:'#a9e4ff',c2:'#1a62d4'},1008:{n:'일렉트릭 드라이브',fx:'voltdrive',c:'#c9f6ff',c2:'#2a4ad8'},896:{n:'프리즈 랜스',fx:'icelance',c:'#d9f6ff',c2:'#2a9bd8'},492:{n:'꽃잎 폭풍',fx:'petalstorm',c:'#ffd9ec',c2:'#e0508c'},773:{n:'멀티어택',fx:'bodyrush',c:'#f0f2ff',c2:'#7a7a92'}};
+const SIG={6:{n:'불대문자',fx:'daimonji',c:'#ffe27a',c2:'#ff7a2e'},25:{n:'10만볼트',fx:'thunder100k',c:'#fff59a',c2:'#f7b500'},150:{n:'사이코키네시스',fx:'psycho',c:'#ffd1ec',c2:'#ff6bb5'},94:{n:'섀도볼',fx:'shadowball',c:'#c9a6ff',c2:'#5b2a8c'},130:{n:'파괴광선',fx:'hyperbeam',c:'#ffd45c',c2:'#ff7a2e'},489:{n:'물의파동',fx:'bubblepulse',c:'#c4f4ff',c2:'#2a86e8'},448:{n:'파동탄',fx:'aurasphere',c:'#d9f1ff',c2:'#3d8bff'},658:{n:'물수리검',fx:'shuriken',c:'#bfeaff',c2:'#1e6fd9'},445:{n:'용성군',fx:'dracometeor',c:'#e9d6ff',c2:'#8f6bff'},815:{n:'화염볼',fx:'pyroball',c:'#ffe27a',c2:'#ff7a2e'},384:{n:'용의 승천',fx:'dragonascent',c:'#b6ffd6',c2:'#1fb877'},9:{n:'하이드로캐논',fx:'hydrocannon',c:'#bfeaff',c2:'#1e6fd9'},3:{n:'솔라빔',fx:'solarbeam',c:'#fff7a0',c2:'#8fd13a'},143:{n:'지진',fx:'earthquake',c:'#e8c078',c2:'#6b4a2b'},149:{n:'역린',fx:'outrage',c:'#ffd45c',c2:'#d9381a'},131:{n:'냉동빔',fx:'icebeam',c:'#d9f6ff',c2:'#2a9bd8'},248:{n:'스톤에지',fx:'stoneedge',c:'#e8e8f4',c2:'#7a7a88'},376:{n:'코멧펀치',fx:'cometpunch',c:'#c9dcff',c2:'#3a4a70'},470:{n:'리프블레이드',fx:'leafblade',c:'#c8f27a',c2:'#2f8f2a'},134:{n:'파도타기',fx:'surf',c:'#bfeaff',c2:'#0f4aa8'},135:{n:'번개',fx:'stormbolt',c:'#fff59a',c2:'#5b7bd8'},136:{n:'오버히트',fx:'overheat',c:'#ffd45c',c2:'#d9381a'},197:{n:'악의파동',fx:'darkpulse',c:'#e0c0ff',c2:'#3a1a6e'},151:{n:'고대의 힘',fx:'ancientpower',c:'#ffe28a',c2:'#7a664a'},383:{n:'단애의 칼',fx:'precipice',c:'#ffd45c',c2:'#b3200f'},382:{n:'근원의 파동',fx:'originpulse',c:'#bfeaff',c2:'#1e6fd9'},133:{n:'스피드스타',fx:'swift',c:'#fff59a',c2:'#f0a800'},398:{n:'브레이브버드',fx:'bravebird',c:'#e8f6ff',c2:'#3a86e8'},12:{n:'벌레의 야단법석',fx:'bugbuzz',c:'#e6f58a',c2:'#7d9a10'},123:{n:'시저크로스',fx:'xscissor',c:'#dff77a',c2:'#3f6b0c'},214:{n:'메가혼',fx:'megahorn',c:'#f3e6c0',c2:'#4f7a14'},89:{n:'오물폭탄',fx:'sludgebomb',c:'#d89cff',c2:'#6a1fa0'},24:{n:'크로스포이즌',fx:'crosspoison',c:'#e8c4ff',c2:'#7a2fb8'},890:{n:'무한다이빔',fx:'eternabeam',c:'#ff7aa0',c2:'#c0143c'},804:{n:'맹독 파동',fx:'venomblast',c:'#ff9ae8',c2:'#8a1fa8'},36:{n:'문포스',fx:'moonblast',c:'#ffe1f1',c2:'#e05aa0'},249:{n:'에어로블라스트',fx:'aeroblast',c:'#d8eeff',c2:'#5aa0e8'},250:{n:'성스러운 불꽃',fx:'sacredfire',c:'#ffd45c',c2:'#ff4a2a'},484:{n:'공간격',fx:'spacialrend',c:'#c9a6ff',c2:'#3a1a7a'},483:{n:'시간의 포효',fx:'roartime',c:'#d6eeff',c2:'#2f6fd0'},800:{n:'포톤 게이저',fx:'photongeyser',c:'#ffe27a',c2:'#7a5cff'},638:{n:'성스러운 칼',fx:'sacredsword',c:'#cfe4ff',c2:'#2a5cc8'},1007:{n:'퓨전 플레어',fx:'fusionflare',c:'#ffd45c',c2:'#c9300f'},802:{n:'인파이트',fx:'closecombat',c:'#ffd45c',c2:'#c9300f'},717:{n:'악몽의 발톱',fx:'nightclaw',c:'#c45cf0',c2:'#2a0f4a'},480:{n:'염동 폭풍',fx:'psyorb',c:'#ffd1ec',c2:'#b43cd8'},490:{n:'해류포',fx:'aquaspiral',c:'#a9e4ff',c2:'#1a62d4'},1008:{n:'일렉트릭 드라이브',fx:'voltdrive',c:'#c9f6ff',c2:'#2a4ad8'},896:{n:'프리즈 랜스',fx:'icelance',c:'#d9f6ff',c2:'#2a9bd8'},492:{n:'꽃잎 폭풍',fx:'petalstorm',c:'#ffd9ec',c2:'#e0508c'},773:{n:'멀티어택',fx:'multiattack',c:'#f0f2ff',c2:'#7a7a92'}};
 // ===== 같은 대표 기술을 쓰는 포켓몬: 이펙트 키 → 번호들 (기술 이름·색은 위의 대표 포켓몬과 같아요. 번호만 더하면 늘어나요) =====
-const SIG_SHARE={psyorb:[481,482,488,494,648,720,898],aquaspiral:[489,647],voltdrive:[894],icelance:[378],petalstorm:[1017],bodyrush:[1024],closecombat:[889,891,892],nightclaw:[893,1001,1002,1003,1004],aeroblast:[641],sacredfire:[721],roartime:[646,718,895],photongeyser:[789,790,791,792],sacredsword:[379,385,808,809],daimonji:[38,59,126,146,157,244,257,392,485,500,609,637,655,727],thunder100k:[26,125,181,310,405,243,171,479,807,462,604,523,777,702],psycho:[65,196,282,80,199,124,121,122,97,178,381,380,386,475,576,579,678,858],shadowball:[897,93,200,429,477,563,302,354,487,681,778,711],hyperbeam:[649,115,128,289,474,486,493],aurasphere:[447,308],shuriken:[657],dracometeor:[373,330,706,784,887],hydrocannon:[160,260,395,503,730],solarbeam:[154,389,497,652,45,182,465,549],earthquake:[31,34,76,105,112,232,208,450,464,473,530,645],outrage:[612,621,334,998],icebeam:[91,144,362,365,461,471,478,584,614,713],stoneedge:[95,142,306,409,526,377,639],cometpunch:[375],leafblade:[254,542,640,798],surf:[55,73,87,186,230,245,321,350],stormbolt:[145,642,644],overheat:[323,324,467,643],darkpulse:[229,262,359,430,491,571,635],ancientpower:[139,141,346,348,251],bravebird:[18,22,169,227,277,521,628,663,733],bugbuzz:[267,284,416,666,166,469,193],xscissor:[212,127,900],megahorn:[],sludgebomb:[88,109,110,316,317,434,435,568,569,690,747,793,803,590,591],crosspoison:[15,23,29,30,32,33,41,42,336,451,452,453,454,757,758,407,315,211],venomblast:[804,691,748,944,945,965,966,980,1014,1015,1016,1025],moonblast:Object.keys(MON).map(Number).filter(i=>MON[i]&&MON[i].types&&MON[i].types.indexOf(17)>=0&&i!==36)};
+const SIG_SHARE={psyorb:[481,482,488,494,648,720,898],aquaspiral:[489,647],voltdrive:[894],icelance:[378],petalstorm:[1017],closecombat:[889,891,892],nightclaw:[893,1001,1002,1003,1004],aeroblast:[641],sacredfire:[721],roartime:[646,718,895],photongeyser:[789,790,791,792],sacredsword:[379,385,808,809],daimonji:[38,59,126,146,157,244,257,392,485,500,609,637,655,727],thunder100k:[26,125,181,310,405,243,171,479,807,462,604,523,777,702],psycho:[65,196,282,80,199,124,121,122,97,178,381,380,386,475,576,579,678,858],shadowball:[897,93,200,429,477,563,302,354,487,681,778,711],hyperbeam:[649,115,128,289,474,486,493],aurasphere:[447,308],shuriken:[657],dracometeor:[373,330,706,784,887],hydrocannon:[160,260,395,503,730],solarbeam:[154,389,497,652,45,182,465,549],earthquake:[31,34,76,105,112,232,208,450,464,473,530,645],outrage:[612,621,334,998],icebeam:[91,144,362,365,461,471,478,584,614,713],stoneedge:[95,142,306,409,526,377,639],cometpunch:[375],leafblade:[254,542,640,798],surf:[55,73,87,186,230,245,321,350],stormbolt:[145,642,644],overheat:[323,324,467,643],darkpulse:[229,262,359,430,491,571,635],ancientpower:[139,141,346,348,251],bravebird:[18,22,169,227,277,521,628,663,733],bugbuzz:[267,284,416,666,166,469,193],xscissor:[212,127,900],megahorn:[],sludgebomb:[88,109,110,316,317,434,435,568,569,690,747,793,803,590,591],crosspoison:[15,23,29,30,32,33,41,42,336,451,452,453,454,757,758,407,315,211],venomblast:[804,691,748,944,945,965,966,980,1014,1015,1016,1025],moonblast:Object.keys(MON).map(Number).filter(i=>MON[i]&&MON[i].types&&MON[i].types.indexOf(17)>=0&&i!==36)};
 (()=>{try{const base={};Object.keys(SIG).forEach(id=>{const v=SIG[id];if(!base[v.fx])base[v.fx]=v;});Object.keys(SIG_SHARE).forEach(fx=>{const b=base[fx];if(!b)return;SIG_SHARE[fx].forEach(id=>{if(!SIG[id]&&MON[id])SIG[id]=b;});});}catch(e){console.warn('SIG_SHARE',e);}})();
-SIG[772]=Object.assign({},SIG[773],{fx:'typenull'}); /* 타입:널 전용 멀티어택 */
+SIG[772]=Object.assign({},SIG[773],{n:'트라이어택',fx:'triattack',c:'#fff3c8',c2:'#3fb4ff'}); /* 타입:널 전용 트라이어택 (실버디 멀티어택과 다른 연출) */
 /* 전설 기술 연출 재배정: 이미 있는 연출 중 어울리는 것으로 바꿔요 (연출 키 → 번호들) */
 (()=>{try{const base={};Object.keys(SIG).forEach(id=>{const v=SIG[id];if(!base[v.fx])base[v.fx]=v;});
-const RE={sacredsword:[888],icelance:[646],earthquake:[718,1003],dracometeor:[895],aurasphere:[385],cometpunch:[808,809],psyorb:[789,790,786],photongeyser:[493],stoneedge:[719],solarbeam:[716,898],stormbolt:[785],petalstorm:[787],surf:[788],leafblade:[1001],icebeam:[1002],overheat:[1004,494],psycho:[648,1015],shadowball:[720],closecombat:[1014],moonblast:[1016],sludgebomb:[1025]};
-Object.keys(RE).forEach(fx=>{const b=base[fx];if(!b)return console.warn('SIG_FIX 없음',fx);RE[fx].forEach(id=>{if(MON[id])SIG[id]=b;});});}catch(e){console.warn('SIG_FIX',e);}})();
+const RE={sacredsword:[],icelance:[646],earthquake:[718],dracometeor:[895],cometpunch:[808,809,379],psyorb:[],solarbeam:[716,898],stormbolt:[],petalstorm:[],surf:[],leafblade:[],icebeam:[],overheat:[],psycho:[],shadowball:[720],closecombat:[],moonblast:[],sludgebomb:[]};
+Object.keys(RE).forEach(fx=>{const b=base[fx];if(!b)return console.warn('SIG_FIX 없음',fx);RE[fx].forEach(id=>{if(MON[id])SIG[id]=b;});});
+SIG[460]={n:'눈보라',fx:'blizzard',c:'#d9f5ff',c2:'#3a7fc4'};SIG[1024]={n:'멀티어택',fx:'terapagosrush',c:'#d8fbff',c2:'#2fb8c8'};SIG[888]={n:'거대한 검',fx:'zaciansword',c:'#ffe27a',c2:'#ff8fb8'};SIG[493]={n:'심판의 뭉치',fx:'judgment',c:'#fff4c4',c2:'#d99a10'};SIG[494]={n:'V제너레이트',fx:'vgenerate',c:'#ffe07a',c2:'#d9341a'};SIG[719]={n:'다이아스톰',fx:'diamondstorm',c:'#fff0f8',c2:'#e05aa8'};SIG[385]={n:'파멸의 소원',fx:'wishstar',c:'#fff9c4',c2:'#e0b000'};
+/*SIGNEW-BEGIN*/SIG[481]={n:'마음의 파동',fx:'heartwave',c:'#ffd8e8',c2:'#ff6fae'};SIG[482]={n:'의지의 일격',fx:'willstar',c:'#cfe4ff',c2:'#3a78ff'};SIG[488]={n:'초승달춤',fx:'moonlight',c:'#fffbe0',c2:'#ffd96a'};SIG[789]={n:'별가루 소용돌이',fx:'stardust',c:'#e8e0ff',c2:'#7a5cff'};SIG[790]={n:'별가루 소용돌이',fx:'stardust',c:'#e8e0ff',c2:'#7a5cff'};SIG[380]={n:'미스트볼',fx:'mistball',c:'#ffe0ea',c2:'#ff5a8a'};SIG[381]={n:'라스터퍼지',fx:'luster',c:'#dff0ff',c2:'#3a9aff'};SIG[386]={n:'사이코부스트',fx:'psychoboost',c:'#e6f9ff',c2:'#35c8ff'};SIG[648]={n:'태고의 노래',fx:'relicsong',c:'#fff4e8',c2:'#7ae0b0'};SIG[785]={n:'수호신의 번개',fx:'tapukoko',c:'#fffbd0',c2:'#ffd93a'};SIG[786]={n:'사이코필드',fx:'tapulele',c:'#ffdff8',c2:'#e84acb'};SIG[787]={n:'우드해머',fx:'tapubulu',c:'#e6ffc8',c2:'#4ccb4a'};SIG[788]={n:'수호신의 파도',fx:'tapufini',c:'#e0fbff',c2:'#2ab8e8'};SIG[1001]={n:'재앙의 덩굴',fx:'ruinwo',c:'#c8ffb0',c2:'#7a3aa8'};SIG[1002]={n:'재앙의 검',fx:'ruinchien',c:'#e8f8ff',c2:'#4aa8ff'};SIG[1003]={n:'재앙의 그릇',fx:'ruinting',c:'#fff0c0',c2:'#b8742a'};SIG[1004]={n:'재앙의 구슬',fx:'ruinchi',c:'#ffe49a',c2:'#ff4a1a'};SIG[1014]={n:'독의 주먹',fx:'okidogi',c:'#f0dcff',c2:'#9a3ad8'};SIG[1015]={n:'정신 독',fx:'munkidori',c:'#ffe0f4',c2:'#b83aa8'};SIG[1016]={n:'독깃털',fx:'fezandipiti',c:'#fff0f8',c2:'#ff6ab8'};SIG[1025]={n:'악의 사슬',fx:'pecharunt',c:'#f8d8ff',c2:'#8a2ac8'};SIG[889]={n:'거수탄',fx:'shieldbash',c:'#ffe49a',c2:'#c8203c'};SIG[641]={n:'폭풍',fx:'tornadus',c:'#effffa',c2:'#5fc8c0'};/*SIGNEW-END*/
+}catch(e){console.warn('SIG_FIX',e);}})();
 function skillOf(id,raw){const m=MON[id];const t=m?kwType(m):0,b=SKILL[t]||SKILL[0],o=Object.assign({t},b);const g=!raw&&SIG[id];if(g)Object.assign(o,g,{sig:1,bfx:b.fx,bm:b.m});return o;}
 const skRand=(a,b)=>a+Math.random()*(b-a);
 // ===== 스킬 이펙트 (도트 스타일) =====
 // 낮은 해상도 캔버스에 "칸(도트)" 단위로 찍고, 24프레임으로 뚝뚝 끊기게 움직여요. (레트로 게임 느낌 + 타격감)
 // 모든 연출은 Math.random(skRand)만 써요. 친구 대전의 씨앗 난수(brand)는 건드리지 않아요.
 const PXF=(()=>{
- const STEP=1000/30,q=Math.round;let cv=null,cx=null,S=3,K=1.5,cw=0,ch=0,parts=[],raf=0,last=0,frz=0,baseA=1,lite=false;let rbOn=false,rbC='';function flushR(){if(rbOn){rbOn=false;cx.fillStyle=rbC;cx.fill();}}
+ const STEP=1000/30,q=Math.round;let cv=null,cx=null,S=3,K=1.5,cw=0,ch=0,parts=[],raf=0,last=0,frz=0,baseA=1,lite=false;const RUNS=[];function flushR(){const n=RUNS.length;if(n){for(let i=0;i<n;i++){const r=RUNS[i];cx.fillStyle=r.c;cx.fill(r.p);}RUNS.length=0;}}
   /* 같은 색 네모를 이어서 찍을 땐 모아서 한 번에 칠해요(불투명할 때만 — 결과 모양은 똑같아요) */
-  function RB(c,x,y,w,h){if(cx.globalAlpha===1&&cx.globalCompositeOperation==='source-over'){if(rbOn&&rbC!==c)flushR();if(!rbOn){cx.beginPath();rbOn=true;rbC=c;}cx.rect(x,y,w,h);return;}flushR();cx.fillStyle=c;cx.fillRect(x,y,w,h);}
+  function RB(c,x,y,w,h){if(cx.globalAlpha===1&&cx.globalCompositeOperation==='source-over'){const x2=x+w,y2=y+h;let t=null;for(let i=RUNS.length-1;i>=0;i--){const r=RUNS[i];if(r.c===c){t=r;break;}if(x<r.x2&&x2>r.x1&&y<r.y2&&y2>r.y1)break;}
+   if(t){t.p.rect(x,y,w,h);if(x<t.x1)t.x1=x;if(y<t.y1)t.y1=y;if(x2>t.x2)t.x2=x2;if(y2>t.y2)t.y2=y2;return;}
+   if(RUNS.length>=48)flushR();const p=new Path2D();p.rect(x,y,w,h);RUNS.push({c,p,x1:x,y1:y,x2,y2});return;}flushR();cx.fillStyle=c;cx.fillRect(x,y,w,h);}
   const DPAT={};function dpat(c){let pt=DPAT[c];if(!pt||pt.cx!==cx){const t=document.createElement('canvas');t.width=t.height=2;const g=t.getContext('2d');g.fillStyle=c;g.fillRect(0,0,1,1);g.fillRect(1,1,1,1);pt=DPAT[c]={cx,p:cx.createPattern(t,'repeat')};}return pt.p;}const HEX6=/^#[0-9a-f]{6}$/i;
  function size(){const w=VW(),h=VH();const S0=Math.max(3,Math.min(6,q(Math.min(w,h)/115)));S=Math.max(2,Math.min(3,q(Math.min(w,h)/200)));lite=document.documentElement.classList.contains('lowfx');if(lite)S=Math.min(S0,Math.max(S+1,q(S*1.6)));K=Math.max(1,S0/S);const nw=Math.ceil(w/S),nh=Math.ceil(h/S);
   if(!cv){cv=document.createElement('canvas');cv.id='pxfx';document.body.appendChild(cv);cx=cv.getContext('2d');}
@@ -8745,19 +8750,19 @@ const PXF=(()=>{
    if(ft>0)for(let i=0;i<5;i++)g.addColorStop(ft*T[i],rgba(c,A*SM[i]));else g.addColorStop(0,rgba(c,A));
    if(fb>0)for(let i=0;i<5;i++)g.addColorStop(1-fb+fb*T[i],rgba(c,A*(1-SM[i])));else g.addColorStop(1,rgba(c,A));
    cx.save();cx.globalAlpha=1;cx.fillStyle=g;cx.beginPath();cx.moveTo(x-hwT,y0);cx.lineTo(x+hwT,y0);cx.lineTo(x+hwB,y0+hh);cx.lineTo(x-hwB,y0+hh);cx.closePath();cx.fill();cx.restore();},
-  line(x0,y0,x1,y1,c,th){th=th||1;x0=q(x0);y0=q(y0);x1=q(x1);y1=q(y1);cx.fillStyle=c;cx.beginPath();const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1,o=-(th>>1);let e=dx+dy,n=0,px=0,py=0,pw=0,ph=0,has=false;
+  line(x0,y0,x1,y1,c,th){th=th||1;x0=q(x0);y0=q(y0);x1=q(x1);y1=q(y1);const op=cx.globalAlpha===1&&cx.globalCompositeOperation==='source-over';if(!op){flushR();cx.fillStyle=c;cx.beginPath();}const RR=op?(a,b,w,h)=>RB(c,a,b,w,h):(a,b,w,h)=>cx.rect(a,b,w,h);const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1,o=-(th>>1);let e=dx+dy,n=0,px=0,py=0,pw=0,ph=0,has=false;
    for(;;){const nx=x0+o,ny=y0+o;
     if(has&&ny===py&&ph===th&&nx<=px+pw&&nx+th>=px){const l=Math.min(px,nx),r=Math.max(px+pw,nx+th);px=l;pw=r-l;}
     else if(has&&nx===px&&pw===th&&ny<=py+ph&&ny+th>=py){const t=Math.min(py,ny),bt=Math.max(py+ph,ny+th);py=t;ph=bt-t;}
-    else{if(has)cx.rect(px,py,pw,ph);px=nx;py=ny;pw=th;ph=th;has=true;}
+    else{if(has)RR(px,py,pw,ph);px=nx;py=ny;pw=th;ph=th;has=true;}
     if((x0===x1&&y0===y1)||++n>900)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}
-   if(has)cx.rect(px,py,pw,ph);cx.fill();},
-  disc(x,y,r,c,dith){x=q(x);y=q(y);r=Math.max(0,q(r));
-   if(r>=3&&r<=160&&warm('d'+r+c+(dith?'t'+((x+y)&1):''))){const par=dith?((x+y)&1):0,sp=cacheCv('d'+r+c+(dith?'t'+par:''),2*r+1,2*r+1,g=>{g.fillStyle=c;for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));if(!dith)g.fillRect(r-w,r+j,w*2+1,1);else for(let i=-w;i<=w;i++)if(((par+i+j)&1)===0)g.fillRect(r+i,r+j,1,1);}});cx.drawImage(sp,x-r,y-r);return;}
+   if(has)RR(px,py,pw,ph);if(!op)cx.fill();},
+  disc(x,y,r,c,dith){x=q(x);y=q(y);r=Math.max(0,q(r));if(thin&&r<=2&&cx.globalAlpha<.4)return;
+   if(r>=3&&r<=160&&warm('d'+r+c+(dith?'t'+((x+y)&1):''))){const par=dith?((x+y)&1):0,sp=cacheCv('d'+r+c+(dith?'t'+par:''),2*r+1,2*r+1,g=>{g.fillStyle=c;for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));if(!dith)g.fillRect(r-w,r+j,w*2+1,1);else for(let i=-w;i<=w;i++)if(((par+i+j)&1)===0)g.fillRect(r+i,r+j,1,1);}});flushR();cx.drawImage(sp,x-r,y-r);return;}
    cx.fillStyle=c;
-   if(!dith&&r<4){if(cx.globalAlpha===1&&cx.globalCompositeOperation==='source-over'){for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));RB(c,x-w,y+j,w*2+1,1);}}else{cx.beginPath();for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));cx.rect(x-w,y+j,w*2+1,1);}cx.fill();}return;}
-   if(!dith){cx.beginPath();let pw=-1,py=0,ph=0,px=0;for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));if(w===pw)ph++;else{if(pw>=0)cx.rect(px,py,pw*2+1,ph);pw=w;px=x-w;py=y+j;ph=1;}}cx.rect(px,py,pw*2+1,ph);cx.fill();return;}
-   cx.beginPath();for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));cx.rect(x-w,y+j,w*2+1,1);}cx.fillStyle=dpat(c);cx.fill();},
+   if(!dith&&r<4){if(cx.globalAlpha===1&&cx.globalCompositeOperation==='source-over'){for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));RB(c,x-w,y+j,w*2+1,1);}}else{flushR();cx.beginPath();for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));cx.rect(x-w,y+j,w*2+1,1);}cx.fill();}return;}
+   if(!dith){const op=cx.globalAlpha===1&&cx.globalCompositeOperation==='source-over';if(!op){flushR();cx.beginPath();}let pw=-1,py=0,ph=0,px=0;for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));if(w===pw)ph++;else{if(pw>=0){if(op)RB(c,px,py,pw*2+1,ph);else cx.rect(px,py,pw*2+1,ph);}pw=w;px=x-w;py=y+j;ph=1;}}if(op)RB(c,px,py,pw*2+1,ph);else{cx.rect(px,py,pw*2+1,ph);cx.fill();}return;}
+   flushR();cx.beginPath();for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(Math.max(0,r*r+r*.8-j*j)));cx.rect(x-w,y+j,w*2+1,1);}cx.fillStyle=dpat(c);cx.fill();},
   ring(x,y,R,c,th,dith){x=q(x);y=q(y);R=Math.max(1,q(R));th=Math.max(1,th||1);const ri=R-th,par=dith?((x+y)&1):0;
    const draw=(g,X,Y,pp)=>{g.fillStyle=c;for(let j=-R;j<=R;j++){const wo=Math.floor(Math.sqrt(Math.max(0,R*R+R*.8-j*j)));const wi=(ri>0&&Math.abs(j)<=ri)?Math.floor(Math.sqrt(Math.max(0,ri*ri+ri*.8-j*j))):-1;
     const put=(a,b)=>{if(!dith)g.fillRect(a,Y+j,b-a+1,1);else for(let i=a;i<=b;i++)if(((i-X+pp+j)&1)===0)g.fillRect(i,Y+j,1,1);};
@@ -8769,10 +8774,12 @@ const PXF=(()=>{
    if(ch>0){cx.imageSmoothingEnabled=false;if(o.rot||sc!==1){cx.save();cx.translate(Math.round(x),Math.round(y));if(o.rot)cx.rotate(o.rot);cx.drawImage(cv,0,0,cv.width,ch,-ox*sc,-oy*sc,cv.width*sc,ch*sc);cx.restore();}else cx.drawImage(cv,0,0,cv.width,ch,Math.round(x-ox),Math.round(y-oy),cv.width,ch);cx.imageSmoothingEnabled=true;}
    cx.globalAlpha=ga0;},
   spr(rows,pal,x,y,sc){sc=Math.max(1,Math.round((sc||1)*K*.75));const h=rows.length,w=rows[0].length;x=q(x-w*sc/2);y=q(y-h*sc/2);
-   for(let j=0;j<h;j++)for(let i=0;i<w;i++){const k=rows[j][i];if(k==='.')continue;cx.fillStyle=pal[k];cx.fillRect(x+i*sc,y+j*sc,sc,sc);}},
+   for(let j=0;j<h;j++)for(let i=0;i<w;i++){const k=rows[j][i];if(k==='.')continue;RB(pal[k],x+i*sc,y+j*sc,sc,sc);}},
   fill(c,alpha,dither){cx.save();cx.globalAlpha=alpha==null?1:alpha;if(dither){let pt=DPAT[c];if(!pt||pt.cx!==cx){const t=document.createElement('canvas');t.width=t.height=2;const g=t.getContext('2d');g.fillStyle=c;g.fillRect(0,0,1,1);g.fillRect(1,1,1,1);pt=DPAT[c]={cx,p:cx.createPattern(t,'repeat')};}cx.fillStyle=pt.p;}else cx.fillStyle=c;cx.fillRect(0,0,cw,ch);cx.restore();},
    ga(a){cx.globalAlpha=baseA*a;},
-   glow(x,y,r,c,a,n){if(lite){if(r>=5&&HEX6.test(c)){P.halo(x,y,r,c,Math.min(.95,a));return;}n=Math.max(2,Math.round((n||6)*.7));}else n=Math.round((n||6)*1.8);const al=1-Math.pow(1-Math.min(.95,Math.max(0,a)),1/n);if(al<=0)return;cx.fillStyle=c;cx.globalAlpha=baseA*al;x=q(x);y=q(y);for(let i=0;i<n;i++){const rr=Math.max(1,q(r*(1-i/n)));cx.beginPath();let pw=-1,py=0,ph=0,px=0;for(let j=-rr;j<=rr;j++){const w=Math.floor(Math.sqrt(Math.max(0,rr*rr+rr*.8-j*j)));if(w===pw)ph++;else{if(pw>=0)cx.rect(px,py,pw*2+1,ph);pw=w;px=x-w;py=y+j;ph=1;}}cx.rect(px,py,pw*2+1,ph);cx.fill();}cx.globalAlpha=baseA;},
+   glow(x,y,r,c,a,n){if(lite){if(r>=5&&HEX6.test(c)){P.halo(x,y,r,c,Math.min(.95,a));return;}n=Math.max(2,Math.round((n||6)*.7));}else n=Math.round((n||6)*1.8);a=Math.min(.95,Math.max(0,a));if(a>.02)a=Math.round(a*24)/24;const al=1-Math.pow(1-a,1/n);if(al<=0)return;x=q(x);y=q(y);
+    {const R0=Math.max(1,q(r));if(R0<=110&&warm('g'+R0+'|'+n+'|'+a+c)){const sz=R0*2+1,sp=cacheCv('g'+R0+'|'+n+'|'+a+c,sz,sz,g=>{g.fillStyle=c;g.globalAlpha=al;for(let i=0;i<n;i++){const rr=Math.max(1,q(r*(1-i/n)));g.beginPath();let pw=-1,py=0,ph=0,px=0;for(let j=-rr;j<=rr;j++){const w=Math.floor(Math.sqrt(Math.max(0,rr*rr+rr*.8-j*j)));if(w===pw)ph++;else{if(pw>=0)g.rect(px,py,pw*2+1,ph);pw=w;px=R0-w;py=R0+j;ph=1;}}g.rect(px,py,pw*2+1,ph);g.fill();}});cx.globalAlpha=baseA;cx.drawImage(sp,x-R0,y-R0);return;}}
+    cx.fillStyle=c;cx.globalAlpha=baseA*al;for(let i=0;i<n;i++){const rr=Math.max(1,q(r*(1-i/n)));cx.beginPath();let pw=-1,py=0,ph=0,px=0;for(let j=-rr;j<=rr;j++){const w=Math.floor(Math.sqrt(Math.max(0,rr*rr+rr*.8-j*j)));if(w===pw)ph++;else{if(pw>=0)cx.rect(px,py,pw*2+1,ph);pw=w;px=x-w;py=y+j;ph=1;}}cx.rect(px,py,pw*2+1,ph);cx.fill();}cx.globalAlpha=baseA;},
    poly(pts,c,al){const n=pts.length;let y0=1e9,y1=-1e9;for(const p of pts){if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1];}cx.fillStyle=c;if(al!=null)cx.globalAlpha=baseA*al;y0=q(y0);y1=q(y1);
     if(y1-y0<5){for(let y=y0;y<=y1;y++){const yy=y+.5,xs=[];for(let i=0;i<n;i++){const A=pts[i],B=pts[(i+1)%n];if((A[1]<=yy&&B[1]>yy)||(B[1]<=yy&&A[1]>yy))xs.push(A[0]+(yy-A[1])/(B[1]-A[1])*(B[0]-A[0]));}xs.sort((u,v)=>u-v);for(let i=0;i+1<xs.length;i+=2){const xa=q(xs[i]),xb=q(xs[i+1]);if(xb>=xa)cx.fillRect(xa,y,Math.max(1,xb-xa),1);}}if(al!=null)cx.globalAlpha=baseA;return;}
     cx.beginPath();let px=0,pw=0,py=0,ph=0,has=false;const xs=[];
@@ -8781,11 +8788,11 @@ const PXF=(()=>{
      for(let i=0;i+1<xs.length;i+=2){const xa=q(xs[i]),xb=q(xs[i+1]);if(xb>=xa){const w=Math.max(1,xb-xa);
       if(has&&xa===px&&w===pw&&y===py+ph)ph++;else{if(has)cx.rect(px,py,pw,ph);px=xa;pw=w;py=y;ph=1;has=true;}}}}
     if(has)cx.rect(px,py,pw,ph);cx.fill();if(al!=null)cx.globalAlpha=baseA;},
-   arc(x,y,r,a0,a1,c,th){th=th||1;cx.fillStyle=c;const st=Math.max(.02,.8/Math.max(2,r)),o=-(th>>1);for(let a=a0;a<=a1;a+=st)cx.fillRect(q(x+Math.cos(a)*r)+o,q(y+Math.sin(a)*r)+o,th,th);}
+   arc(x,y,r,a0,a1,c,th){th=th||1;const st=Math.max(.02,.8/Math.max(2,r)),o=-(th>>1);for(let a=a0;a<=a1;a+=st)RB(c,q(x+Math.cos(a)*r)+o,q(y+Math.sin(a)*r)+o,th,th);}
  };
  function add(delay,dur,x,y,f,o){if(lite?parts.length>220:parts.length>480)parts.splice(0,lite?50:80);const p=Object.assign({age:-delay,dur,x,y,f},o||{});parts.push(p);if(!raf){size();last=0;raf=requestAnimationFrame(tick);}return p;}
  // 화면 주사율(최대 60fps)에 맞춰 그려요. 한 프레임 그리는 데 시간이 오래 걸리는 기기는 자동으로 30fps로 낮춰 렉을 막아요.
- const FAST=1000/60,SLOWF=1000/30;let cap=FAST,cs=0,cn=0,thin=false,lt=0,halos=0;for(const k of Object.keys(P)){const f=P[k];if(typeof f==='function'&&k!=='rect'&&k!=='px')P[k]=function(){flushR();return f.apply(this,arguments);};}Object.defineProperty(P,'thin',{get:()=>thin});
+ const FAST=1000/60,SLOWF=1000/30;let cap=FAST,cs=0,cn=0,thin=false,lt=0,halos=0;for(const k of Object.keys(P)){const f=P[k];if(typeof f==='function'&&k!=='rect'&&k!=='px'&&k!=='disc'&&k!=='line'&&k!=='arc'&&k!=='spr')P[k]=function(){flushR();return f.apply(this,arguments);};}Object.defineProperty(P,'thin',{get:()=>thin});
  function tick(ts){raf=requestAnimationFrame(tick);if(lite)cap=SLOWF;if(!last)last=ts;const dt=ts-last;if(dt<cap-2)return;last=ts;halos=0;if(dt>cap*1.5&&dt<250)lt++;
   const t0=performance.now();
   if(frz>0)frz-=dt;else{const st=Math.min(dt,50);for(let i=0;i<parts.length;i++)parts[i].age+=st;}
@@ -9879,7 +9886,7 @@ const capR=u=>u>.86?Math.sqrt(Math.max(.03,1-Math.pow((u-.86)/.14,2))):1;
 // 좌표는 모두 "캔버스 칸" 단위로 써요 (화면 px ÷ S)
 const mk=c=>{const S=F.S();return{S,sc:cl(c.pw||1,.6,1.8),ax:c.x0/S,ay:c.y0/S,bx:c.x1/S,by:c.y1/S,R:Math.max(c.mini?8:14,c.R/S),big:(c.pw||1)>=1,cb:!!c.cb,epic:!!c.epic};};
 // 길이가 긴 스킬은 전체를 빠르게 재생해 최대 2초 안쪽으로 맞춰요(SPEED). 타이밍·움직임이 그대로 비율만 줄어요.
-let SPD=1;const SPEED={icelance:1.18,bodyrush:1.08,closecombat:1.2,daimonji:1.5,ancientpower:1.35,cometpunch:1.22,stoneedge:1.12,swift:1.12,overheat:1.12,dracometeor:1.08};
+let SPD=1;const SPEED={icelance:1.18,bodyrush:1.08,multiattack:1.08,terapagosrush:1.08,closecombat:1.2,daimonji:1.5,ancientpower:1.35,cometpunch:1.22,stoneedge:1.12,swift:1.12,overheat:1.12,dracometeor:1.08};
 const F=Object.assign({},F0,{debris(x,y,o){if(SPD===1)return F0.debris(x,y,o);const s=SPD;return F0.debris(x,y,Object.assign({},o,{delay:(o.delay||0)/s,dur:(o.dur||560)/s,stagger:o.stagger?o.stagger/s:o.stagger,sp:(o.sp||170)*s,g:(o.g!=null?o.g:320)*s*s}));}});
 const waitS=ms=>wait(ms/SPD);
 const add=(d,du,f,o)=>{const s=SPD;if(s===1)return F.add(d,du,0,0,(P_,p,k)=>f(k,p),o||{nf:1});let px=null;return F.add(d/s,du/s,0,0,(P_,p,k)=>{if(!px)px=Object.create(p,{age:{get(){return p.age*s}},dur:{get(){return du}}});return f(k,px);},o||{nf:1});};
@@ -10520,9 +10527,63 @@ solarbeam(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=900,tB=720,tH=tC+120,ang=Math
  setTimeout(()=>{F.hold(140);F.flash('#fffbd0');shk();setTimeout(shk,150);sparks(bx,by,22,[Y[2],Y[3],Y[4]],280,850);},tH);
  return waitS(tH);},
 });
+// ── 도트 주먹: 팔레트 도트를 직접 찍어 만든 돌 건틀릿(한 번만 생성해 회전해서 찍어요)
+const pixFist=()=>{const W=72,H=40,G=[];for(let y=0;y<H;y++)G.push(new Array(W).fill(null));
+  const RA=['#14151c','#232531','#31344a','#434861','#585e7a','#727992','#939ab3','#b6bdd2','#d8dded','#f3f5fb'],RED=['#5d6a86','#a9bbdb','#ffffff','#e6eefc','#ffffff'];
+  let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  // 다각형을 도트로 채움(안티앨리어싱 없음). 윗줄/왼쪽은 밝게, 아랫줄/오른쪽은 어둡게 한 칸씩 깎아 면 느낌을 내요
+  const fill=(pts,tone,o)=>{o=o||{};const pal=o.pal||RA;let y0=Math.max(0,Math.floor(Math.min(...pts.map(p=>p[1])))),y1=Math.min(H-1,Math.ceil(Math.max(...pts.map(p=>p[1]))));
+   const rows=[];for(let y=y0;y<=y1;y++){const xs=[];for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];const ya=a[1],yb=b[1],yy=y+.5;if((ya<=yy&&yb>yy)||(yb<=yy&&ya>yy))xs.push(a[0]+(yy-ya)/(yb-ya)*(b[0]-a[0]));}xs.sort((p,q)=>p-q);
+    for(let k=0;k+1<xs.length;k+=2){const xa=Math.ceil(xs[k]-.5),xb=Math.ceil(xs[k+1]-.5)-1;if(xb>=xa)rows.push([y,xa,xb]);}}
+   const top=rows.length?Math.min(...rows.map(r=>r[0])):0,bot=rows.length?Math.max(...rows.map(r=>r[0])):0;
+   for(const[y,xa,xb]of rows){for(let x=xa;x<=xb;x++){if(x<0||x>=W)continue;let t=tone;
+     if(o.bevel!==0){if(y===top||x===xa)t+=1;if(y===bot||x===xb)t-=1;if(y===top&&x===xa)t+=0;}
+     if(o.tex&&rnd()<o.tex)t+=rnd()<.5?-1:1;G[y][x]=typeof o.col==='string'?o.col:pal[Math.max(0,Math.min(pal.length-1,t))];}}};
+  const line=(x0,y0,x1,y1,col)=>{x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy;for(;;){if(x0>=0&&x0<W&&y0>=0&&y0<H)G[y0][x0]=col;if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}};
+  const px=(x,y,col)=>{if(x>=0&&x<W&&y>=0&&y<H)G[y][x]=col;};
+  const disc=(cx,cy,r,tone,o)=>{const pts=[];for(let i=0;i<20;i++){const a=i/20*Math.PI*2;pts.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);}fill(pts,tone,o);};
+  // ① 손목 갑옷(왼쪽): 비스듬한 면 3개 + 붉은 홈 두 줄
+  fill([[3,9],[26,7],[27,13],[4,15]],6);                       // 윗면(밝음)
+  fill([[4,15],[27,13],[28,28],[5,30]],4,{tex:.05});           // 앞면
+  fill([[5,30],[28,28],[26,33],[7,34]],2);                     // 아랫면(어두움)
+  fill([[2,10],[4,15],[5,30],[3,29]],3);                       // 왼쪽 모서리 면
+  for(const ox of [0,5]){fill([[10+ox,17],[13+ox,17],[13+ox,24],[10+ox,24]],0,{col:RED[1],bevel:0});fill([[11+ox,18],[12+ox,18],[12+ox,23],[11+ox,23]],0,{col:RED[2],bevel:0});px(11+ox,18,RED[4]);px(11+ox,19,RED[3]);}
+  line(6,27,26,25,RA[2]);line(6,28,26,26,RA[6]);
+  // ② 검은 커프 + 붉은 빛 띠
+  fill([[27,8],[35,7],[35,33],[27,32]],1,{bevel:0});fill([[29,9],[33,9],[33,32],[29,31]],0,{col:RED[1],bevel:0});fill([[30,9],[32,9],[32,31],[30,31]],0,{col:RED[2],bevel:0});for(let y=10;y<31;y+=1)px(31,y,RED[3]);
+  line(27,10,35,9,RA[3]);line(27,31,35,32,RA[0]);
+  // ③ 주먹 덩어리: 돌처럼 각진 큰 면들(손등)
+  fill([[34,10],[46,6],[58,8],[58,32],[46,34],[34,31]],3,{bevel:0});
+  fill([[36,11],[46,7],[56,9],[52,15],[38,17]],6,{tex:.06});                     // 윗면 큰 돌
+  fill([[38,17],[52,15],[55,27],[40,30]],4,{tex:.06});                           // 가운데 큰 돌
+  fill([[40,30],[55,27],[57,32],[46,34],[38,32]],2,{tex:.04});                   // 아래 그늘 돌
+  // ④ 엄지: 손가락 아래로 접힌 돌(먼저 그려 손가락이 덮게)
+  fill([[44,30],[60,28],[64,32],[60,37],[46,37]],4,{tex:.06});line(46,32,60,30,RA[7]);line(47,36,60,36,RA[1]);
+  // ⑤ 네 손가락: 앞쪽에 쌓인 각진 돌 마디(위→아래), 마디마다 어두운 틈
+  const FB=[[7,15,66],[15,22,69],[22,29,68],[29,35,63]];
+  for(const[y0,y1,xe]of FB){const poly=[[53,y0],[xe-3,y0-1],[xe,y0+2],[xe,y1-2],[xe-3,y1],[53,y1]];
+   fill(poly,5,{tex:.07});fill([[xe-9,y0+2],[xe-4,y0+2],[xe-1,y0+4],[xe-1,y1-3],[xe-4,y1-2],[xe-9,y1-2]],6,{tex:.05});
+   for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length];line(p[0],p[1],q[0],q[1],RA[1]);}
+   line(54,y0+1,xe-4,y0,RA[8]);px(xe-5,y0+3,RA[9]);px(xe-4,y0+3,RA[9]);px(xe-6,y0+4,RA[8]);px(xe-2,y0+4,RA[7]);line(xe-6,y0+6,xe-6,y1-4,RA[3]);}
+  // ⑥ 균열과 하이라이트
+  line(44,19,48,24,RA[1]);line(50,10,52,15,RA[1]);
+  for(let i=0;i<30;i++){const x=36+Math.floor(rnd()*28),y=9+Math.floor(rnd()*22);if(G[y][x]&&G[y][x]!==RED[1]&&G[y][x]!==RED[2])G[y][x]=rnd()<.5?RA[Math.min(9,RA.indexOf(G[y][x])+1)]||G[y][x]:G[y][x];}
+  // ⑦ 바깥 윤곽(한 칸) — 가장자리 도트를 가장 어두운 색으로
+  const solid=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&G[y][x];const E=[];
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(G[y][x]&&(!solid(x-1,y)||!solid(x+1,y)||!solid(x,y-1)||!solid(x,y+1)))E.push([x,y]);
+  for(const[x,y]of E)G[y][x]='#0f1016';
+  // 손목 끝: 왼쪽 가장자리를 도트 단위로 흩어지게
+  for(let y=0;y<H;y++)for(let x=0;x<16;x++){if(G[y][x]&&rnd()>(x/16)*1.1+.08)G[y][x]=null;}
+  const cells=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(G[y][x])cells.push({x,y,col:G[y][x]});return{W,H,cells};};
+const fistSpr=()=>{if(window.__pfs)return window.__pfs;const R0=pixFist(),PPU=R0.W/2.9;const cv=bake(R0.W,R0.H,B=>{for(const c of R0.cells)B.rect(c.x,c.y,1,1,c.col);});return window.__pfs={cv,PPU,ox:R0.W*.55,oy:R0.H*.5};};
+window.__pixFistFn=pixFist;
+/* 흰색 주먹: 코멧펀치의 도트 주먹 모양에서 색만 밝은 흰색으로 바꿔 (인파이트에서 써요) */
+window.__whiteFist=()=>{if(window.__pfsW)return window.__pfsW;const R0=pixFist(),PPU=R0.W/2.9,lo=[88,98,130],hi=[255,255,255],hx=s=>[1,3,5].map(i=>parseInt(s.substr(i,2),16));
+ const cv=bake(R0.W,R0.H,B=>{for(const c of R0.cells){let col=c.col;if(/^#[0-9a-f]{6}$/i.test(col)){const[r,g,b]=hx(col),l=Math.min(1,(.3*r+.59*g+.11*b)/255/.82),tt=Math.pow(l,.7),n=lo.map((v,i)=>Math.round(v+(hi[i]-v)*tt));col='#'+n.map(v=>v.toString(16).padStart(2,'0')).join('');}B.rect(c.x,c.y,1,1,col);}});
+ return window.__pfsW={cv,PPU,ox:R0.W*.55,oy:R0.H*.5};};
 Object.assign(FX,{
 // 잠만보 · 지진: 쿵! 발을 구르면 땅을 가르는 균열이 상대에게 내달리고, 쩍쩍 갈라진 틈에서 빛과 바위가 솟구쳐요
-earthquake(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,E=['#2a1608','#6b4a2b','#c98a3c','#ffc866','#fff3b0'],DU='#d9bf8c',yb=by+R*.9,ya=ay+R*.9,tS=420,tT=tS+360,tB=tT+120,TB=1250,Sx=big?1.25:1;
+earthquake(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,E=['#2a1608','#6b4a2b','#c98a3c','#ffc866','#fff3b0'],DU='#d9bf8c',ya=ay+R*.9,yb=(()=>{let y=by+R*.9;try{if(c.toEl){const r=spriteRect(c.toEl);y=Math.max(y,(r.top+r.height)/m.S+R*.95);}}catch(e){}return y;})(),tS=420,tT=tS+360,tB=tT+120,TB=1250,Sx=big?1.25:1;
  const jag=(x0,y0,x1,y1,n,amp,sd)=>{const pts=[[x0,y0]],dx=x1-x0,dy=y1-y0,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;for(let i=1;i<n;i++){const t=i/n,o=(hz(sd*7+i*1.9)-.5)*amp;pts.push([x0+dx*t+nx*o,y0+dy*t+ny*o]);}pts.push([x1,y1]);return pts;};
  const part=(pts,u)=>{const n=pts.length-1,f=cl(u,0,1)*n,i=Math.floor(f),o=pts.slice(0,i+1);if(i<n){const t=f-i;o.push([lerp(pts[i][0],pts[i+1][0],t),lerp(pts[i][1],pts[i+1][1],t)]);}return o.length>1?o:[pts[0],pts[0]];};
  // 갈라진 틈: 어두운 틈 · 빛나는 가장자리 · 뜨거운 속
@@ -10547,10 +10608,10 @@ earthquake(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,E=['#2a1608','#6b4a
   // 가운데 큰 틈: 점점 벌어지며 빛이 새어 나와요
   const g=ez.out(cl(kt/380,0,1)),w=R*(.35+1.3*g)*Sx,h=R*(.1+.34*g);
   P.ga(a);P.poly([[bx-w*1.5,yb],[bx-w*.5,yb-h],[bx+w*.6,yb-h*.9],[bx+w*1.5,yb],[bx+w*.5,yb+h],[bx-w*.6,yb+h*.9]],E[0]);P.poly([[bx-w*1.1,yb],[bx-w*.4,yb-h*.6],[bx+w*.5,yb-h*.55],[bx+w*1.1,yb],[bx+w*.4,yb+h*.6],[bx-w*.5,yb+h*.55]],E[2]);P.poly([[bx-w*.8,yb],[bx,yb-h*.3],[bx+w*.8,yb],[bx,yb+h*.3]],E[4]);P.ga(1);
-  const rl=R*(2+3*g)*a;for(let j=-3;j<=3;j++)P.ray(bx+j*w*.22,yb,-PI/2+j*.13,rl*(1-Math.abs(j)*.1),Math.max(1,R*.09),j%2?E[3]:E[4],.55*a);
-  glow(bx,yb-R*.4,R*(1+1.4*g),E[3],.55*a);});
+  const rl=R*(.5+.7*g)*a;for(let j=-3;j<=3;j++)P.ray(bx+j*w*.22,yb,-PI/2+j*.13,rl*(1-Math.abs(j)*.1),Math.max(1,R*.09),j%2?E[3]:E[4],.55*a);
+  glow(bx,yb,R*(1+1.4*g),E[3],.45*a);});
  // 4) 바위 덩어리가 튀어 오르고 떨어져요
- add(tT+60,TB,(k,p)=>{const kt=k*TB;for(let i=0;i<16;i++){const t0=(kt-i*22-60)/1000;if(t0<0)continue;const vx=(hz(i*3)-.5)*R*5.5*Sx,vy=R*(5+4*hz(i+9)),g2=R*11,x=bx+vx*t0*1.1,y=yb-vy*t0+.5*g2*t0*t0;if(y>yb+R*.3)continue;const sz=R*(.12+.2*hz(i+2)),rot=t0*(4+hz(i)*8)+i,ca=cos(rot),sa=sin(rot),Q=(px,py)=>[x+px*ca-py*sa,y+px*sa+py*ca];
+ add(tT+60,TB,(k,p)=>{const kt=k*TB;for(let i=0;i<16;i++){const t0=(kt-i*22-60)/1000;if(t0<0)continue;const vx=(hz(i*3)-.5)*R*5.5*Sx,vy=R*(2.2+1.6*hz(i+9)),g2=R*11,x=bx+vx*t0*1.1,y=yb-vy*t0+.5*g2*t0*t0;if(y>yb+R*.3)continue;const sz=R*(.12+.2*hz(i+2)),rot=t0*(4+hz(i)*8)+i,ca=cos(rot),sa=sin(rot),Q=(px,py)=>[x+px*ca-py*sa,y+px*sa+py*ca];
    P.ga(.95);P.poly([Q(-sz,-sz*.7),Q(sz*.9,-sz),Q(sz*1.1,sz*.6),Q(-sz*.4,sz)],E[0]);P.poly([Q(-sz*.8,-sz*.55),Q(sz*.7,-sz*.8),Q(sz*.9,sz*.4),Q(-sz*.3,sz*.8)],i%2?E[1]:E[2]);P.poly([Q(-sz*.5,-sz*.4),Q(sz*.4,-sz*.6),Q(sz*.2,0)],E[3]);P.ga(1);}});
  // 5) 흙먼지: 충격파 고리와 퍼지는 먼지 구름
  add(tT,TB,(k)=>{const a=k>.7?(1-k)/.3:1,e=ez.out(Math.min(1,k*2));
@@ -10696,55 +10757,6 @@ stoneedge(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,n=sc>=1.3?8:7,tC=720,gap=sc>=1.3
 // 메타그로스 · 코멧펀치: 쇠주먹이 혜성처럼 날아가 꽝! 부딪혀요
 cometpunch(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,N=big?4:3,tC=520,gap=150,fl=190,ang=Math.atan2(by-ay,bx-ax),dx=cos(ang),dy=sin(ang),
  M={o:'#141c3a',d:'#2c3c70',a:'#4a5f95',b:'#3f74f0',c:'#8fb4ff',e:'#cfe2ff',w:'#ffffff',g:'#6fe0ff'},DU={l:'#eceafd',m:'#c3c2ee',d:'#8f90cb',x:'#5f619f'};
- // ── 도트 주먹: 팔레트 도트를 직접 찍어 만든 돌 건틀릿(한 번만 생성해 회전해서 찍어요)
- const pixFist=()=>{const W=72,H=40,G=[];for(let y=0;y<H;y++)G.push(new Array(W).fill(null));
-  const RA=['#14151c','#232531','#31344a','#434861','#585e7a','#727992','#939ab3','#b6bdd2','#d8dded','#f3f5fb'],RED=['#5d6a86','#a9bbdb','#ffffff','#e6eefc','#ffffff'];
-  let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
-  // 다각형을 도트로 채움(안티앨리어싱 없음). 윗줄/왼쪽은 밝게, 아랫줄/오른쪽은 어둡게 한 칸씩 깎아 면 느낌을 내요
-  const fill=(pts,tone,o)=>{o=o||{};const pal=o.pal||RA;let y0=Math.max(0,Math.floor(Math.min(...pts.map(p=>p[1])))),y1=Math.min(H-1,Math.ceil(Math.max(...pts.map(p=>p[1]))));
-   const rows=[];for(let y=y0;y<=y1;y++){const xs=[];for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];const ya=a[1],yb=b[1],yy=y+.5;if((ya<=yy&&yb>yy)||(yb<=yy&&ya>yy))xs.push(a[0]+(yy-ya)/(yb-ya)*(b[0]-a[0]));}xs.sort((p,q)=>p-q);
-    for(let k=0;k+1<xs.length;k+=2){const xa=Math.ceil(xs[k]-.5),xb=Math.ceil(xs[k+1]-.5)-1;if(xb>=xa)rows.push([y,xa,xb]);}}
-   const top=rows.length?Math.min(...rows.map(r=>r[0])):0,bot=rows.length?Math.max(...rows.map(r=>r[0])):0;
-   for(const[y,xa,xb]of rows){for(let x=xa;x<=xb;x++){if(x<0||x>=W)continue;let t=tone;
-     if(o.bevel!==0){if(y===top||x===xa)t+=1;if(y===bot||x===xb)t-=1;if(y===top&&x===xa)t+=0;}
-     if(o.tex&&rnd()<o.tex)t+=rnd()<.5?-1:1;G[y][x]=typeof o.col==='string'?o.col:pal[Math.max(0,Math.min(pal.length-1,t))];}}};
-  const line=(x0,y0,x1,y1,col)=>{x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy;for(;;){if(x0>=0&&x0<W&&y0>=0&&y0<H)G[y0][x0]=col;if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}};
-  const px=(x,y,col)=>{if(x>=0&&x<W&&y>=0&&y<H)G[y][x]=col;};
-  const disc=(cx,cy,r,tone,o)=>{const pts=[];for(let i=0;i<20;i++){const a=i/20*Math.PI*2;pts.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);}fill(pts,tone,o);};
-  // ① 손목 갑옷(왼쪽): 비스듬한 면 3개 + 붉은 홈 두 줄
-  fill([[3,9],[26,7],[27,13],[4,15]],6);                       // 윗면(밝음)
-  fill([[4,15],[27,13],[28,28],[5,30]],4,{tex:.05});           // 앞면
-  fill([[5,30],[28,28],[26,33],[7,34]],2);                     // 아랫면(어두움)
-  fill([[2,10],[4,15],[5,30],[3,29]],3);                       // 왼쪽 모서리 면
-  for(const ox of [0,5]){fill([[10+ox,17],[13+ox,17],[13+ox,24],[10+ox,24]],0,{col:RED[1],bevel:0});fill([[11+ox,18],[12+ox,18],[12+ox,23],[11+ox,23]],0,{col:RED[2],bevel:0});px(11+ox,18,RED[4]);px(11+ox,19,RED[3]);}
-  line(6,27,26,25,RA[2]);line(6,28,26,26,RA[6]);
-  // ② 검은 커프 + 붉은 빛 띠
-  fill([[27,8],[35,7],[35,33],[27,32]],1,{bevel:0});fill([[29,9],[33,9],[33,32],[29,31]],0,{col:RED[1],bevel:0});fill([[30,9],[32,9],[32,31],[30,31]],0,{col:RED[2],bevel:0});for(let y=10;y<31;y+=1)px(31,y,RED[3]);
-  line(27,10,35,9,RA[3]);line(27,31,35,32,RA[0]);
-  // ③ 주먹 덩어리: 돌처럼 각진 큰 면들(손등)
-  fill([[34,10],[46,6],[58,8],[58,32],[46,34],[34,31]],3,{bevel:0});
-  fill([[36,11],[46,7],[56,9],[52,15],[38,17]],6,{tex:.06});                     // 윗면 큰 돌
-  fill([[38,17],[52,15],[55,27],[40,30]],4,{tex:.06});                           // 가운데 큰 돌
-  fill([[40,30],[55,27],[57,32],[46,34],[38,32]],2,{tex:.04});                   // 아래 그늘 돌
-  // ④ 엄지: 손가락 아래로 접힌 돌(먼저 그려 손가락이 덮게)
-  fill([[44,30],[60,28],[64,32],[60,37],[46,37]],4,{tex:.06});line(46,32,60,30,RA[7]);line(47,36,60,36,RA[1]);
-  // ⑤ 네 손가락: 앞쪽에 쌓인 각진 돌 마디(위→아래), 마디마다 어두운 틈
-  const FB=[[7,15,66],[15,22,69],[22,29,68],[29,35,63]];
-  for(const[y0,y1,xe]of FB){const poly=[[53,y0],[xe-3,y0-1],[xe,y0+2],[xe,y1-2],[xe-3,y1],[53,y1]];
-   fill(poly,5,{tex:.07});fill([[xe-9,y0+2],[xe-4,y0+2],[xe-1,y0+4],[xe-1,y1-3],[xe-4,y1-2],[xe-9,y1-2]],6,{tex:.05});
-   for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length];line(p[0],p[1],q[0],q[1],RA[1]);}
-   line(54,y0+1,xe-4,y0,RA[8]);px(xe-5,y0+3,RA[9]);px(xe-4,y0+3,RA[9]);px(xe-6,y0+4,RA[8]);px(xe-2,y0+4,RA[7]);line(xe-6,y0+6,xe-6,y1-4,RA[3]);}
-  // ⑥ 균열과 하이라이트
-  line(44,19,48,24,RA[1]);line(50,10,52,15,RA[1]);
-  for(let i=0;i<30;i++){const x=36+Math.floor(rnd()*28),y=9+Math.floor(rnd()*22);if(G[y][x]&&G[y][x]!==RED[1]&&G[y][x]!==RED[2])G[y][x]=rnd()<.5?RA[Math.min(9,RA.indexOf(G[y][x])+1)]||G[y][x]:G[y][x];}
-  // ⑦ 바깥 윤곽(한 칸) — 가장자리 도트를 가장 어두운 색으로
-  const solid=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&G[y][x];const E=[];
-  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(G[y][x]&&(!solid(x-1,y)||!solid(x+1,y)||!solid(x,y-1)||!solid(x,y+1)))E.push([x,y]);
-  for(const[x,y]of E)G[y][x]='#0f1016';
-  // 손목 끝: 왼쪽 가장자리를 도트 단위로 흩어지게
-  for(let y=0;y<H;y++)for(let x=0;x<16;x++){if(G[y][x]&&rnd()>(x/16)*1.1+.08)G[y][x]=null;}
-  const cells=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(G[y][x])cells.push({x,y,col:G[y][x]});return{W,H,cells};};
- const fistSpr=()=>{if(window.__pfs)return window.__pfs;const R0=pixFist(),PPU=R0.W/2.9;const cv=bake(R0.W,R0.H,B=>{for(const c of R0.cells)B.rect(c.x,c.y,1,1,c.col);});return window.__pfs={cv,PPU,ox:R0.W*.55,oy:R0.H*.5};};
  const fist=(x,y,s,rot,al,gl)=>{const A0=al==null?1:al;if(gl)glow(x,y,s*2.2,M.c,.28*gl*A0);const F0=fistSpr();P.blit(F0.cv,x,y,{a:A0,rot,sc:s/F0.PPU,ox:F0.ox,oy:F0.oy});};
  // ── 강철빛 빛무리: 방사 광선은 한 번 구워 두고 돌려 찍어요
  const RS={};const halo=(x,y,s,rot,a,t,big,ph)=>{const c_=cos(rot),s_=sin(rot),ST={a:'#7787a2',b:'#b0bed3',c:'#dde6f2'},back=ph===0,front=ph===1;
@@ -11256,7 +11268,7 @@ originpulse(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,dx=bx-ax,dy=by-ay,
   for(let i=0;i<6;i++){const an=hz(i)*TAU+k*3,d=R*(3-2.6*e)*(.6+.5*hz(i+3));bub(ax+cos(an)*d,ay+sin(an)*d*.85,R*(.1+.12*hz(i+5)),Math.min(1,k*3));}});
  setTimeout(()=>{F.hold(100);shk();},tC-40);
  // 2) 물구슬 다섯 개가 시전자 주위 여기저기에 떠오르고, 차례로 레이저처럼 쏘아져 상대에 꽂혀요
- const OFF=[[-1.9,-1.5],[1.5,-2.1],[-2.5,.2],[2.2,-.4],[-.3,-2.8]],orbP=(w,kt)=>{const o=OFF[w],bob=Math.sin(kt*.006+w*1.9)*R*.1,bx2=Math.cos(kt*.004+w*2.3)*R*.06;return [ax+o[0]*R*Sx+bx2,ay+o[1]*R*Sx+bob];};
+ const OFF=[[-2,-.35],[-1,-1.15],[1,-1.15],[2,-.25],[0,.85]],hc=(()=>{let x=ax,y=ay;try{if(c.fromEl){const q=center(c.fromEl);x=q[0]/m.S;y=q[1]/m.S;}}catch(e){}return[x,y];})(),orbP=(w,kt)=>{const o=OFF[w],bob=Math.sin(kt*.006+w*1.9)*R*.1,bx2=Math.cos(kt*.004+w*2.3)*R*.06;return [hc[0]+o[0]*R*Sx+bx2,hc[1]+o[1]*R*Sx+bob];};
  for(let w=0;w<5;w++){const tf=tC+[0,1,2,3,4][w]*gap,ta=Math.round(tC*.35+[0,3,1,4,2][w]*55),life=tf+300-ta,tx=bx+(hz(w*3+1)-.5)*R*.9,ty=by+(hz(w*5+2)-.5)*R*.8;
   // 물구슬
   add(ta,life,(k,p)=>{const kt=p.age,fa=tf-ta,gr=ez.out(Math.min(1,kt/260)),pre=kt>fa-140&&kt<=fa,after=kt>fa?cl((kt-fa)/300,0,1):0,[x,y]=orbP(w,kt),Rb=R*.34*Sx*gr*(1+(pre?.18:0)+(kt>fa?.25*(1-after):0))*(1-after*.9),al=1-after;
@@ -11682,16 +11694,65 @@ fusionflare(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=480,tF=400,tH=tC+tF,ang=Mat
  setTimeout(()=>{F.hold(170);F.flash('#fff1d0');shk();setTimeout(shk,150);setTimeout(shk,320);sparks(bx,by,26,[FU[3],FU[4],FU[2]],340,820,true);embers(bx,by,12,[FU[2],FU[3],FU[4]],1100);},tH);
  return waitS(tH+950);}
 });
+// 자시안 · 거대한 검: 황금빛 도트 검(분홍 문양·푸른 보석)이 날아가 십자로 베고, 마지막엔 하늘에서 내리꽂혀요
+const ZSW_ROWS=["....................................................................dhh...................................", "....................................................................kgmGh.................................", ".....................................................................gmmGh................................", ".....................................................................kkdmmG...............................", "......................................................................nnGgmG..............................", ".......................................................................bBddG..............................", ".......................................................................nnGGkk.............................", ".......................................................................dddGkn.....................gGG.....", ".......................................................................dmGdGkm....................mmmGG...", ".......................................................................mmmGmgGG...................mmGgGg..", "...............................................................GGGGGGGGGmGhddmd...................dmmddg..", "......hhGGhhhGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGhhhhGGGGnbbbnhGGGGGGGhGGdddhPPGmmdkmdmmhdmgGmdgmdghgmGmmdddg.", "..hGGGGggggpphggggggggggggggggggggghPPhggggggggggggggGGbmgggdddddGGmmGGPPPpPPGmGddGmGmgPGmhGGGGGgmGghdhBdd", "hhGhgggggggggpppppppppppppppppppppppppppppppphggggggGGGggggqhhhhPPPPPPPPppppPdmkddmmdddPPddgdmmmmgGmddnnng", "mddggggggggggppppppppppppppppppppppppppppddddmgggggGGGgggggddddddqqqqqqqqppqdmdkkkmdddkdkddkddddmdmddddbnk", "..dddgggggggpggggggggggggggggggGGGGkppGgggggggggggGGGggdggggddddmdkkkdddkqqkdgdkkkkkkkkkkkkkkkkdkkddkdddk.", "....mgddddddddddddddddddddddddGGGGdddddddddddddddGGGdgBbbBggdddddddGkkkdddddddmkkkk..........k...kkkddkd..", "....................................................ddddddd....dddddddddkdgGddk....................kgddk..", ".........................................................................kdghnn....................kgdk...", ".........................................................................kdgkkk....................ddk....", ".........................................................................kGddk............................", ".........................................................................kbdgkk...........................", ".........................................................................kbmgk............................", ".........................................................................dmmkk............................", "........................................................................dGmkk.............................", "........................................................................dmmk..............................", "........................................................................Gdk...............................", ".......................................................................kdk................................", ".......................................................................kk................................."],ZSW_PAL={"k": "#582818", "d": "#985828", "m": "#b8742c", "g": "#e8a838", "G": "#f8c858", "h": "#f8e898", "p": "#e87898", "P": "#f8aac4", "q": "#aa466e", "b": "#2a3e94", "B": "#5070d2", "n": "#1e2c68"},ZSW_W=106,ZSW_H=29,ZSW_TX=0,ZSW_TY=13.5;let ZSW=null;
+Object.assign(FX,{
+zaciansword(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=480,tF=250,gap=170,tS=tC+tF,tP=tS+2*gap+90,tH=tP+230,
+ ZG='#ffe27a',ZP='#ff8fb8',ZB='#6f94ff',ZD='#7a3c14',ZH='#fff6c8',ang=Math.atan2(by-ay,bx-ax);
+ if(!ZSW)ZSW=bake(ZSW_W,ZSW_H,B=>{ZSW_ROWS.forEach((r,y)=>{for(let x=0;x<r.length;x++){const ch=r[x];if(ch!=='.')B.rect(x,y,1,1,ZSW_PAL[ch]);}});});
+ // 검 그리기: th=칼끝이 향하는 각도, Ls=칼 길이(칸), tip=true면 칼끝이 기준점
+ const swd=(x,y,th,Ls,al,tip)=>{if(al<=.01)return;P.blit(ZSW,x,y,{rot:th+PI,sc:Ls/ZSW_W,a:al,ox:tip?ZSW_TX:ZSW_W/2,oy:ZSW_TY});};
+ vig('#1a1004',.4,tH+1000,0);
+ gather(ax,ay,R*1.6,[ZG,ZP,ZH],tC,22);
+ // 1) 허공에 도트 검이 떠올라요
+ add(0,tC,(k,p)=>{const e=ez.out(k),hv=Math.sin(p.age*.012)*R*.12,sx=ax,sy=ay-R*(.6+.5*e)+hv,th=-PI/2+(ang+PI/2)*.55*e,L=R*5.2*(.55+.45*e);
+  glow(sx,sy,R*(1+1.6*e),ZG,.45*e);glow(sx,sy,R*(.5+.8*e),ZP,.3*e);
+  swd(sx,sy,th,L,e);
+  const sw=cl((k-.35)/.5,0,1);if(sw>0&&sw<1){const u=(sw*2-1)*L*.5;flare(sx+cos(th)*u,sy+sin(th)*u,R*.5*Math.sin(sw*PI),ZH,Math.sin(sw*PI),sw*3);}
+  for(let i=0;i<6;i++){const ph=(k*1.2+hz(i))%1;P.ga(e*Math.sin(ph*PI));F.spark4(sx+(hz(i+3)-.5)*L*.9,sy-ph*R*1.6+(hz(i+8)-.5)*R*.5,i%2?2:1,i%3?ZG:ZB,'#ffffff');}P.ga(1);});
+ // 2) 검이 날아가요(잔상 + 반짝이 꼬리)
+ add(tC,tF+80,(k,p)=>{const g=ez.in(Math.min(1,p.age/tF)),al=p.age>tF?cl(1-(p.age-tF)/80,0,1):1,L=R*5.6;
+  const sx0=ax,sy0=ay-R*1.1,th=ang;
+  for(let j=6;j>=0;j--){const t=Math.max(0,g-j*.045),x=lerp(sx0,bx,t),y=lerp(sy0,by,t),a=(1-j/7)*al*.55;if(j>0){glow(x,y,R*(.9-j*.08),j%2?ZP:ZG,.3*a);swd(x,y,th,L,a*.7);}}
+  const hx=lerp(sx0,bx,g),hy=lerp(sy0,by,g);glow(hx,hy,R*1.6,ZG,.5*al);swd(hx,hy,th,L,al);
+  for(let i=0;i<8;i++){const t=Math.max(0,g-hz(i)*.3),x=lerp(sx0,bx,t)+(hz(i+5)-.5)*R*.9,y=lerp(sy0,by,t)+(hz(i+9)-.5)*R*.9;P.ga(al*.9);F.spark4(x,y,1,i%3?ZG:(i%2?ZP:ZB),'#ffffff');}P.ga(1);});
+ // 3) 십자 베기: 검이 목표를 가로지르며 황금 초승달 궤적을 남겨요
+ const CUT=[[-.85,1],[.85,-1]];
+ CUT.forEach(([ra,fl],j)=>{const t0=tS+j*gap,Ls=R*8,dur=240;
+  add(t0,dur+360,(k,p)=>{const g=ez.out(Math.min(1,p.age/dur)),al=p.age>dur?cl(1-(p.age-dur)/360,0,1):1,c0=cos(ra),s0=sin(ra),T=(u,v)=>[bx+u*c0-v*s0,by+u*s0+v*c0],n=14,top=[],bot=[],t2=[],b2=[];
+   for(let i=0;i<=n;i++){const q=i/n,u=(q*2-1)*Ls*.5*g,v=-Math.sin(q*PI)*R*.7*fl*g,w=Math.sin(q*PI)*R*.38*(1-.3*(1-al)),w2=Math.sin(q*PI)*R*.16;top.push(T(u,v-w));bot.push(T(u,v+w*.4));t2.push(T(u,v-w2));b2.push(T(u,v+w2*.3));}
+   glow(bx,by,R*(1.6+1.2*g),ZG,.4*al);P.ga(al);P.poly(top.concat(bot.reverse()),ZG);P.ga(al*.9);P.poly(t2.concat(b2.reverse()),ZH);P.ga(1);
+   // 칼날이 궤적을 따라 지나가요
+   if(p.age<dur+60){const q=cl(g,0,1),u=(q*2-1)*Ls*.5,v=-Math.sin(q*PI)*R*.7*fl,[hx,hy]=T(u,v),dx=T(u+1,-Math.sin(Math.min(1,q+.02)*PI)*R*.7*fl)[0]-hx,dy=T(u+1,-Math.sin(Math.min(1,q+.02)*PI)*R*.7*fl)[1]-hy;swd(hx,hy,Math.atan2(dy,dx),R*5,al,true);F.spark4(hx,hy,2,ZH,'#ffffff');}});
+  ring(bx,by,R*2.4,j?ZP:ZG,t0+50,420,1);
+  setTimeout(()=>{F.hold(45);shk();sparks(bx,by,8,[ZG,ZP,ZH],240,520,true);},t0/SPD+50);});
+ // 4) 하늘에서 거대한 검이 내리꽂혀요
+ add(tP,tH-tP+520,(k,p)=>{const t=p.age,dn=ez.in(cl(t/(tH-tP),0,1)),al=t>tH-tP+160?cl(1-(t-(tH-tP)-160)/360,0,1):1,Ls=R*10,y=lerp(by-R*16,by,dn);
+  const col=Math.max(0,by-y);
+  P.ga(.5*al);P.vfade(bx,0,Math.max(2,by),R*.3,R*.9,ZG,.35*al,.5,.1);P.ga(1);
+  glow(bx,y-R*.5,R*2.2,ZG,.5*al);glow(bx,y,R*1.2,ZP,.4*al);
+  swd(bx,y,PI/2,Ls,al,true);
+  for(let i=0;i<8;i++){const ph=((t*.002+hz(i))%1),yy=y-ph*R*8;P.ga(al*(1-ph));F.spark4(bx+(hz(i+4)-.5)*R*1.6,yy,i%3===0?2:1,i%2?ZG:ZB,'#ffffff');}P.ga(1);});
+ // 5) 착탄: 황금빛 폭발 + 십자 섬광 + 푸른 보석 파편
+ add(tH,900,(k)=>{const e=ez.out(k),a=1-k;glow(bx,by,R*(1.8+3.4*e),ZG,.6*a);glow(bx,by,R*(.9+1.6*e),ZH,.85*a);glow(bx,by,R*(1.2+2*e),ZP,.35*a);
+  flare(bx,by,R*(1.2+2.2*e),ZH,a,k);
+  for(let i=0;i<12;i++){const an=i/12*TAU+.1,LL=R*(2+3.4*e)*(i%2?.62:1);P.ray(bx,by,an,LL,Math.max(1,R*.11*(1-k)),i%3===0?ZP:(i%2?ZG:ZB),.9*a);}
+  for(let i=0;i<8;i++){const an=i/8*TAU+.4,d=R*(.8+3.2*e);P.ga(a);F.spark4(bx+cos(an)*d,by+sin(an)*d*.8,i%2?2:1,i%2?ZB:ZP,'#ffffff');}P.ga(1);});
+ for(let j=0;j<3;j++)ring(bx,by,R*(2.6+j*1.5),[ZH,ZG,ZP][j],tH+j*90,620,j?1:2);
+ setTimeout(()=>{F.hold(160);F.flash('#fff2c8');shk();setTimeout(shk,150);sparks(bx,by,28,[ZH,ZG,ZP,ZB],340,860,true);},tH/SPD);
+ return waitS(tH+900);}
+});
 Object.assign(FX,{
 // 마샤도 · 인파이트: 기합을 모아 눈 깜짝할 새 주먹 연타를 퍼붓고, 거대한 주먹 한 방으로 땅이 갈라지게 날려버려요
 closecombat(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=420,gap=85,N=9,t1=tC+80,tH=t1+N*gap+90,ang=Math.atan2(by-ay,bx-ax),ux=cos(ang),uy=sin(ang),nx=-uy,ny=ux,
  FC=['#4a0a06','#c9300f','#ff7a2e','#ffd45c','#fff6c8','#ffffff'];
  // 주먹 모양(도트): 손등·손가락 마디·엄지 / 별 모양 타격 섬광
- const fist=(x,y,s,a,al)=>{const ca=cos(a),sa=sin(a),T=(u,v)=>[x+u*ca-v*sa,y+u*sa+v*ca];P.ga(al);
+ const fistOld=(x,y,s,a,al)=>{const ca=cos(a),sa=sin(a),T=(u,v)=>[x+u*ca-v*sa,y+u*sa+v*ca];P.ga(al);
   P.poly([T(-s*1.1,-s*.62),T(s*.7,-s*.7),T(s*.95,-s*.3),T(s*.95,s*.5),T(s*.7,s*.72),T(-s*1.1,s*.62)],FC[0]);
   P.poly([T(-s,-s*.5),T(s*.65,-s*.58),T(s*.85,-s*.25),T(s*.85,s*.45),T(s*.65,s*.6),T(-s,s*.5)],FC[2]);
   P.poly([T(-s*.9,-s*.4),T(s*.5,-s*.45),T(s*.5,-s*.12),T(-s*.9,-s*.1)],FC[3]);
   for(let i=0;i<4;i++){const v=(i-1.5)*s*.36,q=T(s*.88,v);P.disc(q[0],q[1],Math.max(1,s*.2),FC[3]);P.disc(q[0],q[1],Math.max(1,s*.12),FC[4]);}P.ga(1);};
+ const fist=(x,y,s,a,al)=>{let F0=null;try{F0=window.__whiteFist&&window.__whiteFist();}catch(e){}if(!F0)return fistOld(x,y,s,a,al);P.blit(F0.cv,x,y,{a:al==null?1:al,rot:a,sc:s*.8/F0.PPU,ox:F0.ox,oy:F0.oy});};
  const burst2=(x,y,r,rot,c1,c2,al)=>{const p1=[],p2=[];for(let i=0;i<14;i++){const an=rot+i/14*TAU,rr=r*(i%2?.5:1)*(.85+.3*hz(i+rot*7));p1.push([x+cos(an)*rr,y+sin(an)*rr]);p2.push([x+cos(an)*rr*.6,y+sin(an)*rr*.6]);}P.ga(al);P.poly(p1,c1);P.poly(p2,c2);P.ga(1);};
  vig('#240402',.42,tH+1000,0);
  gather(ax,ay,R*1.5,[FC[2],FC[3],FC[5]],tC,22);
@@ -12008,6 +12069,145 @@ bodyrush(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=440,gap=125,N=5,t1=tC+60,tH=t1
   F.debris(bx*F.S(),(by+R*.5)*F.S(),{n:12,cols:['#5a5a6a','#9a9ab0','#3a3a48'],sp:200,g:420,dur:800,sz:3,up:true});},tH);
  return waitS(tH+1000);}
 });
+// ===== 실버디 · 멀티어택: 메모리 디스크의 힘이 모여 몸을 감싸고 → 실제 몸이 속성 오라를 두른 채 여섯 번 연달아 돌진(때릴 때마다 다른 속성) → 마지막엔 모든 속성이 합쳐진 무지개 충격 =====
+// 몸은 DOM 복제본(transform·filter만 사용)이 직접 움직이고, 이펙트는 캔버스에 그려요. (총알 모양 대신 진짜 몸이 돌진해요)
+Object.assign(FX,{
+multiattack(c,o){const mono=!!(o&&o.mono),m=mk(c),{S,ax,ay,bx,by,R}=m;
+ let img=null;try{let ba=0;c.fromEl.querySelectorAll('img').forEach(n=>{const r=n.getBoundingClientRect(),a=r.width*r.height;if(a>ba&&r.width>8&&r.height>8){ba=a;img=n;}});}catch(e){}
+ if(!img||!img.getBoundingClientRect||!document.body.animate)return FX.bodyrush(c);
+ const TP=mono?Array(6).fill(['#2fb8c8','#d8fbff']):[['#ff5a2a','#ffd45c'],['#2f86ff','#c9e8ff'],['#ffd91a','#fffbc0'],['#43c85a','#dcffc4'],['#5fe0f0','#e6ffff'],['#ff6ac8','#ffd6f0']],N=mono?3:TP.length,NO=mono?5:N,W=mono?'#eaffff':'#ffffff',
+  dx=bx-ax,dy=by-ay,Ln=Math.hypot(dx,dy)||1,ux=dx/Ln,uy=dy/Ln,nx=-uy,ny=ux,
+  tC=520,gap=125,T0=tC-60,tw=60+N*gap+100,tFh=tw+190,tHB=T0+tFh,D=tFh+640;
+ const star=(x,y,r,rot,c1,c2,al)=>{const p1=[],p2=[];for(let i=0;i<10;i++){const an=rot+i/10*TAU,rr=r*(i%2?.45:1);p1.push([x+cos(an)*rr,y+sin(an)*rr]);p2.push([x+cos(an)*rr*.58,y+sin(an)*rr*.58]);}P.ga(al);P.poly(p1,c1);P.poly(p2,c2);P.ga(1);};
+ vig(mono?'#06222a':'#0a0a18',.36,tHB+1000,0);
+ // ① 힘 모으기: 여섯 속성의 메모리 빛구슬이 몸 주위를 돌며 빨려 들어와요
+ gather(ax,ay,R*1.6,[TP[0][1],TP[1][1],TP[3][1]],tC,18);
+ add(0,tC,(k)=>{const e=ez.in(k);glow(ax,ay,R*(.9+1.4*e),TP[Math.floor(k*9)%N][0],.45*e);glow(ax,ay,R*(.4+.7*e),W,.4*e);
+  for(let i=0;i<NO;i++){const an=i/NO*TAU+k*6.5,d=R*(2.6-2.1*e),x=ax+cos(an)*d,y=ay+sin(an)*d*.8,r=R*(.2+.07*sin(k*18+i));
+   glow(x,y,r*3.2,TP[i][0],.5*(1-.5*e));P.ga(1-.5*e);P.disc(x,y,r*1.1,TP[i][0]);P.disc(x,y,r*.7,TP[i][1]);P.disc(x-r*.2,y-r*.25,Math.max(1,r*.28),W);P.ga(1);}});
+ ring(ax,ay,R*2.3,TP[2][1],tC*.5,340,1);
+ add(tC-170,170,(k)=>{flare(ax,ay-R*.2,R*(.7+.9*k),W,sin(k*PI),0);});
+ // ② 몸이 직접 돌진 (복제 이미지 + 잔상 2장). 몸 둘레에 속성별 오라가 번쩍이며 바뀌어요
+ const hp=[];for(let j=0;j<N;j++)hp.push({x:bx+(hz(j*3+2)-.5)*R*1.8,y:by+(hz(j*5+1)-.5)*R*1.5});
+ setTimeout(()=>{try{
+  const sr=img.getBoundingClientRect(),sx=sr.left+sr.width/2,sy=sr.top+sr.height/2,Rp=R*S,pv=img.style.visibility,g1=Math.max(3,Rp*.1),g2=Math.max(6,Rp*.26);
+  let flip=false;try{const t=getComputedStyle(img).transform;flip=!!t&&t!=='none'&&new DOMMatrix(t).a<0;}catch(e){}
+  const tf=(x,y,s,r)=>`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) rotate(${r}deg) scale(${s})${flip?' scaleX(-1)':''}`,
+   aura=(a,b,br)=>`drop-shadow(0 0 ${g1.toFixed(1)}px ${a}) drop-shadow(0 0 ${g2.toFixed(1)}px ${b}) brightness(${br})`,
+   A0='drop-shadow(0 0 0px rgba(255,255,255,0)) drop-shadow(0 0 0px rgba(255,255,255,0)) brightness(1)',
+   rel=(px,py)=>[px-sx,py-sy],kf=[],kg=[],K=(t,p,s,r,e,fl)=>{const b={transform:tf(p[0],p[1],s,r),offset:t/D,easing:e||'ease-out'};kg.push(b);kf.push(Object.assign({},b,{filter:fl||A0}));};
+  K(0,[0,0],1,0,null,A0);K(60,[-ux*Rp*.35,-uy*Rp*.35],.9,0,'ease-in',aura(TP[0][0],TP[0][1],1.2));
+  for(let j=0;j<N;j++){const h=hp[j],t0=60+j*gap,c1=TP[j][0],c2=TP[j][1];
+   K(t0+gap*.45,rel(h.x*S-ux*Rp*.9,h.y*S-uy*Rp*.9),1.1,(j%2?-1:1)*7,'cubic-bezier(.1,.9,.2,1)',aura(c1,c2,1.45));
+   K(t0+gap,rel(h.x*S-ux*Rp*2.4+nx*(j%2?1:-1)*Rp*.9,h.y*S-uy*Rp*2.4+ny*(j%2?1:-1)*Rp*.9),.98,0,'ease-out',aura(c1,c2,1.15));}
+  K(tw,[-ux*Rp*1.0,-uy*Rp*1.0],.84,0,'ease-in',aura(W,TP[5][0],1.35));
+  K(tFh,rel(bx*S-ux*Rp*.5,by*S-uy*Rp*.5),1.32,0,'cubic-bezier(.1,.9,.2,1)',aura(W,TP[1][1],1.7));
+  K(tFh+130,rel(bx*S-ux*Rp*.5,by*S-uy*Rp*.5),1.32,0,'linear',aura(W,TP[5][1],1.5));
+  K(D,[0,0],1,0,'ease-in-out',A0);
+  const mkc=(op,gh,main)=>{const e=img.cloneNode(false);['class','id','onerror','loading'].forEach(a=>e.removeAttribute(a));
+   e.style.cssText=`position:fixed;left:${sr.left}px;top:${sr.top}px;width:${sr.width}px;height:${sr.height}px;z-index:161;pointer-events:none;margin:0;object-fit:contain;image-rendering:pixelated;opacity:${op};will-change:transform${main?',filter':''}${gh?';filter:brightness(1.6) saturate(.6)':''}`;
+   document.body.appendChild(e);e.animate(main?kf:kg,{duration:D,delay:gh,fill:'both'});return e;};
+  const els=[mkc(.2,90,false),mkc(.34,45,false),mkc(1,0,true)];img.style.visibility='hidden';
+  const done=()=>{els.forEach(e=>{try{e.remove();}catch(_){}});img.style.visibility=pv;};
+  setTimeout(done,D+160);
+ }catch(e){try{img.style.visibility='';}catch(_){}}},T0);
+ // ③ 타격 여섯 번: 때릴 때마다 다른 속성(불 · 물 · 번개 · 풀 · 얼음 · 요정)으로 터져요
+ const acc=(j,x,y,e,k,c1,c2)=>{if(mono)j=4;const a=1-k;P.ga(a);
+  if(j===0){for(let i=0;i<4;i++){const ox=(i-1.5)*R*.4,h=R*(.5+1.2*e)*(1-.15*(i%2));P.poly([[x+ox-R*.2,y],[x+ox,y-h],[x+ox+R*.2,y]],i%2?c2:c1);}}
+  else if(j===1){for(let i=0;i<6;i++){const an=-PI/2+(i-2.5)*.5,d=R*(.6+1.5*e);P.disc(x+cos(an)*d,y+sin(an)*d+R*.9*e*e,Math.max(1,R*.17*(1-k)),i%2?c2:W);}}
+  else if(j===2){if(k<.65)for(let b=0;b<2;b++){let px=x+(b?1:-1)*R*.3,py=y-R*1.7;for(let s=0;s<4;s++){const qx=px+(hz(s+b*4+j)-.5)*R*.9,qy=py+R*.43;P.line(px,py,qx,qy,s%2?W:c1,1);px=qx;py=qy;}}}
+  else if(j===3){for(let i=0;i<7;i++){const an=i/7*TAU+.4+k*2,d=R*(.6+1.5*e),lx=x+cos(an)*d,ly=y+sin(an)*d;P.poly([[lx+cos(an)*R*.28,ly+sin(an)*R*.28],[lx-sin(an)*R*.12,ly+cos(an)*R*.12],[lx-cos(an)*R*.2,ly-sin(an)*R*.2],[lx+sin(an)*R*.12,ly-cos(an)*R*.12]],i%2?c1:c2);}}
+  else if(j===4){for(let i=0;i<6;i++){const an=i/6*TAU+.2,d=R*(.5+1.5*e),lx=x+cos(an)*d,ly=y+sin(an)*d;P.poly([[lx+cos(an)*R*.4,ly+sin(an)*R*.4],[lx-sin(an)*R*.12,ly+cos(an)*R*.12],[lx-cos(an)*R*.14,ly-sin(an)*R*.14],[lx+sin(an)*R*.12,ly-cos(an)*R*.12]],i%2?c2:W);}}
+  else{star(x,y,R*(1.1+1.4*e),k*2,c1,c2,a*.85);}
+  P.ga(1);};
+ for(let j=0;j<N;j++){const th=tC+j*gap+gap*.45,c1=TP[j][0],c2=TP[j][1],tx=hp[j].x,ty=hp[j].y;
+  add(th,330,(k)=>{const e=ez.out(k),a=1-k;glow(tx,ty,R*(1.1+1.7*e),c1,.6*a);glow(tx,ty,R*(.5+.8*e),W,.85*a);
+   for(let i=0;i<6;i++){const an=i/6*TAU+j*.5,LL=R*(.9+1.6*e)*(i%2?.6:1);P.ray(tx,ty,an,LL,Math.max(1,R*.09*(1-k)),i%2?c2:W,.9*a);}
+   acc(j,tx,ty,e,k,c1,c2);P.ga(1);});
+  ring(tx,ty,R*(1.5+.2*(j%2)),c2,th,330,1);
+  setTimeout(()=>{F.hold(30);shk();sparks(tx,ty,5,[W,c2,c1],190,360,true);},th);}
+ // ④ 마지막 전신 돌진: 모든 속성이 합쳐져 무지개빛 충격파가 퍼져요
+ add(T0+tw-110,150,(k)=>{flare(ax,ay-R*.2,R*(.8+1.1*k),W,sin(k*PI),.4);});
+ add(tHB,1000,(k)=>{const e=ez.out(k),a=1-k;glow(bx,by,R*(2+4*e),TP[1][0],.45*a);glow(bx,by,R*(1.4+2.6*e),TP[5][0],.4*a);glow(bx,by,R*(.7+1.2*e),W,.9*a);
+  if(k<.4)star(bx,by,R*(1.4+2.8*e),.2,W,TP[2][1],1-k/.4);
+  for(let i=0;i<18;i++){const an=i/18*TAU+.1,LL=R*(2.2+3.4*e)*(i%2?.62:1);P.ray(bx,by,an,LL,Math.max(1,R*.14*(1-k)),i%3===0?W:TP[i%N][i%2],.9*a);}flare(bx,by,R*(1+2*e),W,a,k*1.3);P.ga(1);});
+ for(let j=0;j<N;j++)ring(bx,by,R*(2.2+j*.8),TP[j][1],tHB+j*60,600,j?1:2);
+ eRingFlat(bx,by+R*.5,R*4.4,TP[1][1],tHB,760);
+ setTimeout(()=>{F.hold(170);F.flash(mono?'#e6ffff':'#fff6e0');shk();setTimeout(shk,150);setTimeout(shk,320);sparks(bx,by,26,[W,TP[0][1],TP[1][1],TP[3][1],TP[5][1]],360,860,true);embers(bx,by,5,[TP[0][1],TP[2][1]],900);
+  F.crackLine(bx*F.S(),(by+R*.7)*F.S(),R*F.S()*3.2,{o:mono?'#0f4a55':'#2a2a3a'},0);F.crackLine(bx*F.S(),(by+R*.9)*F.S(),R*F.S()*2.1,{o:mono?'#2fb8c8':'#7a7a92'},120);
+  F.debris(bx*F.S(),(by+R*.5)*F.S(),{n:10,cols:mono?['#2fb8c8','#8fe6ef','#0f4a55']:['#5a5a6a','#9a9ab0','#3a3a48'],sp:200,g:420,dur:800,sz:3,up:true});},tHB);
+ return waitS(tHB+950);}
+});
+// 테라파고스 · 멀티어택: 같은 몸통 돌진이지만 청록 수정빛 한 가지 색으로, 세 번만 단순하게 들이받아요
+Object.assign(FX,{terapagosrush(c){return FX.multiattack(c,{mono:true});}});
+// 눈설왕 · 눈보라: 큰 몸을 흔들자 눈발이 소용돌이쳐 모이고 → 새하얀 눈보라가 몰아쳐 상대를 뒤덮고 → 얼음 결정이 솟아올랐다가 산산이 부서져요
+Object.assign(FX,{
+blizzard(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,
+ I=['#12305a','#3a7fc4','#8fd6f7','#d9f5ff','#ffffff'],
+ dx=bx-ax,dy=by-ay,Ln=Math.hypot(dx,dy)||1,nx=-dy/Ln,ny=dx/Ln,
+ tC=520,tF=480,tH=tC+tF,ya=ay+R*.9,yb=by+R*.9;
+ const flake=(x,y,s,col,al)=>{s=Math.max(1,Math.round(s));if(al<=.03)return;P.ga(Math.min(1,al));P.rect(x-s,y,s*2+1,1,col);P.rect(x,y-s,1,s*2+1,col);if(s>1){P.rect(x-s+1,y-s+1,1,1,col);P.rect(x+s-1,y+s-1,1,1,col);P.rect(x-s+1,y+s-1,1,1,col);P.rect(x+s-1,y-s+1,1,1,col);}P.ga(1);};
+ const crys=(x,y,h,w,col,al)=>{if(h<1||al<=.03)return;P.ga(Math.min(1,al));P.poly([[x-w,y],[x-w*.45,y-h*.78],[x,y-h],[x+w*.45,y-h*.78],[x+w,y]],col);P.ga(1);};
+ vig('#071a33',.4,tH+1100,0);
+ // ① 눈발 모으기: 눈송이가 소용돌이치며 빨려 들어오고, 발밑에 서리가 깔려요
+ gather(ax,ay,R*1.6,[I[3],I[2],I[4]],tC,20);
+ add(0,tC,(k)=>{const e=ez.in(k);glow(ax,ay,R*(1+1.8*e),I[1],.4*e);glow(ax,ay,R*(.5+.9*e),I[3],.55*e);
+  for(let i=0;i<24;i++){const ph=(k*1.3+hz(i))%1,an=hz(i+7)*TAU+ph*6.5,d=R*(3.4*(1-ph)+.3);flake(ax+cos(an)*d,ay+sin(an)*d*.7,i%4===0?2:1,i%3?I[4]:I[3],(Math.sin(ph*PI)*.9+.1)*(.3+.7*e));}
+  P.ga(.7*e);P.ringGlow(ax,ya,R*(.8+2.2*e),Math.max(2,R*.12),I[3],.7,.38);P.ga(1);
+  for(let i=0;i<5;i++)crys(ax+(i-2)*R*.55,ya,R*.55*e*(.6+.4*hz(i)),R*.14,I[2],.9*e);});
+ ring(ax,ya,R*2.4,I[3],tC*.5,360,1);
+ setTimeout(()=>F.hold(60),tC);
+ // ② 눈보라 몰아치기: 하얀 눈발과 바람 띠가 점점 넓어지며 상대 쪽으로 휩쓸어요
+ add(tC,tF+80,(k,p)=>{const g=ez.in(Math.min(1,p.age/tF)),al=p.age>tF?cl(1-(p.age-tF)/80,0,1):1,fx0=lerp(ax,bx,g),fy0=lerp(ay,by,g);
+  for(let j=0;j<4;j++){const pts=[];for(let q=0;q<=12;q++){const s=q/12*g,o=(j-1.5)*.8*R*(.2+1.7*s)+sin(p.age*.012+q*.7+j*2)*R*.22;pts.push([lerp(ax,bx,s)+nx*o,lerp(ay,by,s)+ny*o]);}rib(pts,u=>R*.16*sin(u*PI)+.3,j%2?I[3]:I[2],.5*al);}
+  for(let i=0;i<46;i++){const s=cl(g*1.15-hz(i+11)*.5,0,1),wc=R*(.5+2.8*s),lat=(hz(i+3)-.5)*2*wc+sin(p.age*.02+i)*R*.25;flake(lerp(ax,bx,s)+nx*lat,lerp(ay,by,s)+ny*lat,i%5===0?2:1,i%3?I[4]:I[3],al*(.4+.6*s));}
+  glow(fx0,fy0,R*(1.5+1.8*g),I[2],.4*al);glow(fx0,fy0,R*(.8+1*g),I[4],.35*al);});
+ // ③ 명중: 눈보라가 상대를 뒤덮고, 얼음 결정이 솟았다가 부서져요
+ add(tH,1100,(k,p)=>{const e=ez.out(Math.min(1,k*2)),a=k>.72?(1-k)/.28:1;
+  glow(bx,by,R*(2+2.4*e),I[2],.45*a);glow(bx,by,R*(1+1.2*e),I[4],.5*a);
+  for(let i=0;i<34;i++){const an=hz(i)*TAU+p.age*.008*(1+hz(i+3)),d=R*(.6+2.2*hz(i+5))*(.6+.4*e);flake(bx+cos(an)*d,by+sin(an)*d*.6-k*R*.6*hz(i+8),i%5===0?2:1,i%3?I[4]:I[3],a*.9);}
+  const rise=ez.out(Math.min(1,k*3)),cr=k>.5?cl(1-(k-.5)/.12,0,1):1;
+  for(let i=0;i<7;i++){const h=R*(1.2+1.2*hz(i))*rise,w=R*.28,x=bx+(i-3)*R*.55+(hz(i+2)-.5)*R*.2;crys(x,yb,h,w,I[2],cr);crys(x-w*.2,yb,h*.9,w*.4,I[4],.8*cr);}});
+ ring(bx,by,R*2.6,I[3],tH,520,2);ring(bx,by,R*3.8,I[2],tH+120,600,1);eRingFlat(bx,yb,R*4.2,I[3],tH,760);
+ setTimeout(()=>{F.hold(110);F.flash('#dff4ff');shk();setTimeout(shk,160);sparks(bx,by,24,[I[4],I[3],I[2]],300,800,true);},tH);
+ setTimeout(()=>{sparks(bx,yb-R*.6,18,[I[4],I[3],I[2],I[1]],380,700,true);F.crackLine(bx*F.S(),yb*F.S(),R*F.S()*3,{o:I[1]},0);},tH+560);
+ return waitS(tH+1100);}
+});
+// 타입:널 · 트라이어택: 불꽃·번개·얼음 세 빛구슬이 삼각형을 이루며 돌다가 → 하나의 삼각 대형으로 날아가 → 세 가지 빛이 한꺼번에 터져요
+Object.assign(FX,{
+triattack(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,
+ TA=[['#ff5a2a','#ffd45c'],['#ffd91a','#fffbc0'],['#3fb4ff','#e6ffff']],W='#ffffff',
+ tC=520,tF=440,tH=tC+tF;
+ const tri=(x,y,r,rot,col,al,th)=>{P.ga(al);for(let i=0;i<3;i++){const a1=rot+i/3*TAU,a2=rot+(i+1)/3*TAU;P.line(x+cos(a1)*r,y+sin(a1)*r,x+cos(a2)*r,y+sin(a2)*r,col,th||1);}P.ga(1);};
+ const orb=(x,y,r,i,al)=>{if(al<=.02)return;glow(x,y,r*3,TA[i][0],.5*al);P.ga(al);P.disc(x,y,r*1.1,TA[i][0]);P.disc(x,y,r*.75,TA[i][1]);P.disc(x-r*.2,y-r*.25,Math.max(1,r*.3),W);P.ga(1);};
+ vig('#10101e',.36,tH+1000,0);
+ gather(ax,ay,R*1.6,[TA[0][1],TA[1][1],TA[2][1]],tC,20);
+ // ① 세 구슬: 불꽃 · 번개 · 얼음 빛이 삼각형을 이루며 돌아요
+ add(0,tC,(k)=>{const e=ez.in(k),r=R*(2.3-.6*e),rot=-PI/2+k*4;glow(ax,ay,R*(.8+1.2*e),W,.35*e);
+  tri(ax,ay,r,rot,W,.6*e,1);
+  for(let i=0;i<3;i++){const an=rot+i/3*TAU,x=ax+cos(an)*r,y=ay+sin(an)*r*.9;orb(x,y,R*(.12+.2*ez.out(Math.min(1,k*1.6))),i,Math.min(1,k*2));
+   P.ga(.6*e);P.line(x,y,ax,ay,TA[i][1],1);P.ga(1);}});
+ ring(ax,ay,R*2.2,W,tC*.5,340,1);
+ add(tC-170,170,(k)=>{flare(ax,ay-R*.2,R*(.7+.9*k),W,sin(k*PI),0);});
+ // ② 세 구슬이 삼각 대형으로 나선을 그리며 날아가요
+ add(tC,tF+60,(k,p)=>{const g=ez.in(Math.min(1,p.age/tF)),al=p.age>tF?cl(1-(p.age-tF)/60,0,1):1,spin=-PI/2+(1-g)*2.4,r0=R*(1.7*(1-g)+.25*g);
+  for(let i=0;i<3;i++){const an=spin+i/3*TAU,x=lerp(ax,bx,g)+cos(an)*r0,y=lerp(ay,by,g)+sin(an)*r0*.9,pts=[];
+   for(let q=0;q<=10;q++){const s=Math.max(0,g-q*.06),rr=R*(1.7*(1-s)+.25*s),aa=-PI/2+(1-s)*2.4+i/3*TAU;pts.push([lerp(ax,bx,s)+cos(aa)*rr,lerp(ay,by,s)+sin(aa)*rr*.9]);}
+   rib(pts,u=>R*.22*(1-u*.7)+.3,TA[i][0],.7*al);rib(pts,u=>R*.09*(1-u*.7)+.3,TA[i][1],.9*al);
+   orb(x,y,R*.34,i,al);}
+  tri(lerp(ax,bx,g),lerp(ay,by,g),r0,spin,W,.5*al,1);});
+ // ③ 명중: 세 색의 빛이 삼각 충격파로 터져요
+ add(tH,1000,(k)=>{const e=ez.out(k),a=1-k;
+  for(let i=0;i<3;i++){const an=-PI/2+i/3*TAU;glow(bx+cos(an)*R*e,by+sin(an)*R*e,R*(1.2+1.8*e),TA[i][0],.55*a);}
+  glow(bx,by,R*(.7+1.1*e),W,.9*a);
+  tri(bx,by,R*(1+3.2*e),-PI/2+k*1.2,W,a,2);tri(bx,by,R*(.6+2*e),PI/2-k*1.2,TA[1][1],a*.8,1);
+  for(let i=0;i<12;i++){const an=i/12*TAU+.15,LL=R*(2+3.2*e)*(i%2?.62:1);P.ray(bx,by,an,LL,Math.max(1,R*.12*(1-k)),TA[i%3][i%2],.9*a);}
+  flare(bx,by,R*(1+2*e),W,a,k*1.3);P.ga(1);});
+ for(let j=0;j<3;j++)ring(bx,by,R*(2.4+j*1.2),TA[j][0],tH+j*80,620,j?1:2);
+ eRingFlat(bx,by+R*.5,R*4.2,TA[2][1],tH,760);
+ setTimeout(()=>{F.hold(150);F.flash('#fff8ec');shk();setTimeout(shk,150);sparks(bx,by,24,[W,TA[0][1],TA[1][1],TA[2][1]],340,840,true);embers(bx,by,5,[TA[0][1],TA[1][1]],900);},tH);
+ return waitS(tH+1000);}
+});
 Object.assign(FX,{
 // 무한다이노 · 무한다이빔(보스 필살기): 붉은 별빛이 소용돌이치며 모여 가는 파동포가 되어 닿으면, 하늘에서 무한다이맥스의 거대한 손이 내리찍고 땅이 갈라져요. 무한다이맥스에도 써요.
 eternabeam(c){const m=mk(c),{S,ax,ay,bx,by,R,sc}=m,tC=700,tB=420,tH=tC+tB,
@@ -12084,9 +12284,324 @@ eternabeam(c){const m=mk(c),{S,ax,ay,bx,by,R,sc}=m,tC=700,tB=420,tH=tC+tB,
  setTimeout(()=>{F.hold(220);F.flash('#ffd0e0');shk();setTimeout(shk,140);setTimeout(shk,300);setTimeout(shk,480);sparks(bx,by,22,[E[5],E[3],V[2],E[4]],330,840,true);embers(bx,by,14,[E[3],V[2],E[2]],1300);},tI);
  return waitS(tI+950);}
 });
-for(const k of Object.keys(FX)){const o=FX[k];if(typeof o==='function')FX[k]=function(c){SPD=SPEED[k]||1;return o.call(this,c);};}
+for(const k of Object.keys(FX)){const o=FX[k];if(typeof o==='function')FX[k]=function(c){SPD=SPEED[k]||1;return o.apply(this,arguments);};}
+/*NEWFX-BEGIN*/
+Object.assign(FX,{
+// 아르세우스 · 심판의 뭉치: 플레이트 열여섯 장이 고리를 그리며 모이고, 황금빛 광선이 꽂힌 자리로 하늘에서 빛기둥이 내려와요
+judgment(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=640,tF=340,tH=tC+tF,Rb=R*(.9+.2*sc),sy0=ay-R*.3,
+ G={a:'#d99a10',b:'#ffcf3a',c:'#ffe58a',e:'#fff4c4',w:'#ffffff'},PL=['#ff7a5a','#ffb347','#ffe45a','#8fe36a','#5ad6c8','#6aa8ff','#a98aff','#ff8ad0'];
+ add(0,tC,(k,p)=>{const e=ez.in(k),t=p.age;P.fill('#1a1330',.2*sin(Math.min(1,k*1.1)*PI));
+  glow(ax,sy0,R*(1.5+.9*e),G.b,.45*e);glow(ax,sy0,R*(.7+.5*e),G.e,.6*e);
+  for(let i=0;i<16;i++){const an=i/16*TAU+t*.004*(1+e),rr=R*(2-.5*e),x=ax+cos(an)*rr,y=sy0+sin(an)*rr*.5,fr=sin(an)>0;P.ga((.35+.65*e)*(fr?1:.5));glow(x,y,R*.3,PL[i%8],.55);P.rect(x-1,y-1,3,3,PL[i%8]);P.rect(x,y-1,1,1,G.w);}
+  P.ga(1);flare(ax,sy0,R*(.5+.8*e),G.e,e,t*.003);});
+ ring(ax,sy0,R*2.4,G.e,tC,420,2);ring(ax,sy0,R*3.6,G.c,tC+90,520,1);
+ setTimeout(()=>F.hold(60),tC);
+ add(tC,tF,(k,p)=>{const e=ez.in(k),hx=lerp(ax,bx,e),hy=lerp(sy0,by,e),n=28;
+  for(let i=0;i<n;i++){const t=i/n,x=lerp(ax,hx,t),y=lerp(sy0,hy,t),w=Rb*(.22+.5*t)*(1+.2*sin(p.age*.03+i));glow(x,y,w*2.6,G.b,.5*t);P.ga(.3+.7*t);P.disc(x,y,Math.max(1,w),i%3?G.c:G.e);P.disc(x,y,Math.max(1,w*.5),G.w);}
+  P.ga(1);glow(hx,hy,Rb*1.7,G.c,.8);flare(hx,hy,Rb,G.w,1,p.age*.01);});
+ add(tH,900,(k,p)=>{const e=ez.out(k),a=1-k,W=Rb*(.5+1.5*Math.sin(Math.min(1,k*1.7)*PI*.5))*(1-k*.45),top=by-Rb*9;
+  glow(bx,by,Rb*(2.4+4.2*e),G.b,.5*a);glow(bx,by,Rb*(1.3+2*e),G.e,.8*a);
+  P.ga(a*.45);P.rect(bx-W*1.5,top,W*3,by-top+Rb*.4,G.b);P.ga(a*.8);P.rect(bx-W,top,W*2,by-top+Rb*.4,G.c);P.ga(a);P.rect(bx-W*.45,top,W*.9,by-top+Rb*.4,G.e);P.rect(bx-W*.18,top,Math.max(1,W*.36),by-top+Rb*.4,G.w);
+  for(let i=0;i<16;i++){const an=i/16*TAU+.1;P.ray(bx,by,an,Rb*(1.4+4.2*e)*(i%2?.6:1),Math.max(1,Rb*.1*a),i%2?PL[i%8]:G.w,.9*a);}
+  P.ga(1);flare(bx,by,Rb*(1+2.2*e),G.w,a,k*3);});
+ ring(bx,by,Rb*3.2,G.e,tH,520,2);ring(bx,by,Rb*5.2,G.c,tH+100,660,2);ring(bx,by,Rb*7.2,G.b,tH+220,760,1);
+ setTimeout(()=>{F.hold(150);F.flash('#fff3c8');shk();sparks(bx,by,34,PL.concat([G.w]),340,900,true);},tH);
+ return waitS(tH+600);},
+// 비크티니 · V제너레이트: 등 뒤에 불꽃 V자를 세우고, V자 불꽃을 두른 채 돌진해서 상대에게 커다란 V자 불꽃을 새겨요
+vgenerate(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=540,tF=300,tH=tC+tF,Rb=R*(.9+.2*sc),sy0=ay-R*.3,
+ Fi={d:'#7a1408',a:'#d9341a',b:'#ff7a1a',c:'#ffb338',e:'#ffe07a',w:'#fff6d8'};
+ const V=(x,y,s,a)=>{for(const q of[-1,1]){const x1=x+q*s*.8,y1=y-s*1.1,th=Math.max(2,Math.round(s*.3));P.ga(a);P.line(x,y,x1,y1,Fi.a,th+2);P.line(x,y,x1,y1,Fi.b,th);P.line(x,y,x1,y1,Fi.c,Math.max(1,Math.round(th*.55)));P.line(x,y,x1,y1,Fi.w,1);glow(x1,y1,s*.5,Fi.b,.5*a);}P.ga(1);};
+ add(0,tC,(k,p)=>{const e=ez.in(k),t=p.age;P.fill('#2a0a06',.2*sin(Math.min(1,k*1.1)*PI));
+  glow(ax,sy0,R*(1.3+.9*e),Fi.b,.45*e);glow(ax,sy0,R*(.7+.4*e),Fi.e,.55*e);
+  for(let i=0;i<36;i++){const ph=((t*.0013+hz(i)*2)%1),x=ax+(hz(i+3)-.5)*R*2.4,y=ay+R*.7-ph*R*2.6,rr=R*.2*(1-ph*.6);if(rr<.6)continue;P.ga(.4+.6*(1-ph)*e);P.disc(x,y,Math.max(1,rr),ph<.4?Fi.e:ph<.7?Fi.c:Fi.b);}
+  P.ga(1);V(ax,ay+R*.5,R*(.5+1.2*e),.4+.6*e);});
+ ring(ax,sy0,R*2.2,Fi.c,tC,400,2);setTimeout(()=>F.hold(60),tC);
+ const ang=Math.atan2(by-sy0,bx-ax);
+ add(tC,tF,(k,p)=>{const e=ez.in(k),hx=lerp(ax,bx,e),hy=lerp(sy0,by,e),L=Rb*(1.3+.5*sin(p.age*.04));
+  for(let s=20;s>=1;s--){const kk=Math.max(0,k-s*.03),px=lerp(ax,bx,ez.in(kk)),py=lerp(sy0,by,ez.in(kk)),a=1-s/21;glow(px,py,Rb*(.5+.9*a),s>9?Fi.b:Fi.c,.32*a+.06);P.ga(a);P.disc(px+(hz(s)-.5)*Rb*.5,py+(hz(s+9)-.5)*Rb*.5,Math.max(1,Rb*.3*a),s%2?Fi.c:Fi.e);}
+  P.ga(1);glow(hx,hy,Rb*1.7,Fi.b,.8);P.ga(1);
+  for(const q of[-1,1]){const x1=hx+cos(ang+PI+q*.62)*L,y1=hy+sin(ang+PI+q*.62)*L;P.line(hx,hy,x1,y1,Fi.a,Math.max(3,Math.round(Rb*.5)));P.line(hx,hy,x1,y1,Fi.b,Math.max(2,Math.round(Rb*.34)));P.line(hx,hy,x1,y1,Fi.e,1);}
+  P.disc(hx,hy,Math.max(2,Rb*.36),Fi.w);});
+ add(tH,820,(k,p)=>{const e=ez.out(k),a=1-k;glow(bx,by,Rb*(2+4.6*e),Fi.b,.6*a);glow(bx,by,Rb*(1+2.4*e),Fi.e,.8*a);
+  P.ga(a);P.disc(bx,by,Math.max(1,Rb*(.6+1.8*e)),Fi.b);P.disc(bx,by,Math.max(1,Rb*(.4+1.1*e)),Fi.c);P.disc(bx,by,Math.max(1,Rb*(.22+.6*e)),Fi.w);
+  V(bx,by+Rb*1.1,Rb*(1+2.2*Math.min(1,e*1.6)),a);
+  for(let i=0;i<14;i++){const an=i/14*TAU+.2;P.ray(bx,by,an,Rb*(1.2+3.8*e)*(i%2?.6:1),Math.max(1,Rb*.1*a),i%2?Fi.c:Fi.w,.9*a);}P.ga(1);});
+ ring(bx,by,Rb*3,Fi.e,tH,500,2);ring(bx,by,Rb*5,Fi.b,tH+100,640,2);
+ setTimeout(()=>{F.hold(140);F.flash('#ffd9a0');shk();sparks(bx,by,30,[Fi.w,Fi.e,Fi.c,Fi.b],320,880,true);},tH);
+ return waitS(tH+560);},
+// 디안시 · 다이아스톰: 보석 조각이 소용돌이치며 모여 상대에게 날아가고, 맞은 자리에서 보석 폭풍이 휘몰아쳐요
+diamondstorm(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=560,tF=380,tH=tC+tF,Rb=R*(.9+.2*sc),sy0=ay-R*.3,
+ Cr={d:'#9a2a74',a:'#e05aa8',b:'#ff9fd0',c:'#ffd0ea',e:'#fff0f8',w:'#ffffff'},CL=[Cr.b,Cr.c,Cr.e,Cr.a,Cr.w];
+ const dia=(x,y,s,col,hi)=>{s=Math.max(1,s);P.poly([[x,y-s*1.3],[x+s*.8,y],[x,y+s*1.3],[x-s*.8,y]],Cr.d);P.poly([[x,y-s*1.15],[x+s*.66,y],[x,y+s*1.15],[x-s*.66,y]],col);if(s>=2)P.poly([[x,y-s*1.15],[x+s*.66,y],[x,y]],hi||Cr.w);};
+ add(0,tC,(k,p)=>{const e=ez.in(k),t=p.age;P.fill('#2a0c24',.2*sin(Math.min(1,k*1.1)*PI));
+  glow(ax,sy0,R*(1.4+.9*e),Cr.b,.45*e);glow(ax,sy0,R*(.7+.4*e),Cr.e,.6*e);
+  for(let i=0;i<14;i++){const an=hz(i)*TAU+t*.006*(1+hz(i+4)),d=R*(2.4*(1-e)+.5)*(.6+.6*hz(i+8));P.ga(.35+.65*e);dia(ax+cos(an)*d,sy0+sin(an)*d*.7,R*(.16+.12*hz(i+2)),CL[i%5]);}
+  P.ga(1);dia(ax,sy0,R*(.2+.5*e),Cr.e,Cr.w);flare(ax,sy0,R*(.4+.5*e),Cr.e,e,t*.003);});
+ ring(ax,sy0,R*2.3,Cr.c,tC,420,2);setTimeout(()=>F.hold(60),tC);
+ add(tC,tF,(k,p)=>{const e=ez.in(k);
+  for(let i=0;i<18;i++){const kk=cl(e-i*.028,0,1),x=lerp(ax,bx,kk),y=lerp(sy0,by,kk)+sin(kk*14+i)*Rb*.55*(1-kk*.3),a=1-i/20;glow(x,y,Rb*.5,Cr.b,.3*a);P.ga(a);dia(x,y,Rb*(.32-i*.007),CL[i%5]);}
+  P.ga(1);const hx=lerp(ax,bx,e),hy=lerp(sy0,by,e);glow(hx,hy,Rb*1.5,Cr.c,.7);dia(hx,hy,Rb*.5,Cr.e,Cr.w);});
+ add(tH,900,(k,p)=>{const e=ez.out(k),a=1-k;glow(bx,by,Rb*(2.2+4.4*e),Cr.b,.55*a);glow(bx,by,Rb*(1.1+2.2*e),Cr.e,.8*a);
+  for(let i=0;i<40;i++){const tt=i/40,an=tt*TAU*3+e*5.5,rr=Rb*(.3+3.4*e*(.3+.7*hz(i+2)));P.ga(a*(1-tt*.3));dia(bx+cos(an)*rr,by+sin(an)*rr*.8,Rb*(.2+.2*hz(i+6))*(1-k*.4),CL[i%5]);}
+  for(let i=0;i<12;i++){const an=i/12*TAU+.1;P.ray(bx,by,an,Rb*(1.3+3.8*e)*(i%2?.6:1),Math.max(1,Rb*.1*a),i%2?Cr.c:Cr.w,.9*a);}
+  P.ga(1);flare(bx,by,Rb*(.9+1.8*e),Cr.w,a,k*2);});
+ ring(bx,by,Rb*3,Cr.e,tH,500,2);ring(bx,by,Rb*5,Cr.b,tH+110,660,2);
+ setTimeout(()=>{F.hold(140);F.flash('#ffe0f2');shk();sparks(bx,by,30,CL,330,900,true);},tH);
+ return waitS(tH+600);},
+// 지라치 · 파멸의 소원: 소원의 별이 하늘로 올라갔다가, 잠시 뒤 커다란 별빛이 되어 내리꽂혀요
+wishstar(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=520,tU=300,tD=340,tH=tC+tU+tD,Rb=R*(.9+.2*sc),sy0=ay-R*.3,topY=by-Rb*9,
+ Y={d:'#8a6a00',a:'#e0b000',b:'#ffe14a',c:'#fff08a',e:'#fff9c4',w:'#ffffff'};
+ const star=(x,y,r,col,rot)=>{const o=[];for(let i=0;i<10;i++){const a=rot-PI/2+i*PI/5,d=i%2?r*.46:r;o.push([x+cos(a)*d,y+sin(a)*d]);}P.poly(o,col);};
+ const bstar=(x,y,r,rot,a)=>{glow(x,y,r*2.4,Y.b,.5*a);P.ga(a);star(x,y,r*1.15,Y.a,rot);star(x,y,r,Y.b,rot);star(x,y,r*.6,Y.e,rot);P.disc(x,y,Math.max(1,r*.2),Y.w);P.ga(1);};
+ add(0,tC,(k,p)=>{const e=ez.in(k),t=p.age;P.fill('#14122e',.22*sin(Math.min(1,k*1.1)*PI));
+  glow(ax,sy0,R*(1.3+.8*e),Y.b,.4*e);
+  for(let i=0;i<22;i++){const ph=((t*.001+hz(i)*2)%1),an=hz(i+3)*TAU,d=R*(2.6*(1-ph)+.2);P.ga(ph);P.rect(ax+cos(an)*d,sy0+sin(an)*d*.8,1+(i%4===0),1+(i%4===0),i%2?Y.e:Y.w);}
+  P.ga(1);bstar(ax,sy0-R*.9,R*(.2+.7*e),t*.004,e);});
+ ring(ax,sy0,R*2,Y.c,tC,400,2);setTimeout(()=>F.hold(50),tC);
+ add(tC,tU,(k,p)=>{const e=ez.in(k),y=lerp(sy0-R*.9,topY,e),r=R*(.9-.5*e);
+  for(let s=14;s>=1;s--){const yy=lerp(sy0-R*.9,topY,ez.in(Math.max(0,k-s*.04)));P.ga(1-s/15);P.rect(ax-1,yy,2,Math.max(1,R*.3),s%2?Y.c:Y.e);}
+  P.ga(1);bstar(ax,y,r,p.age*.01,1-k*.4);});
+ add(tC+tU,tD,(k,p)=>{const e=ez.in(k),sx=bx+Rb*1.4,hx=lerp(sx,bx,e),hy=lerp(topY,by,e),n=26;
+  for(let i=0;i<n;i++){const t=i/n,x=lerp(sx,hx,t),y=lerp(topY,hy,t),w=Rb*(.2+.5*t);glow(x,y,w*2.4,Y.b,.5*t);P.ga(.3+.7*t);P.disc(x,y,Math.max(1,w),i%3?Y.c:Y.e);P.disc(x,y,Math.max(1,w*.5),Y.w);}
+  P.ga(1);bstar(hx,hy,Rb*(.5+.7*e),p.age*.012,1);});
+ add(tH,900,(k,p)=>{const e=ez.out(k),a=1-k;glow(bx,by,Rb*(2.4+4.4*e),Y.b,.55*a);glow(bx,by,Rb*(1.2+2.2*e),Y.e,.85*a);
+  bstar(bx,by,Rb*(1+2.4*e),k*2.5,a);
+  for(let i=0;i<5;i++){const an=i*TAU/5-PI/2+k*.6;P.ray(bx,by,an,Rb*(1.6+5*e),Math.max(1,Rb*.16*a),Y.w,.95*a);P.ray(bx,by,an+PI/5,Rb*(1+3.2*e),Math.max(1,Rb*.1*a),Y.c,.8*a);}
+  P.ga(1);});
+ ring(bx,by,Rb*3.2,Y.e,tH,520,2);ring(bx,by,Rb*5.2,Y.c,tH+110,660,2);ring(bx,by,Rb*7,Y.b,tH+230,760,1);
+ setTimeout(()=>{F.hold(150);F.flash('#fff7c8');shk();sparks(bx,by,34,[Y.w,Y.e,Y.c,Y.b],340,920,true);},tH);
+ return waitS(tH+600);},
+});
+/*NEWFX-END*/
+/*NEWFX2-BEGIN*/
+{
+// ===== 공용 틀: 모으기 → 발사 → 명중 세 단계를 만들고, 포켓몬마다 안에 그릴 도형(charge·proj·hit)만 달라요 =====
+const rp=(x,y,pts,rot,col)=>{const cs=cos(rot),sn=sin(rot);P.poly(pts.map(([a,b])=>[x+a*cs-b*sn,y+a*sn+b*cs]),col);};
+const heart=(x,y,s,col)=>{s=Math.max(1,s);P.disc(x-s*.5,y-s*.3,s*.55,col);P.disc(x+s*.5,y-s*.3,s*.55,col);P.poly([[x-s*1.02,y-s*.1],[x+s*1.02,y-s*.1],[x,y+s*1.1]],col);};
+const crescent=(x,y,r,rot,col)=>{const o=[];for(let i=0;i<=14;i++){const a=PI/2+i*PI/14;o.push([cos(a)*r,sin(a)*r]);}for(let i=14;i>=0;i--){const a=PI/2+i*PI/14;o.push([r*.5+cos(a)*r*.82,sin(a)*r*.82]);}rp(x,y,o,rot,col);};
+const note=(x,y,s,col)=>{s=Math.max(1,s);P.disc(x,y,s*.55,col);P.rect(x+s*.45,y-s*1.6,Math.max(1,s*.22),s*1.7,col);P.poly([[x+s*.6,y-s*1.6],[x+s*1.5,y-s*.9],[x+s*.6,y-s*.9]],col);};
+const shard=(x,y,l,w,rot,col)=>rp(x,y,[[l,0],[0,w],[-l*.7,0],[0,-w]],rot,col);
+const star4=(x,y,r,rot,col)=>{const o=[];for(let i=0;i<8;i++){const a=i*PI/4,d=i%2?r*.3:r;o.push([cos(a)*d,sin(a)*d]);}rp(x,y,o,rot,col);};
+const cross=(x,y,s,col)=>{P.rect(x-s,y,s*2+1,1,col);P.rect(x,y-s,1,s*2+1,col);};
+const bolt=(x0,y0,x1,y1,col,th,seed)=>{let px=x0,py=y0;const n=7,dx=(x1-x0)/n,dy=(y1-y0)/n,L=Math.hypot(dx,dy)||1;for(let i=1;i<=n;i++){const o=i===n?0:(hz(seed+i*3.1)-.5)*L*1.5,nx=x0+dx*i-dy/L*o,ny=y0+dy*i+dx/L*o;P.line(px,py,nx,ny,col,th);px=nx;py=ny;}};
+const chainL=(x0,y0,x1,y1,col,col2,n,s)=>{for(let i=0;i<=n;i++){const t=i/n,x=lerp(x0,x1,t),y=lerp(y0,y1,t);if(i%2)P.rect(x-s,y-s*.5,s*2,Math.max(1,s),col);else P.rect(x-s*.5,y-s,Math.max(1,s),s*2,col2);}};
+const spike=(x,y,w,h,col)=>P.poly([[x-w,y],[x,y-h],[x+w,y]],col);
+const orbitN=(x,y,r,n,t,sp,fn)=>{for(let i=0;i<n;i++){const an=i/n*TAU+t*sp;fn(x+cos(an)*r,y+sin(an)*r*.55,i,an);}};
+const raysN=(x,y,n,L,w,cols,a,off)=>{for(let i=0;i<n;i++){const an=i/n*TAU+(off||0);P.ray(x,y,an,L*(i%2?.62:1),Math.max(1,w),cols[i%cols.length],a);}};
+const burstN=(x,y,n,rr,fn,e,seed)=>{for(let i=0;i<n;i++){const an=hz(i+seed)*TAU,d=rr*e*(.4+.6*hz(i+seed+7));fn(x+cos(an)*d,y+sin(an)*d*.85,i,an);}};
+const trio=o=>c=>{const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=o.tC||560,tF=o.tF||340,tH=tC+tF,Rb=R*(.9+.2*sc),sy0=ay-R*.3,K=o.K,ang=Math.atan2(by-sy0,bx-ax);
+ add(0,tC,(k,p)=>{const e=ez.in(k);P.fill(o.dark||'#12122a',.2*sin(Math.min(1,k*1.1)*PI));glow(ax,sy0,R*(1.4+.8*e),K.b,.45*e);glow(ax,sy0,R*(.7+.4*e),K.e,.55*e);o.charge({x:ax,y:sy0,R,e,k,t:p.age,K,ang});P.ga(1);});
+ ring(ax,sy0,R*2.3,K.c,tC,420,2);setTimeout(()=>F.hold(60),tC);
+ add(tC,tF,(k,p)=>{const e=ez.in(k),hx=lerp(ax,bx,e),hy=lerp(sy0,by,e);
+  for(let s=18;s>=1;s--){const kk=Math.max(0,k-s*.028),q=ez.in(kk),a=1-s/19;glow(lerp(ax,bx,q),lerp(sy0,by,q),Rb*(.4+.8*a),s>8?K.b:K.c,.3*a+.05);}
+  glow(hx,hy,Rb*1.6,K.c,.75);o.proj({x:hx,y:hy,Rb,e,k,t:p.age,K,ang,ax,ay:sy0,bx,by});P.ga(1);});
+ add(tH,860,(k,p)=>{const e=ez.out(k),a=1-k;glow(bx,by,Rb*(2.2+4.4*e),K.b,.55*a);glow(bx,by,Rb*(1.1+2.2*e),K.e,.8*a);o.hit({x:bx,y:by,Rb,e,k,a,t:p.age,K});P.ga(1);});
+ ring(bx,by,Rb*3,K.e,tH,500,2);ring(bx,by,Rb*5,K.b,tH+110,660,2);
+ setTimeout(()=>{F.hold(140);F.flash(K.e);shk();sparks(bx,by,30,[K.w,K.e,K.c,K.b],330,900,true);},tH);
+ return waitS(tH+580);};
+const trail=(g,n,fn)=>{for(let i=1;i<=n;i++){const kk=Math.max(0,g.k-i*.05),q=ez.in(kk);fn(lerp(g.ax,g.bx,q),lerp(g.ay,g.by,q),i,1-i/(n+1));}};
+const P1={a:'#a01c5a',b:'#ff6fae',c:'#ffa8cc',e:'#ffd8e8',w:'#ffffff'},P2={a:'#1a3a9a',b:'#3a78ff',c:'#86b8ff',e:'#cfe4ff',w:'#ffffff'},P3={a:'#b8782a',b:'#ffd96a',c:'#fff0a8',e:'#fffbe0',w:'#ffffff'},P4={a:'#2a1a6a',b:'#7a5cff',c:'#b8a4ff',e:'#e8e0ff',w:'#ffffff'},P5={a:'#b01846',b:'#ff5a8a',c:'#ffa0bf',e:'#ffe0ea',w:'#ffffff'},P6={a:'#1a4a9a',b:'#3a9aff',c:'#9fd0ff',e:'#e4f2ff',w:'#ffffff'},P7={a:'#102a6a',b:'#35c8ff',c:'#9be8ff',e:'#e6f9ff',w:'#ffffff'},P8={a:'#2a8a6a',b:'#7ae0b0',c:'#ffb8d8',e:'#fff4e8',w:'#ffffff'};
+Object.assign(FX,{
+// 엠라이트 · 마음의 파동: 하트가 고리를 그리며 모이고, 커다란 하트가 날아가 하트 폭죽으로 터져요
+heartwave:trio({K:P1,charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2-.7*g.e),8,g.t,.004,(px,py,i)=>{P.ga(.4+.6*g.e);heart(px,py,g.R*.2,i%2?K.c:K.b);});},
+ proj:g=>{const{K}=g;trail(g,5,(x,y,i,a)=>{P.ga(a);heart(x,y,g.Rb*.34*a+1,K.c);});P.ga(1);const s=g.Rb*(.8+.1*sin(g.t*.03));heart(g.x,g.y,s,K.a);heart(g.x,g.y,s*.86,K.b);heart(g.x,g.y,s*.5,K.e);},
+ hit:g=>{const{K}=g;burstN(g.x,g.y,24,g.Rb*3.4,(px,py,i)=>{P.ga(g.a);heart(px,py,g.Rb*(.3+.25*hz(i)),i%2?K.c:K.e);},g.e,3);P.ga(g.a);heart(g.x,g.y,g.Rb*(.7+1.8*g.e),K.b);heart(g.x,g.y,g.Rb*(.45+1.1*g.e),K.c);}}),
+// 아그놈 · 의지의 일격: 날카로운 별날이 회전하며 모여 날아가고, 명중하면 십자로 베어요
+willstar:trio({K:P2,charge:g=>{const{K}=g;P.ga(.4+.6*g.e);star4(g.x,g.y,g.R*(.4+.9*g.e),g.t*.006,K.c);star4(g.x,g.y,g.R*(.25+.5*g.e),-g.t*.008,K.e);orbitN(g.x,g.y,g.R*1.8,4,g.t,.005,(px,py)=>{star4(px,py,g.R*.28,g.t*.01,K.b);});},
+ proj:g=>{const{K}=g;trail(g,4,(x,y,i,a)=>{P.ga(a*.8);star4(x,y,g.Rb*.5*a+1,g.t*.02,K.b);});P.ga(1);star4(g.x,g.y,g.Rb*1.2,g.t*.025,K.a);star4(g.x,g.y,g.Rb,g.t*.025,K.c);star4(g.x,g.y,g.Rb*.55,-g.t*.02,K.w);},
+ hit:g=>{const{K}=g,L=g.Rb*(1+4.2*g.e),w=Math.max(2,Math.round(g.Rb*.4*g.a));P.ga(g.a);for(const q of[-1,1]){P.line(g.x-L*.8,g.y-q*L*.8,g.x+L*.8,g.y+q*L*.8,K.b,w);P.line(g.x-L*.8,g.y-q*L*.8,g.x+L*.8,g.y+q*L*.8,K.w,Math.max(1,w-2));}star4(g.x,g.y,g.Rb*(1+2.4*g.e),g.k*4,K.e);raysN(g.x,g.y,8,L*1.2,g.Rb*.1,[K.w,K.c],.9*g.a);}}),
+// 크레세리아 · 초승달춤: 초승달이 둥글게 모여 하나로 합쳐 날아가고, 달빛이 사방으로 퍼져요
+moonlight:trio({K:P3,dark:'#1a1840',charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2.1-.6*g.e),5,g.t,.004,(px,py,i,an)=>{P.ga(.4+.6*g.e);crescent(px,py,g.R*.4,an+PI/2,i%2?K.c:K.b);});},
+ proj:g=>{const{K}=g,r=g.t*.012;trail(g,4,(x,y,i,a)=>{P.ga(a*.7);crescent(x,y,g.Rb*.8*a+1,r-i*.25,K.c);});P.ga(1);crescent(g.x,g.y,g.Rb*1.35,r,K.a);crescent(g.x,g.y,g.Rb*1.2,r,K.b);crescent(g.x,g.y,g.Rb*.95,r,K.e);},
+ hit:g=>{const{K}=g;burstN(g.x,g.y,8,g.Rb*3.6,(px,py,i,an)=>{P.ga(g.a);crescent(px,py,g.Rb*(.5+.4*hz(i)),an+g.k*4,i%2?K.e:K.c);},g.e,5);P.ga(g.a);crescent(g.x,g.y,g.Rb*(1+2*g.e),g.k*3,K.b);raysN(g.x,g.y,10,g.Rb*(1.2+4*g.e),g.Rb*.1,[K.w,K.c],.8*g.a);}}),
+// 코스모그·코스모움 · 별가루 소용돌이: 별가루가 소용돌이치며 모여 은하 구슬이 되어 날아가요
+stardust:trio({K:P4,dark:'#0c0a2e',charge:g=>{const{K}=g;for(let i=0;i<30;i++){const ph=((g.t*.001+hz(i)*2)%1),an=hz(i+3)*TAU+ph*4,d=g.R*(2.6*(1-ph)+.2);P.ga(ph);cross(g.x+cos(an)*d,g.y+sin(an)*d*.75,1+(i%4===0),i%2?K.e:K.w);}P.ga(1);P.disc(g.x,g.y,Math.max(1,g.R*.5*g.e),K.b);P.disc(g.x,g.y,Math.max(1,g.R*.3*g.e),K.e);},
+ proj:g=>{const{K}=g;P.disc(g.x,g.y,g.Rb*.95,K.a);P.disc(g.x,g.y,g.Rb*.8,K.b);for(let a_=0;a_<3;a_++)for(let i=0;i<12;i++){const t=i/12,an=a_*TAU/3+t*3.6+g.t*.012,rr=g.Rb*(.15+.7*t);P.ga(.4+.6*(1-t));P.disc(g.x+cos(an)*rr,g.y+sin(an)*rr,Math.max(1,g.Rb*.1),i%2?K.e:K.c);}P.ga(1);P.disc(g.x,g.y,g.Rb*.3,K.w);for(let i=0;i<5;i++){const an=i*1.7+g.t*.01;cross(g.x+cos(an)*g.Rb*1.3,g.y+sin(an)*g.Rb*1.3,1,K.w);}},
+ hit:g=>{const{K}=g;burstN(g.x,g.y,28,g.Rb*3.6,(px,py,i)=>{P.ga(g.a);cross(px,py,1+(i%3),i%2?K.w:K.e);},g.e,7);P.ga(g.a);for(let a_=0;a_<3;a_++)for(let i=0;i<14;i++){const t=i/14,an=a_*TAU/3+t*3.6+g.e*5,rr=g.Rb*(.3+2.6*g.e*t);P.disc(g.x+cos(an)*rr,g.y+sin(an)*rr*.9,Math.max(1,g.Rb*.16*(1-t*.5)),i%2?K.c:K.e);}flare(g.x,g.y,g.Rb*(1+1.6*g.e),K.w,g.a,g.k*2);}}),
+// 라티아스 · 미스트볼: 붉은 안개 구슬이 안개 고리를 달고 날아가, 명중하면 안개가 터져요
+mistball:trio({K:P5,charge:g=>{const{K}=g;for(let i=0;i<3;i++)P.ring(g.x,g.y,g.R*(.7+i*.6+.5*g.e),i%2?K.c:K.b,1,false);orbitN(g.x,g.y,g.R*1.6,10,g.t,.006,(px,py,i)=>{P.ga(.4+.6*g.e);P.disc(px,py,Math.max(1,g.R*.14),i%2?K.e:K.c);});},
+ proj:g=>{const{K}=g;P.disc(g.x,g.y,g.Rb*.95,K.a);P.disc(g.x,g.y,g.Rb*.8,K.b);P.disc(g.x,g.y,g.Rb*.55,K.c);P.disc(g.x,g.y,g.Rb*.3,K.e);for(let i=0;i<3;i++)P.ring(g.x,g.y,g.Rb*(1.2+i*.45),K.c,1,i>0);trail(g,6,(x,y,i,a)=>{P.ga(a*.6);P.disc(x,y,Math.max(1,g.Rb*.7*a),K.c);});},
+ hit:g=>{const{K}=g;for(let i=0;i<22;i++){const an=hz(i)*TAU,d=g.Rb*(.4+3.4*g.e*(.4+.6*hz(i+5)));P.ga(g.a*.8);P.disc(g.x+cos(an)*d,g.y+sin(an)*d*.85,Math.max(1,g.Rb*(.5+.5*hz(i+2))*(1-g.k*.5)),i%3?K.c:K.e);}P.ga(g.a);P.disc(g.x,g.y,Math.max(1,g.Rb*(.5+1.8*g.e)),K.b);P.disc(g.x,g.y,Math.max(1,g.Rb*(.3+1*g.e)),K.e);}}),
+// 라티오스 · 라스터퍼지: 눈부신 빛 구슬이 날아가, 명중하면 빛살이 사방으로 뻗어요
+luster:trio({K:P6,charge:g=>{const{K}=g;raysN(g.x,g.y,10,g.R*(.8+1.6*g.e),g.R*.08,[K.e,K.c],.7*g.e,g.t*.002);P.disc(g.x,g.y,Math.max(1,g.R*.5*g.e),K.c);P.disc(g.x,g.y,Math.max(1,g.R*.3*g.e),K.w);},
+ proj:g=>{const{K}=g;raysN(g.x,g.y,8,g.Rb*2.4,g.Rb*.12,[K.w,K.c],.9,g.t*.01);P.disc(g.x,g.y,g.Rb*.95,K.a);P.disc(g.x,g.y,g.Rb*.8,K.c);P.disc(g.x,g.y,g.Rb*.55,K.e);P.disc(g.x,g.y,g.Rb*.3,K.w);trail(g,5,(x,y,i,a)=>{P.ga(a*.7);P.disc(x,y,Math.max(1,g.Rb*.6*a),K.e);});},
+ hit:g=>{const{K}=g;raysN(g.x,g.y,18,g.Rb*(1.5+6*g.e),g.Rb*.14*g.a+1,[K.w,K.e,K.c],.95*g.a,g.k*.8);P.ga(g.a);P.disc(g.x,g.y,Math.max(1,g.Rb*(.6+1.8*g.e)),K.c);P.disc(g.x,g.y,Math.max(1,g.Rb*(.4+1.1*g.e)),K.w);}}),
+// 테오키스 · 사이코부스트: 이중 나선 에너지가 몸을 감아 날아가고, 나선이 폭발하며 퍼져요
+psychoboost:trio({K:P7,charge:g=>{const{K}=g;for(let s=0;s<2;s++)for(let i=0;i<20;i++){const t=i/20,y=g.y+g.R*(1-t*2.4)*(.6+.4*g.e),x=g.x+sin(t*9+g.t*.01+s*PI)*g.R*(.7+.5*g.e)*(1-t*.5);P.ga(.4+.6*g.e);P.disc(x,y,Math.max(1,g.R*.12),s?'#ff4a5a':K.c);}},
+ proj:g=>{const{K}=g,dx=cos(g.ang),dy=sin(g.ang),nx=-dy,ny=dx;for(let s=0;s<2;s++)for(let i=0;i<22;i++){const t=i/22,off=sin(t*10+g.t*.02+s*PI)*g.Rb*.8,x=g.x-dx*g.Rb*3.6*t+nx*off,y=g.y-dy*g.Rb*3.6*t+ny*off;P.ga(1-t*.7);P.disc(x,y,Math.max(1,g.Rb*.2*(1-t*.5)),s?'#ff6a7a':K.c);}P.ga(1);P.disc(g.x,g.y,g.Rb*.7,K.a);P.disc(g.x,g.y,g.Rb*.5,K.e);},
+ hit:g=>{const{K}=g;for(let s=0;s<3;s++)for(let i=0;i<20;i++){const t=i/20,an=s*TAU/3+t*5+g.e*6,rr=g.Rb*(.3+3*g.e*t);P.ga(g.a);P.disc(g.x+cos(an)*rr,g.y+sin(an)*rr*.9,Math.max(1,g.Rb*.2*(1-t*.5)),s===1?'#ff6a7a':K.c);}raysN(g.x,g.y,12,g.Rb*(1.4+4*g.e),g.Rb*.1,[K.w,K.c],.9*g.a);P.ga(g.a);P.disc(g.x,g.y,Math.max(1,g.Rb*(.4+1.2*g.e)),K.e);}}),
+// 메로엣타 · 태고의 노래: 음표가 물결치며 날아가고, 명중하면 음표와 음파가 퍼져요
+relicsong:trio({K:P8,dark:'#14282a',charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2-.6*g.e),7,g.t,.004,(px,py,i)=>{P.ga(.4+.6*g.e);note(px,py,g.R*.22,i%2?K.c:K.b);});},
+ proj:g=>{const{K}=g;trail(g,7,(x,y,i,a)=>{P.ga(a);note(x,y+sin(i*1.4+g.t*.02)*g.Rb*.9,g.Rb*.34*a+1,i%2?K.c:K.b);});P.ga(1);note(g.x,g.y,g.Rb*.8,K.a);note(g.x,g.y,g.Rb*.62,K.e);},
+ hit:g=>{const{K}=g;burstN(g.x,g.y,16,g.Rb*3.4,(px,py,i)=>{P.ga(g.a);note(px,py,g.Rb*(.3+.25*hz(i)),i%2?K.c:K.e);},g.e,9);for(let i=0;i<4;i++){P.ga(g.a*.7);P.ring(g.x,g.y,g.Rb*(.8+i*.9)*(.4+g.e),i%2?K.b:K.c,1,false);}note(g.x,g.y,g.Rb*(.8+1.4*g.e),K.e);}}),
+});
+
+const Q9={a:'#b88a00',b:'#ffd93a',c:'#fff08a',e:'#fffbd0',w:'#ffffff'},Q10={a:'#8a1c7a',b:'#e84acb',c:'#ff9fe8',e:'#ffdff8',w:'#ffffff'},Q11={a:'#1c6a2a',b:'#4ccb4a',c:'#a6f07a',e:'#e6ffc8',w:'#ffffff'},Q12={a:'#0a5a8a',b:'#2ab8e8',c:'#8ae8ff',e:'#e0fbff',w:'#ffffff'},
+ Q13={a:'#2a1040',b:'#7a3aa8',c:'#7ee05a',e:'#c8ffb0',w:'#ffffff'},Q14={a:'#1a2a6a',b:'#4aa8ff',c:'#a8e0ff',e:'#e8f8ff',w:'#ffffff'},Q15={a:'#4a2a10',b:'#b8742a',c:'#e8b45a',e:'#fff0c0',w:'#ffffff'},Q16={a:'#5a0a0a',b:'#ff4a1a',c:'#ffa83a',e:'#ffe49a',w:'#ffffff'};
+Object.assign(FX,{
+// 카푸꼬꼬꼭 · 수호신의 번개: 번개가 몸을 휘감고, 지그재그 번개가 꽂히며 하늘에서 번개 다발이 내리쳐요
+tapukoko:trio({K:Q9,dark:'#201a04',charge:g=>{const{K}=g;for(let i=0;i<5;i++){const an=i/5*TAU+g.t*.003,sd=Math.floor(g.t/70)+i*7;P.ga(.4+.6*g.e);bolt(g.x+cos(an)*g.R*(2.3-.8*g.e),g.y+sin(an)*g.R*1.2,g.x,g.y,K.c,1,sd);}P.ga(1);star4(g.x,g.y,g.R*(.3+.6*g.e),g.t*.01,K.e);},
+ proj:g=>{const{K}=g,sd=Math.floor(g.t/55),th=Math.max(2,Math.round(g.Rb*.38));bolt(g.ax,g.ay,g.x,g.y,K.b,th,sd);bolt(g.ax,g.ay,g.x,g.y,K.e,Math.max(1,th-2),sd);star4(g.x,g.y,g.Rb*1.3,g.t*.02,K.c);P.disc(g.x,g.y,g.Rb*.45,K.w);},
+ hit:g=>{const{K}=g;P.ga(g.a);for(let i=0;i<6;i++){const o=(i-2.5)*g.Rb*.85,sd=Math.floor(g.t/50)+i*5;bolt(g.x+o,g.y-g.Rb*9,g.x+o*.3,g.y,i%2?K.c:K.b,Math.max(2,Math.round(g.Rb*.3)),sd);bolt(g.x+o,g.y-g.Rb*9,g.x+o*.3,g.y,K.w,1,sd);}star4(g.x,g.y,g.Rb*(1+2.4*g.e),g.k*3,K.e);raysN(g.x,g.y,10,g.Rb*(1.2+4*g.e),g.Rb*.1,[K.w,K.c],.9*g.a);}}),
+// 카푸나비나 · 사이코필드: 분홍 구슬 셋이 돌며 날아가고, 명중하면 사이코 필드가 번져요
+tapulele:trio({K:Q10,charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(1.9-.5*g.e),3,g.t,.006,(px,py,i)=>{P.ga(.4+.6*g.e);glow(px,py,g.R*.5,K.b,.5);P.disc(px,py,Math.max(1,g.R*.24),K.c);P.disc(px,py,Math.max(1,g.R*.12),K.w);});},
+ proj:g=>{const{K}=g;P.disc(g.x,g.y,g.Rb*.8,K.a);P.disc(g.x,g.y,g.Rb*.62,K.b);P.disc(g.x,g.y,g.Rb*.3,K.e);for(let i=0;i<3;i++){const an=i/3*TAU+g.t*.02,x=g.x+cos(an)*g.Rb*1.5,y=g.y+sin(an)*g.Rb*1.5;glow(x,y,g.Rb*.7,K.b,.5);P.disc(x,y,Math.max(1,g.Rb*.34),K.c);P.disc(x,y,Math.max(1,g.Rb*.16),K.w);}},
+ hit:g=>{const{K}=g;P.ga(g.a*.6);P.disc(g.x,g.y,Math.max(1,g.Rb*(.8+3.4*g.e)),K.a);P.ga(g.a*.8);P.disc(g.x,g.y,Math.max(1,g.Rb*(.6+2.4*g.e)),K.b);P.ga(g.a);P.disc(g.x,g.y,Math.max(1,g.Rb*(.3+1.2*g.e)),K.e);for(let i=0;i<3;i++)P.ring(g.x,g.y,g.Rb*(.8+i*.9)*(.4+g.e),i%2?K.c:K.w,1,i>0);burstN(g.x,g.y,14,g.Rb*3.4,(px,py,i)=>{P.disc(px,py,Math.max(1,g.Rb*.22),i%2?K.c:K.e);},g.e,11);}}),
+// 카푸브루루 · 우드해머: 덩굴이 땅에서 솟고, 잎날이 소용돌이쳐 날아가 뿌리 가시가 솟아요
+tapubulu:trio({K:Q11,charge:g=>{const{K}=g;for(let i=0;i<6;i++){const bx0=g.x+(i-2.5)*g.R*.7;for(let j=0;j<10;j++){const t=j/10,yy=g.y+g.R*.9-t*g.R*2*g.e,xx=bx0+sin(j*.8+g.t*.008+i)*g.R*.25;P.ga(.4+.6*g.e);P.disc(xx,yy,Math.max(1,g.R*.14*(1-t*.5)),j%3?K.b:K.c);}}},
+ proj:g=>{const{K}=g;for(let i=0;i<6;i++){const an=i/6*TAU+g.t*.02;shard(g.x+cos(an)*g.Rb*1.1,g.y+sin(an)*g.Rb*1.1,g.Rb*.7,g.Rb*.28,an+PI/2,i%2?K.c:K.b);}P.disc(g.x,g.y,g.Rb*.85,K.a);P.disc(g.x,g.y,g.Rb*.65,K.b);P.disc(g.x,g.y,g.Rb*.3,K.e);},
+ hit:g=>{const{K}=g;P.ga(g.a);for(let i=0;i<7;i++){const h=g.Rb*(.5+2*Math.min(1,g.e*1.5)*(.6+.4*hz(i+4)));spike(g.x+(i-3)*g.Rb*.75,g.y+g.Rb,g.Rb*.3,h,i%2?'#8a5a2a':K.b);}burstN(g.x,g.y-g.Rb*.5,14,g.Rb*3.4,(px,py,i,an)=>{shard(px,py,g.Rb*.5,g.Rb*.2,an+g.k*5,i%2?K.c:K.e);},g.e,13);}}),
+// 카푸느지느 · 수호신의 파도: 물방울이 솟아 소용돌이 물줄기로 날아가고, 명중하면 파도가 솟구쳐요
+tapufini:trio({K:Q12,charge:g=>{const{K}=g;for(let i=0;i<14;i++){const ph=((g.t*.0012+hz(i)*2)%1),x=g.x+(hz(i+3)-.5)*g.R*2.4,y=g.y+g.R*.8-ph*g.R*2.4;P.ga(.4+.6*g.e*(1-ph));P.ring(x,y,Math.max(1,g.R*.2*(1-ph*.4)),i%2?K.c:K.e,1,false);}},
+ proj:g=>{const{K}=g;for(let i=0;i<10;i++){const t=i/10,an=t*6+g.t*.02,d=g.Rb*(.3+1.2*t);P.ga(1-t*.6);P.disc(g.x-cos(g.ang)*g.Rb*3*t+cos(an)*d*.5,g.y-sin(g.ang)*g.Rb*3*t+sin(an)*d*.5,Math.max(1,g.Rb*.3*(1-t*.5)),i%2?K.c:K.b);}P.ga(1);P.disc(g.x,g.y,g.Rb*.9,K.a);P.disc(g.x,g.y,g.Rb*.72,K.b);P.disc(g.x,g.y,g.Rb*.4,K.e);P.ring(g.x,g.y,g.Rb*1.2,K.c,1,false);},
+ hit:g=>{const{K}=g,W=g.Rb*(.5+1.4*Math.sin(Math.min(1,g.k*1.8)*PI*.5)),top=g.y-g.Rb*(1+5*g.e);P.ga(g.a*.55);P.rect(g.x-W*1.4,top,W*2.8,g.y-top+g.Rb*.5,K.b);P.ga(g.a*.85);P.rect(g.x-W,top,W*2,g.y-top+g.Rb*.5,K.c);P.ga(g.a);P.rect(g.x-W*.4,top,W*.8,g.y-top+g.Rb*.5,K.e);burstN(g.x,g.y-g.Rb,18,g.Rb*3.2,(px,py,i)=>{P.disc(px,py,Math.max(1,g.Rb*(.18+.14*hz(i))),i%2?K.c:K.e);},g.e,15);}}),
+// 총지엔 · 재앙의 덩굴: 시든 잎이 독기와 함께 맴돌다 날아가, 명중하면 잎과 독기가 흩어져요
+ruinwo:trio({K:Q13,dark:'#140a1e',charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2-.6*g.e),8,g.t,.004,(px,py,i,an)=>{P.ga(.4+.6*g.e);shard(px,py,g.R*.4,g.R*.17,an+g.t*.006,i%2?K.c:'#a07a3a');});for(let i=0;i<5;i++){P.ga(.25*g.e);P.disc(g.x+(hz(i)-.5)*g.R*2,g.y+g.R*.5-hz(i+3)*g.R*.6,Math.max(1,g.R*.5),K.a);}},
+ proj:g=>{const{K}=g;for(let i=0;i<7;i++){const an=i/7*TAU+g.t*.022;shard(g.x+cos(an)*g.Rb*1.05,g.y+sin(an)*g.Rb*1.05,g.Rb*.62,g.Rb*.24,an+PI/2,i%2?K.c:'#a07a3a');}P.disc(g.x,g.y,g.Rb*.85,K.a);P.disc(g.x,g.y,g.Rb*.6,K.b);P.disc(g.x,g.y,g.Rb*.28,K.e);},
+ hit:g=>{const{K}=g;for(let i=0;i<8;i++){P.ga(g.a*.5);P.disc(g.x+(hz(i)-.5)*g.Rb*3.4*g.e,g.y+(hz(i+4)-.5)*g.Rb*2.4*g.e,Math.max(1,g.Rb*(.8+.6*hz(i+2))),K.a);}P.ga(g.a);burstN(g.x,g.y,20,g.Rb*3.6,(px,py,i,an)=>{shard(px,py,g.Rb*.5,g.Rb*.2,an+g.k*6,i%2?K.c:'#a07a3a');},g.e,17);}}),
+// 파오젠 · 재앙의 검: 얼음 검이 줄지어 일어서고, 큰 검이 날아가 하늘에서 얼음 검이 쏟아져요
+ruinchien:trio({K:Q14,charge:g=>{const{K}=g;for(let i=0;i<6;i++){const x=g.x+(i-2.5)*g.R*.7,h=g.R*(.5+1.1*g.e);P.ga(.4+.6*g.e);shard(x,g.y+g.R*.5-h*.5,h,g.R*.17,-PI/2,i%2?K.c:K.b);}},
+ proj:g=>{const{K}=g;shard(g.x,g.y,g.Rb*2.6,g.Rb*.55,g.ang,K.a);shard(g.x,g.y,g.Rb*2.3,g.Rb*.42,g.ang,K.b);shard(g.x,g.y,g.Rb*1.9,g.Rb*.2,g.ang,K.e);trail(g,5,(x,y,i,a)=>{P.ga(a*.7);shard(x,y,g.Rb*1.6*a+1,g.Rb*.3*a+1,g.ang,K.c);});},
+ hit:g=>{const{K}=g;P.ga(g.a);for(let i=0;i<7;i++){const sx=g.x+(i-3)*g.Rb*.9,yy=lerp(g.y-g.Rb*8,g.y-g.Rb*.2,Math.min(1,g.e*1.5));shard(sx,yy,g.Rb*1.8,g.Rb*.34,PI/2,i%2?K.c:K.b);}burstN(g.x,g.y,14,g.Rb*3.2,(px,py,i,an)=>{shard(px,py,g.Rb*.55,g.Rb*.2,an,i%2?K.e:K.c);},g.e,19);}}),
+// 딩루 · 재앙의 그릇: 바윗덩이가 맴돌고, 큰 바위가 날아가 땅에서 바위 가시가 줄지어 솟아요
+ruinting:trio({K:Q15,dark:'#1a1008',charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2-.6*g.e),6,g.t,.004,(px,py,i)=>{P.ga(.4+.6*g.e);P.disc(px,py,Math.max(1,g.R*.26),K.a);P.disc(px-1,py-1,Math.max(1,g.R*.18),i%2?K.b:K.c);});for(let i=0;i<7;i++){P.ga(.3*g.e);P.disc(g.x+(i-3)*g.R*.6,g.y+g.R*.9,Math.max(1,g.R*.4),K.c);}},
+ proj:g=>{const{K}=g;P.disc(g.x,g.y,g.Rb*1.05,K.a);P.disc(g.x,g.y,g.Rb*.9,K.b);P.disc(g.x-g.Rb*.2,g.y-g.Rb*.2,g.Rb*.5,K.c);for(let i=0;i<5;i++){const an=i/5*TAU+g.t*.02;P.disc(g.x+cos(an)*g.Rb*1.5,g.y+sin(an)*g.Rb*1.5,Math.max(1,g.Rb*.28),i%2?K.b:K.c);}},
+ hit:g=>{const{K}=g;P.ga(g.a);for(let i=0;i<9;i++){const h=g.Rb*(.6+2.4*Math.min(1,g.e*1.4)*(.5+.5*hz(i+2)));spike(g.x+(i-4)*g.Rb*.6,g.y+g.Rb,g.Rb*.34,h,i%2?K.a:K.b);}for(let i=0;i<8;i++){P.ga(g.a*.5);P.disc(g.x+(hz(i)-.5)*g.Rb*4*g.e,g.y+g.Rb*.6-hz(i+3)*g.Rb*1.2*g.e,Math.max(1,g.Rb*.6),K.c);}burstN(g.x,g.y-g.Rb,12,g.Rb*3,(px,py,i)=>{P.ga(g.a);P.disc(px,py,Math.max(1,g.Rb*.26),i%2?K.a:K.b);},g.e,21);}}),
+// 위유이 · 재앙의 구슬: 불꽃 구슬이 맴돌다 불덩이로 날아가고, 하늘에서 불구슬이 쏟아져요
+ruinchi:trio({K:Q16,dark:'#200808',charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2-.6*g.e),8,g.t,.005,(px,py,i)=>{P.ga(.4+.6*g.e);glow(px,py,g.R*.45,K.b,.6);P.disc(px,py,Math.max(1,g.R*.2),i%2?K.c:K.b);P.disc(px,py,Math.max(1,g.R*.1),K.e);});},
+ proj:g=>{const{K}=g;P.disc(g.x,g.y,g.Rb*1,K.a);P.disc(g.x,g.y,g.Rb*.85,K.b);P.disc(g.x,g.y,g.Rb*.55,K.c);P.disc(g.x,g.y,g.Rb*.28,K.e);for(let i=0;i<6;i++){const an=i/6*TAU+g.t*.022;glow(g.x+cos(an)*g.Rb*1.5,g.y+sin(an)*g.Rb*1.5,g.Rb*.5,K.b,.6);P.disc(g.x+cos(an)*g.Rb*1.5,g.y+sin(an)*g.Rb*1.5,Math.max(1,g.Rb*.22),K.c);}},
+ hit:g=>{const{K}=g;for(let i=0;i<10;i++){const sx=g.x+(i-4.5)*g.Rb*.75,yy=lerp(g.y-g.Rb*8-i*g.Rb*.4,g.y,Math.min(1,g.e*1.5));P.ga(g.a);glow(sx,yy,g.Rb*.6,K.b,.6);P.disc(sx,yy,Math.max(1,g.Rb*.28),K.c);P.disc(sx,yy,Math.max(1,g.Rb*.14),K.e);}P.ga(g.a);P.disc(g.x,g.y,Math.max(1,g.Rb*(.5+1.8*g.e)),K.b);P.disc(g.x,g.y,Math.max(1,g.Rb*(.3+1.1*g.e)),K.c);P.disc(g.x,g.y,Math.max(1,g.Rb*(.15+.5*g.e)),K.e);raysN(g.x,g.y,10,g.Rb*(1.2+3.8*g.e),g.Rb*.1,[K.e,K.c],.9*g.a);}}),
+});
+const Q17={a:'#3a1a5a',b:'#9a3ad8',c:'#d28aff',e:'#f0dcff',w:'#ffffff'},Q18={a:'#4a1a6a',b:'#b83aa8',c:'#ff8ad8',e:'#ffe0f4',w:'#ffffff'},Q19={a:'#7a1a5a',b:'#ff6ab8',c:'#ffb8e0',e:'#fff0f8',w:'#ffffff'},Q20={a:'#2a0a3a',b:'#8a2ac8',c:'#d86aff',e:'#f8d8ff',w:'#ffffff'},TOX='#7aff4a';
+Object.assign(FX,{
+// 조타구 · 독의 주먹: 독이 뚝뚝 떨어지는 주먹이 날아가, 명중하면 독이 튀며 웅덩이로 번져요
+okidogi:trio({K:Q17,dark:'#12081e',charge:g=>{const{K}=g;P.ga(.4+.6*g.e);P.disc(g.x,g.y,Math.max(1,g.R*(.4+.4*g.e)),K.a);P.disc(g.x,g.y,Math.max(1,g.R*(.3+.3*g.e)),K.b);for(let i=0;i<4;i++)P.disc(g.x+(i-1.5)*g.R*.28,g.y-g.R*.32*(.5+g.e),Math.max(1,g.R*.15),K.c);for(let i=0;i<9;i++){const ph=((g.t*.0012+hz(i)*2)%1);P.ga(1-ph);P.disc(g.x+(hz(i+3)-.5)*g.R*1.4,g.y+ph*g.R*1.6,Math.max(1,g.R*.12*(1-ph*.3)),i%2?TOX:K.c);}},
+ proj:g=>{const{K}=g,nx=-sin(g.ang),ny=cos(g.ang),fx=cos(g.ang),fy=sin(g.ang);trail(g,6,(x,y,i,a)=>{P.ga(a);P.disc(x+(hz(i)-.5)*g.Rb*.6,y+(hz(i+4)-.5)*g.Rb*.6,Math.max(1,g.Rb*.28*a),i%2?TOX:K.c);});P.ga(1);P.disc(g.x,g.y,g.Rb*1.05,K.a);P.disc(g.x,g.y,g.Rb*.88,K.b);for(let i=0;i<4;i++){const o=(i-1.5)*g.Rb*.5;P.disc(g.x+fx*g.Rb*.8+nx*o,g.y+fy*g.Rb*.8+ny*o,Math.max(1,g.Rb*.3),K.c);}P.disc(g.x-g.Rb*.2,g.y-g.Rb*.2,g.Rb*.3,K.e);},
+ hit:g=>{const{K}=g;P.ga(g.a*.7);for(let i=0;i<12;i++){const o=(i-5.5)*g.Rb*.5*g.e;P.disc(g.x+o,g.y+g.Rb*.8,Math.max(1,g.Rb*.5*(1-Math.abs(i-5.5)/7)),i%2?K.a:K.b);}P.ga(g.a);P.disc(g.x,g.y,Math.max(1,g.Rb*(.5+1.7*g.e)),K.b);P.disc(g.x,g.y,Math.max(1,g.Rb*(.3+1*g.e)),K.c);burstN(g.x,g.y,22,g.Rb*3.4,(px,py,i)=>{P.disc(px,py,Math.max(1,g.Rb*(.2+.18*hz(i))),i%2?TOX:K.c);},g.e,23);}}),
+// 이야후 · 정신 독: 소용돌이 무늬가 감아 돌며 날아가, 명중하면 최면 고리가 번져요
+munkidori:trio({K:Q18,charge:g=>{const{K}=g;for(let i=0;i<40;i++){const t=i/40,an=t*9+g.t*.006,rr=g.R*2*(1-g.e*.4)*t;P.ga(.35+.65*g.e*(1-t*.5));P.disc(g.x+cos(an)*rr,g.y+sin(an)*rr*.7,Math.max(1,g.R*.12*(1-t*.4)),i%3?K.c:K.e);}},
+ proj:g=>{const{K}=g;P.disc(g.x,g.y,g.Rb*1,K.a);for(let s=0;s<2;s++)for(let i=0;i<18;i++){const t=i/18,an=t*7+g.t*.025+s*PI,rr=g.Rb*(.1+.9*t);P.ga(.5+.5*(1-t));P.disc(g.x+cos(an)*rr,g.y+sin(an)*rr,Math.max(1,g.Rb*.13),s?'#8aff6a':K.c);}P.ga(1);P.disc(g.x,g.y,g.Rb*.22,K.w);},
+ hit:g=>{const{K}=g;for(let i=0;i<5;i++){P.ga(g.a);P.ring(g.x,g.y,g.Rb*(.6+i*.8)*(.4+g.e),i%2?'#8aff6a':K.c,2,false);}for(let s=0;s<2;s++)for(let i=0;i<24;i++){const t=i/24,an=t*8+g.e*6+s*PI,rr=g.Rb*(.2+3*g.e*t);P.ga(g.a);P.disc(g.x+cos(an)*rr,g.y+sin(an)*rr*.9,Math.max(1,g.Rb*.18*(1-t*.4)),s?'#8aff6a':K.e);}P.ga(g.a);P.disc(g.x,g.y,Math.max(1,g.Rb*(.4+1.2*g.e)),K.b);}}),
+// 기로치 · 독깃털: 독 묻은 깃털이 부채꼴로 날아가, 명중하면 깃털이 흩날려요
+fezandipiti:trio({K:Q19,charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2-.6*g.e),8,g.t,.005,(px,py,i,an)=>{P.ga(.4+.6*g.e);shard(px,py,g.R*.5,g.R*.15,an+PI/2+g.t*.004,i%2?K.c:K.b);});},
+ proj:g=>{const{K}=g;for(let i=-3;i<=3;i++){const aa=g.ang+PI+i*.28,L=g.Rb*(2.6-Math.abs(i)*.3);shard(g.x+cos(aa)*L*.5,g.y+sin(aa)*L*.5,L*.5,g.Rb*.2,aa+PI,i%2?K.c:K.b);}P.disc(g.x,g.y,g.Rb*.75,K.a);P.disc(g.x,g.y,g.Rb*.58,K.b);P.disc(g.x,g.y,g.Rb*.26,K.e);},
+ hit:g=>{const{K}=g;P.ga(g.a);burstN(g.x,g.y,22,g.Rb*3.6,(px,py,i,an)=>{shard(px,py,g.Rb*.6,g.Rb*.18,an+g.k*3,i%3?K.c:(i%2?K.b:'#9a5aff'));},g.e,29);P.disc(g.x,g.y,Math.max(1,g.Rb*(.5+1.6*g.e)),K.b);P.disc(g.x,g.y,Math.max(1,g.Rb*(.3+.9*g.e)),K.e);raysN(g.x,g.y,10,g.Rb*(1.2+3.6*g.e),g.Rb*.1,[K.w,K.c],.85*g.a);}}),
+// 복숭악동 · 악의 사슬: 사슬이 뻗어 나가 상대를 휘감고, 조이며 독기가 폭발해요
+pecharunt:trio({K:Q20,dark:'#120618',charge:g=>{const{K}=g;P.ga(.4+.6*g.e);for(let i=0;i<5;i++){const an=i/5*TAU+g.t*.003,L=g.R*(1.2+1.1*g.e);chainL(g.x,g.y,g.x+cos(an)*L,g.y+sin(an)*L*.7,K.c,K.b,8,Math.max(1,g.R*.12));}},
+ proj:g=>{const{K}=g;chainL(g.ax,g.ay,g.x,g.y,K.c,K.b,Math.max(6,Math.round(Math.hypot(g.x-g.ax,g.y-g.ay)/(g.Rb*.35))),Math.max(1,g.Rb*.18));P.disc(g.x,g.y,g.Rb*.95,K.a);P.disc(g.x,g.y,g.Rb*.75,K.b);P.ring(g.x,g.y,g.Rb*1.2,'#ff5a9a',1,false);P.disc(g.x,g.y,g.Rb*.3,K.e);},
+ hit:g=>{const{K}=g;P.ga(g.a);for(let i=0;i<6;i++){const an=i/6*TAU+.3,r1=g.Rb*(4*(1-g.e)+.8);chainL(g.x+cos(an)*r1*1.6,g.y+sin(an)*r1,g.x,g.y,K.c,K.b,8,Math.max(1,g.Rb*.16));}for(let i=0;i<16;i++){const an=hz(i)*TAU,d=g.Rb*(.4+3*g.e*(.4+.6*hz(i+5)));P.ga(g.a*.7);P.disc(g.x+cos(an)*d,g.y+sin(an)*d*.85,Math.max(1,g.Rb*(.4+.4*hz(i+2))),i%3?K.b:K.a);}P.ga(g.a);P.disc(g.x,g.y,Math.max(1,g.Rb*(.4+1.4*g.e)),K.c);P.disc(g.x,g.y,Math.max(1,g.Rb*(.2+.7*g.e)),K.e);raysN(g.x,g.y,10,g.Rb*(1.2+3.6*g.e),g.Rb*.1,['#ff5a9a',K.w],.85*g.a);}}),
+});
+const Z2={a:'#5a0c24',b:'#e0283f',c:'#f2c24c',e:'#fff1b0',w:'#ffffff'};
+// 자마젠타(왕관) 방패: 참고 도트 이미지(474x1024) 좌표를 정규화해서 옮긴 도형 목록 (왼쪽 반쪽만 적고 오른쪽은 거울)
+const ZC={o:'#2e0a16',g0:'#8c6c2c',g1:'#b38f47',g2:'#d8b558',g3:'#f0d884',g4:'#fff4c0',r0:'#3f0c1e',r1:'#770f30',r2:'#a81e38',r3:'#e0485e'};
+const ZP=(()=>{const L=[];
+ const n=(a,b)=>[(a-237)/237,(b-470)/237],nn=p=>p.map(([a,b])=>n(a,b)),mm=p=>p.map(([a,b])=>n(474-a,b));
+ const H=(part,c,pts,ol)=>{L.push({p:part,c,g:nn(pts),o:ol,sd:-1});L.push({p:part,c,g:mm(pts),o:ol,sd:1});};
+ const F=(part,c,pts,ol)=>L.push({p:part,c,g:nn(pts),o:ol,sd:0});
+ // ── 1) 불꽃 날개 (위 소용돌이 / 가운데 짙은 면 / 아래 잎사귀 둘)
+ H('w','g2',[[8,265],[20,277],[50,292],[77,300],[93,317],[100,347],[103,395],[108,425],[100,442],[55,436],[0,418],[0,332],[40,346],[48,332],[30,312],[10,295]],1);
+ H('w','g1',[[0,400],[100,420],[110,450],[105,482],[83,480],[50,463],[10,442],[0,430]]);
+ H('w','g2',[[10,442],[50,463],[83,480],[110,510],[140,530],[172,570],[147,567],[110,557],[115,578],[120,597],[135,615],[163,650],[140,637],[100,617],[73,603],[50,583],[33,550],[23,520],[14,490]],1);
+ H('w','g0',[[12,305],[20,322],[40,342],[47,362],[26,346],[14,324]]);
+ H('w','r1',[[8,272],[22,284],[42,306],[55,332],[64,362],[80,384],[102,402],[103,424],[75,414],[48,398],[20,380],[0,366],[0,350],[30,366],[48,372],[42,345],[25,318],[10,295]]);
+ H('w','r2',[[10,280],[30,298],[50,325],[60,355],[48,340],[28,315]]);
+ H('w','g3',[[10,268],[30,280],[60,293],[88,305],[60,299],[30,291]]);
+ H('w','r1',[[12,452],[40,490],[80,515],[110,530],[150,558],[110,552],[85,540],[60,528],[40,510],[20,480]]);
+ H('w','r1',[[50,545],[70,547],[70,570],[85,590],[110,612],[142,640],[110,630],[80,617],[60,595],[48,570]]);
+ H('w','g3',[[80,490],[103,520],[120,547],[95,533]]);
+ H('w','g3',[[94,580],[108,585],[133,618],[110,605]]);
+ // ── 2) 아래로 길게 뻗은 몸통(칼날)
+ H('k2','g1',[[160,520],[173,567],[183,640],[203,713],[240,790],[240,520]],1);
+ // ── 3) 어깨 뿔(바깥 금 띠)과 머리 뒤 암적색 판
+ F('c','r1',[[143,268],[337,268],[333,300],[318,345],[300,377],[270,412],[240,432],[210,412],[180,377],[162,345],[147,300]]);
+ H('c','r2',[[143,268],[182,263],[162,296]]);
+ H('b','g2',[[122,225],[143,262],[147,300],[162,346],[190,352],[180,377],[207,415],[228,428],[228,452],[200,443],[163,410],[147,372],[128,345],[136,332],[121,324],[140,318],[131,290],[126,255]],1);
+ H('b','g0',[[158,353],[190,350],[178,372]]);
+ // ── 4) 앞판(V자 방패면) + 가슴 V자 붉은 띠 + 가운데 창끝
+ H('k','g2',[[85,350],[147,372],[163,410],[200,443],[227,452],[240,497],[240,640],[190,555],[167,513],[143,477],[123,450],[110,407]],1);
+ H('k','g3',[[88,352],[122,362],[140,372],[112,410],[96,372]]);
+ H('k','g1',[[150,479],[200,489],[240,521],[240,528],[198,497],[152,488]]);
+ H('k','g0',[[166,513],[190,552],[240,636],[240,643],[186,558],[162,516]]);
+ H('k','r2',[[148,370],[152,371],[177,393],[207,417],[227,428],[228,452],[200,443],[163,410]]);
+ H('k','r1',[[105,387],[125,395],[150,418],[148,428],[125,412]]);
+ F('k','g4',[[238,500],[242,500],[242,782],[240,788],[238,782]]);
+ H('k','r2',[[200,498],[219,498],[223,540],[230,575],[228,602],[214,598],[203,560],[193,532],[183,522],[194,517]]);
+ H('k','r1',[[188,580],[197,585],[205,605],[214,650],[212,668],[200,650],[192,615]]);
+ F('k2','r2',[[228,628],[252,628],[250,700],[255,718],[240,704],[226,718],[230,700]]);
+ F('k2','r3',[[238,632],[242,632],[242,704],[238,704]]);
+ F('k','r2',[[240,412],[251,436],[252,462],[240,497],[228,462],[229,436]]);
+ F('k','r3',[[238,418],[242,418],[242,488],[238,488]]);
+ // ── 5) 왕관: 뿔 두 개 + 가운데 봉우리 + 문장
+ H('c','g2',[[195,163],[203,200],[206,236],[214,252],[200,262],[184,262],[183,215],[190,180]],1);
+ H('c','r0',[[190,208],[196,208],[197,258],[190,258]]);
+ F('c','r2',[[213,250],[240,200],[267,250]]);
+ H('c','g2',[[184,258],[213,250],[226,232],[240,218],[240,300],[222,311],[192,298],[183,288]],1);
+ F('c','g4',[[238,222],[242,222],[242,290],[238,290]]);
+ F('c','g3',[[240,300],[252,318],[264,330],[240,341],[216,330],[228,318]]);
+ return L;})();
+const shieldPro=(x,y,s,rot,K,asm,mono)=>{asm=asm==null?1:asm;const cs=Math.cos(rot),sn=Math.sin(rot),u=1-asm;
+ const off=it=>it.p==='w'?[it.sd*u*1.1,0]:it.p==='b'?[it.sd*u*.6,-u*.3]:it.p==='c'?[0,-u*.9]:it.p==='k2'?[0,u*.9]:[0,0];
+ const tr=(it,px,py)=>{const[dx,dy]=off(it);return it.g.map(([a,b])=>{const X=(a+dx)*s,Y=(b+dy)*s;return[x+X*cs-Y*sn+px,y+X*sn+Y*cs+py];});};
+ if(!mono){for(const it of ZP){if(!it.o)continue;for(const[px,py]of[[1,0],[-1,0],[0,1],[0,-1]])P.poly(tr(it,px,py),ZC.o);}}
+ for(const it of ZP)P.poly(tr(it,0,0),mono||ZC[it.c]);};
+Object.assign(FX,{
+// 자마젠타 · 거수탄: 금빛 조각이 모여 왕관 방패가 완성되고, 불꽃 날개를 펼친 채 날아가 들이받으며 방패 문양을 새겨요
+shieldbash:trio({K:Z2,dark:'#1a0a08',
+ charge:g=>{const{K}=g,e=g.e,as=ez.out(Math.min(1,g.k*1.35));
+  orbitN(g.x,g.y,g.R*(2.2-1.1*e),8,g.t,.005,(px,py,i,an)=>{P.ga(.3+.7*e);shard(px,py,g.R*.42*(1-.3*e),g.R*.15,an+PI/2,i%2?K.c:K.b);});
+  P.ga(.35+.65*e);glow(g.x,g.y,g.R*(1.1+.9*e),K.b,.5*e);
+  shieldPro(g.x,g.y,g.R*(.55+.6*e),0,K,as);
+  if(g.k>.8){P.ga((g.k-.8)/.2*.55);shieldPro(g.x,g.y,g.R*(.55+.6*e),0,K,1,ZC.g4);}},
+ proj:g=>{const{K}=g,fx=cos(g.ang),fy=sin(g.ang),nx=-fy,ny=fx,sw=sin(g.t*.03)*.06;
+  for(let i=0;i<7;i++){const d=g.Rb*(1.5+i*.35),w=(i-3)*g.Rb*.42,px=g.x-fx*d+nx*w,py=g.y-fy*d+ny*w,L=g.Rb*(1.5-Math.abs(i-3)*.2);P.ga(.85-Math.abs(i-3)*.12);shard(px,py,L,g.Rb*.2,g.ang+PI,i%2?K.b:K.c);shard(px+fx*L*.2,py+fy*L*.2,L*.55,g.Rb*.1,g.ang+PI,K.e);}
+  for(let i=0;i<4;i++){const d=g.Rb*(2.2+i*.7),w=(i-1.5)*g.Rb*.8;P.ga(.5-i*.1);P.line(g.x-fx*d+nx*w,g.y-fy*d+ny*w,g.x-fx*(d+g.Rb*1.2)+nx*w,g.y-fy*(d+g.Rb*1.2)+ny*w,i%2?K.c:K.e,Math.max(1,Math.round(g.Rb*.1)));}
+  P.ga(1);glow(g.x,g.y,g.Rb*2,K.b,.5);shieldPro(g.x,g.y,g.Rb*1.15,sw,K);},
+ hit:g=>{const{K}=g,e=g.e,s=g.Rb*(.75+.85*Math.min(1,e*2.2));
+  P.ga(g.a*.45);shieldPro(g.x,g.y,s*(1.15+.4*e),0,K,1,K.b);
+  P.ga(g.a);for(let i=0;i<10;i++){const an=i/10*TAU+.15,L=g.Rb*(1.3+3.8*e);P.line(g.x,g.y,g.x+cos(an)*L,g.y+sin(an)*L,K.a,2);P.line(g.x,g.y,g.x+cos(an)*L*.9,g.y+sin(an)*L*.9,i%2?K.c:K.b,1);}
+  for(let i=0;i<7;i++){const h=g.Rb*(.8+2.2*Math.min(1,e*1.4)*(.5+.5*hz(i+4)));spike(g.x+(i-3)*g.Rb*.8,g.y+g.Rb*1.1,g.Rb*.3,h,i%2?K.c:K.b);}
+  shieldPro(g.x,g.y,s,0,K);
+  raysN(g.x,g.y,12,g.Rb*(1.4+4*e),g.Rb*.1,[K.w,K.c,K.b],.9*g.a);
+  burstN(g.x,g.y,12,g.Rb*3.4,(px,py,i,an)=>{shard(px,py,g.Rb*.5,g.Rb*.17,an+g.k*3,i%2?K.c:K.b);},e,37);}}),
+});
+// ===== 토네로스 · 폭풍(태풍): 회오리가 휘몰아치며 모여 → 깔때기 모양 회오리가 날아가 → 상대를 휘감아요 =====
+const TW={a:'#1f5a6a',b:'#5fc8c0',c:'#b6efe6',e:'#effffa',w:'#ffffff',d:'#7a5a3a',l:'#7ac85a'};
+// 깔때기 하나: 아래는 가늘고 위로 갈수록 넓어지며, 띠가 빙글빙글 돌아요 (yB=바닥, H=높이, W=맨 위 반폭)
+const funnel=(x,yB,H,W,t,a,spd,seed)=>{const N=12,L=[],Rr=[];
+ for(let i=0;i<=N;i++){const q=i/N,w=W*(.1+.9*Math.pow(q,1.3)),sw=sin(t*.011*spd+q*3.2+seed)*W*.14*q;L.push([x+sw-w,yB-q*H]);Rr.push([x+sw+w,yB-q*H]);}
+ P.ga(.62*a);P.poly(L.concat(Rr.slice().reverse()),TW.a);P.ga(.55*a);P.poly(L.map((p,i)=>[lerp(p[0],Rr[i][0],.22),p[1]]).concat(Rr.map((p,i)=>[lerp(p[0],L[i][0],.22),p[1]]).reverse()),TW.b);
+ for(let i=0;i<=N;i++){const q=i/N,w=(Rr[i][0]-L[i][0])/2,cx0=(Rr[i][0]+L[i][0])/2,ry=Math.max(1,w*.27),ph=t*.012*spd*(1+q*.35)+i*1.35+seed,col=i%3===0?TW.e:(i%3===1?TW.c:TW.b);
+  P.ga(a*(.55+.45*q));let px=0,py=0;for(let s=0;s<=5;s++){const an=ph+s*.3,xx=cx0+cos(an)*w,yy=L[i][1]+sin(an)*ry;if(s)P.line(px,py,xx,yy,col,i%2?3:2);px=xx;py=yy;}
+  if(i%4===2){P.ga(a*.5);let qx=0,qy=0;for(let s=0;s<=4;s++){const an=ph+PI+s*.3,xx=cx0+cos(an)*w,yy=L[i][1]+sin(an)*ry;if(s)P.line(qx,qy,xx,yy,TW.a,1);qx=xx;qy=yy;}}}
+ for(let i=0;i<9;i++){const q=hz(i*3.7+seed),w=W*(.1+.9*Math.pow(q,1.3))*1.25,an=t*.012*spd*(1.1+q*.3)+i*2.1,xx=x+sin(t*.011*spd+q*3.2+seed)*W*.14*q+cos(an)*w,yy=yB-q*H+sin(an)*w*.27;P.ga(a);if(i%3===0)P.rect(xx,yy,2,1,TW.l);else if(i%3===1)P.rect(xx,yy,1,1,TW.e);else P.rect(xx,yy,2,2,TW.d);}
+ P.ga(1);};
+Object.assign(FX,{
+tornadus(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,S=m.S,tC=520,tF=560,tH=tC+tF,ya=ay+R*.9;
+ let yb=by+R*.9,Hs=R*3.2,Ws=R*1.2;try{if(c.toEl){const r=spriteRect(c.toEl);yb=(r.top+r.height)/S;Hs=Math.max(R*3.6,r.height/S*1.3);Ws=Math.max(R*1.5,r.width/S*.75);}}catch(e){}
+ const H0=R*(2.5+.8*sc),W0=R*(.95+.3*sc);
+ vig('#0c2a30',.3,tH+1100,0);
+ // 1) 모으기: 발밑에서 작은 회오리가 일어나 점점 커져요
+ add(0,tC,(k,p)=>{const e=ez.in(k);glow(ax,ya,R*(1.2+.8*e),TW.b,.4*e);funnel(ax,ya,H0*(.35+.65*e),W0*(.3+.7*e),p.age,.4+.6*e,1+e,1);
+  for(let i=0;i<2;i++){const q=(k*1.5+i/2)%1;P.ga((1-q)*.8);P.ringGlow(ax,ya,R*(.4+q*1.4),Math.max(2,R*.14),TW.c,.7,.4);}P.ga(1);});
+ setTimeout(()=>F.hold(60),tC);
+ // 2) 날아가기: 회오리가 땅을 훑으며 점점 커지고 먼지를 일으켜요
+ add(tC,tF+60,(k,p)=>{const f=Math.min(1,k*1.05),x=lerp(ax,bx,Math.pow(f,1.35)),y=lerp(ya,yb,Math.pow(f,1.35)),g=.55+.45*f;
+  for(let i=1;i<=8;i++){const ff=Math.max(0,f-i*.045),pp=Math.pow(ff,1.35),a=1-i/9;P.ga(a*.55);P.disc(lerp(ax,bx,pp)+(hz(i)-.5)*R*.6,lerp(ya,yb,pp)-R*(.1+.15*hz(i+3)),Math.max(1,R*(.25+.35*a)),i%2?'#d9c9a0':'#b9a98a');}P.ga(1);
+  glow(x,y-H0*g*.4,R*1.4,TW.b,.3);funnel(x,y,lerp(H0,Hs*.8,f),lerp(W0,Ws*.8,f),p.age,1,2,2);
+  for(let i=0;i<5;i++){const t2=(k*2+hz(i))%1;P.ga(1-t2);P.rect(x-(hz(i+4)-.5)*R*2-(x-ax)*.1*t2,y-t2*R*1.5,2,1,i%2?TW.l:TW.e);}P.ga(1);});
+ // 3) 명중: 상대를 휘감고 거세게 휘몰아쳐요
+ add(tH,1000,(k,p)=>{const e=ez.out(Math.min(1,k*2.2)),a=k>.72?(1-k)/.28:1,t=p.age;
+  glow(bx,yb-Hs*.45,Ws*(1.6+.8*e),TW.b,.38*a);funnel(bx,yb,Hs*(.8+.3*e),Ws*(.8+.3*e),t,a,3.2,3);
+  for(let j=0;j<3;j++){const q=cl(k*2-j*.25,0,1);P.ga((1-q)*.85*a);P.ringGlow(bx,yb,Ws*(.6+q*2.6),Math.max(2,R*.2),j%2?TW.e:TW.c,.8,.38);}P.ga(1);
+  for(let i=0;i<16;i++){const q=(k*1.6+hz(i))%1,an=hz(i+9)*TAU+q*5,d=Ws*(.8+1.6*q),x=bx+cos(an)*d,y=yb-Hs*(.2+.7*q)+sin(an)*d*.3;P.ga(Math.sin(q*PI)*a);if(i%3===0)P.rect(x,y,2,1,TW.l);else if(i%3===1)P.rect(x,y,2,2,TW.d);else P.rect(x,y,1,1,TW.e);}P.ga(1);});
+ setTimeout(()=>{F.hold(110);F.flash('#e6fffa');shk();setTimeout(shk,160);setTimeout(shk,340);sparks(bx,yb-Hs*.4,22,[TW.e,TW.c,TW.b,TW.l],280,800,true);},tH);
+ try{lift(c.toEl,10,700);}catch(e){}
+ return waitS(tH+640);},
+});
+}
+/*NEWFX2-END*/
 return FX;})();
-const SKLITE_HEAVY=new Set(['typenull','dragonascent','dracometeor','crosspoison','ancientpower','pyroball','daimonji','originpulse','eternabeam']); /* 저사양에서 프레임당 8ms 이상 걸리던 고유 기술 (측정값 기준) */
+const SKLITE_HEAVY=new Set(['typenull','multiattack','terapagosrush','dragonascent','dracometeor','crosspoison','ancientpower','pyroball','daimonji','originpulse','eternabeam']); /* 저사양에서 프레임당 8ms 이상 걸리던 고유 기술 (측정값 기준) */
 async function skillMove(A,si,toEl,ok,cb,ov){const a=ov?{id:ov.id}:A.board[si];const fromEl=unitEl(A,si);if(!ov&&a&&fromEl&&toEl)bossFxSend({k:'sk',id:a.id,si,f:bossFxDesc(fromEl),e:bossFxDesc(toEl),ok,cb,lf:t2L(A)});
  if(!a||!fromEl||!toEl||window.__sim)return lunge(fromEl,toEl);
  let k=skillMix(a.id);if(skLite()&&k.sig&&SKLITE_HEAVY.has(k.fx))k=Object.assign({},k,{sig:0,fx:k.bfx,m:k.bm}); /* 저사양: 아주 무거운 고유 기술은 같은 속성의 기본 이펙트로 바꿔요 */
@@ -28404,6 +28919,150 @@ body:has(#gpWrap) #bg *,body:has(#gpWrap) #bgMons *,body:has(#gpWrap) #bgImg{ani
  function wake(){window.__lastIn=performance.now();H.classList.remove('decoSleep');}
  ['pointerdown','keydown','touchstart','wheel'].forEach(function(e){addEventListener(e,wake,{capture:true,passive:true});});
  setInterval(function(){if(document.hidden)return;var sl=false;try{sl=performance.now()-window.__lastIn>30000&&S.screen!=='battle';}catch(e){}H.classList.toggle('decoSleep',sl);},2000);
+})();
+</script>
+<script id="battle-test-js">
+/* ===== 🛠 운영자 모드 · ⚔️ 전투 테스트 =====
+   모든 포켓몬의 스킬 이펙트를 확인하는 연습용 전투예요 (선생님 화면 → 운영자 모드 탭).
+   · 상대 자리: 서로 다른 특성의 랜덤 포켓몬 5마리 (체력 99, 쓰러지면 새로 나와요)
+   · 내 손: 카드 없이 「포켓몬 선택하기」 버튼만 있어요. 모든 포켓몬 중 최대 5마리를 골라 「출전하기」
+   · 공격은 나만 해요 (문제 없음 · 차례 끝 없음). 내 포켓몬은 언제나 행동 가능, 메가진화·거다이맥스도 바로 가능
+   · 기록·보상·도감·저장 데이터는 전혀 바뀌지 않아요 */
+(function(){
+ if(window.__btLoaded)return;window.__btLoaded=1;
+ const MAXSEL=5,FHP=99,BIG=99999;
+ let picked=[];                       // 내가 고른 포켓몬 (출전 중)
+ const T=()=>!!(B&&B.test);
+
+ /* ---------- 상대 5마리: 서로 다른 특성 ---------- */
+ const kwKey=id=>{try{return kwOf(MON[id]).k;}catch(e){return 'x'+id;}};
+ const BYKW=(()=>{const m={};MON_IDS.forEach(id=>{if(!MON[id])return;const k=kwKey(id);(m[k]=m[k]||[]).push(id);});return m;})();
+ const rnd1=a=>a[Math.floor(Math.random()*a.length)];
+ function mkFoe(id){const u=mkUnit(id);u.hp=u.max=FHP;u.att=0;u.fresh=0;return u;}
+ function pickFoeId(used){const ks=Object.keys(BYKW).filter(k=>!used.has(k));const k=ks.length?rnd1(ks):rnd1(Object.keys(BYKW));return rnd1(BYKW[k]);}
+ function fillFoes(){const f=B.foe;
+  // 살아 있는 상대는 체력을 99로 되돌리고(상태 이상도 지워요), 쓰러진 자리는 특성이 겹치지 않게 새로 채워요
+  for(let i=0;i<f.board.length;i++){const u=f.board[i];if(u&&u.hp>0)f.board[i]=mkFoe(u.id);else f.board[i]=null;}
+  for(let i=0;i<f.board.length;i++){if(f.board[i])continue;const used=new Set(f.board.filter(Boolean).map(x=>x.kw));f.board[i]=mkFoe(pickFoeId(used));}
+  f.hp=f.max=BIG;}
+
+ /* ---------- 내 포켓몬: 늘 행동 가능 ---------- */
+ const mkMine=id=>{const u=mkUnit(id);u.att=u.kw==='double'?2:1;u.fresh=0;return u;};
+ function keepReady(){const me=B.me;me.hp=me.max=BIG;me.mana=me.maxMana=6;me.mgUsed=false;me.gmUsed=false;me.mgN=0;
+  me.board.forEach(u=>{if(!u)return;u.frozen=0;u.moon=0;u.fresh=0;u.att=u.kw==='double'?2:1;});}
+ function refillMine(){const me=B.me;if(me.gmx){try{gmaxEnd(me,'end');}catch(e){me.gmx=null;}}
+  picked.forEach((id,i)=>{const u=me.board[i];if(!u||u.hp<=0)me.board[i]=mkMine(id);else u.hp=u.max;});
+  for(let i=picked.length;i<me.board.length;i++)me.board[i]=null;
+  keepReady();}
+
+ /* ---------- 시작 · 종료 ---------- */
+ function startTest(){
+  let av=25;try{av=partnerId()||25;}catch(e){}
+  const me=mkPlayer((S.meta&&S.meta.name)||'선생님',[],BIG,av,false,MON_IDS.slice(),false);
+  const foe=mkPlayer('테스트 상대',[],BIG,rnd1(MON_IDS),false,[],false);
+  B={gi:-1,hard:null,g:{n:'전투 테스트',ldr:'테스트 상대',types:[0,0],c:'#c9b8f5'},diff:1,turn:1,round:1,side:'me',test:1,
+   me,foe,sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:false,over:false};
+  picked=[];me.maxMana=me.mana=6;fillFoes();
+  S.screen='battle';$('#view').innerHTML='';$('#battle').classList.add('on');
+  try{startBgm('battle');}catch(e){}
+  renderBattle();
+  try{toast('⚔️ 전투 테스트 · 아래 「포켓몬 선택하기」를 눌러 주세요');}catch(e){}}
+ function exitTest(){
+  try{closeInfo();closeM();}catch(e){}
+  B=null;picked=[];const bt=$('#battle');bt.classList.remove('on');bt.innerHTML='';
+  try{startBgm('adventure');}catch(e){}
+  try{renderTeacher();const b=document.querySelector('#tcTabs [data-tt=op]');if(b)b.click();}catch(e){console.warn('bt exit',e);try{renderTitle();}catch(_){}}}
+
+ /* ---------- 포켓몬 선택하기 (모든 포켓몬 중 5마리) ---------- */
+ function openPicker(){
+  if(!T()||B.busy)return;
+  let chosen=[],q='',flt='all';
+  const FLT=[['all','전체'],['1','★1'],['2','★2'],['3','★3'],['4','★4'],['5','★5'],['mega','메가'],['gmax','맥스']];
+  const list=()=>{const t=q.trim();return MON_IDS.filter(id=>{const m=MON[id];if(!m)return false;
+    if(flt==='mega'&&!MEGA[id])return false;if(flt==='gmax'&&!GMAX[id])return false;if(/^[1-5]$/.test(flt)&&m.rar!==+flt)return false;
+    return !t||m.name.includes(t)||String(id)===t;});};
+  const cell=id=>`<div class="dexCell${chosen.includes(id)?' trSel':''}" data-id="${id}"><span class=no>${id}</span>${(MEGA[id]||GMAX[id])?`<span class=tg style="font-size:10px">${MEGA[id]?'메가':''}${MEGA[id]&&GMAX[id]?'·':''}${GMAX[id]?'맥스':''}</span>`:''}${monImg(id)}<span class=nm>${esc(MON[id].name)}</span></div>`;
+  const prev=()=>chosen.length?chosen.map((id,i)=>`<span style="display:inline-flex;align-items:center;gap:2px;background:#fff;border:2px solid #f0cf7a;border-radius:12px;padding:2px 6px 2px 2px;font-size:12px">${monImg(id)}${esc(MON[id].name)}</span>`).join(' '):`<span class=mut>포켓몬을 눌러 최대 ${MAXSEL}마리까지 골라요</span>`;
+  const paint=()=>{const g=$('#btGrid');if(!g)return;const L=list();
+   g.innerHTML=L.map(cell).join('')||'<p class=mut style="grid-column:1/-1;text-align:center">해당하는 포켓몬이 없어요</p>';
+   g.querySelectorAll('.dexCell').forEach(c=>c.onclick=()=>{sfx('tap');const id=+c.dataset.id,k=chosen.indexOf(id);
+    if(k>=0)chosen.splice(k,1);else if(chosen.length>=MAXSEL){toast(`최대 ${MAXSEL}마리까지 고를 수 있어요`);return;}else chosen.push(id);
+    c.classList.toggle('trSel',chosen.includes(id));upd();});
+   upd();const cn=$('#btCnt');if(cn)cn.textContent=L.length+' / '+MON_IDS.length;};
+  const upd=()=>{const pv=$('#btPrev');if(pv)pv.innerHTML=prev();const go=$('#mbox [data-a=go]');if(go){go.disabled=!chosen.length;go.textContent=`⚔️ 출전하기 (${chosen.length}/${MAXSEL})`;}};
+  M(`<h2 style="margin:0 0 4px">🎴 포켓몬 선택하기</h2><div class=mut style="font-size:13.5px;line-height:1.6;text-align:left">모든 포켓몬 중에서 <b>최대 ${MAXSEL}마리</b>를 골라 <b>출전하기</b>를 눌러요. 다시 고르면 지금 나와 있는 포켓몬은 모두 바뀌어요.</div>
+   <div class=trBar><input class=inp id=btQ placeholder="이름이나 번호로 찾기" autocomplete=off><span id=btCnt class=mut style="font-size:12px"></span></div>
+   <div class=trBar style="margin-top:0">${FLT.map(([k,n])=>`<button class="fbtn${k==='all'?' on':''}" data-bf="${k}">${n}</button>`).join('')}</div>
+   <div class=trPrev id=btPrev style="flex-wrap:wrap"></div>
+   <div class="dexGrid trGrid" id=btGrid></div>
+   <div class=mbtns><button class="btn gold" data-a=go disabled>⚔️ 출전하기</button><button class="btn ghost" data-a=x>닫기</button></div>`,
+   {_close:()=>closeM(),x:()=>closeM(),go:()=>{if(!chosen.length)return;picked=chosen.slice();closeM();deploy();}},{wide:true});
+  const qi=$('#btQ');if(qi)qi.oninput=e=>{q=e.target.value;paint();};
+  document.querySelectorAll('#mbox [data-bf]').forEach(b=>b.onclick=()=>{sfx('tap');flt=b.dataset.bf;document.querySelectorAll('#mbox [data-bf]').forEach(x=>x.classList.toggle('on',x===b));paint();});
+  paint();}
+
+ // 고른 포켓몬을 배치해요 (이미 나와 있던 포켓몬·진화 상태는 모두 지워지고 새로 나와요)
+ function deploy(){if(!T())return;const me=B.me;
+  try{closeInfo();}catch(e){}
+  me.gmx=null;me.board=Array(BOARD_N).fill(null);
+  picked.forEach((id,i)=>{me.board[i]=mkMine(id);try{S.meta.dexSeen&&0;}catch(e){}});
+  B.sel=-1;B.pick=-1;B.busy=false;B.over=false;keepReady();fillFoes();
+  try{sfx('summon');}catch(e){}
+  renderBattle();}
+
+ /* ---------- 공격이 끝난 뒤: 상대 5마리 되돌리기 ---------- */
+ async function afterAction(){
+  if(!B||!B.test)return;B.busy=true;
+  await wait(450);if(!B||!B.test)return;
+  B.over=false;B.combo=0;
+  try{fillFoes();refillMine();}catch(e){console.warn('bt after',e);}
+  B.sel=-1;B.pick=-1;B.busy=false;renderBattle();}
+
+ /* ---------- 기존 전투 코드에 끼워 넣기 (전투 테스트일 때만 달라져요) ---------- */
+ {const o=pickQ;pickQ=function(){if(T())return null;return o.apply(this,arguments);};}   // 문제 없이 바로 공격
+ {const o=targetsFor;targetsFor=function(si){const r=o.apply(this,arguments);if(!T()||si<0||!B.me.board[si])return r;
+   r.hero=false;r.units=B.foe.board.map((u,i)=>u&&u.hp>0?i:-1).filter(i=>i>=0);return r;};}   // 도발·방벽 상관없이 아무나 공격
+ {const o=megaCan;megaCan=function(P,i){if(!T()||P!==B.me)return o.apply(this,arguments);const u=P.board[i];return !!(u&&!u.mg&&!u.gm&&u.hp>0&&MEGA[u.id]);};}
+ {const o=gmaxCan;gmaxCan=function(P,i,show){if(!T()||P!==B.me)return o.apply(this,arguments);const u=P.board[i];return !!(u&&!u.gm&&!u.mg&&u.hp>0&&!P.gmx&&GMAX[u.id]&&u.att>0&&!u.frozen);};}
+ {const o=evoLeft;evoLeft=function(){if(T())return false;return o.apply(this,arguments);};}
+ {const o=megaDo;megaDo=async function(P,i,r){const t=T()&&P===B.me;if(t)P.mgUsed=false;const ok=await o.apply(this,arguments);if(t&&B&&B.test){keepReady();renderBattle();}return ok;};}
+ {const o=gmaxDo;gmaxDo=async function(P,i){const t=T()&&P===B.me;if(t){P.gmUsed=false;P.gmx=null;}const ok=await o.apply(this,arguments);if(t&&B&&B.test){B.me.board.forEach(u=>{if(u){u.att=u.kw==='double'?2:1;u.frozen=0;}});renderBattle();}return ok;};}
+ {const o=playerAttack;playerAttack=async function(){const t=T();const r=await o.apply(this,arguments);if(t&&B&&B.test)await afterAction();return r;};}
+ {const o=battleMenu;battleMenu=function(){if(!T())return o.apply(this,arguments);
+   M(`<h2>⚔️ 전투 테스트</h2><div class=explain style="font-size:14px;line-height:1.7;text-align:left">· 상대는 서로 다른 특성의 포켓몬 5마리예요 (체력 99, 쓰러지면 새로 나와요)<br>· 공격은 나만 하고, 문제는 나오지 않아요<br>· 내 포켓몬은 언제나 행동할 수 있고 메가진화·거다이맥스도 바로 할 수 있어요<br>· 거다이맥스는 한 번 공격하면 풀려요<br>· 기록이나 보상은 바뀌지 않아요</div>
+    <div class="mbtns bmBtns"><button class="btn gold" data-a=x>계속하기</button><button class="btn blue" data-a=set>${I('gear')} 설정</button><button class="btn ghost" data-a=q>🛠 운영자 화면으로 나가기</button></div>`,
+    {x:()=>closeM(),_close:()=>closeM(),set:()=>showSettings(true),q:()=>{closeM();exitTest();}});};}
+ {const o=endBattle;endBattle=function(){if(T()){B.over=false;return;}return o.apply(this,arguments);};}   // 혹시 끝나더라도 기록·보상 없이 계속해요
+ {const o=checkEnd;checkEnd=function(){if(T())return false;return o.apply(this,arguments);};}
+ {const o=startTurn;startTurn=function(){if(T())return Promise.resolve();return o.apply(this,arguments);};}   // 상대 차례는 오지 않아요
+
+ /* 화면: 손에 카드 대신 「포켓몬 선택하기」, 차례 끝·공부 기술·자동전투는 숨겨요 */
+ {const o=renderBattle;renderBattle=function(){const r=o.apply(this,arguments);
+   try{if(!T())return r;const bt=document.getElementById('battle');if(!bt)return r;
+    const hand=bt.querySelector('.hand');
+    if(hand){hand.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;padding:6px 0"><button class="btn gold big" id=btPick style="font-size:18px;padding:12px 26px">🎴 포켓몬 선택하기</button><span class=mut style="font-size:12.5px">${picked.length?`지금 ${picked.length}마리 출전 중 · 다시 고르면 모두 바뀌어요`:'모든 포켓몬 중에서 최대 5마리를 골라요'}</span></div>`;
+     const b=hand.querySelector('#btPick');if(b)b.onclick=()=>{sfx('tap');openPicker();};}
+    ['#bEnd','#bPower','#bAuto','#evoPill','#bEvoOut'].forEach(s=>{const e=bt.querySelector(s);if(e)e.style.display='none';});
+    bt.querySelectorAll('.hhp').forEach(h=>{[...h.childNodes].forEach(n=>{if(n.nodeType===3)n.textContent='∞';});});
+    bt.querySelectorAll('.bTop .pill, .bTop .mana').forEach(p=>{p.style.display='none';});
+    const mid=bt.querySelector('.mid');if(mid&&!mid.querySelector('.btTag')){const t=document.createElement('span');t.className='pill btTag';t.style.cssText='color:#6b3fc2;border-color:#b79cf2;background:#f1eaff';t.textContent='⚔️ 전투 테스트 · 진화 상시 가능';mid.appendChild(t);}
+    if(!picked.length&&!B.busy){const m=bt.querySelector('#bMsg');if(m)m.innerHTML='아래 <b>포켓몬 선택하기</b>를 눌러 출전할 포켓몬을 골라요';}
+   }catch(e){console.warn('bt render',e);}return r;};}
+
+ /* ---------- 운영자 모드 탭에 「전투 테스트」 메뉴 ---------- */
+ {const o=renderTeacher;renderTeacher=function(){const r=o.apply(this,arguments);
+   try{const op=document.getElementById('tcOp');
+    if(op&&!document.getElementById('btBoxT')){
+     const box=document.createElement('div');box.className='gfBox';box.id='btBoxT';
+     box.innerHTML=`<h3 style="margin:0 0 4px">⚔️ 전투 테스트</h3>
+      <div class=explain style="font-size:14px;line-height:1.7;text-align:left">모든 포켓몬의 <b>스킬 이펙트</b>를 확인하는 연습 전투예요. 들어가면 일반 전투 화면이 나오고, 상대 자리에는 <b>서로 다른 특성의 랜덤 포켓몬 5마리</b>(체력 99)가 계속 서 있어요. <b>포켓몬 선택하기</b>로 내 포켓몬 5마리를 고르면 바로 공격해 볼 수 있어요. 문제도, 차례 끝도 없고 메가진화·거다이맥스도 바로 쓸 수 있어요. 기록과 보상은 바뀌지 않아요.</div>
+      <div class=row style="margin-top:10px"><button class="btn gold" id=btGo>⚔️ 전투 테스트 들어가기</button></div>`;
+     op.appendChild(box);
+     document.getElementById('btGo').onclick=()=>{sfx('tap');startTest();};
+    }
+   }catch(e){console.warn('bt teacher',e);}return r;};}
+
+ window.BATTLETEST={start:startTest,exit:exitTest};
 })();
 </script>
 </body></html>
