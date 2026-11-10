@@ -10744,6 +10744,15 @@ window.__pixFistFn=pixFist;
 window.__whiteFist=()=>{if(window.__pfsW)return window.__pfsW;const R0=pixFist(),PPU=R0.W/2.9,lo=[88,98,130],hi=[255,255,255],hx=s=>[1,3,5].map(i=>parseInt(s.substr(i,2),16));
  const cv=bake(R0.W,R0.H,B=>{for(const c of R0.cells){let col=c.col;if(/^#[0-9a-f]{6}$/i.test(col)){const[r,g,b]=hx(col),l=Math.min(1,(.3*r+.59*g+.11*b)/255/.82),tt=Math.pow(l,.7),n=lo.map((v,i)=>Math.round(v+(hi[i]-v)*tt));col='#'+n.map(v=>v.toString(16).padStart(2,'0')).join('');}B.rect(c.x,c.y,1,1,col);}});
  return window.__pfsW={cv,PPU,ox:R0.W*.55,oy:R0.H*.5};};
+/* 독 주먹: 코멧펀치의 도트 주먹 모양 그대로, 색만 독 속성(보라 몸통 + 독 초록 포인트)으로 바꿔요 (조타구 독의 주먹) */
+window.__poisonFist=()=>{if(window.__pfsP)return window.__pfsP;const R0=pixFist(),PPU=R0.W/2.9/1.3,lo=[30,12,56],mid=[138,52,200],hi=[236,206,255],hx=s=>[1,3,5].map(i=>parseInt(s.substr(i,2),16)),mx=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t)),hex=n=>'#'+n.map(v=>v.toString(16).padStart(2,'0')).join('');
+ /* 로봇 같은 손목 보호대(보석·금속 띠)는 빼고 주먹만 남겨요. 손목 쪽은 독에 녹아 흩어지는 도트로 */
+ const X0=36,hh=(x,y)=>{const n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floor(n);};
+ const cv=bake(R0.W,R0.H,B=>{for(const c of R0.cells){if(c.x<X0)continue;const k=(c.x-X0)/9;if(k<1&&hh(c.x,c.y)>.25+k*.75)continue;let col=c.col;if(/^#[0-9a-f]{6}$/i.test(col)){
+   if(col.toLowerCase()==='#0f1016')col='#12061c';
+   else{const[r,g,b]=hx(col),l=Math.min(1,(.3*r+.59*g+.11*b)/255/.82),t=Math.pow(l,.7);col=hex(t<.55?mx(lo,mid,t/.55):mx(mid,hi,(t-.55)/.45));}}
+   B.rect(c.x,c.y,1,1,col);}});
+ return window.__pfsP={cv,PPU,ox:R0.W*.72,oy:R0.H*.5};};
 Object.assign(FX,{
 // 잠만보 · 지진: 쿵! 발을 구르면 땅을 가르는 균열이 상대에게 내달리고, 쩍쩍 갈라진 틈에서 빛과 바위가 솟구쳐요
 earthquake(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,E=['#2a1608','#6b4a2b','#c98a3c','#ffc866','#fff3b0'],DU='#d9bf8c',ya=ay+R*.9,yb=(()=>{let y=by+R*.9;try{if(c.toEl){const r=spriteRect(c.toEl);y=Math.max(y,(r.top+r.height)/m.S+R*.95);}}catch(e){}return y;})(),tS=420,tT=tS+360,tB=tT+120,TB=1250,Sx=big?1.25:1;
@@ -12640,6 +12649,10 @@ relicsong:trio({K:P8,dark:'#14282a',charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2-
 
 const Q9={a:'#b88a00',b:'#ffd93a',c:'#fff08a',e:'#fffbd0',w:'#ffffff'},Q10={a:'#8a1c7a',b:'#e84acb',c:'#ff9fe8',e:'#ffdff8',w:'#ffffff'},Q11={a:'#1c6a2a',b:'#4ccb4a',c:'#a6f07a',e:'#e6ffc8',w:'#ffffff'},Q12={a:'#0a5a8a',b:'#2ab8e8',c:'#8ae8ff',e:'#e0fbff',w:'#ffffff'},
  Q13={a:'#2a1040',b:'#7a3aa8',c:'#7ee05a',e:'#c8ffb0',w:'#ffffff'},Q14={a:'#1a2a6a',b:'#4aa8ff',c:'#a8e0ff',e:'#e8f8ff',w:'#ffffff'},Q15={a:'#4a2a10',b:'#b8742a',c:'#e8b45a',e:'#fff0c0',w:'#ffffff'},Q16={a:'#5a0a0a',b:'#ff4a1a',c:'#ffa83a',e:'#ffe49a',w:'#ffffff'};
+// 파오젠 · 재앙의 검에 쓰는 얼음 검: 자시안 거대한 검(ZSW_ROWS) 도트 그대로, 금빛 팔레트만 얼음색으로 바꿔 구워요
+const ICEW_PAL={k:'#12306a',d:'#3563a1',m:'#5f95cf',g:'#8ecef1',G:'#c5ecf6',h:'#f4feff',p:'#9fc4ec',P:'#d9f6ff',q:'#5f7fc0',b:'#1f7fd0',B:'#7fe0ff',n:'#14509a'};
+let ZSWI=null;
+const iceSwd=(x,y,th,Ls,al,tip)=>{if(al<=.01)return;if(!ZSWI)ZSWI=bake(ZSW_W,ZSW_H,B=>{ZSW_ROWS.forEach((r,y)=>{for(let x=0;x<r.length;x++){const ch=r[x];if(ch!=='.')B.rect(x,y,1,1,ICEW_PAL[ch]);}});});P.blit(ZSWI,x,y,{rot:th+PI,sc:Ls/ZSW_W,a:al,ox:tip?ZSW_TX:ZSW_W/2,oy:ZSW_TY});};
 Object.assign(FX,{
 // 카푸꼬꼬꼭 · 수호신의 번개: 번개가 몸을 휘감고, 지그재그 번개가 꽂히며 하늘에서 번개 다발이 내리쳐요
 tapukoko:trio({K:Q9,dark:'#201a04',charge:g=>{const{K}=g;for(let i=0;i<5;i++){const an=i/5*TAU+g.t*.003,sd=Math.floor(g.t/70)+i*7;P.ga(.4+.6*g.e);bolt(g.x+cos(an)*g.R*(2.3-.8*g.e),g.y+sin(an)*g.R*1.2,g.x,g.y,K.c,1,sd);}P.ga(1);star4(g.x,g.y,g.R*(.3+.6*g.e),g.t*.01,K.e);},
@@ -12662,9 +12675,16 @@ ruinwo:trio({K:Q13,dark:'#140a1e',charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2-.6
  proj:g=>{const{K}=g;for(let i=0;i<7;i++){const an=i/7*TAU+g.t*.022;shard(g.x+cos(an)*g.Rb*1.05,g.y+sin(an)*g.Rb*1.05,g.Rb*.62,g.Rb*.24,an+PI/2,i%2?K.c:'#a07a3a');}P.disc(g.x,g.y,g.Rb*.85,K.a);P.disc(g.x,g.y,g.Rb*.6,K.b);P.disc(g.x,g.y,g.Rb*.28,K.e);},
  hit:g=>{const{K}=g;for(let i=0;i<8;i++){P.ga(g.a*.5);P.disc(g.x+(hz(i)-.5)*g.Rb*3.4*g.e,g.y+(hz(i+4)-.5)*g.Rb*2.4*g.e,Math.max(1,g.Rb*(.8+.6*hz(i+2))),K.a);}P.ga(g.a);burstN(g.x,g.y,20,g.Rb*3.6,(px,py,i,an)=>{shard(px,py,g.Rb*.5,g.Rb*.2,an+g.k*6,i%2?K.c:'#a07a3a');},g.e,17);}}),
 // 파오젠 · 재앙의 검: 얼음 검이 줄지어 일어서고, 큰 검이 날아가 하늘에서 얼음 검이 쏟아져요
-ruinchien:trio({K:Q14,charge:g=>{const{K}=g;for(let i=0;i<6;i++){const x=g.x+(i-2.5)*g.R*.7,h=g.R*(.5+1.1*g.e);P.ga(.4+.6*g.e);shard(x,g.y+g.R*.5-h*.5,h,g.R*.17,-PI/2,i%2?K.c:K.b);}},
- proj:g=>{const{K}=g;shard(g.x,g.y,g.Rb*2.6,g.Rb*.55,g.ang,K.a);shard(g.x,g.y,g.Rb*2.3,g.Rb*.42,g.ang,K.b);shard(g.x,g.y,g.Rb*1.9,g.Rb*.2,g.ang,K.e);trail(g,5,(x,y,i,a)=>{P.ga(a*.7);shard(x,y,g.Rb*1.6*a+1,g.Rb*.3*a+1,g.ang,K.c);});},
- hit:g=>{const{K}=g;P.ga(g.a);for(let i=0;i<7;i++){const sx=g.x+(i-3)*g.Rb*.9,yy=lerp(g.y-g.Rb*8,g.y-g.Rb*.2,Math.min(1,g.e*1.5));shard(sx,yy,g.Rb*1.8,g.Rb*.34,PI/2,i%2?K.c:K.b);}burstN(g.x,g.y,14,g.Rb*3.2,(px,py,i,an)=>{shard(px,py,g.Rb*.55,g.Rb*.2,an,i%2?K.e:K.c);},g.e,19);}}),
+ruinchien:trio({K:Q14,charge:g=>{const{K}=g,e=g.e;for(let i=0;i<5;i++){const d=Math.abs(i-2),Ls=g.R*4.8*(1-d*.16),x=g.x+(i-2)*g.R*.85,y0=g.y+g.R*.9,ti=cl(e*1.5-d*.15,0,1);
+   glow(x,y0,g.R*(.4+.5*ti),K.c,.45*ti);iceSwd(x,y0-Ls*ti,-PI/2,Ls,ti,true);
+   P.ga(ti);shard(x-g.R*.35,y0,g.R*.3*ti+1,g.R*.1,-PI/2-.5,K.e);shard(x+g.R*.35,y0,g.R*.3*ti+1,g.R*.1,-PI/2+.5,K.c);P.ga(1);}},
+ proj:g=>{const{K}=g,Ls=g.Rb*6.6;trail(g,5,(x,y,i,a)=>{iceSwd(x,y,g.ang,Ls,a*.4,false);});
+  iceSwd(g.x,g.y,g.ang,Ls,1,false);
+  for(let i=0;i<5;i++){const u=(hz(i+1)-.5)*Ls*.8,v=(hz(i+6)-.5)*g.Rb*1.2;F.spark4(g.x+cos(g.ang)*u-sin(g.ang)*v,g.y+sin(g.ang)*u+cos(g.ang)*v,i%2?2:1,i%2?K.e:K.c,'#ffffff');}},
+ hit:g=>{const{K}=g,e=g.e,Ls=g.Rb*5.2;
+  for(let i=0;i<7;i++){const d=Math.abs(i-3),q=cl(e*1.7-i*.09,0,1),sx=g.x+(i-3)*g.Rb*.95,ty=lerp(g.y-g.Rb*9,g.y-g.Rb*.1+d*g.Rb*.15,q);iceSwd(sx,ty,PI/2,Ls*(1-d*.07),g.a,true);}
+  P.ga(g.a);for(let i=0;i<7;i++){const h=g.Rb*(.6+1.8*Math.min(1,e*1.4)*(.5+.5*hz(i+4)));spike(g.x+(i-3)*g.Rb*.9,g.y+g.Rb*.9,g.Rb*.26,h,i%2?K.c:K.e);}
+  burstN(g.x,g.y,14,g.Rb*3.2,(px,py,i,an)=>{shard(px,py,g.Rb*.55,g.Rb*.2,an,i%2?K.e:K.c);},e,19);}}),
 // 딩루 · 재앙의 그릇: 바윗덩이가 맴돌고, 큰 바위가 날아가 땅에서 바위 가시가 줄지어 솟아요
 ruinting:trio({K:Q15,dark:'#1a1008',charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2-.6*g.e),6,g.t,.004,(px,py,i)=>{P.ga(.4+.6*g.e);P.disc(px,py,Math.max(1,g.R*.26),K.a);P.disc(px-1,py-1,Math.max(1,g.R*.18),i%2?K.b:K.c);});for(let i=0;i<7;i++){P.ga(.3*g.e);P.disc(g.x+(i-3)*g.R*.6,g.y+g.R*.9,Math.max(1,g.R*.4),K.c);}},
  proj:g=>{const{K}=g;P.disc(g.x,g.y,g.Rb*1.05,K.a);P.disc(g.x,g.y,g.Rb*.9,K.b);P.disc(g.x-g.Rb*.2,g.y-g.Rb*.2,g.Rb*.5,K.c);for(let i=0;i<5;i++){const an=i/5*TAU+g.t*.02;P.disc(g.x+cos(an)*g.Rb*1.5,g.y+sin(an)*g.Rb*1.5,Math.max(1,g.Rb*.28),i%2?K.b:K.c);}},
@@ -12677,9 +12697,21 @@ ruinchi:trio({K:Q16,dark:'#200808',charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2-.
 const Q17={a:'#3a1a5a',b:'#9a3ad8',c:'#d28aff',e:'#f0dcff',w:'#ffffff'},Q18={a:'#4a1a6a',b:'#b83aa8',c:'#ff8ad8',e:'#ffe0f4',w:'#ffffff'},Q19={a:'#7a1a5a',b:'#ff6ab8',c:'#ffb8e0',e:'#fff0f8',w:'#ffffff'},Q20={a:'#2a0a3a',b:'#8a2ac8',c:'#d86aff',e:'#f8d8ff',w:'#ffffff'},TOX='#7aff4a';
 Object.assign(FX,{
 // 조타구 · 독의 주먹: 독이 뚝뚝 떨어지는 주먹이 날아가, 명중하면 독이 튀며 웅덩이로 번져요
-okidogi:trio({K:Q17,dark:'#12081e',charge:g=>{const{K}=g;P.ga(.4+.6*g.e);P.disc(g.x,g.y,Math.max(1,g.R*(.4+.4*g.e)),K.a);P.disc(g.x,g.y,Math.max(1,g.R*(.3+.3*g.e)),K.b);for(let i=0;i<4;i++)P.disc(g.x+(i-1.5)*g.R*.28,g.y-g.R*.32*(.5+g.e),Math.max(1,g.R*.15),K.c);for(let i=0;i<9;i++){const ph=((g.t*.0012+hz(i)*2)%1);P.ga(1-ph);P.disc(g.x+(hz(i+3)-.5)*g.R*1.4,g.y+ph*g.R*1.6,Math.max(1,g.R*.12*(1-ph*.3)),i%2?TOX:K.c);}},
- proj:g=>{const{K}=g,nx=-sin(g.ang),ny=cos(g.ang),fx=cos(g.ang),fy=sin(g.ang);trail(g,6,(x,y,i,a)=>{P.ga(a);P.disc(x+(hz(i)-.5)*g.Rb*.6,y+(hz(i+4)-.5)*g.Rb*.6,Math.max(1,g.Rb*.28*a),i%2?TOX:K.c);});P.ga(1);P.disc(g.x,g.y,g.Rb*1.05,K.a);P.disc(g.x,g.y,g.Rb*.88,K.b);for(let i=0;i<4;i++){const o=(i-1.5)*g.Rb*.5;P.disc(g.x+fx*g.Rb*.8+nx*o,g.y+fy*g.Rb*.8+ny*o,Math.max(1,g.Rb*.3),K.c);}P.disc(g.x-g.Rb*.2,g.y-g.Rb*.2,g.Rb*.3,K.e);},
- hit:g=>{const{K}=g;P.ga(g.a*.7);for(let i=0;i<12;i++){const o=(i-5.5)*g.Rb*.5*g.e;P.disc(g.x+o,g.y+g.Rb*.8,Math.max(1,g.Rb*.5*(1-Math.abs(i-5.5)/7)),i%2?K.a:K.b);}P.ga(g.a);P.disc(g.x,g.y,Math.max(1,g.Rb*(.5+1.7*g.e)),K.b);P.disc(g.x,g.y,Math.max(1,g.Rb*(.3+1*g.e)),K.c);burstN(g.x,g.y,22,g.Rb*3.4,(px,py,i)=>{P.disc(px,py,Math.max(1,g.Rb*(.2+.18*hz(i))),i%2?TOX:K.c);},g.e,23);}}),
+okidogi:trio({K:Q17,dark:'#12081e',charge:g=>{const{K}=g,e=g.e,F0=window.__poisonFist(),s=g.R*(.55+.45*e);
+  P.ga(.4+.6*e);glow(g.x,g.y,g.R*(1+.8*e),K.b,.5*e);
+  P.blit(F0.cv,g.x,g.y,{a:Math.min(1,e*1.6),rot:g.ang,sc:s/F0.PPU,ox:F0.ox,oy:F0.oy});
+  for(let i=0;i<9;i++){const ph=((g.t*.0012+hz(i)*2)%1);P.ga(1-ph);P.disc(g.x+(hz(i+3)-.5)*g.R*1.6,g.y+g.R*.3+ph*g.R*1.6,Math.max(1,g.R*.12*(1-ph*.3)),i%2?TOX:K.c);}
+  for(let i=0;i<5;i++){const ph=((g.t*.0009+hz(i+9)*2)%1);P.ga(e*(1-ph));P.ring(g.x+(hz(i+1)-.5)*g.R*1.6,g.y-ph*g.R*1.4,Math.max(1,g.R*.18),TOX,1,false);}},
+ proj:g=>{const{K}=g,F0=window.__poisonFist(),s=g.Rb*1.05,nx=-sin(g.ang),ny=cos(g.ang);
+  trail(g,5,(x,y,i,a)=>{P.blit(F0.cv,x,y,{a:a*.35,rot:g.ang,sc:s/F0.PPU,ox:F0.ox,oy:F0.oy});P.ga(a);P.disc(x+(hz(i)-.5)*g.Rb*.8,y+(hz(i+4)-.5)*g.Rb*.8+g.Rb*.1*i,Math.max(1,g.Rb*.28*a),i%2?TOX:K.c);});
+  glow(g.x,g.y,g.Rb*1.8,K.b,.4);P.ga(1);P.blit(F0.cv,g.x,g.y,{a:1,rot:g.ang,sc:s/F0.PPU,ox:F0.ox,oy:F0.oy});
+  for(let i=0;i<4;i++){const ph=((g.t*.003+hz(i)*2)%1);P.ga(1-ph*.6);P.disc(g.x-cos(g.ang)*g.Rb*(.3+ph*1.2)+nx*(hz(i+2)-.5)*g.Rb*.8,g.y-sin(g.ang)*g.Rb*(.3+ph*1.2)+ny*(hz(i+2)-.5)*g.Rb*.8+ph*g.Rb*.8,Math.max(1,g.Rb*.16*(1-ph*.5)),i%2?TOX:K.e);}P.ga(1);},
+ hit:g=>{const{K}=g,e=g.e,F0=window.__poisonFist(),s=g.Rb*(1.25-.2*e);
+  P.ga(g.a*.7);for(let i=0;i<12;i++){const o=(i-5.5)*g.Rb*.5*e;P.disc(g.x+o,g.y+g.Rb*.8,Math.max(1,g.Rb*.5*(1-Math.abs(i-5.5)/7)),i%2?K.a:K.b);}
+  P.blit(F0.cv,g.x,g.y,{a:g.a,rot:-.2,sc:s/F0.PPU,ox:F0.ox*.9,oy:F0.oy});
+  P.ga(g.a);P.disc(g.x,g.y,Math.max(1,g.Rb*(.5+1.7*e)),K.b);P.disc(g.x,g.y,Math.max(1,g.Rb*(.3+1*e)),K.c);
+  P.blit(F0.cv,g.x,g.y,{a:g.a,rot:-.2,sc:s/F0.PPU,ox:F0.ox*.9,oy:F0.oy});
+  burstN(g.x,g.y,22,g.Rb*3.4,(px,py,i)=>{P.disc(px,py,Math.max(1,g.Rb*(.2+.18*hz(i))),i%2?TOX:K.c);},e,23);}}),
 // 이야후 · 정신 독: 소용돌이 무늬가 감아 돌며 날아가, 명중하면 최면 고리가 번져요
 munkidori:trio({K:Q18,charge:g=>{const{K}=g;for(let i=0;i<40;i++){const t=i/40,an=t*9+g.t*.006,rr=g.R*2*(1-g.e*.4)*t;P.ga(.35+.65*g.e*(1-t*.5));P.disc(g.x+cos(an)*rr,g.y+sin(an)*rr*.7,Math.max(1,g.R*.12*(1-t*.4)),i%3?K.c:K.e);}},
  proj:g=>{const{K}=g;P.disc(g.x,g.y,g.Rb*1,K.a);for(let s=0;s<2;s++)for(let i=0;i<18;i++){const t=i/18,an=t*7+g.t*.025+s*PI,rr=g.Rb*(.1+.9*t);P.ga(.5+.5*(1-t));P.disc(g.x+cos(an)*rr,g.y+sin(an)*rr,Math.max(1,g.Rb*.13),s?'#8aff6a':K.c);}P.ga(1);P.disc(g.x,g.y,g.Rb*.22,K.w);},
