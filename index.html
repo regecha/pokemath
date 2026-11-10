@@ -8871,7 +8871,9 @@ const SIG={6:{n:'불대문자',fx:'daimonji',c:'#ffe27a',c2:'#ff7a2e'},25:{n:'10
 // ===== 같은 대표 기술을 쓰는 포켓몬: 이펙트 키 → 번호들 (기술 이름·색은 위의 대표 포켓몬과 같아요. 번호만 더하면 늘어나요) =====
 const SIG_SHARE={psyorb:[481,482,488,494,648,720,898],aquaspiral:[489,647],voltdrive:[894],icelance:[378],petalstorm:[1017],closecombat:[889,891,892],nightclaw:[893,1001,1002,1003,1004],aeroblast:[641],sacredfire:[721],roartime:[646,718,895],photongeyser:[789,790,791,792],sacredsword:[379,385,808,809],daimonji:[38,59,126,146,157,244,257,392,485,500,609,637,655,727],thunder100k:[26,125,181,310,405,243,171,479,807,462,604,523,777,702],psycho:[65,196,282,80,199,124,121,122,97,178,381,380,386,475,576,579,678,858],shadowball:[897,93,200,429,477,563,302,354,487,681,778,711],hyperbeam:[649,115,128,289,474,486,493],aurasphere:[447,308],shuriken:[657],dracometeor:[373,330,706,784,887],hydrocannon:[160,260,395,503,730],solarbeam:[154,389,497,652,45,182,465,549],earthquake:[31,34,76,105,112,232,208,450,464,473,530,645],outrage:[612,621,334,998],icebeam:[91,144,362,365,461,471,478,584,614,713],stoneedge:[95,142,306,409,526,377,639],cometpunch:[375],leafblade:[254,542,640,798],surf:[55,73,87,186,230,245,321,350],stormbolt:[145,642,644],overheat:[323,324,467,643],darkpulse:[229,262,359,430,491,571,635],ancientpower:[139,141,346,348,251],bravebird:[18,22,169,227,277,521,628,663,733],bugbuzz:[267,284,416,666,166,469,193],xscissor:[212,127,900],megahorn:[],sludgebomb:[88,109,110,316,317,434,435,568,569,690,747,793,803,590,591],crosspoison:[15,23,29,30,32,33,41,42,336,451,452,453,454,757,758,407,315,211],venomblast:[804,691,748,944,945,965,966,980,1014,1015,1016,1025],moonblast:Object.keys(MON).map(Number).filter(i=>MON[i]&&MON[i].types&&MON[i].types.indexOf(17)>=0&&i!==36)};
 (()=>{try{const base={};Object.keys(SIG).forEach(id=>{const v=SIG[id];if(!base[v.fx])base[v.fx]=v;});Object.keys(SIG_SHARE).forEach(fx=>{const b=base[fx];if(!b)return;SIG_SHARE[fx].forEach(id=>{if(!SIG[id]&&MON[id])SIG[id]=b;});});}catch(e){console.warn('SIG_SHARE',e);}})();
-SIG[772]=Object.assign({},SIG[773],{n:'트라이어택',fx:'triattack',c:'#fff3c8',c2:'#3fb4ff'}); /* 타입:널 전용 트라이어택 (실버디 멀티어택과 다른 연출) */
+SIG[772]=Object.assign({},SIG[773]); /* 타입:널: 실버디와 같은 멀티어택 */
+SIG[233]=Object.assign({},SIG[773],{n:'트라이어택',fx:'triattack',c:'#fff3c8',c2:'#3fb4ff'}); /* 폴리곤2: 트라이어택 (불꽃·번개·얼음) */
+SIG[137]=SIG[233]; /* 폴리곤도 트라이어택 */
 /* 전설 기술 연출 재배정: 이미 있는 연출 중 어울리는 것으로 바꿔요 (연출 키 → 번호들) */
 (()=>{try{const base={};Object.keys(SIG).forEach(id=>{const v=SIG[id];if(!base[v.fx])base[v.fx]=v;});
 const RE={sacredsword:[],icelance:[646],earthquake:[718],dracometeor:[895],cometpunch:[808,809,379],psyorb:[],solarbeam:[716,898],stormbolt:[],petalstorm:[],surf:[],leafblade:[],icebeam:[],overheat:[],psycho:[],shadowball:[720],closecombat:[],moonblast:[],sludgebomb:[]};
@@ -12129,7 +12131,7 @@ icelance(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=440,gap=120,N=5,tH=tC+N*gap+60
   add('h',[[850,178],[866,158],[880,178]]);
   add('d',[[850,178],[866,198],[880,178]]);
   return S;})();
- const lance=(x,y,rot,L,w,al)=>{const c0=cos(rot),s0=sin(rot),LL=L*1.2,T=([u,v],ox,oy)=>[x+u*LL*c0-v*LL*s0+ox,y+u*LL*s0+v*LL*c0+oy];
+ const lance=(x,y,rot,L,w,al)=>{const c0=cos(rot),s0=sin(rot),LL=L*.84,T=([u,v],ox,oy)=>[x+u*LL*c0-v*LL*s0+ox,y+u*LL*s0+v*LL*c0+oy];
   for(const it of ZS){if(!it.o)continue;for(const[ox,oy]of[[1,0],[-1,0],[0,1],[0,-1]])P.poly(it.g.map(p=>T(p,ox,oy)),ZI.o,al);}
   for(const it of ZS)P.poly(it.g.map(p=>T(p,0,0)),ZI[it.c],al);
   P.ga(1);};
@@ -12606,7 +12608,7 @@ const trio=o=>c=>{const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=o.tC||560,tF=o.tF||340,t
  add(tC,tF,(k,p)=>{const e=ez.in(k),hx=lerp(ax,bx,e),hy=lerp(sy0,by,e);
   for(let s=18;s>=1;s--){const kk=Math.max(0,k-s*.028),q=ez.in(kk),a=1-s/19;glow(lerp(ax,bx,q),lerp(sy0,by,q),Rb*(.4+.8*a),s>8?K.b:K.c,.3*a+.05);}
   glow(hx,hy,Rb*1.6,K.c,.75);o.proj({x:hx,y:hy,Rb,e,k,t:p.age,K,ang,ax,ay:sy0,bx,by});P.ga(1);});
- add(tH,860,(k,p)=>{const e=ez.out(k),a=1-k;glow(bx,by,Rb*(2.2+4.4*e),K.b,.55*a);glow(bx,by,Rb*(1.1+2.2*e),K.e,.8*a);o.hit({x:bx,y:by,Rb,e,k,a,t:p.age,K});P.ga(1);});
+ add(tH,860,(k,p)=>{const e=ez.out(k),a=1-k;glow(bx,by,Rb*(2.2+4.4*e),K.b,.55*a);glow(bx,by,Rb*(1.1+2.2*e),K.e,.8*a);o.hit({x:bx,y:by,Rb,e,k,a,t:p.age,K,ang});P.ga(1);});
  ring(bx,by,Rb*3,K.e,tH,500,2);ring(bx,by,Rb*5,K.b,tH+110,660,2);
  setTimeout(()=>{F.hold(140);F.flash(K.e);shk();sparks(bx,by,30,[K.w,K.e,K.c,K.b],330,900,true);},tH);
  return waitS(tH+580);};
@@ -12674,10 +12676,8 @@ tapufini:trio({K:Q12,charge:g=>{const{K}=g;for(let i=0;i<14;i++){const ph=((g.t*
 ruinwo:trio({K:Q13,dark:'#140a1e',charge:g=>{const{K}=g;orbitN(g.x,g.y,g.R*(2-.6*g.e),8,g.t,.004,(px,py,i,an)=>{P.ga(.4+.6*g.e);shard(px,py,g.R*.4,g.R*.17,an+g.t*.006,i%2?K.c:'#a07a3a');});for(let i=0;i<5;i++){P.ga(.25*g.e);P.disc(g.x+(hz(i)-.5)*g.R*2,g.y+g.R*.5-hz(i+3)*g.R*.6,Math.max(1,g.R*.5),K.a);}},
  proj:g=>{const{K}=g;for(let i=0;i<7;i++){const an=i/7*TAU+g.t*.022;shard(g.x+cos(an)*g.Rb*1.05,g.y+sin(an)*g.Rb*1.05,g.Rb*.62,g.Rb*.24,an+PI/2,i%2?K.c:'#a07a3a');}P.disc(g.x,g.y,g.Rb*.85,K.a);P.disc(g.x,g.y,g.Rb*.6,K.b);P.disc(g.x,g.y,g.Rb*.28,K.e);},
  hit:g=>{const{K}=g;for(let i=0;i<8;i++){P.ga(g.a*.5);P.disc(g.x+(hz(i)-.5)*g.Rb*3.4*g.e,g.y+(hz(i+4)-.5)*g.Rb*2.4*g.e,Math.max(1,g.Rb*(.8+.6*hz(i+2))),K.a);}P.ga(g.a);burstN(g.x,g.y,20,g.Rb*3.6,(px,py,i,an)=>{shard(px,py,g.Rb*.5,g.Rb*.2,an+g.k*6,i%2?K.c:'#a07a3a');},g.e,17);}}),
-// 파오젠 · 재앙의 검: 얼음 검이 줄지어 일어서고, 큰 검이 날아가 하늘에서 얼음 검이 쏟아져요
-ruinchien:trio({K:Q14,charge:g=>{const{K}=g,e=g.e;for(let i=0;i<5;i++){const d=Math.abs(i-2),Ls=g.R*4.8*(1-d*.16),x=g.x+(i-2)*g.R*.85,y0=g.y+g.R*.9,ti=cl(e*1.5-d*.15,0,1);
-   glow(x,y0,g.R*(.4+.5*ti),K.c,.45*ti);iceSwd(x,y0-Ls*ti,-PI/2,Ls,ti,true);
-   P.ga(ti);shard(x-g.R*.35,y0,g.R*.3*ti+1,g.R*.1,-PI/2-.5,K.e);shard(x+g.R*.35,y0,g.R*.3*ti+1,g.R*.1,-PI/2+.5,K.c);P.ga(1);}},
+// 파오젠 · 재앙의 검: 큰 얼음 검 하나가 날아가고, 하늘에서 얼음 검이 내리꽂혀요
+ruinchien:trio({K:Q14,tC:380,charge:g=>{},
  proj:g=>{const{K}=g,Ls=g.Rb*6.6;trail(g,5,(x,y,i,a)=>{iceSwd(x,y,g.ang,Ls,a*.4,false);});
   iceSwd(g.x,g.y,g.ang,Ls,1,false);
   for(let i=0;i<5;i++){const u=(hz(i+1)-.5)*Ls*.8,v=(hz(i+6)-.5)*g.Rb*1.2;F.spark4(g.x+cos(g.ang)*u-sin(g.ang)*v,g.y+sin(g.ang)*u+cos(g.ang)*v,i%2?2:1,i%2?K.e:K.c,'#ffffff');}},
@@ -12708,9 +12708,9 @@ okidogi:trio({K:Q17,dark:'#12081e',charge:g=>{const{K}=g,e=g.e,F0=window.__poiso
   for(let i=0;i<4;i++){const ph=((g.t*.003+hz(i)*2)%1);P.ga(1-ph*.6);P.disc(g.x-cos(g.ang)*g.Rb*(.3+ph*1.2)+nx*(hz(i+2)-.5)*g.Rb*.8,g.y-sin(g.ang)*g.Rb*(.3+ph*1.2)+ny*(hz(i+2)-.5)*g.Rb*.8+ph*g.Rb*.8,Math.max(1,g.Rb*.16*(1-ph*.5)),i%2?TOX:K.e);}P.ga(1);},
  hit:g=>{const{K}=g,e=g.e,F0=window.__poisonFist(),s=g.Rb*(1.25-.2*e);
   P.ga(g.a*.7);for(let i=0;i<12;i++){const o=(i-5.5)*g.Rb*.5*e;P.disc(g.x+o,g.y+g.Rb*.8,Math.max(1,g.Rb*.5*(1-Math.abs(i-5.5)/7)),i%2?K.a:K.b);}
-  P.blit(F0.cv,g.x,g.y,{a:g.a,rot:-.2,sc:s/F0.PPU,ox:F0.ox*.9,oy:F0.oy});
+  P.blit(F0.cv,g.x,g.y,{a:g.a,rot:g.ang,sc:s/F0.PPU,ox:F0.ox*.9,oy:F0.oy});
   P.ga(g.a);P.disc(g.x,g.y,Math.max(1,g.Rb*(.5+1.7*e)),K.b);P.disc(g.x,g.y,Math.max(1,g.Rb*(.3+1*e)),K.c);
-  P.blit(F0.cv,g.x,g.y,{a:g.a,rot:-.2,sc:s/F0.PPU,ox:F0.ox*.9,oy:F0.oy});
+  P.blit(F0.cv,g.x,g.y,{a:g.a,rot:g.ang,sc:s/F0.PPU,ox:F0.ox*.9,oy:F0.oy});
   burstN(g.x,g.y,22,g.Rb*3.4,(px,py,i)=>{P.disc(px,py,Math.max(1,g.Rb*(.2+.18*hz(i))),i%2?TOX:K.c);},e,23);}}),
 // 이야후 · 정신 독: 소용돌이 무늬가 감아 돌며 날아가, 명중하면 최면 고리가 번져요
 munkidori:trio({K:Q18,charge:g=>{const{K}=g;for(let i=0;i<40;i++){const t=i/40,an=t*9+g.t*.006,rr=g.R*2*(1-g.e*.4)*t;P.ga(.35+.65*g.e*(1-t*.5));P.disc(g.x+cos(an)*rr,g.y+sin(an)*rr*.7,Math.max(1,g.R*.12*(1-t*.4)),i%3?K.c:K.e);}},
