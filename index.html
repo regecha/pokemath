@@ -3120,13 +3120,18 @@ html.short .wildTop .wtInfo{min-width:0}
 #myLane.gmaxLane .unit.taunt::before,#foeLane.gmaxLane .unit.taunt::before,
 #myLane.gmaxLane .unit.ready.taunt::before,#foeLane.gmaxLane .unit.ready.taunt::before{
  content:''!important;position:absolute!important;
- left:var(--tl,25%)!important;top:var(--tt,0px)!important;right:auto!important;bottom:auto!important;
- width:var(--tw,50%)!important;height:var(--th,90%)!important;
+ inset:7px!important;width:auto!important;height:auto!important;
  transform:none!important;animation:none!important;will-change:auto!important;
  border:3px solid #9a744e!important;border-radius:12px!important;background:none!important;
  box-shadow:inset 0 0 0 1px rgba(255,255,255,.62),0 0 16px 3px color-mix(in srgb,var(--ea,#ff4d6d) 38%,transparent)!important;
  -webkit-mask-image:none!important;mask-image:none!important;z-index:2!important;pointer-events:none}
 </style>
+<style>/* 큰 포켓몬의 투명한 여백이 클릭을 가로채지 않게: 그림은 클릭 무시, 칸(.unit)만 눌리게 */
+#battle .unit .sp img,#battle .unit .sp svg{pointer-events:none!important}
+#evoPill,#bMega,#bEnd,#bPower,#bAuto,#bEvoOut{position:relative;z-index:60}
+/* 숨쉬기 애니메이션은 시작 지연(--d) 동안에도 첫 장면의 크기(1.38배)를 그대로 보여 줘요 → 화면이 다시 그려질 때마다 작았다가 커지는 깜빡임 방지 */
+html .unit .sp img.idle{animation-fill-mode:backwards!important}</style>
+<style>#myLane .unit .sp img[data-id="888"],#myLane .unit .sp img[data-id="889"],#foeLane .unit .sp img[data-id="888"],#foeLane .unit .sp img[data-id="889"],#myLane .unit .sp img[data-id="485"],#myLane .unit .sp img[data-id="807"],#foeLane .unit .sp img[data-id="485"],#foeLane .unit .sp img[data-id="807"]{transform:scale(1.1)}</style>
 </head>
 <body>
 <div id="ttFade"></div>
@@ -7275,13 +7280,13 @@ function gmaxPickB(id){try{const p=S.meta.gmaxPick&&S.meta.gmaxPick[id];if(p>0&&
 const gmWord=id=>id===890?'무한다이맥스':'거다이맥스';   // 무한다이노는 '무한다이맥스'로 불러요
 const gmaxCache=()=>{try{return JSON.parse(localStorage.getItem('gmaxArt')||'{}')||{};}catch(e){return {};}};
 const gmaxBusy={};
-function gmaxApply(b,u){try{document.querySelectorAll('img[data-id="'+(GM_BASE+b)+'"]').forEach(el=>{if(u&&u!=='-'&&el.dataset.gm!=='2'){el.dataset.gm='';el.src=u;}});}catch(e){}}
-function gmaxResolve(b){if(gmaxBusy[b])return gmaxBusy[b];const name=GMAX[b]||(GMAXV[b]&&(GMAX_ART_NAME[GMAXV[b]]||GMAXV[b]));
- return gmaxBusy[b]=(async()=>{const c=gmaxCache();if(c[b])return c[b];if(!name)return '-';
-  try{const r=await fetch('https://pokeapi.co/api/v2/pokemon/'+name);if(!r.ok)throw new Error('http '+r.status);const j=await r.json(),sp=j.sprites||{},ot=sp.other||{};
-   const u=(ot['official-artwork']&&ot['official-artwork'].front_default)||(ot.home&&ot.home.front_default)||sp.front_default||'-';
-   c[b]=u;try{localStorage.setItem('gmaxArt',JSON.stringify(c));}catch(e){}gmaxApply(b,u);return u;}
-  catch(e){gmaxBusy[b]=null;return '-';}})();}
+function gmaxApply(b,u,sh){try{document.querySelectorAll('img[data-id="'+(GM_BASE+b)+'"]').forEach(el=>{if(sh!==undefined&&!!/shiny/.test(el.getAttribute('src')||'')!==!!sh)return;if(u&&u!=='-'&&el.dataset.gm!=='2'){el.dataset.gm='';el.src=u;}});}catch(e){}}
+function gmaxResolve(b,sh){if(sh===undefined)sh=gmaxShiny(b);sh=!!sh;const ck=sh?b+'s':b;if(gmaxBusy[ck])return gmaxBusy[ck];const name=GMAX[b]||(GMAXV[b]&&(GMAX_ART_NAME[GMAXV[b]]||GMAXV[b]));
+ return gmaxBusy[ck]=(async()=>{const c=gmaxCache();if(c[ck])return c[ck];if(!name)return '-';
+  try{const r=await fetch('https://pokeapi.co/api/v2/pokemon/'+name);if(!r.ok)throw new Error('http '+r.status);const j=await r.json(),sp=j.sprites||{},ot=sp.other||{},oa=ot['official-artwork']||{},hm=ot.home||{};
+   const u=(sh&&(oa.front_shiny||hm.front_shiny||sp.front_shiny))||oa.front_default||hm.front_default||sp.front_default||'-';
+   c[ck]=u;try{localStorage.setItem('gmaxArt',JSON.stringify(c));}catch(e){}gmaxApply(b,u,sh);return u;}
+  catch(e){gmaxBusy[ck]=null;return '-';}})();}
 // 이미지 후보: [GIF 모드] 움직이는 그림 → 도트 움직이는 그림 → 도트 / [도트 모드] 도트 → 움직이는 그림 → 도트 움직이는 그림. 모두 실패하면 PokeAPI에서 이름으로 찾고, 그래도 없으면 원래 모습을 크게 보여줘요.
 const gmaxSD=b=>(GMAX[b]||GMAXV[b]||'').replace('-amped','').replace('urshifu-single-strike','urshifu');
 const gmaxDot=()=>!!(S.meta&&S.meta.settings&&S.meta.settings.anim!=='gif');
@@ -7291,52 +7296,60 @@ function gmaxVars(n){const o=[n],add=x=>{if(x&&o.indexOf(x)<0)o.push(x);};
  const q=n.split('-');if(q.length>=3){add(q[0]+'-'+q.slice(1).join(''));add(q[0]+'-'+q.slice(1,-1).join('')+'gmax');}
  if(/^urshifu/.test(n)){if(/rapid/.test(n)){add('urshifu-rapidstrikegmax');add('urshifu-rapidstrike-gmax');}else{add('urshifu-gmax');add('urshifu-singlestrikegmax');}}
  return o;}
-function gmaxCands(b){const V=gmaxVars(gmaxSD(b)),U='https://play.pokemonshowdown.com/sprites/',m=d=>V.map(n=>U+d+'/'+n+(d==='gen5'||d==='dex'?'.png':'.gif')),ani=m('ani'),dotAni=m('gen5ani'),dot=m('gen5'),dex=m('dex');return gmaxDot()?[].concat(dot,dex,ani,dotAni):[].concat(ani,dotAni,dex,dot);}
+function gmaxCands(b,sh){sh=!!sh;const V=gmaxVars(gmaxSD(b)),U='https://play.pokemonshowdown.com/sprites/',
+ mk=sf=>{const m=d=>V.map(n=>U+d+sf+'/'+n+(d==='gen5'||d==='dex'?'.png':'.gif')),ani=m('ani'),dotAni=m('gen5ani'),dot=m('gen5'),dex=m('dex');return gmaxDot()?[].concat(dot,dex,ani,dotAni):[].concat(ani,dotAni,dex,dot);};
+ return sh?mk('-shiny').concat(mk('')):mk('');}
 window.gmaxGifReport=async function(){const res=[];for(const k of Object.keys(GMAX).concat(Object.keys(GMAXV))){const b=+k,c=gmaxCands(b);const ok=await Promise.all(c.map(gmaxProbe));const i=ok.indexOf(true);
   res.push({id:b,이름:((MON[b>1000&&b<2000?b-1000:b]||{}).name||'?')+' 거다이맥스',결과:i<0?'없음':(/\/ani\//.test(c[i])?'GIF':/gen5ani/.test(c[i])?'도트GIF':'정지그림'),주소:i<0?'':c[i]});}
  try{console.table(res);}catch(e){}return res;};
 /* 거다이맥스 그림: 후보를 한꺼번에 확인해서(병렬) 되는 걸 기억해 둬요 → 다음부터는 바로 떠요 */
-const gmaxBK=b=>(gmaxDot()?'d':'g')+b;
+function gmaxShiny(b){try{return !!shinyOn(GM_BASE+b);}catch(e){return false;}}
+const gmaxBK=(b,sh)=>(gmaxDot()?'d':'g')+(sh?'s':'')+b;
 function gmaxBestMap(){try{return JSON.parse(localStorage.getItem('gmaxBest')||'{}');}catch(e){return {};}}
-function gmaxURL(b){const v=gmaxBestMap()[gmaxBK(b)];if(v)return v;setTimeout(()=>{try{gmaxProbeAll(b);}catch(e){}},0);return gmaxCands(b)[0];}
+function gmaxURL(b,sh){sh=!!sh;const v=gmaxBestMap()[gmaxBK(b,sh)];if(v)return v;setTimeout(()=>{try{gmaxProbeAll(b,sh);}catch(e){}},0);return gmaxCands(b,sh)[0];}
 const gmaxWarmBusy={};
-function gmaxProbe(u){return new Promise(r=>{const im=new Image();let t=setTimeout(()=>{t=0;im.src='';r(false);},/assets\.pokestats\.gg/.test(u)?30000:6000);im.onload=()=>{if(t)clearTimeout(t);r(true);};im.onerror=()=>{if(t)clearTimeout(t);r(false);};im.src=u;});}
+function gmaxProbe(u){return new Promise(r=>{const im=new Image();let t=setTimeout(()=>{t=0;im.src='';r(false);},6000);im.onload=()=>{if(t)clearTimeout(t);r(true);};im.onerror=()=>{if(t)clearTimeout(t);r(false);};im.src=u;});}
 async function gmaxWarm(ids){
   const todo=ids.filter(b=>GMAX[b]&&!gmaxBestMap()[gmaxBK(b)]&&!gmaxWarmBusy[gmaxBK(b)]);
   let next=0;
   const one=async b=>{const key=gmaxBK(b);gmaxWarmBusy[key]=1;
     try{const c=gmaxCands(b);const ok=await Promise.all(c.map(gmaxProbe));const k=ok.indexOf(true);
       if(k>=0){const m=gmaxBestMap();m[key]=c[k];try{localStorage.setItem('gmaxBest',JSON.stringify(m));}catch(e){}
-        document.querySelectorAll('img[data-id="'+(GM_BASE+b)+'"]').forEach(el=>{if(el.getAttribute('src')!==c[k]){el.classList.remove('gmFb');el.dataset.gm='0';el.src=c[k];}});}
+        document.querySelectorAll('img[data-id="'+(GM_BASE+b)+'"]').forEach(el=>{if(/shiny/.test(el.getAttribute('src')||''))return;if(el.getAttribute('src')!==c[k]){el.classList.remove('gmFb');el.dataset.gm='0';el.src=c[k];}});}
     }catch(e){}finally{gmaxWarmBusy[key]=0;}};
   const worker=async()=>{while(next<todo.length){const b=todo[next++];await one(b);}};
   await Promise.all([worker(),worker(),worker(),worker(),worker(),worker()]);
 }
 /* 거다이맥스 그림: 후보를 하나씩 바꿔 끼우면 화면이 깜빡이므로, 한꺼번에 확인해서 되는 그림 하나로 딱 한 번만 바꿔요 */
 const GMAX_RES={};
-function gmaxFallback(el,b){el.dataset.gm='99';el.classList.add('gmFb');el.removeAttribute('onerror');el.src=SPR_BASE+'other/official-artwork/'+(b>=1000?b-1000:b)+'.png';}
-function gmaxProbeAll(b){const key=gmaxBK(b);if(GMAX_RES[key])return GMAX_RES[key];
- return GMAX_RES[key]=(async()=>{const c=gmaxCands(b);const ok=await Promise.all(c.map(gmaxProbe));const i=ok.indexOf(true);const u=i>=0?c[i]:'';
+function gmaxFallback(el,b){el.dataset.gm='99';el.classList.add('gmFb');el.removeAttribute('onerror');el.src=SPR_BASE+'other/official-artwork/'+(/shiny/.test(el.getAttribute('src')||'')?'shiny/':'')+(b>=1000?b-1000:b)+'.png';}
+function gmaxProbeAll(b,sh){sh=!!sh;const key=gmaxBK(b,sh);if(GMAX_RES[key])return GMAX_RES[key];
+ return GMAX_RES[key]=(async()=>{const c=gmaxCands(b,sh);const ok=await Promise.all(c.map(gmaxProbe));const i=ok.indexOf(true);const u=i>=0?c[i]:'';
   if(u){const m=gmaxBestMap();m[key]=u;try{localStorage.setItem('gmaxBest',JSON.stringify(m));}catch(e){}
-   try{document.querySelectorAll('img[data-id="'+(GM_BASE+b)+'"]').forEach(el=>{if(el.dataset.gm==='99')return;if(el.getAttribute('src')!==u){el.classList.remove('gmFb');el.dataset.gm='0';el.dataset.gr=u;el.src=u;}});}catch(e){}}
+   try{document.querySelectorAll('img[data-id="'+(GM_BASE+b)+'"]').forEach(el=>{if(el.dataset.gm==='99')return;if(!!/shiny/.test(el.getAttribute('src')||'')!==sh)return;if(el.getAttribute('src')!==u){el.classList.remove('gmFb');el.dataset.gm='0';el.dataset.gr=u;el.src=u;}});}catch(e){}}
   return u;})();}
-function gmaxImgFail(el,b){const cur=el.getAttribute('src')||'',key=gmaxBK(b);
+function gmaxImgFail(el,b){const cur=el.getAttribute('src')||'',sh=/shiny/.test(cur),key=gmaxBK(b,sh);
  try{const m=gmaxBestMap();if(m[key]===cur){delete m[key];localStorage.setItem('gmaxBest',JSON.stringify(m));}}catch(e){}
  if(el.dataset.gr===cur||cur.indexOf('data:')===0||el.dataset.gm==='99'){gmaxFallback(el,b);return;}
  delete GMAX_RES[key];
- gmaxProbeAll(b).then(u=>{if(!el.isConnected)return;
+ gmaxProbeAll(b,sh).then(u=>{if(!el.isConnected)return;
   if(u&&u!==cur&&el.dataset.gr!==u){el.dataset.gr=u;el.src=u;return;}
-  gmaxResolve(b).then(u2=>{if(!el.isConnected)return;if(u2&&u2!=='-'&&el.dataset.gr!==u2&&u2!==cur){el.dataset.gr=u2;el.src=u2;}else gmaxFallback(el,b);});});}
+  gmaxResolve(b,sh).then(u2=>{if(!el.isConnected)return;if(u2&&u2!=='-'&&el.dataset.gr!==u2&&u2!==cur){el.dataset.gr=u2;el.src=u2;}else gmaxFallback(el,b);});});}
 /* 앱을 켠 뒤 잠깐 있다가 모든 거다이맥스 그림을 미리 확인해 둬요 */
 window.addEventListener('load',()=>setTimeout(()=>{try{if(!S||!S.meta||!S.meta.settings||!S.meta.settings.imgs)return;
  const ids=Object.keys(GMAX).concat(Object.keys(GMAXV)).map(Number).filter(b=>!gmaxBestMap()[gmaxBK(b)]);let n=0;const w=async()=>{while(n<ids.length){try{await gmaxProbeAll(ids[n++]);}catch(e){}}};Promise.all([w(),w(),w()]);}catch(e){}},3500));
 
 // ===== 이로치: 파트너로 정한 포켓몬과 함께 문제를 100개 풀면 이로치로 변해요. 파트너를 바꾸면 원래 모습으로 돌아와요 =====
 const SHINY_AT=100;
-function shinyOn(id){try{const m=S.meta;if(!(m&&m.col&&id&&((m.bond&&m.bond[id])||0)>=SHINY_AT))return false;if(id===partnerId())return true;return gdPets(m).indexOf(id)>=0;}catch(e){return false;}} // 정원에 풀어놓은 포켓몬은 파트너가 아니어도 계속 이로치
+/* 메가·원시회귀·거다이맥스는 '원래 포켓몬'이 변신한 모습이라서, 이로치인지도 원래 도감 번호로 확인해요 */
+function shinyBase(id){
+ try{if(id>=GM_BASE&&id<GM_BASE+2000){id-=GM_BASE;if(id>=1000&&GMAXV[id])id-=1000;return id;}}catch(e){}
+ try{if(id>10000&&MEGAB[id])return MEGAB[id];}catch(e){}
+ return id;}
+function shinyOn(id){try{id=shinyBase(id);const m=S.meta;if(!(m&&m.col&&id&&((m.bond&&m.bond[id])||0)>=SHINY_AT))return false;if(id===partnerId())return true;return gdPets(m).indexOf(id)>=0;}catch(e){return false;}} // 정원에 풀어놓은 포켓몬은 파트너가 아니어도 계속 이로치
 function bondTick(pid){const m=S.meta;m.bond=m.bond||{};const b=(m.bond[pid]||0)+1;m.bond[pid]=b;
  if(b===SHINY_AT){try{setTimeout(()=>{sfx('win');confetti(60);toast(`✨ ${josa(esc(MON[pid].name),'이가')} 이로치로 변했어요! 파트너로 함께 있는 동안 반짝여요!`);},900);}catch(e){}}}
-function spriteURL(id,kind='front',ns){if(id>=GM_BASE&&id<GM_BASE+2000){const b=id-GM_BASE;return S.meta.settings.imgs?gmaxURL(b):fallbackSprite(b);}if(!S.meta.settings.imgs)return fallbackSprite(id);const sh=!ns&&shinyOn(id)?'shiny/':'';
+function spriteURL(id,kind='front',ns){if(id>=GM_BASE&&id<GM_BASE+2000){const b=id-GM_BASE;return S.meta.settings.imgs?gmaxURL(b,!ns&&shinyOn(id)):fallbackSprite(b);}if(!S.meta.settings.imgs)return fallbackSprite(id);const sh=!ns&&shinyOn(id)?'shiny/':'';
  if(kind==='art')return SPR_BASE+'other/official-artwork/'+sh+id+'.png';
  // 움직이는 GIF는 프레임 간격이 아주 짧아 PC 브라우저에서 너무 빨리 움직여요 → 기본은 도트 그림 + 숨쉬기 움직임(설정에서 GIF 선택 가능)
  const gif=S.meta.settings.anim==='gif';
@@ -7348,16 +7361,19 @@ function fallbackSprite(id){if(FB[id])return FB[id];const m=MON[id];const c=m?TY
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><circle cx="48" cy="52" r="30" fill="${c}" stroke="#3a2e3f" stroke-width="4"/><path d="M18 52a30 30 0 0 1 60 0z" fill="${c2}" opacity=".6"/><circle cx="38" cy="48" r="4" fill="#3a2e3f"/><circle cx="58" cy="48" r="4" fill="#3a2e3f"/><path d="M42 60q6 5 12 0" stroke="#3a2e3f" stroke-width="3" fill="none"/><text x="48" y="92" font-size="12" text-anchor="middle" fill="#3a2e3f">${m?m.id:''}</text></svg>`;
  return FB[id]='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);}
 /* ===== 메가·합체 그림: 되는 그림 주소를 기억해서, 화면이 다시 그려질 때마다 실패→재시도로 깜빡이지 않게 해요 ===== */
-const MEGA_BEST=(()=>{try{return JSON.parse(localStorage.getItem('megaBest6')||'{}')||{};}catch(e){return {};}})();
+const MEGA_BEST=(()=>{try{const o=JSON.parse(localStorage.getItem('megaBest5')||'{}')||{};Object.keys(o).forEach(k=>{if(o[k]&&/pokestats/.test(o[k].u||''))delete o[k];/* 뒷모습 도트로 바꾼 메가: 예전에 기억해 둔 Showdown 그림 주소는 지워요 */if(o[k]&&/^(10287|10290|10303|10304|10305|10313|10292)\|back\|/.test(k)&&!/\/back\/[^/]*\d\.png/.test(o[k].u||''))delete o[k];});return o;}catch(e){return {};}})();
 const megaKey=(id,k,sh)=>id+'|'+k+'|'+(sh?1:0)+'|'+(S.meta.settings.anim==='gif'?1:0);
-function megaSave(){try{localStorage.setItem('megaBest6',JSON.stringify(MEGA_BEST));}catch(e){}}
-function megaGet(key){try{const v=MEGA_BEST[key];if(!v)return '';if(v.u==='BASE'&&Date.now()-v.t>6e5){delete MEGA_BEST[key];return '';}if(/\.gif(\?|$)/i.test(v.u))return v.u;if(Date.now()-v.t<864e5)return v.u;delete MEGA_BEST[key];}catch(e){}return '';}
+function megaSave(){try{localStorage.setItem('megaBest5',JSON.stringify(MEGA_BEST));}catch(e){}}
+function megaGet(key){try{const v=MEGA_BEST[key];if(!v)return '';if(/\.gif(\?|$)/i.test(v.u))return v.u;if(Date.now()-v.t<864e5)return v.u;delete MEGA_BEST[key];}catch(e){}return '';}
 function megaPut(key,u){try{MEGA_BEST[key]={u,t:Date.now()};megaSave();}catch(e){}}
-/* 뒷모습은 GIF 대신 뒷모습 도트(2D)로 보여 줄 메가: 몰드류 · 저리더프 · 대여르 */
-const MEGA_BACKDOT={10287:1,10290:1,10303:1};
+/* 뒷모습은 GIF 대신 뒷모습 도트(2D)로 보여 줄 메가: 몰드류 · 저리더프 · 대여르 · 라이츄 X/Y · 골루그 · 브리가론 (Showdown 앞모습 3D 그림이 뿌옇게 나오는 것 방지) */
+const MEGA_BACKDOT={10287:1,10290:1,10303:1,10304:1,10305:1,10313:1,10292:1};
+const MEGA_GIF1={10034:1,10035:1,10073:1,10157:1};
 function megaCands(id,kind,sh){const out=[],add=u=>{if(u&&out.indexOf(u)<0)out.push(u);};
  if(kind==='back'&&MEGA_BACKDOT[id]){const sf=sh?'shiny/':'';add(SPR_BASE+'back/'+sf+id+'.png');add(SPR_BASE+'back/'+sf+(MEGAB[id]||id)+'.png');return out;}
- if(S.meta.settings.anim==='gif'&&(kind==='anim'||kind==='back')){psMegaWebp(id,kind,sh).slice(0,1).forEach(add);megaSdUrls(id,kind,sh).forEach(add);add(SPR_BASE+'other/showdown/'+(kind==='back'?'back/':'')+(sh?'shiny/':'')+id+'.gif');
+ /* 리자몽 X·Y · 피죤투 · 울트라네크로즈마: 처음 나오는 PokeAPI GIF(크게 잘 나옴)를 먼저 쓰고, 나중에 찾은 다른 GIF로 바뀌며 작아지지 않게 해요 */
+ if(MEGA_GIF1[id]&&S.meta.settings.anim==='gif'&&(kind==='anim'||kind==='back'))add(SPR_BASE+'other/showdown/'+(kind==='back'?'back/':'')+(sh?'shiny/':'')+id+'.gif');
+ if(S.meta.settings.anim==='gif'&&(kind==='anim'||kind==='back')){megaSdUrls(id,kind,sh).forEach(add);add(SPR_BASE+'other/showdown/'+(kind==='back'?'back/':'')+(sh?'shiny/':'')+id+'.gif');
   /* GIF가 없으면 pokestats의 움직이는 webp(레전즈 Z-A)를 도트 그림보다 먼저 연결 */
   psMegaWebp(id,kind,sh).forEach(add);
   /* 일반 GIF가 모두 없으면 도트 GIF(Showdown gen5ani)로 연결 */
@@ -7370,16 +7386,15 @@ function megaCands(id,kind,sh){const out=[],add=u=>{if(u&&out.indexOf(u)<0)out.p
 const MEGA_RES={};
 function megaProbeAll(id,k,sh){const key=megaKey(id,k,sh);if(MEGA_RES[key])return MEGA_RES[key];
  return MEGA_RES[key]=(async()=>{const list=megaCands(id,k,sh);let u='BASE';
-  if(list.length){const ps=list.map(x=>gmaxProbe(x));for(let i=0;i<ps.length;i++){if(await ps[i]){u=list[i];break;}}}
-  try{console.info('[메가그림]',id,k,'→',u);}catch(e){}
+  if(list.length){const ok=await Promise.all(list.map(x=>gmaxProbe(x)));const i=ok.indexOf(true);if(i>=0)u=list[i];}
   if(u!=='BASE'||navigator.onLine!==false)megaPut(key,u);
   try{document.querySelectorAll('img[data-id="'+id+'"][data-k="'+k+'"]').forEach(el=>{if(el.dataset.mf==='1')return;const cur=el.getAttribute('src')||'';if(!!/shiny/.test(cur)!==!!sh)return;if(u==='BASE'){megaFallback(el,id,k,key);}else if(cur!==u&&cur.indexOf('data:')!==0){el.dataset.mr=u;if(/\.png(\?|$)/.test(u))el.classList.add('idle');el.src=u;}});}catch(e){}
   return u;})();}
 function megaFallback(el,id,k,key){
  /* 모든 주소가 안 되면 원래 포켓몬 도트 그림으로 바꾸고, 그 사실도 기억해요 */
- el.dataset.mf='1';el.dataset.id=MEGAB[id];el.classList.add('mgFb');el.removeAttribute('data-shifted');
+ el.dataset.mf='1';el.dataset.mgid=id;el.dataset.id=MEGAB[id];el.classList.add('mgFb');el.removeAttribute('data-shifted');
  if(k==='anim'||k==='back')megaPut(key,'BASE');
- el.src=spriteURL(MEGAB[id],k,true);}
+ el.src=spriteURL(MEGAB[id],k,!/shiny/.test(el.getAttribute('src')||''));}
 function megaNext(el,id){
  const k=el.dataset.k||'front',cur=el.getAttribute('src')||'',sh=/shiny/.test(cur),key=megaKey(id,k,sh);
  try{const v=MEGA_BEST[key];if(v&&v.u===cur){delete MEGA_BEST[key];megaSave();}}catch(e){}
@@ -7395,13 +7410,11 @@ async function megaWarmAll(kinds){try{if(!S||!S.meta||!S.meta.settings||!S.meta.
 window.addEventListener('load',()=>setTimeout(()=>{try{(window.requestIdleCallback||setTimeout)(()=>megaWarmAll(['anim','back']));}catch(e){}},2500));
 document.addEventListener('load',e=>{try{const im=e.target;if(!im||im.tagName!=='IMG')return;const id=+im.dataset.id,k=im.dataset.k;if(!(id>10000&&id<GM_BASE&&MEGAB[id])||im.dataset.mf==='1'||!(k==='anim'||k==='back'))return;const src=im.getAttribute('src')||'';if(!src||src.startsWith('data:'))return;const key=megaKey(id,k,/shiny/.test(src)),v=MEGA_BEST[key];if(!v||v.u!==src)megaPut(key,src);}catch(err){}},true);
 /* pokestats 이미지: GIF가 안 나올 때, 도트 그림보다 먼저 연결해요 (스칼렛·바이올렛 그림) */
-function psMegaWebp(id,kind,sh){if(!(id>10000&&id<20000)||!(kind==='anim'||kind==='back'))return [];const B='https://assets.pokestats.gg/pokeapi/orig/pokemon/versions/generation-ix/legends-za/',s=sh?'shiny/':'';return kind==='back'?[B+'back/'+s+id+'.webp',B+s+id+'.webp']:[B+s+id+'.webp'];}
-const MIRAI_URL='https://raw.githubusercontent.com/regecha/pokemath/main/1008.webp';let MIRAI_BAD=false;
-const psAnimWebp=s=>s===MIRAI_URL||/assets\.pokestats\.gg\/.*legends-za/.test(s||'');
-function psWebp(id,kind,sh){if(!(id>0&&id<=1025)||!(kind==='anim'||kind==='back'))return '';return 'https://assets.pokestats.gg/pokeapi/orig/pokemon/versions/generation-ix/scarlet-violet/'+(kind==='back'?'back/':'')+(sh?'shiny/':'')+id+'.webp';}
+function psMegaWebp(id,kind,sh){return [];/* 새 앞모습 도트(pokestats) 안 씀: GIF 없으면 원래 2D 도트로 */if(!(id>10000&&id<20000)||!(kind==='anim'||kind==='back'))return [];return ['https://assets.pokestats.gg/pokeapi/orig/pokemon/versions/generation-ix/legends-za/'+(kind==='back'?'back/':'')+(sh?'shiny/':'')+id+'.webp'];}
+const psAnimWebp=s=>/assets\.pokestats\.gg\/.*legends-za/.test(s||'');
+function psWebp(id,kind,sh){return '';/* 새 앞모습 도트(pokestats) 안 씀 */if(!(id>0&&id<=1025)||!(kind==='anim'||kind==='back'))return '';return 'https://assets.pokestats.gg/pokeapi/orig/pokemon/versions/generation-ix/scarlet-violet/'+(kind==='back'?'back/':'')+(sh?'shiny/':'')+id+'.webp';}
 document.addEventListener('load',e=>{try{const im=e.target;if(!im||im.tagName!=='IMG'||!(im.dataset.k==='anim'||im.dataset.k==='back'))return;const s=im.currentSrc||im.src||'';if(/assets\.pokestats\.gg\/.*scarlet-violet.*\.webp/.test(s)){if(!im.classList.contains('idle')){im.classList.add('idle');im.dataset.psIdle='1';}}else if(im.dataset.psIdle==='1'){im.dataset.psIdle='';if(/\.gif(\?|$)/i.test(s))im.classList.remove('idle');}}catch(x){}},true);
 function imgFail(el){const id=+el.dataset.id;
- if(id===1008&&(el.getAttribute('src')||'')===MIRAI_URL){MIRAI_BAD=true;el.removeAttribute('data-shifted');el.src=spriteURL(id,el.dataset.k||'front',true);return;}
  {const k0=el.dataset.k;if(!el.dataset.sx&&sdxElig(id,k0)){el.dataset.sx='1';const cur0=el.getAttribute('src')||'',sh0=/shiny/.test(cur0);
   sdxProbe(id,k0,sh0,sdxOrig(id,k0,!sh0)).then(u=>{if(!el.isConnected)return;if(u&&u!=='-'&&u!==cur0){el.src=u;}else{el.dataset.ps='1';imgFail(el);}});return;}}if(id>=GM_BASE&&id<GM_BASE+2000){gmaxImgFail(el,id-GM_BASE);return;}if(id>10000&&MEGAB[id]&&el.dataset.mf!=='1'){megaNext(el,id);return;}
  {const k1=el.dataset.k;if(el.dataset.ps!=='1'&&(k1==='anim'||k1==='back')&&S.meta.settings.imgs&&S.meta.settings.anim==='gif'){const cs=el.getAttribute('src')||'',w=psWebp(id,k1,/shiny/.test(cs));if(w&&cs!==w){el.dataset.ps='1';el.removeAttribute('data-shifted');el.src=w;return;}}}
@@ -7412,16 +7425,23 @@ function imgFail(el){const id=+el.dataset.id;
 function monImg(id,kind='front',cls='',ns){if((kind==='anim'||kind==='back')&&S.meta.settings.anim!=='gif')cls=(cls?cls+' ':'')+'idle';return `<img class="${cls}" style="--d:${(id%7)*.17}s" src="${spriteURL(id,kind,ns)}" data-id="${id}" data-k="${kind}" alt="" loading="lazy" draggable="false" onerror="imgFail(this)">`;}
 /* ===== 전투 칸의 포켓몬 그림: 그림 파일 아래쪽의 투명한 여백을 없애 발이 바닥에 닿게 해요 ===== */
 /* 실제 키가 작은 포켓몬(꼬렛·메타몽 등)은 그림 여백을 채우느라 너무 커지지 않게, 도감 키에 맞춰 확대 한도를 둬요 */
-function htCap(id){try{let b=id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];const h=MON[b]&&MON[b].ht;if(!(h>0))return 1.6;return h<=.4?1.05:h<=.7?1.15:h<=1?1.3:h<=1.5?1.45:1.6;}catch(e){return 1.6;}}
+const NOBIG0={485:1,807:1,888:1,889:1},NOBIG=new Proxy({},{get:(t,id)=>{let b=+id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];return NOBIG0[b];}}); /* 히드런·제라오라·자시안·자마젠타: 도감 키(1.7m·1.5m)보다 커 보이지 않게 확대를 막아요 */
+function htCap(id){try{if(NOBIG[id])return 1;let b=id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];const h=(id>10000&&typeof MEGA_HT!=='undefined'&&MEGA_HT[id])||(MON[b]&&MON[b].ht);if(!(h>0))return 1.6;return h<=.4?1.05:h<=.7?1.15:h<=1?1.3:h<=1.5?1.45:1.6;}catch(e){return 1.6;}}
 /* 도감 키에 맞는 '몸 높이 비율' 한도: GIF는 그림 크기에 딱 맞게 잘려 있어서 작은 포켓몬도 칸을 가득 채워 커져 버리므로, 작은 포켓몬은 칸의 일부만 차지하게 줄여요 */
-function htFrac(id){try{let b=id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];const h=MON[b]&&MON[b].ht;if(!(h>0))return 1;const T=[[.2,.30],[.4,.38],[.6,.46],[.8,.53],[1,.58],[1.5,.70],[2,.80],[3,.92]];if(h<=T[0][0])return T[0][1];for(let i=1;i<T.length;i++){if(h<=T[i][0]){const a=T[i-1],b2=T[i];return a[1]+(b2[1]-a[1])*(h-a[0])/(b2[0]-a[0]);}}return 1;}catch(e){return 1;}}
+function htFrac(id){try{let b=id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];const h=(id>10000&&typeof MEGA_HT!=='undefined'&&MEGA_HT[id])||(MON[b]&&MON[b].ht);if(!(h>0))return 1;const T=[[.2,.30],[.4,.38],[.6,.46],[.8,.53],[1,.58],[1.5,.70],[2,.80],[3,.92]];if(h<=T[0][0])return T[0][1];for(let i=1;i<T.length;i++){if(h<=T[i][0]){const a=T[i-1],b2=T[i];return a[1]+(b2[1]-a[1])*(h-a[0])/(b2[0]-a[0]);}}return 1;}catch(e){return 1;}}
 
 /* 메가·합체 그림: 기억해 둔 주소가 있으면 처음부터 그걸 써요 (없던 그림이면 처음부터 원래 포켓몬 도트) */
-{const __spU=spriteURL;spriteURL=function(id,kind,ns){try{if(id>10000&&id<GM_BASE&&MEGAB[id]&&(kind==='anim'||kind==='back')&&S.meta.settings.imgs){const sh=!ns&&shinyOn(id),v=megaGet(megaKey(id,kind,sh));if(v&&v!=='BASE')return v;if(v==='BASE')return __spU(MEGAB[id],kind,true);if(S.meta.settings.anim==='gif')setTimeout(()=>{try{megaProbeAll(id,kind,sh);}catch(e){}},0);}}catch(e){}return __spU.apply(this,arguments);};}
-{const __mi=monImg;monImg=function(id,kind,cls,ns){let h=__mi.apply(this,arguments);try{if(id>10000&&id<GM_BASE&&MEGAB[id]&&(kind==='anim'||kind==='back')){const sh=!ns&&shinyOn(id);if(megaGet(megaKey(id,kind,sh))==='BASE')h=h.replace('<img class="','<img class="mgFb ').replace('data-id="'+id+'"','data-id="'+MEGAB[id]+'" data-mf="1"');}}catch(e){}return h;};}
+{const __spU=spriteURL;spriteURL=function(id,kind,ns){try{if(id>10000&&id<GM_BASE&&MEGAB[id]&&(kind==='anim'||kind==='back')&&S.meta.settings.imgs){const sh=!ns&&shinyOn(id),v=megaGet(megaKey(id,kind,sh));if(v&&v!=='BASE')return v;if(v==='BASE')return __spU(MEGAB[id],kind,ns);if(S.meta.settings.anim==='gif')setTimeout(()=>{try{megaProbeAll(id,kind,sh);}catch(e){}},0);}}catch(e){}return __spU.apply(this,arguments);};}
+/* 메가 그림 크기 보정 기억: 한 번 계산한 크기(scale·위치)를 그림 주소별로 기억해 두었다가, 화면이 다시 그려질 때 처음부터 적용해요 (클릭할 때마다 커졌다 작아졌다 하는 것 방지) */
+const FIT_CACHE=new Map();
+{const __mi=monImg;monImg=function(id,kind,cls,ns){let h=__mi.apply(this,arguments);try{if(id>10000&&id<GM_BASE&&MEGAB[id]&&(kind==='anim'||kind==='back')){const sh=!ns&&shinyOn(id);let mfb=false;if(megaGet(megaKey(id,kind,sh))==='BASE'){mfb=true;h=h.replace('<img class="','<img class="mgFb ').replace('data-id="'+id+'"','data-id="'+MEGAB[id]+'" data-mf="1" data-mgid="'+id+'"');}
+ const sm=h.match(/ src="([^"]*)"/),src=sm?sm[1]:'';
+ if(src&&!/\.gif(\?|$)/i.test(src)&&!psAnimWebp(src)){h=h.replace('<img class="','<img class="idle mgSt '+(/\/sprites\/dex|official-artwork/.test(src)?'mgSoft ':''));}
+ const ft=src&&FIT_CACHE.get(src);
+ if(ft){h=h.replace('style="--d:','style="'+(ft.s?'scale:'+ft.s+';':'')+(ft.t?'translate:'+ft.t+';':'')+(ft.o?'transform-origin:'+ft.o+';':'')+'--d:').replace(' alt=""',' data-gfit="1" data-gfs="'+src+'" alt=""');}}}catch(e){}return h;};}
 /* ===== 일반 포켓몬 GIF 보조: PokeAPI에 GIF가 없는 포켓몬(주로 최신 세대)은 Pokémon Showdown의 움직이는 그림을 찾아봐요 ===== */
 const SDN={899:'wyrdeer',900:'kleavor',901:'ursaluna',902:'basculegion',903:'sneasler',904:'overqwil',905:'enamorus',906:'sprigatito',907:'floragato',908:'meowscarada',909:'fuecoco',910:'crocalor',911:'skeledirge',912:'quaxly',913:'quaxwell',914:'quaquaval',915:'lechonk',916:'oinkologne',917:'tarountula',918:'spidops',919:'nymble',920:'lokix',921:'pawmi',922:'pawmo',923:'pawmot',924:'tandemaus',925:'maushold',926:'fidough',927:'dachsbun',928:'smoliv',929:'dolliv',930:'arboliva',931:'squawkabilly',932:'nacli',933:'naclstack',934:'garganacl',935:'charcadet',936:'armarouge',937:'ceruledge',938:'tadbulb',939:'bellibolt',940:'wattrel',941:'kilowattrel',942:'maschiff',943:'mabosstiff',944:'shroodle',945:'grafaiai',946:'bramblin',947:'brambleghast',948:'toedscool',949:'toedscruel',950:'klawf',951:'capsakid',952:'scovillain',953:'rellor',954:'rabsca',955:'flittle',956:'espathra',957:'tinkatink',958:'tinkatuff',959:'tinkaton',960:'wiglett',961:'wugtrio',962:'bombirdier',963:'finizen',964:'palafin',965:'varoom',966:'revavroom',967:'cyclizar',968:'orthworm',969:'glimmet',970:'glimmora',971:'greavard',972:'houndstone',973:'flamigo',974:'cetoddle',975:'cetitan',976:'veluza',977:'dondozo',978:'tatsugiri',979:'annihilape',980:'clodsire',981:'farigiraf',982:'dudunsparce',983:'kingambit',984:'greattusk',985:'screamtail',986:'brutebonnet',987:'fluttermane',988:'slitherwing',989:'sandyshocks',990:'irontreads',991:'ironbundle',992:'ironhands',993:'ironjugulis',994:'ironmoth',995:'ironthorns',996:'frigibax',997:'arctibax',998:'baxcalibur',999:'gimmighoul',1000:'gholdengo',1001:'wochien',1002:'chienpao',1003:'tinglu',1004:'chiyu',1005:'roaringmoon',1006:'ironvaliant',1007:'koraidon',1008:'miraidon',1009:'walkingwake',1010:'ironleaves',1011:'dipplin',1012:'poltchageist',1013:'sinistcha',1014:'okidogi',1015:'munkidori',1016:'fezandipiti',1017:'ogerpon',1018:'archaludon',1019:'hydrapple',1020:'gougingfire',1021:'ragingbolt',1022:'ironboulder',1023:'ironcrown',1024:'terapagos',1025:'pecharunt'};
-const SDX=(()=>{try{return JSON.parse(localStorage.getItem('sdxBest2')||'{}')||{};}catch(e){return {};}})();
+const SDX=(()=>{try{const o=JSON.parse(localStorage.getItem('sdxBest2')||'{}')||{};Object.keys(o).forEach(k=>{if(/pokestats/.test(o[k]))delete o[k];});return o;}catch(e){return {};}})();
 function sdxSave(){try{localStorage.setItem('sdxBest2',JSON.stringify(SDX));}catch(e){}}
 const sdxKey=(id,k,sh)=>id+'|'+k+'|'+(sh?1:0);
 const sdxRes={};let sdxOrig=null;
@@ -7433,10 +7453,9 @@ function sdxProbe(id,kind,sh,orig){const key=sdxKey(id,kind,sh);if(sdxRes[key])r
   if(u!=='-'){try{document.querySelectorAll('img[data-id="'+id+'"][data-k="'+kind+'"]').forEach(el=>{const cur=el.getAttribute('src')||'';if(el.dataset.mf==='1'||!!/shiny/.test(cur)!==!!sh)return;if(cur!==u&&cur.indexOf('data:')!==0&&!/\.gif(\?|$)/.test(cur)||cur!==u&&el.dataset.sx==='1'){el.dataset.sx='1';el.classList.remove('idle');el.src=u;}});}catch(e){}}
   return u;})();}
 {const __sd=spriteURL;sdxOrig=__sd;spriteURL=function(id,kind,ns){try{if(sdxElig(id,kind)){const sh=!ns&&shinyOn(id),key=sdxKey(id,kind,sh),v=SDX[key];if(v&&v!=='-')return v;const o=__sd.apply(this,arguments);if(!v)setTimeout(()=>{try{sdxProbe(id,kind,sh,o);}catch(e){}},0);return o;}}catch(e){}return __sd.apply(this,arguments);};}
-{const __mr=spriteURL;spriteURL=function(id,kind,ns){try{if(id===1008&&!MIRAI_BAD&&(kind==='anim'||kind==='back')&&S.meta.settings.imgs&&S.meta.settings.anim==='gif'&&!(!ns&&shinyOn(id)))return MIRAI_URL;}catch(e){}return __mr.apply(this,arguments);};}
 const SPR_SHIFT=new Map();
 function monImgU(id,kind,ns){let h=monImg(id,kind,'',ns);try{const u=spriteURL(id,kind,ns),c=SPR_SHIFT.get(u);if(c&&c!==u)h=h.replace('src="'+u+'"','src="'+c+'" data-shifted="1"');}catch(e){}return h;}
-function shiftSpriteDown(src,cap){return new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';
+function shiftSpriteDown(src,cap,soft){return new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';
  im.onload=()=>{try{const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h||w>600||h>600)return res(src);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(im,0,0);
   const d=cx.getImageData(0,0,w,h).data;let minX=w,maxX=-1,minY=h,maxY=-1;
   for(let y=0;y<h;y++)for(let x=0;x<w;x++){if(d[(y*w+x)*4+3]>24){if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;}}
@@ -7445,7 +7464,7 @@ function shiftSpriteDown(src,cap){return new Promise(res=>{try{const im=new Imag
   const bw=maxX-minX+1,bh=maxY-minY+1,fill=Math.max(bw/w,bh/h),pad=h-1-maxY;
   let k=fill<0.8?Math.min(cap||1.6,0.8/fill):1;k=Math.max(1,Math.min(k,w/bw*0.98,h/bh*0.98));
   if(k<1.06&&pad<2)return res(src);
-  const c2=document.createElement('canvas');c2.width=w;c2.height=h;const c2x=c2.getContext('2d');c2x.imageSmoothingEnabled=false;
+  const c2=document.createElement('canvas');c2.width=w;c2.height=h;const c2x=c2.getContext('2d');c2x.imageSmoothingEnabled=!!soft;if(soft)c2x.imageSmoothingQuality='high';
   if(k<1.06){c2x.drawImage(im,0,pad);}
   else{const sw=Math.round(bw*k),sh=Math.round(bh*k);c2x.drawImage(im,minX,minY,bw,bh,Math.round((w-sw)/2),h-sh,sw,sh);}
   res(c2.toDataURL('image/png'));}catch(e){res(src);}};
@@ -7453,30 +7472,59 @@ function shiftSpriteDown(src,cap){return new Promise(res=>{try{const im=new Imag
 document.addEventListener('load',e=>{const im=e.target;if(!im||im.tagName!=='IMG'||im.dataset.shifted||!im.closest||!im.closest('#myLane .unit .sp,#foeLane:not(.wildLane) .unit .sp'))return;
  const src=im.currentSrc||im.src;if(!src||src.startsWith('data:')||/\.gif(\?|$)/i.test(src)||psAnimWebp(src))return;
  if(SPR_SHIFT.has(src)){const c=SPR_SHIFT.get(src);if(c!==src){im.dataset.shifted='1';im.src=c;}return;}
- shiftSpriteDown(src,htCap(+im.dataset.id)).then(c=>{SPR_SHIFT.set(src,c);if(c!==src&&im.isConnected&&(im.currentSrc||im.src)===src){im.dataset.shifted='1';im.src=c;}});},true);
+ shiftSpriteDown(src,htCap(+im.dataset.id),/\/sprites\/dex|official-artwork/.test(src)).then(c=>{SPR_SHIFT.set(src,c);if(c!==src&&im.isConnected&&(im.currentSrc||im.src)===src){im.dataset.shifted='1';im.src=c;}});},true);
 /* GIF 그림: 움직임은 그대로 두고, 그림 안의 투명 여백이 커서 작아 보이는 포켓몬만 CSS로 키워서 칸을 채워요 */
 const GIF_FIT=new Map();
 function gifBBox(src){if(GIF_FIT.has(src))return GIF_FIT.get(src);
- const p=new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>{try{const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h||w>800||h>800)return res(null);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(im,0,0);const d=cx.getImageData(0,0,w,h).data;let a=w,b=-1,c=h,e=-1;for(let y=0;y<h;y++)for(let x=0;x<w;x++){if(d[(y*w+x)*4+3]>24){if(x<a)a=x;if(x>b)b=x;if(y<c)c=y;if(y>e)e=y;}}res(b<0?null:{w,h,x0:a,x1:b,y0:c,y1:e});}catch(err){res(null);}};im.onerror=()=>res(null);im.src=src;}catch(err){res(null);}});
+ const p=new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>{try{const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h||w>800||h>800)return res(null);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(im,0,0);const d=cx.getImageData(0,0,w,h).data;let a=w,b=-1,c=h,e=-1,n=0;for(let y=0;y<h;y++)for(let x=0;x<w;x++){if(d[(y*w+x)*4+3]>24){n++;if(x<a)a=x;if(x>b)b=x;if(y<c)c=y;if(y>e)e=y;}}res(b<0?null:{w,h,x0:a,x1:b,y0:c,y1:e,n});}catch(err){res(null);}};im.onerror=()=>res(null);im.src=src;}catch(err){res(null);}});
  GIF_FIT.set(src,p);return p;}
-function gifFit(im){try{
- if(!im.isConnected||im.dataset.gfit)return;const src=im.currentSrc||im.src;
- if(!src||!(/\.gif(\?|$)/i.test(src)||psAnimWebp(src))||im.closest('.unit.gmax,.gmaxLane'))return;
- gifBBox(src).then(bb=>{try{
-  if(!bb||!im.isConnected||(im.currentSrc||im.src)!==src)return;
-  const r=im.getBoundingClientRect(),W=r.width,H=r.height;if(!W||!H)return;
+/* 칸 안에서 포켓몬 몸이 차지할 크기(k배 확대)를 계산해요. 일반 포켓몬·메가 공통 */
+/* 정지 그림(GIF 없음)으로 나오는 메가: 숨쉬기 움직임을 주고, 도트가 아닌 부드러운 그림(Showdown dex·공식 일러스트)은 뭉개지지 않게 부드럽게 보여 줘요 */
+function mgStatic(im){try{if(!im.isConnected||!im.closest('.unit .sp'))return;const id=+im.dataset.id,mega=(id>10000&&id<GM_BASE&&MEGAB[id])||im.dataset.mf==='1'||im.classList.contains('mgFb');if(!mega)return;const src=im.currentSrc||im.src||'';if(!src||/\.gif(\?|$)/i.test(src)||psAnimWebp(src))return;im.classList.add('idle','mgSt');if(src.indexOf('data:')!==0){if(/\/sprites\/dex|official-artwork/.test(src))im.classList.add('mgSoft');else im.classList.remove('mgSoft');}}catch(e){}}
+function gifCalc(bb,W,H,id){
   const f=Math.min(W/bb.w,H/bb.h),cw=bb.w*f,ch=bb.h*f,left=(W-cw)/2,top=H-ch;
   const bx0=left+bb.x0*f,bx1=left+(bb.x1+1)*f,by1=top+(bb.y1+1)*f,bwid=bx1-bx0,bhei=(bb.y1-bb.y0+1)*f;
-  const fill=Math.max(bwid/W,bhei/H);
-  const wide=bwid/bhei>1.12; /* 날개를 펼쳐 옆으로 넓은 포켓몬(리자몽·루기아 등): 칸 폭보다 조금 더 넓게 키워서 몸이 작아 보이지 않게 해요 */
-  const tgt=wide?0.95:0.8;let k=bhei/H<tgt?Math.min(wide?Math.max(htCap(+im.dataset.id),1.7):htCap(+im.dataset.id),tgt/(bhei/H)):1;k=Math.max(1,Math.min(k,(wide?W*1.7:W*0.98)/bwid,H/bhei*0.98));
-  {const fr=bhei/H,allow=htFrac(+im.dataset.id)*(wide?1.45:1),kMax=allow/fr;if(kMax<1)k=Math.max(.4,kMax);else k=Math.min(k,kMax);const aw=Math.min(1.4,htFrac(+im.dataset.id)*1.3+.1),kW=aw/(bwid/W);if(kW<1)k=Math.min(k,Math.max(.4,kW));}
+  const nb=!!NOBIG[id],wide=!nb&&bwid/bhei>1.12;
+  const tgt=wide?0.95:0.8;let k=bhei/H<tgt?Math.min(wide?Math.max(htCap(id),1.7):htCap(id),tgt/(bhei/H)):1;k=Math.max(1,Math.min(k,(wide?W*1.7:W*0.98)/bwid,H/bhei*0.98));
+  {const fr=bhei/H,allow=htFrac(id)*(wide?1.45:1)*(nb?.82:1),kMax=allow/fr;if(kMax<1)k=Math.max(.4,kMax);else k=Math.min(k,kMax);const aw=Math.min(1.4,htFrac(id)*1.3+.1)*(nb?.82:1),kW=aw/(bwid/W);if(kW<1)k=Math.min(k,Math.max(.4,kW));}
+  return {k,bx0,bx1,by1,bwid,bhei,wide,f};
+}
+/* 메가·원시회귀 실제 도감 키(m) — 진화 전 포켓몬 크기에 (메가 키 ÷ 진화 전 키)를 곱해 그려요. 표에 없는 메가는 진화 전과 같은 크기 */
+const MEGA_HT={10033:2.4,10034:1.7,10035:1.7,10036:1.6,10037:1.2,10038:1.4,10039:2.2,10040:1.7,10041:6.5,10042:2.1,10043:2.3,10044:1.5,10045:1.4,10046:2.0,10047:1.7,10048:1.9,10049:2.5,10050:1.9,10051:1.6,10052:1.0,10053:2.2,10054:1.3,10055:1.8,10056:1.2,10057:1.2,10058:1.9,10059:1.3,10060:2.7,10062:1.8,10063:2.3,10064:1.9,10065:1.9,10066:0.5,10067:1.5,10068:1.6,10069:1.5,10070:2.5,10071:2.0,10072:10.5,10073:2.2,10074:2.1,10075:1.1,10076:2.5,10077:9.8,10078:5.0,10079:10.8,10087:2.5,10088:1.3,10089:1.8,10090:1.4,10157:7.5,10155:3.8,10156:4.2,10086:6.5,10007:6.9,10006:0.4,10120:4.5,10256:1.8,10188:2.8,10189:2.9};
+/* 그림의 '덩치': 채워진 면적(√)과 높이의 기하평균. 가늘고 긴 그림·옆으로 퍼진 그림도 진화 전과 비슷한 무게감으로 맞춰 줘요 */
+function gifM(bb,g){return Math.sqrt(Math.sqrt(bb.n||bb.w*bb.h*.4)*g.f*g.bhei);}
+const MEGA_STATIC_FILL=1.15; /* GIF 없이 도트·일러스트로 나오는 메가의 최소 크기: 도감 키에 맞는 칸 채움 비율의 이 배수 (더 키우려면 1.25, 줄이려면 1.05) */
+const MEGA_MIN_BOOST=1.12; /* 메가는 진화 전보다 최소 이만큼은 커 보이게 (더 키우려면 1.2, 줄이려면 1.05) */
+function megaHtRatio(id){try{const b=MEGAB[id],mh=MEGA_HT[id],bh=MON[b]&&MON[b].ht;if(mh>0&&bh>0)return Math.max(.5,Math.min(3.2,mh/bh));}catch(e){}return 1;}
+function gifFit(im){try{
+ mgStatic(im);if(!im.isConnected)return;const src=im.currentSrc||im.src;
+ if(im.dataset.gfit&&im.dataset.gfs&&im.dataset.gfs!==src){delete im.dataset.gfit;im.style.scale='';im.style.translate='';im.style.transformOrigin='';}/* 그림 주소가 바뀌면(메가 GIF를 더 좋은 것으로 교체 등) 예전 그림 기준의 크기 보정을 지우고 다시 계산해요 */
+ if(im.dataset.gfit)return;
+ if(!src||im.closest('.unit.gmax,.gmaxLane'))return;if(!(/\.gif(\?|$)/i.test(src)||psAnimWebp(src))){const m0=+im.dataset.id;if(!((m0>10000&&m0<GM_BASE&&MEGAB[m0]&&!im.dataset.mf&&im.closest('.unit.mega'))||(im.dataset.mf==='1'&&im.dataset.mgid&&im.closest('.unit.mega'))))return;}
+ const mid=+im.dataset.id,mg0=(mid>10000&&mid<GM_BASE&&MEGAB[mid]&&!im.dataset.mf)?MEGAB[mid]:0;let baseSrc='',baseSrcT='';const isBk=u=>/\/back\/|ani-back/.test(u||''),dispK=im.dataset.k==='back'?'back':'anim',srcK=isBk(src)?'back':'anim';try{if(mg0){baseSrc=spriteURL(mg0,dispK);baseSrcT=srcK===dispK?baseSrc:spriteURL(mg0,srcK);}}catch(e){}
+ gifBBox(src).then(async bb=>{try{
+  if(!bb||!im.isConnected||(im.currentSrc||im.src)!==src)return;
+  const r=im.getBoundingClientRect(),W=r.width,H=r.height;if(!W||!H)return;
+  const g=gifCalc(bb,W,H,+im.dataset.id);let k=g.k;const {bx0,bx1,by1}=g;
+  /* 메가: 진화 전 포켓몬이 칸에서 차지하던 몸 높이를 기준으로, 실제 도감 키 비율만큼만 크게 그려요 */
+  if(mg0&&baseSrc){try{const bb2=await gifBBox(baseSrc);if(bb2&&im.isConnected&&(im.currentSrc||im.src)===src){const gb=gifCalc(bb2,W,H,mg0),NAT=/other\/showdown\/|pokemonshowdown\.com\/sprites\/ani(-back)?\//,nat=NAT.test(src)&&NAT.test(baseSrc)&&!/gen5ani/.test(src+baseSrc);
+   /* Showdown 움직이는 그림은 진화 전·메가가 같은 도트 배율로 그려져 있어서(메가가 더 크게 그려져 있어요), 진화 전과 같은 배율을 그대로 쓰면 실제 키 차이가 자연스럽게 나와요. 다른 출처 그림이면 덩치 비교 + 도감 키 비율로 맞춰요 */
+   if(nat){if(baseSrcT===baseSrc)k=gb.f*gb.k/g.f;else{const bb3=await gifBBox(baseSrcT);/* 메가 그림이 앞모습인데 진화 전은 뒷모습으로 보이는 경우: 진화 전 몸 높이(화면 px)를 진화 전 앞모습 그림의 도트 높이로 나눠 배율을 구해요 */if(bb3&&(bb3.y1-bb3.y0)>0)k=(gb.bhei*gb.k)/(bb3.y1-bb3.y0+1)/g.f;else k=gb.f*gb.k/g.f;}}else k=gifM(bb2,gb)*gb.k*megaHtRatio(+im.dataset.id)/gifM(bb,g);
+   /* 최소 크기: 옆으로 긴 메가도 진화 전 높이의 75%(도감 키 비율 반영)보다 작아지지 않게 해요. 옆 칸과 겹쳐도 괜찮아요 */
+   k=Math.max(k,.75*gb.bhei*gb.k*Math.max(.7,Math.min(1.3,megaHtRatio(+im.dataset.id)))/g.bhei);{const rr=Math.max(MEGA_MIN_BOOST,Math.min(1.35,megaHtRatio(+im.dataset.id))),bulkB=Math.sqrt(gb.bwid*gb.bhei)*gb.k,bulkM=Math.sqrt(g.bwid*g.bhei);if(bulkM>0&&bulkB>0)k=Math.max(k,bulkB*rr/bulkM);}
+   k=Math.min(k,H*1.3/g.bhei,(g.wide?W*3.6:W*1.8)/g.bwid);k=Math.max(.4,k);}}catch(e){}}
+  /* GIF 없이 도트·일러스트로 나오는 메가는 진화 전보다 작아 보이지 않게 최소 크기를 보장하고, 메가 그림이 아예 없어 진화 전 그림으로 대신 나오는 메가도 메가답게 조금 키워요 */
+  try{const mgid=+im.dataset.mgid||0,isSt=!(/\.gif(\?|$)/i.test(src)||psAnimWebp(src));
+   if(mg0&&isSt){const tgt=Math.min(1,Math.max(.6,htFrac(mid)*MEGA_STATIC_FILL)),kf=Math.min(tgt*H/g.bhei,(g.wide?1.5:1.15)*W/g.bwid);if(kf>k)k=kf;}
+   else if(mgid&&im.dataset.mf==='1'){const rr=Math.max(MEGA_MIN_BOOST,Math.min(1.35,megaHtRatio(mgid)));k=Math.min(k*rr,H*1.2/g.bhei,(g.wide?W*3.6:W*1.8)/g.bwid);}
+   k=Math.max(.4,k);}catch(e){}
   const cxp=(bx0+bx1)/2;
   if(Math.abs(k-1)<.06&&by1>=H-2)return;
-  im.dataset.gfit='1';
+  im.dataset.gfit='1';im.dataset.gfs=src;
   im.style.transformOrigin=(cxp/W*100).toFixed(2)+'% '+(by1/H*100).toFixed(2)+'%';
   im.style.translate=((W/2-cxp)/W*100).toFixed(2)+'% '+((H-by1)/H*100).toFixed(2)+'%';
   if(Math.abs(k-1)>=.06)im.style.scale=k.toFixed(3);
+  try{if(im.closest('.unit.mega'))FIT_CACHE.set(src,{s:im.style.scale||'',t:im.style.translate||'',o:im.style.transformOrigin||''});}catch(e){}
  }catch(err){}});}catch(err){}}
 document.addEventListener('load',e=>{const im=e.target;if(im&&im.tagName==='IMG'&&im.closest&&im.closest('#myLane .unit .sp,#foeLane:not(.wildLane) .unit .sp'))gifFit(im);},true);
 /* 전투 화면이 다시 그려질 때마다(이미 불러온 GIF는 load 이벤트가 오지 않아요) 크기 보정을 다시 걸어 줘요 → 출전 직후 커졌다가 작아지는 문제 해결 */
@@ -8359,7 +8407,7 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
  const valid=targetsFor(B.sel);
  const unitH=(u,P,i)=>{if(!u)return '';const friendly=P===me;const mine=friendly&&(!B.coop||Number(u.coopOwner??0)===B.coop.active);const m=MON[u.id];const ready=mine&&my&&u.att>0&&!u.frozen;
   return `<div class="unit${u.mg?' mega':''}${u.mg&&PRIMAL[u.id]?' primal':''}${u.gm?' gmax':''}${u.gm&&u.id===890?' eterna':''}${ready?' ready':''}${mine&&B.sel===i?' sel':''}${!friendly&&valid.units.includes(i)?' tgt':''}${isTaunt(u)?' taunt':''}${u.frozen?' frozen':''}${u.frozen&&u.moon?' moonstun':''}${u.shield?' shielded':''}${mine&&B.itemTargetMode&&!u.frozen?' itemTarget':''}${!friendly&&B.moonTargetMode?' itemTarget':''}${mine&&!ready&&my?' zz':''}" data-i="${i}"${u.mg?` style="--mc:${TYPE_COL[kwType(m)]||'#8ad0ff'}"`:''}>
-   ${B.coop?(()=>{const _L=(P===me?B.coop.players:(B.coop.foeTeam||B.coop.players));let ow=Number(u.coopOwner??0);if(!Number.isInteger(ow)||ow<0||ow>3||ow>=Math.max(2,_L.length))ow=0;const nm=String((_L[ow]&&_L[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${u.gm?monImgU(GM_BASE+(u.gb||u.id),'front',true).replace('<img class="','<img class="'+(gmaxDot()?'gmDot ':'')):monImgU(u.mg||u.id,mine?'back':'anim',!mine)}</div><div class=un>${esc(u.fz&&FORMNAME[u.mg]?FORMNAME[u.mg]:m.name)}</div><div class=tdots>${(u.fz&&FUSE_TYPES[u.mg]||m.types).map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
+   ${B.coop?(()=>{const _L=(P===me?B.coop.players:(B.coop.foeTeam||B.coop.players));let ow=Number(u.coopOwner??0);if(!Number.isInteger(ow)||ow<0||ow>3||ow>=Math.max(2,_L.length))ow=0;const nm=String((_L[ow]&&_L[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${u.gm?monImgU(GM_BASE+(u.gb||u.id),'front',!mine).replace('<img class="','<img class="'+(gmaxDot()?'gmDot ':'')):monImgU(u.mg||u.id,mine?'back':'anim',!mine)}</div><div class=un>${esc(u.fz&&FORMNAME[u.mg]?FORMNAME[u.mg]:m.name)}</div><div class=tdots>${(u.fz&&FUSE_TYPES[u.mg]||m.types).map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
    <div class=us><span class="st atk">${u.atk}</span><span class="st hp"${u.hp<u.max?' style="background:#d9393f"':''}>${u.hp}</span></div></div>`;};
  const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=(B.coop&&!(B.t2&&B.t2.boss))?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front','',P===B.foe)}</div><div><div class=hn>${esc(P.name)}${P.t2done?' ✔':''}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
   const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),sp=Math.max(0,Math.min(P.sunMana||0,P.mana-bp)),bl=P.mana-bp-sp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}${Array.from({length:sp},()=>'<i class="on sun"></i>').join('')}${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}<b>${bl}${bp+sp?`<span class=manaPlus>+${bp+sp}</span>`:''}/${den}</b></div>`;};
@@ -11530,7 +11578,7 @@ originpulse(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,big=sc>=1.3,dx=bx-ax,dy=by-ay,
   for(let i=0;i<6;i++){const an=hz(i)*TAU+k*3,d=R*(3-2.6*e)*(.6+.5*hz(i+3));bub(ax+cos(an)*d,ay+sin(an)*d*.85,R*(.1+.12*hz(i+5)),Math.min(1,k*3));}});
  setTimeout(()=>{F.hold(100);shk();},tC-40);
  // 2) 물구슬 다섯 개가 시전자 주위 여기저기에 떠오르고, 차례로 레이저처럼 쏘아져 상대에 꽂혀요
- const OFF=[[-1.85,.55],[-1.15,1.05],[1.15,1.05],[1.85,.55],[0,1.35]],hc=(()=>{let x=ax,y=ay;try{if(c.fromEl){const q=center(c.fromEl);x=q[0]/m.S;y=q[1]/m.S;}}catch(e){}return[x,y];})(),orbP=(w,kt)=>{const o=OFF[w],bob=Math.sin(kt*.006+w*1.9)*R*.1,bx2=Math.cos(kt*.004+w*2.3)*R*.06;return [hc[0]+o[0]*R*Sx+bx2,hc[1]+o[1]*R*Sx+bob];};
+ const OFF=[[-2.25,-.4],[-1.25,-1.6],[1.25,-1.6],[2.25,-.4],[0,-2.05]],hc=(()=>{let x=ax,y=ay;try{if(c.fromEl){const q=center(c.fromEl);x=q[0]/m.S;y=q[1]/m.S;}}catch(e){}return[x,y];})(),orbP=(w,kt)=>{const o=OFF[w],bob=Math.sin(kt*.006+w*1.9)*R*.1,bx2=Math.cos(kt*.004+w*2.3)*R*.06;return [hc[0]+o[0]*R*Sx+bx2,hc[1]+o[1]*R*Sx+bob];};
  for(let w=0;w<5;w++){const tf=tC+[0,1,2,3,4][w]*gap,ta=Math.round(tC*.35+[0,3,1,4,2][w]*55),life=tf+300-ta,tx=bx+(hz(w*3+1)-.5)*R*.9,ty=by+(hz(w*5+2)-.5)*R*.8;
   // 물구슬
   add(ta,life,(k,p)=>{const kt=p.age,fa=tf-ta,gr=ez.out(Math.min(1,kt/260)),pre=kt>fa-140&&kt<=fa,after=kt>fa?cl((kt-fa)/300,0,1):0,[x,y]=orbP(w,kt),Rb=R*.34*Sx*gr*(1+(pre?.18:0)+(kt>fa?.25*(1-after):0))*(1-after*.9),al=1-after;
@@ -12298,13 +12346,21 @@ bubblepulse(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=480,tF=380,tH=tC+tF,
   flare(bx,by,R*(1+1.6*e),BP[3],a,k*.8);});
  eRingFlat(bx,by+R*.35,R*3.2,BP[2],tH,720);eRingFlat(bx,by+R*.35,R*4.8,BP[3],tH+110,820);eRingFlat(bx,by+R*.35,R*6,BP[1],tH+240,880);
  ring(bx,by,R*3.8,BP[4],tH,560,2);ring(bx,by,R*5,BP[3],tH+90,640,1);
- // 물기둥: 명중 지점에서 맑은 물기둥이 솟았다가 가라앉아요
- add(tH+50,860,(k)=>{const h=Math.min(R*4.4,Math.max(0,by-4))*ez.out(Math.min(1,k*2.4))*(k>.62?1-(k-.62)/.38:1),w=R*(.95+.2*sin(k*22)),a=k>.7?1-(k-.7)/.3:1;if(h<2)return;
-  P.poly([[bx-w,by+R*.2],[bx-w*.78,by-h*.5],[bx-w*.5,by-h],[bx+w*.5,by-h],[bx+w*.78,by-h*.5],[bx+w,by+R*.2]],BP[1],.55*a);
-  P.poly([[bx-w*.66,by+R*.2],[bx-w*.5,by-h*.5],[bx-w*.3,by-h*.95],[bx+w*.3,by-h*.95],[bx+w*.5,by-h*.5],[bx+w*.66,by+R*.2]],BP[2],.6*a);
-  P.poly([[bx-w*.3,by+R*.2],[bx-w*.2,by-h*.5],[bx+w*.2,by-h*.5],[bx+w*.3,by+R*.2]],BP[3],.7*a);
-  P.ga(.85*a);P.disc(bx,by-h,Math.max(1,w*.62),BP[4]);P.disc(bx-w*.55,by-h*.9,Math.max(1,w*.34),BP[3]);P.disc(bx+w*.55,by-h*.9,Math.max(1,w*.34),BP[3]);P.ga(1);
-  for(let i=0;i<6;i++){const u=((k*1.6+hz(i))%1);bub(bx+(hz(i+4)-.5)*w*1.2,by-u*h,R*.12+u*R*.08,.9*a*(1-u*.5));}});
+ // 물기둥: 명중 지점에서 출렁이는 물기둥이 솟구쳐 끝이 갈라져 쏟아져 내리고, 밑동에서 물거품이 일어요
+ add(tH+50,860,(k)=>{const t=k*860,gr=ez.out(Math.min(1,k*2.2)),fall=k>.58?ez.in((k-.58)/.42):0,hMax=Math.min(R*4.6,Math.max(0,by-4)),h=hMax*gr*(1-fall*.9),a=k>.8?1-(k-.8)/.2:1;if(h<3)return;
+  const n=20,base=by+R*.25,pos=i=>{const u=i/n,w=R*(.5+.7*Math.pow(1-u,3.5)+.1*u)*(1+.12*sin(u*9-t*.02+i))*(1-fall*.3);return[bx+sin(u*5-t*.012)*R*.28*u,base-h*u,Math.max(1,w)];};
+  // 맑은 물기둥: 겹쳐진 둥근 덩어리로 울퉁불퉁한 가장자리를 만들어요 (밑동은 넓게 퍼지고 위로 갈수록 가늘어요)
+  P.ga(a);for(let L=0;L<3;L++)for(let i=0;i<=n;i++){const q=pos(i);P.disc(q[0],q[1],Math.max(1,q[2]*[1,.72,.38][L]),[BP[1],BP[2],BP[3]][L]);}
+  P.ga(.75*a);for(let s2=0;s2<2;s2++){let pa=null;for(let i=1;i<=n-1;i++){const q=pos(i),pt=[q[0]+(s2?.35:-.45)*q[2]+sin(i*1.3+t*.01)*q[2]*.08,q[1]];if(pa)P.line(pa[0],pa[1],pt[0],pt[1],s2?BP[3]:BP[4],1);pa=pt;}}
+  P.ga(1);
+  const top=pos(n);
+  // 끝에서 우산처럼 갈라져 사방으로 쏟아지는 물줄기와 물보라
+  for(let sd=-1;sd<=1;sd+=2)for(let j=0;j<4;j++){const pts=[],sp=R*(.8+.5*j)*(1+.3*gr),dr=R*(2+.8*j)*(.4+.6*gr);for(let q2=0;q2<=7;q2++){const u=q2/7;pts.push([top[0]+sd*sp*u,top[1]-R*(.55-.12*j)*Math.sin(u*PI*.8)+dr*u*u]);}rib(pts,u=>R*(.15-.09*u)+.4,j%2?BP[3]:BP[2],.9*a);rib(pts,u=>R*.05+.3,BP[4],.9*a);}
+  P.ga(a);for(let i=0;i<9;i++){const an=hz(i+1)*TAU,d=R*(.12+.4*hz(i+5));P.disc(top[0]+cos(an)*d,top[1]+sin(an)*d*.6-R*.1,Math.max(1,R*(.1+.12*hz(i+8))),i%2?BP[4]:BP[3]);}
+  for(let i=0;i<16;i++){const u=((k*1.7+hz(i))%1),dir=hz(i+3)>.5?1:-1,x=top[0]+dir*R*(.3+2*hz(i+6))*u,y=top[1]-R*(1.3*hz(i+9))*Math.sin(Math.min(1,u*1.4)*PI*.5)+R*2.8*u*u;P.ga(a*(1-u*.5));P.disc(x,y,Math.max(1,R*(.07+.07*hz(i+2))),i%3?BP[3]:BP[4]);}
+  P.ga(1);
+  // 밑동에서 이는 물거품
+  P.ga(.9*a);for(let i=0;i<12;i++){const an=i/12*TAU+t*.002,rr=R*(1.3+.35*sin(t*.01+i));P.disc(bx+cos(an)*rr,base+sin(an)*rr*.3,Math.max(1,R*(.18+.14*hz(i+4))),i%2?BP[4]:BP[3]);}P.ga(1);});
  // 떠오르는 물방울과 쏟아지는 물방울 비
  add(tH,1100,(k)=>{for(let i=0;i<16;i++){const d0=hz(i+11)*.3,u=cl((k-d0)/.7,0,1);if(u<=0||u>=1)continue;bub(bx+(hz(i+2)-.5)*R*2.6+sin(u*7+i)*R*.18,by+R*.3-u*R*(1.2+1.8*hz(i+6)),R*(.12+.2*hz(i+8)),sin(u*PI)*.95);}});
  add(tH+120,820,(k)=>{for(let i=0;i<14;i++){const d0=hz(i+21)*.45,u=cl((k-d0)/.5,0,1);if(u<=0||u>=1)continue;const x=bx+(hz(i+3)-.5)*R*3.6,y=by-R*3+u*R*3.6;P.ga(1-u*.5);P.line(x,y,x-1.4,y-R*.5,i%2?BP[3]:BP[2],1);P.px(x-1.4,y-R*.5,BP[4]);}P.ga(1);});
@@ -29038,6 +29094,8 @@ async function t2Pump(){if(T2.pumping)return;T2.pumping=true;
 function t2Unend(d){const T=B.t2,team=d.team,idx=d.idx,p=T.teams[team]&&T.teams[team][idx];
  if(!p||T2.proc||team!==T.turn||!T.done[team][idx]||T.done[team].every(Boolean)||p.t2uc||(!T.boss&&p.hp<=0))return;
  p.t2uc=1;p.t2done=0;T.done[team][idx]=0;try{t2Sync();t2Rest();}catch(e){}try{banner.local=1;banner('↩ 취소',esc(p.name)+'님이 다시 행동해요',1100);banner.local=0;t2Raw({t:'boss-banner',b1:'↩ 취소',b2:esc(p.name)+'님이 다시 행동해요',ms:1100});}catch(e){}renderBattle();t2Broadcast(true);}
+// 효과/이미지가 멈춰도 처리 잠금이 영원히 안 풀리지 않게 30초 안전장치
+const T2G=p=>Promise.race([Promise.resolve(p),new Promise(r=>setTimeout(()=>{console.warn('t2 action timeout');r();},30000))]);
 async function t2Exec(d){if(!B||!B.t2||B.over)return;if((d.a||{}).type==='unend'){t2Unend(d);return;}const T=B.t2,team=d.team,idx=d.idx;
  if(team!==T.turn||T.done[team][idx]||!T.teams[team][idx])return;
  const a=d.a||{};let fh=(a.tg&&a.tg.hero&&(a.tg.h===0||a.tg.h===1))?a.tg.h:0;if(!T.boss){const ft=T.teams[1-team];if(ft[fh]&&ft[fh].hp<=0&&ft[1-fh]&&ft[1-fh].hp>0)fh=1-fh;}
@@ -29049,22 +29107,22 @@ async function t2Exec(d){if(!B||!B.t2||B.over)return;if((d.a||{}).type==='unend'
   const ownU=si=>{const u=P.board[Number(si)];return(u&&Number(u.coopOwner??0)===idx)?u:null;};
   if(a.type==='summon'){const s=Number(a.s),h=Number(a.h);
    if(!Number.isInteger(s)||s<0||s>=P.board.length||!Number.isInteger(h)||h<0||h>=P.hand.length||P.board[s]||(!MON[P.hand[h]]&&!isRandomMonCard(P.hand[h])))return;
-   B.busy=false;await summon(P,h,s);}
+   B.busy=false;await T2G(summon(P,h,s));}
   else if(a.type==='item'){const h=Number(a.h);if(!Number.isInteger(h)||h<0||h>=P.hand.length)return;const card=P.hand[h];
    if(!isItemCard(card))return;if(card.item==='thunder'&&!ownU(a.target))return;
-   B.busy=false;await playItem(P,h,Number(a.target??-1),true);}
+   B.busy=false;await T2G(playItem(P,h,Number(a.target??-1),true));}
   else if(a.type==='attack'){const si=Number(a.si),u=ownU(si);if(!u||!(u.att>0)||u.frozen)return;
    const tg=a.tg||{};const t=targetsFor(si);
    if(tg.hero){if(!t.hero)return;}else{if(!Number.isInteger(Number(tg.u))||!t.units.includes(Number(tg.u)))return;}
-   B.busy=false;await playerAttack(si,tg.hero?{hero:1}:{u:Number(tg.u)},!!a.ok,!!a.ok&&!!a.crit,a.hint?1:0);}
-  else if(a.type==='power'){B.busy=false;await bossApplyPower(!!a.ok,!!a.ok&&!!a.crit);}
-  else if(a.type==='mega'){const si=Number(a.si),u=ownU(si);if(!u||((P.qc||0)-(P.mgBase||0))<evoNeedFor(evoBase(u.id),P))return;B.busy=false;await megaDo(P,si);}
-  else if(a.type==='fuse'){const si=Number(a.si),pj=Number(a.pj);if(!fuseRemoteOk(P,si,pj,idx))return;B.busy=false;await fuseDo(P,si,pj);}
+   B.busy=false;await T2G(playerAttack(si,tg.hero?{hero:1}:{u:Number(tg.u)},!!a.ok,!!a.ok&&!!a.crit,a.hint?1:0));}
+  else if(a.type==='power'){B.busy=false;await T2G(bossApplyPower(!!a.ok,!!a.ok&&!!a.crit));}
+  else if(a.type==='mega'){const si=Number(a.si),u=ownU(si);if(!u||((P.qc||0)-(P.mgBase||0))<evoNeedFor(evoBase(u.id),P))return;B.busy=false;await T2G(megaDo(P,si));}
+  else if(a.type==='fuse'){const si=Number(a.si),pj=Number(a.pj);if(!fuseRemoteOk(P,si,pj,idx))return;B.busy=false;await T2G(fuseDo(P,si,pj));}
   else if(a.type==='trainerSkill'){const sk=String(a.skill||''),lv=Math.max(1,Math.min(5,Number(a.level)||1)),slot=Number(a.slot),U=B.trainerSkillUsed;
    if(!['heal','counter','attack','cheer'].includes(sk)||U[sk])return;
    if(sk==='heal'){P.hp=Math.min(P.max||15,P.hp+lv);U.heal=true;fx(heroEl(P),`+${lv} 회복`,'txt');try{trainerHealFx(heroEl(P));}catch(e){}}
    else if(sk==='counter'){P.ctr=lv;U.counter=true;try{trainerCounterReadyFx(heroEl(P));}catch(e){}}
-   else if(sk==='attack'){const u=B.foe.board[slot];if(!u||u.hp<=0)return;U.attack=true;try{await trainerAtkFx(heroEl(P),unitEl(B.foe,slot),lv);}catch(e){}await dealUnit(B.foe,slot,lv);checkEnd();}
+   else if(sk==='attack'){const u=B.foe.board[slot];if(!u||u.hp<=0)return;U.attack=true;try{await trainerAtkFx(heroEl(P),unitEl(B.foe,slot),lv);}catch(e){}await T2G(dealUnit(B.foe,slot,lv));checkEnd();}
    else if(sk==='cheer'){const u=ownU(slot);if(!u||u.hp<=0)return;const ca=CHEER_ATK[lv]||0,cs=CHEER_SHIELD[lv]||0;u.atk+=ca;u.shield=(u.shield||0)+cs;U.cheer=true;fx(unitEl(P,slot),`공격 +${ca} · 방어막 +${cs}`,'txt');try{trainerCheerFx(unitEl(P,slot));}catch(e){}}}
  }catch(e){console.error('t2 exec',e);}
  finally{T2.proc=false;if(B&&B.t2&&B.coop){B.coop.processing=false;if(!B.t2.fin||true){try{t2Sync();t2Rest();}catch(e){}}B.busy=false;banner.local=0;renderBattle();t2Broadcast(true);}}}
@@ -29211,7 +29269,7 @@ function t2FvShow(d){t2FvHide();if(!(B&&B.t2)||BC.host)return;
 // 알아서 풀기: 처리 중이 아닌데 방장 화면이 잠겨 있거나, 처리가 너무 오래 멈춰 있으면 풀어 줘요
 setInterval(()=>{try{if(!B||!B.t2||!BC.host||B.over)return;const now=Date.now();const q=document.getElementById('bq');const qOpen=!!(q&&q.classList.contains('on'));
  if(B.busy&&!T2.proc&&!T2.pumping&&!qOpen){T2.bz=T2.bz||now;if(now-T2.bz>4000){T2.bz=0;B.busy=false;renderBattle();t2Broadcast(true);}}else T2.bz=0;
- if(T2.proc&&!T2.defWait&&!qOpen){T2.pz=T2.pz||now;if(now-T2.pz>150000){T2.pz=0;t2Unstick();toast('멈춰 있던 처리를 풀었어요');renderBattle();t2Broadcast(true);}}else T2.pz=0;
+ if(T2.proc&&!T2.defWait&&!qOpen){T2.pz=T2.pz||now;if(now-T2.pz>40000){T2.pz=0;t2Unstick();toast('멈춰 있던 처리를 풀었어요');renderBattle();t2Broadcast(true);}}else T2.pz=0;
  if(T2.queue.length&&!T2.pumping&&!T2.proc)t2Pump();
  if(!T2.proc&&!T2.pumping&&!T2.queue.length&&now-(T2.lastSend||0)>5000)t2Broadcast(true);}catch(e){}},2000);
 function t2HeroAttack(hi){if(!B||!B.t2||B.busy||B.sel<0||B.side!=='me'||t2Done1())return;closeInfo();const si=B.sel,me=B.me,u=me.board[si];if(!u)return;
@@ -29882,4 +29940,13 @@ body:has(#gpWrap) #bg *,body:has(#gpWrap) #bgMons *,body:has(#gpWrap) #bgImg{ani
  window.BATTLETEST={start:startTest,exit:exitTest};
 })();
 </script>
+<style id="mgFix">
+/* 정지 그림 메가: 숨쉬기 + (기존) 은은한 빛 깜빡임을 함께 — 예전엔 빛 깜빡임이 숨쉬기를 덮어썼어요 */
+@media (prefers-reduced-motion:no-preference){html:not(.lowfx) .unit.mega .sp img.mgSt.idle{animation:idleBreathU 2.6s ease-in-out infinite,megaPulse 2.2s ease-in-out infinite;animation-delay:var(--d,0s),0s;transform-origin:50% 100%}}
+/* 정지 그림은 빛 번짐을 줄여 또렷하게 */
+.unit.mega .sp img.mgSt{filter:drop-shadow(0 0 1px rgba(255,255,255,.9)) drop-shadow(0 0 6px var(--ea,#8ad0ff))}
+.unit .sp img.mgSoft{image-rendering:auto!important}
+/* 도발(벽) 포켓몬의 갈색 테두리: 포켓몬 그림 아래(뒤)에 깔려서 그림이 테두리 위로 보이게 */
+#myLane .unit.taunt::before,#foeLane:not(.wildLane) .unit.taunt::before,#myLane .unit.ready.taunt::before,#foeLane:not(.wildLane) .unit.ready.taunt::before{z-index:0!important}
+</style>
 </body></html>
