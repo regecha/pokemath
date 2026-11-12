@@ -7281,7 +7281,7 @@ const SPR_BASE='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites
 // ===== 거다이맥스 이미지 (PokeAPI에서 '이름-gmax'로 찾아 주소를 저장해 둬요) =====
 const GM_BASE=20000; // 거다이맥스 그림용 가짜 번호 = 20000 + 원래 도감 번호
 const GMAX={3:'venusaur-gmax',6:'charizard-gmax',9:'blastoise-gmax',12:'butterfree-gmax',25:'pikachu-gmax',52:'meowth-gmax',68:'machamp-gmax',94:'gengar-gmax',99:'kingler-gmax',131:'lapras-gmax',133:'eevee-gmax',143:'snorlax-gmax',569:'garbodor-gmax',809:'melmetal-gmax',812:'rillaboom-gmax',815:'cinderace-gmax',818:'inteleon-gmax',823:'corviknight-gmax',826:'orbeetle-gmax',834:'drednaw-gmax',839:'coalossal-gmax',841:'flapple-gmax',842:'appletun-gmax',844:'sandaconda-gmax',849:'toxtricity-amped-gmax',851:'centiskorch-gmax',858:'hatterene-gmax',861:'grimmsnarl-gmax',869:'alcremie-gmax',879:'copperajah-gmax',884:'duraludon-gmax',892:'urshifu-single-strike-gmax',890:'eternatus-eternamax'};
-const GMAXV={1849:'toxtricity-lowkey-gmax',1892:'urshifu-rapidstrike-gmax'}; // 고른 모습으로 거다이맥스할 때 쓰는 그림 번호(1000+원래 번호)
+const GMAXV={}; // 거다이맥스는 한 가지 모습만 써요 (예전: 스트린더 저음 1849, 우라오스 연격 1892 — 고르는 기능을 껐어요)
 function gmaxPickB(id){try{const p=S.meta.gmaxPick&&S.meta.gmaxPick[id];if(p>0&&GMAXV[1000+id])return 1000+id;}catch(e){}return id;}
 const gmWord=id=>id===890?'무한다이맥스':'거다이맥스';   // 무한다이노는 '무한다이맥스'로 불러요
 const gmaxCache=()=>{try{return JSON.parse(localStorage.getItem('gmaxArt')||'{}')||{};}catch(e){return {};}};
@@ -7472,9 +7472,9 @@ function monImg(id,kind='front',cls='',ns){if((kind==='anim'||kind==='back')&&S.
 /* ===== 전투 칸의 포켓몬 그림: 그림 파일 아래쪽의 투명한 여백을 없애 발이 바닥에 닿게 해요 ===== */
 /* 실제 키가 작은 포켓몬(꼬렛·메타몽 등)은 그림 여백을 채우느라 너무 커지지 않게, 도감 키에 맞춰 확대 한도를 둬요 */
 const NOBIG0={485:1,807:1,888:1,889:1},NOBIG=new Proxy({},{get:(t,id)=>{let b=+id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];return NOBIG0[b];}}); /* 히드런·제라오라·자시안·자마젠타: 도감 키(1.7m·1.5m)보다 커 보이지 않게 확대를 막아요 */
-function htCap(id){try{if(NOBIG[id])return 1;let b=id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];const h=(id>10000&&typeof MEGA_HT!=='undefined'&&MEGA_HT[id])||(MON[b]&&MON[b].ht);if(!(h>0))return 1.6;return h<=.4?1.05:h<=.7?1.15:h<=1?1.3:h<=1.5?1.45:1.6;}catch(e){return 1.6;}}
+function htCap(id){try{if(NOBIG[id])return 1;let b=id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];const h=(id>10000&&megaHt(id))||(MON[b]&&MON[b].ht);if(!(h>0))return 1.6;return h<=.4?1.05:h<=.7?1.15:h<=1?1.3:h<=1.5?1.45:1.6;}catch(e){return 1.6;}}
 /* 도감 키에 맞는 '몸 높이 비율' 한도: GIF는 그림 크기에 딱 맞게 잘려 있어서 작은 포켓몬도 칸을 가득 채워 커져 버리므로, 작은 포켓몬은 칸의 일부만 차지하게 줄여요 */
-function htFrac(id){try{let b=id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];const h=(id>10000&&typeof MEGA_HT!=='undefined'&&MEGA_HT[id])||(MON[b]&&MON[b].ht);if(!(h>0))return 1;const T=[[.2,.30],[.4,.38],[.6,.46],[.8,.53],[1,.58],[1.5,.70],[2,.80],[3,.92]];if(h<=T[0][0])return T[0][1];for(let i=1;i<T.length;i++){if(h<=T[i][0]){const a=T[i-1],b2=T[i];return a[1]+(b2[1]-a[1])*(h-a[0])/(b2[0]-a[0]);}}return 1;}catch(e){return 1;}}
+function htFrac(id){try{let b=id;if(b>10000&&typeof MEGAB!=='undefined'&&MEGAB[b])b=MEGAB[b];const h=(id>10000&&megaHt(id))||(MON[b]&&MON[b].ht);if(!(h>0))return 1;const T=[[.2,.30],[.4,.38],[.6,.46],[.8,.53],[1,.58],[1.5,.70],[2,.80],[3,.92]];if(h<=T[0][0])return T[0][1];for(let i=1;i<T.length;i++){if(h<=T[i][0]){const a=T[i-1],b2=T[i];return a[1]+(b2[1]-a[1])*(h-a[0])/(b2[0]-a[0]);}}return 1;}catch(e){return 1;}}
 
 /* 메가·합체 그림: 기억해 둔 주소가 있으면 처음부터 그걸 써요 (없던 그림이면 처음부터 원래 포켓몬 도트) */
 {const __spU=spriteURL;spriteURL=function(id,kind,ns){try{const kd=(kind==='back'&&FRONT_GIF[id])?'anim':kind;if(id>10000&&id<GM_BASE&&MEGAB[id]&&(kind==='anim'||kind==='back')&&S.meta.settings.imgs){const sh=!ns&&shinyOn(id),v=megaGet(megaKey(id,kind,sh));if(v&&v!=='BASE')return v;if(v==='BASE')return __spU(MEGAB[id],kd,ns);if(S.meta.settings.anim==='gif')setTimeout(()=>{try{megaProbeAll(id,kind,sh);}catch(e){}},0);}if(kd!==kind)return __spU(id,kd,ns);}catch(e){}return __spU.apply(this,arguments);};}
@@ -7500,7 +7500,7 @@ function sdxProbe(id,kind,sh,orig){const key=sdxKey(id,kind,sh);if(sdxRes[key])r
   return u;})();}
 {const __sd=spriteURL;sdxOrig=__sd;spriteURL=function(id,kind,ns){try{if(sdxElig(id,kind)){const sh=!ns&&shinyOn(id),key=sdxKey(id,kind,sh),v=SDX[key];if(v&&v!=='-')return v;const o=__sd.apply(this,arguments);if(!v)setTimeout(()=>{try{sdxProbe(id,kind,sh,o);}catch(e){}},0);return o;}}catch(e){}return __sd.apply(this,arguments);};}
 const SPR_SHIFT=new Map();
-function monImgU(id,kind,ns){let h=monImg(id,kind,'',ns);try{const u=spriteURL(id,kind,ns),c=SPR_SHIFT.get(u);if(c&&c!==u)h=h.replace('src="'+u+'"','src="'+c+'" data-shifted="1"');}catch(e){}return h;}
+function monImgU(id,kind,ns){let h=monImg(id,kind,'',ns);try{const u=spriteURL(id,kind,ns),c=SPR_SHIFT.get(u);if(c&&c!==u&&!(id>10000&&id<GM_BASE&&MEGAB[id]))h=h.replace('src="'+u+'"','src="'+c+'" data-shifted="1"');}catch(e){}return h;}
 function shiftSpriteDown(src,cap,soft){return new Promise(res=>{try{const im=new Image();im.crossOrigin='anonymous';
  im.onload=()=>{try{const w=im.naturalWidth,h=im.naturalHeight;if(!w||!h||w>600||h>600)return res(src);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(im,0,0);
   const d=cx.getImageData(0,0,w,h).data;let minX=w,maxX=-1,minY=h,maxY=-1;
@@ -7515,7 +7515,7 @@ function shiftSpriteDown(src,cap,soft){return new Promise(res=>{try{const im=new
   else{const sw=Math.round(bw*k),sh=Math.round(bh*k);c2x.drawImage(im,minX,minY,bw,bh,Math.round((w-sw)/2),h-sh,sw,sh);}
   res(c2.toDataURL('image/png'));}catch(e){res(src);}};
  im.onerror=()=>res(src);im.src=src;}catch(e){res(src);}});}
-document.addEventListener('load',e=>{const im=e.target;if(!im||im.tagName!=='IMG'||im.dataset.shifted||!im.closest||!im.closest('#myLane .unit .sp,#foeLane:not(.wildLane) .unit .sp'))return;
+document.addEventListener('load',e=>{const im=e.target;if(!im||im.tagName!=='IMG'||im.dataset.shifted||!im.closest||!im.closest('#myLane .unit .sp,#foeLane:not(.wildLane) .unit .sp'))return;if(im.closest('.unit.mega')||(+im.dataset.id>10000&&+im.dataset.id<GM_BASE&&MEGAB[+im.dataset.id]))return; /* 메가는 gifFit이 위치를 맞추니, 그림을 한 번 더 아래로 옮기면 두 번 보정돼 바닥으로 내려가요 */
  const src=im.currentSrc||im.src;if(!src||src.startsWith('data:')||/\.gif(\?|$)/i.test(src)||psAnimWebp(src))return;
  if(SPR_SHIFT.has(src)){const c=SPR_SHIFT.get(src);if(c!==src){im.dataset.shifted='1';im.src=c;}return;}
  shiftSpriteDown(src,htCap(+im.dataset.id),/\/sprites\/dex|official-artwork/.test(src)).then(c=>{SPR_SHIFT.set(src,c);if(c!==src&&im.isConnected&&(im.currentSrc||im.src)===src){im.dataset.shifted='1';im.src=c;}});},true);
@@ -7537,11 +7537,17 @@ function gifCalc(bb,W,H,id){
 }
 /* 메가·원시회귀 실제 도감 키(m) — 진화 전 포켓몬 크기에 (메가 키 ÷ 진화 전 키)를 곱해 그려요. 표에 없는 메가는 진화 전과 같은 크기 */
 const MEGA_HT={10033:2.4,10034:1.7,10035:1.7,10036:1.6,10037:1.2,10038:1.4,10039:2.2,10040:1.7,10041:6.5,10042:2.1,10043:2.3,10044:1.5,10045:1.4,10046:2.0,10047:1.7,10048:1.9,10049:2.5,10050:1.9,10051:1.6,10052:1.0,10053:2.2,10054:1.3,10055:1.8,10056:1.2,10057:1.2,10058:1.9,10059:1.3,10060:2.7,10062:1.8,10063:2.3,10064:1.9,10065:1.9,10066:0.5,10067:1.5,10068:1.6,10069:1.5,10070:2.5,10071:2.0,10072:10.5,10073:2.2,10074:2.1,10075:1.1,10076:2.5,10077:9.8,10078:5.0,10079:10.8,10087:2.5,10088:1.3,10089:1.8,10090:1.4,10157:7.5,10155:3.8,10156:4.2,10086:6.5,10007:6.9,10006:0.4,10120:4.5,10256:1.8,10188:2.8,10189:2.9};
+/* 표에 없는 메가(레전즈 Z-A 새 메가 등)는 진화 전 키의 1.45배(+0.5m 이상)로 봐요 → 작은 채로 바닥에 붙어 나오지 않게 해요 */
+function megaHt(id){try{if(!(id>10000))return 0;if(MEGA_HT[id])return MEGA_HT[id];const b=MEGAB[id],bh=b&&MON[b]&&MON[b].ht;return 0;}catch(e){return 0;}}
+/* 메가별 추가 확대 배율 (GIF 보정 뒤에 한 번 더 곱해요. 더 키우려면 숫자를 올리고, 줄이려면 내려요) */
+const MEGA_EXTRA={};
+/* 바닥에서 위로 띄울 정도(칸 높이의 %) — 싸리용 메가 */
+const MEGA_LIFT={};
 /* 그림의 '덩치': 채워진 면적(√)과 높이의 기하평균. 가늘고 긴 그림·옆으로 퍼진 그림도 진화 전과 비슷한 무게감으로 맞춰 줘요 */
 function gifM(bb,g){return Math.sqrt(Math.sqrt(bb.n||bb.w*bb.h*.4)*g.f*g.bhei);}
 const MEGA_STATIC_FILL=1.15; /* GIF 없이 도트·일러스트로 나오는 메가의 최소 크기: 도감 키에 맞는 칸 채움 비율의 이 배수 (더 키우려면 1.25, 줄이려면 1.05) */
 const MEGA_MIN_BOOST=1.12; /* 메가는 진화 전보다 최소 이만큼은 커 보이게 (더 키우려면 1.2, 줄이려면 1.05) */
-function megaHtRatio(id){try{const b=MEGAB[id],mh=MEGA_HT[id],bh=MON[b]&&MON[b].ht;if(mh>0&&bh>0)return Math.max(.5,Math.min(3.2,mh/bh));}catch(e){}return 1;}
+function megaHtRatio(id){try{const b=MEGAB[id],mh=megaHt(id),bh=MON[b]&&MON[b].ht;if(mh>0&&bh>0)return Math.max(.5,Math.min(3.2,mh/bh));}catch(e){}return 1;}
 function gifFit(im){try{
  mgStatic(im);if(!im.isConnected)return;const src=im.currentSrc||im.src;
  if(im.dataset.gfit&&im.dataset.gfs&&im.dataset.gfs!==src){delete im.dataset.gfit;im.style.scale='';im.style.translate='';im.style.transformOrigin='';}/* 그림 주소가 바뀌면(메가 GIF를 더 좋은 것으로 교체 등) 예전 그림 기준의 크기 보정을 지우고 다시 계산해요 */
@@ -7564,11 +7570,12 @@ function gifFit(im){try{
    if(mg0&&isSt){const tgt=Math.min(1,Math.max(.6,htFrac(mid)*MEGA_STATIC_FILL)),kf=Math.min(tgt*H/g.bhei,(g.wide?1.5:1.15)*W/g.bwid);if(kf>k)k=kf;}
    else if(mgid&&im.dataset.mf==='1'){const rr=Math.max(MEGA_MIN_BOOST,Math.min(1.35,megaHtRatio(mgid)));k=Math.min(k*rr,H*1.2/g.bhei,(g.wide?W*3.6:W*1.8)/g.bwid);}
    k=Math.max(.4,k);}catch(e){}
+  try{const ex=MEGA_EXTRA[+im.dataset.mgid||+im.dataset.id];if(ex&&im.closest('.unit.mega'))k=Math.max(.4,Math.min(k*ex,H*1.3/g.bhei,(g.wide?W*3.6:W*1.8)/g.bwid));}catch(e){}
   const cxp=(bx0+bx1)/2;
-  if(Math.abs(k-1)<.06&&by1>=H-2)return;
+  if(Math.abs(k-1)<.06&&by1>=H-2&&!MEGA_LIFT[+im.dataset.mgid||+im.dataset.id])return;
   im.dataset.gfit='1';im.dataset.gfs=src;
   im.style.transformOrigin=(cxp/W*100).toFixed(2)+'% '+(by1/H*100).toFixed(2)+'%';
-  im.style.translate=((W/2-cxp)/W*100).toFixed(2)+'% '+((H-by1)/H*100).toFixed(2)+'%';
+  im.style.translate=((W/2-cxp)/W*100).toFixed(2)+'% '+((H-by1)/H*100-(MEGA_LIFT[+im.dataset.mgid||+im.dataset.id]&&im.closest('.unit.mega')?MEGA_LIFT[+im.dataset.mgid||+im.dataset.id]:0)).toFixed(2)+'%';
   if(Math.abs(k-1)>=.06)im.style.scale=k.toFixed(3);
   try{if(im.closest('.unit.mega'))FIT_CACHE.set(src,{s:im.style.scale||'',t:im.style.translate||'',o:im.style.transformOrigin||''});}catch(e){}
  }catch(err){}});}catch(err){}}
@@ -7606,7 +7613,7 @@ function cardHTML(id,opt={}){const m=MON[id];const kw=kwOf(m);const t=m.types[0]
   <div class=types>${typeChips(m)}</div>
   <div class=kw>${I(kw.ic)} <b>${m.rar===5?'★ ':''}${kw.n}</b><br>${kwD(m,kw)}</div>
   <div class=stats><span class="st atk">${m.atk}</span><span class=rar>${'★'.repeat(m.rar)}</span><span class="st hp">${m.hp}</span></div>
-  ${opt.cnt>1?`<span class=cnt>×${opt.cnt}</span>`:''}</div>`;}
+  ${opt.size==='deck'?spBadges(id):''}${opt.cnt>1?`<span class=cnt>×${opt.cnt}</span>`:''}</div>`;}
 function isBattleSpecial(v){return !!(v&&typeof v==='object'&&v.sp);}
 function isRandomMonCard(v){return isBattleSpecial(v)&&v.sp==='random';}
 function isItemCard(v){return isBattleSpecial(v)&&v.sp==='item';}
@@ -7854,7 +7861,7 @@ function showCard(id){const m=MON[id],me=S.meta,own=me.col[id]||0;const kw=kwOf(
 let DEXF='all',DEXR=-1,DEXRAR=0;
 // ===== 도감: 메가·거다이맥스 모습이 두 가지 이상인 포켓몬은 그림만 바꿔 볼 수 있어요 =====
 const MEGA_ALT={718:[[10120,'퍼펙트폼'],[10301,'메가']],658:[[10294,'메가'],[10117,'지우개굴닌자']],6:[[10034,'X'],[10035,'Y']],150:[[10043,'X'],[10044,'Y']],26:[[10304,'X'],[10305,'Y']],359:[[10057,'기본'],[10307,'Z']],445:[[10058,'기본'],[10309,'Z']],448:[[10059,'기본'],[10310,'Z']],678:[[10314,'수컷'],[10326,'암컷']],801:[[10317,'기본'],[10318,'오리지널']],978:[[10322,'젖힌'],[10323,'늘어진'],[10324,'뻗은']]};
-const GMAX_ALT={849:[['toxtricity-gmax','증폭'],['toxtricity-lowkey-gmax','저음']],892:[['urshifu-gmax','일격'],['urshifu-rapidstrike-gmax','연격']]};
+const GMAX_ALT={}; // 거다이맥스 모습 고르기 없음: 스트린더(증폭)·우라오스(일격) 한 가지만 (예전: 증폭/저음, 일격/연격)
 const ALTI={};
 function altList(k,id){return k==='m'?MEGA_ALT[id]:GMAX_ALT[id];}
 function altIdx(k,id){const key=k+id;if(ALTI[key]==null){const l=altList(k,id);ALTI[key]=0;if(l&&k==='m'){const j=l.findIndex(x=>x[0]===megaPickGet(id));if(j>=0)ALTI[key]=j;}else if(l&&k==='g'){try{const p=S.meta.gmaxPick&&S.meta.gmaxPick[id];if(p>=0&&p<l.length)ALTI[key]=p;}catch(e){}}}return ALTI[key];}
@@ -7925,7 +7932,7 @@ function renderDex(){S.screen='dex';const me=S.meta;const own=ownCount();
   <div class="filters dexF" style="margin:8px 0">${[['all','전체'],['own','보유'],['evo','진화']].map(([k,n])=>`<button class="fbtn gB${DEXF===k?' on':''}" data-f="${k}">${n}</button>`).join('')}${[['mega','🔷특수진화','gM'],['gmax','🌋거다이맥스','gX']].map(([k,n,g])=>`<button class="fbtn ${g}${DEXF===k?' on':''}" data-f="${k}">${n}</button>`).join('')}</div>
   <div class="filters dexTypes" style="margin:8px 0">${TYPE_KO.map((n,i)=>{const c=TYPE_COL[i],on=DEXF===String(i);return `<button class="fbtn${on?' on':''}" data-f="${i}" style="${on?`--a:color-mix(in srgb,${c} 70%,#fff);--b:${c};--fr:color-mix(in srgb,${c} 65%,#000);--fg:#fff`:`--a:color-mix(in srgb,${c} 14%,#fff);--b:color-mix(in srgb,${c} 36%,#fff);--fr:color-mix(in srgb,${c} 70%,#fff);--fg:color-mix(in srgb,${c} 60%,#000)`}">${n}</button>`;}).join('')}</div>
   ${DEXF==='mega'?MGNOTE:DEXF==='gmax'?GMNOTE:`<div class=mut style="font-size:12px;margin-bottom:8px">일반·고급은 한 번에, 희귀는 조각 3개·영웅 5개·전설 8개를 모아야 내 카드가 돼요. 본 적 있는 포켓몬은 별가루로 조각을 만들 수 있어요. 카드팩에서 전설 조각이 나올 확률은 장마다 ${PACK_W[5]}%예요. 카드팩 40개 안에는 꼭 1장 나와요(지금 ${me.pity.p5}/40). 영웅 이상은 10팩 안에 꼭(지금 ${me.pity.p4}/10).</div>`}
-  <div class="dexGrid dex8${DEXF==='mega'||DEXF==='gmax'?' mgGrid':''}">${fl.map(id=>{const n=me.col[id]||0,seen=me.dexSeen[id];if(DEXF==='mega')return mgCell(id,n,seen);if(DEXF==='gmax')return gmCell(id,n,seen);return `<div class="dexCell ${n?'':seen?'seen':'none'}" data-id="${id}"><span class=no>${id}</span>${!n&&me.shard&&me.shard[id]?`<span class=n2 style="color:#9a6bff">${me.shard[id]}/${SHARD_NEED[MON[id].rar]}</span>`:''}${monImg(id)}<span class=nm>${n||seen?esc(MON[id].name):'???'}</span></div>`;}).join('')||'<p class=mut>아직 없어요</p>'}</div></div></div>`;
+  <div class="dexGrid dex8${DEXF==='mega'||DEXF==='gmax'?' mgGrid':''}">${fl.map(id=>{const n=me.col[id]||0,seen=me.dexSeen[id];if(DEXF==='mega')return mgCell(id,n,seen);if(DEXF==='gmax')return gmCell(id,n,seen);return `<div class="dexCell ${n?'':seen?'seen':'none'}" data-id="${id}"><span class=no>${id}</span>${n||seen?spBadges(id):''}${!n&&me.shard&&me.shard[id]?`<span class=n2 style="color:#9a6bff">${me.shard[id]}/${SHARD_NEED[MON[id].rar]}</span>`:''}${monImg(id)}<span class=nm>${n||seen?esc(MON[id].name):'???'}</span></div>`;}).join('')||'<p class=mut>아직 없어요</p>'}</div></div></div>`;
  bindHud();
  {const qi=$('#dexQ'),cells=[...$('#view').querySelectorAll('.dexGrid > [data-id]')];
   const ap=()=>{const t=DEXQ.trim().replace(/^#|^no\.?/i,'');let c=0;cells.forEach(el=>{const id=+el.dataset.id,m=MON[id];const seen=me.col[id]||me.dexSeen[id];const ok=!t||String(id)===t||String(id).startsWith(t)&&/^\d+$/.test(t)&&t.length>=2||(seen&&m&&m.name.includes(t));el.style.display=ok?'':'none';if(ok)c++;});const n=$('#dexQn');if(n)n.textContent=t?c+'마리':'';};
@@ -8209,6 +8216,17 @@ function megaCand(P){try{return P.board.some((u,i)=>u&&!u.mg&&u.hp>0&&megaOk(u.i
 const FUSE_COST=500;
 const FUSE={646:[{p:644,f:10022,n:'블랙 큐레무'},{p:643,f:10023,n:'화이트 큐레무'}],898:[{p:897,f:10194,n:'흑마 버드렉스'},{p:896,f:10193,n:'백마 버드렉스'}],800:[{p:791,f:10155,n:'황혼의 갈기 네크로즈마'},{p:792,f:10156,n:'새벽의 날개 네크로즈마'}]};
 const FUSE_FORM={};Object.keys(FUSE).forEach(b=>FUSE[b].forEach(x=>{FUSE_FORM[x.f]={b:+b,p:x.p,n:x.n};FORMNAME[x.f]=x.n;MEGAB[x.f]=+b;}));
+/* ===== 특수 표시 이름표: 메가 · 원시 · 변신 · 합체 · 합체짝 · 스킨 · 맥스 (도감 · 덱 짜기 · 전투 테스트 카드 위) ===== */
+const FUSEP={};Object.keys(FUSE).forEach(b=>FUSE[b].forEach(x=>{(FUSEP[x.p]=FUSEP[x.p]||[]).push(+b);}));
+const SP_ORDER=['메가','원시','변신','합체','합체짝','스킨','맥스'],SP_CODE={'메가':'M','원시':'W','변신':'S','합체':'F','합체짝':'P','스킨':'K','맥스':'G'};
+function spKinds(id){const k=[];
+ if(PRIMAL[id])k.push('원시');
+ else if(MEGA[id]){const f=MEGA[id];k.push((EVO_FM[f]||EVO_ID[id]||(FORMNAME[f]&&f!==10301))?'변신':'메가');}
+ const al=MEGA_ALT[id];if(al)al.forEach(x=>{if(/메가/.test(x[1])&&!k.includes('메가'))k.push('메가');if(/퍼펙트폼|지우개굴닌자/.test(x[1])&&!k.includes('변신'))k.push('변신');});
+ if(FUSE[id])k.push('합체');if(FUSEP[id])k.push('합체짝');
+ if(SKIN[id])k.push('스킨');if(GMAX[id])k.push('맥스');
+ return SP_ORDER.filter(x=>k.includes(x));}
+function spBadges(id){const k=spKinds(id);return k.length?`<span class=spTags>${k.map(x=>`<i class="spT sp${SP_CODE[x]}">${x}</i>`).join('')}</span>`:'';}
 Object.assign(MEGA_SD,{10022:'kyurem-black',10023:'kyurem-white',10193:'calyrex-ice',10194:'calyrex-shadow'});
 const fuseHas=id=>!!(FUSE[id]&&S.meta&&S.meta.fuse&&S.meta.fuse[id]);
 function fusePickGet(id){const l=FUSE[id];if(!l)return null;const p=S.meta&&S.meta.fusePick&&S.meta.fusePick[id];return l.find(x=>x.f===p)||l[0];}
@@ -8472,7 +8490,7 @@ function renderBattle(){if(!B||window.__sim)return;if(window.__fpsGuard)__fpsGua
  const valid=targetsFor(B.sel);
  const unitH=(u,P,i)=>{if(!u)return '';const friendly=P===me;const mine=friendly&&(!B.coop||Number(u.coopOwner??0)===B.coop.active);const m=MON[u.id];const ready=mine&&my&&u.att>0&&!u.frozen;
   return `<div class="unit${u.mg?' mega':''}${u.mg&&!u.fz&&PRIMAL[u.id]?' primal':''}${u.mg&&!u.fz&&evoCat(u.id)==='S'?' spform':''}${u.mg&&!u.fz&&evoCat(u.id)==='U'?' ultra':''}${u.mg&&u.fz?' fuse':''}${u.gm?' gmax':''}${u.gm&&u.id===890?' eterna':''}${ready?' ready':''}${mine&&B.sel===i?' sel':''}${!friendly&&valid.units.includes(i)?' tgt':''}${isTaunt(u)?' taunt':''}${u.frozen?' frozen':''}${u.frozen&&u.moon?' moonstun':''}${u.shield?' shielded':''}${mine&&B.itemTargetMode&&!u.frozen?' itemTarget':''}${!friendly&&B.moonTargetMode?' itemTarget':''}${mine&&!ready&&my?' zz':''}" data-i="${i}"${u.mg?` style="--mc:${TYPE_COL[kwType(m)]||'#8ad0ff'}"`:''}>
-   ${B.coop?(()=>{const _L=(P===me?B.coop.players:(B.coop.foeTeam||B.coop.players));let ow=Number(u.coopOwner??0);if(!Number.isInteger(ow)||ow<0||ow>3||ow>=Math.max(2,_L.length))ow=0;const nm=String((_L[ow]&&_L[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${u.gm?monImgU(GM_BASE+(u.gb||u.id),'front',!mine).replace('<img class="','<img class="'+(gmaxDot()?'gmDot ':'')):monImgU(u.mg||u.id,mine?'back':'anim',!mine)}</div><div class=un>${esc(u.fz&&FORMNAME[u.mg]?FORMNAME[u.mg]:m.name)}</div><div class=tdots>${(u.fz&&FUSE_TYPES[u.mg]||m.types).map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
+   ${B.coop?(()=>{const _L=(P===me?B.coop.players:(B.coop.foeTeam||B.coop.players));let ow=Number(u.coopOwner??0);if(!Number.isInteger(ow)||ow<0||ow>3||ow>=Math.max(2,_L.length))ow=0;const nm=String((_L[ow]&&_L[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp>${u.gm?monImgU(GM_BASE+(u.gb||u.id),'front',!mine).replace('<img class="','<img class="'+(gmaxDot()?'gmDot ':'')):monImgU(u.mg||u.id,mine?'back':'anim',!mine)}</div><div class=un>${esc(u.fz&&FORMNAME[u.mg]?FORMNAME[u.mg]:m.name)}</div><div class=tdots>${(u.fz&&FUSE_TYPES[u.mg]||unitTypes(u,true)).map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
    <div class=us><span class="st atk">${u.atk}</span><span class="st hp"${u.hp<u.max?' style="background:#d9393f"':''}>${u.hp}</span></div></div>`;};
  const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=(B.coop&&!(B.t2&&B.t2.boss))?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${monImg(P.av,'front','',P===B.foe)}</div><div><div class=hn>${esc(P.name)}${P.t2done?' ✔':''}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
   const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),sp=Math.max(0,Math.min(P.sunMana||0,P.mana-bp)),bl=P.mana-bp-sp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}${Array.from({length:sp},()=>'<i class="on sun"></i>').join('')}${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}<b>${bl}${bp+sp?`<span class=manaPlus>+${bp+sp}</span>`:''}/${den}</b></div>`;};
@@ -8537,10 +8555,10 @@ function showItemInfo(v,o={}){if(window.__sim)return;let b=$('#bInfo');if(!b){b=
  b.classList.add('on');
  $('#biX').onclick=()=>{sfx('tap');closeInfo();B.pick=-1;renderBattle();};
  const u=$('#biUse');if(u)u.onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex))return;sfx('tap');useItemCard(o.hand);};}
-function showInfo(id,o={}){if(window.__sim)return;const m=MON[id],kw=kwOf(m),t=kwType(m);let b=$('#bInfo');if(!b){b=document.createElement('div');b.id='bInfo';document.body.appendChild(b);}
+function showInfo(id,o={}){if(window.__sim)return;const m=MON[id],kw=kwOf(m),t=o.unit?unitAtkType(o.unit):kwType(m);let b=$('#bInfo');if(!b){b=document.createElement('div');b.id='bInfo';document.body.appendChild(b);}
  const chips=a=>a.map(x=>`<span class=tchip style="background:${TYPE_COL[x]}">${TYPE_KO[x]}</span>`).join('')||'<span class=mut>없음</span>';
  const opp=o.foe?B.me.board:B.foe.board;
- const vs=opp.map(d=>{if(!d)return '';const mu=o.foe?matchup(d.id,id):matchup(id,d.id);return `<div class=vs>${monImg(d.id,'front')}<span style="flex:1">${esc(MON[d.id].name)}</span>${mu?`<span class=tchip style="background:${mu.c==='adv'?'#3cc47c':'#a7b0bd'}">${o.foe?(mu.c==='adv'?'나에게 유리':'나에게 불리'):mu.t}</span>`:'<span class=mut style="font-size:12px">보통</span>'}</div>`;}).join('');
+ const vs=opp.map(d=>{if(!d)return '';const su=o.unit||id,mu=o.foe?matchup(d,su):matchup(su,d);return `<div class=vs>${monImg(d.id,'front')}<span style="flex:1">${esc(MON[d.id].name)}</span>${mu?`<span class=tchip style="background:${mu.c==='adv'?'#3cc47c':'#a7b0bd'}">${o.foe?(mu.c==='adv'?'나에게 유리':'나에게 불리'):mu.t}</span>`:'<span class=mut style="font-size:12px">보통</span>'}</div>`;}).join('');
  const st=o.unit?`<div class=mut style="font-size:13px">지금 공격 ${rlAtkLabel(o.unit,o.foe)} · 체력 ${o.unit.hp}/${o.unit.max}${o.unit.frozen?(o.unit.moon?' · 기절':' · 얼음'):''}${o.unit.icy?' · ❄ 얼음 '+o.unit.icy+'/'+iceMaxOf(o.unit):''}${hk(o.unit,'grow')?' · 🌱 성장 '+Math.min(growCap(o.unit),o.unit.grow||0)+'/'+growCap(o.unit):''}${o.unit.psn?' · ☠ 독 공격 -'+o.unit.psn:''}${o.unit.fai?' · ✨ 요정의 빛 공격 -'+o.unit.fai:''}${o.unit.dodge?' · 피하기 남음':''}${o.unit.shield>0?' · 🛡️ 방어막 '+o.unit.shield:''}</div>${o.unit.shield>0?`<div class=mut style="font-size:12px">🛡️ 방어막: 맞을 때마다 피해 -1, 남은 피해는 방어막 수치만큼 먼저 막고 그만큼 줄어요</div>`:''}`:'';
  b.innerHTML=`<div class=sheet>${cardHTML(id,{noHolo:1})}<div class=itx><h3>${esc(m.name)} ${o.foe?'<span class=mut style="font-size:13px">(상대)</span>':''}</h3>${st}
   <div class=kwbox>${I(kw.ic)} <b>${m.rar===5?'★ ':''}${kw.n}</b> — ${kwD(m,kw)}</div>${o.unit&&o.unit.kw2?(()=>{const k2=Object.values(KW).find(v=>v.k===o.unit.kw2);return k2?`<div class=kwbox>${I(k2.ic)} <b>+ ${k2.n}</b> — ${kwD(m,k2)}</div>`:'';})():''}
@@ -8688,7 +8706,7 @@ async function summon(P,hi,slot){const card=P.hand[hi];let id=card;
  if(isRandomMonCard(card)){const pool=ownedBand(P,card.band);if(!pool.length){toast('이 코스트 구간의 보유 포켓몬이 없어 사용할 수 없어요');return;}id=pool[Math.floor(playerRoll(P)*pool.length)];}
  if(!MON[id]||slot<0||!P.board||P.board[slot])return;
  const m=MON[id],pay=battleCost(card);if(P.mana<pay){toast(`에너지가 ${pay-P.mana} 모자라요`);return;}
- if(P===B.me&&!window.__sim)S.meta.dexSeen[id]=1;spendMana(P,pay);P.hand.splice(hi,1);const u=mkUnit(id);if(B.coop)u.coopOwner=B.coop.active;P.board[slot]=u;B.pick=-1;sfx('summon');
+ if(P===B.me&&!window.__sim)S.meta.dexSeen[id]=1;spendMana(P,pay);P.hand.splice(hi,1);const u=mkUnit(id);if(B.t2&&P&&P.skm&&P.skm[id])u.skf=P.skm[id];if(B.coop)u.coopOwner=B.coop.active;P.board[slot]=u;B.pick=-1;sfx('summon');
  if(isRandomMonCard(card))fx(unitEl(P,slot),`${card.name}! ${m.name}`,'txt');
  const O=P===B.me?B.foe:B.me;renderBattle();slamFx(P,slot);if(m.rar===5){try{await legendFx(P,slot,m.name);}catch(e){}}await wait(240);
  // 나올 때 효과
@@ -8904,7 +8922,9 @@ const FUSE_TYPES={10193:[10,5],10194:[10,13],10155:[10,16],10156:[10,13]}; /* �
 /* 스킨으로 속성이 바뀌는 포켓몬(춤추새·오거폰)은 "그 포켓몬 주인의 스킨"으로 상성을 계산해요.
    내 것은 내 스킨, 친구 대전/협동에서 친구 것은 친구가 보낸 스킨(sk), 컴퓨터 상대는 기본 속성이에요. 그래서 두 기기의 계산이 똑같아요. */
 function skinTyMap(){const o={};try{[741,1017].forEach(b=>{const f=skinOf(b);if(f&&SKIN_TYPES[f])o[b]=f;});}catch(e){}return o;}
+function skinCleanMap(raw){const o={};try{if(raw&&typeof raw==='object')[741,1017].forEach(b=>{const f=Number(raw[b]);if(f&&SKIN_TYPES[f]&&(SKIN[b]||[]).some(x=>x[0]===f))o[b]=f;});}catch(e){}return o;}
 function unitSkinForm(u){try{if(!B||!u||(u.id!==741&&u.id!==1017))return 0;let f=0;
+ if(B.t2){/* 2:2·4인 전투: 유닛이 나올 때 주인의 스킨을 찍어 둬요(u.skf). 찍히지 않은 유닛(보스 등)은 기본 속성이에요 */f=Number(u.skf)||0;return(f&&SKIN_TYPES[f]&&(SKIN[u.id]||[]).some(x=>x[0]===f))?f:0;}
  const mineSide=B.me&&(B.me.board.indexOf(u)>=0||(B.coop&&B.coop.players&&B.coop.players.some(pl=>pl&&pl.board&&pl.board.indexOf(u)>=0)));
  if(mineSide){if(B.coop&&typeof BC==='object'&&BC&&Number(u.coopOwner??0)!==Number(BC.localIndex))f=(BC.foe&&BC.foe.sk&&BC.foe.sk[u.id])||0;else f=skinTyMap()[u.id]||0;}
  else if(B.pvp&&B.foe&&B.foe.board.indexOf(u)>=0)f=(B.foeSkin&&B.foeSkin[u.id])||0;
@@ -8931,8 +8951,8 @@ function recapHTML(auto){const d=recapData();if(!d)return '';const mn=esc(MON[d.
 function recapCopy(b){const d=recapData();if(!d)return;const t=`📋 오늘의 한 판 요약\n🏅 MVP 포켓몬: ${MON[d.mvp.id].name} (총 ${d.mvp.dmg} 피해)\n💥 가장 센 한 방: ${MON[d.best.id].name} ${d.best.n} 피해\n✅ 정답 ${recapQc(d,1)}`;
  const ok=()=>{try{toast('요약을 복사했어요! 친구에게 붙여넣어 자랑해 봐요');}catch(e){}if(b)b.textContent='✔ 복사했어요';};
  try{navigator.clipboard.writeText(t).then(ok,()=>{try{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();ok();}catch(e){}});}catch(e){try{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();ok();}catch(_){}}}
-function typeWhy(aid,did){try{const a=MON[aid],d=MON[did];if(!a||!d)return '';const t=kwType(a),at=TYPE_KO[t];let k=1;d.types.forEach(x=>k*=TYPE_CHART[t][x]);
- const pick=f=>{const x=d.types.find(f);return x==null?null:TYPE_KO[x];};
+function typeWhy(aid,did){try{const au=(aid&&typeof aid==='object')?aid:null,du=(did&&typeof did==='object')?did:null;const a=MON[au?au.id:aid],d=MON[du?du.id:did];if(!a||!d)return '';const t=au?unitAtkType(au):kwType(a),at=TYPE_KO[t],dts=du?unitTypes(du):d.types;let k=1;dts.forEach(x=>k*=TYPE_CHART[t][x]);
+ const pick=f=>{const x=dts.find(f);return x==null?null:TYPE_KO[x];};
  if(k>=2){const dn=pick(x=>TYPE_CHART[t][x]>=2);return dn?`${josa(at,'은는')} ${dn}에 강해요`:'';}
  if(k<=0){const dn=pick(x=>TYPE_CHART[t][x]===0);return dn?`${josa(at,'은는')} ${dn}에 거의 안 통해요`:'';}
  if(k<1){const dn=pick(x=>TYPE_CHART[t][x]<1);return dn?`${josa(at,'은는')} ${dn}에 약해요`:'';}
@@ -12222,7 +12242,110 @@ photongeyser(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,tC=460,tF=380,tH=tC+tF,
  setTimeout(()=>{F.hold(160);F.flash('#f2e8ff');shk();setTimeout(shk,150);sparks(bx,by,26,[GX[5],GX[4],GX[3],GX[2]],340,820,true);},tH);
  return waitS(tH+900);},
 // 솔가레오 · 메테오 드라이브(선스틸 스트라이크): 태양이 떠올라 불꽃이 일렁이고, 솔가레오 본체가 불타는 혜성이 되어 꿰뚫어요
-sunsteel(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,Z=R*1.5,tA=c.nocharge?40:700,tD=360,tH=tA+tD,
+// 솔가레오 · 메테오 드라이브(선스틸 스트라이크) v2 — 실버디(멀티어택)처럼 "진짜 몸 그림"이 직접 날아가요
+// 태양이 떠올라 솔가레오 뒤에서 이글거림 → 몸을 뒤로 당김 → 불꽃 혜성이 되어 가속 돌진(잔상·불꽃 꼬리·속도선) → 쾅! → 튕겨 돌아옴
+// 몸 그림은 캔버스에 다시 그리지 않고 원본 <img>를 복제해 CSS 변환으로 움직여서, 확대·회전해도 도트가 깨지지 않아요
+sunsteel(c){const m=mk(c),{S,R}=m,Z=R*1.5;
+ let img=null;try{let ba=0;c.fromEl.querySelectorAll('img').forEach(n=>{const r=zRect(n),a=r.width*r.height;if(a>ba&&r.width>8&&r.height>8){ba=a;img=n;}});}catch(e){}
+ if(!img||!img.animate||!document.body)return FX.sunsteelLegacy(c);
+ const lite=(()=>{try{return typeof skLite==='function'&&!!skLite();}catch(e){return false;}})(),
+ SU=['#4a0c00','#c8300a','#ff7a2e','#ffc23a','#fff3b0','#ffffff'],FC=[SU[1],SU[2],SU[3],SU[4]],
+ sr=zRect(img),Rp=Math.max(sr.width,sr.height)/2,hh=Math.max(10,sr.height/S/2),Zb=Math.max(Z,hh*.55),
+ c0x=(sr.left+sr.width/2)/S,c0y=(sr.top+sr.height/2)/S,bx=m.bx,by=m.by,
+ dx=bx-c0x,dy=by-c0y,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,nx=-uy,ny=ux,ang=Math.atan2(dy,dx),
+ tA=c.nocharge?30:480,tP=150,tD=210,tL=tA+tP,tH=tL+tD,tK=140,tR=560,Dt=tH+tK+tR,
+ cin=k=>k*k*k,cou=k=>1-Math.pow(1-k,3),cio=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,
+ P0x=c0x-ux*hh*.6,P0y=c0y-uy*hh*.6,stp=Math.min(hh*.6,L*.35),P1x=bx-ux*stp,P1y=by-uy*stp,
+ TL=Math.max(-.45,Math.min(.45,Math.atan2(Math.sin(ang),Math.abs(Math.cos(ang)))*.35*(Math.cos(ang)>=0?1:-1)))*180/PI,
+ g1=Math.max(3,Rp*.08),g2=Math.max(6,Rp*.22),
+ TRO=['#7a1a05','#a82a0a','#d44a14','#ff6a22','#ff8a2e','#ffa83a','#ffc23a','#ffd96a'],TRI=['#c8300a','#e0501a','#ff7a2e','#ff9a3a','#ffb84a','#ffd45c','#ffe890','#fff3b0'];
+ let flip=false;try{const t=getComputedStyle(img).transform;flip=!!t&&t!=='none'&&new DOMMatrix(t).a<0;}catch(e){}
+ // 시간 t(ms)에 따른 몸의 위치·크기·기울기·불꽃 세기
+ const pos=t=>{
+  if(t<tA){const e=cou(cl(t/tA,0,1));return[c0x+Math.sin(t*.11)*.35*e,c0y-hh*.08*e+Math.sin(t*.07)*.3*e,1+.05*e,0,.2+.55*e];}
+  if(t<tL){const e=cio((t-tA)/tP);return[lerp(c0x,P0x,e),lerp(c0y-hh*.08,P0y,e),lerp(1.05,.88,e),-TL*.6*e,lerp(.75,.95,e)];}
+  if(t<tH){const q=cin((t-tL)/tD);return[lerp(P0x,P1x,q),lerp(P0y,P1y,q),lerp(.88,1.28,q),lerp(-TL*.6,TL,Math.min(1,q*2)),1];}
+  if(t<tH+tK){const j=(t-tH)/tK,sk=Math.sin(j*14)*(1-j);return[P1x+ux*hh*.1*sk+nx*hh*.04*sk,P1y+uy*hh*.1*sk+ny*hh*.04*sk,1.28+.06*(1-j),TL,1-.3*j];}
+  if(t<Dt){const e=cou((t-tH-tK)/tR);return[lerp(P1x,c0x,e),lerp(P1y,c0y,e),lerp(1.28,1,e),TL*(1-e),lerp(.7,0,e)];}
+  return[c0x,c0y,1,0,0];};
+ // 복제 이미지(잔상 3장 + 본체). 본체는 캔버스 위(163)에 두어 태양·꼬리가 몸 뒤로 자연스럽게 깔려요
+ const pv=img.style.visibility,els=[];let done=false;
+ const mkc=(op,ghost)=>{const e=img.cloneNode(false);['class','id','onerror','loading'].forEach(a=>e.removeAttribute(a));
+  e.style.cssText=`position:fixed;left:${sr.left}px;top:${sr.top}px;width:${sr.width}px;height:${sr.height}px;z-index:163;pointer-events:none;margin:0;object-fit:contain;image-rendering:pixelated;opacity:${op};will-change:transform${ghost?'':',filter'}${ghost?';filter:'+(lite?'brightness(1.8) sepia(1) saturate(4)':'brightness(1.9) sepia(1) saturate(5) hue-rotate(-18deg)'):''}`;
+  document.body.appendChild(e);els.push(e);return e;};
+ const NG=lite?1:3,ghosts=[];for(let i=0;i<NG;i++)ghosts.push(mkc(0,true));
+ const main=mkc(1,false);
+ const clean=()=>{if(done)return;done=true;els.forEach(e=>{try{e.remove();}catch(_){}});try{img.style.visibility=pv;}catch(_){}};
+ try{img.style.visibility='hidden';}catch(e){}
+ setTimeout(clean,Dt+900);
+ const tfm=(x,y,s,r)=>`translate(${((x-c0x)*S).toFixed(1)}px,${((y-c0y)*S).toFixed(1)}px) rotate(${r.toFixed(1)}deg) scale(${s.toFixed(3)})${flip?' scaleX(-1)':''}`;
+ let lastAK=-1,zUp=false;
+ const aura=a=>a<=.03?'none':(lite?`brightness(${(1+.45*a).toFixed(2)})`:`drop-shadow(0 0 ${(g1*a).toFixed(1)}px ${SU[3]}) drop-shadow(0 0 ${(g2*a).toFixed(1)}px ${SU[2]}) brightness(${(1+.5*a).toFixed(2)})`);
+ vig('#2a0600',.6,tH+1300,0);
+ if(!c.nocharge){gather(c0x,c0y,hh*1.5,[SU[2],SU[3],SU[4]],tA,26);setTimeout(()=>embers(c0x,c0y,22,[SU[3],SU[2],SU[4]],1100),160);}
+ // ⓪ 몸 그림 움직임(DOM): 한 프레임마다 캔버스 효과와 같은 시계로 갱신해서 꼬리와 몸이 정확히 맞아요
+ add(0,Dt,(k)=>{
+  if(done)return;
+  const t=k*Dt,[x,y,s,r,au]=pos(t);
+  main.style.transform=tfm(x,y,s,r);
+  const ak=Math.round(au*10);if(ak!==lastAK){lastAK=ak;main.style.filter=aura(ak/10);}
+  if(!zUp&&t>=tH){zUp=true;els.forEach(e=>{e.style.zIndex=161;});} // 타격 순간부터는 폭발이 몸 위로 덮이게
+  for(let i=0;i<NG;i++){const g=ghosts[i],on=t>=tL+25&&t<tH+tK*.7;
+   if(!on){if(g.style.opacity!=='0')g.style.opacity='0';continue;}
+   const q=pos(Math.max(tL,t-(i+1)*42)),fo=t>tH?Math.max(0,1-(t-tH)/(tK*.7)):1;
+   g.style.transform=tfm(q[0],q[1],q[2],q[3]);g.style.opacity=((lite?.4:[.5,.34,.2][i])*fo).toFixed(2);}
+  if(k>=.985)clean();
+ });
+ // ① 태양이 몸 뒤에서 떠올라 불꽃 코로나가 이글거려요 (몸이 위에 있어서 태양이 뒤에 깔려요)
+ add(0,tL+170,(k,p)=>{const t=k*(tL+170),f=fn(p),e=cou(cl(t/tA,0,1)),al=t>tL?Math.max(0,1-(t-tL)/170):1,
+  sx=c0x,sy=c0y-hh*.1,SRm=hh*1.15,sr2=SRm*(.25+.75*e);
+  glow(sx,sy,SRm*2.8*(.5+.5*e),SU[1],.5*e*al);glow(sx,sy,sr2*2.2,SU[2],.55*e*al);
+  for(let i=0;i<18;i++){const a=i/18*TAU+t*.0016,l=sr2*(1.6+.5*sin(i*3+f*.4));P.ray(sx,sy,a,l,Math.max(1,hh*.05),i%2?SU[3]:SU[4],.6*e*al);}
+  for(let i=0;i<12;i++){const a=i/12*TAU+t*.0014;SX.blob(sx+cos(a)*sr2*1.02,sy+sin(a)*sr2*1.02,sr2*.3,t*.008+i,.6*e*al,FC,10);}
+  P.ga(.85*e*al);P.disc(sx,sy,sr2,SU[2]);P.disc(sx,sy,sr2*.84,SU[3]);P.disc(sx,sy,sr2*.58,SU[4]);P.disc(sx,sy,sr2*.32,SU[5]);P.ga(1);
+  P.ga(.8*e*al);P.ringGlow(sx,sy,sr2*1.28,Math.max(2,hh*.08),SU[4],.8,1);P.ga(1);
+  SX.loop(sx,c0y+hh*.75,hh*(1.1+.3*e),hh*(.35+.1*e),0,hh*.05,SU[3],.8*e*al);});
+ // ② 돌진: 몸 뒤로 한 줄기로 이어진 불꽃 꼬리, 쏟아지는 속도선, 몸을 감싸는 충격 고리와 불꽃
+ {const T0=tL-30,DU=tD+tK+300;
+ add(T0,DU,(k,p)=>{const t=T0+k*DU,f=fn(p);if(t<tL)return;
+  const q=cin(cl((t-tL)/tD,0,1)),fade=t>tH?Math.max(0,1-(t-tH)/150):1,al=cl((t-tL)/50,0,1)*fade;if(al<=0)return;
+  const lenF=.7*(t>tH?Math.max(0,1-(t-tH)/150):1),[hx,hy]=pos(Math.min(t,tH));
+  // 속도선: 몸보다 빨리 뒤로 흘러가는 가늘고 긴 띠
+  const NS=lite?9:18;
+  for(let i=0;i<NS;i++){const o=(hz(i)-.5)*hh*3.4,s0=(hz(i+3)+(t-tL)*.004)%1,ln=Zb*(3+8*hz(i+7)),cx=hx-ux*Zb*(.8+10*s0)+nx*o,cy=hy-uy*Zb*(.8+10*s0)+ny*o;
+   SX.band([[cx-ux*ln,cy-uy*ln],[cx-ux*ln*.5,cy-uy*ln*.5],[cx,cy]],u=>.2+.5*u,i%3?SU[3]:SU[5],.5*al);}
+  // 불꽃 꼬리: 꼬리→머리 순서의 한 줄 경로(끊김 없는 띠), 꼬리로 갈수록 일렁여요
+  const NT=26,pts=[];for(let i=0;i<=NT;i++){const u=i/NT,qq=Math.max(0,q-(1-u)*lenF),w=sin((1-u)*7+f*.7)*Zb*.12*(1-u);pts.push([lerp(P0x,P1x,qq)+nx*w,lerp(P0y,P1y,qq)+ny*w]);}
+  pts[NT]=[hx,hy];
+  // 꼬리: 각진 띠 대신 부드러운 빛 번짐을 촘촘히 이어서, 머리는 밝고 꼬리 끝은 어둡게 사라지는 그라데이션
+  P.blend('lighter');
+  for(let i=0;i<=NT;i++){const u=i/NT,uu=Math.pow(u,.8),ci=Math.min(7,(u*8)|0),r=Zb*(.3+1.0*uu),aa=al*(.06+.5*Math.pow(u,.9));
+   P.halo(pts[i][0],pts[i][1],r*1.5,TRO[ci],aa);P.halo(pts[i][0],pts[i][1],r*.75,TRI[ci],aa*.9);}
+  P.blend();
+  // 몸 둘레의 충격 고리(속도감)
+  for(let j=0;j<4;j++){const qq=Math.max(0,q-.05-j*.065);if(q<=.05&&j>0)continue;
+   SX.loop(lerp(P0x,P1x,qq),lerp(P0y,P1y,qq),Zb*.3,Zb*(1.3-j*.14),ang,Zb*.06,j%2?SU[3]:SU[5],(1-j*.2)*al);}
+  // 몸을 감싸는 불꽃 테두리(몸 뒤로 번져서 가장자리만 이글거려요)
+  for(let i=0;i<(lite?4:8);i++){const a=i/8*TAU+f*.5,rr=hh*(.55+.12*sin(f*.4+i*2));SX.blob(hx+cos(a)*rr*.8,hy+sin(a)*rr,hh*.38,f*.7+i,.6*al,FC,9);}
+  glow(hx,hy,hh*2.1,SU[2],.5*al);glow(hx,hy,hh*1.1,SU[4],.4*al);});}
+ // ③ 출발과 착탄 순간: 출발 고리, 그리고 불덩이가 겹겹이 부풀며 터지고 휘어지는 강철 베기·불기둥·불티
+ ring(c0x,c0y,hh*1.7,SU[5],tL,360,2);ring(c0x,c0y,hh*2.4,SU[3],tL+60,420,1);eRingFlat(c0x,c0y+hh*.8,hh*3.2,SU[3],tL,520);
+ setTimeout(()=>{shk();sparks(c0x,c0y,14,[SU[5],SU[4],SU[3]],260,520,true);},tL);
+ add(tH,1250,(k)=>{const e=ez.out(k),e2=ez.out(Math.min(1,k*2.2)),a=k>.55?(1-k)/.45:1;
+  glow(bx,by,Z*(3+5*e),SU[1],.55*a);glow(bx,by,Z*(1.8+3.2*e),SU[2],.8*a);glow(bx,by,Z*(.9+1.9*e),SU[4],.95*a);
+  SX.blob(bx,by,Z*(.9+2.4*e2),k*8,a,FC,34);
+  for(let i=0;i<7;i++){const an=i/7*TAU+.4,d=Z*(.8+2.2*e2);SX.blob(bx+cos(an)*d,by+sin(an)*d*.75-Z*.3*e,Z*(.55+1.1*e2)*(1-k*.3),k*9+i,.85*a,FC,16);}
+  for(let i=0;i<8;i++){const h=Z*(.4+i*.62)*e2,rr=Z*(1.05-.08*i)*(1-k*.5);SX.blob(bx+sin(i*2+k*8)*Z*.2,by+Z*.5-h,rr,k*10+i,.8*a*(k>.7?(1-k)/.3:1),FC,12);}
+  [[0,-.2,1.3],[.07,.6,1.05],[.14,1.3,.8]].forEach(([dl,a0,mul],j)=>{const q=Math.max(0,Math.min(1,(k-dl)*3.4));if(q<=0)return;SX.slash(bx,by,Z*(1.5+1.8*mul)*q,ang+a0-1.2+j*.2,ang+a0+1.3+j*.2,Z*.55*mul*(1-k*.7),[[1.6,SU[3],.55],[1,'#b9c3d9',1],[.45,SU[5],1]],a);});
+  P.ga(.9*a);P.disc(bx,by,Math.max(1,Z*(.4+1.3*(1-k))*e2),SU[5]);P.ga(1);
+  SX.arcs(bx,by,18,Z*5,k,[SU[5],SU[4],SU[3],SU[2]],Z*.12,.95*a);
+  flare(bx,by,Z*(1+2.4*e),SU[4],a*.8,k*2);});
+ eRingFlat(bx,by+Z*.5,Z*3.8,SU[3],tH,640);eRingFlat(bx,by+Z*.5,Z*6,SU[2],tH+110,760);eRingFlat(bx,by+Z*.5,Z*8.4,SU[1],tH+240,900);
+ for(let j=0;j<4;j++)ring(bx,by,Z*(2+j*1.3),[SU[5],SU[3],SU[2],SU[1]][j],tH+j*70,640,j<2?2:1);
+ setTimeout(()=>{F.hold(220);F.flash('#fff0c0');shk();setTimeout(shk,120);setTimeout(shk,260);sparks(bx,by,36,[SU[5],SU[4],SU[3],SU[2]],420,900,true);embers(bx,by,26,[SU[3],SU[2],SU[4]],1200);},tH);
+ return waitS(tH+1250);},
+// (보관용) 예전 방식: 몸 그림을 못 구할 때만 쓰는 예비 연출
+sunsteelLegacy(c){const m=mk(c),{ax,ay,bx,by,R,sc}=m,Z=R*1.5,tA=c.nocharge?40:700,tD=360,tH=tA+tD,
  SU=['#4a0c00','#c8300a','#ff7a2e','#ffc23a','#fff3b0','#ffffff'],FC=[SU[1],SU[2],SU[3],SU[4]],
  dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,nx=-uy,ny=ux,ang=Math.atan2(dy,dx);
  vig('#2a0600',.6,tH+1300,0);
@@ -13857,7 +13980,7 @@ async function resolveAttack(A,D,si,tg,ok,cb,defReduce=0,crit=false,hint=0,defHi
  else{const d=D.board[tg.u];if(!d){return;}const wasFz=!!d.frozen;
   dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a,d);dmg=Math.max(1,applyType(dmg,k));if(hint>0){dmg=Math.max(0,dmg-hint);fx(unitEl(A,si),`💡힌트 사용 -${hint}`,'txt');}
   await skillMove(A,si,unitEl(D,tg.u),ok,cb);
-  if(k>=2){fx(unitEl(D,tg.u),'효과가 굉장했다!','txt super');if(A===B.me)S.meta.stats.superEff=(S.meta.stats.superEff||0)+1;}else if(k<1)fx(unitEl(D,tg.u),'효과가 별로인 듯…','txt');whyFx(unitEl(D,tg.u),a.id,d.id,k);
+  if(k>=2){fx(unitEl(D,tg.u),'효과가 굉장했다!','txt super');if(A===B.me)S.meta.stats.superEff=(S.meta.stats.superEff||0)+1;}else if(k<1)fx(unitEl(D,tg.u),'효과가 별로인 듯…','txt');whyFx(unitEl(D,tg.u),a,d,k);
   acUnit(D,tg.u,recHit(A,a,await dealUnit(D,tg.u,dmg,undefined,hk(a,'sneak')&&isLeg(a))),k);
   if(hk(a,'freeze')&&D.board[tg.u])applyFreeze(D,tg.u,a);
   if(hk(a,'poison')&&D.board[tg.u])poisonHit(D,tg.u,isLeg(a));
@@ -14026,7 +14149,7 @@ async function resolveGmaxAll(A,D,si,ok,cb,crit,hint){const a=A.board[si];if(!a)
   if(fin){try{await fin;}catch(e){}try{idx.forEach(j=>evoImpact(unitEl(D,j),a.id,skillOf(a.id).t,ok?(cb?1.8:1.55):.6,ok,cb,true));}catch(e){}}else{try{await Promise.all(idx.map(j=>skillMove(A,si,unitEl(D,j),ok,cb)));}catch(e){}}}
  for(const j of idx){const d=D.board[j];if(!d||d.hp<=0)continue;
   const k=typeMul(a,d);let d1=Math.max(1,applyType(dmg+fightB(a)+sneakB(a,d),k)-2);if(hint>0)d1=Math.max(0,d1-hint);
-  if(k>=2){fx(unitEl(D,j),'효과가 굉장했다!','txt super');if(A===B.me)S.meta.stats.superEff=(S.meta.stats.superEff||0)+1;}else if(k<1)fx(unitEl(D,j),'효과가 별로인 듯…','txt');whyFx(unitEl(D,j),a.id,d.id,k);
+  if(k>=2){fx(unitEl(D,j),'효과가 굉장했다!','txt super');if(A===B.me)S.meta.stats.superEff=(S.meta.stats.superEff||0)+1;}else if(k<1)fx(unitEl(D,j),'효과가 별로인 듯…','txt');whyFx(unitEl(D,j),a,d,k);
   acUnit(D,j,recHit(A,a,await dealUnit(D,j,d1,undefined,hk(a,'sneak')&&isLeg(a))),k);
   if(hk(a,'freeze')&&D.board[j])applyFreeze(D,j,a);
   if(hk(a,'poison')&&D.board[j])poisonHit(D,j,isLeg(a));}
@@ -14392,7 +14515,7 @@ async function foeAttack(i,tg){const fo=B.foe,me=B.me;const a=fo.board[i];if(!a)
     if(r){if(r.ok){qcUp(tp);B.combo++;if(!remoteDef)streakFx(B.combo);if(!remoteDef)S.meta.stats.defOk=(S.meta.stats.defOk||0)+1;{const hv=!!((dq&&dq.tier==='H')||(r&&r.sv));dmg=Math.max(0,dmg-2-(hv?1:0));acDef(tp,hv);fx(heroEl(tp),hv?'슈퍼세이브! -3':'막았다!',hv?'crit':'txt');if(hv)sfx('crit');}heroBlockFx(heroEl(tp));if(B.counterActive>0){await trainerAtkFx(heroEl(tp),unitEl(fo,i),Math.min(5,B.counterActive),'counter');await dealUnit(fo,i,B.counterActive,undefined,undefined,!!B.wildMode);fx(heroEl(tp),`반격 -${B.counterActive}`,'txt');}}else{B.combo=0;if(acOn()){AC.cur=null;acSay('방어 실패…','sv');}}if(r.hint){dmg+=1;fx(heroEl(tp),'💡힌트 사용 +1','txt');}}}
   bossMarkTarget(tp);window.__sd=dmg;await skillMove(fo,i,heroEl(tp),true,false);window.__sd=null;if(quakeB(a)>0)await quakeFx(heroEl(tp));tp.hp-=dmg;acHero(dmg,tp);if(dmg){impact(heroEl(tp),dmg,{hero:1,col:'#ff5a5f'});fx(heroEl(tp),'-'+dmg,dmg>=4?'big':'');}}
  else{const d=me.board[tg.u];if(!d)return;dmg+=fightB(a)+sneakB(a,d);const k=typeMul(a,d);dmg=Math.max(1,applyType(dmg,k));
-  await skillMove(fo,i,unitEl(me,tg.u),true,false);if(k>=2)fx(unitEl(me,tg.u),'효과가 굉장했다!','txt');else if(k<1)fx(unitEl(me,tg.u),'효과가 별로인 듯…','txt');whyFx(unitEl(me,tg.u),a.id,d.id,k);
+  await skillMove(fo,i,unitEl(me,tg.u),true,false);if(k>=2)fx(unitEl(me,tg.u),'효과가 굉장했다!','txt');else if(k<1)fx(unitEl(me,tg.u),'효과가 별로인 듯…','txt');whyFx(unitEl(me,tg.u),a,d,k);
   const wasFz=!!d.frozen;acUnit(me,tg.u,await dealUnit(me,tg.u,dmg,undefined,hk(a,'sneak')&&isLeg(a)),k);if(hk(a,'freeze')&&me.board[tg.u])applyFreeze(me,tg.u,a);if(hk(a,'poison')&&me.board[tg.u])poisonHit(me,tg.u,isLeg(a));
   let cd=(hk(a,'wing')||wasFz)?0:applyType(d.atk,typeMul(d,a));cd=Math.ceil(cd*wingM(d));if(cd>0){if(wingM(d)>1)await wingFx(me,tg.u,fo,i,wingM(d));await wait(200);await dealUnit(fo,i,cd,undefined,undefined,!!B.wildMode);}}
  if(hk(a,'double')&&a.att>0&&a.hp>0)await dragonFangFx(fo,i);
@@ -17444,24 +17567,26 @@ function renderBossCoop(keep){S.screen='bosscoop';if(!keep)bossClose();const m=S
  <div class=tiles style="margin-top:12px"><div class=tile><span class=ti>🌈</span><span class=tn>4성 보스 20%</span><span class=td>희귀한 보스 포켓몬</span></div><div class=tile><span class=ti>✨</span><span class=tn>5성 보스 80%</span><span class=td>최상위 보스 포켓몬</span></div></div>
  <details class=bossHow style="margin-top:12px"><summary class="btn ghost sm" style="cursor:pointer;list-style:none">📖 설명 보기 / 접기</summary><div class=explain style="margin-top:8px;font-size:14px;line-height:1.7">보스 체력은 기본의 <b>15배</b>, 공격력은 그대로이며 기본 공격은 턴마다 <b>2회</b>예요. 단, 우리 포켓몬이 <b>3마리 늘 때마다 공격이 1회씩 늘어요</b>(최대 4회). 보스 체력이 <b>절반 이하면 공격력 +1</b>, <b>25% 이하면 공격 +1회</b>로 더 강해져요. 또 <b>3번째 보스 턴마다</b> 우리 포켓몬 모두에게 <b>1 피해</b>(분노한 뒤에는 2)를 주는 전체 공격이 와요. 한 턴 전에 예고가 떠요. 10% 확률로 보스 2마리가 등장하며, 이때는 각 보스가 턴마다 1회 공격해요. 보스전에서는 쉬운 전투가 적용되지 않아요. 보스를 쓰러뜨리면 보스 1마리당 조각 4개를 획득합니다. 보스는 아직 카드가 없는 포켓몬 위주로 나와요(나와 친구 둘 다 없는 포켓몬을 가장 먼저 찾아요). 두 플레이어는 8칸의 공유 출전 필드를 함께 사용합니다. 보스는 <b>내 트레이너와 친구 트레이너 중 한 명을 골라</b> 공격해요. 한 명의 체력이 0이 되어도 남은 한 명이 쓰러진 친구의 포켓몬까지 모두 조종하며 혼자 전투를 이어가요. <b>둘 다</b> 체력이 0이 되면 전투가 끝나요.</div></details>
  <div class=row style="margin-top:14px"><button class="btn red big" id=bcHost>방 만들기</button><button class="btn blue big" id=bcJoin>코드로 접속</button></div><input class="inp codeIn" id=bcCode maxlength=4 inputmode=numeric placeholder="방 코드 4자리" style="margin-top:10px">
+ <p class=mut style="font-size:12.5px;margin-top:8px;line-height:1.5">🔁 <b>전투 중에 나갔다면?</b> 나갔던 사람이 <b>같은 방 코드</b>를 넣고, 방장이었으면 <b>방 만들기</b>, 친구였으면 <b>코드로 접속</b>을 누르면 이어서 할 수 있어요. (같은 닉네임이어야 해요 · 방장이 다시 열 때 방장의 손패는 내 덱에서 새로 뽑아요)</p>
  <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요합니다. <b>학교 와이파이는 작동하지 않을 수 있어요.</b> 두 사람 모두 같은 버전의 게임 파일을 사용해 주세요. <a href="#" id=bcNet style="color:inherit">📶 연결 시험</a></p></div><div class=panel id=bcBox style="display:none;text-align:center"></div><div class=panel><h3>협동 규칙</h3><ul style="line-height:1.8;padding-left:20px"><li>턴 순서: 방장 → 친구 → 보스</li><li>각자 자기 손패와 덱으로 행동</li><li>8칸 공유 필드의 체력·상태·공격 횟수 동기화</li><li>문제는 행동한 플레이어가 풀고, 결과를 호스트가 판정·반영</li><li>보스 행동과 포획 결과는 호스트가 한 번만 처리해 두 화면에 전파</li></ul></div></div>`;
- bindHud();$('#bcNet').onclick=e=>{e.preventDefault();sfx('tap');showNetTest();};$('#bcHost').onclick=()=>bossConnect(true,String(rint(1000,9999)));$('#bcJoin').onclick=()=>{const c=($('#bcCode').value||'').replace(/\D/g,'');if(c.length!==4){toast('방 코드 4자리를 입력해 주세요');return;}bossConnect(false,c);};}
+ bindHud();$('#bcNet').onclick=e=>{e.preventDefault();sfx('tap');showNetTest();};$('#bcHost').onclick=()=>{const c=($('#bcCode').value||'').replace(/\D/g,'');bossConnect(true,c.length===4?c:String(rint(1000,9999)));};$('#bcJoin').onclick=()=>{const c=($('#bcCode').value||'').replace(/\D/g,'');if(c.length!==4){toast('방 코드 4자리를 입력해 주세요');return;}bossConnect(false,c);};}
 function bossBox(h){const b=$('#bcBox');if(!b)return;b.style.display='block';b.innerHTML=h;{const t=b.querySelector('#netTest');if(t)t.onclick=()=>{sfx('tap');showNetTest();};}const c=$('#bcCancel');if(c)c.onclick=()=>{bossClose();if(B&&B.coop){B=null;$('#battle').classList.remove('on');}renderBossCoop()};const st=$('#bcStart');if(st)st.onclick=()=>bossStartBattleGo();}
 async function bossConnect(host,code){bossClose();BC.host=host;BC.localIndex=host?0:1;BC.code=code;bossBox(`<p>연결 준비 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);
  try{await loadPeer()}catch(e){bossBox(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}
  const id='pkboss-coop-v1-'+code;const peer=host?new Peer(id,PO()):new Peer(PO());BC.peer=peer;bossPeerHooks(peer);
- peer.on('error',e=>{if(B&&B.coop&&!B.coop.result&&S.screen==='battle'){if(!BC.conn||!BC.conn.open)bossRecover();return;}const t=String(e&&e.type||'');bossBox(netErrHTML(t==='unavailable-id'?'이미 사용 중인 코드예요. 새 방을 만들어 주세요.':t==='peer-unavailable'?'해당 방을 찾을 수 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결에 실패했어요 ('+t+')',t,'bcCancel'))});
- peer.on('open',()=>{if(host){bossBox(`<p>친구에게 아래 코드를 알려 주세요.</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구 접속 대기 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);peer.on('connection',bossOnIncoming);}else{bossBox(`<p>방 ${code}에 접속 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);{const cc=peer.connect(id,{reliable:true});BC.conn=cc;bossBind(cc);setTimeout(()=>{try{if(BC.conn===cc&&!cc.open&&!BC.ready&&S.screen==='bosscoop')bossBox(netErrHTML('친구와 연결되지 않았어요','timeout','bcCancel'));}catch(e){}},20000);}}});}
+ peer.on('error',e=>{if(B&&B.coop&&!B.coop.result&&S.screen==='battle'){if(!BC.conn||!BC.conn.open)bossRecover();return;}const t=String(e&&e.type||'');bossBox(netErrHTML(t==='unavailable-id'?'이미 사용 중인 코드예요. 새 방을 만들어 주세요. (방금 나갔다 같은 코드로 다시 만드는 거라면 1분쯤 뒤에 다시 눌러 보세요)':t==='peer-unavailable'?'해당 방을 찾을 수 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결에 실패했어요 ('+t+')',t,'bcCancel'))});
+ if(host)peer.on('connection',bossOnIncoming);peer.on('open',()=>{if(B&&B.coop)return;if(host){bossBox(`<p>친구에게 아래 코드를 알려 주세요.</p><div class=tcode style="font-size:52px;margin:8px 0">${code}</div><p class=mut>친구 접속 대기 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);}else{if(BC.conn)return;bossBox(`<p>방 ${code}에 접속 중…</p><button class="btn ghost" id=bcCancel>취소</button>`);{const cc=peer.connect(id,{reliable:true});BC.conn=cc;bossBind(cc);setTimeout(()=>{try{if(BC.conn===cc&&!cc.open&&!BC.ready&&S.screen==='bosscoop')bossBox(netErrHTML('친구와 연결되지 않았어요','timeout','bcCancel'));}catch(e){}},20000);}}});}
 const BOSS_NET_VER=4;
-function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,vit:vitBonus(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,evo:Number(trainerSkillLevels().evo)||0,sk:skinTyMap(),name:S.meta.name,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number),avatar:partnerId(),pg:(S.meta&&S.meta.pg==='f')?'f':'m'});});c.on('data',d=>{if(!d||typeof d!=='object')return;BC.lastRx=Date.now();if(BC.reconnecting)bossResumed();if(d.t==='boss-ping')return;
- if(d.t==='boss-hi'){if(d.v!==BOSS_NET_VER){BC.ready=false;BC.foe=null;bossBox(`<p style="color:#d9393f">친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}BC.foe=d;BC.ready=true;if(B&&B.coop&&S.screen==='battle'){bossResumed();return;}bossBox(`<h2>친구와 연결됐어요!</h2><p>${esc(d.name||'친구')}와 협동 보스전에 입장할 준비가 됐어요.</p><div class=explain>4성 20% · 5성 80% · 공유 필드 8칸</div>${BC.host?'<button class="btn red big" id=bcStart>보스전 시작</button>':'<p class=mut>방장이 보스전을 시작하기를 기다리는 중…</p>'}<button class="btn ghost" id=bcCancel>나가기</button>`);if(BC.host)bossSend({t:'boss-wait',name:S.meta.name});}
+function bossBind(c){c.on('open',()=>{bossSend({t:'boss-hi',v:BOSS_NET_VER,snap:(window.bossGuestSnap?bossGuestSnap():null),vit:vitBonus(),mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,evo:Number(trainerSkillLevels().evo)||0,sk:skinTyMap(),name:S.meta.name,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number),avatar:partnerId(),pg:(S.meta&&S.meta.pg==='f')?'f':'m'});});c.on('data',d=>{if(!d||typeof d!=='object')return;BC.lastRx=Date.now();if(BC.reconnecting)bossResumed();if(d.t==='boss-ping')return;
+ if(d.t==='boss-hi'){if(window.bossRejoinHi&&bossRejoinHi(d,c))return;if(d.v!==BOSS_NET_VER){BC.ready=false;BC.foe=null;bossBox(`<p style="color:#d9393f">친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);return;}BC.foe=d;BC.ready=true;if(B&&B.coop&&S.screen==='battle'){bossResumed();return;}bossBox(`<h2>친구와 연결됐어요!</h2><p>${esc(d.name||'친구')}와 협동 보스전에 입장할 준비가 됐어요.</p><div class=explain>4성 20% · 5성 80% · 공유 필드 8칸</div>${BC.host?'<button class="btn red big" id=bcStart>보스전 시작</button>':'<p class=mut>방장이 보스전을 시작하기를 기다리는 중…</p>'}<button class="btn ghost" id=bcCancel>나가기</button>`);if(BC.host)bossSend({t:'boss-wait',name:S.meta.name});}
  else if(d.t==='boss-wait'){toast(`${esc(d.name||'친구')}가 접속했어요`)}
  else if(d.t==='boss-intro'){if(!BC.host)bossIntroRecv(d);}
   else if(d.t==='boss-start'){if(!BC.host){const go=()=>bossApplySnapshot(d.state,true);if(BC.introRun){const r=BC.introRun;try{r.skip();}catch(e){}r.then(()=>setTimeout(go,0),()=>setTimeout(go,0));}else go();}}
  else if(d.t==='boss-dq'){pvSpecShow(d.q,d.k,d.name);}
  else if(d.t==='boss-heart'){bossHeartShow(+d.i);}
  else if(d.t==='boss-dqr'){pvSpecResult(d.i,!!d.ok);clearTimeout(window.__pvsT);window.__pvsT=setTimeout(pvSpecHide,1800);}
- else if(d.t==='boss-snapshot'){if(!BC.host)bossApplySnapshot(d.state,false);}
+ else if(d.t==='boss-snapshot'){if(!BC.host){const first=!(B&&B.coop);bossApplySnapshot(d.state,false);if(first&&B&&B.coop){try{startBgm('battle');}catch(e){}toast('전투에 다시 들어왔어요! 이어서 해요');}}}
+ else if(d.t==='boss-nomatch'){const msg=String(d.msg||'이어 할 수 없어요.');if(B&&B.coop&&S.screen==='battle')toast(msg);else bossBox(`<p style="color:#d9393f">${esc(msg)}</p><button class="btn ghost" id=bcCancel>돌아가기</button>`);}
  else if(d.t==='coop-action'&&BC.host){bossHandleAction(d);}
  else if(d.t==='boss-result'){bossClientResult(d);}
  else if(d.t==='boss-left'){bossPeerLeft();}
@@ -17748,7 +17873,7 @@ async function bossAnswerDefense(d){if(!B||!B.coop)return;const q=pickQ({cyc:1})
 // 연결은 WebRTC(PeerJS). 처음 연결할 때만 PeerJS 공개 서버를 거치고, 그 뒤는 기기끼리 바로 주고받아요.
 const PVP_COST=60;       // 한 판에 드는 코인 (훈련 정답 12개쯤) — 쉬는 시간 내내 하지 않도록
 const PVP_WIN=30,PVP_LOSE=10;
-const PVP_VER=6; // 마나 연구·공부 강화·카드 보유량 패시브가 대전에도 적용되는 버전
+const PVP_VER=7; // 7: 춤추새·오거폰 스킨 속성을 서로 보내 같은 속성으로 계산하는 버전 (6: 마나 연구·공부 강화·카드 보유량 패시브가 대전에도 적용)
 const PV={peer:null,conn:null,host:false,code:'',q:[],busy:false,foe:null,started:false,charged:false,tx:0,rx:0,out:[]};
 const TURN_SECRET='openrelayprojectsecret';let _turnCred=null;
 async function turnPrepStatic(){if(_turnCred&&_turnCred.exp>Date.now()/1000+600)return;
@@ -17796,15 +17921,16 @@ function renderPvp1(){S.screen='pvp';pvpClose();const m=S.meta;ensureDeck();cons
   <p style="line-height:1.6">인터넷으로 연결된 친구와 <b>내가 모으고 키운 카드</b>로 대전해요. 공격할 때마다 문제를 풀고, 상대가 내 트레이너를 직접 공격하면 <b>방어 문제 정답으로 피해를 1 줄일 수 있어요.</b> 랜덤 카드와 돌 아이템도 등장하고, 트레이너 스킬 중 <b>마나 연구</b>와 <b>공부 강화</b> 패시브도 적용돼요!</p>
   <div class=explain style="font-size:15px">${I('coin')} 한 판에 <b>코인 ${PVP_COST}개</b>가 들어요. 이기면 ${PVP_WIN}개, 져도 ${PVP_LOSE}개를 돌려받아요.<br>코인은 오늘의 훈련·야생 포켓몬 포획에서 문제를 맞히면 모여요. (지금 <b>${m.coins}개</b>)</div>
   ${can?'':`<p style="color:#d9393f;margin-top:8px">코인이 ${PVP_COST-m.coins}개 모자라요. 공부해서 코인을 모아 와요!</p>`}
-  <div class=row style="margin-top:12px"><button class="btn red big" id=pvHost ${can?'':'disabled'}>방 만들기</button><button class="btn blue big" id=pvJoin ${can?'':'disabled'}>방 들어가기</button></div>
+  <div class=row style="margin-top:12px"><button class="btn red big" id=pvHost>방 만들기</button><button class="btn blue big" id=pvJoin>방 들어가기</button></div>
   <div class=row style="margin-top:8px;align-items:center"><input class="inp codeIn" id=pvCode maxlength=4 inputmode=numeric placeholder="방 번호 4자리" style="flex:1"></div>
+  <p class=mut style="font-size:12.5px;margin-top:6px;line-height:1.5">🔁 <b>대전 중에 나갔다면?</b> 같은 방 번호를 넣고 같은 닉네임으로 다시 들어오면 <b>이어서</b> 할 수 있어요. (원래 방을 만든 사람은 번호를 넣고 <b>방 만들기</b>, 들어갔던 사람은 번호를 넣고 <b>방 들어가기</b>)</p>
   <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요해요. <b>학교 와이파이는 작동하지 않을 수 있어요.</b> 두 사람 모두 같은 버전의 게임 파일을 써 주세요. <a href="#" id=pvNet style="color:inherit">📶 연결 시험</a><br>친구 대전 기록: ${(m.pvp&&m.pvp.n)||0}판 · ${(m.pvp&&m.pvp.w)||0}승 · 함께한 친구 ${Object.keys((m.pvp&&m.pvp.foes)||{}).length}명 · 내 덱 ${m.deck.length}장 <a href="#" id=pvDeck style="color:inherit">덱 고치기</a></p></div>
   <div class=panel id=pvBox style="display:none;text-align:center"></div></div>`;
  bindHud();
  $('#pvDeck').onclick=e=>{e.preventDefault();renderDeck();};
  $('#pvNet').onclick=e=>{e.preventDefault();sfx('tap');showNetTest();};
- $('#pvHost').onclick=()=>{sfx('tap');pvpStart(true,String(rint(1000,9999)));};
- $('#pvJoin').onclick=()=>{const c=($('#pvCode').value||'').replace(/\D/g,'');if(c.length!==4){toast('방 번호 4자리를 넣어 주세요');return;}sfx('tap');pvpStart(false,c);};
+ $('#pvHost').onclick=()=>{const c=($('#pvCode').value||'').replace(/\D/g,'');if(!can&&c.length!==4){toast(`코인이 ${PVP_COST-m.coins}개 모자라요. 나가기 전의 방 번호를 넣으면 이어서 할 수 있어요`);return;}sfx('tap');pvpStart(true,c.length===4?c:String(rint(1000,9999)),!can);};
+ $('#pvJoin').onclick=()=>{const c=($('#pvCode').value||'').replace(/\D/g,'');if(c.length!==4){toast('방 번호 4자리를 넣어 주세요');return;}sfx('tap');pvpStart(false,c,!can);};
  coachOnce('c_pvp',[{h:'친구 대전',ic:'teacher',t:'한 사람이 <b>방 만들기</b>를 누르고 나온 번호를 알려 주면, 친구가 번호를 넣고 <b>방 들어가기</b>를 눌러요.'}]);}
 
 // ===== 연결 진단 · 안내 (친구 대전 · 협동 보스전 · 선생님께 보내기 공통) =====
@@ -17841,13 +17967,13 @@ async function showNetTest(){
  else st.p2p=['✗','기기끼리 직접 연결하는 길이 막혀 있어요'];
  draw(p2p.srflx>0?'<b>연결할 수 있을 것 같아요!</b> 방 만들기와 방 들어가기를 눌러 보세요. 그래도 안 되면 한 명을 휴대폰 데이터로 바꿔 보세요.':p2p.host>0?'<b>같은 와이파이의 친구와는 될 수 있어요.</b> 다른 곳에 있는 친구와 할 때 안 되면 한 명을 휴대폰 데이터로 바꿔 보세요.':'<b>이 네트워크에서는 연결이 어려울 수 있어요.</b> 휴대폰 데이터(핫스팟)로 바꿔서 다시 시험해 보세요. 수업 전에 선생님이 미리 확인해 두면 좋아요.');}
 function pvBox(html){const b=$('#pvBox');if(!b)return;b.style.display='block';b.innerHTML=html;{const t=b.querySelector('#netTest');if(t)t.onclick=()=>{sfx('tap');showNetTest();};}const c=b.querySelector('#pvCancel');if(c)c.onclick=()=>{sfx('tap');pvpClose();renderPvp();};}
-async function pvpStart(host,code){const m=S.meta;if(m.coins<PVP_COST){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
+async function pvpStart(host,code,rj){const m=S.meta;PV.rejoinOnly=!!rj;if(m.coins<PVP_COST&&!rj){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
  PV.host=host;PV.code=code;PV.q=[];PV.tx=0;PV.rx=0;PV.out=[];PV.started=false;PV.charged=false;PV.peerOver=false;
  pvBox(`<p>연결 준비 중…</p><button class="btn ghost" id=pvCancel>취소</button>`);
  try{await loadPeer();}catch(e){pvBox(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);return;}
  const id='pkmath-'+PVP_VER+'-'+code;
  const peer=host?new Peer(id,PO()):new Peer(PO());PV.peer=peer;pvPeerHooks(peer);
- peer.on('error',e=>{if(pvInBattle()){if(!PV.conn||!PV.conn.open)pvRecover();return;}const t=String(e&&e.type||'');pvBox(netErrHTML(t==='unavailable-id'?'이미 쓰는 방 번호예요. 다시 만들어 주세요.':t==='peer-unavailable'?'그 번호의 방이 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결하지 못했어요 ('+t+')',t,'pvCancel'));});
+ peer.on('error',e=>{if(pvInBattle()){if(!PV.conn||!PV.conn.open)pvRecover();return;}const t=String(e&&e.type||'');pvBox(netErrHTML(t==='unavailable-id'?'이미 쓰는 방 번호예요. 방금 나갔다 다시 만드는 거라면 1분쯤 뒤에 다시 눌러 보세요.':t==='peer-unavailable'?'그 번호의 방이 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결하지 못했어요 ('+t+')',t,'pvCancel'));});
  if(host)peer.on('connection',pvOnIncoming);
  peer.on('open',()=>{
   if(PV.started)return;   // 대전 중에 서버에 다시 연결돼도 처음 화면·새 연결을 만들지 않아요
@@ -17857,7 +17983,7 @@ function pvBind(c){
  c.on('open',()=>{if(PV.started){try{c.send({t:'sync',have:PV.rx});}catch(e){}return;}PV.tx=0;PV.rx=0;PV.out=[];const me=S.meta;const deck=shuffle(me.deck.slice());PV.myDeck=deck;PV.myOwned=Object.keys(me.col).map(Number).filter(id=>MON[id]);
   pvpSend({t:'hi',v:PVP_VER,name:me.name,deck,col:PV.myOwned,av:partnerId(),pg:(S.meta.pg==='f')?'f':'m',mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,sk:skinTyMap(),seed:PV.host?(Math.random()*1e9|0):0});});
  c.on('data',d=>{if(!pvRx(d))return;if(d&&d.t==='emo'){pvEmoRecv(d);return;}if(d&&d.t==='over'){PV.peerOver=true;pvpPeerOver(d);return;}PV.q.push(d);pvpPump();});
- c.on('close',()=>{if(PV.conn&&PV.conn!==c)return;if(PV.peerOver||PV.q.some(x=>x&&x.t==='quit'))return;if(PV.peer&&pvInBattle()){pvRecover();return;}if(B&&B.pvp&&!B.over){B.over=true;toast('친구와 연결이 끊겼어요');pvpEnd(null);}else if(!PV.started&&S.screen==='pvp'){pvBox(`<p>연결이 끊겼어요</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);}});}
+ c.on('close',()=>{if(PV.conn&&PV.conn!==c)return;if(PV.peerOver||PV.q.some(x=>x&&x.t==='quit'))return;if(PV.peer&&pvInBattle()){pvRecover();return;}if(B&&B.pvp&&!B.over){B.over=true;toast('친구와 연결이 끊겼어요 · 같은 방 번호'+(PV.code?'('+PV.code+')':'')+'와 닉네임으로 다시 들어오면 이어 할 수 있어요 (방장은 방 만들기, 친구는 방 들어가기)');pvpEnd(null);}else if(!PV.started&&S.screen==='pvp'){pvBox(`<p>연결이 끊겼어요</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);}});}
 // 받은 행동을 차례대로 하나씩 처리해요(애니메이션이 겹치지 않게)
 function pvSpecShow(q,k,nm0,tm){try{pvSpecHide();clearTimeout(window.__pvsT);window.__pvsT=setTimeout(pvSpecHide,90000);if(!q||!Array.isArray(q.ch))return;const nm=esc(nm0||(PV.foe&&PV.foe.name)||'친구');const el=document.createElement('div');el.id='pvSpec';el.className='k-'+(k||'def');
  const sk=SKM[q.sk]?esc(SKM[q.sk].n):'';
@@ -17890,8 +18016,8 @@ function pvSpecHide(){try{const el=$('#pvSpec');if(el)el.remove();}catch(e){}}
 async function pvpPump(){if(PV.busy||PV.intro)return;PV.busy=true;
  try{while(PV.q.length&&!PV.intro){const d=PV.q[0];
   if(d.t==='hi'){PV.q.shift();if(d.v!==PVP_VER){pvBox(`<p style="color:#d9393f">친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);continue;}PV.foe=d;if(PV.host)PV.seed=d.seed||((Math.random()*1e9)|0);
-   if(PV.host){PV.seed=PV.seed||((Math.random()*1e9)|0);pvpSend({t:'go',seed:PV.seed});pvpBegin(PV.seed);}continue;}
-  if(d.t==='go'){PV.q.shift();pvpBegin(d.seed);continue;}
+   if(PV.host){if(PV.rejoinOnly||S.meta.coins<PVP_COST){pvBox(`<p style="color:#d9393f">이어 하던 대전이 없어서 새 대전은 시작할 수 없어요. (새 대전은 코인 ${PVP_COST}개가 필요해요)</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);pvpClose();continue;}PV.seed=PV.seed||((Math.random()*1e9)|0);pvpSend({t:'go',seed:PV.seed});pvpBegin(PV.seed);}continue;}
+  if(d.t==='go'){PV.q.shift();if(PV.rejoinOnly||S.meta.coins<PVP_COST){pvBox(`<p style="color:#d9393f">이어 하던 대전이 없어서 새 대전은 시작할 수 없어요. (새 대전은 코인 ${PVP_COST}개가 필요해요)</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);pvpClose();continue;}pvpBegin(d.seed);continue;}
   if(d.t==='gg'){PV.q.shift();toast(`${esc((PV.foe&&PV.foe.name)||'친구')}: "좋은 경기였어!"`);sfx('heal');continue;}
   if(!B||!B.pvp||B.over){PV.q.shift();continue;}
   // 내 차례가 시작되기 전에 들어온 상대 행동은 상대 차례에 처리
@@ -17922,12 +18048,12 @@ async function pvpPump(){if(PV.busy||PV.intro)return;PV.busy=true;
 function pvpBegin(seed){if(PV.started)return;PV.started=true;const me=S.meta,f=PV.foe;
  me.coins-=PVP_COST;PV.charged=true;autoSave();
  const G={n:'친구 대전',ldr:f.name,c:'#bfe6ff'};
- B={gi:-2,g:G,diff:3,turn:0,round:0,side:'me',pvp:true,rng:mkRng(seed),me:mkPlayer(me.name,PV.myDeck,HERO_HP,partnerId(),true,PV.myOwned||Object.keys(me.col).map(Number),true),foe:mkPlayer(f.name,f.deck,HERO_HP,MON[f.av]?f.av:25,true,f.col||[],true),
+ B={gi:-2,g:G,diff:3,turn:0,round:0,side:'me',pvp:true,rng:mkRngS(seed),me:mkPlayer(me.name,PV.myDeck,HERO_HP,partnerId(),true,PV.myOwned||Object.keys(me.col).map(Number),true),foe:mkPlayer(f.name,f.deck,HERO_HP,MON[f.av]?f.av:25,true,f.col||[],true),
   sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:true,over:false};B.foeSkin=(f.sk&&typeof f.sk==='object')?f.sk:{};
  // 포켓몬별 특수 카드 확률 난수는 트레이너 이름과 대전 씨앗으로 분리해 두 기기에서 같은 결과가 나와요.
- B.me.drawRng=mkRng((seed^hashStr(B.me.name)^0x51A7)>>>0);B.foe.drawRng=mkRng((seed^hashStr(B.foe.name)^0x51A7)>>>0);
+ B.me.drawRng=mkRngS((seed^hashStr(B.me.name)^0x51A7)>>>0);B.foe.drawRng=mkRngS((seed^hashStr(B.foe.name)^0x51A7)>>>0);
  // 마나 연구·공부 강화 확률도 두 기기에서 같은 결과가 나오도록 플레이어별 고정 난수를 써요.
- B.me.passRng=mkRng((seed^hashStr(B.me.name)^0x7C3D)>>>0);B.foe.passRng=mkRng((seed^hashStr(B.foe.name)^0x7C3D)>>>0);
+ B.me.passRng=mkRngS((seed^hashStr(B.me.name)^0x7C3D)>>>0);B.foe.passRng=mkRngS((seed^hashStr(B.foe.name)^0x7C3D)>>>0);
  B.me.manaLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().mana)||0));B.me.studyLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().study)||0));
  B.foe.manaLv=Math.max(0,Math.min(5,Number(f.mana)||0));B.foe.studyLv=Math.max(0,Math.min(5,Number(f.study)||0));B.me.handLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().hand)||0));B.foe.handLv=Math.max(0,Math.min(5,Number(f.hand)||0));B.me.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(B.me.studyLv));B.foe.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(B.foe.studyLv));
  // 먼저 하는 사람(방장)은 3장, 나중에 하는 사람은 4장
@@ -26613,7 +26739,7 @@ html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{padding:4px 7px}
 <script id="boss-reco">
 /* 협동 보스전 재접속: 연결이 끊겨도 바로 끝내지 않고 90초 동안 다시 이어 붙여요 */
 (function(){
- const MAX=90000,PID=()=>'pkboss-coop-v1-'+BC.code;
+ const MAX=300000,PID=()=>'pkboss-coop-v1-'+BC.code;
  const inBattle=()=>!!(B&&B.coop&&!B.coop.result&&S.screen==='battle');
  function ui(html){let o=document.getElementById('bcReco');if(!o){o=document.createElement('div');o.id='bcReco';o.style.cssText='position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(20,24,44,.62);text-align:center';o.innerHTML='<div style="background:#fffaf1;color:#3a2e3f;border:3px solid #8a7650;border-radius:16px;padding:18px 22px;max-width:86vw;box-shadow:0 8px 0 rgba(0,0,0,.25)"><div style="font-size:22px;margin-bottom:6px;font-family:Jua,sans-serif">📶 연결이 끊겼어요</div><div id="bcRecoTx" style="font-size:15px;line-height:1.6"></div><button class="btn ghost" id="bcRecoX" style="margin-top:12px">포기하고 나가기</button></div>';document.body.appendChild(o);o.querySelector('#bcRecoX').onclick=()=>{window.bossRecoReset();bossPeerLeft();};}
   o.querySelector('#bcRecoTx').innerHTML=html;}
@@ -26631,9 +26757,10 @@ html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{padding:4px 7px}
  function tick(){
   if(!BC.reconnecting)return;
   if(!B||!B.coop||BC.left){window.bossRecoReset();return;}
+  {const now=Date.now();if(BC.recoLast&&now-BC.recoLast>8000)BC.recoSince=now;BC.recoLast=now;if(document.hidden){BC.recoSince=now;return;}}   // 잠들었거나 화면이 가려진 시간은 세지 않아요
   const el=Math.round((Date.now()-BC.recoSince)/1000);
   if(Date.now()-BC.recoSince>MAX){window.bossRecoReset();bossPeerLeft();return;}
-  ui(BC.host?`친구가 다시 들어오기를 기다리는 중… (${el}초)`:`방장에게 다시 연결하는 중… (${el}초)`);
+  ui((BC.host?`친구가 다시 들어오기를 기다리는 중… (${el}초)`:`방장에게 다시 연결하는 중… (${el}초)`)+`<br><small style="opacity:.75">방 코드 ${BC.code} · 앱을 껐다면 같은 코드·같은 닉네임으로 다시 들어와요 (방장이었다면 「방 만들기」, 친구였다면 「코드로 접속」)</small>`);
   let peer=BC.peer;
   if(!peer||peer.destroyed){remake();return;}
   if(peer.disconnected){try{peer.reconnect();}catch(e){}}
@@ -26645,7 +26772,7 @@ html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{padding:4px 7px}
   }}
  window.bossRecover=function(){
   if(BC.t2||!inBattle()||BC.left||BC.resultHandled||BC.reconnecting)return;
-  BC.reconnecting=true;BC.recoSince=Date.now();BC.tryAt=0;
+  BC.reconnecting=true;BC.recoSince=Date.now();BC.recoLast=0;BC.tryAt=0;
   BC.recoTimer=setInterval(tick,2500);tick();};
  window.bossResumed=function(){
   const was=BC.reconnecting||!!document.getElementById('bcReco');
@@ -26660,10 +26787,11 @@ html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{padding:4px 7px}
  setInterval(()=>{try{
   const act=inBattle()&&!!BC.peer,lobby=S.screen==='bosscoop'&&BC.ready&&!!BC.peer;
   if(act||lobby)wlOn();else wlOff();
+  if(!BC.t2&&act&&BC.peer&&!BC.peer.destroyed&&BC.peer.disconnected){try{BC.peer.reconnect();}catch(e){}}   // 연결 서버와 끊겼으면 계속 다시 붙어요
   if(BC.t2||!BC.conn||!BC.peer||BC.left)return;
   if(!act&&!lobby)return;
   if(BC.conn.open){try{BC.conn.send({t:'boss-ping'});}catch(e){}
-   if(act&&!document.hidden&&!BC.reconnecting&&Date.now()-(BC.lastRx||Date.now())>(iceOk(BC.conn)?90000:30000)){try{BC.conn.close();}catch(e){}bossRecover();}}
+   if(act&&!document.hidden&&!BC.reconnecting&&Date.now()-(BC.lastRx||Date.now())>(iceOk(BC.conn)?45000:25000)){try{BC.conn.close();}catch(e){}bossRecover();}}
   else if(act&&!BC.reconnecting)bossRecover();
  }catch(e){}},4000);
  document.addEventListener('visibilitychange',()=>{try{if(document.hidden)return;BC.lastRx=Date.now();if(inBattle()&&BC.peer){wlOn();if(!BC.t2&&(!BC.conn||!BC.conn.open))bossRecover();}}catch(e){}});
@@ -26676,7 +26804,7 @@ html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{padding:4px 7px}
  window.pvInBattle=()=>!!(B&&B.pvp&&!B.over&&!B.__pvDone&&PV.started&&S.screen==='battle');
  function ui(html){let o=document.getElementById('pvReco');if(!o){o=document.createElement('div');o.id='pvReco';o.style.cssText='position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(20,24,44,.62);text-align:center';o.innerHTML='<div style="background:#fffaf1;color:#3a2e3f;border:3px solid #8a7650;border-radius:16px;padding:18px 22px;max-width:86vw;box-shadow:0 8px 0 rgba(0,0,0,.25)"><div style="font-size:22px;margin-bottom:6px;font-family:Jua,sans-serif">📶 연결이 끊겼어요</div><div id="pvRecoTx" style="font-size:15px;line-height:1.6"></div><button class="btn ghost" id="pvRecoX" style="margin-top:12px">포기하고 나가기</button></div>';document.body.appendChild(o);o.querySelector('#pvRecoX').onclick=()=>giveUp();}
   o.querySelector('#pvRecoTx').innerHTML=html;}
- function giveUp(){window.pvRecoReset();try{if(B&&B.pvp&&!B.over){B.over=true;toast('친구와 연결이 끊겼어요');pvpEnd(null);}}catch(e){}}
+ function giveUp(){window.pvRecoReset();try{if(B&&B.pvp&&!B.over){B.over=true;toast('친구와 연결이 끊겼어요 · 같은 방 번호'+(PV.code?'('+PV.code+')':'')+'와 닉네임으로 다시 들어오면 이어 할 수 있어요 (방장은 방 만들기, 친구는 방 들어가기)');pvpEnd(null);}}catch(e){}}
  window.pvRecoReset=function(){try{clearInterval(PV.recoTimer);}catch(e){}PV.recoTimer=0;PV.reconnecting=false;PV.tryAt=0;const o=document.getElementById('pvReco');if(o)o.remove();};
  window.pvPeerHooks=function(peer){try{peer.on('disconnected',()=>{try{if(!peer.destroyed)peer.reconnect();}catch(e){}});}catch(e){}};
  window.pvOnIncoming=function(c){
@@ -26692,6 +26820,9 @@ html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{padding:4px 7px}
  function resend(have){try{if(!PV.conn||!PV.conn.open)return;for(const o of PV.out)if(o.n>have)PV.conn.send(o);}catch(e){}}
  window.pvRx=function(d){
   if(!d||typeof d!=='object')return false;
+  if(d.t==='hi'&&PV.started){try{pvRejoinReq(d);}catch(e){console.warn('rejoin',e);}return false;}          // 나갔던 친구가 같은 방으로 다시 들어옴
+  if(d.t==='resume'&&!PV.started){try{pvRestore(d);}catch(e){console.warn('restore',e);try{pvBox('<p style="color:#d9393f">이어 하기에 실패했어요.</p><button class="btn ghost" id=pvCancel>돌아가기</button>');}catch(_){}}return false;}
+  if(d.t==='noresume'&&!PV.started){try{pvBox(`<p style="color:#d9393f">${esc(d.msg||'이어 할 수 없어요.')}</p><button class="btn ghost" id=pvCancel>돌아가기</button>`);}catch(e){}return false;}
   PV.lastRx=Date.now();if(PV.reconnecting)window.pvResumed();
   if(typeof d.a==='number')trim(d.a);
   if(d.t==='ping')return false;
@@ -26710,7 +26841,7 @@ html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{padding:4px 7px}
    if(document.hidden){PV.recoSince=now;return;}}                                              // 화면이 가려진 동안은 기다리기만 해요
   const el=Math.round((Date.now()-PV.recoSince)/1000);
   if(Date.now()-PV.recoSince>MAX){giveUp();return;}
-  ui(PV.host?`친구가 다시 들어오기를 기다리는 중… (${el}초)`:`친구에게 다시 연결하는 중… (${el}초)`);
+  ui((PV.host?`친구가 다시 들어오기를 기다리는 중… (${el}초)`:`친구에게 다시 연결하는 중… (${el}초)`)+`<br><small style="opacity:.75">방 번호 ${PV.code} · 앱을 껐다면 같은 번호·같은 닉네임으로 다시 들어와요 (방장이었다면 「방 만들기」, 친구였다면 「방 들어가기」)</small>`);
   let peer=PV.peer;
   if(!peer||peer.destroyed){remake();return;}
   if(peer.disconnected){try{peer.reconnect();}catch(e){}}
@@ -26745,6 +26876,111 @@ html body .hud .hl1 .btn.sm,html body .hud .hl2 .btn.sm{padding:4px 7px}
    if(PV.peer&&!PV.peer.destroyed&&PV.peer.disconnected){try{PV.peer.reconnect();}catch(e){}}
    if(!PV.peer||PV.peer.destroyed||!PV.conn||!PV.conn.open)pvRecover();}}catch(e){}});
 })();
+</script>
+<script id="pvp-rejoin">
+/* 친구 대전 다시 들어오기: 나갔던 친구가 같은 방 번호·같은 닉네임으로 들어오면, 남아 있던 쪽의 전투 상태를 보내 줘서 그 자리에서 이어서 해요 */
+function mkRngS(seed){let a=seed|0;const f=function(){a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};f.get=()=>a;f.set=v=>{a=v|0;};return f;}
+/* 같은 객체를 여러 곳에서 가리키는 구조(거다이맥스 등)도 유지하도록, 객체마다 번호를 붙여 평평하게 바꿔요 */
+function gEnc(root){const ids=new Map(),tab=[];
+ function enc(v){if(v===null||v===undefined)return null;const ty=typeof v;if(ty==='function')return null;if(ty!=='object')return(ty==='number'&&!isFinite(v))?0:v;
+  if(typeof Node!=='undefined'&&v instanceof Node)return null;if(ids.has(v))return{$r:ids.get(v)};
+  const id=tab.length;ids.set(v,id);tab.push(null);let o;
+  if(Array.isArray(v)){o=v.map(enc);}else{o={};for(const k in v){const x=v[k];if(typeof x==='function')continue;o[k]=enc(x);}}
+  tab[id]=o;return{$r:id};}
+ const r=enc(root);return{t:tab,r};}
+function gDec(g){const objs=g.t.map(o=>Array.isArray(o)?[]:{});
+ const dec=x=>(x&&typeof x==='object'&&('$r' in x))?objs[x.$r]:x;
+ g.t.forEach((o,i)=>{if(Array.isArray(o))o.forEach((x,j)=>{objs[i][j]=dec(x);});else for(const k in o)objs[i][k]=dec(o[k]);});
+ return dec(g.r);}
+function pvMyProfile(){const me=S.meta;return{t:'hi',v:PVP_VER,name:me.name,deck:PV.myDeck||me.deck.slice(),col:PV.myOwned||Object.keys(me.col).map(Number).filter(id=>MON[id]),av:partnerId(),pg:(me.pg==='f')?'f':'m',mana:Number(trainerSkillLevels().mana)||0,study:Number(trainerSkillLevels().study)||0,hand:Number(trainerSkillLevels().hand)||0,sk:skinTyMap()};}
+let _rjBusy=false;
+function pvNoResume(msg){try{PV.conn&&PV.conn.open&&PV.conn.send({t:'noresume',msg});}catch(e){}}
+// (남아 있는 쪽) 친구가 다시 들어왔어요 → 닉네임이 같으면 전투 상태를 보내요
+function pvRejoinReq(d){
+ if(_rjBusy)return;
+ const f=PV.foe;
+ if(!B||!B.pvp||B.over||B.__pvDone||!f){pvNoResume('이 방의 대전은 이미 끝났어요. 새 방을 만들어 주세요.');return;}
+ if(d.v!==PVP_VER){pvNoResume('친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.');return;}
+ if(String(d.name||'').trim()!==String(f.name||'').trim()){pvNoResume('이 방은 다른 닉네임('+String(f.name||'')+')의 대전이 진행 중이에요. 같은 닉네임으로 들어와야 이어 할 수 있어요.');return;}
+ // 같은 사람의 단순 재전송(처음 인사 다시 받기)이면 무시해요
+ try{if(f.seed!==undefined&&d.seed===f.seed&&JSON.stringify(d.deck)===JSON.stringify(f.deck))return;}catch(e){}
+ _rjBusy=true;const t0=Date.now();let asked=false;
+ const done=()=>{_rjBusy=false;};
+ const step=()=>{
+  if(!B||!B.pvp||B.over||B.__pvDone){done();return;}
+  // 친구가 막기 문제를 풀기 전에 나간 공격은 막지 못한 것으로 처리해요
+  if(B.pendingAttack&&!asked&&!PV.q.length){asked=true;PV.q.push({t:'defres',reduce:0,ok:false,ctr:0,dh:0});try{pvpPump();}catch(e){}}
+  if(PV.intro||PV.busy||B.busy){if(Date.now()-t0>40000){pvNoResume('친구가 문제를 푸는 중이에요. 잠시 뒤에 다시 들어와 주세요.');done();return;}setTimeout(step,300);return;}
+  try{
+   const rs=P=>({d:P.drawRng&&P.drawRng.get?P.drawRng.get():0,p:P.passRng&&P.passRng.get?P.passRng.get():0});
+   const snap=gEnc({me:B.me,foe:B.foe,turn:B.turn,round:B.round,side:B.side,rng:(B.rng&&B.rng.get)?B.rng.get():0,rs:{me:rs(B.me),foe:rs(B.foe)}});
+   PV.q=[];PV.tx=0;PV.rx=0;PV.out=[];
+   PV.foe=Object.assign({},f,{name:d.name,av:d.av,pg:d.pg,sk:d.sk||f.sk,deck:d.deck||f.deck,col:d.col||f.col,seed:d.seed});B.foeSkin=(d.sk&&typeof d.sk==='object')?d.sk:(B.foeSkin||{});
+   PV.conn.send({t:'resume',snap,foe:pvMyProfile()});
+   try{window.pvResumed();}catch(e){}
+   toast(`${f.name}님이 다시 들어왔어요! 이어서 해요`);try{sfx('heal');}catch(e){}
+   renderBattle();
+  }catch(e){console.warn('rejoin snap',e);pvNoResume('상태를 보내지 못했어요. 다시 시도해 주세요.');}
+  done();};
+ step();}
+// (다시 들어온 쪽) 받은 상태로 전투를 다시 세워요: 상대가 보던 '나'와 '상대'를 서로 바꿔요
+function pvRestore(d){
+ const g=gDec(d.snap),me=S.meta,f=d.foe;if(!g||!g.me||!g.foe)throw new Error('bad snap');
+ PV.foe=f;PV.started=true;PV.charged=true;PV.tx=0;PV.rx=0;PV.out=[];PV.q=[];PV.busy=false;PV.intro=0;PV.peerOver=false;PV.rejoinOnly=false;
+ PV.myDeck=me.deck.slice();PV.myOwned=Object.keys(me.col).map(Number).filter(id=>MON[id]);
+ const G={n:'친구 대전',ldr:f.name,c:'#bfe6ff'};
+ B={gi:-2,g:G,diff:3,turn:g.turn|0,round:g.round|0,side:g.side==='me'?'foe':'me',pvp:true,rng:mkRngS(0),me:g.foe,foe:g.me,sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:true,over:false,trainerSkillUsed:{},counterActive:0};
+ B.rng.set(g.rng|0);
+ const st=(P,r)=>{r=r||{};P.drawRng=mkRngS(0);P.drawRng.set(r.d|0);P.passRng=mkRngS(0);P.passRng.set(r.p|0);};
+ st(B.me,g.rs&&g.rs.foe);st(B.foe,g.rs&&g.rs.me);
+ B.foeSkin=(f.sk&&typeof f.sk==='object')?f.sk:{};
+ try{pvRecoReset();}catch(e){}
+ S.screen='battle';$('#view').innerHTML='';$('#battle').classList.add('on');startBgm('battle');
+ renderBattle();toast('대전에 다시 들어왔어요! 이어서 해요');try{sfx('heal');}catch(e){}
+ try{pvpPump();}catch(e){}}
+/* 대전 화면 오른쪽 위 「메뉴」 옆에 방 번호를 보여 줘요 */
+{const o=renderBattle;renderBattle=function(){const r=o.apply(this,arguments);
+ try{const rc=(B&&B.t2&&T2&&T2.code)||((B&&B.pvp&&!B.t2&&!B.coop&&PV&&PV.code)?PV.code:'')||((B&&B.coop&&!B.t2&&BC&&BC.code)?BC.code:'');if(rc){const bt=document.getElementById('battle'),mb=bt&&bt.querySelector('#bMenu');
+  if(mb&&!bt.querySelector('.roomPill')){const row=document.createElement('div');row.className='mRow';row.style.cssText='display:flex;align-items:center;gap:6px';
+   const p=document.createElement('span');p.className='pill roomPill';p.title='나갔다가 이 방 번호로 다시 들어오면 이어서 할 수 있어요';p.style.cssText='font-size:12px;padding:3px 9px;white-space:nowrap';p.textContent='🚪 방 '+rc;
+   mb.parentNode.insertBefore(row,mb);row.appendChild(p);row.appendChild(mb);}}}catch(e){}return r;};}
+</script>
+<script id="coop-rejoin">
+/* 2인 협동 보스전 다시 들어오기
+   - 친구가 나갔다 같은 코드로 다시 들어오면: 방장이 가진 전투 상태를 그대로 보내 줘요 (닉네임이 같아야 해요)
+   - 방장이 나갔다 같은 코드로 방을 다시 열면: 친구 화면에 남아 있는 전투 상태로 이어요 (방장 손패는 방장 덱에서 새로 뽑아요) */
+window.bossGuestSnap=function(){try{if(BC.host||!(B&&B.coop)||B.coop.result||S.screen!=='battle')return null;return JSON.parse(JSON.stringify(B));}catch(e){return null;}};
+window.bossRejoinHi=function(d,c){
+ try{
+  if(!BC.host)return false;
+  const same=(a,b)=>String(a||'').trim()===String(b||'').trim();
+  const bye=msg=>{try{c.send({t:'boss-nomatch',msg});}catch(e){}setTimeout(()=>{try{c.close();}catch(e){}},500);};
+  if(B&&B.coop&&S.screen==='battle'&&!B.coop.result){   // 전투가 진행 중: 같은 닉네임의 친구만 다시 앉혀요
+   if(d.v!==BOSS_NET_VER){bye('친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.');return true;}
+   const pn=B.coop.players&&B.coop.players[1]&&B.coop.players[1].name;
+   if(BC.foe&&!same(d.name,BC.foe.name||pn)){bye(`이 방은 '${BC.foe.name||pn}'님과 전투 중이에요. 같은 닉네임으로 들어와야 이어 할 수 있어요.`);return true;}
+   return false;}   // 같은 닉네임이면 기존 처리(지금 상태를 다시 보내 주기)로
+  if(d.snap&&d.snap.coop&&!d.snap.coop.result&&!(B&&B.coop)){   // 방장이 다시 열었는데 친구가 전투 화면을 가지고 있음
+   if(d.v!==BOSS_NET_VER){bye('친구와 게임 버전이 달라요. 둘 다 최신 파일로 열어 주세요.');return true;}
+   const p0=d.snap.coop.players&&d.snap.coop.players[0];
+   if(!p0||!same(p0.name,S.meta.name)){bye(`이 방은 '${p0&&p0.name||'다른 방장'}'님의 전투예요. 같은 닉네임으로 방을 열어야 이어 할 수 있어요.`);return true;}
+   bossRestoreHost(d);return true;}
+ }catch(e){console.warn('coop rejoin',e);}
+ return false;};
+function bossRestoreHost(d){
+ const m=S.meta,st=JSON.parse(JSON.stringify(d.snap));
+ BC.foe=d;BC.ready=true;BC.resultHandled=false;BC.clientCaught=[];BC.lastSeqByPlayer={};BC.lastSeq=0;BC.processing=false;BC.localIndex=0;BC.defWait=null;
+ const p0=st.coop.players[0];
+ p0.deck=shuffle(m.deck.slice());p0.hand=[];
+ B=st;B.busy=false;B.over=false;B.coop.processing=false;B.coop.localIndex=0;
+ try{bossRewire();}catch(e){}
+ for(let i=0;i<3;i++){try{draw(p0,true);}catch(e){break;}}
+ try{bossRecoReset();}catch(e){}
+ S.screen='battle';$('#view').innerHTML='';try{$('#bq').classList.remove('on');closeInfo();}catch(e){}$('#battle').classList.add('on');startBgm('battle');
+ // 보스 차례 중간에 끊겼다면 보스 차례부터 다시 시작해요
+ if(B.side==='foe'){try{bossSetActive(1);}catch(e){}B.side='me';try{startTurn('foe');}catch(e){console.warn(e);}}
+ renderBattle();toast('전투에 다시 들어왔어요! 이어서 해요');try{sfx('heal');}catch(e){}
+ setTimeout(()=>{try{bossBroadcast(true);}catch(e){}},300);}
 </script>
 <script id="boss-shards">
 /* 협동 보스전 승리 보상: 보스 1마리당 조각 4개 (조각이 다 모이면 카드가 되고, 남는 조각은 코인·별가루로 바뀌어요) */
@@ -26873,6 +27109,11 @@ html body .trGrid{max-height:38vh;overflow:auto;padding:4px;margin:6px 0;-webkit
 html body .trGrid .dexCell{cursor:pointer}
 html body .trGrid .dexCell.trSel{outline:4px solid #ffb703;outline-offset:-2px;background:#fff6d6;transform:scale(1.04);z-index:1}
 html body .trGrid .dexCell .tg{position:absolute;top:2px;right:3px;font-size:10px;background:#ffb703;border-radius:8px;padding:0 5px;color:#5a3b00}
+.spTags{position:absolute;z-index:3;display:flex;flex-direction:column;gap:1px;pointer-events:none}
+.dexCell .spTags{top:3px;right:3px;align-items:flex-end}
+.card .spTags{left:3px;top:27px;align-items:flex-start}
+.spT{font-style:normal;font:700 9px/12px 'Jua',sans-serif;padding:0 5px;border-radius:7px;color:#fff;box-shadow:0 1px 0 rgba(0,0,0,.28);white-space:nowrap;border:1px solid rgba(255,255,255,.7)}
+.spT.spM{background:#7b4be0}.spT.spW{background:#d9482b}.spT.spS{background:#1f8fd8}.spT.spF{background:#12957a}.spT.spP{background:#4fb39a}.spT.spK{background:#e0588f}.spT.spG{background:#f2b705;color:#5a3b00}
 html body .trPrev{display:flex;align-items:center;gap:10px;min-height:58px;background:#fff8e6;border:2px dashed #f0cf7a;border-radius:14px;padding:6px 10px;font-size:14px;text-align:left}
 html body .trPrev img{width:52px;height:52px;object-fit:contain}
 html body .trSwap{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0;flex-wrap:wrap}
@@ -29052,7 +29293,7 @@ rlTutorial=function(){
    - 방장이 판정(권위 호스트)하고, 모든 화면에는 '내 팀이 아래' 시점으로 상태를 보내요
    =================================================================== */
 const T2_VER=1;
-const T2_RECO_MAX=90000; // 연결이 끊긴 친구를 기다려 주는 시간(90초)
+const T2_RECO_MAX=300000; // 연결이 끊긴 친구를 기다려 주는 시간(90초)
 const T2={mode:'pvp',peer:null,host:false,code:'',members:[],lobby:null,started:false,queue:[],pumping:false,proc:false,
  defWait:null,defSeq:0,bt:null,dirty:false,nextId:2,myId:1,charged:false,resDone:false,conn:null,tries:0};
 window.T2=T2;
@@ -29081,8 +29322,9 @@ function renderPvp2(){S.screen='pvp';pvpClose();t2Close();const m=S.meta;ensureD
   <p style="line-height:1.65;margin-top:8px">4명이 모여 <b>두 팀(2명씩)</b>으로 싸워요. 팀마다 <b>8칸 필드를 함께</b> 쓰고, 한 팀의 두 사람이 <b>동시에</b> 행동해요. 두 사람이 모두 <b>차례 끝</b>을 누르면 다음 팀의 두 사람이 동시에 시작해요. 상대 트레이너를 공격할 때는 <b>둘 중 한 명</b>을 골라요. 한 명의 체력이 0이 되어도 남은 한 명이 쓰러진 친구의 포켓몬까지 모두 조종하며 전투를 이어가요. <b>팀원 둘 다</b> 체력이 0이 되면 그 팀이 져요.</p>
   <div class=explain style="font-size:14px">${I('coin')} 한 판에 <b>코인 ${PVP_COST}개</b> · 이기면 ${PVP_WIN}개, 져도 ${PVP_LOSE}개를 돌려받아요. (지금 <b>${m.coins}개</b>)</div>
   ${can?'':`<p style="color:#d9393f;margin-top:8px">코인이 ${PVP_COST-m.coins}개 모자라요. 공부해서 코인을 모아 와요!</p>`}
-  <div class=row style="margin-top:12px"><button class="btn red big" id=t2Host ${can?'':'disabled'}>방 만들기 (방장)</button><button class="btn blue big" id=t2Join ${can?'':'disabled'}>방 들어가기</button></div>
+  <div class=row style="margin-top:12px"><button class="btn red big" id=t2Host ${can?'':'disabled'}>방 만들기 (방장)</button><button class="btn blue big" id=t2Join>방 들어가기</button></div>
   <div class=row style="margin-top:8px;align-items:center"><input class="inp codeIn" id=t2Code maxlength=4 inputmode=numeric placeholder="방 번호 4자리" style="flex:1"></div>
+  <p class=mut style="font-size:12.5px;margin-top:8px;line-height:1.5">🔁 <b>전투 중에 나갔다면?</b> 같은 방 번호를 넣고 <b>방 들어가기</b>로 <b>같은 닉네임</b>으로 다시 들어오면 원래 자리에서 이어서 할 수 있어요. (방장이 앱을 껐을 때는 이어 할 수 없어요)</p>
   <p class=mut style="font-size:12px;margin-top:10px">방장이 방을 열면 나머지 3명이 같은 방 번호로 들어와요. <a href="#" id=t2Net style="color:inherit">📶 연결 시험</a> · 내 덱 ${m.deck.length}장 <a href="#" id=t2Deck style="color:inherit">덱 고치기</a></p></div>
   <div class=panel id=t2Box style="display:none;text-align:center"></div></div>`;
  bindHud();
@@ -29090,7 +29332,7 @@ function renderPvp2(){S.screen='pvp';pvpClose();t2Close();const m=S.meta;ensureD
  $('#t2Deck').onclick=e=>{e.preventDefault();renderDeck();};
  $('#t2Net').onclick=e=>{e.preventDefault();sfx('tap');showNetTest();};
  $('#t2Host').onclick=()=>{sfx('tap');t2Host();};
- $('#t2Join').onclick=()=>{const c=($('#t2Code').value||'').replace(/\D/g,'');if(c.length!==4){toast('방 번호 4자리를 입력해 주세요');return;}sfx('tap');t2Join(c);};}
+ $('#t2Join').onclick=()=>{const c=($('#t2Code').value||'').replace(/\D/g,'');if(c.length!==4){toast('방 번호 4자리를 입력해 주세요');return;}sfx('tap');t2Join(c,undefined,undefined,!can);};}
 
 function t2Box(h){const b=$('#t2Box');if(!b)return;b.style.display='block';b.innerHTML=h;{const t=b.querySelector('#netTest');if(t)t.onclick=()=>{sfx('tap');showNetTest();};}
  const c=b.querySelector('#t2Cancel');if(c)c.onclick=()=>{sfx('tap');t2Leave();};}
@@ -29109,7 +29351,7 @@ function t2Close(){try{if(T2.started&&!T2.host&&T2.conn&&T2.conn.open&&t2Active(
  Object.assign(T2,{mode:'pvp',peer:null,host:false,code:'',members:[],lobby:null,started:false,queue:[],pumping:false,proc:false,defWait:null,bt:null,dirty:false,nextId:2,myId:1,charged:false,resDone:false,conn:null,tries:0,tok:'',reco:null,gTimer:0,recoTimer:0,lastRx:0,lastEnd:null,bn:4});}
 
 /* ------------------------------ 내 정보 ------------------------------ */
-function t2MyHi(){const L=trainerSkillLevels();return{t:'t2-hi',v:T2_VER,tok:T2.tok||'',mode:T2.mode,name:String(S.meta.name||'').trim()||'친구',av:partnerId(),pg:(S.meta.pg==='f')?'f':'m',vit:vitBonus(),mana:Number(L.mana)||0,study:Number(L.study)||0,hand:Number(L.hand)||0,evo:Number(L.evo)||0,deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number)};}
+function t2MyHi(){const L=trainerSkillLevels();return{t:'t2-hi',v:T2_VER,tok:T2.tok||'',mode:T2.mode,name:String(S.meta.name||'').trim()||'친구',av:partnerId(),pg:(S.meta.pg==='f')?'f':'m',vit:vitBonus(),mana:Number(L.mana)||0,study:Number(L.study)||0,hand:Number(L.hand)||0,evo:Number(L.evo)||0,sk:skinTyMap(),deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number)};}
 
 /* ------------------------------ 방장: 방 만들기 ------------------------------ */
 async function t2Host(mode,bn){mode=mode||'pvp';const m=S.meta;if(mode==='pvp'&&m.coins<PVP_COST){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
@@ -29121,10 +29363,12 @@ async function t2Host(mode,bn){mode=mode||'pvp';const m=S.meta;if(mode==='pvp'&&
  peer.on('error',e=>{const t=String(e&&e.type||'');if(t2Active())return;
   if(t==='unavailable-id'&&T2.tries++<6){try{peer.destroy();}catch(_){}T2.peer=null;t2Host(T2.mode,T2.bn);return;}
   t2Box(netErrHTML(t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결하지 못했어요 ('+t+')',t,'t2Cancel'));});
+ peer.on('connection',t2OnIncoming);
  peer.on('open',()=>{
+  if(T2.members.length)return;   // 연결 서버에 다시 붙은 경우: 이미 모인 사람들 정보를 지우지 않아요
   T2.members=[{id:1,host:true,name:String(m.name||'').trim()||'방장',av:partnerId(),team:null,pos:null,conn:null,hi:t2MyHi()}];T2.nextId=2;T2.myId=1;
   BC.host=true;BC.t2=true;BC.peer=peer;BC.conn={open:true,send:o=>t2Raw(o),close(){}};
-  peer.on('connection',t2OnIncoming);t2PushLobby();});}
+  t2PushLobby();});}
 
 // 방장 → 모든 친구에게 (연출·알림 같은 공통 메시지)
 function t2HostMid(){const m=T2.members.find(x=>x.host);return m?m.id:null;}
@@ -29148,6 +29392,7 @@ function t2OnIncoming(c){
  if(T2.started){ // 전투 중에는 '다시 들어오기'만 받아요 (끊겼던 친구가 같은 방 번호 + 자기 표식으로 다시 연결)
   c.on('data',d=>{try{
    if(c.__m){t2HostRx(c.__m,d);return;}
+   if(d&&d.t==='t2-hi'){t2NameRejoin(c,d);return;}
    if(d&&d.t==='t2-rejoin'){const m=T2.members.find(x=>!x.host&&x.id===d.id&&x.tok&&x.tok===String(d.tok||''));
     if(m&&T2.lastEnd){try{c.send(T2.lastEnd);}catch(e){}setTimeout(()=>{try{c.close();}catch(e){}},500);return;} // 끊긴 사이 끝난 전투: 진짜 결과 화면을 보내 줘요
     if(m&&t2Active()&&!B.over&&!B.t2.fin){t2Rebind(m,c);return;}
@@ -29159,6 +29404,18 @@ function t2OnIncoming(c){
  const m={id:T2.nextId++,host:false,name:'',av:25,team:null,pos:null,conn:c,hi:null};T2.members.push(m);
  c.on('data',d=>{try{t2HostRx(m,d);}catch(e){console.error('t2 host rx',e);}});
  c.on('close',()=>t2HostClosed(m,c));c.on('error',()=>{});}
+// 앱을 껐다 켜서 표식(tok)을 잃은 친구도, 같은 방 번호 + 같은 닉네임이면 원래 자리(팀·덱·손패)로 돌아와요
+function t2NameRejoin(c,d){
+ const bye=o=>{try{c.send(o);}catch(e){}setTimeout(()=>{try{c.close();}catch(e){}},500);};
+ if(d.v!==T2_VER||(d.mode||'pvp')!==T2.mode){bye({t:'t2-ver'});return;}
+ const nm=String(d.name||'친구').slice(0,12).trim(),now=Date.now();
+ if(!(t2Active()&&!B.over&&!B.t2.fin)){bye({t:'t2-nomatch',msg:'이 방의 전투는 이미 끝났어요.'});return;}
+ const cands=T2.members.filter(x=>!x.host&&String(x.name||'').trim()===nm);
+ const m=cands.find(x=>x.down)||cands.find(x=>!x.conn||!x.conn.open||now-(x.lastRx||0)>8000);
+ if(!m){bye({t:'t2-nomatch',msg:cands.length?`'${nm}'님은 아직 연결되어 있어요. 잠시 뒤에 다시 들어와 보세요.`:`이 방에서 '${nm}' 닉네임으로 하던 전투를 찾지 못했어요. 닉네임이 같은지 확인해 주세요.`});return;}
+ m.tok=String(d.tok||'').slice(0,40);
+ try{c.send({t:'t2-rejoined',id:m.id});}catch(e){}
+ t2Rebind(m,c);}
 function t2HostClosed(m,c){const i=T2.members.indexOf(m);if(i<0)return;if(c&&m.conn&&m.conn!==c)return;
  if(T2.started){if(t2Active()&&!B.over&&!B.t2.fin){try{t2MemberDown(m);}catch(e){console.error('t2 down',e);t2Abort(`${m.name||'친구'}님의 연결이 끊어졌어요`);}}return;}
  T2.members.splice(i,1);t2PushLobby();}
@@ -29181,14 +29438,14 @@ function t2Seat(m,team,pos){if(!(team===0||team===1)||!(pos===0||pos===1)){if(te
 const t2CanStart=()=>T2.members.filter(m=>m.hi&&m.team!=null).length===4&&[0,1].every(t=>[0,1].every(p=>T2.members.some(m=>m.team===t&&m.pos===p)));
 
 /* ------------------------------ 친구: 방 들어가기 ------------------------------ */
-async function t2Join(code,mode,bn){mode=mode||'pvp';const m=S.meta;if(mode==='pvp'&&m.coins<PVP_COST){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
- t2Close();T2.tok=Math.random().toString(36).slice(2,12)+Date.now().toString(36);T2.mode=mode;T2.bn=bn===2?2:4;T2.host=false;T2.code=code;t2Box(`<p>연결 준비 중…</p><button class="btn ghost" id=t2Cancel>취소</button>`);
+async function t2Join(code,mode,bn,rj){mode=mode||'pvp';const m=S.meta;if(mode==='pvp'&&m.coins<PVP_COST&&!rj){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
+ t2Close();T2.rjOnly=!!rj;T2.tok=Math.random().toString(36).slice(2,12)+Date.now().toString(36);T2.mode=mode;T2.bn=bn===2?2:4;T2.host=false;T2.code=code;t2Box(`<p>연결 준비 중…</p><button class="btn ghost" id=t2Cancel>취소</button>`);
  try{await loadPeer();}catch(e){t2Box(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);return;}
  let peer;try{peer=new Peer(PO());}catch(e){t2Box(`<p style="color:#d9393f">연결을 시작하지 못했어요</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);return;}
  T2.peer=peer;BC.host=false;BC.t2=true;BC.peer=peer;
  peer.on('disconnected',()=>{try{if(!peer.destroyed)peer.reconnect();}catch(e){}});
  peer.on('error',e=>{const t=String(e&&e.type||'');if(t2Active()||T2.lobby)return;t2Box(netErrHTML(t==='peer-unavailable'?'그 번호의 방이 없어요.':t==='network'||t==='server-error'||t==='socket-error'?'연결 서버에 닿지 못했어요.':'연결하지 못했어요 ('+t+')',t,'t2Cancel'));});
- peer.on('open',()=>{t2Box(`<p>방 ${code}에 들어가는 중…</p><button class="btn ghost" id=t2Cancel>취소</button>`);
+ peer.on('open',()=>{if(T2.conn)return;t2Box(`<p>방 ${code}에 들어가는 중…</p><button class="btn ghost" id=t2Cancel>취소</button>`);
   const c=peer.connect(t2Pre()+T2_VER+'-'+code,{reliable:true});T2.conn=c;BC.conn=c;
   c.on('open',()=>{try{c.send(t2MyHi());}catch(e){}});
   c.on('data',d=>{try{t2GuestRx(d);}catch(e){console.error('t2 guest rx',e);}});
@@ -29206,7 +29463,11 @@ function t2GuestRx(d){if(!d||typeof d!=='object')return;T2.lastRx=Date.now();if(
  if(d.t==='t2-fvote'){t2FvShow(d);return;}
  if(d.t==='t2-fres'){t2FvHide();if(!d.ok)toast('강제 진행하지 않았어요 · '+(d.why||''));return;}
  if(d.t==='t2-norejoin'){if(T2.reco)t2OnAbort({reason:'방장이 다시 이어 주지 못했어요'});return;}
- if(d.t==='t2-lobby'){T2.lobby={you:d.you,members:d.members};T2.mode=d.mode||'pvp';T2.myId=d.you;t2DrawLobby();}
+ if(d.t==='t2-nomatch'){t2Box(`<p style="color:#d9393f">${esc(d.msg||'이어 할 전투를 찾지 못했어요.')}</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);return;}
+ if(d.t==='t2-rejoined'){   // 다시 들어왔어요: 곧 방장이 지금 전투 화면을 보내 줘요
+  T2.myId=d.id;T2.started=true;T2.charged=true;T2.resDone=false;T2.lobby={you:d.id,members:[],mode:T2.mode};T2.lastRx=Date.now();
+  BC.resultHandled=false;BC.pendingSnap=null;BC.fxUntil=0;try{startBgm('battle');}catch(e){}toast('전투에 다시 들어왔어요! 이어서 해요');return;}
+ if(d.t==='t2-lobby'){if(T2.rjOnly){const code=T2.code,md=T2.mode;t2Close();t2Box(`<p style="color:#d9393f">이어 하던 전투가 없는 방이에요. 새 전투는 코인 ${PVP_COST}개가 필요해서 들어갈 수 없어요.</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);return;}T2.lobby={you:d.you,members:d.members};T2.mode=d.mode||'pvp';T2.myId=d.you;t2DrawLobby();}
  else if(d.t==='t2-full'){t2Box(`<p style="color:#d9393f">${d.started?'이미 전투가 시작된 방이에요.':'방이 가득 찼어요. ('+t2N()+'명까지)'}</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);}
  else if(d.t==='t2-ver'){t2Box(`<p style="color:#d9393f">방장과 게임 버전이 달라요. 모두 최신 파일로 열어 주세요.</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);}
  else if(d.t==='t2-intro'){t2IntroRecv(d);}
@@ -29251,7 +29512,7 @@ function t2StartMatch(){if(!T2.host||T2.started||!t2CanStart())return;
  const teams=seats.map((tm,t)=>tm.map((m,i)=>{const hi=m.hi;const hp=m.host?heroHpMax():HERO_HP+t2clamp(hi.vit,0,5);
   const p=mkPlayer(nameOf(m),hi.deck,hp,MON[hi.av]?hi.av:25,false,hi.owned,true);
   p.manaLv=t2clamp(hi.mana,0,5);p.studyLv=t2clamp(hi.study,0,5);p.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(p.studyLv));p.handLv=t2clamp(hi.hand,0,5);p.evoLv=t2clamp(hi.evo,0,5);
-  p.team=t;p.tix=i;p.mid=m.id;p.tsUsed={};p.ctr=0;p.t2done=0;p.qc=0;p.board=boards[t];return p;}));
+  p.skm=skinCleanMap(hi.sk);p.team=t;p.tix=i;p.mid=m.id;p.tsUsed={};p.ctr=0;p.t2done=0;p.qc=0;p.board=boards[t];return p;}));
  teams.forEach((tm,t)=>tm.forEach(p=>{for(let i=0;i<(t===0?3:4);i++)draw(p,true);}));
  const hostM=T2.members[0],vt=hostM.team,li=hostM.pos;BC.localIndex=li;BC.host=true;BC.t2=true;
  T2.started=true;T2.queue=[];T2.resDone=false;
@@ -29612,6 +29873,7 @@ function renderBoss4(n){n=n===2?2:4;S.screen='bosscoop';bossClose();t2Close();co
   <details class=bossHow style="margin-top:10px"><summary class="btn ghost sm" style="cursor:pointer;list-style:none">📖 설명 보기 / 접기</summary><div class=explain style="margin-top:8px;font-size:14px;line-height:1.7">• ${n}명 모두 <b>동시에</b> 행동하고, 모두 <b>차례 끝</b>을 누르면 보스 차례가 돼요.<br>• ${n===2?8:10}칸 필드와 <b>트레이너 체력은 모두가 함께</b> 써요. 체력은 <b>${n===2?20:30}</b> + 각자의 체력증강 레벨 합(모두 5레벨이면 <b>${n===2?30:50}</b>)이에요.<br>• 트레이너 스킬은 <b>각자</b> 쓸 수 있어요.<br>${n===2?'• 보스는 <b>1마리면 2회</b>, <b>2마리면 각각 1회</b> 공격해요. 한 마리가 쓰러지면 남은 보스는 2회가 돼요. 우리 필드에 포켓몬이 <b>3마리 이상</b>이면 +1회(6마리 이상이면 +2회), 보스 체력이 <b>25% 이하</b>면 발악해서 +1회 (최대 4회). 체력이 50% 이하면 분노해서 공격력도 +1이에요.<br>':'• 보스는 <b>각각 2회</b> 공격해요. 체력이 <b>50% 이하</b>면 분노해서 공격력 +1, <b>25% 이하</b>면 발악해서 +1회, 우리 필드에 포켓몬이 <b>5마리 이상</b>이면 +1회 (최대 4회).<br>'}• 보스가 트레이너를 공격하면 <b>방어 문제가 한 명씩 돌아가며</b> 나와요. 다른 친구들은 그 친구가 고른 답을 보고, 결과가 <b>❤️ / 💔</b>로 나와요. 내 차례가 아닐 땐 <b>답이라고 생각하는 보기를 눌러 ❤️ 로 응원</b>할 수 있어요. 푸는 친구 화면에 작은 ❤️ 가 최대 3개 떠요. ❤️는 <b>문제 시작 30초 뒤</b>에 떠요.<br>• <b>차례 끝</b>을 누르면 아직 행동 중인 친구의 <b>공격·공부 기술 문제</b>를 구경할 수 있어요. 친구가 여럿이면 <b>◀ ▶</b> 로 바꿔 볼 수 있어요. (방어 문제는 언제나 가장 먼저 보여요)<br>• 보스를 쓰러뜨리면 보스 1마리당 조각 ${typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:4}개를 받아요. 코인은 들지 않아요.</div></details>
   <div class=row style="margin-top:12px"><button class="btn red big" id=b4Host>방 만들기 (방장)</button><button class="btn blue big" id=b4Join>방 들어가기</button></div>
   <div class=row style="margin-top:8px;align-items:center"><input class="inp codeIn" id=b4Code maxlength=4 inputmode=numeric placeholder="방 번호 4자리" style="flex:1"></div>
+  <p class=mut style="font-size:12.5px;margin-top:8px;line-height:1.5">🔁 <b>전투 중에 나갔다면?</b> 같은 방 번호를 넣고 <b>방 들어가기</b>로 <b>같은 닉네임</b>으로 다시 들어오면 원래 자리에서 이어서 할 수 있어요. (방장이 앱을 껐을 때는 이어 할 수 없어요)</p>
   <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요해요. 학교 와이파이는 작동하지 않을 수 있어요. <a href="#" id=b4Net style="color:inherit">📶 연결 시험</a> · 내 덱 ${m.deck.length}장</p></div>
   <div class=panel id=t2Box style="display:none;text-align:center"></div><div class=panel><h3>협동 규칙</h3><ul style="line-height:1.8;padding-left:20px"><li>${n}명이 한 팀 · 모두 동시에 행동</li><li>모두 <b>차례 끝</b>을 누르면 보스 차례</li><li>각자 자기 손패와 덱으로 행동</li><li>${n===2?8:10}칸 필드와 트레이너 체력은 모두가 함께 사용</li><li>문제는 행동한 플레이어가 풀고, 결과를 호스트가 판정·반영</li><li>보스 행동과 방어 문제(한 명씩 돌아가며)는 호스트가 한 번만 처리해 모든 화면에 전파</li></ul></div></div>`;
  bindHud();
@@ -29648,7 +29910,7 @@ function t2StartBoss(){if(!T2.host||T2.started||T2.mode!=='boss')return;const N=
  const sh={hp:0,max:0};ms.forEach(m=>{sh.max+=t2clamp(m.hi.vit,0,5);});sh.max+=(N===2?20:B4_HP);sh.hp=sh.max;
  const players=ms.map((m,i)=>{const hi=m.hi;const p=mkPlayer(nameOf(m),hi.deck,sh.max,MON[hi.av]?hi.av:25,false,hi.owned,true);
   p.manaLv=t2clamp(hi.mana,0,5);p.studyLv=t2clamp(hi.study,0,5);p.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(p.studyLv));p.handLv=t2clamp(hi.hand,0,5);p.evoLv=t2clamp(hi.evo,0,5);
-  p.team=0;p.tix=i;p.mid=m.id;p.tsUsed={};p.ctr=0;p.t2done=0;p.qc=0;
+  p.skm=skinCleanMap(hi.sk);p.team=0;p.tix=i;p.mid=m.id;p.tsUsed={};p.ctr=0;p.t2done=0;p.qc=0;
   Object.defineProperty(p,'hp',{get:()=>sh.hp,set:v=>{sh.hp=v;},enumerable:true,configurable:true});Object.defineProperty(p,'max',{get:()=>sh.max,set:v=>{sh.max=v;},enumerable:true,configurable:true});return p;});
  const board=Array(N===2?8:10).fill(null);players.forEach(p=>{p.board=board;for(let i=0;i<3;i++)draw(p,true);}); // 2인 동시 보스전은 8칸, 4인 협동은 10칸
  const ids=N===2?t2BossPick2(ms.map(m=>m.hi)):t2BossPick(ms.map(m=>m.hi),2);const slots=N===2?(ids.length===2?[1,3]:[2]):[1,3];
@@ -29794,7 +30056,7 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
  window.t2WaitShow=function(names,el){let o=document.getElementById('t2Wait');
   if(!names||!names.length||!live()){if(o)o.remove();return;}
   if(!o){o=document.createElement('div');o.id='t2Wait';o.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:290;background:#fffaf1;color:#3a2e3f;border:3px solid #8a7650;border-radius:14px;padding:8px 14px;font-size:14px;line-height:1.5;box-shadow:0 4px 0 rgba(0,0,0,.25);text-align:center;max-width:92vw';document.body.appendChild(o);}
-  o.innerHTML='📶 <b>'+names.map(esc).join(', ')+'</b>님의 연결이 끊겼어요. 다시 들어오기를 기다리는 중…'+(el!=null?' ('+el+'초)':'')+(T2.host?'<div><button class="btn ghost sm" id="t2WaitX" style="margin-top:6px">기다리지 않고 끝내기</button></div>':'');
+  o.innerHTML='📶 <b>'+names.map(esc).join(', ')+'</b>님의 연결이 끊겼어요. 다시 들어오기를 기다리는 중…'+(el!=null?' ('+el+'초)':'')+'<div style="font-size:12.5px;opacity:.8">방 번호 '+T2.code+' · 같은 번호·같은 닉네임으로 다시 들어오면 이어서 할 수 있어요</div>'+(T2.host?'<div><button class="btn ghost sm" id="t2WaitX" style="margin-top:6px">기다리지 않고 끝내기</button></div>':'');
   const x=o.querySelector('#t2WaitX');if(x)x.onclick=()=>{t2Abort('연결이 끊긴 친구를 기다리지 않고 끝냈어요');};};
 
  /* ---------- 방장 쪽 ---------- */
@@ -29836,9 +30098,10 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
  function guestTick(){
   if(!T2.reco)return;
   if(!live()){stopGuest();return;}
+  {const now=Date.now();if(T2.reco.last&&now-T2.reco.last>8000)T2.reco.since=now;T2.reco.last=now;if(document.hidden){T2.reco.since=now;return;}}   // 잠들었거나 화면이 가려진 시간은 세지 않아요
   const el=Math.round((Date.now()-T2.reco.since)/1000);
   if(Date.now()-T2.reco.since>MAX){stopGuest();t2OnAbort({reason:'방장과 연결이 끊어졌어요'});return;}
-  ov('방장에게 다시 연결하는 중… ('+el+'초)<br><small>화면을 켜 둔 채 잠시만 기다려 주세요</small>');
+  ov('방장에게 다시 연결하는 중… ('+el+'초)<br><small>화면을 켜 둔 채 잠시만 기다려 주세요<br>방 번호 '+T2.code+' · 앱을 껐다면 같은 번호·같은 닉네임으로 「방 들어가기」를 누르면 이어서 할 수 있어요</small>');
   const peer=T2.peer;
   if(!peer||peer.destroyed){remakeGuest();return;}
   if(peer.disconnected){try{peer.reconnect();}catch(e){}}
@@ -29857,18 +30120,19 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
  setInterval(()=>{try{
   if(!T2.started||!live())return;
   const hid=document.hidden,now=Date.now();
+  try{const pp=T2.peer;if(pp&&!pp.destroyed&&pp.disconnected)pp.reconnect();}catch(e){}   // 연결 서버와 끊겼으면 계속 다시 붙어요 (다시 들어오는 친구가 방을 찾을 수 있게)
   if(T2.host){
    T2.members.forEach(m=>{if(m.host||m.down)return;
     if(m.conn&&m.conn.open){try{m.conn.send({t:'t2-ping'});}catch(e){}
-     if(!hid&&now-(m.lastRx||now)>(iceOk(m.conn)?90000:30000)){const c=m.conn;try{c.close();}catch(e){}t2HostClosed(m,c);}}
+     if(!hid&&now-(m.lastRx||now)>(iceOk(m.conn)?45000:25000)){const c=m.conn;try{c.close();}catch(e){}t2HostClosed(m,c);}}
     else t2HostClosed(m,m.conn);});
   }else{
    if(T2.reco)return;
    if(T2.conn&&T2.conn.open){try{T2.conn.send({t:'t2-ping'});}catch(e){}
-    if(!hid&&now-(T2.lastRx||now)>(iceOk(T2.conn)?90000:30000)){try{T2.conn.close();}catch(e){}t2GuestRecover();}}
+    if(!hid&&now-(T2.lastRx||now)>(iceOk(T2.conn)?45000:25000)){try{T2.conn.close();}catch(e){}t2GuestRecover();}}
    else t2GuestRecover();}
  }catch(e){}},4000);
- document.addEventListener('visibilitychange',()=>{try{if(document.hidden)return;const now=Date.now();T2.lastRx=now;T2.members.forEach(m=>{m.lastRx=now;});
+ document.addEventListener('visibilitychange',()=>{try{if(document.hidden)return;const now=Date.now();T2.lastRx=now;T2.members.forEach(m=>{m.lastRx=now;});try{const pp=T2.peer;if(pp&&!pp.destroyed&&pp.disconnected)pp.reconnect();}catch(e){}
   if(live()&&!T2.host&&!T2.reco&&(!T2.conn||!T2.conn.open))t2GuestRecover();}catch(e){}});
 })();
 </script>
@@ -30134,11 +30398,11 @@ body:has(#gpWrap) #bg *,body:has(#gpWrap) #bgMons *,body:has(#gpWrap) #bgImg{ani
  function openPicker(){
   if(!T()||B.busy)return;
   let chosen=[],q='',flt='all';
-  const FLT=[['all','전체'],['1','★1'],['2','★2'],['3','★3'],['4','★4'],['5','★5'],['mega','특수진화'],['gmax','맥스']];
+  const FLT=[['all','전체'],['1','★1'],['2','★2'],['3','★3'],['4','★4'],['5','★5'],['mega','특수진화'],['gmax','맥스'],['skin','🎨 스킨'],['form','🔄 진화 폼'],['fuse','🧬 합체']];
   const list=()=>{const t=q.trim();return MON_IDS.filter(id=>{const m=MON[id];if(!m)return false;
-    if(flt==='mega'&&!MEGA[id])return false;if(flt==='gmax'&&!GMAX[id])return false;if(/^[1-5]$/.test(flt)&&m.rar!==+flt)return false;
+    if(flt==='mega'&&!MEGA[id])return false;if(flt==='gmax'&&!GMAX[id])return false;if(flt==='skin'&&!SKIN[id])return false;if(flt==='form'&&!(MEGA_ALT[id]||GMAX_ALT[id]))return false;if(flt==='fuse'&&!(FUSE[id]||FUSEP[id]))return false;if(/^[1-5]$/.test(flt)&&m.rar!==+flt)return false;
     return !t||m.name.includes(t)||String(id)===t;});};
-  const cell=id=>`<div class="dexCell${chosen.includes(id)?' trSel':''}" data-id="${id}"><span class=no>${id}</span>${(MEGA[id]||GMAX[id])?`<span class=tg style="font-size:10px">${MEGA[id]?'특수':''}${MEGA[id]&&GMAX[id]?'·':''}${GMAX[id]?'맥스':''}</span>`:''}${monImg(id)}<span class=nm>${esc(MON[id].name)}</span></div>`;
+  const cell=id=>`<div class="dexCell${chosen.includes(id)?' trSel':''}" data-id="${id}"><span class=no>${id}</span>${spBadges(id)}${monImg(id)}<span class=nm>${esc(MON[id].name)}</span></div>`;
   const prev=()=>chosen.length?chosen.map((id,i)=>`<span style="display:inline-flex;align-items:center;gap:2px;background:#fff;border:2px solid #f0cf7a;border-radius:12px;padding:2px 6px 2px 2px;font-size:12px">${monImg(id)}${esc(MON[id].name)}</span>`).join(' '):`<span class=mut>포켓몬을 눌러 최대 ${MAXSEL}마리까지 골라요</span>`;
   const paint=()=>{const g=$('#btGrid');if(!g)return;const L=list();
    g.innerHTML=L.map(cell).join('')||'<p class=mut style="grid-column:1/-1;text-align:center">해당하는 포켓몬이 없어요</p>';
@@ -30159,12 +30423,12 @@ body:has(#gpWrap) #bg *,body:has(#gpWrap) #bgMons *,body:has(#gpWrap) #bgImg{ani
   paint();}
 
  /* ---------- 🎨 스킨·진화 폼 바꾸기 (도감처럼 고르는 창 · 테스트에서만 적용) ---------- */
- const FKIND=id=>{const k=[];if(SKIN[id])k.push('skin');if(MEGA_ALT[id])k.push('mega');if(GMAX_ALT[id])k.push('gmax');return k;};
+ const FKIND=id=>{const k=[];if(SKIN[id])k.push('skin');if(MEGA_ALT[id])k.push('mega');return k;};
  const fChanged=id=>TS.skin[id]!==undefined||TS.mega[id]!==undefined||TS.gmax[id]!==undefined;
  function openForms(){
   if(!T()||B.busy)return;
   let sel=0,q='',flt='all';
-  const FLT=[['all','전체'],['skin','🎨 스킨'],['mega','🔄 메가·특수진화 폼'],['gmax','🔆 맥스 폼']];
+  const FLT=[['all','전체'],['skin','🎨 스킨'],['mega','🔄 메가·특수진화 폼']];
   const ids=()=>{const t=q.trim();return MON_IDS.filter(id=>{if(!MON[id])return false;const k=FKIND(id);if(!k.length)return false;if(flt!=='all'&&!k.includes(flt))return false;return !t||MON[id].name.includes(t)||String(id)===t;});};
   const cell=id=>`<div class="dexCell${id===sel?' trSel':''}" data-id="${id}"><span class=no>${id}</span>${fChanged(id)?'<span class=tg style="font-size:10px">변경</span>':''}${monImg(id)}<span class=nm>${esc(MON[id].name)}</span></div>`;
   const detail=()=>{if(!sel)return '<p class=mut style="text-align:center;margin:8px 0">아래 도감에서 포켓몬을 눌러 주세요</p>';
