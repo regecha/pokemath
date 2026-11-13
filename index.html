@@ -7461,7 +7461,7 @@ function fallbackSprite(id){if(FB[id])return FB[id];const m=MON[id];const c=m?TY
  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><circle cx="48" cy="52" r="30" fill="${c}" stroke="#3a2e3f" stroke-width="4"/><path d="M18 52a30 30 0 0 1 60 0z" fill="${c2}" opacity=".6"/><circle cx="38" cy="48" r="4" fill="#3a2e3f"/><circle cx="58" cy="48" r="4" fill="#3a2e3f"/><path d="M42 60q6 5 12 0" stroke="#3a2e3f" stroke-width="3" fill="none"/><text x="48" y="92" font-size="12" text-anchor="middle" fill="#3a2e3f">${m?m.id:''}</text></svg>`;
  return FB[id]='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);}
 /* ===== 메가·합체 그림: 되는 그림 주소를 기억해서, 화면이 다시 그려질 때마다 실패→재시도로 깜빡이지 않게 해요 ===== */
-const MEGA_BEST=(()=>{try{const o=JSON.parse(localStorage.getItem('megaBest7')||'{}')||{};Object.keys(o).forEach(k=>{if(o[k]&&/pokestats/.test(o[k].u||''))delete o[k];/* Z 메가(앱솔·한카리아스·루카리오): 예전에 일반 메가 그림으로 기억된 주소는 지워요 */if(o[k]&&/^(10307|10309|10310)\|/.test(k)&&/\/(absol|garchomp|lucario)-?mega\.(gif|png)/.test(o[k].u||''))delete o[k];/* 뒷모습 도트로 바꾼 메가: 예전에 기억해 둔 Showdown 그림 주소는 지워요 */if(o[k]&&/^(10287|10290|10303|10304|10305|10313|10292)\|back\|/.test(k)&&!/\/back\/[^/]*\d\.png/.test(o[k].u||''))delete o[k];});return o;}catch(e){return {};}})();
+const MEGA_BEST=(()=>{try{const o=JSON.parse(localStorage.getItem('megaBest7')||'{}')||{};Object.keys(o).forEach(k=>{if(o[k]&&/pokestats/.test(o[k].u||''))delete o[k];/* 메가 지가르데: 내 GIF가 아닌 예전 기록(대체 그림 등)은 지워서 새로 찾게 해요 */if(o[k]&&/^10301\|/.test(k)&&!/regecha/.test(o[k].u||''))delete o[k];/* Z 메가(앱솔·한카리아스·루카리오): 예전에 일반 메가 그림으로 기억된 주소는 지워요 */if(o[k]&&/^(10307|10309|10310)\|/.test(k)&&/\/(absol|garchomp|lucario)-?mega\.(gif|png)/.test(o[k].u||''))delete o[k];/* 뒷모습 도트로 바꾼 메가: 예전에 기억해 둔 Showdown 그림 주소는 지워요 */if(o[k]&&/^(10287|10290|10303|10304|10305|10313|10292)\|back\|/.test(k)&&!/\/back\/[^/]*\d\.png/.test(o[k].u||''))delete o[k];});return o;}catch(e){return {};}})();
 const megaKey=(id,k,sh)=>id+'|'+k+'|'+(sh?1:0)+'|'+(S.meta.settings.anim==='gif'?1:0);
 function megaSave(){try{localStorage.setItem('megaBest7',JSON.stringify(MEGA_BEST));}catch(e){}}
 function megaGet(key){try{const v=MEGA_BEST[key];if(!v)return '';if(/\.gif(\?|$)/i.test(v.u))return v.u;if(Date.now()-v.t<864e5)return v.u;delete MEGA_BEST[key];}catch(e){}return '';}
@@ -7472,6 +7472,7 @@ const MEGA_BACKDOT={10287:1,10290:1,10303:1,10304:1,10305:1,10313:1,10292:1};
 const FRONT_GIF={};
 const MEGA_GIF1={10034:1,10035:1,10073:1,10157:1};
 function megaCands(id,kind,sh){const out=[],add=u=>{if(u&&out.indexOf(u)<0)out.push(u);};
+  add(megaMine(id,kind,sh)); /* 내가 올린 GIF가 있으면 제일 먼저 */
  if(kind==='back'&&FRONT_GIF[id])kind='anim';
  if(kind==='back'&&MEGA_BACKDOT[id]){const sf=sh?'shiny/':'';add(SPR_BASE+'back/'+sf+id+'.png');add(SPR_BASE+'back/'+sf+(MEGAB[id]||id)+'.png');return out;}
  /* 모든 메가: 처음 나오는 PokeAPI GIF를 먼저 쓰고(없을 때만 Showdown), 나중에 찾은 다른 GIF로 바뀌며 작아지지 않게 해요 */
@@ -7485,7 +7486,7 @@ function megaCands(id,kind,sh){const out=[],add=u=>{if(u&&out.indexOf(u)<0)out.p
  /* GIF·도트가 둘 다 없는 메가: 원래 포켓몬 대신 '그 메가의 정지 그림'(+숨쉬기 움직임)이라도 보여 줘요 */
  if(kind==='anim'){String(MEGA_SD[id]||'').split('|').filter(Boolean).slice(0,1).forEach(n=>add('https://play.pokemonshowdown.com/sprites/dex'+(sh?'-shiny':'')+'/'+n+'.png'));add(SPR_BASE+'other/official-artwork/'+(sh?'shiny/':'')+id+'.png');}
  /* 뒷모습(내 필드): 앞모습 GIF·앞모습 일러스트는 쓰지 않아요 → 뒷모습 GIF가 없으면 메가 뒷모습 도트, 그것도 없으면 원래 포켓몬 GIF로 */
- if(kind==='back'){const bo=out.filter(u=>/\/back\/|ani-back|gen5ani-back/.test(u));if(!bo.length&&(id===10307||id===10309||id===10310)){/* Z 메가는 뒷모습 그림이 없으면 Z 메가 앞모습 그림이라도 보여 줘요(원래 포켓몬 모습 방지) */megaSdUrls(id,'anim',sh).forEach(u=>bo.push(u));String(MEGA_SD[id]||'').split('|').filter(Boolean).slice(0,1).forEach(n=>bo.push('https://play.pokemonshowdown.com/sprites/dex'+(sh?'-shiny':'')+'/'+n+'.png'));}return bo;}
+ if(kind==='back'){const bo=out.filter(u=>/\/back\/|ani-back|gen5ani-back|_back_mega/.test(u));if(!bo.length&&(id===10307||id===10309||id===10310)){/* Z 메가는 뒷모습 그림이 없으면 Z 메가 앞모습 그림이라도 보여 줘요(원래 포켓몬 모습 방지) */megaSdUrls(id,'anim',sh).forEach(u=>bo.push(u));String(MEGA_SD[id]||'').split('|').filter(Boolean).slice(0,1).forEach(n=>bo.push('https://play.pokemonshowdown.com/sprites/dex'+(sh?'-shiny':'')+'/'+n+'.png'));}return bo;}
  return out;}
 /* 후보 주소를 한꺼번에(병렬) 확인해서, 우선순위가 가장 높은 되는 그림 하나만 골라요 → 그림이 여러 번 바뀌며 깜빡이지 않아요 */
 const MEGA_RES={};
@@ -7601,6 +7602,9 @@ const MEGA_HT={10033:2.4,10034:1.7,10035:1.7,10036:1.6,10037:1.2,10038:1.4,10039
 /* 표에 없는 메가(레전즈 Z-A 새 메가 등)는 진화 전 키의 1.45배(+0.5m 이상)로 봐요 → 작은 채로 바닥에 붙어 나오지 않게 해요 */
 function megaHt(id){try{if(!(id>10000))return 0;if(MEGA_HT[id])return MEGA_HT[id];const b=MEGAB[id],bh=b&&MON[b]&&MON[b].ht;return 0;}catch(e){return 0;}}
 /* 메가별 추가 확대 배율 (GIF 보정 뒤에 한 번 더 곱해요. 더 키우려면 숫자를 올리고, 줄이려면 내려요) */
+/* 내가 GitHub(regecha/pokemath)에 올린 메가 GIF: 앞 718_mega.gif · 뒤 718_back_mega.gif · 이로치 718_mega_shiny.gif · 718_back_mega_shiny.gif (다른 메가를 올리면 숫자를 여기에 추가: 10301 → 718) */
+const MEGA_MINE={10301:718};
+function megaMine(id,kind,sh){const b=MEGA_MINE[id];if(!b||!(kind==='anim'||kind==='back'))return '';return 'https://raw.githubusercontent.com/regecha/pokemath/main/'+b+(kind==='back'?'_back':'')+'_mega'+(sh?'_shiny':'')+'.gif';}
 /* 메가 그림을 못 찾았을 때 보여 줄 '폼별' 대체 그림: 암컷 냐오닉스 · 오리지널 마기아나 · 늘어진/뻗은 싸리용 · 메가 지가르데(퍼펙트폼 그림으로 대신) */
 const MEGA_FB={10326:10025,10318:10147,10323:10258,10324:10259,10301:10120};
 const GIF_SHRINK={658:.8}; /* 개굴닌자: 도감 키(1.5m)에 비해 커 보여서 80%로 줄여요. 메가·지우개굴닌자는 이 크기를 기준으로 따라 줄어들어요 (더 줄이려면 .7, 키우려면 .9) */
