@@ -3137,6 +3137,13 @@ html.short .wildTop .wtInfo{min-width:0}
 /* 숨쉬기 애니메이션은 시작 지연(--d) 동안에도 첫 장면의 크기(1.38배)를 그대로 보여 줘요 → 화면이 다시 그려질 때마다 작았다가 커지는 깜빡임 방지 */
 html .unit .sp img.idle{animation-fill-mode:backwards!important}</style>
 <style>#myLane .unit .sp img[data-id="888"],#myLane .unit .sp img[data-id="889"],#foeLane .unit .sp img[data-id="888"],#foeLane .unit .sp img[data-id="889"],#myLane .unit .sp img[data-id="485"],#myLane .unit .sp img[data-id="807"],#foeLane .unit .sp img[data-id="485"],#foeLane .unit .sp img[data-id="807"]{transform:scale(1.1)}</style>
+<style id="sc-wait-css">
+#scNext.scWait{position:relative;overflow:hidden;opacity:.6;filter:saturate(.6)}
+#scNext.scWait::after{content:'';position:absolute;left:0;bottom:0;height:4px;width:0;background:#ffd54a;animation:scFill var(--w,1500ms) linear forwards}
+@keyframes scFill{to{width:100%}}
+#scNext.scNudge{animation:scNudge .28s}
+@keyframes scNudge{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+</style>
 </head>
 <body>
 <div id="ttFade"></div>
@@ -17605,7 +17612,7 @@ const SIM={p:.8,deck:null,
 
 // ===== 협동 보스전: 권위 호스트 + 공유 필드 + 행동/상태 동기화 =====
 const BC={defWait:null,defSeq:0,peer:null,conn:null,host:false,code:'',foe:null,queue:[],busy:false,ready:false,localIndex:0,processing:false,lastCaught:[],clientCaught:[],lastSeq:0,lastSeqByPlayer:{},resultHandled:false};
-function bossClose(){try{bossRecoReset()}catch(e){}try{BC.conn&&BC.conn.close()}catch(e){}try{BC.peer&&BC.peer.destroy()}catch(e){}Object.assign(BC,{pendingSnap:null,fxUntil:0,pendTimer:null,defWait:null,peer:null,conn:null,foe:null,queue:[],busy:false,ready:false,processing:false,lastCaught:[],clientCaught:[],lastSeq:0,lastSeqByPlayer:{},resultHandled:false,left:false});}
+function bossClose(){try{bossRecoReset()}catch(e){}try{BC.conn&&BC.conn.close()}catch(e){}try{BC.peer&&BC.peer.destroy()}catch(e){}Object.assign(BC,{pendingSnap:null,fxUntil:0,pendTimer:null,defWait:null,peer:null,conn:null,foe:null,queue:[],busy:false,ready:false,processing:false,lastCaught:[],clientCaught:[],lastSeq:0,lastSeqByPlayer:{},resultHandled:false,left:false,stableJ:''});}
 function bossSend(o){try{if(BC.conn&&BC.conn.open)BC.conn.send(o)}catch(e){}}
 function renderBossCoop(keep){S.screen='bosscoop';if(!keep)bossClose();const m=S.meta;ensureDeck();
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><h2>⚔️ 협동 보스전</h2><p style="line-height:1.7">친구와 힘을 합쳐 강력한 보스 포켓몬을 공략하세요. 한 명이 방을 만들고 코드를 공유하면 다른 친구가 코드로 접속합니다.</p>
@@ -17765,7 +17772,7 @@ function bossStartBattle(pre){if(!BC.host||!BC.ready||!BC.foe||!ensureDeck())ret
 function bossSetActive(i){if(!B||!B.coop)return;const p=B.coop.players;if(!p||p.length!==2)return;B.coop.active=i;const board=bossSharedBoard();p[0].board=board;p[1].board=board;B.me=p[i];B.me.board=board;B.foe=B.coop.foe||B.foe;}
 function bossSharedBoard(){if(!B||!B.coop||!Array.isArray(B.coop.players))return Array(8).fill(null);const p=B.coop.players;const a=Array.isArray(p[0]?.board)?p[0].board:[];const b=Array.isArray(p[1]?.board)?p[1].board:[];const board=Array(8).fill(null);for(let i=0;i<8;i++){const x=a[i]||null,y=b[i]||null;if(x&&y){const xo=Number(x.coopOwner??0),yo=Number(y.coopOwner??0);board[i]=xo===yo?x:(xo===1?x:y);}else board[i]=x||y;}return board;}
 function bossRewire(){if(!B||!B.coop)return;const p=B.coop.players;if(!p||p.length!==2)return;const board=bossSharedBoard();p[0].board=board;p[1].board=board;B.coop.foe=B.foe;const active=Number(B.coop.active)===1?1:0;B.coop.active=active;B.me=p[active];B.me.board=board;}
-function bossSnapshot(forPeer=false){if(!B||!B.coop)return null;const x=JSON.parse(JSON.stringify(B));if(forPeer){/* 수신자는 친구(플레이어 2): 방장 손패/덱만 숨김 */x.coop.players[0].hand=[];x.coop.players[0].deck=[];x.coop.localIndex=1;}return x;}
+function bossSnapshot(forPeer=false){if(!B||!B.coop)return null;const x=JSON.parse(JSON.stringify(B));if(forPeer){/* 수신자는 친구(플레이어 2): 방장 손패/덱만 숨김 (같이 싸우는 친구라서, 방장이 나갔다 돌아올 때 쓰도록 백업은 남겨 둬요) */x.hb={hand:(x.coop.players[0].hand||[]).slice(),deck:(x.coop.players[0].deck||[]).slice()};x.coop.players[0].hand=[];x.coop.players[0].deck=[];x.coop.localIndex=1;}return x;}
 function bossBroadcast(force=false){if(!BC.host||!BC.conn||!BC.conn.open||!B||!B.coop||BC.processing&&!force)return;try{bossSend({t:'boss-snapshot',state:bossSnapshot(true)});}catch(e){}}
 function bossApplySnapshotNow(state,initial){if(!state)return;try{if(initial){BC.resultHandled=false;BC.clientCaught=[];}const prev=(B&&B.wildState&&B.wildState.caughtIds||[]).slice();B=state;B.busy=!!B.busy;if(B.wildState&&B.wildState.caughtIds){BC.clientCaught=BC.clientCaught||[];for(const id of B.wildState.caughtIds)if(!BC.clientCaught.includes(id)){addCard(id);BC.clientCaught.push(id);autoSave();}}if(B.coop)B.coop.localIndex=BC.localIndex;bossRewire();if(B.coop&&B.coop.result){bossClientResult({t:'boss-result',...B.coop.result});return;}S.screen='battle';$('#view').innerHTML='';$('#battle').classList.add('on');if(initial)startBgm('battle');renderBattle();}catch(e){console.error('coop snapshot',e);}}
 function bossSubmit(a){if(!B||!B.coop||BC.host)return;if(!BC.conn||!BC.conn.open){toast('방장과 연결이 끊어졌어요. 행동을 전송하지 못했어요.');return;}bossSend({t:'coop-action',a,seq:++BC.lastSeq,player:BC.localIndex});}
@@ -19807,6 +19814,7 @@ function scShow(u,pos){
  document.querySelectorAll('body>.scv-fxlay').forEach(e=>e.remove());
  SC.unit=u;SC.pos=pos;SC.index=SC_UNITS[u].art;SC.bgKey=scSceneKey(u,pos);SC.bgVar=scSceneVariant(u,pos);S.screen='scenarioStory';scMusicStart(SC_UNITS[u].bgm);scApplyBackdrop(SC.index,false,SC.bgKey,SC.bgVar);
  // 첫 방문 때만 일어나는 일(맹세 새기기·지역 보상·잠금 해제)
+ const prevMax=(p.pos[u]===undefined)?-1:p.pos[u],wasDone=!!p.done[u];   // 이 장면을 예전에 본 적이 있는지 알아보려고, 기록을 바꾸기 전에 적어 둬요
  if(!SC.replay){p.unit=u;p.pos[u]=Math.max(p.pos[u]||0,pos);}
  let grant=null;
  if(pg.k==='vow'&&!pg.final&&u>=1&&u<=6&&p.vows.indexOf(u)<0){p.vows.push(u);p.vows.sort((a,b)=>a-b);sfx('level');}
@@ -19819,13 +19827,19 @@ function scShow(u,pos){
  autoSave();
  const nav=scNavFor(u,pos,pg),stage=scStageHTML(u,pos,pg,grant),pct=Math.round((pos+1)/pages.length*100);
  const lab=scSceneLabel(u,pos);
- $('#view').innerHTML=`<div class="sc-page scv scv-k-${pg.k}"><div class="scv-bar"><button class="btn ghost sm" id="scMapBtn">${u>=SC_MAIN_N?'목록':'지도'}</button><h2>${esc(SC_UNITS[u].name)}${lab?` <span>· ${esc(lab)}</span>`:''}</h2><button class="btn ${S.meta.settings.bgm?'blue':'ghost'} sm" id="scMusicBtn">${S.meta.settings.bgm?'♪ ON':'♪ OFF'}</button></div><div class="scv-stage" id="scStage">${stage}</div><div class="scv-nav"><button class="btn ghost" id="scPrev" ${pos===0?'disabled':''}>◀ 이전</button><div class="scv-prog" title="${pct}%"><i style="width:${pct}%"></i><span>${pos+1} / ${pages.length}</span></div><button class="btn purple big" id="scNext" ${nav.dis?'disabled':''}>${nav.label}</button></div></div>`;
+ // 처음 보는 글 장면은 글자 수에 따라 1~3초 뒤에 다음 버튼이 눌려요 (이미 본 장면·다시 보기는 바로 넘겨요)
+ let wait=0;{const nowT=Date.now(),key=u+':'+pos,seen=!!SC.replay||wasDone||pos<=prevMax;
+  if(SC.hold&&SC.hold.k===key&&SC.hold.until>nowT)wait=SC.hold.until-nowT;   // 같은 장면을 다시 그려도(음악 버튼 등) 남은 시간만 기다려요
+  else if(!seen&&!nav.dis&&(pg.k==='say'||pg.k==='n'||pg.k==='bg'||pg.k==='sys')){const len=String(pg.t||'').replace(/\s/g,'').length;wait=Math.max(1000,Math.min(3000,1000+(len-10)*20));SC.hold={k:key,until:nowT+wait};}}
+ let hold=wait>0;
+ $('#view').innerHTML=`<div class="sc-page scv scv-k-${pg.k}"><div class="scv-bar"><button class="btn ghost sm" id="scMapBtn">${u>=SC_MAIN_N?'목록':'지도'}</button><h2>${esc(SC_UNITS[u].name)}${lab?` <span>· ${esc(lab)}</span>`:''}</h2><button class="btn ${S.meta.settings.bgm?'blue':'ghost'} sm" id="scMusicBtn">${S.meta.settings.bgm?'♪ ON':'♪ OFF'}</button></div><div class="scv-stage" id="scStage">${stage}</div><div class="scv-nav"><button class="btn ghost" id="scPrev" ${pos===0?'disabled':''}>◀ 이전</button><div class="scv-prog" title="${pct}%"><i style="width:${pct}%"></i><span>${pos+1} / ${pages.length}</span></div><button class="btn purple big${wait>0?' scWait':''}" id="scNext" ${(nav.dis||wait>0)?'disabled':''}${wait>0?` style="--w:${Math.round(wait)}ms"`:''}>${nav.label}</button></div></div>`;
  $('#scMapBtn').onclick=()=>{sfx('tap');u>=SC_MAIN_N?scRenderSide():scRenderMap();};
  if(pg.k==='fx')scFxRun(pg);
  $('#scMusicBtn').onclick=()=>{sfx('tap');S.meta.settings.bgm=!S.meta.settings.bgm;autoSave();startBgm();scShow(u,pos);};
  $('#scPrev').onclick=()=>{if(pos>0){sfx('tap');let q=pos-1;while(q>0&&pages[q].k==='bt')q--;scShow(u,q);}};
- $('#scNext').onclick=()=>{if(nav.dis)return;sfx('page');nav.fn();};
- const st=$('#scStage');if(st&&(pg.k==='say'||pg.k==='n'||pg.k==='bg'||pg.k==='sys')){st.onclick=e=>{if(e.target.closest('button,a'))return;if(!nav.dis){sfx('page');nav.fn();}};}
+ $('#scNext').onclick=()=>{if(nav.dis||hold)return;sfx('page');nav.fn();};
+ if(wait>0)setTimeout(()=>{hold=false;try{const b=$('#scNext');if(b&&S.screen==='scenarioStory'&&SC.unit===u&&SC.pos===pos&&!nav.dis){b.disabled=false;b.classList.remove('scWait');}}catch(e){}},wait);
+ const st=$('#scStage');if(st&&(pg.k==='say'||pg.k==='n'||pg.k==='bg'||pg.k==='sys')){st.onclick=e=>{if(e.target.closest('button,a'))return;if(hold){const b=$('#scNext');if(b){b.classList.remove('scNudge');void b.offsetWidth;b.classList.add('scNudge');}return;}if(!nav.dis){sfx('page');nav.fn();}};}
  const od=$('#scOpenDeck');if(od)od.onclick=()=>{sfx('tap');scOpenDeckFor(u,pos);};
  const bd=$('#scBtDeck');if(bd)bd.onclick=()=>{sfx('tap');scOpenDeckFor(u,pos);};
  const gb=$('#scGoBattle');if(gb)gb.onclick=()=>{sfx('tap');scStartBattle(u,pos);};
@@ -27000,7 +27014,7 @@ function pvRestore(d){
 /* 2인 협동 보스전 다시 들어오기
    - 친구가 나갔다 같은 코드로 다시 들어오면: 방장이 가진 전투 상태를 그대로 보내 줘요 (닉네임이 같아야 해요)
    - 방장이 나갔다 같은 코드로 방을 다시 열면: 친구 화면에 남아 있는 전투 상태로 이어요 (방장 손패는 방장 덱에서 새로 뽑아요) */
-window.bossGuestSnap=function(){try{if(BC.host||!(B&&B.coop)||B.coop.result||S.screen!=='battle')return null;return JSON.parse(JSON.stringify(B));}catch(e){return null;}};
+window.bossGuestSnap=function(){try{if(BC.host||!(B&&B.coop)||B.coop.result||S.screen!=='battle')return null;const s=JSON.parse(JSON.stringify(B));s.__stable=BC.stableJ||'';return s;}catch(e){return null;}};
 window.bossRejoinHi=function(d,c){
  try{
   if(!BC.host)return false;
@@ -27019,13 +27033,15 @@ window.bossRejoinHi=function(d,c){
  }catch(e){console.warn('coop rejoin',e);}
  return false;};
 function bossRestoreHost(d){
- const m=S.meta,st=JSON.parse(JSON.stringify(d.snap));
+ let sn=d.snap;if(sn&&sn.side==='foe'&&sn.__stable){try{const s2=JSON.parse(sn.__stable);if(s2&&s2.coop&&s2.coop.players&&s2.coop.players.length===2){if(sn.hb&&!s2.hb)s2.hb=sn.hb;sn=s2;}}catch(e){}}   // 보스 차례 도중에 끊겼다면 직전 '우리 차례' 상태로
+ const m=S.meta,st=JSON.parse(JSON.stringify(sn));delete st.__stable;
  BC.foe=d;BC.ready=true;BC.resultHandled=false;BC.clientCaught=[];BC.lastSeqByPlayer={};BC.lastSeq=0;BC.processing=false;BC.localIndex=0;BC.defWait=null;
  const p0=st.coop.players[0];
- p0.deck=shuffle(m.deck.slice());p0.hand=[];
+ let gotHb=false;if(st.hb&&Array.isArray(st.hb.hand)){p0.hand=st.hb.hand.slice();p0.deck=(st.hb.deck||[]).slice();gotHb=true;}else{p0.deck=shuffle(m.deck.slice());p0.hand=[];}delete st.hb;
  B=st;B.busy=false;B.over=false;B.coop.processing=false;B.coop.localIndex=0;
  try{bossRewire();}catch(e){}
- for(let i=0;i<3;i++){try{draw(p0,true);}catch(e){break;}}
+ try{cleanup();}catch(e){console.warn('복구 후 정리',e);}   // 쓰러진 포켓몬 치우기
+ if(!gotHb){for(let i=0;i<3;i++){try{draw(p0,true);}catch(e){break;}}try{toast('손패를 되살리지 못해 새로 뽑았어요');}catch(e){}}
  try{bossRecoReset();}catch(e){}
  S.screen='battle';$('#view').innerHTML='';try{$('#bq').classList.remove('on');closeInfo();}catch(e){}$('#battle').classList.add('on');startBgm('battle');
  // 보스 차례 중간에 끊겼다면 보스 차례부터 다시 시작해요
@@ -27039,8 +27055,8 @@ window.t2SendMyState=function(){
  try{if(!(B&&B.t2&&!B.over&&T2.started&&!T2.host&&T2.conn&&T2.conn.open))return;
   const T=B.t2,x={};for(const k in B){if(k==='me'||k==='foe'||k==='coop'||k==='t2'||k==='trainerSkillUsed'||typeof B[k]==='function')continue;x[k]=B[k];}
   const pl=p=>{const o={};for(const k in p){if(k==='board'||typeof p[k]==='function')continue;o[k]=p[k];}return o;};
-  x.t2={vt:T.vt,idx:T.idx!==undefined?T.idx:BC.localIndex,boss:T.boss?1:0,turn:T.turn,done:T.done,fin:T.fin?1:0,ver:T2_VER,teams:T.teams.map(tm=>tm.map(pl)),boards:T.boards};
-  T2.conn.send({t:'t2-state',v:T2_VER,id:T2.myId,tok:T2.tok,name:S.meta.name,av:partnerId(),mode:T2.mode,bn:T2.bn,snap:JSON.parse(JSON.stringify(x))});
+  x.t2={vt:T.vt,idx:T.idx!==undefined?T.idx:BC.localIndex,boss:T.boss?1:0,turn:T.turn,done:T.done,fin:T.fin?1:0,ver:T2_VER,sq:T.sq||0,xr:T.xr||null,teams:T.teams.map(tm=>tm.map(pl)),boards:T.boards};
+  T2.conn.send({t:'t2-state',v:T2_VER,id:T2.myId,tok:T2.tok,name:S.meta.name,av:partnerId(),mode:T2.mode,bn:T2.bn,stable:T2.stableJ||'',snap:JSON.parse(JSON.stringify(x))});
  }catch(e){console.warn('t2 state',e);}};
 window.t2HrBox=function(){const R=T2.hr||{reps:{}},k=Object.keys(R.reps).length,N=t2N();
  t2Box(`<p>방 ${T2.code}에서 전투를 이어 여는 중…</p><div style="font-size:26px;margin:6px 0">${k} / ${N-1}명 연결됨</div><p class=mut style="font-size:12.5px;line-height:1.5">전투 화면을 켜 둔 친구들이 자동으로 다시 연결돼요.<br>모든 친구가 모이면 바로 이어져요. (친구가 앱을 껐다면 이어 할 수 없어요)</p><button class="btn ghost" id=t2Cancel>취소</button>`);};
@@ -27067,30 +27083,51 @@ function t2HostCollect(c,d){
  if(Object.keys(R.reps).length>=t2N()-1)t2HostRestore();else window.t2HrBox();}
 function t2HostRestore(){
  const R=T2.hr;if(!R||T2.started)return;
- const reps=Object.keys(R.reps).map(id=>R.reps[id]),f=reps[0].d.snap,ft=f.t2;
+ const reps=Object.keys(R.reps).map(id=>R.reps[id]);t2RsPrefer(reps);const f=reps.slice().sort((a,b)=>((b.d.snap.t2.sq||0)-(a.d.snap.t2.sq||0)))[0].d.snap,ft=f.t2;   // 가장 최신 화면을 기준으로 삼아요
  const base={};for(const k in f){if(['me','foe','coop','t2','trainerSkillUsed','sel','pick','itemTargetMode','moonTargetMode','trainerSkillTarget'].includes(k))continue;base[k]=f[k];}
  // 각 플레이어의 '진짜' 정보(손패·덱)는 그 친구 화면에서, 나머지는 보이는 정보만 가져와요
  const teams=ft.teams.map((tm,t)=>tm.map((p,i)=>{const own=reps.find(r=>{const s=r.d.snap.t2;return s.vt===t&&(s.idx===i);});return JSON.parse(JSON.stringify(own?own.d.snap.t2.teams[t][i]:p));}));
  const flat=teams.reduce((a,tm)=>a.concat(tm),[]);const hostP=flat.find(p=>p.mid===1);if(!hostP)throw new Error('no host player');
  let ht=0,li=0;teams.forEach((tm,t)=>tm.forEach((p,i)=>{if(p===hostP){ht=t;li=i;}}));
- const T={teams,boards:JSON.parse(JSON.stringify(ft.boards)),turn:ft.turn|0,eng:ht,done:JSON.parse(JSON.stringify(ft.done)),vt:ht,boss:!!ft.boss,defRot:0,fin:false,ver:T2_VER};
+ const T={teams,boards:JSON.parse(JSON.stringify(ft.boards)),turn:ft.turn|0,eng:ht,done:JSON.parse(JSON.stringify(ft.done)),vt:ht,boss:!!ft.boss,defRot:(ft.xr&&ft.xr.dr)||0,fin:false,ver:T2_VER};if(ft.xr){if(ft.xr.sr)T.soloRage=1;if(ft.xr.ad)T.adopted=ft.xr.ad;}
  teams.forEach((tm,t)=>tm.forEach(p=>{p.board=T.boards[t];p.team=t;}));
  if(T.boss){const sh={hp:teams[0][0].hp,max:teams[0][0].max};teams[0].forEach(p=>{Object.defineProperty(p,'hp',{get:()=>sh.hp,set:v=>{sh.hp=v;},enumerable:true,configurable:true});Object.defineProperty(p,'max',{get:()=>sh.max,set:v=>{sh.max=v;},enumerable:true,configurable:true});});}
  BC.localIndex=li;BC.host=true;BC.t2=true;
  const nb=Object.assign({},base,{over:false,busy:false,side:'me',sel:-1,pick:-1});
- nb.t2=T;nb.coop={players:teams[ht],foeTeam:teams[1-ht],active:li,localIndex:li,seq:0,processing:false,result:null,t2:true};
+ delete nb.hb;nb.t2=T;nb.coop={players:teams[ht],foeTeam:teams[1-ht],active:li,localIndex:li,seq:0,processing:false,result:null,t2:true};
  nb.me=teams[ht][li];nb.foe=teams[1-ht][0];nb.trainerSkillUsed=nb.me.tsUsed=(nb.me.tsUsed||{});B=nb;
  // 방장 손패·덱은 친구 화면에 없어서 방장 덱에서 새로 뽑아요
- hostP.deck=shuffle(S.meta.deck.slice());hostP.hand=[];for(let i=0;i<3;i++){try{draw(hostP,true);}catch(e){break;}}
+ {let hb=null;reps.slice().sort((a,b)=>((b.d.snap.t2.sq||0)-(a.d.snap.t2.sq||0))).some(r=>{const h=r.d.snap.hb;if(h&&Array.isArray(h.hand)){hb=h;return true;}return false;});
+  if(hb){hostP.hand=JSON.parse(JSON.stringify(hb.hand));hostP.deck=JSON.parse(JSON.stringify(hb.deck||[]));}   // 같은 편 친구 화면에 백업돼 있던 방장 손패·덱 그대로
+  else{hostP.deck=shuffle(S.meta.deck.slice());hostP.hand=[];for(let i=0;i<3;i++){try{draw(hostP,true);}catch(e){break;}}try{toast('손패를 되살리지 못해 새로 뽑았어요');}catch(e){}}}
  T2.members=[{id:1,host:true,name:String(S.meta.name||'').trim()||'방장',av:partnerId(),team:ht,pos:li,conn:null,hi:t2MyHi()}];
  reps.forEach(r=>{const s=r.d.snap.t2,p=teams[s.vt][s.idx];T2.members.push({id:r.d.id,host:false,name:String(r.d.name||p.name).slice(0,12),av:r.d.av||p.av,team:s.vt,pos:s.idx,conn:null,tok:String(r.d.tok||'').slice(0,40),lastRx:Date.now(),hi:{name:r.d.name,av:r.d.av,vit:0,mana:0,study:0,hand:0,evo:0,deck:[],owned:[]}});});
  T2.nextId=Math.max.apply(null,T2.members.map(m=>m.id))+1;T2.myId=1;T2.started=true;T2.resDone=false;T2.charged=true;T2.queue=[];T2.lastEnd=null;T2.hr=null;T2.hostRejoin=false;T2.proc=false;T2.turnAt=Date.now();BC.resultHandled=false;BC.processing=false;
  try{t2Rest();}catch(e){console.warn(e);}
+ try{cleanup();t2Sync();}catch(e){console.warn('복구 후 정리',e);}   // 친구 화면에 찍혀 있던 쓰러진(체력 0 이하) 포켓몬을 치워요
  S.screen='battle';$('#view').innerHTML='';try{$('#bq').classList.remove('on');closeInfo();}catch(e){}$('#battle').classList.add('on');startBgm('battle');
  renderBattle();toast('전투를 이어서 열었어요!');try{sfx('heal');}catch(e){}
  T2.members.forEach(m=>{const r=m.host?null:reps.find(x=>x.d.id===m.id);if(r)t2Rebind(m,r.c);});
  if(T.boss&&T.turn===1)setTimeout(()=>{if(B&&B.t2&&!B.over)t2BossTurn();},1200);   // 보스 차례 도중이었다면 보스 차례부터 다시
  setTimeout(()=>{try{t2Broadcast(true);}catch(e){}},400);}
+</script>
+<script id="rejoin-keep">
+/* 다시 들어오기 보조: 친구 화면이 '직전 우리 차례' 상태를 보관해 두고, 방장이 복구할 때 가장 알맞은 상태를 골라 써요 */
+(function(){
+ const _b=bossApplySnapshot;
+ bossApplySnapshot=function(state,initial){
+  try{if(!BC.host&&state&&typeof state==='object'){
+   if(state.t2){if(!(state.t2.boss&&state.t2.turn!==0))T2.stableJ=JSON.stringify(state);}   // 보스 차례 중이 아닌 상태만 보관
+   else if(state.coop&&state.side==='me'){BC.stableJ=JSON.stringify(state);}}}catch(e){}
+  return _b.call(this,state,initial);};
+ // 보스가 움직이던 중에 끊겼다면, 모든 친구가 보관한 '직전 우리 차례' 상태로 되돌려요 (보스 공격이 두 번 들어가지 않게)
+ window.t2RsPrefer=function(reps){try{
+  if(!reps.some(r=>r.d.snap.t2.boss&&r.d.snap.t2.turn!==0))return;
+  const st=reps.map(r=>{try{const x=r.d.stable?JSON.parse(r.d.stable):null;if(x&&x.t2&&Array.isArray(x.t2.players)){x.t2.teams=x.t2.players;delete x.t2.players;return x;}}catch(e){}return null;});
+  if(st.some(x=>!x))return;
+  reps.forEach((r,i)=>{r.d.snap=st[i];});
+ }catch(e){console.warn('t2RsPrefer',e);}};
+})();
 </script>
 <script id="rejoin-btn">
 (function(){
@@ -29476,7 +29513,7 @@ const t2Md=()=>T2.mode==='boss'&&T2.bn===2?'boss2':T2.mode;
 function t2Leave(){const inBattle=t2Active()&&!B.over,md=t2Md();t2Close();if(inBattle){B=null;try{$('#battle').classList.remove('on');$('#battle').innerHTML='';}catch(e){}}t2Home(md);}
 
 /* ------------------------------ 연결 정리 ------------------------------ */
-function t2Close(){try{T2.hostRejoin=false;T2.hr=null;}catch(e){}t2Close0.apply(this,arguments);}
+function t2Close(){try{T2.hostRejoin=false;T2.hr=null;T2.stableJ='';}catch(e){}t2Close0.apply(this,arguments);}
 function t2Close0(){try{if(T2.started&&!T2.host&&T2.conn&&T2.conn.open&&t2Active()&&!B.over&&!B.t2.fin)T2.conn.send({t:'t2-quit'});}catch(e){}
  try{t2RecoReset();}catch(e){}
  try{clearTimeout(T2.bt);}catch(e){}
@@ -29489,7 +29526,7 @@ function t2Close0(){try{if(T2.started&&!T2.host&&T2.conn&&T2.conn.open&&t2Active
 function t2MyHi(){const L=trainerSkillLevels();return{t:'t2-hi',v:T2_VER,tok:T2.tok||'',mode:T2.mode,name:String(S.meta.name||'').trim()||'친구',av:partnerId(),pg:(S.meta.pg==='f')?'f':'m',vit:vitBonus(),mana:Number(L.mana)||0,study:Number(L.study)||0,hand:Number(L.hand)||0,evo:Number(L.evo)||0,sk:skinTyMap(),deck:S.meta.deck.slice(),owned:Object.keys(S.meta.col).map(Number)};}
 
 /* ------------------------------ 방장: 방 만들기 ------------------------------ */
-async function t2Host(mode,bn,hcode){mode=mode||'pvp';const m=S.meta;if(mode==='pvp'&&m.coins<PVP_COST&&!hcode){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
+async function t2Host(mode,bn,hcode){mode=mode||'pvp';const m=S.meta;if((mode==='pvp'||mode==='boss')&&m.coins<PVP_COST&&!hcode){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
  t2Close();T2.mode=mode;T2.bn=bn===2?2:4;T2.host=true;T2.code=hcode||String(rint(1000,9999));T2.hostRejoin=!!hcode;if(!hcode)window.__t2hrTry=0;t2Box(`<p>연결 준비 중…</p><button class="btn ghost" id=t2Cancel>취소</button>`);
  try{await loadPeer();}catch(e){t2Box(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);return;}
  const id=t2Pre()+T2_VER+'-'+T2.code;let peer;try{peer=new Peer(id,PO());}catch(e){t2Box(`<p style="color:#d9393f">연결을 시작하지 못했어요</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);return;}
@@ -29578,7 +29615,7 @@ function t2Seat(m,team,pos){if(!(team===0||team===1)||!(pos===0||pos===1)){if(te
 const t2CanStart=()=>T2.members.filter(m=>m.hi&&m.team!=null).length===4&&[0,1].every(t=>[0,1].every(p=>T2.members.some(m=>m.team===t&&m.pos===p)));
 
 /* ------------------------------ 친구: 방 들어가기 ------------------------------ */
-async function t2Join(code,mode,bn,rj){mode=mode||'pvp';const m=S.meta;if(mode==='pvp'&&m.coins<PVP_COST&&!rj){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
+async function t2Join(code,mode,bn,rj){mode=mode||'pvp';const m=S.meta;if((mode==='pvp'||mode==='boss')&&m.coins<PVP_COST&&!rj){toast('코인이 모자라요');return;}if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
  t2Close();T2.rjOnly=!!rj;T2.tok=Math.random().toString(36).slice(2,12)+Date.now().toString(36);T2.mode=mode;T2.bn=bn===2?2:4;T2.host=false;T2.code=code;t2Box(`<p>연결 준비 중…</p><button class="btn ghost" id=t2Cancel>취소</button>`);
  try{await loadPeer();}catch(e){t2Box(`<p style="color:#d9393f">${esc(e.message)}</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);return;}
  let peer;try{peer=new Peer(PO());}catch(e){t2Box(`<p style="color:#d9393f">연결을 시작하지 못했어요</p><button class="btn ghost" id=t2Cancel>돌아가기</button>`);return;}
@@ -29727,8 +29764,10 @@ function t2ViewFor(team,idx){const T=B.t2,base={};
   o.hc=p.hand.length;o.dc=p.deck.length;o.hand=own?p.hand.slice():[];o.deck=own?p.deck.slice():[];return JSON.parse(JSON.stringify(o));};
  x.t2={vt:team,idx,boss:T.boss?1:0,turn:T.turn,done:JSON.parse(JSON.stringify(T.done)),fin:T.fin?1:0,ver:T2_VER,
   players:T.teams.map((tm,t)=>tm.map((p,i)=>pl(p,t===team&&i===idx))),boards:JSON.parse(JSON.stringify(T.boards))};
+ x.t2.sq=T2.sq||0;x.t2.xr={dr:T.defRot||0,sr:T.soloRage?1:0,ad:T.adopted?JSON.parse(JSON.stringify(T.adopted)):null};
+ try{const hp=t2Pos(t2HostMid());if(hp&&hp.t===team&&hp.i!==idx){const H=T.teams[hp.t][hp.i];x.hb={hand:JSON.parse(JSON.stringify(H.hand||[])),deck:JSON.parse(JSON.stringify(H.deck||[]))};}}catch(e){}   // 방장이 나갔다 돌아올 때 쓰도록 같은 편 친구 화면에만 방장 손패·덱을 백업해 둬요
  x.side=T.turn===team?'me':'foe';x.busy=false;x.over=!!B.over;return x;}
-function t2Send(force,init){if(!B||!B.t2)return;T2.lastSend=Date.now();
+function t2Send(force,init){if(!B||!B.t2)return;T2.lastSend=Date.now();T2.sq=(T2.sq||0)+1;
  T2.members.forEach(m=>{if(m.host||!m.conn||!m.conn.open)return;let team=-1,idx=-1;B.t2.teams.forEach((tm,t)=>tm.forEach((p,i)=>{if(p.mid===m.id){team=t;idx=i;}}));if(team<0)return;
   try{m.conn.send({t:'t2-snap',init:init?1:0,state:t2ViewFor(team,idx)});}catch(e){console.error('t2 snap',e);}});}
 function t2Broadcast(force,init){if(!BC.host||!B||!B.t2)return;if(BC.processing&&!force&&false)return;
@@ -30009,7 +30048,7 @@ function renderBossMode(){S.screen='bosscoop';bossClose();t2Close();const m=S.me
 
 function renderBoss4(n){n=n===2?2:4;S.screen='bosscoop';bossClose();t2Close();const m=S.meta;ensureDeck();
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${n===2?'⚡ 2인 동시 보스전':'👥 4인 협동 보스전'}</h2><span class=hudSp></span><button class="btn ghost sm" id=b4Back>← 모드 선택</button></div>
-  <p style="line-height:1.65;margin-top:8px">방장이 방을 열고 친구 <b>${n-1}명</b>이 같은 번호로 들어오면 시작해요. 보스는 ${n===2?'<b>4성 20% · 5성 80%</b>로 나타나고, 10% 확률로 <b>2마리</b>가 함께 나와요.':'<b>항상 전설 포켓몬 2마리</b>예요.'}</p>
+  <p style="line-height:1.65;margin-top:8px">방장이 방을 열고 친구 <b>${n-1}명</b>이 같은 번호로 들어오면 시작해요. 한 판에 <b>코인 ${PVP_COST}개</b>가 들어요. 보스는 ${n===2?'<b>4성 20% · 5성 80%</b>로 나타나고, 10% 확률로 <b>2마리</b>가 함께 나와요.':'<b>항상 전설 포켓몬 2마리</b>예요.'}</p>
   <div class=tiles style="margin-top:12px"><div class=tile><span class=ti>✨</span><span class=tn>${n===2?'4성 20% · 5성 80%':'5성 보스 100%'}</span><span class=td>${n===2?'보스 1마리 (10%는 2마리)':'항상 전설 포켓몬'}</span></div><div class=tile><span class=ti>👹</span><span class=tn>보스 ${n===2?'1~2마리':'2마리'}</span><span class=td>${n===2?'가끔 두 마리가 나와요':'한꺼번에 등장해요'}</span></div></div>
   <details class=bossHow style="margin-top:10px"><summary class="btn ghost sm" style="cursor:pointer;list-style:none">📖 설명 보기 / 접기</summary><div class=explain style="margin-top:8px;font-size:14px;line-height:1.7">• ${n}명 모두 <b>동시에</b> 행동하고, 모두 <b>차례 끝</b>을 누르면 보스 차례가 돼요.<br>• ${n===2?8:10}칸 필드와 <b>트레이너 체력은 모두가 함께</b> 써요. 체력은 <b>${n===2?20:30}</b> + 각자의 체력증강 레벨 합(모두 5레벨이면 <b>${n===2?30:50}</b>)이에요.<br>• 트레이너 스킬은 <b>각자</b> 쓸 수 있어요.<br>${n===2?'• 보스는 <b>1마리면 2회</b>, <b>2마리면 각각 1회</b> 공격해요. 한 마리가 쓰러지면 남은 보스는 2회가 돼요. 우리 필드에 포켓몬이 <b>3마리 이상</b>이면 +1회(6마리 이상이면 +2회), 보스 체력이 <b>25% 이하</b>면 발악해서 +1회 (최대 4회). 체력이 50% 이하면 분노해서 공격력도 +1이에요.<br>':'• 보스는 <b>각각 2회</b> 공격해요. 체력이 <b>50% 이하</b>면 분노해서 공격력 +1, <b>25% 이하</b>면 발악해서 +1회, 우리 필드에 포켓몬이 <b>5마리 이상</b>이면 +1회 (최대 4회).<br>'}• 보스가 트레이너를 공격하면 <b>방어 문제가 한 명씩 돌아가며</b> 나와요. 다른 친구들은 그 친구가 고른 답을 보고, 결과가 <b>❤️ / 💔</b>로 나와요. 내 차례가 아닐 땐 <b>답이라고 생각하는 보기를 눌러 ❤️ 로 응원</b>할 수 있어요. 푸는 친구 화면에 작은 ❤️ 가 최대 3개 떠요. ❤️는 <b>문제 시작 30초 뒤</b>에 떠요.<br>• <b>차례 끝</b>을 누르면 아직 행동 중인 친구의 <b>공격·공부 기술 문제</b>를 구경할 수 있어요. 친구가 여럿이면 <b>◀ ▶</b> 로 바꿔 볼 수 있어요. (방어 문제는 언제나 가장 먼저 보여요)<br>• 보스를 쓰러뜨리면 보스 1마리당 조각 ${typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:4}개를 받아요. 코인은 들지 않아요.</div></details>
   <div class=row style="margin-top:12px"><button class="btn red big" id=b4Host>방 만들기 (방장)</button><button class="btn blue big" id=b4Join>방 들어가기</button></div><button class="btn ghost big" id=b4Rj style="width:100%;margin-top:8px">🔁 다시 들어가기 (나갔다 돌아올 때)</button>
@@ -30047,6 +30086,7 @@ function t2BossPick(hi,cnt){cnt=cnt||2; // 전설 2마리: 우리 중 아무도 
  while(pick.length<cnt){const a=src();pick.push(rpick(a));}return pick;}
 
 function t2StartBoss(){if(!T2.host||T2.started||T2.mode!=='boss')return;const N=t2N();const ms=T2.members.filter(m=>m.hi);if(ms.length!==N)return;
+ if(S.meta.coins<PVP_COST){toast(`코인이 ${PVP_COST-S.meta.coins}개 모자라요`);return;}
  ms.forEach((m,i)=>{m.team=0;m.pos=i;});
  const used={};const nameOf=m=>{let n=m.name||'친구';if(used[n]){used[n]++;n+=' '+'②③④'[used[n]-2];}else used[n]=1;return n;};
  const sh={hp:0,max:0};ms.forEach(m=>{sh.max+=t2clamp(m.hi.vit,0,5);});sh.max+=(N===2?20:B4_HP);sh.hp=sh.max;
@@ -30058,7 +30098,7 @@ function t2StartBoss(){if(!T2.host||T2.started||T2.mode!=='boss')return;const N=
  const ids=N===2?t2BossPick2(ms.map(m=>m.hi)):t2BossPick(ms.map(m=>m.hi),2);const slots=N===2?(ids.length===2?[1,3]:[2]):[1,3];
  const foe=mkPlayer(ids.map(x=>MON[x].name).join(' · '),[],1,ids[0],true,[],false);foe.team=1;foe.tix=0;foe.mid=0;
  ids.forEach((wid,k)=>{const u=mkUnit(wid);u.hp=MON[wid].hp*15;u.max=u.hp;u.atk=MON[wid].atk;u.att=0;u.fresh=0;u.wildEncounter=1;foe.board[slots[k]]=u;});
- const li=0;BC.localIndex=li;BC.host=true;BC.t2=true;T2.started=true;T2.queue=[];T2.resDone=false;T2.charged=false;
+ const li=0;BC.localIndex=li;BC.host=true;BC.t2=true;T2.started=true;T2.queue=[];T2.resDone=false;S.meta.coins-=PVP_COST;T2.charged=true;autoSave();   // 보스전은 친구들처럼 방장도 코인이 들어요
  const st={n:0,id:ids[0],ids:ids.slice(),finished:false,caughtIds:[],caughtNewIds:[],captureModalOpen:false,note:'',previousScreen:'bosscoop',coopMode:true};
  B={gi:-2,g:{n:N+'인 동시 협동 보스전',ldr:'보스 포켓몬',c:TYPE_COL[MON[ids[0]].types[0]]||'#ffc93c'},diff:Math.max(1,Math.ceil(lvOf(S.meta.xp).lv/2)),turn:0,round:0,side:'me',me:players[li],foe,sel:-1,pick:-1,busy:false,combo:0,qn:0,qc:0,defUsed:false,over:false,
   wildMode:true,wildId:ids[0],wildSlot:slots[0],wildIds:ids.slice(),wildSlots:slots.slice(),wildState:st,capturePrompted:true,trainerSkillUsed:players[li].tsUsed,
