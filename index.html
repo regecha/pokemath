@@ -27165,6 +27165,7 @@ function t2HostRestore(){
  // 각 플레이어의 '진짜' 정보(손패·덱)는 그 친구 화면에서, 나머지는 보이는 정보만 가져와요
  const teams=ft.teams.map((tm,t)=>tm.map((p,i)=>{const own=reps.find(r=>{const s=r.d.snap.t2;return s.vt===t&&(s.idx===i);});return JSON.parse(JSON.stringify(own?own.d.snap.t2.teams[t][i]:p));}));
  const flat=teams.reduce((a,tm)=>a.concat(tm),[]);const hostP=flat.find(p=>p.mid===1);if(!hostP)throw new Error('no host player');
+  try{hostP.owned=Object.keys(S.meta.col||{}).map(Number).filter(id=>MON[id]);}catch(e){}   // 방장 본인의 소유 목록은 방장 기기의 것으로
  let ht=0,li=0;teams.forEach((tm,t)=>tm.forEach((p,i)=>{if(p===hostP){ht=t;li=i;}}));
  const T={teams,boards:JSON.parse(JSON.stringify(ft.boards)),turn:ft.turn|0,eng:ht,done:JSON.parse(JSON.stringify(ft.done)),vt:ht,boss:!!ft.boss,defRot:(ft.xr&&ft.xr.dr)||0,fin:false,ver:T2_VER};if(ft.xr){if(ft.xr.sr)T.soloRage=1;if(ft.xr.ad)T.adopted=ft.xr.ad;}
  teams.forEach((tm,t)=>tm.forEach(p=>{p.board=T.boards[t];p.team=t;}));
@@ -29675,7 +29676,7 @@ function t2HostClosed(m,c){const i=T2.members.indexOf(m);if(i<0)return;if(c&&m.c
  T2.members.splice(i,1);t2PushLobby();}
 function t2HostRx(m,d){if(!d||typeof d!=='object')return;m.lastRx=Date.now();if(d.t==='t2-ping')return;
  if(d.t==='t2-hi'){m.tok=String(d.tok||'').slice(0,40);if(d.v!==T2_VER||(d.mode||'pvp')!==T2.mode){t2SendTo(m,{t:'t2-ver'});setTimeout(()=>{try{m.conn.close();}catch(e){}},500);const i=T2.members.indexOf(m);if(i>=0)T2.members.splice(i,1);return;}
-  m.name=String(d.name||'친구').slice(0,12);m.av=MON[d.av]?d.av:25;m.hi={name:m.name,av:m.av,vit:t2clamp(d.vit,0,5),mana:t2clamp(d.mana,0,5),study:t2clamp(d.study,0,5),hand:t2clamp(d.hand,0,5),evo:t2clamp(d.evo,0,5),deck:Array.isArray(d.deck)?d.deck.slice(0,60):[],owned:Array.isArray(d.owned)?d.owned.slice(0,600):[]};
+  m.name=String(d.name||'친구').slice(0,12);m.av=MON[d.av]?d.av:25;m.hi={name:m.name,av:m.av,vit:t2clamp(d.vit,0,5),mana:t2clamp(d.mana,0,5),study:t2clamp(d.study,0,5),hand:t2clamp(d.hand,0,5),evo:t2clamp(d.evo,0,5),deck:Array.isArray(d.deck)?d.deck.slice(0,60):[],owned:Array.isArray(d.owned)?d.owned.slice(0,1100):[]/* 도감 전체(1025마리)가 다 가도록 600→1100 */};
   t2PushLobby();return;}
  if(!m.hi)return;
  if(d.t==='t2-pick'&&!T2.started){t2Seat(m,Number(d.team),Number(d.pos));return;}
@@ -29837,7 +29838,7 @@ bossPxDec=function(x){if(!(B&&B.t2))return _pxDec(x);if(x&&typeof x==='object'){
 function t2ViewFor(team,idx){const T=B.t2,base={};
  for(const k in B){if(k==='me'||k==='foe'||k==='coop'||k==='t2'||k==='trainerSkillUsed'||typeof B[k]==='function')continue;base[k]=B[k];}
  const x=JSON.parse(JSON.stringify(base));
- const pl=(p,own)=>{const o={};for(const k in p){if(k==='board'||k==='hand'||k==='deck'||typeof p[k]==='function')continue;o[k]=p[k];}
+ const pl=(p,own)=>{const o={};for(const k in p){if(k==='board'||k==='hand'||k==='deck'||k==='owned'||typeof p[k]==='function')continue;o[k]=p[k];} /* owned(소유 포켓몬 목록)는 방장만 쓰는 값이라 보내지 않아요 → 통신량 절약 */
   o.hc=p.hand.length;o.dc=p.deck.length;o.hand=own?p.hand.slice():[];o.deck=own?p.deck.slice():[];return JSON.parse(JSON.stringify(o));};
  x.t2={vt:team,idx,boss:T.boss?1:0,turn:T.turn,done:JSON.parse(JSON.stringify(T.done)),fin:T.fin?1:0,ver:T2_VER,
   players:T.teams.map((tm,t)=>tm.map((p,i)=>pl(p,t===team&&i===idx))),boards:JSON.parse(JSON.stringify(T.boards))};
@@ -29858,6 +29859,7 @@ const _applyNow=bossApplySnapshotNow;
 bossApplySnapshotNow=function(x,initial){if(!(x&&x.t2))return _applyNow.apply(this,arguments);
  try{const prev=(B&&B.t2&&!initial)?B:null;const T=x.t2,vt=T.vt,idx=T.idx;T.teams=T.players;delete T.players;
   [0,1].forEach(t=>T.teams[t].forEach(p=>{p.board=T.boards[t];p.team=t;}));
+  try{const lp=T.teams[vt]&&T.teams[vt][idx];if(lp&&!lp.owned)lp.owned=Object.keys(S.meta.col||{}).map(Number).filter(id=>MON[id]);}catch(e){} /* 내 소유 목록은 내 기기에 있는 걸로 (방장 복구 때 필요) */
   BC.localIndex=idx;T.eng=vt;
   x.coop={players:T.teams[vt],foeTeam:T.teams[1-vt],active:idx,localIndex:idx,seq:0,processing:false,result:null,t2:true};
   x.me=T.teams[vt][idx];x.foe=T.teams[1-vt][0];x.trainerSkillUsed=x.me.tsUsed=(x.me.tsUsed||{});x.busy=!!x.busy;
