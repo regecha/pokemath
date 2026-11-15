@@ -22084,18 +22084,22 @@ const ENTTS={voice:null,bad:new Set(),seq:0,ok(){return typeof speechSynthesis!=
 // 목소리 고르기: 기기에 내장된(local) 영어 음성을 먼저 써요. 인터넷 음성은 연결이 느리면 소리가 안 나거나 멈춰 보일 수 있어요.
 // 주의: voiceschanged 안에서 getVoices()를 다시 부르면 일부 기기에서 무한 반복으로 화면이 멈춰서, 여기서는 캐시만 지워요.
 function enPickVoice(){if(!ENTTS.ok())return null;if(ENTTS.voice)return ENTTS.voice;try{const vs=speechSynthesis.getVoices()||[];if(!vs.length)return null;
- const en=vs.filter(v=>/^en[-_]/i.test(v.lang)&&!ENTTS.bad.has(v.name));if(!en.length)return null;const loc=en.filter(v=>v.localService!==false),pool=loc.length?loc:en;
+ const en=vs.filter(v=>/^en[-_]/i.test(v.lang)&&!ENTTS.bad.has(v.name)&&!ENTTS_NOV.test(v.name));if(!en.length)return null;const loc=en.filter(v=>v.localService!==false),pool=loc.length?loc:en;
  const pref=[/en[-_]US/i,/Samantha|Ava|Allison|Aria|Jenny|Zira|Google US English/i,/en[-_]GB/i];
  for(const re of pref){const f=pool.find(v=>re.test(v.lang)||re.test(v.name));if(f)return ENTTS.voice=f;}return ENTTS.voice=pool[0];}catch(e){return null;}}
 try{if(ENTTS.ok()){speechSynthesis.onvoiceschanged=()=>{ENTTS.voice=null;};speechSynthesis.getVoices();}}catch(e){}
 const ENTTS_KEEP=[];
+// 아이폰(iOS)은 '터치가 끝나는 순간(touchend/click)' 안에서 바로 speak()를 불러야 소리가 나요. 중간에 setTimeout·대기가 끼면 조용히 무시돼요.
+ENTTS.ios=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+// 아이폰에 들어 있는 장난감 음성(소리가 이상하거나 안 나는 것)은 제외해요.
+const ENTTS_NOV=/^(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Good News|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Junior|Ralph|Kathy)\b/i;
 // Chrome은 음성 목록을 늦게 불러와요: 목록이 올 때까지 잠깐(최대 1.2초) 기다렸다가 읽어요.
 function enVoicesReady(cb){try{if((speechSynthesis.getVoices()||[]).length)return cb();let d=false;const fin=()=>{if(d)return;d=true;cb();};speechSynthesis.addEventListener('voiceschanged',()=>{ENTTS.voice=null;fin();},{once:true});setTimeout(fin,1200);}catch(e){cb();}}
 function enAnyVoice(skip){try{const en=(speechSynthesis.getVoices()||[]).filter(v=>/^en[-_]/i.test(v.lang)&&!(skip&&v.name===skip.name));return en.find(v=>/en[-_]US/i.test(v.lang))||en[0]||null;}catch(e){return null;}}
-function enTtsFail(){const now=Date.now();if(ENTTS.lastWarn&&now-ENTTS.lastWarn<20000)return;ENTTS.lastWarn=now;const dbg=' ('+(function(){try{return '음성 '+(speechSynthesis.getVoices()||[]).length+'개';}catch(e){return '';}})()+(ENTTS.err?', 오류 '+ENTTS.err:'')+')';try{toast((ENTTS.blocked?'🔇 브라우저가 소리를 막았어요. 화면을 한 번 누른 뒤 🔊 듣기를 눌러 보세요.':'🔇 이 브라우저에서 영어 음성을 못 찾았어요. 컴퓨터의 텍스트 음성 변환(영어) 설정을 확인하거나 다른 브라우저를 써 보세요.')+dbg);}catch(e){}}
+function enTtsFail(){const now=Date.now();if(ENTTS.lastWarn&&now-ENTTS.lastWarn<20000)return;ENTTS.lastWarn=now;const dbg=' ('+(function(){try{return '음성 '+(speechSynthesis.getVoices()||[]).length+'개';}catch(e){return '';}})()+(ENTTS.err?', 오류 '+ENTTS.err:'')+')';try{toast((ENTTS.blocked?'🔇 브라우저가 소리를 막았어요. 화면을 한 번 누른 뒤 🔊 듣기를 눌러 보세요.':(ENTTS.ios?'🔇 소리가 안 나요. 아이폰 옆면의 무음(벨) 스위치를 끄고, 설정 > 손쉬운 사용 > 말하는 콘텐츠 > 음성에서 영어 음성을 받아 보세요.':'🔇 이 브라우저에서 영어 음성을 못 찾았어요. 컴퓨터의 텍스트 음성 변환(영어) 설정을 확인하거나 다른 브라우저를 써 보세요.'))+dbg);}catch(e){}}
 function enSpeak(text){
  if(!ENTTS.ok()||!text)return;const id=++ENTTS.seq,ss=speechSynthesis;
- enVoicesReady(()=>{if(id!==ENTTS.seq)return;
+ (ENTTS.ios?(f=>f()):enVoicesReady)(()=>{if(id!==ENTTS.seq)return;
   let busy=false;try{busy=ss.speaking||ss.pending;if(busy)ss.cancel();ss.resume();}catch(e){}
   const go=()=>{if(id!==ENTTS.seq)return;
    const first=enPickVoice(),tries=[()=>first,()=>enAnyVoice(first),()=>null];let ti=0;
@@ -22108,10 +22112,14 @@ function enSpeak(text){
     try{ss.speak(u);}catch(e){next();}
     setTimeout(()=>{if(!started&&!ss.speaking)next();},2000);};
    attempt();};
-  if(busy)setTimeout(go,100);else go();});
+  if(busy&&!ENTTS.ios)setTimeout(go,100);else go();});
 }
 // 첫 터치 때 음성 기능을 미리 깨워 둬요 (Chrome은 사용자 조작 뒤에만 소리를 내요)
-try{document.addEventListener('pointerdown',()=>{try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){}},{once:true,capture:true});}catch(e){}
+// (iOS Safari/Chrome은 pointerdown을 '사용자 조작'으로 인정하지 않아서, touchend/pointerup/click에서 깨우고 성공할 때까지 반복해요)
+try{(function(){const evs=['touchend','pointerup','click','keydown'];let done=false;
+ function warm(){if(done||!ENTTS.ok())return;try{const ss=speechSynthesis;if(ss.speaking||ss.pending)return;const u=new SpeechSynthesisUtterance('.');u.volume=0;u.lang='en-US';ENTTS_KEEP.push(u);
+  u.onstart=()=>{done=true;evs.forEach(e=>removeEventListener(e,warm,true));};ss.speak(u);}catch(e){}}
+ evs.forEach(e=>addEventListener(e,warm,{capture:true,passive:true}));})();}catch(e){}
 // 문제에서 읽을 영어 문장 만들기
 function enSayText(q){const r=q&&q.ref;if(!r)return'';const i=r.l-1;try{
  if(r.t==='vocabulary')return EN_WORDS[i][r.i][0];
