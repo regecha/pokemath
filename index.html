@@ -3812,7 +3812,7 @@ const S={meta:defaultMeta(),screen:'title',busy:false};
 // ===== 저장 · 불러오기 =====
 const STORE_OK=(()=>{try{const k='__pm';localStorage.setItem(k,'1');const ok=localStorage.getItem(k)==='1';localStorage.removeItem(k);return ok;}catch(e){return false;}})();
 function __J(o){const st=S.meta&&S.meta.settings;if(window.__autoLow&&st){const v=st.lowfx;st.lowfx=false;try{return JSON.stringify(o);}finally{st.lowfx=v;}}return JSON.stringify(o);} /* 전투 중 자동으로 켠 저사양 모드는 저장에 남기지 않아요 */
-function saveLocal(){if(window.__sim)return;try{localStorage.setItem(SAVE_KEY,__J({meta:S.meta}));}catch(e){}}
+function saveLocal(){if(window.__sim||window.__cloudWipe)return;try{const _s=__J({meta:S.meta});localStorage.setItem(SAVE_KEY,_s);try{window.cloudNote&&window.cloudNote(_s);}catch(e){}}catch(e){}}
 function loadLocal(){try{const s=localStorage.getItem(SAVE_KEY);if(!s)return;const o=JSON.parse(s);S.meta=upgradeMeta(mergeMeta(o.meta));}catch(e){}}
 // 새 버전을 처음 열면 저사양 모드를 풀어요. (기기가 정말 느리면 전투 중에 다시 자동으로 켜져요)
 function buildCheck(){try{const m=S.meta;if(!m||!m.settings||m.buildSeen===BUILD_ID)return;const was=!!m.settings.lowfx;m.settings.lowfx=false;m.buildSeen=BUILD_ID;saveLocal();if(was)setTimeout(()=>{try{toast('새 버전이에요! <b>저사양 모드</b>를 풀었어요. (설정에서 다시 켤 수 있어요)');}catch(e){}},900);}catch(e){}}
@@ -3825,8 +3825,8 @@ function fmtWhen(t){const d=new Date(t);return `${d.getMonth()+1}월 ${d.getDate
 function b64u(u){let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
 function ub64u(t){t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';const b=atob(t);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
 // ===== 저장코드 서명 (코드 글자를 직접 고쳐 불러오는 조작을 막아요) =====
-// 서명이 없는 예전 코드는 SAVE_UNSIGNED_UNTIL(2026-11-23 23:59, 한국 시간)까지만 불러올 수 있어요. 연장하려면 이 날짜를 바꾸세요.
-const SAVE_SIGN_KEY='pm-sv-7f3c19ab52e0d468';const SAVE_UNSIGNED_UNTIL=new Date('2026-11-23T23:59:59+09:00').getTime();
+// 서명이 없는 예전 코드는 SAVE_UNSIGNED_UNTIL(2026-12-31 23:59, 한국 시간)까지만 불러올 수 있어요. 연장하려면 이 날짜를 바꾸세요.
+const SAVE_SIGN_KEY='pm-sv-7f3c19ab52e0d468';const SAVE_UNSIGNED_UNTIL=new Date('2026-12-31T23:59:59+09:00').getTime();
 function __hmac(key,msg){const E=new TextEncoder();let k=E.encode(key);if(k.length>64)k=__sha256(k);const ip=new Uint8Array(64+msg.length),op=new Uint8Array(96);for(let i=0;i<64;i++){const c=k[i]||0;ip[i]=c^0x36;op[i]=c^0x5c;}ip.set(msg,64);op.set(__sha256(ip),64);return __sha256(op);}
 function saveSig(str){return b64u(__hmac(SAVE_SIGN_KEY,new TextEncoder().encode(String(str))).subarray(0,16));}
 function sigUnsignedOk(){if(Date.now()>SAVE_UNSIGNED_UNTIL)throw new Error('서명이 없는 예전 저장 코드는 더 이상 쓸 수 없어요. 선생님께 문의해 주세요');}
@@ -3856,8 +3856,8 @@ function recSanity(m){const w=[];try{const num=v=>typeof v==='number'&&isFinite(
 async function makeCode(){let b=new TextEncoder().encode(__J({game:GAME.id,v:1,meta:S.meta,tl:(window.tradeLedgerOut?window.tradeLedgerOut():undefined)})),tag='A';
  if(window.CompressionStream){try{b=new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());tag='Z';}catch(e){}}
  const p=b64u(b);return 'ljcms'+tag.toLowerCase()+':'+p+'.'+saveSig(tag+':'+p);}
-// 옛 접두어(PKMT) 코드는 SAVE_OLDPREFIX_UNTIL(2026-11-23 23:59, 한국 시간)까지만 불러올 수 있어요. 연장하려면 이 날짜를 바꾸세요.
-const SAVE_OLDPREFIX_UNTIL=new Date('2026-11-23T23:59:59+09:00').getTime();
+// 옛 접두어(PKMT) 코드는 SAVE_OLDPREFIX_UNTIL(2026-12-31 23:59, 한국 시간)까지만 불러올 수 있어요. 연장하려면 이 날짜를 바꾸세요.
+const SAVE_OLDPREFIX_UNTIL=new Date('2026-12-31T23:59:59+09:00').getTime();
 async function readAny(text){text=String(text||'').trim();if(!text)throw new Error('코드를 붙여 넣어 주세요');
  if(/```json/.test(text)){const m=text.match(/```json\s*([\s\S]*?)```/);const o=JSON.parse(m[1]);if(o.game!==GAME.id)throw new Error(GAME.title+' 기록이 아니에요');sigCheckObj(o);return o;}
  const m=text.replace(/\s+/g,'').match(/(ljcms|pkmt)([az]):([A-Za-z0-9_-]+)(?:\.([A-Za-z0-9_-]{22}))?/i);if(!m)throw new Error('저장 코드 모양이 아니에요 (ljcms로 시작해요)');
@@ -3889,6 +3889,320 @@ function bkBannerHTML(m){if(!bkNeed(m))return '';const a=bkAgo();
  return `<div class="panel bkBanner"><div style="font-size:26px">💾</div><div style="flex:1"><b class=jua style="font-size:17px">기록 백업해 둘까요?</b><div class=mut style="font-size:13px">${a===null?'아직 백업한 적이 없어요.':a+'일 동안 백업하지 않았어요.'} 브라우저 데이터를 지우거나 기기가 바뀌면 기록이 사라질 수 있어요. 저장 코드를 한 번 만들어 두면 안전해요!</div></div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn gold sm" onclick="showSaveBox()">지금 백업</button><button class="btn ghost sm" onclick="bkLater()">나중에</button></div></div>`;}
 function bkLater(){S.meta.bkSnooze=Date.now()+3*864e5;saveLocal();sfx('tap');renderHub();}
 function quickSave(){if(!STORE_OK){showSaveBox();return;}saveLocal();toast(`${I('check')} 저장했어요! 지금 꺼도 다음에 이어서 할 수 있어요 <button class="btn sm ghost" style="margin-left:6px;pointer-events:auto" onclick="showSaveBox()">저장 옮기기</button>`);}
+// ===== ☁️ 계정 저장 (Firebase) : ID·비밀번호로 로그인해서 다른 기기에서도 기록을 이어서 해요 =====
+// 구조: 로그인(Authentication, ID는 'ID@monstudy.web.app' 처럼 바꿔서 이메일 형식으로 보내요) + 저장(Firestore)
+//   saves/{내 uid}/slots/auto   = 자동 저장 (게임이 알아서 올려요)
+//   saves/{내 uid}/slots/manual = 내가 올린 저장 (버튼을 눌렀을 때만 바뀌어요)
+//   문서 칸: code(저장 코드 ljcms…), savedAt(시각), sum(요약), rev(버전 번호), dev(기기 표시). 규칙(Firestore Rules)과 같아야 해요.
+// Firebase 프로그램은 처음 필요할 때만 불러와요. 인터넷이 없어도 게임은 그대로 돼요.
+const CLOUD_CFG={apiKey:"AIzaSyCPfd943xYQ3K1gHInBWhLR-K6WOqATgco",authDomain:"monstudy.firebaseapp.com",projectId:"monstudy",storageBucket:"monstudy.firebasestorage.app",messagingSenderId:"333809017854",appId:"1:333809017854:web:0f2481917c00b69afb96af"};
+const CLOUD_SDK='10.14.1';                 // Firebase 프로그램 버전 (주소가 안 열리면 이 숫자만 바꾸면 돼요)
+const CLOUD_MAIL='@monstudy.web.app';      // ID 뒤에 붙이는 가짜 이메일 꼬리 (실제로 메일을 보내지 않아요)
+const CLOUD_CLASS_CODES=['ljc'];           // 수업 코드 (가입할 때 물어봐요. 여러 개면 ['ljc','abc']처럼)
+const CLOUD_GAP=60000;                     // 자동 올리기 최소 간격(1분)
+const CLOUD_TICK=300000;                   // 안전망: 바뀐 게 있으면 5분마다
+const CL_KEY=GAME.id+'-cloud',CL_PREV=GAME.id+'-prevcloud';
+const CL={pref:null,sdk:null,auth:null,db:null,user:null,ready:false,dirty:false,busy:false,lastPush:0,lastJson:null,conflict:null,cards:null,fail:0,tm:0,tmAt:0,state:'off',startP:null,startUid:null,interactive:false,applied:false,signingOut:false,acts:null};
+function clLoadPref(){let p={};try{p=JSON.parse(localStorage.getItem(CL_KEY)||'{}')||{};}catch(e){}
+ p.use=!!p.use;p.auto=p.auto!==false;p.remember=!!p.remember;p.owner=p.owner||null;p.base=(p.base&&typeof p.base==='object')?p.base:{};p.hash=p.hash||'';
+ if(!p.dev)p.dev=Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);return p;}
+CL.pref=clLoadPref();
+function clSave(){try{localStorage.setItem(CL_KEY,JSON.stringify(CL.pref));}catch(e){}}
+const clBase=uid=>(CL.pref.base[uid]=CL.pref.base[uid]||{auto:0});
+function clHash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return s.length+':'+(h>>>0);}
+const clTo=(p,ms)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j(Object.assign(new Error('timeout'),{code:'timeout'})),ms))]);
+const clInBattle=()=>['battle','pvp','bosscoop','scenarioBattle','scenarioRLBattle'].indexOf(S.screen)>=0;
+const clMyId=()=>String((CL.user&&CL.user.email)||'').replace(CLOUD_MAIL,'');
+(function(){try{const st=document.createElement('style');st.textContent=
+ '.cloudBox{margin:12px 0;padding:12px;border:3px solid #4aa3ff;border-radius:16px;background:linear-gradient(180deg,#eaf5ff,#fff);box-shadow:0 4px 0 #b9dcff}'
+ +'.cloudBox .cAuto{display:flex;gap:6px;align-items:center;font-size:14px;margin:6px 0}'
+ +'.cIn{margin:5px 0}.cMsg{min-height:20px;margin:4px 0;font-size:14px;color:#d9393f;line-height:1.4}'
+ +'.cConsent{font-size:13px;line-height:1.6;background:#fff8e6;border:2px solid #f1d27a;border-radius:12px;padding:6px 10px;margin:6px 0}'
+ +'.cRem{display:flex;gap:6px;align-items:flex-start;font-size:13px;margin:6px 0;line-height:1.4}'
+ +'#cloudChip{position:fixed;left:8px;bottom:8px;z-index:90;font:700 12px/1.2 "Jua",sans-serif;padding:4px 9px;border-radius:999px;border:2px solid #9be0a2;background:rgba(255,255,255,.94);color:#2a6f35;opacity:.92}'
+ +'#cloudChip.bad{border-color:#e8a1a1;color:#b3262c;background:#fff1f1}';
+ (document.head||document.documentElement).appendChild(st);}catch(e){}})();
+
+// ---------- 상태 표시(왼쪽 아래 작은 알약) ----------
+function clState(s){CL.state=s;clChipRender();}
+function clChipRender(){let c=document.getElementById('cloudChip');
+ if(!CL.user||clInBattle()){if(c)c.style.display='none';return;}
+ if(!c){c=document.createElement('button');c.id='cloudChip';c.type='button';c.onclick=()=>{try{showSaveBox();}catch(e){}};document.body.appendChild(c);}
+ const t=new Date(CL.lastPush||Date.now());let txt,cls='';
+ if(CL.state==='sync'){txt='☁️ 올리는 중…';}
+ else if(CL.state==='fail'){txt='⚠️ 올리기 실패 · 다시 시도해요';cls='bad';}
+ else if(CL.state==='conflict'||CL.state==='hold'||!CL.ready){txt='⚠️ 기록 확인이 필요해요';cls='bad';}
+ else if(!CL.pref.auto){txt='☁️ 자동 올리기 꺼짐';}
+ else{txt='☁️ 로그인됨'+(CL.lastPush?` · ${pad2(t.getHours())}:${pad2(t.getMinutes())} 저장`:'');}
+ c.textContent=txt;c.className=cls;c.style.display='';}
+setInterval(()=>{try{if(CL.user)clChipRender();}catch(e){}},2500);
+
+// ---------- Firebase 프로그램 불러오기 ----------
+const CLOUD_SDK2='10.12.5';                // 위 버전 주소가 안 열릴 때 대신 쓰는 예비 버전
+async function cloudSdk(){if(CL.sdk)return CL.sdk;
+ let m=null;
+ for(const v of [CLOUD_SDK,CLOUD_SDK2]){const b=`https://www.gstatic.com/firebasejs/${v}/`;
+  try{m=await clTo(Promise.all([import(b+'firebase-app.js'),import(b+'firebase-auth.js'),import(b+'firebase-firestore.js')]),10000);CL.ver=v;break;}catch(e){}}
+ if(!m)throw Object.assign(new Error('sdk'),{code:'sdk'});
+ const [A,U,F]=m;const app=A.initializeApp(CLOUD_CFG);const auth=U.getAuth(app);let db;
+ try{db=F.initializeFirestore(app,{experimentalAutoDetectLongPolling:true});}catch(e){db=F.getFirestore(app);} // 학교망에서도 되게
+ CL.sdk={A,U,F,app};CL.auth=auth;CL.db=db;
+ U.onAuthStateChanged(auth,u=>{
+  if(u){if(!CL.user||CL.user.uid!==u.uid)CL.user=u;CL.pref.use=true;clSave();cloudStart(!CL.interactive);}
+  else if(CL.user&&!CL.signingOut){cloudStop();}});
+ return CL.sdk;}
+async function cloudBoot(){try{await cloudSdk();}catch(e){}}
+
+// ---------- 시작할 때: 클라우드와 이 기기 기록 맞춰 보기 ----------
+function cloudStart(quiet){const u=CL.user;if(!u)return Promise.resolve();
+ if(CL.startP&&CL.startUid===u.uid)return CL.startP;
+ CL.startUid=u.uid;CL.startP=(async()=>{try{await cloudReconcile(quiet);}catch(e){clState('fail');}CL.interactive=false;})();return CL.startP;}
+function cloudStop(){CL.user=null;CL.ready=false;CL.dirty=false;CL.startP=null;CL.startUid=null;CL.cards=null;CL.conflict=null;CL.lastJson=null;CL.lastPush=0;CL.state='off';clearTimeout(CL.tm);CL.tmAt=0;clChipRender();}
+async function cloudFetch(){const {F}=CL.sdk,uid=CL.user.uid;
+ const g=async k=>{const s=await clTo(F.getDoc(F.doc(CL.db,'saves',uid,'slots',k)),12000);return s.exists()?s.data():null;};
+ const [auto,manual]=await Promise.all([g('auto'),g('manual')]);return{auto,manual};}
+async function cloudReconcile(quiet){
+ const uid=CL.user.uid,b=clBase(uid);CL.ready=false;CL.conflict=null;clState('sync');
+ let docs;try{docs=await cloudFetch();}catch(e){clState('fail');if(!quiet)toast('☁️ 클라우드 기록을 확인하지 못했어요');return;}
+ const {auto,manual}=docs;CL.cards={t:Date.now(),auto,manual};
+ const localHas=!!S.meta.name,own=CL.pref.owner===uid;
+ // 1) 클라우드가 비어 있어요
+ if(!auto&&!manual){
+  b.auto=0;
+  if(!localHas){clSave();CL.ready=true;clState('ok');return;}
+  if(!own){
+   if(quiet){CL.ready=false;clState('hold');return;}
+   const mine=await cloudAskMine();
+   if(!mine){if(await confirmBox('이 기기에 있는 기록을 <b>지울까요?</b><br><span class=mut>다른 사람의 기록일 때만 지워 주세요.</span>','지우기','취소')){cloudWipeLocal();return;}CL.ready=false;clState('hold');return;}
+   CL.ready=true;CL.dirty=true;clSave();
+   const r=await cloudPush('auto');if(r.ok){await cloudPush('manual',{rev:1});toast('☁️ 이 기기의 기록을 올렸어요!');}else{CL.ready=false;clState('fail');}
+   CL.cards=null;return;}
+  CL.ready=true;CL.dirty=true;clSave();await cloudFlush(true,'reconcile');return;}
+ // 2) 이미 맞아요 (이 기기가 마지막으로 올리거나 받은 기록 그대로)
+ if(localHas&&own&&auto&&b.auto===auto.rev){
+  const cur=__J({meta:S.meta});CL.lastJson=cur;CL.dirty=(clHash(cur)!==CL.pref.hash);CL.ready=true;clState('ok');
+  if(CL.dirty)cloudTrigger('reconcile',3000);return;}
+ // 3) 서로 달라요 → 학생이 골라요
+ if(quiet){CL.ready=false;clState('hold');toast('☁️ 클라우드 기록과 달라요. 왼쪽 아래 ☁️ 표시를 눌러 확인해 주세요');return;}
+ let pick;
+ for(;;){pick=await cloudChoose({auto,manual,localHas,own});
+  if(pick==='local'&&!(await confirmBox('☁️ <b>자동 저장</b>이 이 기기의 기록으로 <b>덮어써져요</b>.<br><span class=mut>클라우드의 더 새로운 기록이 사라질 수 있어요.</span>','덮어쓰기','다시 고르기')))continue;
+  break;}
+ if(pick==='auto'||pick==='manual'){
+  const d=pick==='auto'?auto:manual;
+  try{await cloudApplyDoc(d,pick==='auto'?'☁️ 자동 저장':'💾 내가 올린 저장');}catch(e){toast('클라우드 기록을 읽지 못했어요 ('+esc(e.message||'')+')');CL.ready=false;clState('hold');return;}
+  b.auto=auto?auto.rev:0;clSave();CL.ready=true;clState('ok');
+  if(pick==='manual'){CL.dirty=true;cloudTrigger('load',3000);}
+  return;}
+ if(pick==='local'){b.auto=auto?auto.rev:0;clSave();CL.ready=true;CL.dirty=true;await cloudFlush(true,'choose');CL.cards=null;return;}
+ CL.ready=false;clState('hold');toast('나중에 왼쪽 아래 ☁️ 표시를 눌러 정할 수 있어요');}
+function cloudAskMine(){return new Promise(res=>{M(`<h2>☁️ 이 기기의 기록</h2><p style="font-size:16px;line-height:1.6;text-align:center">이 기기에 <b>${esc(S.meta.name)}</b> 님의 기록이 있어요.<br><span class=mut>${esc(saveSummary())}</span><br>이 기록이 <b>내 기록</b>이 맞나요?</p><p class=mut style="font-size:13px;line-height:1.5">맞으면 이 계정에 올려서 다른 기기에서도 쓸 수 있어요. 다른 사람의 기록이라면 지우고 새로 시작해요.</p><div class=mbtns><button class="btn green" data-a=y>내 기록이에요 (올리기)</button><button class="btn red" data-a=n>아니에요</button></div>`,{y:()=>{closeM();res(true);},n:()=>{closeM();res(false);}});});}
+function cloudChoose(o){return new Promise(res=>{
+ const a=o.auto,m=o.manual,nw=(a&&m)?(a.savedAt>=m.savedAt?'a':'m'):(a?'a':(m?'m':''));
+ const card=(key,ico,title,sum,t,btn,cls,badge,note)=>`<div class=slot2 style="flex-direction:column;align-items:stretch;gap:4px"><div><b>${ico} ${title}</b>${badge?` <span class=pill style="font-size:12px">${badge}</span>`:''}</div><div class=mut style="font-size:13px">${esc(sum)}${t?' · '+fmtWhen(t):''}</div>${note?`<div class=mut style="font-size:12px">${note}</div>`:''}<button class="btn sm ${cls}" data-a=${key}>${btn}</button></div>`;
+ let h=`<h2>☁️ 어느 기록으로 할까요?</h2><p class=mut style="font-size:13px;line-height:1.5">클라우드와 이 기기의 기록이 달라요. 하나를 골라 주세요. 고르지 않은 기록은 사라질 수 있어요.</p>`;
+ if(o.localHas)h+=card('pk_local','📱','이 기기의 기록',saveSummary(),0,'이 기기 기록으로 계속하기','gold','',o.own?'☁️ 자동 저장이 이 기록으로 바뀌어요':'<span style="color:#d9393f">⚠️ 다른 사람의 기록일 수도 있어요</span>');
+ if(a)h+=card('pk_auto','☁️','자동 저장',a.sum,a.savedAt,'이 기록 불러오기','blue',nw==='a'?'가장 최근':'');
+ if(m)h+=card('pk_manual','💾','내가 올린 저장',m.sum,m.savedAt,'이 기록 불러오기','blue',nw==='m'?'가장 최근':'','자동 저장도 이 기록에서 이어져요');
+ h+=`<div class=mbtns><button class="btn ghost" data-a=pk_later>나중에 정할게요</button></div>`;
+ const f=v=>()=>{closeM();res(v);};
+ M(h,{pk_local:f('local'),pk_auto:f('auto'),pk_manual:f('manual'),pk_later:f(null),_close:f(null)});});}
+// 클라우드 기록을 이 기기에 적용해요. 바꾸기 전의 기기 기록은 「직전 기록 되돌리기」용으로 따로 남겨요.
+async function cloudApplyDoc(d,label){
+ const o=await readAny(d.code);
+ try{if(S.meta.name)localStorage.setItem(CL_PREV,__J({t:Date.now(),sum:saveSummary(),name:S.meta.name,meta:S.meta}));}catch(e){}
+ applyLoaded(o,label+'을(를) 불러왔어요!');
+ const cur=__J({meta:S.meta});CL.lastJson=cur;CL.dirty=false;CL.pref.hash=clHash(cur);CL.pref.owner=CL.user.uid;clSave();CL.applied=true;CL.cards=null;}
+
+// ---------- 올리기 ----------
+async function cloudPush(slot,opts){opts=opts||{};
+ const {F}=CL.sdk,uid=CL.user.uid,b=clBase(uid);
+ const code=await makeCode();if(code.length>880000)return{err:'big'};
+ const jsonNow=__J({meta:S.meta});
+ const rev=slot==='auto'?(b.auto||0)+1:opts.rev;
+ const d={code,savedAt:Date.now(),sum:String(saveSummary()).slice(0,190),rev,dev:CL.pref.dev};
+ const ref=F.doc(CL.db,'saves',uid,'slots',slot);
+ try{await clTo(F.setDoc(ref,d),20000);}
+ catch(e){
+  if(e&&e.code==='permission-denied'){ // 보통은 '다른 기기에서 먼저 바뀐 것'이에요
+   let s;try{s=await clTo(F.getDoc(ref),10000);}catch(_){throw e;}
+   const cur=s.exists()?s.data():null,cr=cur?cur.rev:0;
+   if(slot==='manual'||cr!==(b.auto||0))return{conflict:cur};
+   return{err:'denied'};}
+  throw e;}
+ if(slot==='auto'){b.auto=rev;CL.lastJson=jsonNow;CL.pref.hash=clHash(jsonNow);}
+ CL.pref.owner=uid;clSave();CL.cards=null;return{ok:true,d};}
+function cloudNote(s){if(!CL.user)return;if(CL.lastJson===null||s!==CL.lastJson)CL.dirty=true;}
+window.cloudNote=cloudNote;
+function cloudTrigger(reason,delay){if(window.__sim||!CL.user||!CL.pref.auto)return;
+ const gap=Math.max(0,CL.lastPush+CLOUD_GAP-Date.now()),want=Date.now()+Math.max(delay==null?2500:delay,gap);
+ if(reason==='skill'){clearTimeout(CL.tm);CL.tmAt=0;}   // 스킬을 연달아 찍으면 마지막에 한 번만
+ if(CL.tmAt&&CL.tmAt<=want+50&&CL.tmAt>Date.now())return;
+ clearTimeout(CL.tm);CL.tmAt=want;CL.tm=setTimeout(()=>{CL.tmAt=0;cloudFlush(false,reason);},Math.max(0,want-Date.now()));}
+async function cloudFlush(force,reason){
+ if(window.__sim||!CL.user||!CL.pref.auto||!CL.ready||CL.busy||!CL.dirty)return;
+ if(!force&&reason==='timer'&&clInBattle())return;
+ if(!force&&Date.now()-CL.lastPush<CLOUD_GAP-50){cloudTrigger(reason);return;}
+ if(typeof navigator!=='undefined'&&navigator.onLine===false){clState('fail');return;}
+ CL.busy=true;clState('sync');
+ try{const r=await cloudPush('auto');
+  if(r.ok){CL.lastPush=Date.now();CL.fail=0;CL.dirty=(__J({meta:S.meta})!==CL.lastJson);clState('ok');}
+  else if('conflict' in r){CL.ready=false;CL.conflict=r.conflict||null;clState('conflict');toast('☁️ 다른 기기에 더 새로운 기록이 있어요. 자동 저장을 멈췄어요. 왼쪽 아래 ☁️ 표시를 눌러 확인해 주세요');}
+  else{CL.fail++;clState('fail');if(r.err==='big')toast('기록이 너무 커서 올리지 못했어요. 선생님께 알려 주세요');}}
+ catch(e){CL.fail++;clState('fail');setTimeout(()=>cloudTrigger('retry'),Math.min(300000,30000*Math.pow(2,Math.max(0,CL.fail-1))));}
+ finally{CL.busy=false;}}
+async function cloudManualUp(){
+ if(!CL.user)return;
+ if(!S.meta.name){toast('먼저 게임을 시작해 주세요');return;}
+ const {F}=CL.sdk;let cur=null;
+ try{const s=await clTo(F.getDoc(F.doc(CL.db,'saves',CL.user.uid,'slots','manual')),12000);cur=s.exists()?s.data():null;}catch(e){toast('☁️ 클라우드에 연결하지 못했어요');return;}
+ if(cur&&!(await confirmBox(`💾 <b>내가 올린 저장</b>을 지금 기록으로 덮어쓸까요?<br><span class=mut>올려 둔 것: ${esc(cur.sum)} · ${fmtWhen(cur.savedAt)}</span><br><span class=mut>지금 기록: ${esc(saveSummary())}</span>`,'덮어쓰기','취소')))return;
+ toast('올리는 중…');
+ try{const r=await cloudPush('manual',{rev:(cur?cur.rev:0)+1});
+  if(r.ok){sfx('coin');toast('💾 올렸어요!');markBackup();showSaveBox();}
+  else if('conflict' in r)toast('다른 기기에서 바뀌었어요. 한 번 더 눌러 주세요');
+  else toast('올리지 못했어요');}
+ catch(e){toast(esc(clErr(e)));}}
+
+// ---------- 불러오기 ----------
+async function cloudLoadSlot(slot){
+ if(!CL.user)return;const {F}=CL.sdk;let d=null;
+ try{const s=await clTo(F.getDoc(F.doc(CL.db,'saves',CL.user.uid,'slots',slot)),12000);d=s.exists()?s.data():null;}catch(e){toast('☁️ 클라우드에서 가져오지 못했어요');return;}
+ if(!d){toast('올려 둔 기록이 없어요');return;}
+ const name=slot==='auto'?'☁️ 자동 저장':'💾 내가 올린 저장';
+ if(S.meta.name&&!(await confirmBox(`지금 이 기기 기록 대신 <b>${name}</b>을 불러올까요?<br><span class=mut>${esc(d.sum)} · ${fmtWhen(d.savedAt)}</span>${slot==='manual'?'<br><span class=mut>불러오면 자동 저장도 이 기록에서 이어져요.</span>':''}<br><span class=mut>지금 기록은 「직전 기록 되돌리기」로 되살릴 수 있어요.</span>`,'불러오기','취소')))return;
+ try{await cloudApplyDoc(d,name);}catch(e){toast(esc(e.message||'읽지 못했어요'));return;}
+ const b=clBase(CL.user.uid);
+ try{if(slot==='auto')b.auto=d.rev;else{const r=await cloudFetch();b.auto=r.auto?r.auto.rev:0;CL.dirty=true;cloudTrigger('load',3000);}}catch(e){}
+ clSave();CL.ready=true;clState('ok');}
+function cloudUndo(){let o=null;try{o=JSON.parse(localStorage.getItem(CL_PREV)||'null');}catch(e){}
+ if(!o||!o.meta){toast('되돌릴 기록이 없어요');return;}
+ confirmBox(`불러오기 전의 이 기기 기록으로 되돌릴까요?<br><span class=mut>${esc((o.name?o.name+' · ':'')+o.sum)} · ${fmtWhen(o.t)}</span><br><span class=mut>자동 저장도 이 기록으로 바뀔 수 있어요.</span>`,'되돌리기','취소').then(ok=>{if(ok)applyLoaded(o,'직전 기록으로 되돌렸어요!');});}
+async function cloudResolveNow(){if(!CL.user)return;closeM();CL.applied=false;await cloudReconcile(false);if(!CL.applied)showSaveBox();CL.applied=false;}
+
+// ---------- 가입 · 로그인 ----------
+function clErr(e){const c=String((e&&e.code)||'');
+ const T={'auth/email-already-in-use':'이미 있는 ID예요. 다른 ID를 써 주세요','auth/invalid-credential':'ID나 비밀번호가 달라요','auth/wrong-password':'ID나 비밀번호가 달라요','auth/user-not-found':'ID나 비밀번호가 달라요','auth/invalid-email':'ID 모양이 이상해요','auth/weak-password':'비밀번호가 너무 약해요','auth/too-many-requests':'너무 여러 번 틀렸어요. 잠시 뒤에 다시 해 주세요','auth/network-request-failed':'인터넷이 연결되지 않았어요. 학교 와이파이에서는 막혀 있을 수 있어요','auth/operation-not-allowed':'계정 기능이 아직 켜지지 않았어요. 선생님께 알려 주세요','auth/unauthorized-domain':'이 주소는 아직 허락되지 않았어요. 선생님께 알려 주세요','auth/requires-recent-login':'다시 로그인한 뒤에 해 주세요','sdk':'클라우드 도구를 불러오지 못했어요. 인터넷이나 학교 와이파이를 확인해 주세요 (설정 → 연결 진단)','timeout':'응답이 너무 늦어요. 인터넷을 확인하고 다시 해 주세요'};
+ return T[c]||('문제가 생겼어요 ('+esc(c||(e&&e.message)||'알 수 없음')+')');}
+function cloudForm(mode){const sign=mode==='sign';cloudSdk().catch(()=>{});
+ const consent=`<details class=cConsent><summary><b>📄 개인정보 수집·이용 안내</b> (눌러서 읽어요)</summary>
+  <b>모으는 정보</b>: ID, 비밀번호(암호로 바뀌어 저장돼요), 닉네임, 게임 진행·학습 기록<br>
+  <b>쓰는 곳</b>: 다른 기기에서 내 기록을 이어서 하기 위해서만 써요<br>
+  <b>저장 장소</b>: Google Firebase 서버 (해외 서버가 함께 쓰일 수 있어요)<br>
+  <b>보관 기간</b>: 학년도가 끝나면 지워요. 「계정 삭제」를 누르면 바로 지울 수 있어요<br>
+  <b>동의하지 않아도</b> 게임은 그대로 할 수 있어요 (저장 코드·.md 파일을 쓰면 돼요)<br>
+  만 14세 미만은 <b>보호자(부모님)의 동의</b>가 꼭 필요해요.</details>
+  <label class=cRem><input type=checkbox id=cOk> <span><b>보호자(부모님)께 설명드리고 동의를 받았어요</b></span></label>`;
+ M(`<h2>☁️ ${sign?'새 계정 만들기':'로그인'}</h2>
+  ${sign?`<input class="inp cIn" id=cCls placeholder="수업 코드 (선생님이 알려 줘요)" autocapitalize=off autocorrect=off spellcheck=false autocomplete=off>`:''}
+  <input class="inp cIn" id=cId placeholder="ID (영어 소문자·숫자 4~20자)" maxlength=20 autocapitalize=off autocorrect=off spellcheck=false autocomplete=username>
+  <input class="inp cIn" id=cPw type=password placeholder="비밀번호${sign?' (8자 이상)':''}" autocomplete=${sign?'new-password':'current-password'}>
+  ${sign?`<input class="inp cIn" id=cPw2 type=password placeholder="비밀번호 한 번 더" autocomplete=new-password>
+  <p class=mut style="font-size:12px;line-height:1.5;margin:4px 0">⚠️ ID와 비밀번호를 잊으면 <b>되찾을 수 없어요</b> (이메일이 없어요). 꼭 적어 두세요!</p>${consent}`:''}
+  <label class=cRem><input type=checkbox id=cRem> <span>이 기기에서 로그인 유지 <span class=mut>(내 휴대폰·집 컴퓨터에서만 켜요. 학교 컴퓨터는 끄세요!)</span></span></label>
+  <p id=cMsg class=cMsg></p>
+  <div class=mbtns><button class="btn blue big" data-a=go>${sign?'가입하기':'로그인'}</button><button class="btn ghost" data-a=back>뒤로</button></div>`,
+  {go:()=>cloudSubmit(mode),back:()=>showSaveBox(),_close:()=>closeM()});
+ const onEnter=e=>{if(e.key==='Enter'){e.preventDefault();cloudSubmit(mode);}};
+ ['#cId','#cPw','#cPw2'].forEach(s=>{const el=$(s);if(el)el.addEventListener('keydown',onEnter);});}
+async function cloudSubmit(mode){const sign=mode==='sign';
+ const msg=t=>{const m=$('#cMsg');if(m)m.innerHTML=t;};
+ const id=($('#cId').value||'').trim().toLowerCase(),pw=$('#cPw').value||'';
+ if(sign){const cc=($('#cCls').value||'').trim().toLowerCase();if(!CLOUD_CLASS_CODES.includes(cc))return msg('수업 코드가 달라요. 선생님께 다시 물어봐 주세요');}
+ if(!/^[a-z0-9]{4,20}$/.test(id))return msg('ID는 영어 소문자와 숫자만, 4~20자로 만들어 주세요');
+ if(sign){
+  if(S.meta.name&&id===String(S.meta.name).trim().toLowerCase())return msg('닉네임과 다른 ID를 써 주세요');
+  if(pw.length<8)return msg('비밀번호는 8자 이상으로 만들어 주세요');
+  if(pw.toLowerCase()===id)return msg('비밀번호를 ID와 다르게 만들어 주세요');
+  if(/^(.)\1+$/.test(pw))return msg('같은 글자만 반복하면 안 돼요');
+  if(pw!==$('#cPw2').value)return msg('비밀번호 두 칸이 서로 달라요');
+  if(!$('#cOk').checked)return msg('보호자 동의를 받았는지 확인해 주세요');
+ }else if(!pw)return msg('비밀번호를 입력해 주세요');
+ const btn=document.querySelector('#mbox [data-a=go]');if(btn)btn.disabled=true;msg('<span class=mut>잠깐만요…</span>');
+ try{
+  CL.interactive=true;const {U}=await cloudSdk();const rem=!!($('#cRem')&&$('#cRem').checked);
+  try{await U.setPersistence(CL.auth,rem?U.browserLocalPersistence:U.browserSessionPersistence);}catch(e){try{await U.setPersistence(CL.auth,U.inMemoryPersistence);}catch(_){}}
+  const email=id+CLOUD_MAIL;
+  const cred=sign?await clTo(U.createUserWithEmailAndPassword(CL.auth,email,pw),20000):await clTo(U.signInWithEmailAndPassword(CL.auth,email,pw),20000);
+  CL.user=cred.user;CL.pref.use=true;CL.pref.remember=rem;clSave();CL.applied=false;
+  await cloudStart(false);
+  toast(sign?'🎉 가입했어요! 이제 ID와 비밀번호로 어디서든 이어서 할 수 있어요':'로그인했어요');
+  if(!CL.applied)showSaveBox();CL.applied=false;
+ }catch(e){CL.interactive=false;msg(clErr(e));if(btn)btn.disabled=false;}}
+
+// ---------- 로그아웃 · 이 기기 기록 지우기 · 계정 삭제 ----------
+function cloudWipeLocal(){window.__cloudWipe=true;
+ try{localStorage.removeItem(SAVE_KEY);[1,2,3].forEach(i=>localStorage.removeItem(slotKey(i)));localStorage.removeItem(CL_PREV);}catch(e){}
+ try{const uid=CL.pref.owner;if(uid)delete CL.pref.base[uid];CL.pref.owner=null;CL.pref.hash='';clSave();}catch(e){}
+ toast('이 기기의 기록을 지웠어요');setTimeout(()=>location.reload(),700);}
+async function cloudLogout(){
+ if(!CL.user)return;
+ if(CL.ready&&CL.dirty){try{await clTo(cloudFlush(true,'logout'),9000);}catch(e){}}
+ const unsynced=!!CL.dirty||!CL.ready;
+ const pick=await new Promise(res=>M(`<h2>로그아웃</h2><p style="font-size:15px;line-height:1.7">이 기기에 남아 있는 <b>내 기록</b>을 어떻게 할까요?</p>
+  <div class=explain style="font-size:14px;line-height:1.6">🏫 <b>학교 컴퓨터처럼 여러 명이 쓰는 기기</b> → <b>기기 기록 지우기</b><br>📱 <b>내 휴대폰·집 컴퓨터</b> → <b>남겨 두기</b></div>
+  <div class=mbtns><button class="btn red" data-a=w>기기 기록 지우기</button><button class="btn gold" data-a=k>남겨 두기</button><button class="btn ghost" data-a=c>취소</button></div>`,
+  {w:()=>res('w'),k:()=>res('k'),c:()=>res('c'),_close:()=>res('c')},{layer2:1}));
+ closeM(1);if(pick==='c')return;
+ if(pick==='w'&&unsynced&&!(await confirmBox('아직 클라우드에 올리지 못한 기록이 있을 수 있어요! 지우면 그 부분은 사라져요. 그래도 지울까요?','지우기','취소')))return;
+ CL.signingOut=true;try{await CL.sdk.U.signOut(CL.auth);}catch(e){}CL.signingOut=false;
+ cloudStop();
+ if(pick==='w'){cloudWipeLocal();return;}
+ toast('로그아웃했어요');showSaveBox();}
+function cloudDeleteForm(){
+ M(`<h2>🗑 계정 삭제</h2><p style="font-size:15px;line-height:1.6">클라우드에 올린 <b>자동 저장·내가 올린 저장</b>과 이 <b>ID</b>가 <b>영원히 지워져요</b>. 되돌릴 수 없어요.<br><span class=mut>이 기기에 있는 기록은 그대로 남아요.</span></p>
+  <input class="inp cIn" type=password id=cDelPw placeholder="비밀번호를 다시 입력해 주세요" autocomplete=current-password><p id=cMsg class=cMsg></p>
+  <div class=mbtns><button class="btn red" data-a=go>삭제하기</button><button class="btn ghost" data-a=back>취소</button></div>`,
+  {go:async()=>{const msg=t=>{const m=$('#cMsg');if(m)m.innerHTML=t;};const pw=$('#cDelPw').value;if(!pw)return msg('비밀번호를 입력해 주세요');
+    if(!(await confirmBox('정말 삭제할까요? 되돌릴 수 없어요.','삭제','취소')))return;
+    try{const {U,F}=CL.sdk,u=CL.auth.currentUser,uid=u.uid;
+     await clTo(U.reauthenticateWithCredential(u,U.EmailAuthProvider.credential(u.email,pw)),15000);
+     await Promise.all(['auto','manual'].map(k=>F.deleteDoc(F.doc(CL.db,'saves',uid,'slots',k))));
+     CL.signingOut=true;await U.deleteUser(u);CL.signingOut=false;
+     delete CL.pref.base[uid];if(CL.pref.owner===uid)CL.pref.owner=null;CL.pref.use=false;clSave();cloudStop();
+     toast('계정과 클라우드 기록을 지웠어요');showSaveBox();
+    }catch(e){CL.signingOut=false;msg(clErr(e));}},
+  back:()=>showSaveBox(),_close:()=>showSaveBox()});}
+
+// ---------- 저장 · 불러오기 창에 들어가는 카드 ----------
+function cloudCardHTML(){
+ if(!CL.user)return `<div class=cloudBox><h3 style="margin:0 0 4px">☁️ 내 계정으로 저장하기 <span class=pill style="font-size:12px">새로워요</span></h3>
+  <p class=mut style="font-size:13px;margin:0 0 8px;line-height:1.5">ID와 비밀번호만 있으면 <b>다른 기기에서도</b> 내 기록을 이어서 할 수 있어요. 인터넷이 필요해요.</p>
+  <div class=row><button class="btn blue" data-a=cLogin>로그인</button><button class="btn green" data-a=cSign>새 계정 만들기</button></div>
+  ${CL.pref.use?'<p class=mut style="font-size:12px;margin:6px 0 0">로그인 상태를 확인하는 중이에요… 잠시 뒤 다시 열어 보세요.</p>':''}</div>`;
+ let prev=false;try{prev=!!localStorage.getItem(CL_PREV);}catch(e){}
+ const warn=CL.ready?'':`<div class="saveStatus bad" style="margin:6px 0">⚠️ <b>기록을 확인해 주세요.</b> 클라우드와 이 기기의 기록이 달라서 자동 저장을 멈췄어요.<br><button class="btn sm gold" style="margin-top:6px" data-a=cResolve>확인하기</button></div>`;
+ return `<div class=cloudBox><h3 style="margin:0 0 4px">☁️ 내 계정 저장 <span class=mut style="font-size:13px">ID: <b>${esc(clMyId())}</b></span></h3>${warn}
+  <label class=cAuto><input type=checkbox id=cAutoCk ${CL.pref.auto?'checked':''}> <span><b>자동으로 올리기</b> <span class=mut>(전투·카드팩·공부가 끝날 때 등)</span></span></label>
+  <div id=cCards class=mut style="font-size:13px">불러오는 중…</div>
+  <div class=row style="margin-top:6px"><button class="btn gold" data-a=cUp>💾 지금 직접 올리기</button>${prev?'<button class="btn sm ghost" data-a=cUndo>↩️ 직전 기록 되돌리기</button>':''}</div>
+  <p class=mut style="font-size:12px;margin:6px 0 0;line-height:1.5">💾 <b>직접 올린 저장</b>은 자동 저장이 덮어쓰지 않아요. 중요한 순간에 눌러 두세요.</p>
+  <div class=row style="margin-top:6px"><button class="btn sm ghost" data-a=cOut>로그아웃</button><button class="btn sm ghost" data-a=cDel>계정 삭제</button></div></div>`;}
+function cloudActs(){return CL.acts={cLogin:()=>cloudForm('login'),cSign:()=>cloudForm('sign'),cUp:()=>cloudManualUp(),cLoadA:()=>cloudLoadSlot('auto'),cLoadM:()=>cloudLoadSlot('manual'),cResolve:()=>cloudResolveNow(),cUndo:()=>cloudUndo(),cOut:()=>cloudLogout(),cDel:()=>cloudDeleteForm()};}
+async function cloudAfterRender(){
+ if(!CL.user)return;
+ const ck=$('#cAutoCk');if(ck)ck.onchange=()=>{CL.pref.auto=ck.checked;clSave();clChipRender();if(ck.checked&&CL.dirty)cloudTrigger('auto',500);};
+ let docs=(CL.cards&&Date.now()-CL.cards.t<20000)?CL.cards:null;
+ if(!docs){try{const r=await cloudFetch();docs=CL.cards={t:Date.now(),auto:r.auto,manual:r.manual};}catch(e){const el=$('#cCards');if(el)el.innerHTML='클라우드 기록을 불러오지 못했어요 (인터넷을 확인해 주세요)';return;}}
+ const el=$('#cCards');if(!el)return;
+ const row=(ico,name,d,act)=>`<div class=slot2><div class=sl1><b>${ico} ${name}</b><div class=mut>${d?esc(d.sum)+' · '+fmtWhen(d.savedAt):'비어 있어요'}</div></div><div class=sl2><button class="btn sm blue" data-a=${act} ${d?'':'disabled'}>불러오기</button></div></div>`;
+ el.innerHTML=row('☁️','자동 저장',docs.auto,'cLoadA')+row('💾','내가 올린 저장',docs.manual,'cLoadM');
+ el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{sfx('tap');const f=CL.acts&&CL.acts[b.dataset.a];if(f)f();});}
+
+// ---------- 언제 올릴까: 전투·카드팩·공부가 끝날 때, 스킬을 찍은 뒤, 홈에 돌아올 때, 5분마다 ----------
+function cloudHooks(){
+ const H=[['endBattle','battle'],['endHard','battle'],['pvpEnd','battle'],['bossFinish','battle'],['rlFinish','battle'],['rl2Finish','battle'],['t2Finish','battle'],['showTrainResult','train'],['afterPack','pack'],['levelUpFx','level'],['renderTrainerSkills','skill'],['renderHub','home']];
+ H.forEach(([n,why])=>{const f=window[n];if(typeof f!=='function'||f.__cl)return;
+  const w=function(){const r=f.apply(this,arguments);
+   try{const d=why==='skill'?10000:undefined;cloudTrigger(why,d);if(r&&typeof r.then==='function')r.then(()=>cloudTrigger(why,d),()=>{});}catch(e){}
+   return r;};
+  w.__cl=1;try{window[n]=w;}catch(e){}});}
+(function(){const go=()=>setTimeout(()=>{try{cloudHooks();}catch(e){}if(CL.pref.use)setTimeout(cloudBoot,2500);},0);
+ if(document.readyState==='complete')go();else addEventListener('load',go);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)cloudFlush(true,'hide');});
+ addEventListener('pagehide',()=>{cloudFlush(true,'hide');});
+ setInterval(()=>{if(CL.dirty&&CL.user&&CL.ready)cloudTrigger('timer',0);},CLOUD_TICK);})();
+
 function showSaveBox(){saveLocal();
  const status=STORE_OK?`<div class=saveStatus>${I('check')} <b>자동 저장 켜짐</b> — 문제를 풀거나 카드를 얻을 때마다 이 브라우저에 저장돼요.<br><span class=mut>지금: ${esc(saveSummary())}</span></div>`
   :`<div class="saveStatus bad">${I('lock')} <b>이 화면에서는 브라우저 저장이 막혀 있어요.</b><br>새로고침되면 기록이 사라지니, 아래 <b>저장 코드</b>를 꼭 만들어 두세요.</div>`;
@@ -3900,7 +4214,8 @@ function showSaveBox(){saveLocal();
   mdS:()=>saveMD(),mdL:()=>$('#fileIn').click(),win:()=>{saveLocal();window.open(location.href,'_blank');},xRcv:()=>{closeM();xferReceive();},xSnd:()=>{closeM();xferSend();}};
  [1,2,3].forEach(i=>{acts['s'+i]=async()=>{const o=slotGet(i);if(o&&!(await confirmBox(`저장 칸 ${i}의 기록을 지금 기록으로 덮어쓸까요?`,'덮어쓰기','취소')))return;if(slotSave(i)){sfx('coin');toast(`저장 칸 ${i}에 저장했어요`);showSaveBox();}else toast('저장하지 못했어요');};
   acts['l'+i]=async()=>{const o=slotGet(i);if(!o)return;if(!(await confirmBox(`지금 기록 대신 저장 칸 ${i}의 기록을 불러올까요?`,'불러오기','취소')))return;applyLoaded(o,`저장 칸 ${i}을 불러왔어요!`);};});
- M(`<h2>${I('disk')} 저장 · 불러오기</h2>${status}${bkLineHTML()}${slots}
+ Object.assign(acts,cloudActs());
+ M(`<h2>${I('disk')} 저장 · 불러오기</h2>${status}${bkLineHTML()}${cloudCardHTML()}${slots}
   <div style="margin:12px 0;padding:14px 12px;border:3px solid #7a5cff;border-radius:16px;background:linear-gradient(180deg,#f3eeff,#fff8e6);box-shadow:0 4px 0 #cdbdff">
    <h3 style="margin:0 0 4px;font-size:20px;text-align:center">📲 다른 기기로 옮기기 <span style="background:#ff5a5f;color:#fff;border-radius:999px;padding:2px 9px;font-size:12px;vertical-align:middle">쉬워요!</span></h3>
    <p class=mut style="font-size:13px;text-align:center;margin:0 0 10px">숫자 4자리만 있으면 돼요 · 두 기기 모두 인터넷이 필요해요</p>
@@ -3923,7 +4238,8 @@ function showSaveBox(){saveLocal();
   <div class=row style="margin-top:8px"><button class="btn blue" data-a=ld>코드로 불러오기</button></div>
   <h3>파일</h3><div class=row><button class="btn ghost" data-a=mdS>${I('disk')} .md 파일로 저장</button><button class="btn ghost" data-a=mdL>${I('folder')} .md 파일 불러오기</button></div>
   ${canNewWin()?`<h3>새 창</h3><div class=row><button class="btn ghost" data-a=win>새 창에서 크게 열기</button></div>`:''}
-  <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,acts,{wide:1});}
+  <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,acts,{wide:1});
+ try{cloudAfterRender();}catch(e){}}
 
 
 
@@ -3931,13 +4247,14 @@ function showSaveBox(){saveLocal();
 async function netDiag(){
  const rows=[
   ['web','일반 웹사이트 접속','인터넷(HTTPS)이 열려 있나요?'],
+  ['fb','☁️ 계정 저장 서버','로그인·자동 저장에 쓰는 구글(Firebase) 서버에 접속되나요?'],
   ['lib','연결 도구 불러오기','PeerJS 프로그램을 내려받을 수 있나요?'],
   ['sig','연결 중개 서버 접속','PeerJS 서버(0.peerjs.com)에 접속되나요?'],
   ['ice','기기끼리 직접 연결 길','공인 주소를 알아내는 통신(STUN)이 열려 있나요?'],
   ['turn','중계 서버(TURN) 연결','직접 연결이 막혔을 때 쓰는 우회 길이 열려 있나요?']];
  const R={};let done=false;
  const ic=v=>v==null?'⏳':v==='ok'?'✅':v==='bad'?'❌':'➖';
- const draw=(sum)=>{M(`<h2>🌐 연결 진단</h2><p class=mut style="font-size:13px;line-height:1.5">친구 대전·보스전·기기 간 옮기기가 되는지 확인해요. 학교에서 눌러 보세요. (약 10~20초)</p>
+ const draw=(sum)=>{M(`<h2>🌐 연결 진단</h2><p class=mut style="font-size:13px;line-height:1.5">친구 대전·보스전·기기 간 옮기기·계정 저장이 되는지 확인해요. 학교에서 눌러 보세요. (약 10~20초)</p>
   ${rows.map(r=>`<div class=setRow><span><b>${ic(R[r[0]])} ${r[1]}</b><br><span class=mut style="font-size:12px">${r[2]}</span></span></div>`).join('')}
   ${sum?`<div class=explain style="font-size:14px;line-height:1.6;margin-top:8px">${sum}</div>`:''}
   <div class=mbtns>${done?'<button class="btn blue" data-a=again>다시 검사</button>':''}<button class="btn gold" data-a=x>닫기</button></div>`,{x:()=>{done=true;closeM();},_close:()=>{done=true;closeM();},again:()=>netDiag()});};
@@ -3945,6 +4262,8 @@ async function netDiag(){
  const to=(p,ms)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j(new Error('timeout')),ms))]);
  // 1) 일반 HTTPS
  try{await to(fetch('https://www.gstatic.com/generate_204',{mode:'no-cors',cache:'no-store'}),7000);R.web='ok';}catch(e){R.web='bad';}
+ draw();
+ try{await to(Promise.all([fetch('https://firestore.googleapis.com/',{mode:'no-cors',cache:'no-store'}),fetch('https://identitytoolkit.googleapis.com/',{mode:'no-cors',cache:'no-store'}),fetch('https://www.gstatic.com/firebasejs/'+CLOUD_SDK+'/firebase-app.js',{mode:'no-cors',cache:'no-store'})]),9000);R.fb='ok';}catch(e){R.fb='bad';}
  draw();
  // 2) PeerJS 프로그램
  try{await to(loadPeer(),9000);R.lib='ok';}catch(e){R.lib='bad';}
@@ -3974,6 +4293,8 @@ async function netDiag(){
  else if(R.turn==='bad'&&R.ice==='bad')sum='<b>직접 연결과 중계 서버가 모두 막혀 있어요.</b> 이 와이파이에서는 온라인 기능이 어려워요. 핫스팟이나 집에서 해 주세요.';
  else if(R.ice==='bad')sum='<b>중개 서버는 열려 있지만 기기끼리 직접 연결이 막혔을 수 있어요.</b> 연결이 안 되면 선생님께 이 화면을 보여 주세요. (TURN 중계 서버를 추가하면 해결될 수 있어요.)';
  else sum='<b>모두 열려 있어요!</b> 이 와이파이에서 친구 대전·보스전·기기 간 옮기기가 될 가능성이 높아요. 그래도 안 되면 양쪽 기기가 같은 조건인지 확인해 보세요.';
+ if(R.fb==='bad')sum+='<br><br><b>☁️ 계정 저장 서버가 막혀 있어요.</b> 이 와이파이에서는 ID·비밀번호 저장을 쓸 수 없어요. 대신 <b>저장 코드</b>나 <b>.md 파일</b>을 쓰거나, 핫스팟·집에서 해 주세요.';
+ else if(R.fb==='ok')sum+='<br><br><b>☁️ 계정 저장 서버도 열려 있어요.</b>';
  draw(sum);
 }
 // ===== 기기 간 저장 데이터 옮기기: 받는 기기가 4자리 번호를 만들고, 보내는 기기가 그 번호를 넣어요 (PeerJS · 기기끼리 바로 전달) =====
