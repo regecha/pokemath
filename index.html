@@ -29090,7 +29090,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   if(!el)return;
   const hb=el.querySelector('[data-hint]'),h=P.hint;
   if(hb){hb.hidden=!h;if(h){hb.classList.toggle('arm',!!h.armed&&!h.used);hb.classList.toggle('used',!!h.used);const more=!!(h.used&&h.levels&&h.lv<h.levels.length);hb.classList.toggle('used',!!h.used&&!more);hb.disabled=!!h.used&&!more;
-   const cost=h.mode==='def'?'받는 피해 +1':'내 공격 −1';
+   const cost=h.mode==='def'?'받는 피해 +1':h.mode==='hack'?'다음 문제 +3초':'내 공격 −1';
    hb.querySelector('.hc').textContent=more?`다음 ${h.lv}/${h.levels.length}`:h.used?'모두 봤어요':'';hb.title=more?'다음 단계 힌트 열기':h.used?'이 문제의 힌트를 모두 봤어요':'힌트 보기';hb.setAttribute('aria-label',hb.title);}}
   {const nb=el.querySelector('[data-next]'),h=P.hint,more=!!(h&&h.used&&h.levels&&h.lv<h.levels.length);clearTimeout(nbT);
    if(nb){nb.hidden=!more;if(more){const left=h.nextAt-Date.now();nb.classList.toggle('wait',left>0);nb.querySelector('.nt').textContent=`다음 힌트 ${h.lv}/${h.levels.length}`;if(left>0)nbT=setTimeout(()=>{if(P.hint===h)sync();},left+40);}}}
@@ -29101,12 +29101,13 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   if(hbtn){const h=P.hint,more=!!(h&&h.used&&h.levels&&h.lv<h.levels.length);hbtn.classList.toggle('used',!!(h&&h.used)&&!more);hbtn.innerHTML=more?`💡 다음 힌트 ${h.lv}/${h.levels.length}`:h&&h.used?'💡 힌트 모두 봄':'💡 힌트';}
  }
  // ---- 위치·크기 ----
- function sheetTop(sh){const bq=document.querySelector('#bq');const pb=bq?parseFloat(getComputedStyle(bq).paddingBottom)||0:0;return window.innerHeight/zm()-pb-sh.offsetHeight;}
+ function sheetTop(sh){const bq=sh.closest&&sh.closest('#hbP')||document.querySelector('#bq');const pb=bq?parseFloat(getComputedStyle(bq).paddingBottom)||0:0;return window.innerHeight/zm()-pb-sh.offsetHeight;}
+ function sheetEl(){return P.host&&P.host.id==='hbP'?document.querySelector('#hbP .pb'):document.querySelector('#bq .sheet');} // 해킹 배틀은 팝업(#hbP .pb)이 문제창
  function layout(){
   if(!el||!P.on)return;
   const H=vh(),T=vt();
   if(P.mode==='top'){
-   const sheet=document.querySelector('#bq .sheet');
+   const sheet=sheetEl();
    const bottomLimit=sheet?sheetTop(sheet)-8:T+H*.55;
    const top=T+8;let h=bottomLimit-top;
    h=Math.max(150,Math.min(h,P.big?H*.62:Math.min(H*.42,380)));
@@ -29130,7 +29131,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
  }
  let lf=0;
  function layoutFollow(){ // 전투 문제창 높이가 바뀌면 연습장 높이도 따라가요
-  const sheet=document.querySelector('#bq .sheet');if(!sheet)return;
+  const sheet=sheetEl();if(!sheet)return;
   const want=sheetTop(sheet)-8-(vt()+8);
   const cur=parseFloat(el.style.height)||0;
   const H=vh(),max=P.big?H*.62:Math.min(H*.42,380);
@@ -29616,7 +29617,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   return h.levels.slice(0,h.lv).flatMap((L,i)=>L.lines.map((x,j)=>j===0&&h.levels.length>1?`<b>${CIR[i]} ${L.t}</b> ${x}`:x));
  }
  const fm=s=>typeof fmtMath==='function'?fmtMath(s):s;
- const hintCost=h=>h.mode==='def'?'받는 피해 +1':h.mode==='train'?'감점 없음':'내 공격 −1';
+ const hintCost=h=>h.mode==='def'?'받는 피해 +1':h.mode==='train'?'감점 없음':h.mode==='hack'?'다음 문제 +3초':'내 공격 −1';
  // 힌트는 연습장 종이에 쓰인 글씨처럼 그려요 (아래층 캔버스 → 지우개로 지워지지 않고, 확대·이동에도 같이 움직여요)
  // 처음 디자인 그대로: 노란 메모 바탕 · Noto Sans KR · 굵은 강조 · 세로 분수/대분수 · 도트 아이콘
  const HIMG={};
@@ -29726,7 +29727,7 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   hbusy=true;
   let ok=false;
   try{
-   const warn=h.mode==='train'?'(연습이라 감점은 없어요. 힌트로 배운 뒤 다음엔 스스로 풀어 봐요!)':h.mode==='def'?'(주의! 힌트를 보면 받는 피해가 1 늘어납니다.)':'(주의! 힌트를 보면 데미지가 1 줄어듭니다.)';
+   const warn=h.mode==='train'?'(연습이라 감점은 없어요. 힌트로 배운 뒤 다음엔 스스로 풀어 봐요!)':h.mode==='def'?'(주의! 힌트를 보면 받는 피해가 1 늘어납니다.)':h.mode==='hack'?'(주의! 힌트를 보면 정답 뒤 다음 문제가 3초 늦게 나와요.)':'(주의! 힌트를 보면 데미지가 1 줄어듭니다.)';
    ok=await confirmBox(`💡 힌트를 볼까요?<br><b style="color:#c2255c;font-size:.92em">${warn}</b><br><span style="font-size:.8em;color:#6b4e12">힌트는 최대 3단계로 천천히 열려요. 한 번 열면 단계를 더 열어도 감점은 그대로예요.</span>`,'확인','취소');
   }catch(e){ok=false;}
   hbusy=false;
@@ -29739,8 +29740,8 @@ html body.padBot #view{padding-bottom:calc(var(--padH,0px) + 28px + var(--sb,0px
   start(host,q,o){
    if(P.hint)clearTimeout(P.hint.t);P.hint=null;hbtn=null;
    if(!host)return; // 영어·국어·IQ 등 모든 문제에서 연습장을 쓸 수 있어요 (힌트는 수학 문제만)
-   if(o&&o.mode&&q&&q.sk&&!q.ko&&(!q.iq||window.IQ_HINT)&&(!q.en||window.EN_HINT))P.hint={mode:o.mode==='def'?'def':o.mode==='train'?'train':'atk',q,cb:o.onUse,used:false,armed:false,min:false,lines:null,t:0}; // 힌트: 수학 문제의 공격·방어 전투 문제에서만
-   P.host=host;P.mode=host.id==='bqHost'?'top':'bottom';
+   if(o&&o.mode&&q&&q.sk&&!q.ko&&(!q.iq||window.IQ_HINT)&&(!q.en||window.EN_HINT))P.hint={mode:o.mode==='def'?'def':o.mode==='train'?'train':o.mode==='hack'?'hack':'atk',q,cb:o.onUse,used:false,armed:false,min:false,lines:null,t:0}; // 힌트: 수학 문제의 공격·방어 전투 문제에서만
+   P.host=host;P.mode=host.id==='bqHost'||host.id==='hbP'?'top':'bottom';
    P.strokes=[];P.undone=null;P.cur=null;P.pid=null;
    if(ctx&&cv){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);}
    V.s=1;V.tx=0;V.ty=0;gest=null;glock=false;touches.clear();if(paper)applyView();
@@ -34962,8 +34963,8 @@ function cm(m){
  else if(m.t==='end')finish(m);
 }
 const $h=s=>root.querySelector(s);
-function pop(html){const p=$h('#hbP');p.innerHTML='<div class=pb><div class=dosHp>hack@dex:~$ <i class=cur></i></div>'+html+'<div style="text-align:right;margin-top:6px"><button class=b data-k=1 style="padding:2px 8px;font-size:12px">🔑 내 번호</button> <small class=hbKv></small></div></div>';p.classList.add('on');showGo(0);syncPad();return p;}
-function popx(){$h('#hbP').classList.remove('on');syncPad();}
+function pop(html){const p=$h('#hbP');try{window.PADX&&PADX.end(p);}catch(e){}p.innerHTML='<div class=pb><div class=dosHp>hack@dex:~$ <i class=cur></i></div>'+html+'<div style="text-align:right;margin-top:6px"><button class=b data-k=1 style="padding:2px 8px;font-size:12px">🔑 내 번호</button> <small class=hbKv></small></div></div>';p.classList.add('on');showGo(0);syncPad();return p;}
+function popx(){try{window.PADX&&PADX.end($h('#hbP'));}catch(e){}$h('#hbP').classList.remove('on');syncPad();}
 function showGo(on){const g=$h('#hbGo');if(g)g.style.display=on?'flex':'none';}
 function syncPad(){const w=$h('.w'),p=$h('#hbP'),pb=p&&p.firstChild;if(!w)return;w.style.paddingBottom=((p&&p.classList.contains('on')&&pb)?pb.offsetHeight+24:(C&&C.mode==='closed'?84:12))+'px';}
 function closeQ(){if(!C||C.mode!=='q')return;C.mode='closed';popx();showGo(1);syncPad();}
@@ -34981,7 +34982,8 @@ function question(){
  if(!q){const a=2+rr(8),b=2+rr(8);q={q:a+' × '+b+' = ?',a:String(a*b),ch:[a*b,a*b+a,a*b-b,a*b+2].map(String),sk:Object.keys(SKM)[0]};}
  try{S.curQ=q;}catch(e){}
  const p=pop('<div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><div style="color:#3f8;font-size:15px">🔓 해킹 접속! 문제를 풀어 카드를 얻으세요</div><button class="b r qclose" data-x=qclose>✖ 닫기</button></div>'+qHTML(q));const qc=p.querySelector('[data-x=qclose]');if(qc)qc.onclick=closeQ;
- p.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{if(C.mode!=='q')return;if(q.ch[+b.dataset.i]===q.a){C.wrong=0;C.mode='wait';C.pendWait=1;pop('<h3 style="text-align:center">✅ 정답! 보안 서버 응답 대기…</h3>');tx({t:'solve'});setTimeout(()=>{if(C&&C.mode==='wait'){C.pendWait=0;C.mode=null;next();}},6000);}
+ let hinted=false;try{window.PADX&&PADX.start(p,q,{mode:'hack',onUse:()=>{hinted=true;}});}catch(e){}   // ✏️ 연습장 · 💡 힌트 (힌트를 쓰면 정답 뒤 대기 +3초)
+ p.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{if(C.mode!=='q')return;if(q.ch[+b.dataset.i]===q.a){C.wrong=0;C.mode='wait';C.pendWait=1;pop('<h3 style="text-align:center">✅ 정답! 보안 서버 응답 대기…</h3>');tx({t:'solve'});setTimeout(()=>{if(C&&C.mode==='wait'){C.pendWait=0;C.mode=null;next();}},hinted?9000:6000);}
   else{b.classList.add('shk');C.mode='x';C.wrong=(C.wrong||0)+1;tx({t:'wrong'});const w=CFG.WRONG_WAIT[Math.min(C.wrong-1,CFG.WRONG_WAIT.length-1)],ah=(p.querySelectorAll('.ch')[q.ch.indexOf(q.a)]||{}).innerHTML||esc(String(q.a));
   pop('<h3 style="color:#f88;text-align:center">❌ 오답!</h3><div style="text-align:center">정답은 <b>'+ah+'</b> 였어요.<br>천천히 읽고 풀어 봐요. <b id=hbWw>'+w+'</b>초 뒤에 새 문제가 나와요.</div>');
   let left=w;const iv=setInterval(()=>{if(!C||C.phase!=='play'||C.mode!=='x'){clearInterval(iv);return;}left--;const e=$h('#hbWw');if(e)e.textContent=Math.max(0,left);if(left<=0){clearInterval(iv);C.mode=null;popx();next();}},1000);}});
@@ -35261,13 +35263,75 @@ const MINI={
    else{sc=Math.max(0,sc-1);dots();b.classList.add('shk');b.style.outline='4px solid #f33';setTimeout(()=>{b.style.outline='';},400);msg('❌ 앗! <b>'+tg[0]+'</b> 버튼을 눌러요 (-1점)','#f88');}});
   const tm=setInterval(()=>{if(!document.body.contains(box)){clearInterval(tm);return;}if(done)return;tk++;const bar=q('#hbRb');if(bar)bar.style.width=Math.max(0,100-tk/EVERY*100)+'%';if(tk>=EVERY)shuf(Math.random()<.4);},100);
   dots();shuf(false);msg('👆 위에 나온 색깔과 같은 버튼을 눌러요!');}},
- laser:{n:'레이저 보안망 탈출',f(box,ok){const W=5,Hh=7,LR=[1,3,5];let x=2,y=6;box.innerHTML='<div>🟢 맨 위(🏁)까지 이동! 켜진 레이저(🟥)에 닿으면 처음으로 돌아가요</div><div id=hbLg class=mg style="grid-template-columns:repeat(5,1fr);gap:2px"></div><div style="text-align:center"><button class=b data-d=u>⬆</button><br><button class=b data-d=l>⬅</button><button class=b data-d=d>⬇</button><button class=b data-d=r>➡</button></div>';
-  const on=(r,t)=>Math.floor((t+LR.indexOf(r)*500)/700)%2===0,g=box.querySelector('#hbLg');
-  const dr=()=>{const t=now();let h='';for(let r=0;r<Hh;r++)for(let c=0;c<W;c++){const hit=LR.includes(r)&&on(r,t);h+='<div style="min-height:34px;border-radius:5px;text-align:center;line-height:34px;font-size:22px;background:'+(hit?'#a22':'#052')+'">'+(r===y&&c===x?'🟢':r===0?'🏁':'')+'</div>';}g.innerHTML=h;if(LR.includes(y)&&on(y,t)){x=2;y=6;}};
-  const mv=d=>{if(d==='u')y=Math.max(0,y-1);if(d==='d')y=Math.min(Hh-1,y+1);if(d==='l')x=Math.max(0,x-1);if(d==='r')x=Math.min(W-1,x+1);dr();if(y===0){clearInterval(tm);document.removeEventListener('keydown',kd);ok();}};
-  const kd=e=>{const m={ArrowUp:'u',ArrowDown:'d',ArrowLeft:'l',ArrowRight:'r'}[e.key];if(m){e.preventDefault();mv(m);}};document.addEventListener('keydown',kd);
+ laser:{n:'레이저 보안망 탈출',f(box,ok){
+  /* 난이도는 원본 그대로: 5x7 칸 · 레이저 3줄(1·3·5번째 줄) · 0.7초 켜짐/0.7초 꺼짐 · 150ms마다 판정 · 시작(2,6) → 맨 위 도착.
+     바뀐 것은 줄마다 켜지는 타이밍(o)뿐이에요. 4가지 모두 평균 통과 시간이 원본과 거의 같게 맞춰 뒀고, 할 때마다 랜덤(직전과 같은 패턴은 피함)으로 나와요.
+     c = 레이저 색(r,g,b) */
+  const W=5,Hh=7,LR=[1,3,5],PAT=[
+   {n:'순차 스캔',o:[0,500,1000],c:'255,59,78'},
+   {n:'더블 펄스',o:[0,200,700],c:'255,92,214'},
+   {n:'물결',o:[0,300,600],c:'255,154,46'},
+   {n:'엇박 점멸',o:[0,400,1000],c:'176,110,255'}];
+  const L=MINI.laser;let pi=rr(PAT.length);if(pi===L._last)pi=(pi+1+rr(PAT.length-1))%PAT.length;L._last=pi;
+  const P=PAT[pi],OF=P.o;let x=2,y=6,hits=0,done=false;
+  if(!document.getElementById('hbLzCss')){const s=document.createElement('style');s.id='hbLzCss';s.textContent=[
+   '.lz{--ch:36px;font-family:var(--mono,monospace);color:#cfe;max-width:340px;margin:4px auto 2px;user-select:none;-webkit-user-select:none}',
+   '.lz .lzTop{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:13px;margin:6px 0 5px}',
+   '.lz .lzTag{padding:1px 8px;border:1px solid var(--ac);border-radius:4px;color:var(--ac);background:rgba(var(--rgb),.1);text-shadow:0 0 6px var(--ac);box-shadow:0 0 8px rgba(var(--rgb),.45)}',
+   '.lz .lzZ{color:#9ab;font-size:13px}',
+   '.lz .lzMsg{font-size:14px;line-height:1.45;color:#bfe}',
+   '.lz .lzBd{position:relative;border:2px solid #0a8;border-radius:10px;background:linear-gradient(#03130f,#020b0a);box-shadow:inset 0 0 24px rgba(0,170,130,.3),0 0 14px rgba(0,170,130,.35);overflow:hidden}',
+   '.lz .lzBd:before{content:"";position:absolute;left:0;right:0;top:0;bottom:0;background:repeating-linear-gradient(0deg,rgba(0,255,170,.05) 0 1px,transparent 1px 3px);pointer-events:none;z-index:4}',
+   '.lz .lzR{position:relative;display:grid;grid-template-columns:18px repeat(5,1fr) 18px;height:var(--ch)}',
+   '.lz .lzC{border:1px solid rgba(0,255,170,.1);background:rgba(0,255,170,.035)}',
+   '.lz .sf .lzC{background:rgba(0,255,170,.075)}',
+   '.lz .st .lzC{background:rgba(90,200,255,.12);border-color:rgba(90,200,255,.22)}',
+   '.lz .gl .lzC{background:linear-gradient(rgba(70,255,150,.34),rgba(70,255,150,.1));border-color:rgba(120,255,170,.4)}',
+   '.lz .lzLb{position:absolute;left:18px;right:18px;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:3px;pointer-events:none;z-index:1}',
+   '.lz .st .lzLb{color:#7cf;justify-content:flex-start;padding-left:6px;font-size:11px;letter-spacing:2px}.lz .gl .lzLb{color:#c8ffd8;text-shadow:0 0 8px #3f8}',
+   '.lz .ln .lzC{background:rgba(var(--rgb),.05);border-color:rgba(var(--rgb),.12)}',
+   '.lz .ln .lzE{position:relative}',
+   '.lz .ln .lzE:before{content:"";position:absolute;left:3px;right:3px;top:5px;bottom:5px;border-radius:5px;background:linear-gradient(#35232b,#1a1015);border:1px solid #6b3d4d}',
+   '.lz .ln .lzE:after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:#5a2a34}',
+   '.lz .lzBm{position:absolute;left:14px;right:14px;top:50%;height:2px;margin-top:-1px;background:repeating-linear-gradient(90deg,rgba(var(--rgb),.4) 0 6px,transparent 6px 12px)}',
+   '.lz .ln.on .lzC{background:rgba(var(--rgb),.26);border-color:rgba(var(--rgb),.55)}',
+   '.lz .ln.on .lzE:after{background:var(--ac);box-shadow:0 0 8px 2px var(--ac)}',
+   '.lz .ln.on .lzE:before{border-color:var(--ac)}',
+   '.lz .ln.on .lzBm{height:4px;margin-top:-2px;border-radius:2px;background:linear-gradient(90deg,transparent,#fff 6%,#fff 94%,transparent);box-shadow:0 0 6px 2px var(--ac),0 0 18px 6px rgba(var(--rgb),.65);animation:lzfk .12s infinite alternate}',
+   '@keyframes lzfk{from{opacity:.8}to{opacity:1}}',
+   '.lz .lzPl{position:absolute;left:18px;right:18px;top:0;bottom:0;pointer-events:none;z-index:3}',
+   '.lz .lzP{position:absolute;left:0;top:0;width:20%;height:var(--ch);display:flex;align-items:center;justify-content:center;transform:translate(calc(var(--x)*100%),calc(var(--y)*100%));transition:transform .09s ease-out}',
+   '.lz .lzP i{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f2fff6,#3f8 45%,#0a6);box-shadow:0 0 0 3px rgba(60,255,140,.25),0 0 14px #3f8;animation:lzpl 1.2s ease-in-out infinite}',
+   '@keyframes lzpl{50%{box-shadow:0 0 0 5px rgba(60,255,140,.12),0 0 20px #3f8}}',
+   '.lz .lzFl{position:absolute;left:0;right:0;top:0;bottom:0;background:rgba(var(--rgb),.55);opacity:0;pointer-events:none;z-index:5}',
+   '.lz .lzBd.zap{animation:lzsk .35s}.lz .lzBd.zap .lzFl{animation:lzfl .35s}',
+   '@keyframes lzsk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}',
+   '@keyframes lzfl{from{opacity:1}to{opacity:0}}',
+   '.lz .lzBd.win{border-color:#8fb;box-shadow:inset 0 0 30px rgba(90,255,160,.5),0 0 22px #3f8}',
+   '.lz .lzPad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,44px);gap:6px;justify-content:center;margin-top:8px}',
+   '.lz .lzPad button{touch-action:manipulation;margin:0;padding:0;min-height:0;border:1px solid #3ff;border-radius:8px;background:rgba(0,40,40,.6);color:#3ff;font-size:18px!important;cursor:pointer;box-shadow:0 0 8px rgba(0,170,170,.5)}',
+   '.lz .lzPad button:active{background:#0a6;color:#fff}',
+   '.lz .lzPad [data-d=u]{grid-column:2;grid-row:1}.lz .lzPad [data-d=l]{grid-column:1;grid-row:2}.lz .lzPad [data-d=d]{grid-column:2;grid-row:2}.lz .lzPad [data-d=r]{grid-column:3;grid-row:2}',
+   '@media (prefers-reduced-motion:reduce){.lz .lzBm,.lz .lzP i,.lz .lzBd.zap{animation:none!important}.lz .lzP{transition:none}}'
+  ].join('\n');document.head.appendChild(s);}
+  let rows='';for(let r=0;r<Hh;r++){const ln=LR.includes(r);rows+='<div class="lzR '+(ln?'ln':r===0?'gl':r===Hh-1?'st':'sf')+'"><div class=lzE></div>'+'<i class=lzC></i>'.repeat(W)+'<div class=lzE></div>'+(ln?'<b class=lzBm></b>':'')+(r===0?'<span class=lzLb>▲ EXIT ▲</span>':r===Hh-1?'<span class=lzLb>START</span>':'')+'</div>';}
+  box.innerHTML='<div class=lz style="--rgb:'+P.c+';--ac:rgb('+P.c+')">'
+   +'<div class=lzMsg>🟢 초록 점을 맨 위 <b>EXIT</b>까지 이동! 켜진 <b style="color:var(--ac)">레이저</b>에 닿으면 처음으로 돌아가요</div>'
+   +'<div class=lzTop><span class=lzTag>패턴 '+(pi+1)+'/'+PAT.length+' · '+P.n+'</span><span class=lzZ>⚡ 감전 0회</span></div>'
+   +'<div class=lzBd>'+rows+'<div class=lzPl><div class=lzP><i></i></div></div><div class=lzFl></div></div>'
+   +'<div class=lzPad><button data-d=u aria-label=위>▲</button><button data-d=l aria-label=왼쪽>◀</button><button data-d=d aria-label=아래>▼</button><button data-d=r aria-label=오른쪽>▶</button></div></div>';
+  const bd=box.querySelector('.lzBd'),rowEl=[...box.querySelectorAll('.lzR')],pl=box.querySelector('.lzP'),zc=box.querySelector('.lzZ');
+  const on=(r,t)=>{const i=LR.indexOf(r);return i>=0&&Math.floor((t+OF[i])/700)%2===0;};
+  const dr=()=>{const t=now();LR.forEach(r=>rowEl[r].classList.toggle('on',on(r,t)));
+   if(LR.includes(y)&&on(y,t)){x=2;y=6;hits++;zc.textContent='⚡ 감전 '+hits+'회';bd.classList.remove('zap');void bd.offsetWidth;bd.classList.add('zap');try{sfx('wrong');}catch(e){}}
+   pl.style.setProperty('--x',x);pl.style.setProperty('--y',y);};
+  const kd=e=>{const m={ArrowUp:'u',ArrowDown:'d',ArrowLeft:'l',ArrowRight:'r'}[e.key];if(m){e.preventDefault();mv(m);}};
+  const tm=setInterval(()=>{if(!document.body.contains(box)){clearInterval(tm);document.removeEventListener('keydown',kd);return;}dr();},150);
+  const mv=d=>{if(done)return;if(d==='u')y=Math.max(0,y-1);if(d==='d')y=Math.min(Hh-1,y+1);if(d==='l')x=Math.max(0,x-1);if(d==='r')x=Math.min(W-1,x+1);dr();
+   if(y===0){done=true;clearInterval(tm);document.removeEventListener('keydown',kd);bd.classList.add('win');box.querySelector('.lzMsg').innerHTML='<b style="color:#8fb">🎉 탈출 성공! 보안망을 뚫었어요</b>';setTimeout(ok,450);}};
+  document.addEventListener('keydown',kd);
   box.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>mv(b.dataset.d));
-  const tm=setInterval(()=>{if(!document.body.contains(box)){clearInterval(tm);document.removeEventListener('keydown',kd);return;}dr();},150);dr();}}
+  dr();}}
 };
 function mini(){if(C.phase!=='play')return;C.mode='mini';C.pendWait=0;const key=pk(CFG.MINI_ON.filter(k=>MINI[k])),g=MINI[key];
  pop('<h3 style="color:#f66">🚨 시스템이 해킹당했어요!'+(C.hitBy?' ('+esc(C.hitBy.by)+')':'')+'</h3><div style="color:#fd6">복구 미니게임: '+g.n+' — 해결해야 다시 문제를 풀 수 있어요. (시간은 계속 흘러요)</div><div id=hbMg></div>');
@@ -35320,15 +35384,18 @@ function paintMenu(){let sv={};try{sv=JSON.parse(localStorage.getItem('zhb_sv')|
  +'<label class=dr><span>사용자명<small>USER</small></span><input id=hbNm maxlength=8 value="'+nmv+'" placeholder="내 이름" autocomplete=off spellcheck=false></label>'
  +'<button class="dbt" data-x=host>▶ 방 만들기 (방장)</button>'
  +'<div class=dsep>또는 기존 방에 접속</div>'
- +'<label class=dr><span>방 번호<small>ROOM</small></span><input id=hbCd maxlength=4 inputmode=numeric value="'+cdv+'" placeholder="4자리" autocomplete=off></label>'
- +'<label class=dr><span>재접속 번호<small>REJOIN</small></span><input id=hbRc maxlength=4 inputmode=numeric value="'+rcv+'" placeholder="끊겼을 때만" autocomplete=off></label>'
+ +'<label class=dr><span>방 번호<small>ROOM</small></span><input id=hbCd maxlength=4 inputmode=numeric value="" placeholder="4자리" autocomplete=off></label>'
+ +'<label class=dr><span>재접속 번호<small>REJOIN</small></span><input id=hbRc maxlength=4 inputmode=numeric value="" placeholder="끊겼을 때만" autocomplete=off></label>'
  +'<button class="dbt j" data-x=join>▷ 참가하기</button>'
+ +'<button class="dbt" data-x=rejoin style="border-color:#fd2;color:#fd6">🔄 재접속하기 (방 번호·재접속 번호 불러오기)</button>'
  +'<button class="dbt" data-x=prac style="border-color:#fd2;color:#fd6">🛠 해킹 복구 연습</button><div id=hbPr></div>'
  +'<div id=hbSt class=dosSt></div>'
  +'<button class="dbt q" data-x=quit>✖ 닫기</button>'
  +'</div></div><div id=hbP class=pop></div></div>';
  root.onclick=e=>{const x=e.target.dataset&&e.target.dataset.x;if(!x)return;const nm=($h('#hbNm')||{}).value||'트레이너';
-  if(x==='quit')return quit();if(x==='prac'){if(!(pracBox()&&pracBox().dataset.on))pracMenu();return;}C.name=nm;if(x==='host'){stat('방을 여는 중…');hostOpen(nm);}
+  if(x==='quit')return quit();if(x==='prac'){if(!(pracBox()&&pracBox().dataset.on))pracMenu();return;}
+  if(x==='rejoin'){if(!cdv)return stat('저장된 접속 기록이 없어요');$h('#hbCd').value=cdv;$h('#hbRc').value=rcv;stat('불러왔어요! 아래 「참가하기」를 눌러 주세요');return;}
+  C.name=nm;if(x==='host'){stat('방을 여는 중…');hostOpen(nm);}
   if(x==='join'){const c=$h('#hbCd').value.trim(),r=$h('#hbRc').value.trim();if(!/^\d{4}$/.test(c))return stat('방 번호 4자리를 넣어 주세요');C.rc=r||null;joinGame(c,r||'',nm);}};
  const bx=$h('#hbBoot'),fm=$h('#hbForm');$h('#hbPr').addEventListener('click',pracClick);
  fm.querySelectorAll('input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key!=='Enter')return;e.preventDefault();if(i.id==='hbNm'){const n=$h('#hbCd');if(n)n.focus();}else{const j=fm.querySelector('[data-x=join]');if(j)j.click();}}));
