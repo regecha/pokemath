@@ -34612,6 +34612,12 @@ const UPDATE_NOTICE={
 #hb .qCard .qText,#hb .qCard .qText *{font-family:'Jua',sans-serif!important}
 #hb .dgh{grid-column:1/-1;color:#fd6;font-size:14px;margin:6px 0 0;padding:2px 6px;border-left:4px solid #fd2;background:rgba(255,220,80,.08)}
 #hb .hbHold{visibility:hidden}
+@keyframes hbVp{0%{transform:scale(.2) rotate(-25deg)}65%{transform:scale(1.15) rotate(6deg)}100%{transform:scale(1)}}
+#hb .vir{display:block;width:86%;height:86%;animation:hbVp .22s ease-out;filter:drop-shadow(0 0 6px #6f6)}
+@media (prefers-reduced-motion:reduce){#hb .vir{animation:none}}
+#hb .dosH #hbMus{margin-left:auto;flex:none;background:rgba(0,40,36,.6);color:#7fe;border:1px solid #0a8;border-radius:6px;padding:0 9px;font-size:14px;line-height:22px;cursor:pointer;box-shadow:none}
+#hb .dosH #hbMus.off{color:#789;border-color:#456;opacity:.75}
+#hb .dosH #hbMus:active{background:#0a8;color:#012}
 #hb .hbLand{animation:hbLand .6s cubic-bezier(.2,1.4,.4,1) both}
 @keyframes hbLand{0%{transform:scale(.2);filter:brightness(2.4) drop-shadow(0 0 8px #fff)}60%{transform:scale(1.18);filter:brightness(1.5) drop-shadow(0 0 10px #8ff)}100%{transform:scale(1);filter:none}}
 #hb .hbDexP{animation:hbDexP .7s ease-out}
@@ -34629,8 +34635,8 @@ const UPDATE_NOTICE={
 #hb .dosB{padding:12px 12px 4px;font-size:clamp(13px,3.7vw,15px);line-height:1.6;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;text-shadow:0 0 6px #0fa6;cursor:default}
 #hb .dl{min-height:1.6em}
 #hb .dl.dim{color:#5a9}
-#hb .dl.ok{color:#3f8}
-#hb .dl.warn{color:#fd6}
+#hb .dl.ok{color:#3f8;background:none!important;border:0;box-shadow:none;padding:0}
+#hb .dl.warn{color:#fd6;background:none;border:0;box-shadow:none;padding:0;animation:none;text-align:left}
 #hb .dl.txt{color:#cfe}
 #hb .dl.ttl{color:#3ff;font-size:clamp(20px,6.4vw,30px);line-height:1.25;margin:10px 0 4px;text-shadow:0 0 10px #0cf,2px 0 #f0a8}
 #hb .cur{display:inline-block;width:.55em;height:1.05em;margin-left:2px;vertical-align:-.15em;background:#3f8;box-shadow:0 0 8px #3f8;animation:hbCur 1s steps(1) infinite}
@@ -34711,6 +34717,18 @@ const UPDATE_NOTICE={
 @keyframes mxGlow{0%,100%{filter:none}50%{filter:drop-shadow(0 0 20px #ffd23f) brightness(1.3)}}
 #hb .hbPk .flip.hbMulGlow{animation:mxGlow .8s ease-in-out 3!important}
 @media (prefers-reduced-motion:reduce){#hb .hbMx{display:none}#hb .hbPk .flip.hbMulGlow{animation:none!important}}
+/* ===== [해킹] 버튼 · 가짜 아이디 삭제 연출 ===== */
+@keyframes hkBtnP{from{box-shadow:0 0 6px #3f86}to{box-shadow:0 0 24px #3f8,inset 0 0 10px #3f88}}
+@keyframes hkDel{0%{transform:none;filter:none}12%{transform:translate(-5px,0) skewX(9deg);filter:hue-rotate(80deg) brightness(1.7)}26%{transform:translate(5px,0) skewX(-9deg)}42%{transform:scale(1.07);filter:brightness(1.9)}70%{opacity:.85;transform:scale(.92) skewX(4deg);letter-spacing:5px;filter:blur(1px)}100%{opacity:0;transform:scale(.15);filter:blur(5px)}}
+@keyframes hkFx{0%{opacity:0;transform:scale(1.8)}30%{opacity:1;transform:scale(.96)}100%{opacity:1;transform:none}}
+#hb .hkBtn{display:block;width:100%;margin:8px 0 2px;padding:12px 10px;font-size:clamp(20px,6vw,26px);font-weight:bold;letter-spacing:2px;background:rgba(0,60,40,.85);border:2px solid #3f8;animation:hkBtnP 1s ease-in-out infinite alternate}
+#hb .hkBtn small{display:block;margin-top:2px;font-size:12px;font-weight:normal;letter-spacing:0;opacity:.9}
+#hb .hkNone{margin:8px 0 2px;padding:6px;text-align:center;color:#fd6;border:1px dashed #fd6;border-radius:6px}
+#hb .hkNote{margin:2px 0;text-align:center;color:#3f8}
+#hb .hkFx{margin:4px 0;text-align:center;font-size:clamp(18px,5.5vw,24px);color:#ff4a5a;text-shadow:0 0 12px #f00;animation:hkFx .35s ease-out}
+#hb .choices .ch.hkDel{--fr:#f33;--a:#a11;--b:#3a0006;--fg:#fff;position:relative;pointer-events:none;background:#d22!important;text-decoration:line-through;box-shadow:0 0 18px #f22;animation:hkDel 1.05s ease-in forwards}
+#hb .hkTag{position:absolute;right:3px;top:2px;font-size:11px;line-height:1.3;color:#fff;background:#a00;padding:0 5px;border-radius:3px;letter-spacing:1px;text-decoration:none}
+@media (prefers-reduced-motion:reduce){#hb .hkBtn,#hb .hkFx{animation:none}#hb .choices .ch.hkDel{animation:none;opacity:.35}}
 /* ===== 해킹 성공 · 해킹당함 연출 ===== */
 @keyframes hkFade{from{opacity:0}to{opacity:1}}
 @keyframes hkSlam{0%{opacity:0;transform:scale(2.8)}60%{opacity:1;transform:scale(.94)}100%{transform:scale(1)}}
@@ -34751,7 +34769,8 @@ const CFG={
  END_CARDS:0,                                      // (사용 안 함) 종료 조건: 한 명이 모든 종류의 포켓몬을 모으면 즉시 종료
  EV:{one:30,two:20,three:10,x2:10,x3:5,hack:10,def:5,miss:10},      // 평소 합계 100
  EV_L30:{one:30,two:20,three:10,x2:15,x3:10,hack:10,def:5,miss:0},  // 마지막 30초 합계 100 (꽝 없음: 꽝 10% 중 5%→카드3배, 5%→카드2배)
- HACK_RATE:.5,LAST30_MS:30000,
+ HACK_RATE:.5,LAST30_MS:30000,HACK_PITY:10,   // 카드 고르기 10번마다 최소 1번은 해킹 이벤트 보장(자연 확률로 나오면 처음부터 다시 셈)
+
  MINI_ON:['color','memory','circuit','virus','code','order','reaction','laser'],
  REWARD:{1:5,2:4,3:3},REWARD_BASE:[1,2],VER:1,HB_TIMEOUT:15000,
  REWARD_MIN_P:2,REWARD_MIN_SCORE:100,   // 보상: 참가자 2명 이상 · 내 점수 100점 이상 · 하루 3번까지
@@ -34782,19 +34801,45 @@ const sha256=(()=>{const rot=(x,n)=>x>>>n|x<<32-n,K=[],H0=[];for(let c=2,p=0;p<6
 const RH={};
 const rhash=rc=>{const k=(H?H.code:'')+'|'+rc;if(RH[k])return RH[k];let h='zhb|'+k;for(let i=0;i<1000;i++)h=sha256(h+k);return RH[k]=h.slice(0,24);}; // 재접속 번호는 8자리 + SHA-256 1000회 해시로만 넘겨요(방장 승격 스냅샷)
 /* ---------- 방장(호스트) 쪽: 게임 상태를 확정하는 건 방장만 ---------- */
-function newP(name,conn,host){return{pid:tok(6),name:(name||'트레이너').slice(0,8),hid:engRand(usedHids()),rc:String(1000+rr(9000)),conn,host:!!host,away:false,own:{},tot:0,sc:0,c5:0,sAt:now(),def:0,shield:0,lock:0,seq:0,pend:null,hk:null,last:now(),lastSolve:0,rch:'',hkCancel:0,ok:0,wr:0,lastWrong:0};}
+function newP(name,conn,host){return{pid:tok(6),name:(name||'트레이너').slice(0,8),hid:engRand(usedHids()),rc:String(1000+rr(9000)),conn,host:!!host,away:false,own:{},tot:0,sc:0,c5:0,sAt:now(),def:0,shield:0,lock:0,seq:0,pend:null,hk:null,last:now(),lastSolve:0,rch:'',hkCancel:0,ok:0,wr:0,lastWrong:0,hp:0,lastHkq:0};}
 function calc(p){let t=0,s=0,c5=0;for(const id in p.own){const n=p.own[id],r=MON[id].rar;t+=n;s+=n*r;if(r===5)c5+=n;}if(s!==p.sc)p.sAt=now();p.tot=t;p.sc=s;p.c5=c5;}
 function give(p,ids){for(const id of ids){p.own[id]=(p.own[id]||0)+1;p.tot++;}calc(p);}
 function pickW(o){let t=0;for(const id in o)t+=o[id];let x=Math.random()*t;for(const id in o){x-=o[id];if(x<0)return id;}return Object.keys(o)[0];}
 function rollSame(r){for(let l=r;l>=1;l--)if(POOL[l]&&POOL[l].length)return pk(POOL[l]);for(let l=r+1;l<=5;l++)if(POOL[l]&&POOL[l].length)return pk(POOL[l]);}
-function mult(p,k){let room=Infinity,add=0;const rc=[0,0,0,0,0,0];for(const id in p.own)rc[MON[id].rar]+=p.own[id];for(let r=1;r<=5&&room>0;r++){let n=rc[r]*(k-1);while(n-->0&&room>0){const id=rollSame(r);if(id===undefined)break;p.own[id]=(p.own[id]||0)+1;room--;add++;}}calc(p);return add;}
-function take(f,t,k){k=Math.min(k,f.tot);let n=0;while(n<k){const id=pickW(f.own);if(id===undefined)break;if(!--f.own[id])delete f.own[id];t.own[id]=(t.own[id]||0)+1;n++;}calc(f);calc(t);return n;}
+/* 카드 2배·3배: 같은 등급 카드를 늘어날 만큼, 그 등급 풀에서 무작위로(중복 허용) 뽑아 더해요.
+   늘어날 장수 n 이 풀 크기 m 의 4배 이하면 예전처럼 한 장씩 뽑고, 그보다 많으면 '다항분포'로 종류별 장수를 한 번에 정해요
+   (종류마다 이항분포를 차례로 뽑아요). 한 장씩 뽑는 것과 확률 분포가 같고, 계산량은 카드 수가 아니라 종류 수(m)에만 비례해요. */
+const gauss=()=>Math.sqrt(-2*Math.log(1-Math.random()))*Math.cos(2*Math.PI*Math.random());
+function binom(n,p){if(n<=0||p<=0)return 0;if(p>=1)return n;if(p>.5)return n-binom(n,1-p);
+ const mu=n*p;if(mu<12){const q=1-p,sr=p/q,a=(n+1)*sr;let r=Math.exp(n*Math.log(q)),u=Math.random(),x=0;while(u>r&&x<n){u-=r;x++;r*=(a/x-sr);}return x;}
+ return Math.max(0,Math.min(n,Math.round(mu+Math.sqrt(mu*(1-p))*gauss())));}
+function mult(p,k){let add=0;const rc=[0,0,0,0,0,0];for(const id in p.own)rc[MON[id].rar]+=p.own[id];
+ for(let r=1;r<=5;r++){const n=rc[r]*(k-1);if(n<=0)continue;
+  let pl=null;for(let l=r;l>=1;l--)if(POOL[l]&&POOL[l].length){pl=POOL[l];break;}
+  if(!pl)for(let l=r+1;l<=5;l++)if(POOL[l]&&POOL[l].length){pl=POOL[l];break;}
+  if(!pl)continue;
+  const m=pl.length;
+  if(n<=m*4){for(let i=n;i>0;i--){const id=pl[rr(m)];p.own[id]=(p.own[id]||0)+1;}}
+  else{let rem=n;for(let i=0;i<m&&rem>0;i++){const c=i===m-1?rem:binom(rem,1/(m-i));if(c){p.own[pl[i]]=(p.own[pl[i]]||0)+c;rem-=c;}}}
+  add+=n;}
+ calc(p);return add;}
+/* 해킹으로 카드 뺏기: 카드 k장을 '종류별 비율'로 한 번에 계산해요. (예전엔 한 장씩 뽑느라 카드 수 x 종류 수만큼 느렸어요)
+   종류마다 floor(보유수 x k / 전체)장을 먼저 가져오고, 남는 몇 장은 소수점 몫이 큰 종류일수록 잘 걸리게 뽑아요. 정수 계산이라 오차가 없고 정확히 k장이에요. */
+function take(f,t,k){k=Math.min(k,f.tot);if(!(k>0)){calc(f);calc(t);return 0;}
+ let tot=0;const ids=[];for(const id in f.own){ids.push(id);tot+=f.own[id];}
+ const tk={},w=[];let got=0;
+ for(const id of ids){const x=f.own[id]*k,b=Math.floor(x/tot),rm=x-b*tot;if(b){tk[id]=b;got+=b;}if(rm>0)w.push([id,rm]);}
+ let r=k-got;
+ while(r>0&&w.length){let sm=0;for(const e of w)sm+=e[1];let x=Math.random()*sm,j=0;for(;j<w.length-1;j++){x-=w[j][1];if(x<0)break;}
+  const id=w[j][0];tk[id]=(tk[id]||0)+1;w[j]=w[w.length-1];w.pop();r--;}
+ let n=0;for(const id in tk){const c=tk[id];f.own[id]-=c;if(f.own[id]<=0)delete f.own[id];t.own[id]=(t.own[id]||0)+c;n+=c;}
+ calc(f);calc(t);return n;}
 function snd(p,m){if(p.host){setTimeout(()=>cm(m),0);return;}try{p.conn&&p.conn.open&&p.conn.send(m);}catch(e){}}
 const bc=m=>H.players.forEach(p=>snd(p,m));
 const mePk=p=>({t:'me',own:Object.entries(p.own),sc:p.sc,tot:p.tot,def:p.def,sh:Math.max(0,p.shield-now()),lock:p.lock});
 function lobBC(){bc({t:'lob',pl:H.players.map(p=>({n:p.name,a:p.away})),dur:H.dur,code:H.code});}
 function topBC(){if(!H||H.state!=='play')return;const l=Math.max(0,H.end-now());bc({t:'top',top:[...H.players].sort(cmp).slice(0,3).map(p=>({n:p.name,s:p.sc})),all:[...H.players].sort(cmp).map(p=>({id:p.pid,n:p.name,s:p.sc})),left:l,away:H.players.filter(p=>p.away).length,order:H.players.map(p=>p.pid),gen:H.gen||0});}
-function snapPk(){return{t:'snap',dur:H.dur,gid:H.gid,t0:H.t0,pl:H.players.map(p=>({pid:p.pid,name:p.name,rch:p.rc?rhash(p.rc):(p.rch||''),own:Object.entries(p.own),sh:Math.max(0,p.shield-now()),def:p.def,lock:p.lock,seq:p.seq,sAt:p.sAt,pend:p.pend?{n:p.pend.n}:null,hk:p.hk?{n:p.hk.n}:null,ok:p.ok|0,wr:p.wr|0}))};}
+function snapPk(){return{t:'snap',dur:H.dur,gid:H.gid,t0:H.t0,pl:H.players.map(p=>({pid:p.pid,name:p.name,rch:p.rc?rhash(p.rc):(p.rch||''),own:Object.entries(p.own),sh:Math.max(0,p.shield-now()),def:p.def,lock:p.lock,seq:p.seq,sAt:p.sAt,pend:p.pend?{n:p.pend.n}:null,hk:p.hk?{n:p.hk.n}:null,ok:p.ok|0,wr:p.wr|0,hp:p.hp|0}))};}
 function weights(){return H.end-now()<=CFG.LAST30_MS?CFG.EV_L30:CFG.EV;}
 function mkSlot(){const ev=wp(weights());const n={one:1,two:2,three:3}[ev]||0;const ids=[];for(let i=0;i<n;i++)ids.push(rollMon());return{ev,ids};}
 function welcome(p){snd(p,{t:'wel',pid:p.pid,hid:p.hid,rc:p.rc,code:H.code});lobBC();if(H.state==='pick'&&!p.idDone&&p.cands)snd(p,{t:'idc',c:p.cands,left:Math.max(1000,PICK_MS-(now()-H.pickAt))});if(H.state==='play'){snd(p,{t:'go',left:Math.max(0,H.end-now()),dur:H.dur,re:1});snd(p,mePk(p));if(p.pend&&!p.lock)snd(p,{t:'tri',n:p.pend.n});if(p.hkCancel){p.hkCancel=0;snd(p,{t:'hkr',ok:false,why:'방장이 바뀌어 해킹이 취소됐어요'});}}}
@@ -34815,7 +34860,7 @@ function hmsg(p,m){
  else if(m.t==='idp')idPick(p,m);
  else if(m.t==='solve'){if(p.lock||p.away)return;if(p.pend){snd(p,{t:'tri',n:p.pend.n});return;}{const t=now();if(t-p.lastSolve<CFG.SOLVE_MIN_MS)return;p.lastSolve=t;}p.pend={n:++p.seq,slots:[mkSlot(),mkSlot(),mkSlot()]};p.ok=(p.ok|0)+1;snd(p,{t:'tri',n:p.pend.n});}
   else if(m.t==='wrong'){const t=now();if(p.away||t-(p.lastWrong||0)<1500)return;p.lastWrong=t;p.wr=(p.wr|0)+1;}
- else if(m.t==='pick'){const e=p.pend;if(!e||e.n!==m.n||!(m.i>=0&&m.i<3))return;p.pend=null;const s=e.slots[m.i];let res={t:'res',n:m.n,ev:s.ev,ids:s.ids};
+ else if(m.t==='pick'){const e=p.pend;if(!e||e.n!==m.n||!(m.i>=0&&m.i<3))return;p.pend=null;const s=e.slots[m.i];p.hp=(p.hp|0)+1;if(p.hp>=CFG.HACK_PITY&&s.ev!=='hack'){s.ev='hack';s.ids=[];}let res={t:'res',n:m.n,ev:s.ev,ids:s.ids};
   if(s.ev==='one'||s.ev==='two'||s.ev==='three'){give(p,s.ids);s.ids.forEach(id=>{if(MON[id].rar===5)bc({t:'leg',id,who:p.name});});}
   else if(s.ev==='x2'||s.ev==='x3'){const a=mult(p,s.ev==='x2'?2:3);res.note=a>0?'카드 +'+a+'장!':'늘어날 카드가 없어요';}
   else if(s.ev==='def'){if(p.def)res={t:'res',n:m.n,ev:'dupdef',ids:[]};else p.def=1;}
@@ -34823,13 +34868,17 @@ function hmsg(p,m){
    if(!el.length)res={t:'res',n:m.n,ev:'miss',ids:[],note:'해킹할 상대가 없어요'};
    else{const sh=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);const real=sh(el).slice(0,2);if(real.length<2){const rest=sh(oth.filter(x=>!real.includes(x)));if(rest.length)real.push(rest[0]);}
     const used=new Set(H.players.map(x=>x.hid)),opts=real.map(x=>({hid:x.hid,pid:x.pid}));while(opts.length<4){const f=engRand(used);if(!used.has(f)){used.add(f);opts.push({hid:f,pid:null});}}
-    const so=sh(opts);p.hk={n:m.n,opts:so};snd(p,{t:'hk',n:m.n,opts:so.map(o=>o.hid),real:real.length});}}
+    const so=sh(opts);p.hk={n:m.n,opts:so,elim:[]};p.hp=0;snd(p,{t:'hk',n:m.n,opts:so.map(o=>o.hid),real:real.length});}}
   if(!(s.ev==='hack'&&p.hk&&p.hk.n===m.n))snd(p,res);snd(p,mePk(p));afterChange();}
  else if(m.t==='hit'){const k=p.hk;if(!k||k.n!==m.n)return;p.hk=null;const o=Number.isInteger(m.i)?k.opts[m.i]:null,t=o&&o.pid?H.players.find(x=>x.pid===o.pid):null;let r={t:'hkr',ok:false,why:'가짜 아이디였어요… 꽝!'};
   if(t){if(t.away||t.tot<1)r.why='대상이 지금은 해킹할 수 없어요';
    else if(t.def){t.def=0;r.why='상대의 해킹 방어권에 막혔어요!';snd(t,{t:'blk',by:p.name});snd(t,mePk(t));}
    else{const mv=take(t,p,Math.ceil(t.tot*CFG.HACK_RATE));t.lock=(t.lock|0)+1;r={t:'hkr',ok:true,k:mv,from:t.name};snd(t,{t:'hit',by:p.name,k:mv});snd(t,mePk(t));bc({t:'hsc',by:p.name,to:t.name,k:mv});}}
   snd(p,r);snd(p,mePk(p));afterChange();}
+ else if(m.t==='hkq'){const k=p.hk;if(!k||k.n!==m.n||p.away)return;const t=now();   // [해킹] 버튼: 문제를 풀었으니 가짜 아이디 1개를 알려줘요 (어느 게 가짜인지는 방장만 알아요)
+  if(t-(p.lastHkq||0)<CFG.SOLVE_MIN_MS){snd(p,{t:'hkx',n:k.n,i:-2});return;}p.lastHkq=t;
+  const fk=k.opts.map((o,i)=>i).filter(i=>!k.opts[i].pid&&!k.elim.includes(i));let i=-1;if(fk.length){i=pk(fk);k.elim.push(i);}
+  p.ok=(p.ok|0)+1;snd(p,{t:'hkx',n:k.n,i});}
  else if(m.t==='rec'){if(!p.lock)return;p.lock--;snd(p,mePk(p));if(!p.lock&&p.pend)snd(p,{t:'tri',n:p.pend.n});}
 }
 const totKinds=()=>{pools();return [1,2,3,4,5].reduce((a,r)=>a+(POOL[r]||[]).length,0);};
@@ -34883,7 +34932,7 @@ function migrate(){if(C.phase!=='play'||C.role==='host')return;C.gen=(C.gen||0)+
 async function becomeHost(){const s=C.snap;if(!s)return migrate();try{await loadPeer();}catch(e){return migrate();}
  try{C.peer&&C.peer.destroy();}catch(e){}C.conn=null;const peer=new Peer(idOf(C.code,C.gen),PO());C.peer=peer;
  peer.on('open',()=>{H={code:C.code,peer,dur:s.dur,state:'play',players:[],t0:s.t0,end:C.end,gid:s.gid,gen:C.gen};
-  s.pl.forEach(o=>{const me=o.pid===C.pid,p=newP(o.name,null,me);Object.assign(p,{pid:o.pid,hid:me?C.hid:p.hid,rc:me?C.rc:null,rch:o.rch||'',own:Object.fromEntries(o.own),def:o.def,lock:o.lock,seq:o.seq,pend:o.pend?{n:o.pend.n,slots:[mkSlot(),mkSlot(),mkSlot()]}:null,hk:null,hkCancel:o.hk?1:0,ok:+o.ok|0,wr:+o.wr|0,shield:now()+o.sh,away:!me,last:now()});calc(p);p.sAt=o.sAt;H.players.push(p);if(p.host)H.me=p;});
+  s.pl.forEach(o=>{const me=o.pid===C.pid,p=newP(o.name,null,me);Object.assign(p,{pid:o.pid,hid:me?C.hid:p.hid,rc:me?C.rc:null,rch:o.rch||'',own:Object.fromEntries(o.own),def:o.def,lock:o.lock,seq:o.seq,pend:o.pend?{n:o.pend.n,slots:[mkSlot(),mkSlot(),mkSlot()]}:null,hk:null,hkCancel:o.hk?1:0,ok:+o.ok|0,wr:+o.wr|0,hp:+o.hp|0,shield:now()+o.sh,away:!me,last:now()});calc(p);p.sAt=o.sAt;H.players.push(p);if(p.host)H.me=p;});
   if(!H.me){H=null;try{peer.destroy();}catch(e){}return migrate();}
   wire(peer);H.tm=setInterval(hostTick,1000);C.role='host';C.rc=H.me.rc;sv();toast('👑 내가 새 방장이 됐어요!');stat('');H.players.forEach(p=>{if(p.host&&p.hkCancel){p.hkCancel=0;snd(p,{t:'hkr',ok:false,why:'방장이 바뀌어 해킹이 취소됐어요'});}});topBC();});
  peer.on('error',e=>{if(!H)migrate();});}
@@ -34905,6 +34954,7 @@ function cm(m){
  else if(m.t==='res')showRes(m);
  else if(m.t==='hk')showHack(m);
  else if(m.t==='hkr')showHkr(m);
+ else if(m.t==='hkx')hackElim(m);
  else if(m.t==='hit'){C.hitBy=m;hitWarn(m);}
  else if(m.t==='blk')toast('🛡 '+esc(m.by)+' 님의 해킹을 방어권으로 막았어요!');
  else if(m.t==='leg')legend(m);
@@ -34917,7 +34967,7 @@ function popx(){$h('#hbP').classList.remove('on');syncPad();}
 function showGo(on){const g=$h('#hbGo');if(g)g.style.display=on?'flex':'none';}
 function syncPad(){const w=$h('.w'),p=$h('#hbP'),pb=p&&p.firstChild;if(!w)return;w.style.paddingBottom=((p&&p.classList.contains('on')&&pb)?pb.offsetHeight+24:(C&&C.mode==='closed'?84:12))+'px';}
 function closeQ(){if(!C||C.mode!=='q')return;C.mode='closed';popx();showGo(1);syncPad();}
-function next(){if(!C||C.phase!=='play'||C.mode==='mini'||C.mode==='warn')return;C.mode=null;if(C.me.lock){mini();return;}if(C.pendWait)return;question();}
+function next(){if(!C||C.phase!=='play'||C.mode==='mini'||C.mode==='warn')return;C.mode=null;if(C.me.lock){mini();return;}if(C.hkM){renderHack();return;}if(C.pendWait)return;question();}
 /* 문제: 내가 고른 모드(수학·영어·국어·영수)를 따르되, 영어·국어는 어떤 세부 모드여도 '종합 모드'로만 출제하고(풀이 속도 균형), IQ·상식 문제는 평소처럼 섞여요. 내 설정은 건드리지 않고 바로 되돌려요 */
 function hbPick(){const m=S.meta,sv=[m.enStudyMode,m.koMode,S.enForce,S.koForce];let q=null;
  try{m.enStudyMode='mixed';m.koMode='mixed';S.enForce=null;S.koForce=null;
@@ -34948,7 +34998,7 @@ function openFlip(row,idx,html,badge){const f=row.children[idx];if(!f)return;con
  if(badge){const bd=document.createElement('b');bd.className='hbBadge';bd.textContent=badge;f.appendChild(bd);}
  void f.offsetWidth;f.classList.add('open');try{snd_flip();}catch(e){}}
 function snd_flip(){try{sfx('flip');}catch(e){}}
-function showPick(n){C.mode='pick';C.pendWait=0;C.pk=null;C.hkTok=0;
+function showPick(n){C.mode='pick';C.pendWait=0;C.pk=null;C.hkTok=0;C.hkM=null;
  const p=pop('<h3 id=hbPT style="text-align:center">🃏 카드를 한 장 고르세요</h3><div class=hbPk>'+[0,1,2].map(flipHTML).join('')+'</div>');
  p.querySelectorAll('.hbFlip').forEach(f=>f.onclick=()=>{if(C.mode!=='pick')return;C.mode='wait';const i=+f.dataset.i;C.pk={i};f.classList.add('hbSel');const row=f.parentNode;row.classList.add('hbPicked');const t=$h('#hbPT');if(t)t.textContent='…해독 중…';try{sfx('tap');}catch(e){}tx({t:'pick',n,i});});}
 /* 고른 카드 자리를 찾아요. 화면이 사라졌으면(재접속 등) 한 장짜리 새 화면을 만들어요 */
@@ -35038,8 +35088,37 @@ function showHack(m){const live=flipRow(),ci=C.pk&&Number.isInteger(C.pk.i)?C.pk
  if(live&&live.children.length===3&&ci>=0&&C.mode==='wait'){C.mode='res';const tok=C.hkTok=(m.n|0)||1;C.pk=null;openFlip(live,ci,evFace('hack'),'');setPT('💥 해킹 이벤트!','#f66');
   setTimeout(()=>{if(C&&C.hkTok===tok&&C.mode==='res'){C.hkTok=0;showHack2(m);}},1100);return;}
  showHack2(m);}
-function showHack2(m){C.mode='hack';const p=pop('<h3 style="color:#f66;text-align:center">⚠ 해킹 시스템에 침투했습니다.<br>해킹 대상을 선택하세요!</h3><div class=choices>'+m.opts.map((o,i)=>'<button class=ch data-i='+i+'>'+esc(o)+'</button>').join('')+'</div><div style="font-size:13px;margin-top:6px">내 아이디: <b>'+C.hid+'</b> (이 중 진짜 플레이어 아이디는 '+(+m.real||1)+'개!)</div>');
- p.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{if(C.mode!=='hack')return;C.mode='wait';tx({t:'hit',n:m.n,i:+b.dataset.i});});}
+/* ---------- 해킹 대상 고르기: 아이디 4개 중 진짜는 1~2개. [해킹] 버튼 → 문제 풀이 → 가짜 아이디 1개를 연출과 함께 삭제 ---------- */
+function showHack2(m){C.hkM=m;C.hkElim=[];renderHack();}
+function renderHack(note){const m=C.hkM;if(!m||!C||C.phase!=='play')return;C.mode='hack';clearTimeout(C.hkTmo);
+ const el=C.hkElim||[],real=+m.real||1,fakes=Math.max(0,m.opts.length-real-el.length);
+ const p=pop('<h3 style="color:#f66;text-align:center">⚠ 해킹 시스템에 침투했습니다.<br>해킹 대상을 선택하세요!</h3>'
+  +(note?'<div class=hkNote>'+note+'</div>':'')
+  +(fakes>0?'<button class="b g hkBtn" data-x=hkq>🔓 [해킹]<small>문제를 풀면 가짜 아이디 1개를 지워요 · 가짜 '+fakes+'개 남음</small></button>':'<div class=hkNone>✅ 남은 아이디는 전부 진짜예요! 하나를 골라요</div>')
+  +'<div class=choices>'+m.opts.map((o,i)=>el.includes(i)?'':'<button class=ch data-i='+i+'>'+esc(o)+'</button>').join('')+'</div><div style="font-size:13px;margin-top:6px">내 아이디: <b>'+C.hid+'</b> (이 중 진짜 플레이어 아이디는 '+real+'개!)</div>');
+ p.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{if(C.mode!=='hack')return;C.mode='wait';C.hkM=null;tx({t:'hit',n:m.n,i:+b.dataset.i});});
+ const hb=p.querySelector('[data-x=hkq]');if(hb)hb.onclick=()=>hkQuestion();}
+function hkQuestion(){const m=C.hkM;if(!m||C.mode!=='hack')return;C.mode='hkq';
+ let q=hbPick();if(!q){const a=2+rr(8),b=2+rr(8);q={q:a+' × '+b+' = ?',a:String(a*b),ch:[a*b,a*b+a,a*b-b,a*b+2].map(String),sk:Object.keys(SKM)[0]};}
+ try{S.curQ=q;}catch(e){}
+ const p=pop('<div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><div style="color:#3f8;font-size:15px">🔓 해킹 중! 문제를 풀면 가짜 아이디 1개를 지워요</div><button class="b r qclose" data-x=hkback>↩ 돌아가기</button></div>'+qHTML(q));
+ const bk=p.querySelector('[data-x=hkback]');if(bk)bk.onclick=()=>{if(C.mode==='hkq')renderHack();};
+ p.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{if(C.mode!=='hkq')return;
+  if(q.ch[+b.dataset.i]===q.a){C.wrong=0;C.mode='hkw';pop('<h3 style="text-align:center;color:#3f8">✅ 정답! 가짜 아이디를 추적하는 중…</h3>');tx({t:'hkq',n:m.n});C.hkTmo=setTimeout(()=>{if(C&&C.mode==='hkw')renderHack();},6000);}
+  else{b.classList.add('shk');C.mode='x';C.wrong=(C.wrong||0)+1;tx({t:'wrong'});const w=CFG.WRONG_WAIT[Math.min(C.wrong-1,CFG.WRONG_WAIT.length-1)],ah=(p.querySelectorAll('.ch')[q.ch.indexOf(q.a)]||{}).innerHTML||esc(String(q.a));
+   pop('<h3 style="color:#f88;text-align:center">❌ 오답!</h3><div style="text-align:center">정답은 <b>'+ah+'</b> 였어요.<br><b id=hbWw>'+w+'</b>초 뒤에 해킹 창으로 돌아가요.</div>');
+   let left=w;const iv=setInterval(()=>{if(!C||C.phase!=='play'||C.mode!=='x'){clearInterval(iv);return;}left--;const e=$h('#hbWw');if(e)e.textContent=Math.max(0,left);if(left<=0){clearInterval(iv);renderHack();}},1000);}});}
+/* 방장이 알려준 가짜 아이디를 '삭제' 연출과 함께 지워요 */
+function hackElim(m){if(!C||!C.hkM||(+m.n|0)!==(+C.hkM.n|0))return;clearTimeout(C.hkTmo);
+ const i=+m.i,mm=C.hkM,live=C.mode==='hkw'||C.mode==='hkq'||C.mode==='hack';
+ if(i===-2){toast('⏳ 너무 빨라요! 조금 뒤에 다시 해킹해 주세요');if(live)renderHack();return;}
+ if(!(i>=0)||(C.hkElim||[]).includes(i)){if(live)renderHack('가짜 아이디가 더 없어요');return;}
+ if(!live){(C.hkElim=C.hkElim||[]).push(i);return;}
+ renderHack();const pb=$h('#hbP .pb'),btn=pb&&pb.querySelector('.ch[data-i="'+i+'"]');C.mode='hkfx';
+ try{sfx('crit');setTimeout(()=>{try{sfx('hit');}catch(e){}},500);}catch(e){}
+ if(btn){btn.classList.add('hkDel');const tg=document.createElement('span');tg.className='hkTag';tg.textContent='FAKE';btn.appendChild(tg);}
+ if(pb){const fx=document.createElement('div');fx.className='hkFx';fx.textContent='💥 가짜 아이디 삭제!';pb.insertBefore(fx,pb.children[1]||null);}
+ setTimeout(()=>{if(!C||C.hkM!==mm||C.phase!=='play'||C.mode!=='hkfx')return;(C.hkElim=C.hkElim||[]).push(i);renderHack('🧹 가짜 아이디를 지웠어요!');},reduceMo()?500:1150);}
 /* ---------- 해킹 성공 연출 (해킹한 사람): 매트릭스 비 + 터미널 + ACCESS GRANTED + 빼앗은 카드 수 ---------- */
 function hackWin(m){
  popx();showGo(0);
@@ -35080,7 +35159,7 @@ function hitWarn(m){
   if(C.me&&C.me.lock&&C.mode!=='mini')mini();
   else if(C.mode==='warn'){C.mode=null;redOff();next();}},reduceMo()?1800:2600);}
 function redOff(){const r=root&&root.querySelector('#hbRed');if(r){r.classList.add('out');setTimeout(()=>r.remove(),450);}}
-function showHkr(m){C.hkTok=0;C.mode='res';if(m.ok){hackWin(m);return;}pop('<h3 style="text-align:center;color:'+(m.ok?'#3f8':'#f88')+'">'+(m.ok?'💥 해킹 성공! '+esc(m.from)+' 님의 카드 '+(+m.k|0)+'장을 빼앗았어요!':'🚫 해킹 실패 — '+esc(m.why))+'</h3>');setTimeout(()=>{if(C&&C.mode==='res'){popx();next();}},2000);}
+function showHkr(m){C.hkTok=0;C.hkM=null;C.mode='res';if(m.ok){hackWin(m);return;}pop('<h3 style="text-align:center;color:'+(m.ok?'#3f8':'#f88')+'">'+(m.ok?'💥 해킹 성공! '+esc(m.from)+' 님의 카드 '+(+m.k|0)+'장을 빼앗았어요!':'🚫 해킹 실패 — '+esc(m.why))+'</h3>');setTimeout(()=>{if(C&&C.mode==='res'){popx();next();}},2000);}
 /* ---------- 상단 알림: 전설 채굴 / 해킹 성공 (모든 참가자 화면 맨 위에 잠깐 떠요) ---------- */
 /* 알림에는 방에서 쓰는 '닉네임'(p.name)만 써요. 해킹용 아이디(hid)는 절대 쓰지 않아요. */
 const jo=(w,a,b)=>{w=String(w||'');const ch=w.slice(-1),c=ch.charCodeAt(0);if(c>=0xAC00&&c<=0xD7A3)return (c-0xAC00)%28?a:b;if(/[0-9]/.test(ch))return '013678'.includes(ch)?a:b;if(/[aeiouyAEIOUY]/.test(ch))return b;return a;};
@@ -35096,27 +35175,92 @@ function hackNews(m){if(!m)return;const a=String(m.by||'트레이너').slice(0,8
 const MINI={
  color:{n:'컬러 코드 해독',f(box,ok){const N=8,S=Array(N).fill(0),tg=i=>[i,(i&3)?i-1:-1,(i&3)<3?i+1:-1,i<4?i+4:i-4].filter(x=>x>=0);const press=i=>tg(i).forEach(j=>S[j]^=1);for(let k=0;k<5;k++)press(rr(N));while(S.every(v=>v===S[0]))press(rr(N));
   box.innerHTML='<div>8개를 모두 같은 색으로! (누르면 주변 칸도 바뀌어요)</div><div class=mg style="grid-template-columns:repeat(4,1fr)">'+S.map((v,i)=>'<button data-i='+i+'></button>').join('')+'</div>';const bs=[...box.querySelectorAll('button')];const dr=()=>bs.forEach((b,i)=>{b.className=S[i]?'on1':'';});dr();bs.forEach((b,i)=>b.onclick=()=>{press(i);dr();if(S.every(v=>v===S[0]))ok();});}},
- memory:{n:'기억력 카드',f(box,ok){const E='🔥💧🌿⚡❄️👻'.match(/.[\uFE0F]?/gu),d=[...E,...E].sort(()=>Math.random()-.5);let open=[],done=0,lock=0;box.innerHTML='<div>같은 그림 짝을 모두 찾으세요</div><div class=mg style="grid-template-columns:repeat(4,1fr)">'+d.map((e,i)=>'<button data-i='+i+'>?</button>').join('')+'</div>';const bs=[...box.querySelectorAll('button')];
-  bs.forEach((b,i)=>b.onclick=()=>{if(lock||b.classList.contains('ok')||open.includes(i))return;b.textContent=d[i];open.push(i);if(open.length===2){const[a,c]=open;if(d[a]===d[c]){bs[a].classList.add('ok');bs[c].classList.add('ok');open=[];if(++done===6)ok();}else{lock=1;setTimeout(()=>{bs[a].textContent='?';bs[c].textContent='?';open=[];lock=0;},700);}}});}},
+ memory:{n:'기억력 카드',f(box,ok){const E='🔥💧🌿⚡'.match(/.[\uFE0F]?/gu),d=[...E,...E].sort(()=>Math.random()-.5);let open=[],done=0,lock=0;box.innerHTML='<div>같은 그림 짝을 모두 찾으세요</div><div class=mg style="grid-template-columns:repeat(4,1fr)">'+d.map((e,i)=>'<button data-i='+i+'>?</button>').join('')+'</div>';const bs=[...box.querySelectorAll('button')];
+  bs.forEach((b,i)=>b.onclick=()=>{if(lock||b.classList.contains('ok')||open.includes(i))return;b.textContent=d[i];open.push(i);if(open.length===2){const[a,c]=open;if(d[a]===d[c]){bs[a].classList.add('ok');bs[c].classList.add('ok');open=[];if(++done===4)ok();}else{lock=1;setTimeout(()=>{bs[a].textContent='?';bs[c].textContent='?';open=[];lock=0;},700);}}});}},
  order:{n:'데이터 순서 복구',f(box,ok){const a=[1,2,3,4,5,6,7,8].sort(()=>Math.random()-.5);let nx=1;box.innerHTML='<div>1부터 8까지 순서대로 누르세요</div><div class=mg style="grid-template-columns:repeat(4,1fr)">'+a.map(v=>'<button data-v='+v+'>'+v+'</button>').join('')+'</div>';box.querySelectorAll('button').forEach(b=>b.onclick=()=>{if(+b.dataset.v===nx){b.classList.add('ok');if(++nx>8)ok();}else{box.querySelectorAll('button').forEach(x=>x.classList.remove('ok'));nx=1;b.classList.add('shk');}});}},
- code:{n:'숫자 암호 해독',f(box,ok){const d='0123456789'.split('').sort(()=>Math.random()-.5).slice(0,3).join('');let left=8;box.innerHTML='<div>서로 다른 숫자 3자리 비밀번호를 찾으세요 (S=숫자·자리 일치, B=숫자만 일치)</div><div style="text-align:center"><input id=hbCg maxlength=3 inputmode=numeric> <button class="b g" id=hbCb>입력</button></div><div id=hbCl></div><div id=hbCn>남은 기회 8</div>';
-  $h('#hbCb').onclick=()=>{const v=$h('#hbCg').value.trim();if(!/^\d{3}$/.test(v)||new Set(v).size<3){toast('서로 다른 숫자 3자리를 넣어 주세요');return;}let s=0,bl=0;for(let i=0;i<3;i++){if(v[i]===d[i])s++;else if(d.includes(v[i]))bl++;}
-   $h('#hbCl').insertAdjacentHTML('afterbegin','<div>'+v+' → <b>'+s+'S '+bl+'B</b></div>');if(s===3)return ok();left--;$h('#hbCn').textContent='남은 기회 '+left;$h('#hbCg').value='';if(left<=0){toast('암호가 바뀌었어요! 다시!');MINI.code.f(box,ok);}};}},
- circuit:{n:'회로 연결',f(box,ok){const CH={1:'╵',2:'╶',4:'╷',8:'╴',3:'└',6:'┌',12:'┐',9:'┘',5:'│',10:'─'},rot=m=>((m<<1)|(m>>3))&15,D=[[0,1,2,8],[1,0,4,1]];
-  let path=[[0,0]];let r=0,c=0;while(r<2||c<2){if(r<2&&(c>=2||Math.random()<.5))r++;else c++;path.push([r,c]);}
+ code:{n:'숫자 암호 해독',f(box,ok){let d;do{d=String(10+rr(90));}while(d[0]===d[1]);
+  const T=(c,ch,lb)=>'<span style="display:inline-block;text-align:center;margin:0 4px;vertical-align:top"><span style="display:block;width:54px;height:62px;line-height:62px;border-radius:10px;font-size:36px;font-weight:bold;color:'+(c==='y'?'#222':'#fff')+';background:'+({g:'#1fae52',y:'#f3c316',x:'#5b6470'}[c])+';border:3px solid '+({g:'#8fffb4',y:'#fff1a0',x:'#aab'}[c])+'">'+ch+'</span><span style="display:block;font-size:13px;margin-top:2px;color:'+({g:'#8fffb4',y:'#ffe066',x:'#ccd'}[c])+'">'+lb+'</span></span>';
+  box.innerHTML='<div style="font-size:17px;line-height:1.5">🔢 <b>두 자리 숫자</b>를 맞혀 보세요! <small>(두 숫자는 서로 달라요 · 예: 47)</small></div>'
+   +'<div style="margin:8px 0;padding:6px;border:1px dashed #0a8;border-radius:8px;font-size:14px">색깔로 알려 줘요!<br>'+T('g','7','딱 맞아요!')+T('y','4','자리만 달라요')+T('x','9','없는 숫자')+'</div>'
+   +'<div style="text-align:center"><input id=hbCg maxlength=2 inputmode=numeric placeholder="00" style="width:100px;font-size:34px;padding:6px"> <button class="b g" id=hbCb style="font-size:22px;padding:10px 18px">확인</button></div>'
+   +'<div id=hbCl></div><div id=hbCn style="font-size:16px;margin-top:6px">♾ 기회는 무제한! 맞힐 때까지 도전해요</div>';
+  const go=()=>{const v=$h('#hbCg').value.trim();if(!/^\d{2}$/.test(v)||v[0]===v[1]){toast('서로 다른 숫자 두 개를 넣어 주세요 (예: 47)');return;}
+   const ts=[0,1].map(i=>v[i]===d[i]?T('g',v[i],'딱 맞아요!'):d.includes(v[i])?T('y',v[i],'자리만 달라요'):T('x',v[i],'없는 숫자'));
+   const win=v===d;
+   $h('#hbCl').insertAdjacentHTML('afterbegin','<div style="margin:8px 0;padding:6px;border-radius:10px;background:rgba(0,40,40,.55);text-align:center">'+ts.join('')+'</div>');
+   if(win)return ok();$h('#hbCg').value='';$h('#hbCg').focus();};
+  $h('#hbCb').onclick=go;$h('#hbCg').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go();}});}},
+ circuit:{n:'회로 연결',f(box,ok){const rot=m=>((m<<1)|(m>>3))&15,D=[[0,1,2,8],[1,0,4,1]];
+  let path=[[0,0]];let r=0,c=0;while(r<3||c<3){if(r<3&&(c>=3||Math.random()<.5))r++;else c++;path.push([r,c]);}
   const sol={},cur={};path.forEach(([r,c],i)=>{const pv=i?path[i-1]:null,nx=i<path.length-1?path[i+1]:null;let m=0;const add=o=>{if(!o)return;if(o[0]<r)m|=1;else if(o[0]>r)m|=4;else if(o[1]>c)m|=2;else m|=8;};if(pv)add(pv);else m|=8;if(nx)add(nx);else m|=2;sol[r+','+c]=m;});
-  const keys=Object.keys(sol);do{keys.forEach(k=>{let m=sol[k],n=rr(4);while(n--)m=rot(m);cur[k]=m;});}while(keys.every(k=>cur[k]===sol[k]));
-  box.innerHTML='<div>⚡ 왼쪽 위 → 오른쪽 아래로 전류가 흐르게 칸을 눌러 돌리세요</div><div class=mg style="grid-template-columns:repeat(3,1fr)">'+[0,1,2].flatMap(r=>[0,1,2].map(c=>'<button data-k='+r+','+c+'></button>')).join('')+'</div>';
-  const bs=[...box.querySelectorAll('button')],dr=()=>bs.forEach(b=>{const k=b.dataset.k;b.textContent=sol[k]?CH[cur[k]]:'·';b.style.fontSize='34px';b.className=sol[k]&&cur[k]===sol[k]?'ok':'';});dr();
-  bs.forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(!sol[k])return;cur[k]=rot(cur[k]);dr();if(keys.every(q=>cur[q]===sol[q]))ok();});}},
- virus:{n:'디지털 바이러스 제거',f(box,ok){let sc=0,at=-1,t0=now();const G=16;box.innerHTML='<div>🦠 바이러스를 눌러 8점! (잘못 누르면 -1, 20초 안에)</div><div id=hbVs>0/8</div><div class=mg style="grid-template-columns:repeat(4,1fr)">'+Array.from({length:G},(_,i)=>'<button data-i='+i+'></button>').join('')+'</div>';
-  const bs=[...box.querySelectorAll('button')],show=()=>{bs.forEach(b=>{b.textContent='';b.className='';});at=rr(G);bs[at].textContent='🦠';};show();
-  bs.forEach((b,i)=>b.onclick=()=>{if(i===at){sc++;}else{sc=Math.max(0,sc-1);b.classList.add('shk');}box.querySelector('#hbVs').textContent=sc+'/8';if(sc>=8){clearInterval(tm);return ok();}if(i===at)show();});
-  const tm=setInterval(()=>{if(!document.body.contains(box)){clearInterval(tm);return;}if(now()-t0>20000){t0=now();sc=0;box.querySelector('#hbVs').textContent='0/8 (다시!)';}show();},900);}},
- reaction:{n:'반응 속도 테스트',f(box,ok){const SY=['🔴','🟢','🔵','🟡','🟣','⚪'];let sc=0,tg=pk(SY);box.innerHTML='<div>눌러야 할 신호: <b id=hbTg style="font-size:28px"></b> 를 8번! (틀리면 -1)</div><div id=hbRs>0/8</div><div class=mg style="grid-template-columns:repeat(3,1fr)">'+SY.map((_,i)=>'<button data-i='+i+'></button>').join('')+'</div>';
-  const bs=[...box.querySelectorAll('button')];let lay=[];const shuf=()=>{lay=[...SY].sort(()=>Math.random()-.5);bs.forEach((b,i)=>b.textContent=lay[i]);if(Math.random()<.4)tg=pk(SY);box.querySelector('#hbTg').textContent=tg;};shuf();
-  bs.forEach((b,i)=>b.onclick=()=>{if(lay[i]===tg){sc++;shuf();}else{sc=Math.max(0,sc-1);b.classList.add('shk');}box.querySelector('#hbRs').textContent=sc+'/8';if(sc>=8){clearInterval(tm);ok();}});
-  const tm=setInterval(()=>{if(!document.body.contains(box)){clearInterval(tm);return;}shuf();},1400);}},
+  const keys=Object.keys(sol),OPP={1:4,2:8,4:1,8:2};
+  /* 가짜 전선: 길이 아닌 칸에도 전선 조각을 섞어 놔요 (돌릴 수는 있지만 건전지에서 이어지는 길만 중요해요) */
+  for(let r=0;r<4;r++)for(let c=0;c<4;c++){const k=r+','+c;if(!sol[k]&&Math.random()<.65){let m=pk([5,3]),n=rr(4);while(n--)m=rot(m);cur[k]=m;}}
+  /* 전기가 건전지(왼쪽 위)에서 출발해 이어진 전선을 따라가 봐요. 이어진 칸은 노랗게 빛나고, 전구까지 닿으면 성공! */
+  const trace=()=>{const lit=[];let y=0,x=0,from=8,win=false;for(let g=0;g<20;g++){const m=cur[y+','+x];if(m==null||!(m&from))break;lit.push(y+','+x);const out=m&~from;if(y===3&&x===3&&out===2){win=true;break;}if(out===1)y--;else if(out===2)x++;else if(out===4)y++;else if(out===8)x--;else break;from=OPP[out];if(y<0||x<0||y>3||x>3)break;}return{lit,win};};
+  do{keys.forEach(k=>{let m=sol[k],n=rr(4);while(n--)m=rot(m);cur[k]=m;});}while(trace().win);
+  const wire=(m,lit)=>{const col=lit?'#ffe14d':'#7b8da4';let l='';[[1,50,0],[2,100,50],[4,50,100],[8,0,50]].forEach(([b,x,y])=>{if(m&b)l+='<line x1=50 y1=50 x2='+x+' y2='+y+' />';});
+   return '<svg viewBox="0 0 100 100" width="100%" height="100%" style="display:block'+(lit?';filter:drop-shadow(0 0 5px #fd2)':'')+'"><g stroke="'+col+'" stroke-width="20" fill="'+col+'">'+l+'<circle cx="50" cy="50" r="10" stroke="none"/></g></svg>';};
+  const CS='clamp(54px,16vw,72px)';
+  box.innerHTML='<div style="font-size:17px;line-height:1.55">⚡ <b>🔋 건전지</b>에서 <b>💡 전구</b>까지 전선을 이어 주세요!</div>'
+   +'<div style="font-size:14px;color:#8fd;margin:4px 0 8px;line-height:1.5">① 칸을 <b>누르면 전선이 빙글 돌아가요</b> (👆 시계 방향)<br>② 전기가 닿은 전선은 <b style="color:#ffe14d">노란색</b>으로 빛나요<br>③ 노란색이 💡 전구까지 가면 성공!<br>④ 길과 상관없는 <b>가짜 전선</b>도 섞여 있어요. 🔋에서 이어지는 길만 보세요!</div>'
+   +'<div style="display:flex;justify-content:center;align-items:stretch;gap:4px"><div style="display:flex;align-items:flex-start;font-size:30px;padding-top:calc('+CS+'/2 - 18px)">🔋</div>'
+   +'<div id=hbCk style="display:grid;grid-template-columns:repeat(4,'+CS+');grid-auto-rows:'+CS+';border:2px solid #0a8;border-radius:8px;overflow:hidden;background:#021a14">'+[0,1,2,3].flatMap(r=>[0,1,2,3].map(c=>'<button data-k='+r+','+c+' style="padding:0;margin:0;border:1px solid #0a4a44;border-radius:0;background:'+(cur[r+','+c]!=null?'#0b2f3c':'#020d0b')+';min-height:0"></button>')).join('')+'</div>'
+   +'<div id=hbCb2 style="display:flex;align-items:flex-end;font-size:30px;padding-bottom:calc('+CS+'/2 - 18px);filter:grayscale(1) brightness(.7);transition:filter .3s">💡</div></div>'
+   +'<div id=hbCs style="text-align:center;font-size:16px;margin-top:8px;min-height:1.6em"></div>';
+  const bs=[...box.querySelectorAll('#hbCk button')];let done=false;
+  const dr=()=>{const t=trace(),L=new Set(t.lit);bs.forEach(b=>{const k=b.dataset.k;b.innerHTML=cur[k]!=null?wire(cur[k],L.has(k)):'<span style="opacity:.25;font-size:12px">빈칸</span>';});
+   const st=box.querySelector('#hbCs'),bu=box.querySelector('#hbCb2');
+   if(t.win){done=true;bu.style.filter='drop-shadow(0 0 14px #ffe14d) brightness(1.3)';st.innerHTML='<b style="color:#ffe14d;font-size:20px">🎉 전구에 불이 켜졌어요!</b>';setTimeout(ok,900);}
+   else st.innerHTML=t.lit.length?'⚡ 전기가 <b style="color:#ffe14d">'+t.lit.length+'칸</b>까지 왔어요! 계속 이어 보세요':'🔌 건전지 옆 첫 칸부터 돌려서 이어 보세요';};
+  bs.forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(done||cur[k]==null)return;cur[k]=rot(cur[k]);dr();});dr();}},
+ virus:{n:'디지털 바이러스 제거',f(box,ok){const G=16,NEED=5;let sc=0,at=-1,t0=now(),tk=0,done=false;
+  let sp='';for(let k=0;k<8;k++){const a=k*Math.PI/4,c=Math.cos(a),n=Math.sin(a);sp+='<line x1='+(50+27*c).toFixed(1)+' y1='+(50+27*n).toFixed(1)+' x2='+(50+36*c).toFixed(1)+' y2='+(50+36*n).toFixed(1)+' /><circle cx='+(50+38*c).toFixed(1)+' cy='+(50+38*n).toFixed(1)+' r=6 />';}
+  /* 화난 얼굴의 초록 바이러스 (그림이라 어떤 기기에서도 똑같이 보여요) */
+  const VIR='<svg class=vir viewBox="0 0 100 100"><g fill="#4be05f" stroke="#0b5a1f" stroke-width="4" stroke-linecap="round">'+sp+'<circle cx=50 cy=50 r=27 /></g><g stroke="#0b5a1f" stroke-width="3.5" stroke-linecap="round" fill="none"><path d="M33 36 L45 42"/><path d="M67 36 L55 42"/><path d="M39 64 Q50 56 61 64"/></g><circle cx=41 cy=49 r=7 fill="#fff"/><circle cx=59 cy=49 r=7 fill="#fff"/><circle cx=42 cy=50 r=3.5 fill="#111"/><circle cx=58 cy=50 r=3.5 fill="#111"/></svg>';
+  box.innerHTML='<div style="font-size:17px;line-height:1.55">🧼 <b style="color:#6f6">초록 바이러스</b>가 나타나면 <b>콕! 눌러서</b> 없애요!</div>'
+   +'<div style="font-size:14px;color:#8fd;margin:2px 0 6px">바이러스가 없는 칸을 누르면 점수가 1점 줄어요 · 5마리를 잡으면 성공!</div>'
+   +'<div id=hbVp style="display:flex;justify-content:center;gap:8px;margin:6px 0"></div>'
+   +'<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#8fd">⏱ 남은 시간<span style="flex:1;height:10px;background:#0a2a2a;border:1px solid #0a8;border-radius:6px;overflow:hidden"><i id=hbVt style="display:block;height:100%;width:100%;background:#4f8"></i></span></div>'
+   +'<div class=mg style="grid-template-columns:repeat(4,1fr);gap:6px;max-width:340px">'+Array.from({length:G},(_,i)=>'<button data-i='+i+'></button>').join('')+'</div>'
+   +'<div id=hbVm style="text-align:center;font-size:17px;min-height:1.8em"></div>';
+  const bs=[...box.querySelectorAll('.mg button')],q=id=>box.querySelector(id);
+  const base=b=>{b.style.cssText='padding:3px;aspect-ratio:1/1;min-height:0;background:radial-gradient(circle,#0e3b3b,#041a1a);border:2px solid #0a6;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-direction:column;line-height:1.1';b.innerHTML='';};
+  bs.forEach(base);
+  const dots=()=>{q('#hbVp').innerHTML=Array.from({length:NEED},(_,i)=>'<span style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;'+(i<sc?'background:#2fc65a;color:#fff;border:2px solid #9fffb4;box-shadow:0 0 8px #3f8':'background:#0a2a2a;color:#4a7;border:2px dashed #3a7')+'">'+(i<sc?'✓':'')+'</span>').join('')+'<b style="align-self:center;margin-left:6px;font-size:18px">'+sc+' / '+NEED+'</b>';};
+  const msg=(h,c)=>{const m=q('#hbVm');if(m){m.innerHTML=h;m.style.color=c||'#cfe';}};
+  const show=()=>{bs.forEach(b=>{if(!b._f)base(b);});let n;do{n=rr(G);}while(n===at);at=n;const b=bs[at];b._f=0;base(b);b.innerHTML=VIR;b.style.borderColor='#ffe14d';b.style.boxShadow='0 0 14px #ffe14d99';};
+  const flash=(b,h,bg,ms)=>{base(b);b._f=1;b.style.background=bg;b.innerHTML=h;setTimeout(()=>{if(b._f){b._f=0;base(b);}},ms);};
+  bs.forEach((b,i)=>b.onclick=()=>{if(done)return;
+   if(i===at){sc++;dots();flash(b,'<span style="font-size:36px">💥</span><b style="color:#ffe14d;font-size:16px">퍽!</b>','radial-gradient(circle,#7a5a00,#2a1a00)',380);
+    if(sc>=NEED){done=true;clearInterval(tm);msg('🎉 바이러스를 모두 없앴어요!','#6f6');setTimeout(ok,650);return;}
+    msg('💥 잡았다! 계속 잡아요!','#ffe14d');show();}
+   else{sc=Math.max(0,sc-1);dots();b.classList.add('shk');flash(b,'<span style="font-size:32px">❌</span><b style="color:#f88;font-size:15px">앗!</b>','#4a1010',450);msg('앗! 바이러스가 있는 칸을 눌러요 (-1점)','#f88');}});
+  const tm=setInterval(()=>{if(!document.body.contains(box)){clearInterval(tm);return;}if(done)return;tk++;
+   const el=now()-t0,left=Math.max(0,1-el/20000),bar=q('#hbVt');if(bar){bar.style.width=(left*100)+'%';bar.style.background=left<.25?'#f55':'#4f8';}
+   if(el>20000){t0=now();sc=0;dots();msg('⏰ 시간이 지났어요! 처음부터 다시!','#fd6');}
+   if(tk%9===0)show();},100);
+  dots();msg('👆 눈에 불을 켠 초록 바이러스를 찾아요!');show();}},
+ reaction:{n:'반응 속도 테스트',f(box,ok){const SY=[['빨강','#e53935','#fff'],['초록','#2ea043','#fff'],['파랑','#1e6fe0','#fff'],['노랑','#f6c90e','#222'],['보라','#8e44ad','#fff'],['하양','#f4f4f4','#222'],['주황','#fb8c00','#222'],['분홍','#ff7ab0','#222']],NEED=5,EVERY=14;
+  let sc=0,tg=pk(SY),lay=[],tk=0,done=false;
+  box.innerHTML='<div style="font-size:17px;line-height:1.55">👀 <b>이 색깔</b>의 버튼을 빨리 눌러요!</div>'
+   +'<div style="font-size:14px;color:#8fd;margin:2px 0 6px">버튼 색깔이 계속 바뀌어요 · 다른 색을 누르면 -1점 · 5번 맞히면 성공!</div>'
+   +'<div id=hbRt style="display:flex;align-items:center;justify-content:center;gap:12px;margin:6px auto;padding:8px 14px;max-width:300px;border:2px dashed #fd6;border-radius:14px;background:#10201f"><span style="font-size:15px;color:#fd6">누를 색 ▶</span><span id=hbRc style="width:58px;height:58px;border-radius:50%;border:4px solid #fff;box-shadow:0 0 12px #fff8"></span><b id=hbRn style="font-size:28px"></b></div>'
+   +'<div id=hbRp style="display:flex;justify-content:center;gap:8px;margin:6px 0"></div>'
+   +'<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#8fd">🔀 색이 바뀌기까지<span style="flex:1;height:10px;background:#0a2a2a;border:1px solid #0a8;border-radius:6px;overflow:hidden"><i id=hbRb style="display:block;height:100%;width:100%;background:#4af"></i></span></div>'
+   +'<div class=mg style="grid-template-columns:repeat(4,1fr);gap:6px;max-width:340px">'+SY.map((_,i)=>'<button data-i='+i+'></button>').join('')+'</div>'
+   +'<div id=hbRm style="text-align:center;font-size:17px;min-height:1.8em"></div>';
+  const bs=[...box.querySelectorAll('.mg button')],q=id=>box.querySelector(id);
+  const msg=(h,c)=>{const m=q('#hbRm');if(m){m.innerHTML=h;m.style.color=c||'#cfe';}};
+  const dots=()=>{q('#hbRp').innerHTML=Array.from({length:NEED},(_,i)=>'<span style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;'+(i<sc?'background:#2fc65a;color:#fff;border:2px solid #9fffb4;box-shadow:0 0 8px #3f8':'background:#0a2a2a;color:#4a7;border:2px dashed #3a7')+'">'+(i<sc?'✓':'')+'</span>').join('')+'<b style="align-self:center;margin-left:6px;font-size:18px">'+sc+' / '+NEED+'</b>';};
+  const paintT=()=>{const c=q('#hbRc'),n=q('#hbRn');if(c)c.style.background=tg[1];if(n){n.textContent=tg[0];n.style.color=tg[1]==='#f4f4f4'?'#fff':tg[1]==='#8e44ad'?'#d9a6ff':tg[1]==='#1e6fe0'?'#7db4ff':tg[1];n.style.textShadow='0 0 6px #000';}};
+  const shuf=(chg)=>{lay=[...SY].sort(()=>Math.random()-.5);bs.forEach((b,i)=>{const c=lay[i];b.className='';b.style.cssText='min-height:76px;border-radius:16px;border:3px solid #fff;background:'+c[1]+';color:'+c[2]+';font-size:18px;font-weight:bold;padding:0;box-shadow:0 3px 0 #0006;text-shadow:'+(c[2]==='#fff'?'0 1px 2px #0008':'none');b.textContent=c[0];});
+   if(chg){const old=tg;tg=pk(SY);if(tg!==old)msg('🔔 새 신호! <b>'+tg[0]+'</b>'+jo(tg[0],'을','를')+' 눌러요','#fd6');}paintT();tk=0;};
+  bs.forEach((b,i)=>b.onclick=()=>{if(done)return;
+   if(lay[i]===tg){sc++;dots();if(sc>=NEED){done=true;clearInterval(tm);msg('🎉 반응이 정말 빨라요!','#6f6');setTimeout(ok,650);return;}msg('⭕ 좋아요! 다음 신호!','#6f6');shuf(Math.random()<.4);}
+   else{sc=Math.max(0,sc-1);dots();b.classList.add('shk');b.style.outline='4px solid #f33';setTimeout(()=>{b.style.outline='';},400);msg('❌ 앗! <b>'+tg[0]+'</b> 버튼을 눌러요 (-1점)','#f88');}});
+  const tm=setInterval(()=>{if(!document.body.contains(box)){clearInterval(tm);return;}if(done)return;tk++;const bar=q('#hbRb');if(bar)bar.style.width=Math.max(0,100-tk/EVERY*100)+'%';if(tk>=EVERY)shuf(Math.random()<.4);},100);
+  dots();shuf(false);msg('👆 위에 나온 색깔과 같은 버튼을 눌러요!');}},
  laser:{n:'레이저 보안망 탈출',f(box,ok){const W=5,Hh=7,LR=[1,3,5];let x=2,y=6;box.innerHTML='<div>🟢 맨 위(🏁)까지 이동! 켜진 레이저(🟥)에 닿으면 처음으로 돌아가요</div><div id=hbLg class=mg style="grid-template-columns:repeat(5,1fr);gap:2px"></div><div style="text-align:center"><button class=b data-d=u>⬆</button><br><button class=b data-d=l>⬅</button><button class=b data-d=d>⬇</button><button class=b data-d=r>➡</button></div>';
   const on=(r,t)=>Math.floor((t+LR.indexOf(r)*500)/700)%2===0,g=box.querySelector('#hbLg');
   const dr=()=>{const t=now();let h='';for(let r=0;r<Hh;r++)for(let c=0;c<W;c++){const hit=LR.includes(r)&&on(r,t);h+='<div style="min-height:34px;border-radius:5px;text-align:center;line-height:34px;font-size:22px;background:'+(hit?'#a22':'#052')+'">'+(r===y&&c===x?'🟢':r===0?'🏁':'')+'</div>';}g.innerHTML=h;if(LR.includes(y)&&on(y,t)){x=2;y=6;}};
@@ -35179,13 +35323,14 @@ function paintMenu(){let sv={};try{sv=JSON.parse(localStorage.getItem('zhb_sv')|
  +'<label class=dr><span>방 번호<small>ROOM</small></span><input id=hbCd maxlength=4 inputmode=numeric value="'+cdv+'" placeholder="4자리" autocomplete=off></label>'
  +'<label class=dr><span>재접속 번호<small>REJOIN</small></span><input id=hbRc maxlength=4 inputmode=numeric value="'+rcv+'" placeholder="끊겼을 때만" autocomplete=off></label>'
  +'<button class="dbt j" data-x=join>▷ 참가하기</button>'
+ +'<button class="dbt" data-x=prac style="border-color:#fd2;color:#fd6">🛠 해킹 복구 연습</button><div id=hbPr></div>'
  +'<div id=hbSt class=dosSt></div>'
  +'<button class="dbt q" data-x=quit>✖ 닫기</button>'
  +'</div></div><div id=hbP class=pop></div></div>';
  root.onclick=e=>{const x=e.target.dataset&&e.target.dataset.x;if(!x)return;const nm=($h('#hbNm')||{}).value||'트레이너';
-  if(x==='quit')return quit();C.name=nm;if(x==='host'){stat('방을 여는 중…');hostOpen(nm);}
+  if(x==='quit')return quit();if(x==='prac'){if(!(pracBox()&&pracBox().dataset.on))pracMenu();return;}C.name=nm;if(x==='host'){stat('방을 여는 중…');hostOpen(nm);}
   if(x==='join'){const c=$h('#hbCd').value.trim(),r=$h('#hbRc').value.trim();if(!/^\d{4}$/.test(c))return stat('방 번호 4자리를 넣어 주세요');C.rc=r||null;joinGame(c,r||'',nm);}};
- const bx=$h('#hbBoot'),fm=$h('#hbForm');
+ const bx=$h('#hbBoot'),fm=$h('#hbForm');$h('#hbPr').addEventListener('click',pracClick);
  fm.querySelectorAll('input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key!=='Enter')return;e.preventDefault();if(i.id==='hbNm'){const n=$h('#hbCd');if(n)n.focus();}else{const j=fm.querySelector('[data-x=join]');if(j)j.click();}}));
  $h('.dos').addEventListener('pointerdown',()=>{if(bx._skip)bx._skip();});
  bootType(bx,bootSeen?BOOT_QUICK:BOOT_FULL,bootSeen?5:2,()=>{bootSeen=true;fm.classList.add('show');});
@@ -35201,7 +35346,18 @@ function paintPick(){root.className='on';
  root.onclick=e=>{const x=e.target.dataset&&e.target.dataset.x;if(!x)return;if(x==='quit')return quit();
   if(x==='pid'&&!C.hidPick){const v=String(e.target.dataset.v||'');if(!C.cand.includes(v))return;C.hidPick=v;C.hid=esc(v);draw();pickInfo();tx({t:'idp',v});}};
  clearInterval(C.pkT);C.pkT=setInterval(()=>{if(!C||C.phase!=='pick'||!$h('#hbIt')){clearInterval(C&&C.pkT);return;}pickInfo();},500);}
+/* ---------- 대기실 해킹 복구 연습: 친구를 기다리는 동안 8종 미니게임을 연습해요 (게임이 시작되면 화면이 바뀌며 자동으로 끝나요) ---------- */
+const PRAC_KEYS=['color','memory','order','code','circuit','virus','reaction','laser'];
+function pracBox(){return root&&root.querySelector('#hbPr');}
+function pracMenu(){const b=pracBox();if(!b)return;b.dataset.on=1;
+ b.innerHTML='<div class=dsep>🛠 해킹 복구 연습 — 하고 싶은 게임을 고르세요</div><div class=dnote>방장이 게임을 시작하면 연습은 자동으로 끝나고 바로 시작해요!</div><div class=durs style="flex-wrap:wrap">'+PRAC_KEYS.filter(k=>MINI[k]).map(k=>'<button class=dbt data-pg="'+k+'">'+MINI[k].n+'</button>').join('')+'</div><button class="dbt q" data-pg=close>✖ 연습 닫기</button>';}
+function pracRun(k){const b=pracBox();if(!b||!MINI[k])return;b.dataset.on=1;
+ b.innerHTML='<div class=dsep>🛠 연습: '+MINI[k].n+'</div><div id=hbMg style="padding:4px 0"></div><div class=durs style="flex-wrap:wrap"><button class=dbt data-pg="'+k+'">↻ 처음부터</button><button class=dbt data-pg=menu>◀ 다른 게임</button><button class="dbt q" data-pg=close>✖ 연습 닫기</button></div>';
+ MINI[k].f(b.querySelector('#hbMg'),()=>{const g=b.querySelector('#hbMg');if(!g)return;g.innerHTML='<div style="text-align:center;font-size:24px;color:#3f8;padding:14px 0">🎉 복구 성공! 잘했어요!</div>';try{sfx('win');}catch(e){}});}
+function pracClick(e){const x=e.target.closest&&e.target.closest('[data-pg]');if(!x||!pracBox()||!pracBox().contains(x))return;const k=x.dataset.pg;
+ if(k==='close'){const b=pracBox();b.innerHTML='';delete b.dataset.on;}else if(k==='menu')pracMenu();else pracRun(k);}
 function paintLobby(){const host=C.role==='host',first=!C.lobTyped;C.lobTyped=1;const pl=C.pl||[];
+ const keepPr=pracBox();const prOn=keepPr&&keepPr.dataset.on?keepPr:null;if(prOn)prOn.remove();   // 연습 중이면 화면이 갱신돼도 그대로 유지해요
  root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\ZASAMON\\LOBBY.EXE</b></div><div class=dosP>'
  +'<div class="dl ttl s" id=hbTt></div>'
  +'<div class=dkv><span>ROOM</span><b class=big>'+C.code+'</b></div>'
@@ -35211,13 +35367,15 @@ function paintLobby(){const host=C.role==='host',first=!C.lobTyped;C.lobTyped=1;
  +'<div class=dsep>참가자 '+pl.length+'명</div><div class=ptags>'+pl.map(p=>'<span class="ptag'+(p.a?' away':'')+'">'+esc(p.n)+(p.a?' (자리비움)':'')+'</span>').join('')+'</div>'
  +(host?'<div class=dsep>게임 시간</div><div class=durs>'+CFG.DURS.map(d=>'<button class="dbt'+(C.dur===d?' sel':'')+'" data-x=d'+d+'>'+d+'분</button>').join('')+'</div><button class="dbt" data-x=st>▶ 게임 시작 (2명 이상)</button>':'<div class=dnote style="font-size:14px;color:#8fd">방장이 시작하길 기다려요… ('+(C.dur||5)+'분 게임)<i class=cur></i></div>')
  +'<div class=dnote>🎁 보상: 참가자 '+CFG.REWARD_MIN_P+'명 이상 · 내 점수 '+CFG.REWARD_MIN_SCORE+'점 이상이면 ★1~2 포켓몬 1마리 · 1·2·3등은 5·4·3성 조각 추가 · 🎯 정답률 1위('+CFG.ACC_MIN_Q+'문제 이상 푼 사람)도 5성 조각 추가</div>'
+ +'<button class="dbt" data-x=prac style="border-color:#fd2;color:#fd6">🛠 해킹 복구 연습 (기다리는 동안 해 보세요)</button><div id=hbPr class=dosP></div>'
  +'<div id=hbSt class=dosSt></div><button class="dbt q" data-x=quit>✖ 나가기</button></div></div><div id=hbP class=pop></div></div>';
+ if(prOn){const n=$h('#hbPr');if(n)n.replaceWith(prOn);}else{const n=$h('#hbPr');if(n)n.addEventListener('click',pracClick);}
  tline($h('#hbTt'),'> 대기실 접속 완료',first?2:0);
- root.onclick=e=>{const x=e.target.dataset&&e.target.dataset.x;if(!x)return;if(x==='quit')return quit();if(x==='st')tx({t:'st'});if(/^d\d+$/.test(x))tx({t:'dur',v:+x.slice(1)});};}
+ root.onclick=e=>{const x=e.target.dataset&&e.target.dataset.x;if(!x)return;if(x==='quit')return quit();if(x==='prac'){if(pracBox()&&pracBox().dataset.on)return;pracMenu();return;}if(x==='st')tx({t:'st'});if(/^d\d+$/.test(x))tx({t:'dur',v:+x.slice(1)});};}
 function paintPlay(){root.className='on';root.innerHTML='<div class=w><div class="dosH dosHs">'+DOTS+'<b>C:\\ZASAMON\\HACK.EXE — LIVE</b></div><div class="box top"><div>⏱ <b id=hbT>--:--</b></div><div>🃏 <b id=hbN>0</b>장 · ⭐ <b id=hbS>0</b>점</div><div id=hbB></div><button class=b data-x=key>🔑 내 번호</button></div><div id=hbW></div><div class=box><b id=hbRh class=bh>▌RANK ▸ 실시간 순위</b><div class=rk id=hbR style="margin-top:6px">집계 중…</div></div><div class=box><b id=hbDh class=bh>▌DEX ▸ 내 도감</b><div class=dex id=hbD style="margin-top:6px"></div></div><div id=hbSt class=dosSt></div><div id=hbP class=pop></div><div id=hbGo class=gobar><button class="b g" data-x=go>🔓 해킹하기 · 문제 풀기</button></div></div>';
  root.onclick=e=>{const d=e.target.dataset||{};if(d.x==='go'){if(C.mode==='closed'){C.mode=null;showGo(0);question();}return;}if(d.x==='key'||d.k){const v=d.k?e.target.parentNode.querySelector('.hbKv'):$h('#hbSt');if(v)v.textContent=v.textContent?'':'재접속 번호 '+C.rc+' · 해킹 아이디 '+C.hid+' · 방 '+C.code+' (남에게 보여 주지 마세요)';}};
  clearInterval(uiT);uiT=setInterval(tick,250);paintMe();paintTop();}
-function tick(){if(C.phase!=='play')return;syncPad();const l=C.end-now();const t=$h('#hbT');if(t){t.textContent=fmt2(l);}const on=l<=CFG.LAST30_MS&&l>0;root.classList.toggle('l30',on);const w=$h('#hbW');if(w)w.innerHTML=on?'<div class=warn>🚨 마지막 30초! 카드 획득 확률 UP · 남은 '+Math.ceil(l/1000)+'초</div>':'';
+function tick(){if(C.phase!=='play')return;syncPad();const l=C.end-now();const t=$h('#hbT');if(t){t.textContent=fmt2(l);}const on=l<=CFG.LAST30_MS&&l>0;root.classList.toggle('l30',on);if(!!C._l30!==on){C._l30=on;hbBgm();}const w=$h('#hbW');if(w)w.innerHTML=on?'<div class=warn>🚨 마지막 30초! 카드 획득 확률 UP · 남은 '+Math.ceil(l/1000)+'초</div>':'';
  if(C.role==='guest'&&C.lastRx&&now()-C.lastRx>CFG.HB_TIMEOUT+2000&&C.conn){try{C.conn.close();}catch(e){}lost();}}
 function paintMe(){const m=C.me;if(!m)return;const q=(id,v)=>{const e=$h(id);if(e)e.textContent=v;};q('#hbN',m.tot);q('#hbS',m.sc);const b=$h('#hbB');if(b)b.innerHTML=(m.def?'🛡방어권 ':'')+(m.shEnd>now()?'✨보호막 ':'');
  const dh=$h('#hbDh');if(dh)dh.textContent='▌DEX ▸ 내 도감 · '+m.own.length+'종 / '+m.tot+'장';const d=$h('#hbD');if(!d)return;const own=[...m.own].sort((a,b)=>MON[b[0]].rar-MON[a[0]].rar||a[0]-b[0]);const NM={5:'전설',4:'영웅',3:'희귀',2:'고급',1:'일반'};let shown=0,hh='';
@@ -35226,7 +35384,7 @@ function paintMe(){const m=C.me;if(!m)return;const q=(id,v)=>{const e=$h(id);if(
 function paintTop(){const r=$h('#hbR');if(!r)return;const all=C.all||[];const list=all.length?all:(C.top||[]).map(p=>({id:'',n:p.n,s:p.s}));
  if(!list.length){r.textContent='집계 중…';return;}const mi=all.findIndex(x=>x.id===C.pid);const h=$h('#hbRh');if(h)h.innerHTML='▌RANK ▸ 실시간 순위'+(mi>=0?' · <b style="color:#ff6">내 순위 '+(mi+1)+'위 / '+all.length+'명</b>':'');
  r.innerHTML=list.map((p,i)=>'<span'+(p.id&&p.id===C.pid?' style="border-color:#ff6;color:#ff6"':'')+'>'+(i<3?['🥇','🥈','🥉'][i]:(i+1)+'위')+' '+esc(p.n)+' '+p.s+'점</span>').join('');}
-function finish(m){m.rank=(Array.isArray(m.rank)?m.rank:[]).map(p=>({pid:String(p.pid),n:String(p.n),s:+p.s||0,c5:+p.c5||0,tot:+p.tot||0,st:[0,1,2,3,4].map(i=>+(p.st||[])[i]||0),ok:Math.max(0,+p.ok|0),wr:Math.max(0,+p.wr|0),r:+p.r||0}));m.gid=String(m.gid);C.phase='end';C.mode='end';clearInterval(uiT);root.classList.remove('l30');let rw='';const me=m.rank.find(x=>x.pid===C.pid),accW=accWin(m.rank);
+function finish(m){m.rank=(Array.isArray(m.rank)?m.rank:[]).map(p=>({pid:String(p.pid),n:String(p.n),s:+p.s||0,c5:+p.c5||0,tot:+p.tot||0,st:[0,1,2,3,4].map(i=>+(p.st||[])[i]||0),ok:Math.max(0,+p.ok|0),wr:Math.max(0,+p.wr|0),r:+p.r||0}));m.gid=String(m.gid);C.phase='end';C.mode='end';clearInterval(uiT);hbBgm();root.classList.remove('l30');let rw='';const me=m.rank.find(x=>x.pid===C.pid),accW=accWin(m.rank);
  if(m.ok&&me){pools();const k=(S.meta.hb=S.meta.hb||{paid:{}});k.paid=k.paid||{};
   const why=m.rank.length<CFG.REWARD_MIN_P?'참가자가 '+CFG.REWARD_MIN_P+'명 이상일 때만 보상을 받아요':me.s<CFG.REWARD_MIN_SCORE?'점수가 '+CFG.REWARD_MIN_SCORE+'점 이상이어야 보상을 받아요 (내 점수 '+me.s+'점)':'';
   if(k.paid[m.gid])rw='<div class=box style="text-align:center">이미 받은 보상이에요</div>';
@@ -35239,9 +35397,32 @@ function finish(m){m.rank=(Array.isArray(m.rank)?m.rank:[]).map(p=>({pid:String(
    if(accW&&accW.pid===me.pid){const id3=pk(POOL[5]);let g3=null;try{g3=gainCard(id3);}catch(e){}rw+='<div class=box style="border-color:#3ff;text-align:center;font-size:20px">🎯 정답률 1위 추가 보상 — 5성 조각 획득!<br>'+card(id3,g3)+'</div>';}
    try{autoSave();}catch(e){}try{saveLocal();}catch(e){}}}
  root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\ZASAMON\\RESULT.EXE</b></div><div class=dosP><div class="dl ttl s" id=hbTt></div>'+rw+accBox(accW)+'<div class=box>'+m.rank.map(p=>'<div style="padding:4px 0;border-bottom:1px dashed #0a85;'+(p.pid===C.pid?'color:#ff6':'')+'">'+(p.r<=3?['🥇','🥈','🥉'][p.r-1]:p.r+'위')+' <b>'+esc(p.n)+'</b>'+(accW&&accW.pid===p.pid?' <span class=dtt>🎯 정답률 1위</span>':'')+' — '+p.s+'점 · 카드 '+p.tot+'장 · ★1~5: '+p.st.join('/')+accRow(p)+'</div>').join('')+'</div><button class="dbt q" data-x=quit>✖ 닫기</button></div></div><div id=hbP class=pop></div></div>';tline($h('#hbTt'),'> 게임 종료'+(m.why==='all'?' (모든 포켓몬을 모았어요!)':''),2);root.onclick=e=>{if(e.target.dataset&&e.target.dataset.x==='quit')quit();};}
-function quit(){try{S.curQ=null;}catch(e){}clearInterval(uiT);if(H){clearInterval(H.tm);try{H.peer.destroy();}catch(e){}H=null;}try{C&&C.peer&&C.peer.destroy();}catch(e){}C=null;root.className='';root.innerHTML='';try{if(typeof renderPvp==='function'){renderPvp();}else{S.screen='hub';renderHub();}}catch(e){try{S.screen='hub';renderHub();}catch(e2){}}}
+function quit(){try{S.curQ=null;}catch(e){}clearInterval(uiT);if(H){clearInterval(H.tm);try{H.peer.destroy();}catch(e){}H=null;}try{C&&C.peer&&C.peer.destroy();}catch(e){}C=null;root.className='';root.innerHTML='';setTimeout(hbBgm,0);try{if(typeof renderPvp==='function'){renderPvp();}else{S.screen='hub';renderHub();}}catch(e){try{S.screen='hub';renderHub();}catch(e2){}}}
+/* ---------- 배경음악: 해킹 배틀 전용 곡 (게임의 MUS 엔진에 곡만 등록해서 써요) ----------
+   hack  = 사이버 해킹 분위기(프리지안 단조 · 달리는 16분 아르페지오 · 펌핑 톱니파 베이스 · 4박 킥)
+   hackL = 같은 곡의 '마지막 30초' 빠른 버전(템포↑ · 드럼 풀 · 종소리)
+   배경음악 설정(S.meta.settings.bgm)과 음량(bgmVol)은 게임 설정을 그대로 따라요. */
+(function hbSongs(){try{const SG=MUS&&MUS.SONGS;if(!SG||SG.hack)return;
+ const HK={bpm:128,swing:0,scale:'phr',tonic:9,oct:5,seed:97,vol:.88,lift:0,
+  prog:{A:['Am','Bb','Am','Gm','Am','Bb','F','E'],B:['Dm','Am','Bb','Am','Dm','F','Bb','E']},rhyA:['synco','run'],rhyB:['driving','synco'],
+  lead:{w:'pulse',v:.05,vib:0,rev:.15,dly:.3,short:1,cut:3000},arp:{pat:'ud16',w:'square',v:.02,base:57,rev:.1,dly:.15,cut:2200},
+  bass:{st:'pump',w:'sawtooth',v:.1,base:33,cut:520},pad:{w:'sawtooth',v:.016,cut:900,base:52},bell:{v:.045},kit:'rock2',
+  lay:{A:{arp:1,pad:1,bass:1,dr:1},A2:{lead:1,arp:1,pad:1,bass:1,dr:1},B:{lead:1,harm:1,arp:1,pad:1,bass:1,dr:2,bell:1},A3:{lead:1,harm:1,arp:1,pad:1,bass:1,dr:2,bell:1}}};
+ const F2={lead:1,harm:1,arp:1,pad:1,bass:1,dr:2,bell:1};
+ SG.hack=HK;SG.hackL=Object.assign({},HK,{bpm:148,vol:.92,lay:{A:F2,A2:F2,B:F2,A3:F2}});
+}catch(e){console.warn('hb songs',e);}})();
+/* 해킹 배틀 화면에서는 위 곡을 틀어요. 마지막 30초에는 빠른 버전으로 바뀌어요. */
+function hbBgmKey(){const l=C&&C.phase==='play'&&C.end?C.end-now():0;return l>0&&l<=CFG.LAST30_MS?'hackL':'hack';}
+try{if(typeof bgmKey==='function'&&!bgmKey._hb){const _bk=bgmKey;bgmKey=function(mode){try{if(!mode&&S.screen==='hb')return hbBgmKey();}catch(e){}return _bk.apply(this,arguments);};bgmKey._hb=1;}}catch(e){console.warn('hb bgmKey',e);}
+const hbBgm=()=>{try{startBgm();}catch(e){}};
+/* 제목줄 오른쪽 🎵 버튼: 해킹 배틀 안에서도 배경음악을 껐다 켤 수 있어요 (게임 전체 설정과 같은 값) */
+const musOn=()=>{try{return !!S.meta.settings.bgm;}catch(e){return true;}};
+function musBtn(){if(!root||!root.classList.contains('on'))return;const h=root.querySelector('.dosH');if(!h)return;let b=root.querySelector('#hbMus');
+ if(!b){b=document.createElement('button');b.id='hbMus';b.type='button';b.onclick=e=>{e.stopPropagation();try{sfx('tap');}catch(er){}try{S.meta.settings.bgm=!S.meta.settings.bgm;}catch(er){}try{autoSave();}catch(er){}hbBgm();musBtn();};}
+ if(b.parentNode!==h)h.appendChild(b);b.className=musOn()?'':'off';b.textContent=musOn()?'🎵':'🔇';b.setAttribute('aria-label',musOn()?'배경음악 끄기':'배경음악 켜기');}
+let musMo=null;function musWatch(){if(musMo||!root||typeof MutationObserver==='undefined')return;musMo=new MutationObserver(()=>{if(root.classList.contains('on')&&!root.querySelector('#hbMus'))musBtn();});musMo.observe(root,{childList:true});}
 function open(){if(!sumOK()){toast('설정 오류: 확률 합계가 100이 아니에요');return;}if(!root){root=document.createElement('div');root.id='hb';document.body.appendChild(root);}
- C={phase:'menu',role:null,me:{own:[],sc:0,tot:0,def:0,lock:0},mode:null};S.screen='hb';root.className='on';paintMenu();}
+ C={phase:'menu',role:null,me:{own:[],sc:0,tot:0,def:0,lock:0},mode:null};S.screen='hb';root.className='on';paintMenu();musWatch();musBtn();hbBgm();}
 function addModeBtn(){const box=document.querySelector('#view .t2modes');if(!box||box.querySelector('[data-hb]'))return;const b=document.createElement('button');b.className='t2mode';b.setAttribute('data-hb','1');b.id='pvMHack';b.style.cssText='grid-column:1/-1;background:linear-gradient(180deg,#14304f,#07101f);border-color:#2fd6ff;color:#aef;box-shadow:0 4px 0 #0a3a5c';b.innerHTML='<span class=t2mi>🕶️</span><b style="color:#3ff">도감 해킹 배틀</b><small style="color:#9fe;opacity:.9">여러 친구와 함께! 문제를 풀어 카드를 모으고 해킹으로 빼앗아요</small>';b.onclick=e=>{e.stopPropagation();try{sfx('tap');}catch(_){}open();};box.appendChild(b);}
 if(typeof renderPvp==='function'){const rp=renderPvp;renderPvp=function(){const r=rp.apply(this,arguments);try{addModeBtn();}catch(e){console.warn('hb mode btn',e);}return r;};}
 window.HB={CFG,MINI,open,_t:!window.__sim?undefined:{hostStart,hostBegin,idPick,idWait,get Cc(){return C;},showPick,showRes,showHack,pkRow,hbPick,cm,finish,question,hjoin,rhash,snapPk,becomeHost,migrate,hostTick,get H(){return H;},setH(h){H=h;},setC(c){C=c;},newP,give,mult,take,calc,endGame,hmsg,mkSlot,pools,sumOK,cmp}};
