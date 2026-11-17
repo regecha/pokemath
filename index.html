@@ -34774,7 +34774,7 @@ const CFG={
  EV_L30:{one:30,two:20,three:10,x2:15,x3:10,hack:10,def:5,miss:0},  // 마지막 30초 합계 100 (꽝 없음: 꽝 10% 중 5%→카드3배, 5%→카드2배)
  HACK_RATE:.5,LAST30_MS:30000,HACK_PITY:10,   // 카드 고르기 10번마다 최소 1번은 해킹 이벤트 보장(자연 확률로 나오면 처음부터 다시 셈)
 
- MINI_ON:['color','memory','circuit','virus','code','order','reaction','laser'],
+ MINI_ON:['color','memory','circuit','virus','code','order','reaction','laser','odd','simon','stack','wire','shadow','target','slide'],
  REWARD:{1:5,2:4,3:3},REWARD_BASE:[1,2],VER:1,HB_TIMEOUT:15000,
  REWARD_MIN_P:2,REWARD_MIN_SCORE:100,   // 보상: 참가자 2명 이상 · 내 점수 100점 이상 · 하루 3번까지
  SOLVE_MIN_MS:2500,WRONG_WAIT:[3,5,8],TAKEOVER_STALE_MS:9000,
@@ -34979,13 +34979,16 @@ function hbPick(){const m=S.meta,sv=[m.enStudyMode,m.koMode,S.enForce,S.koForce]
  catch(e){q=null;}
  finally{m.enStudyMode=sv[0];m.koMode=sv[1];S.enForce=sv[2];S.koForce=sv[3];}
  return q&&q.ch&&q.ch.length>=2&&q.ch.map(String).includes(String(q.a))?q:null;}
+/* 학습 기록: 평소 문제 풀이와 똑같이 앱 기록(푼 문제·정답률·오답 노트·별·경험치·영어/국어/IQ 통계)에 반영해요 */
+function hbRec(q,ok,pick){try{recordAnswer(q,ok,Math.max(300,now()-(C.qAt||now())),{choice:pick});}catch(e){console.warn('hb record',e);}try{qStreak(ok);}catch(e){}try{autoSave();}catch(e){}}
 function question(){
  if(C.mode)return;C.mode='q';showGo(0);let q=hbPick();
  if(!q){const a=2+rr(8),b=2+rr(8);q={q:a+' × '+b+' = ?',a:String(a*b),ch:[a*b,a*b+a,a*b-b,a*b+2].map(String),sk:Object.keys(SKM)[0]};}
  try{S.curQ=q;}catch(e){}
+ C.qAt=now();
  const p=pop('<div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><div style="color:#3f8;font-size:15px">🔓 해킹 접속! 문제를 풀어 카드를 얻으세요</div><button class="b r qclose" data-x=qclose>✖ 닫기</button></div>'+qHTML(q));const qc=p.querySelector('[data-x=qclose]');if(qc)qc.onclick=closeQ;
  let hinted=false;try{window.PADX&&PADX.start(p,q,{mode:'hack',onUse:()=>{hinted=true;}});}catch(e){}   // ✏️ 연습장 · 💡 힌트 (힌트를 쓰면 정답 뒤 대기 +3초)
- p.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{if(C.mode!=='q')return;if(q.ch[+b.dataset.i]===q.a){C.wrong=0;C.mode='wait';C.pendWait=1;pop('<h3 style="text-align:center">✅ 정답! 보안 서버 응답 대기…</h3>');tx({t:'solve'});setTimeout(()=>{if(C&&C.mode==='wait'){C.pendWait=0;C.mode=null;next();}},hinted?9000:6000);}
+ p.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{if(C.mode!=='q')return;const pk0=q.ch[+b.dataset.i];hbRec(q,pk0===q.a,pk0);if(pk0===q.a){C.wrong=0;C.mode='wait';C.pendWait=1;pop('<h3 style="text-align:center">✅ 정답! 보안 서버 응답 대기…</h3>');tx({t:'solve'});setTimeout(()=>{if(C&&C.mode==='wait'){C.pendWait=0;C.mode=null;next();}},hinted?9000:6000);}
   else{b.classList.add('shk');C.mode='x';C.wrong=(C.wrong||0)+1;tx({t:'wrong'});const w=CFG.WRONG_WAIT[Math.min(C.wrong-1,CFG.WRONG_WAIT.length-1)],ah=(p.querySelectorAll('.ch')[q.ch.indexOf(q.a)]||{}).innerHTML||esc(String(q.a));
   pop('<h3 style="color:#f88;text-align:center">❌ 오답!</h3><div style="text-align:center">정답은 <b>'+ah+'</b> 였어요.<br>천천히 읽고 풀어 봐요. <b id=hbWw>'+w+'</b>초 뒤에 새 문제가 나와요.</div>');
   let left=w;const iv=setInterval(()=>{if(!C||C.phase!=='play'||C.mode!=='x'){clearInterval(iv);return;}left--;const e=$h('#hbWw');if(e)e.textContent=Math.max(0,left);if(left<=0){clearInterval(iv);C.mode=null;popx();next();}},1000);}});
@@ -35105,11 +35108,12 @@ function renderHack(note){const m=C.hkM;if(!m||!C||C.phase!=='play')return;C.mod
 function hkQuestion(){const m=C.hkM;if(!m||C.mode!=='hack')return;C.mode='hkq';
  let q=hbPick();if(!q){const a=2+rr(8),b=2+rr(8);q={q:a+' × '+b+' = ?',a:String(a*b),ch:[a*b,a*b+a,a*b-b,a*b+2].map(String),sk:Object.keys(SKM)[0]};}
  try{S.curQ=q;}catch(e){}
+ C.qAt=now();
  const p=pop('<div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><div style="color:#3f8;font-size:15px">🔓 해킹 중! 문제를 풀면 가짜 아이디 1개를 지워요</div><button class="b r qclose" data-x=hkback>↩ 돌아가기</button></div>'+qHTML(q));
  const bk=p.querySelector('[data-x=hkback]');if(bk)bk.onclick=()=>{if(C.mode==='hkq')renderHack();};
  let hinted=false;try{window.PADX&&PADX.start(p,q,{mode:'hack',onUse:()=>{hinted=true;}});}catch(e){}   // ✏️ 연습장 · 💡 힌트 (힌트를 쓰면 정답 뒤 해킹 결과가 3초 늦게 와요)
- p.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{if(C.mode!=='hkq')return;
-  if(q.ch[+b.dataset.i]===q.a){C.wrong=0;C.mode='hkw';pop('<h3 style="text-align:center;color:#3f8">✅ 정답! 가짜 아이디를 추적하는 중…</h3>');const pen=hinted?3000:0;if(pen)setTimeout(()=>{if(C&&C.mode==='hkw'&&C.hkM===m)tx({t:'hkq',n:m.n});},pen);else tx({t:'hkq',n:m.n});C.hkTmo=setTimeout(()=>{if(C&&C.mode==='hkw')renderHack();},6000+pen);}
+ p.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{if(C.mode!=='hkq')return;const pk0=q.ch[+b.dataset.i];hbRec(q,pk0===q.a,pk0);
+  if(pk0===q.a){C.wrong=0;C.mode='hkw';pop('<h3 style="text-align:center;color:#3f8">✅ 정답! 가짜 아이디를 추적하는 중…</h3>');const pen=hinted?3000:0;if(pen)setTimeout(()=>{if(C&&C.mode==='hkw'&&C.hkM===m)tx({t:'hkq',n:m.n});},pen);else tx({t:'hkq',n:m.n});C.hkTmo=setTimeout(()=>{if(C&&C.mode==='hkw')renderHack();},6000+pen);}
   else{b.classList.add('shk');C.mode='x';C.wrong=(C.wrong||0)+1;tx({t:'wrong'});const w=CFG.WRONG_WAIT[Math.min(C.wrong-1,CFG.WRONG_WAIT.length-1)],ah=(p.querySelectorAll('.ch')[q.ch.indexOf(q.a)]||{}).innerHTML||esc(String(q.a));
    pop('<h3 style="color:#f88;text-align:center">❌ 오답!</h3><div style="text-align:center">정답은 <b>'+ah+'</b> 였어요.<br><b id=hbWw>'+w+'</b>초 뒤에 해킹 창으로 돌아가요.</div>');
    let left=w;const iv=setInterval(()=>{if(!C||C.phase!=='play'||C.mode!=='x'){clearInterval(iv);return;}left--;const e=$h('#hbWw');if(e)e.textContent=Math.max(0,left);if(left<=0){clearInterval(iv);renderHack();}},1000);}});}
@@ -35307,7 +35311,7 @@ const MINI={
    if(el>20000){t0=now();sc=0;dots();msg('⏰ 시간이 지났어요! 처음부터 다시!','#fd6');}
    if(tk%9===0)show();},100);
   dots();msg('👆 눈에 불을 켠 초록 바이러스를 찾아요!');show();}},
- reaction:{n:'반응 속도 테스트',f(box,ok){const SY=[['빨강','#e53935','#fff'],['초록','#2ea043','#fff'],['파랑','#1e6fe0','#fff'],['노랑','#f6c90e','#222'],['보라','#8e44ad','#fff'],['하양','#f4f4f4','#222'],['주황','#fb8c00','#222'],['분홍','#ff7ab0','#222']],NEED=5,EVERY=14;
+ reaction:{n:'반응 속도 테스트',f(box,ok){const SY=[['빨강','#e53935','#fff'],['초록','#2ea043','#fff'],['파랑','#1e6fe0','#fff'],['노랑','#f6c90e','#222'],['보라','#8e44ad','#fff'],['하양','#f4f4f4','#222'],['주황','#fb8c00','#222'],['분홍','#ff7ab0','#222']],NEED=5,EVERY=10;
   let sc=0,tg=pk(SY),lay=[],tk=0,done=false;
   box.innerHTML='<div style="font-size:17px;line-height:1.55">👀 <b>이 색깔</b>의 버튼을 빨리 눌러요!</div>'
    +'<div style="font-size:14px;color:#8fd;margin:2px 0 6px">버튼 색깔이 계속 바뀌어요 · 다른 색을 누르면 -1점 · 5번 맞히면 성공!</div>'
@@ -35323,19 +35327,23 @@ const MINI={
   const shuf=(chg)=>{lay=[...SY].sort(()=>Math.random()-.5);bs.forEach((b,i)=>{const c=lay[i];b.className='';b.style.cssText='min-height:76px;border-radius:16px;border:3px solid #fff;background:'+c[1]+';color:'+c[2]+';font-size:18px;font-weight:bold;padding:0;box-shadow:0 3px 0 #0006;text-shadow:'+(c[2]==='#fff'?'0 1px 2px #0008':'none');b.textContent=c[0];});
    if(chg){const old=tg;do{tg=pk(SY);}while(tg===old);if(tg!==old)msg('🔔 새 신호! <b>'+tg[0]+'</b>'+jo(tg[0],'을','를')+' 눌러요','#fd6');}paintT();tk=0;};
   bs.forEach((b,i)=>b.onclick=()=>{if(done)return;
-   if(lay[i]===tg){sc++;dots();if(sc>=NEED){done=true;clearInterval(tm);msg('🎉 반응이 정말 빨라요!','#6f6');setTimeout(ok,650);return;}msg('⭕ 좋아요! 다음 신호!','#6f6');shuf(Math.random()<.6);}
+   if(lay[i]===tg){sc++;dots();if(sc>=NEED){done=true;clearInterval(tm);msg('🎉 반응이 정말 빨라요!','#6f6');setTimeout(ok,650);return;}msg('⭕ 좋아요! 다음 신호!','#6f6');shuf(Math.random()<.7);}
    else{sc=Math.max(0,sc-1);dots();b.classList.add('shk');b.style.outline='4px solid #f33';setTimeout(()=>{b.style.outline='';},400);msg('❌ 앗! <b>'+tg[0]+'</b> 버튼을 눌러요 (-1점)','#f88');}});
-  const tm=setInterval(()=>{if(!document.body.contains(box)){clearInterval(tm);return;}if(done)return;tk++;const bar=q('#hbRb');if(bar)bar.style.width=Math.max(0,100-tk/EVERY*100)+'%';if(tk>=EVERY)shuf(Math.random()<.6);},100);
+  const tm=setInterval(()=>{if(!document.body.contains(box)){clearInterval(tm);return;}if(done)return;tk++;const bar=q('#hbRb');if(bar)bar.style.width=Math.max(0,100-tk/EVERY*100)+'%';if(tk>=EVERY)shuf(Math.random()<.7);},100);
   dots();shuf(false);msg('👆 위에 나온 색깔과 같은 버튼을 눌러요!');}},
  laser:{n:'레이저 보안망 탈출',f(box,ok){
   /* 난이도는 원본 그대로: 5x7 칸 · 레이저 3줄(1·3·5번째 줄) · 0.7초 켜짐/0.7초 꺼짐 · 150ms마다 판정 · 시작(2,6) → 맨 위 도착.
-     바뀐 것은 줄마다 켜지는 타이밍(o)뿐이에요. 4가지 모두 평균 통과 시간이 원본과 거의 같게 맞춰 뒀고, 할 때마다 랜덤(직전과 같은 패턴은 피함)으로 나와요.
+     바뀐 것은 줄마다 켜지는 타이밍(o)뿐이에요. 8가지 모두 평균 통과 시간이 원본과 거의 같게(±4%) 맞춰 뒀고, 할 때마다 랜덤(직전과 같은 패턴은 피함)으로 나와요.
      c = 레이저 색(r,g,b) */
   const W=5,Hh=7,LR=[1,3,5],PAT=[
    {n:'순차 스캔',o:[0,500,1000],c:'255,59,78'},
    {n:'더블 펄스',o:[0,200,700],c:'255,92,214'},
    {n:'물결',o:[0,300,600],c:'255,154,46'},
-   {n:'엇박 점멸',o:[0,400,1000],c:'176,110,255'}];
+   {n:'엇박 점멸',o:[0,400,1000],c:'176,110,255'},
+   {n:'추격',o:[0,300,900],c:'255,225,60'},
+   {n:'쌍둥이 점멸',o:[0,100,600],c:'90,200,255'},
+   {n:'빠른 물결',o:[0,200,500],c:'190,255,80'},
+   {n:'느린 추격',o:[0,500,700],c:'255,140,140'}];
   const L=MINI.laser;let pi=rr(PAT.length);if(pi===L._last)pi=(pi+1+rr(PAT.length-1))%PAT.length;L._last=pi;
   const P=PAT[pi],OF=P.o;let x=2,y=6,hits=0,done=false;
   if(!document.getElementById('hbLzCss')){const s=document.createElement('style');s.id='hbLzCss';s.textContent=[
@@ -35395,7 +35403,249 @@ const MINI={
    if(y===0){done=true;clearInterval(tm);document.removeEventListener('keydown',kd);bd.classList.add('win');box.querySelector('.lzMsg').innerHTML='<b style="color:#8fb">🎉 탈출 성공! 보안망을 뚫었어요</b>';setTimeout(ok,450);}};
   document.addEventListener('keydown',kd);
   box.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>mv(b.dataset.d));
-  dr();}}
+  dr();}},
+ odd:{n:'가짜 파일 찾기',f(box,ok){
+  /* 규칙: 똑같아 보이는 파일 중 '다른 것 1개'를 찾아 누르세요. 3라운드(3×3 → 4×4 → 5×5)를 모두 찾으면 성공! 틀리면 0.6초 쉬어요. */
+  const LV=[{g:3,fs:34,p:[['🍎','🍏'],['🐶','🐱'],['🌞','🌙'],['🚗','🚌'],['🐸','🐵']]},
+   {g:4,fs:28,p:[['😀','😃'],['🌕','🌖'],['🔴','🟠'],['🐻','🐼'],['🍊','🍋']]},
+   {g:5,fs:24,p:[['b','d'],['6','9'],['ㅂ','ㅁ'],['O','Q'],['E','F'],['ㄹ','ㄷ']]}];
+  if(!document.getElementById('hbOdCss')){const st=document.createElement('style');st.id='hbOdCss';st.textContent=[
+   '.od{font-family:var(--mono,monospace);color:#cfe;max-width:340px;margin:4px auto 2px;user-select:none;-webkit-user-select:none}',
+   '.od .odMsg{font-size:14px;line-height:1.45;color:#bfe}',
+   '.od .odGr{display:grid;gap:6px;margin:8px 0;padding:8px;border:2px solid #0a8;border-radius:10px;background:linear-gradient(#03130f,#020b0a);box-shadow:inset 0 0 22px rgba(0,170,130,.3),0 0 12px rgba(0,170,130,.3)}',
+   '.od .odGr.win{border-color:#8fb;box-shadow:inset 0 0 30px rgba(90,255,160,.5),0 0 22px #3f8}',
+   '.od .odC{display:flex;align-items:center;justify-content:center;height:52px;border:1px solid #0a6;border-radius:8px;background:rgba(0,255,200,.06);font-size:var(--fs,28px);line-height:1;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}',
+   '.od .odC:active{filter:brightness(1.5)}',
+   '.od .odC.ok{border-color:#8fb;background:rgba(80,255,150,.25);box-shadow:0 0 14px #3f8;animation:odok .4s ease-out}',
+   '.od .odC.bad{border-color:#f55;background:rgba(255,80,80,.22);animation:odbad .3s}',
+   '@keyframes odok{50%{transform:scale(1.18)}}@keyframes odbad{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}',
+   '.od .odBar{display:flex;gap:6px;justify-content:center;font-size:13px;color:#9ab}',
+   '.od .odBar i{width:34px;height:8px;border-radius:4px;background:#0a2a24;box-shadow:inset 0 0 0 1px #0a6}',
+   '.od .odBar i.on{background:linear-gradient(90deg,#3f8,#ff9)}',
+   '@media (prefers-reduced-motion:reduce){.od .odC.ok,.od .odC.bad{animation:none}}'].join('\n');document.head.appendChild(st);}
+  let r=0,lock=0,done=false;
+  const draw=()=>{if(!document.body.contains(box))return;const lv=LV[r],n=lv.g*lv.g,pr=pk(lv.p),sw=Math.random()<.5,a=sw?pr[1]:pr[0],b=sw?pr[0]:pr[1],odd=rr(n);
+   box.innerHTML='<div class=od><div class=odMsg>🗂 <b>다른 파일 1개</b>를 찾아 누르세요! ('+(r+1)+'/3)</div><div class=odGr style="grid-template-columns:repeat('+lv.g+',1fr);--fs:'+lv.fs+'px">'
+    +Array.from({length:n},(_,i)=>'<div class=odC role=button data-i='+i+'>'+(i===odd?b:a)+'</div>').join('')+'</div><div class=odBar>'+[0,1,2].map(i=>'<i'+(i<r?' class=on':'')+'></i>').join('')+'</div></div>';
+   const gr=box.querySelector('.odGr');
+   box.querySelectorAll('.odC').forEach(c=>c.onclick=()=>{if(lock||done)return;
+    if(+c.dataset.i===odd){c.classList.add('ok');lock=1;r++;
+     if(r>=3){done=true;gr.classList.add('win');box.querySelector('.odMsg').innerHTML='<b style="color:#8fb">🎉 가짜 파일을 모두 찾았어요!</b>';setTimeout(ok,650);}
+     else setTimeout(()=>{lock=0;draw();},450);}
+    else{c.classList.add('bad');lock=1;setTimeout(()=>{lock=0;c.classList.remove('bad');},600);}});};
+  draw();}},
+ simon:{n:'보안 코드 따라 하기',f(box,ok){
+  /* 규칙: 4색 패드가 깜빡이는 순서를 보고 그대로 누르세요. 2개 → 3개 → 4개 → 5개로 늘어나요. 틀리면 같은 순서를 다시 보여줘요. */
+  const COL=[['255,70,90','▲'],['70,220,130','●'],['70,160,255','■'],['255,215,70','◆']],LEN=5;
+  if(!document.getElementById('hbSmCss')){const st=document.createElement('style');st.id='hbSmCss';st.textContent=[
+   '.sm{font-family:var(--mono,monospace);color:#cfe;max-width:340px;margin:4px auto 2px;user-select:none;-webkit-user-select:none}',
+   '.sm .smMsg{font-size:14px;line-height:1.45;color:#bfe;min-height:21px}',
+   '.sm .smGr{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 8px;padding:10px;border:2px solid #0a8;border-radius:12px;background:linear-gradient(#03130f,#020b0a);box-shadow:inset 0 0 24px rgba(0,170,130,.3),0 0 14px rgba(0,170,130,.35)}',
+   '.sm .smGr.win{border-color:#8fb;box-shadow:inset 0 0 30px rgba(90,255,160,.5),0 0 22px #3f8}',
+   '.sm .smP{display:flex;align-items:center;justify-content:center;height:78px;border-radius:12px;border:2px solid rgba(var(--k),.75);background:rgba(var(--k),.16);color:rgba(var(--k),1);font-size:30px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:filter .1s,box-shadow .1s,background .1s}',
+   '.sm .smP.on{background:rgba(var(--k),.95);color:#fff;box-shadow:0 0 26px rgba(var(--k),1),inset 0 0 18px rgba(255,255,255,.45);filter:brightness(1.25)}',
+   '.sm .smGr.bad{animation:smbad .35s}@keyframes smbad{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}',
+   '.sm .smBar{display:flex;gap:6px;justify-content:center;font-size:13px;color:#9ab;align-items:center}',
+   '.sm .smBar i{width:26px;height:8px;border-radius:4px;background:#0a2a24;box-shadow:inset 0 0 0 1px #0a6}',
+   '.sm .smBar i.on{background:linear-gradient(90deg,#3f8,#ff9)}',
+   '@media (prefers-reduced-motion:reduce){.sm .smGr.bad{animation:none}}'].join('\n');document.head.appendChild(st);}
+  const seq=[];for(let i=0;i<LEN;i++){let v;do{v=rr(4);}while(i>=2&&seq[i-1]===v&&seq[i-2]===v);seq.push(v);}
+  box.innerHTML='<div class=sm><div class=smMsg></div><div class=smGr>'+COL.map((c,i)=>'<div class=smP role=button data-i='+i+' style="--k:'+c[0]+'">'+c[1]+'</div>').join('')+'</div><div class=smBar><span>코드 길이</span>'+[2,3,4,5].map(n=>'<i data-n='+n+'></i>').join('')+'</div></div>';
+  const ps=[...box.querySelectorAll('.smP')],gr=box.querySelector('.smGr'),mg=box.querySelector('.smMsg'),dots=[...box.querySelectorAll('.smBar i')];
+  let round=2,pos=0,tok=0,accept=false,done=false;
+  const alive=()=>document.body.contains(box)&&!done;
+  const msg=h=>{mg.innerHTML=h;};const bar=()=>dots.forEach(d=>d.classList.toggle('on',+d.dataset.n<round||(+d.dataset.n===round&&pos>=round)));
+  const lit=(i,ms)=>{ps[i].classList.add('on');try{sfx('tap');}catch(e){}setTimeout(()=>ps[i].classList.remove('on'),ms);};
+  const play=()=>{if(!alive())return;const my=++tok;accept=false;pos=0;bar();msg('👀 깜빡이는 순서를 <b>잘 보세요</b> ('+round+'개)');let k=0;
+   const step=()=>{if(my!==tok||!alive())return;if(k>=round){accept=true;msg('👆 같은 순서로 <b>눌러 보세요</b> (0/'+round+')');return;}lit(seq[k],360);k++;setTimeout(step,640);};setTimeout(step,600);};
+  ps.forEach((p,i)=>p.onclick=()=>{if(!accept||done)return;lit(i,200);
+   if(i===seq[pos]){pos++;msg('👆 같은 순서로 <b>눌러 보세요</b> ('+pos+'/'+round+')');
+    if(pos>=round){accept=false;bar();
+     if(round>=LEN){done=true;gr.classList.add('win');msg('<b style="color:#8fb">🎉 보안 코드를 해독했어요!</b>');setTimeout(ok,650);}
+     else{round++;msg('✅ 좋아요! 한 개 더 늘어나요');setTimeout(play,900);}}}
+   else{accept=false;gr.classList.remove('bad');void gr.offsetWidth;gr.classList.add('bad');msg('❌ 틀렸어요! 같은 순서를 다시 보여줄게요');setTimeout(play,1000);}});
+  play();}},
+ stack:{n:'서버 랙 쌓기',f(box,ok){
+  /* 규칙: 좌우로 움직이는 서버 랙을 타이밍 맞춰 '고정!'으로 멈춰 5층을 쌓아요. 겹친 만큼만 남고, 거의 정확하면 퍼펙트(안 줄어요)! 완전히 빗나가면 처음부터 다시 쌓아요. */
+  const SW=300,BH=28,NEED=5,MINW=18,SNAP=8,BASEW=150;
+  if(!document.getElementById('hbSkCss')){const st=document.createElement('style');st.id='hbSkCss';st.textContent=[
+   '.sk{font-family:var(--mono,monospace);color:#cfe;max-width:340px;margin:4px auto 2px;user-select:none;-webkit-user-select:none;text-align:center}',
+   '.sk .skMsg{font-size:14px;line-height:1.45;color:#bfe;min-height:21px;text-align:left}',
+   '.sk .skSt{position:relative;width:300px;max-width:100%;height:'+(BH*(NEED+2))+'px;margin:8px auto;border:2px solid #0a8;border-radius:10px;overflow:hidden;background:repeating-linear-gradient(0deg,rgba(0,255,200,.05) 0 1px,transparent 1px '+BH+'px),linear-gradient(#03130f,#020b0a);box-shadow:inset 0 0 22px rgba(0,170,130,.3),0 0 12px rgba(0,170,130,.3);touch-action:manipulation}',
+   '.sk .skSt.win{border-color:#8fb;box-shadow:inset 0 0 30px rgba(90,255,160,.5),0 0 22px #3f8}',
+   '.sk .skSt.bad{border-color:#f55;box-shadow:inset 0 0 26px rgba(255,80,80,.45),0 0 18px #f55}',
+   '.sk .skB{position:absolute;height:'+(BH-3)+'px;border-radius:5px;border:1px solid rgba(255,255,255,.35);box-shadow:0 0 8px rgba(0,255,200,.35),inset 0 0 8px rgba(255,255,255,.25)}',
+   '.sk .skB.mv{box-shadow:0 0 14px #fff6,inset 0 0 10px rgba(255,255,255,.4)}',
+   '.sk .skCut{position:absolute;height:'+(BH-3)+'px;border-radius:5px;opacity:.9;transition:transform .7s ease-in,opacity .7s}',
+   '.sk .skBtn{display:block;width:300px;max-width:100%;margin:6px auto 2px;padding:14px 0;border:2px solid #3f8;border-radius:10px;background:#062a3a;color:#3f8;font-size:22px;font-weight:700;box-shadow:0 0 10px #3f86;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}',
+   '.sk .skBtn:active{filter:brightness(1.5);transform:scale(.98)}',
+   '.sk .skBar{font-size:13px;color:#9ab}',
+   '@media (prefers-reduced-motion:reduce){.sk .skCut{transition:none}}'].join('\n');document.head.appendChild(st);}
+  box.innerHTML='<div class=sk><div class=skMsg></div><div class=skSt></div><div class="skBtn" role=button>⏹ 고정!</div><div class=skBar></div></div>';
+  const stg=box.querySelector('.skSt'),mg=box.querySelector('.skMsg'),btn=box.querySelector('.skBtn'),bar=box.querySelector('.skBar');
+  const hue=i=>'hsl('+(170+i*28)+',75%,45%)';
+  let L,cur,t0,spd,done=false,hold=0,perf=0;
+  const alive=()=>document.body.contains(box);
+  const msg=h=>{mg.innerHTML=h;};
+  const place=(i,x,w,cls)=>{const d=document.createElement('div');d.className='skB'+(cls?' '+cls:'');d.style.cssText='left:'+x+'px;width:'+w+'px;bottom:'+(i*BH+1)+'px;background:'+hue(i);stg.appendChild(d);return d;};
+  const reset=()=>{stg.querySelectorAll('.skB,.skCut').forEach(e=>e.remove());stg.classList.remove('bad');L=[{x:(SW-BASEW)/2,w:BASEW}];place(0,L[0].x,L[0].w);start();};
+  const start=()=>{const top=L[L.length-1];spd=170+L.length*22;t0=performance.now()-rr(900);cur=place(L.length,0,top.w,'mv');hold=0;
+   msg('🧱 서버 랙을 <b>맞춰서 고정!</b> ('+(L.length-1)+'/'+NEED+'층)');bar.textContent=perf?'✨ 퍼펙트 '+perf+'번':'';};
+  const px=()=>{const top=L[L.length-1],R=SW-top.w,p=((performance.now()-t0)/1000*spd)%(2*R);return p<R?p:2*R-p;};
+  const frame=()=>{if(!alive()||done)return;if(cur&&!hold)cur.style.left=px()+'px';requestAnimationFrame(frame);};
+  const fix=e=>{if(e&&e.preventDefault)e.preventDefault();if(done||hold||!cur)return;hold=1;
+   const top=L[L.length-1],x=px(),d=x-top.x,w=top.w;try{sfx('tap');}catch(er){}
+   let nx,nw,isP=Math.abs(d)<=SNAP;
+   if(isP){nx=top.x;nw=top.w;perf++;}
+   else{nx=Math.max(x,top.x);nw=Math.min(x+w,top.x+top.w)-nx;}
+   if(nw<MINW){cur.style.left=x+'px';cur.style.opacity='.5';stg.classList.add('bad');msg('💥 <b>균형이 무너졌어요!</b> 처음부터 다시 쌓아요');perf=0;
+    setTimeout(()=>{if(alive()&&!done)reset();},950);return;}
+   cur.style.left=nx+'px';cur.style.width=nw+'px';cur.classList.remove('mv');
+   if(!isP){const cw=w-nw,cx=x<top.x?x:x+nw,cut=document.createElement('div');cut.className='skCut';cut.style.cssText='left:'+cx+'px;width:'+cw+'px;bottom:'+(L.length*BH+1)+'px;background:'+hue(L.length);stg.appendChild(cut);requestAnimationFrame(()=>{cut.style.transform='translateY('+(BH*3)+'px)';cut.style.opacity='0';});setTimeout(()=>cut.remove(),800);}
+   L.push({x:nx,w:nw});
+   if(L.length-1>=NEED){done=true;stg.classList.add('win');msg('<b style="color:#8fb">🎉 서버 랙 '+NEED+'층 완성!</b>');setTimeout(ok,650);return;}
+   msg(isP?'✨ <b>퍼펙트!</b>':'👍 좋아요! 폭이 줄었어요');setTimeout(()=>{if(alive()&&!done)start();},320);};
+  btn.onpointerdown=fix;stg.onpointerdown=fix;
+  reset();requestAnimationFrame(frame);}},
+ wire:{n:'와이어 자르기',f(box,ok){
+  /* 규칙: 안내된 색 순서대로 전선을 자르세요. 순서가 틀리면 전선이 다시 이어지고 처음부터! */
+  const COLS=[['빨강','#ff4d5a'],['파랑','#4da3ff'],['노랑','#ffd84d'],['초록','#3fe08a'],['보라','#c77dff']];
+  if(!document.getElementById('hbWrCss')){const st=document.createElement('style');st.id='hbWrCss';st.textContent=[
+   '.mgW{font-family:var(--mono,monospace);color:#cfe;max-width:340px;margin:4px auto 2px;user-select:none;-webkit-user-select:none}',
+   '.mgW .wMsg{font-size:14px;line-height:1.45;color:#bfe;min-height:21px}',
+   '.mgW .wClue{display:flex;gap:6px;justify-content:center;align-items:center;margin:8px 0;flex-wrap:wrap;font-size:14px}',
+   '.mgW .wClue b{padding:4px 10px;border-radius:14px;color:#111;font-size:14px}',
+   '.mgW .wClue i.dn{opacity:.35;text-decoration:line-through}',
+   '.mgW .wBox{padding:12px 10px;border:2px solid #0a8;border-radius:12px;background:linear-gradient(#03130f,#020b0a);box-shadow:inset 0 0 24px rgba(0,170,130,.3)}',
+   '.mgW .wBox.win{border-color:#8fb;box-shadow:inset 0 0 30px rgba(90,255,160,.5),0 0 22px #3f8}',
+   '.mgW .wBox.bad{animation:wbad .4s;border-color:#f55}@keyframes wbad{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}',
+   '.mgW .wW{position:relative;height:40px;margin:9px 0;border-radius:20px;color:#111;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;box-shadow:0 0 10px rgba(255,255,255,.25),inset 0 -6px 8px rgba(0,0,0,.25)}',
+   '.mgW .wW.cut{opacity:.35;filter:grayscale(.5);box-shadow:none;cursor:default;text-decoration:line-through}',
+   '.mgW .wW.cut::after{content:"✂";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;color:#fff;text-decoration:none}',
+   '@media (prefers-reduced-motion:reduce){.mgW .wBox.bad{animation:none}}'].join('\n');document.head.appendChild(st);}
+  const cs=COLS.map(c=>c).sort(()=>Math.random()-.5),need=cs.slice(0,3).map(c=>c[0]);
+  const order=COLS.map(c=>c).sort(()=>Math.random()-.5);
+  box.innerHTML='<div class=mgW><div class=wMsg></div><div class=wClue></div><div class=wBox>'+order.map(c=>'<div class=wW role=button data-n="'+c[0]+'" style="background:'+c[1]+'">'+c[0]+' 전선</div>').join('')+'</div></div>';
+  const ws=[...box.querySelectorAll('.wW')],bx=box.querySelector('.wBox'),mg=box.querySelector('.wMsg'),cl=box.querySelector('.wClue');
+  let pos=0,done=false,lock=false;
+  const col=n=>COLS.find(c=>c[0]===n)[1];
+  const alive=()=>document.body.contains(box);
+  const clue=()=>{cl.innerHTML=need.map((n,i)=>'<span>'+(i?'→ ':'')+'<b style="background:'+col(n)+'">'+n+'</b></span>').join(' ');cl.querySelectorAll('span').forEach((s,i)=>{if(i<pos)s.style.opacity='.35';});};
+  const msg=h=>{mg.innerHTML=h;};
+  ws.forEach(w=>w.onclick=()=>{if(done||lock||w.classList.contains('cut')||!alive())return;
+   try{sfx('tap');}catch(e){}
+   if(w.dataset.n===need[pos]){w.classList.add('cut');pos++;clue();
+    if(pos>=need.length){done=true;bx.classList.add('win');msg('<b style="color:#8fb">🎉 보안 장치를 해제했어요!</b>');setTimeout(ok,650);}
+    else msg('✂ 좋아요! 다음은 <b>'+need[pos]+'</b>');}
+   else{lock=true;bx.classList.remove('bad');void bx.offsetWidth;bx.classList.add('bad');msg('💥 순서가 틀렸어요! 전선이 다시 이어져요');
+    setTimeout(()=>{if(!alive())return;ws.forEach(x=>x.classList.remove('cut'));pos=0;lock=false;clue();msg('✂ 안내된 <b>순서대로</b> 잘라 보세요');},800);}});
+  clue();msg('✂ 안내된 <b>순서대로</b> 전선을 잘라 보세요');}},
+ shadow:{n:'포켓몬 그림자 맞추기',f(box,ok){
+  /* 규칙: 까만 그림자의 주인공 이름을 4개 중에서 고르세요. 3번 맞히면 성공! */
+  const NEED=3;
+  if(!document.getElementById('hbShCss')){const st=document.createElement('style');st.id='hbShCss';st.textContent=[
+   '.mgS{font-family:var(--mono,monospace);color:#cfe;max-width:340px;margin:4px auto 2px;user-select:none;-webkit-user-select:none;text-align:center}',
+   '.mgS .sMsg{font-size:14px;line-height:1.45;color:#bfe;min-height:21px;text-align:left}',
+   '.mgS .sPic{height:150px;margin:8px 0;border:2px solid #0a8;border-radius:12px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#0a3a50,#03121c)}',
+   '.mgS .sPic img{max-height:130px;max-width:80%;object-fit:contain;filter:brightness(0);transition:filter .4s}',
+   '.mgS .sPic.rev img{filter:none}',
+   '.mgS .sCh{display:grid;grid-template-columns:1fr 1fr;gap:8px}',
+   '.mgS .sB{padding:12px 4px;border:2px solid #0a8;border-radius:10px;background:#062a3a;color:#bfe;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation}',
+   '.mgS .sB.bad{border-color:#f55;color:#f99;background:#3a0a14;opacity:.6}',
+   '.mgS .sB.good{border-color:#8fb;color:#8fb;background:#0a3a22}',
+   '.mgS .sBar{display:flex;gap:6px;justify-content:center;margin-top:8px;font-size:13px;color:#9ab;align-items:center}',
+   '.mgS .sBar i{width:26px;height:8px;border-radius:4px;background:#0a2a24;box-shadow:inset 0 0 0 1px #0a6}',
+   '.mgS .sBar i.on{background:linear-gradient(90deg,#3f8,#ff9)}'].join('\n');document.head.appendChild(st);}
+  box.innerHTML='<div class=mgS><div class=sMsg></div><div class=sPic></div><div class=sCh></div><div class=sBar><span>맞힌 수</span>'+Array.from({length:NEED},()=>'<i></i>').join('')+'</div></div>';
+  const pic=box.querySelector('.sPic'),chs=box.querySelector('.sCh'),mg=box.querySelector('.sMsg'),dots=[...box.querySelectorAll('.sBar i')];
+  const ids=MON_IDS.filter(id=>id<=1025&&MON[id]&&MON[id].name);
+  let got=0,cur=0,lock=false,done=false,tries=0;
+  const alive=()=>document.body.contains(box);
+  const msg=h=>{mg.innerHTML=h;};
+  const round=()=>{if(!alive()||done)return;lock=false;cur=pk(ids);const nm=MON[cur].name,opts=[nm];let g=0;
+   while(opts.length<4&&g++<200){const n=MON[pk(ids)].name;if(!opts.includes(n))opts.push(n);}
+   opts.sort(()=>Math.random()-.5);
+   pic.className='sPic';pic.innerHTML=monImg(cur,'front');
+   const im=pic.querySelector('img');if(im)im.addEventListener('error',()=>{if(alive()&&!done&&tries++<6)round();});
+   chs.innerHTML=opts.map(o=>'<div class=sB role=button data-n="'+esc(o)+'">'+esc(o)+'</div>').join('');
+   chs.querySelectorAll('.sB').forEach(b=>b.onclick=()=>{if(lock||done||b.classList.contains('bad'))return;
+    if(b.dataset.n===nm){lock=true;b.classList.add('good');pic.classList.add('rev');got++;dots.forEach((d,i)=>d.classList.toggle('on',i<got));try{sfx('tap');}catch(e){}
+     if(got>=NEED){done=true;msg('<b style="color:#8fb">🎉 정체를 모두 밝혔어요!</b>');setTimeout(ok,800);}
+     else{msg('✅ 정답! <b>'+esc(nm)+'</b>');setTimeout(round,900);}}
+    else{b.classList.add('bad');msg('❌ 아니에요! 다시 골라 보세요');}});
+   msg('🕵 이 그림자는 <b>누구</b>일까요? ('+(got+1)+'/'+NEED+')');};
+  round();}},
+ target:{n:'목표 숫자 만들기',f(box,ok){
+  /* 규칙: 숫자를 모두 한 번씩 써서 목표 숫자를 만드세요. 계산은 왼쪽부터 차례대로! 2라운드 */
+  const SIZES=[3,4];
+  if(!document.getElementById('hbTgCss')){const st=document.createElement('style');st.id='hbTgCss';st.textContent=[
+   '.mgT{font-family:var(--mono,monospace);color:#cfe;max-width:340px;margin:4px auto 2px;user-select:none;-webkit-user-select:none;text-align:center}',
+   '.mgT .tMsg{font-size:14px;line-height:1.45;color:#bfe;min-height:21px;text-align:left}',
+   '.mgT .tGoal{margin:8px 0;padding:8px;border:2px solid #0a8;border-radius:12px;background:linear-gradient(#03130f,#020b0a);font-size:15px;color:#9ab}',
+   '.mgT .tGoal b{display:block;font-size:40px;color:#ff9;line-height:1.1}',
+   '.mgT .tGoal.win{border-color:#8fb;box-shadow:0 0 22px #3f8}',
+   '.mgT .tGoal.bad{border-color:#f55;animation:tbad .4s}@keyframes tbad{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}',
+   '.mgT .tEx{min-height:34px;font-size:22px;color:#fff;margin:6px 0;word-break:keep-all}',
+   '.mgT .tRow{display:flex;gap:8px;justify-content:center;margin:6px 0;flex-wrap:wrap}',
+   '.mgT .tB{min-width:62px;padding:12px 0;border:2px solid #0a8;border-radius:10px;background:#062a3a;color:#bfe;font-size:22px;font-weight:700;cursor:pointer;touch-action:manipulation}',
+   '.mgT .tB.op{border-color:#fa4;color:#fc7}',
+   '.mgT .tB.off{opacity:.3;pointer-events:none}',
+   '.mgT .tB.sm{font-size:14px;min-width:96px;padding:10px 0;border-color:#789;color:#abc}',
+   '.mgT .tBar{font-size:13px;color:#9ab;margin-top:6px}',
+   '@media (prefers-reduced-motion:reduce){.mgT .tGoal.bad{animation:none}}'].join('\n');document.head.appendChild(st);}
+  box.innerHTML='<div class=mgT><div class=tMsg></div><div class=tGoal>목표 숫자<b></b></div><div class=tEx></div><div class="tRow tN"></div><div class="tRow tO"></div><div class=tRow><div class="tB sm" role=button data-a=undo>↩ 한 칸 지우기</div><div class="tB sm" role=button data-a=clear>🔄 처음부터</div></div><div class=tBar></div></div>';
+  const goalBox=box.querySelector('.tGoal'),goal=goalBox.querySelector('b'),ex=box.querySelector('.tEx'),rn=box.querySelector('.tN'),ro=box.querySelector('.tO'),mg=box.querySelector('.tMsg'),bar=box.querySelector('.tBar');
+  const OPS=['+','−','×'];
+  const ap=(a,o,b)=>o==='+'?a+b:o==='−'?a-b:a*b;
+  let lv=0,nums=[],target=0,toks=[],used=[],busy=false,done=false;
+  const alive=()=>document.body.contains(box);
+  const msg=h=>{mg.innerHTML=h;};
+  const gen=n=>{for(let t=0;t<500;t++){const a=Array.from({length:n},()=>1+rr(9));let v=a[0],okk=true;for(let i=1;i<n;i++){const o=OPS[rr(3)];v=ap(v,o,a[i]);if(v<0){okk=false;break;}}
+    if(okk&&v>=2&&v<=(n===3?40:60)&&!a.includes(v))return{a,v};}
+   return{a:[2,3,4].slice(0,n),v:ap(ap(2,'+',3),'×',4)};};
+  const val=()=>{let v=toks[0];for(let i=1;i+1<toks.length;i+=2)v=ap(v,toks[i],toks[i+1]);return v;};
+  const draw=()=>{const nn=toks.filter((_,i)=>i%2===0).length,expectNum=toks.length%2===0;
+   ex.innerHTML=toks.length?toks.join(' ')+(toks.length%2?' = <b style="color:#8fb">'+val()+'</b>':''):'<span style="color:#678;font-size:15px">숫자를 눌러 시작하세요</span>';
+   rn.innerHTML=nums.map((n,i)=>'<div class="tB'+(used[i]||!expectNum?' off':'')+'" role=button data-i='+i+'>'+n+'</div>').join('');
+   ro.innerHTML=OPS.map(o=>'<div class="tB op'+(expectNum||nn>=nums.length?' off':'')+'" role=button data-o="'+o+'">'+o+'</div>').join('');
+   bar.textContent='라운드 '+(lv+1)+'/'+SIZES.length+' · 숫자는 한 번씩만, 왼쪽부터 계산';
+   rn.querySelectorAll('.tB').forEach(b=>b.onclick=()=>pickN(+b.dataset.i));
+   ro.querySelectorAll('.tB').forEach(b=>b.onclick=()=>pickO(b.dataset.o));};
+  const check=()=>{const v=val();busy=true;
+   if(v===target){goalBox.classList.add('win');try{sfx('tap');}catch(e){}
+    if(lv+1>=SIZES.length){done=true;msg('<b style="color:#8fb">🎉 목표 숫자를 모두 만들었어요!</b>');setTimeout(ok,700);}
+    else{msg('✅ 정답! 다음 라운드로 가요');setTimeout(()=>{if(alive()){lv++;start();}},900);}}
+   else{goalBox.classList.remove('bad');void goalBox.offsetWidth;goalBox.classList.add('bad');msg('❌ 결과가 <b>'+v+'</b>예요. 다시 만들어 보세요');setTimeout(()=>{if(alive()){reset();}},1000);}};
+  const pickN=i=>{if(busy||done||used[i]||toks.length%2!==0)return;used[i]=1;toks.push(nums[i]);draw();if(toks.filter((_,k)=>k%2===0).length>=nums.length)check();};
+  const pickO=o=>{if(busy||done||toks.length%2!==1)return;toks.push(o);draw();};
+  const reset=()=>{toks=[];used=nums.map(()=>0);busy=false;goalBox.classList.remove('bad','win');msg('🧮 숫자와 기호를 눌러 <b>'+target+'</b>을 만들어 보세요');draw();};
+  const start=()=>{const g=gen(SIZES[lv]);nums=g.a.slice().sort(()=>Math.random()-.5);target=g.v;goal.textContent=target;reset();};
+  box.querySelector('[data-a=undo]').onclick=()=>{if(busy||done||!toks.length)return;const t=toks.pop();if(typeof t==='number'){const i=nums.findIndex((n,k)=>used[k]&&n===t);if(i>=0)used[i]=0;}draw();};
+  box.querySelector('[data-a=clear]').onclick=()=>{if(busy||done)return;reset();};
+  start();}},
+ slide:{n:'슬라이딩 퍼즐',f(box,ok){
+  /* 규칙: 빈칸 옆의 숫자 조각을 눌러 밀어서 1~8 순서대로 맞추세요. */
+  if(!document.getElementById('hbSlCss')){const st=document.createElement('style');st.id='hbSlCss';st.textContent=[
+   '.mgL{font-family:var(--mono,monospace);color:#cfe;max-width:340px;margin:4px auto 2px;user-select:none;-webkit-user-select:none;text-align:center}',
+   '.mgL .lMsg{font-size:14px;line-height:1.45;color:#bfe;min-height:21px;text-align:left}',
+   '.mgL .lGr{display:grid;grid-template-columns:repeat(3,86px);grid-template-rows:repeat(3,86px);gap:6px;justify-content:center;margin:10px 0;padding:10px;border:2px solid #0a8;border-radius:12px;background:linear-gradient(#03130f,#020b0a);box-shadow:inset 0 0 24px rgba(0,170,130,.3)}',
+   '.mgL .lGr.win{border-color:#8fb;box-shadow:inset 0 0 30px rgba(90,255,160,.5),0 0 22px #3f8}',
+   '.mgL .lT{display:flex;align-items:center;justify-content:center;border-radius:12px;border:2px solid #3fd;background:linear-gradient(145deg,#0b4a66,#062a3a);color:#dff;font-size:34px;font-weight:700;cursor:pointer;touch-action:manipulation;box-shadow:0 0 10px rgba(0,255,200,.3)}',
+   '.mgL .lT.ok{border-color:#8fb;color:#8fb}',
+   '.mgL .lT.e{border:2px dashed #0a6;background:transparent;box-shadow:none;cursor:default}',
+   '.mgL .lBar{font-size:13px;color:#9ab}'].join('\n');document.head.appendChild(st);}
+  box.innerHTML='<div class=mgL><div class=lMsg></div><div class=lGr></div><div class=lBar></div></div>';
+  const gr=box.querySelector('.lGr'),mg=box.querySelector('.lMsg'),bar=box.querySelector('.lBar');
+  let t=[1,2,3,4,5,6,7,8,0],mv=0,done=false;
+  const alive=()=>document.body.contains(box);
+  const nb=i=>{const r=Math.floor(i/3),c=i%3,a=[];if(r>0)a.push(i-3);if(r<2)a.push(i+3);if(c>0)a.push(i-1);if(c<2)a.push(i+1);return a;};
+  const solved=()=>t.every((v,i)=>v===(i<8?i+1:0));
+  (()=>{let z=8,prev=-1;for(let k=0;k<16||solved();k++){const c=nb(z).filter(x=>x!==prev),n=pk(c);t[z]=t[n];t[n]=0;prev=z;z=n;}})();
+  const draw=()=>{gr.innerHTML=t.map((v,i)=>'<div class="lT'+(v?(v===i+1?' ok':''):' e')+'" role=button data-i='+i+'>'+(v||'')+'</div>').join('');
+   gr.querySelectorAll('.lT').forEach(d=>d.onclick=()=>tap(+d.dataset.i));bar.textContent='움직인 횟수 '+mv;};
+  const tap=i=>{if(done||!alive())return;const z=t.indexOf(0);if(!nb(i).includes(z))return;t[z]=t[i];t[i]=0;mv++;try{sfx('tap');}catch(e){}draw();
+   if(solved()){done=true;gr.classList.add('win');mg.innerHTML='<b style="color:#8fb">🎉 퍼즐 완성!</b>';setTimeout(ok,700);}};
+  mg.innerHTML='🧩 빈칸 옆 조각을 눌러 <b>1~8 순서</b>로 맞춰 보세요';draw();}}
 };
 function mini(){if(C.phase!=='play')return;C.mode='mini';C.pendWait=0;const key=pk(CFG.MINI_ON.filter(k=>MINI[k])),g=MINI[key];
  pop('<h3 style="color:#f66">🚨 시스템이 해킹당했어요!'+(C.hitBy?' ('+esc(C.hitBy.by)+')':'')+'</h3><div style="color:#fd6">복구 미니게임: '+g.n+' — 해결해야 다시 문제를 풀 수 있어요. (시간은 계속 흘러요)</div><div id=hbMg></div>');
