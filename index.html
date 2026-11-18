@@ -3209,6 +3209,37 @@ html body .tiles.cmp>.tile .td{grid-area:d;font-size:11px;line-height:1.25}
 @keyframes raysIn{from{opacity:0}to{opacity:1}}
 #pack .rays{animation:raysIn .8s ease-out .55s both}
 </style>
+<style id="ttlCss">
+/* ===== 단원 마스터 칭호 (1~12) ===== */
+.ttlName{display:inline-flex;align-items:center;gap:6px;max-width:100%;min-width:0}
+.ttlName .ttlTxt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.ttlBadge{flex:none;display:inline-flex;align-items:center;gap:2px;padding:1px 8px 1px 5px;border-radius:999px;font-size:.62em;line-height:1.5;font-weight:900;color:#fff;background:var(--tb,#6b7);border:2px solid var(--tbd,#454);text-shadow:0 1px 0 rgba(0,0,0,.45);box-shadow:0 0 0 0 transparent,0 2px 0 rgba(0,0,0,.25);letter-spacing:0}
+.ttlBadge i{font-style:normal;font-size:1.05em;filter:drop-shadow(0 0 3px var(--tg,transparent))}
+.ttlTxt{background:var(--tt,none);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;background-size:200% 100%;filter:drop-shadow(0 1px 0 rgba(50,25,0,.42)) drop-shadow(0 0 var(--tgr,0px) var(--tg,transparent))}
+.ttl1{--tb:#5fae6a;--tbd:#3b7d46;--tt:linear-gradient(90deg,#6ccf7a,#b6f08c)}
+.ttl2{--tb:#2fa7c9;--tbd:#1b7794;--tt:linear-gradient(90deg,#34b6d8,#8be6ff)}
+.ttl3{--tb:#3f7fe0;--tbd:#2652a8;--tt:linear-gradient(90deg,#3f7fe0,#77c0ff)}
+.ttl4{--tb:#f08a24;--tbd:#b4560c;--tg:#ff9a3c;--tgr:2px;--tt:linear-gradient(90deg,#ff7a1a,#ffc14d)}
+.ttl5{--tb:#e6b800;--tbd:#a07800;--tg:#ffd23f;--tgr:3px;--tt:linear-gradient(90deg,#e08a00,#ffc928,#e08a00)}
+.ttl6{--tb:#13b5c9;--tbd:#0a7b8a;--tg:#5ff1ff;--tgr:3px;--tt:linear-gradient(90deg,#0698b4,#3ddcf0,#0698b4)}
+.ttl7{--tb:#8a4fe0;--tbd:#5a2aa8;--tg:#b88cff;--tgr:4px;--tt:linear-gradient(90deg,#7a3fd8,#c08cff,#7a3fd8)}
+.ttl8{--tb:#e0392f;--tbd:#8f1a14;--tg:#ff5a4a;--tgr:4px;--tt:linear-gradient(90deg,#ff3b2f,#ffd23f,#ff3b2f)}
+.ttl9{--tb:#d63a8c;--tbd:#8a1659;--tg:#ff6ab8;--tgr:5px;--tt:linear-gradient(90deg,#ff3b8c,#ffd23f,#3bd6ff,#b86bff,#ff3b8c)}
+.ttl10{--tb:#caa100;--tbd:#7a5d00;--tg:#ffe36a;--tgr:6px;--tt:linear-gradient(90deg,#d28a00,#ffd84a,#d28a00,#ffd84a)}
+.ttl11{--tb:#3a46d8;--tbd:#1b2390;--tg:#8cf0ff;--tgr:6px;--tt:linear-gradient(90deg,#5ff1ff,#a78bff,#ff8be0,#5ff1ff)}
+.ttl12{--tb:#1b1230;--tbd:#ffd23f;--tg:#ffe36a;--tgr:8px;--tt:linear-gradient(90deg,#ff4d4d,#ffd23f,#5dff9a,#4dd2ff,#b06bff,#ff4d4d)}
+.ttl5 .ttlTxt,.ttl6 .ttlTxt,.ttl7 .ttlTxt,.ttl8 .ttlTxt,.ttl10 .ttlTxt{animation:ttlSlide 2.6s linear infinite}
+.ttl9 .ttlTxt,.ttl11 .ttlTxt,.ttl12 .ttlTxt{animation:ttlSlide 1.6s linear infinite}
+.ttl8 .ttlBadge,.ttl9 .ttlBadge,.ttl10 .ttlBadge,.ttl11 .ttlBadge{animation:ttlGlow 1.8s ease-in-out infinite}
+.ttl12 .ttlBadge{background:linear-gradient(135deg,#1b1230,#3a1e6e);animation:ttlGlow 1.2s ease-in-out infinite}
+.ttl12 .ttlBadge i{animation:ttlBob 1.2s ease-in-out infinite}
+@keyframes ttlSlide{to{background-position:200% 0}}
+@keyframes ttlGlow{50%{box-shadow:0 0 12px 2px var(--tg,#fff),0 2px 0 rgba(0,0,0,.25)}}
+@keyframes ttlBob{50%{transform:translateY(-2px) scale(1.15)}}
+.btn .ttlName{font-size:inherit}.btn .ttlBadge{font-size:.8em}
+.btn .ttlTxt{-webkit-text-fill-color:currentColor;background:none!important;color:inherit;filter:none;animation:none!important}
+@media(prefers-reduced-motion:reduce){.ttlTxt,.ttlBadge,.ttlBadge i{animation:none!important}}
+</style>
 </head>
 <body>
 <div id="ttFade"></div>
@@ -6294,11 +6325,20 @@ sk('28u','4-2',6,'수 카드를 180° 돌렸을 때 만들어지는 수',R=>{con
 
 const SKM={};SK.forEach(s=>SKM[s.id]=s);
 const unitKey=(s,u)=>s+'|'+u;
+// ===== 단원 마스터 칭호: 지금 학년·학기에서 별을 모두 모은(🏅 마스터) 단원 수 = 칭호 번호 (1~12) =====
+// 다음 학기로 올리면 그 학기 마스터 수만큼만 보여서 칭호가 사라지고, 원래 학기로 내리면 다시 보여요.
+const TITLE_ICONS=['','🌱','⚔️','🛡️','🔥','⚡','💎','🌙','🐉','☄️','👑','🌌','🏆'];
+function masterCount(m){try{m=m||S.meta;if(!m||!m.gs||!m.sk)return 0;const by={};SK.forEach(s=>{if(s.s===m.gs)(by[s.u]=by[s.u]||[]).push(s);});
+ let n=0;for(const u in by)if(by[u].every(s=>(m.sk[s.id]&&m.sk[s.id].st)>=5))n++;return Math.min(12,n);}catch(e){return 0;}}
+function nickHTML(m){m=m||S.meta;const nm=esc(m&&m.name||''),n=masterCount(m);if(!n)return nm;
+ return `<span class="ttlName ttl${n}" title="${esc(semName(m.gs))} 단원 ${n}개 마스터"><span class=ttlBadge><i>${TITLE_ICONS[n]}</i>${n}</span><span class=ttlTxt>${nm}</span></span>`;}
+function unitMasterHTML(m){m=m||S.meta;const n=masterCount(m);return n?`<b>${TITLE_ICONS[n]} 현재 칭호 ${n}</b>`:'<span class=mut>단원을 마스터하면 닉네임에 칭호가 붙어요</span>';}
 // 선행 방지: 코드 학기보다 앞 학기는 전부, 코드 학기는 '지금 배우는 단원'까지만
 function allowedSkills(){const m=S.meta,gi=semIdx(m.gs);if(gi<0)return[];const uMax=m.uMax||99;
  return SK.filter(s=>{const i=semIdx(s.s);return i<gi||(i===gi&&s.u<=uMax);});}
 function focusSkills(){const m=S.meta,al=allowedSkills();
  if(m.focus&&m.focus.length){const f=al.filter(s=>m.focus.includes(unitKey(s.s,s.u)));if(f.length)return f;}
+ {const x=mathSel();if(x){const f=al.filter(s=>x.C.has(unitKey(s.s,s.u)));if(f.length)return f;}}   // 수학 설정에서 체크한 단원
  const cur=al.filter(s=>s.s===m.gs);if(cur.length)return cur;
  const gi=semIdx(m.gs);for(let k=gi-1;k>=0;k--){const p=al.filter(s=>s.s===SEMS[k]);if(p.length)return p;}return al;}
 // 단원 집중: 집중으로 고른 단원의 개념 중 별 5개를 아직 못 모은 것이 남아 있으면, 그 개념만 계속 나와요 (다 모으면 자동으로 풀려요)
@@ -6313,7 +6353,21 @@ function skState(id){const m=S.meta;return m.sk[id]||(m.sk[id]={c:0,x:0,st:0,run
 function needW(s){const v=S.meta.sk[s.id];if(!v)return 3;let w=1+Math.max(0,3-v.st)*.8+v.w*2;if(v.last&&dayDiff(v.last,today())>=3)w+=1;return w;}
 function wpick(list){let t=0;for(const s of list)t+=needW(s);let r=rnd()*t;for(const s of list){r-=needW(s);if(r<=0)return s;}return list[list.length-1];}
 const RECENT=[];
-function reviewSkills(){const m=S.meta,gi=semIdx(m.gs);const al=allowedSkills();const r=al.filter(s=>{const i=semIdx(s.s);const v=m.sk[s.id];return i>=gi-2||(v&&v.w>0);});return r.length?r:al;}
+function reviewSkills(){const m=S.meta,gi=semIdx(m.gs);const al=allowedSkills();let r=al.filter(s=>{const i=semIdx(s.s);const v=m.sk[s.id];return i>=gi-2||(v&&v.w>0);});
+ const x=mathSel();if(x){   // 수학 설정: 이번 학기는 체크한 단원만, 아래 학년 문제는 그대로, 마스터한 단원 문제도 섞어요
+  r=r.filter(s=>selOK(s,x));const have=new Set(r.map(s=>s.id));al.forEach(s=>{if(!have.has(s.id)&&x.ms.has(unitKey(s.s,s.u)))r.push(s);});
+  if(!r.length)return focusSkills();}
+ return r.length?r:al;}
+// ---- 수학 설정(단원 체크박스): m.mathUnits = 이번 학기에서 체크한 단원 키 목록. 별을 모두 모은(개념마다 별 5개) 단원은 '마스터' ----
+function mathMastered(){const m=S.meta,by={};SK.forEach(s=>{const k=unitKey(s.s,s.u);(by[k]=by[k]||[]).push(s);});const r=new Set();
+ for(const k in by)if(by[k].every(s=>(m.sk[s.id]&&m.sk[s.id].st)>=5))r.add(k);return r;}
+// 지금 적용할 체크 단원: {C:출제할 단원 키 집합, ms:마스터한 단원 키 집합, fb:1이면 체크한 단원을 전부 마스터해서 보정함} / 설정 안 했으면 null(예전과 같이)
+function mathSel(){const m=S.meta;if(!m||!Array.isArray(m.mathUnits)||!m.mathUnits.length)return null;
+ const cur=new Set(allowedSkills().filter(s=>s.s===m.gs).map(s=>unitKey(s.s,s.u)));const C=m.mathUnits.filter(k=>cur.has(k));if(!C.length)return null;
+ const ms=mathMastered();
+ if(C.every(k=>ms.has(k))){const rest=[...cur].filter(k=>!ms.has(k));return{C:new Set(rest.concat(C)),ms,fb:1};}   // 마스터한 단원만 남았으면 아직 안 한 단원을 같이 내요
+ return{C:new Set(C),ms};}
+function selOK(s,x){x=x||mathSel();if(!x||s.s!==S.meta.gs)return true;const k=unitKey(s.s,s.u);return x.C.has(k)||x.ms.has(k);}
 
 // ---- 기초 쌓기: 어떤 개념을 자꾸 틀리면, 그 개념의 바탕이 되는 아래 학년 개념을 함께 연습해요 ----
 const MUL=['4b2','4b3','4b4','4b5','4b6','4b7','4b8','4b9'];
@@ -7379,6 +7433,7 @@ function buildRx(){try{const m=S.meta;if((m.questionMode||'math')!=='math')retur
  const seen=new Set(),weak=[];const add=(sk,arr)=>{if(sk&&!seen.has(sk.id)){seen.add(sk.id);arr.push(sk);}};
  const cand=[];DOMS.forEach(d=>st[d.k].weak.forEach(x=>cand.push({x,boost:need.some(o=>o.d.k===d.k)?.25:0})));
  cand.sort((a,b)=>(b.x.score+b.boost)-(a.x.score+a.boost)).slice(0,6).forEach(c=>{add(c.x.sk,weak);preOf(c.x.sk.id).filter(p=>!solid(p)).slice(0,mode==='hard'?3:2).forEach(p=>add(SKM[p],weak));});
+ {const x=mathSel();if(x){const k=weak.filter(sk=>selOK(sk,x));weak.length=0;k.forEach(sk=>weak.push(sk));}}
  if(!weak.length)return null;
  const focus=focusSkills().filter(sk=>!(m.sk[sk.id]&&m.sk[sk.id].st>=3)&&!seen.has(sk.id));
  const review=reviewSkills().filter(sk=>!seen.has(sk.id)&&m.sk[sk.id]&&m.sk[sk.id].c>0&&(!m.sk[sk.id].last||dayDiff(m.sk[sk.id].last,today())>=2));
@@ -20592,7 +20647,7 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
   return `<button class=tile data-f="${f.k}">${extra}${m.unlNew[f.k]?'<i class=newTag>NEW</i>':''}<span class=ti>${I(f.ic,'ti')}</span><span class=tn>${f.n}</span><span class=td>${td}</span></button>`;}).join('');
  const next=FEAT.find(f=>!m.unl[f.k]);
  $('#view').innerHTML=hudHTML()+`<div class=wrap>
-  <div class="panel hubTop" style="display:flex;gap:12px;align-items:center"><div class=htMon>${monImg(partner,'anim')}</div><div class=htBody><div class=htRow><div class="jua htName">${esc(m.name)}</div><button class="btn ghost sm" id=hPartner>${I('heart')} 파트너 바꾸기</button></div><div class="mut htSub">${esc(lvOf(m.xp).title)} · ${josa(esc(MON[partner].name),'와과')} 함께해요${shinyOn(partner)?' ✨':''}</div><div class="mut htBond">${shinyOn(partner)?'✨ 이로치 파트너!':`이로치까지 함께 푼 문제 ${Math.min(bondOf(partner),SHINY_AT)} / ${SHINY_AT}`}</div><div class=htLine>${hubLine()}</div></div></div>
+  <div class="panel hubTop" style="display:flex;gap:12px;align-items:center"><div class=htMon>${monImg(partner,'anim')}</div><div class=htBody><div class=htRow><div class="jua htName">${nickHTML(m)}</div><button class="btn ghost sm" id=hPartner>${I('heart')} 파트너 바꾸기</button></div><div class="mut htSub">${esc(lvOf(m.xp).title)} · ${josa(esc(MON[partner].name),'와과')} 함께해요${shinyOn(partner)?' ✨':''}</div><div class="mut htBond">${shinyOn(partner)?'✨ 이로치 파트너!':`이로치까지 함께 푼 문제 ${Math.min(bondOf(partner),SHINY_AT)} / ${SHINY_AT}`}</div><div class=htLine>${hubLine()}</div></div></div>
   ${bkBannerHTML(m)}
   ${gardenPanel(m)}
   ${wgPanel(m)}
@@ -21099,7 +21154,7 @@ function renderTitle(){S.screen='title';const m=S.meta;$('#battle').classList.re
  let pid=25;try{if(m.starter)pid=partnerId()||m.starter;}catch(e){}
  $('#view').innerHTML=`<div class=title><div class="peek solo">${monImg(pid,'front')}</div>
   <div class=logo>좌삼몬스터디<small>지식의 경계를 넘어</small></div>
-  <div class=menuCol>${m.name?`<button class="btn red big" id=tGo>${I('ball')} 이어하기 <small style="font-size:13px">${esc(m.name)} · Lv.${lvOf(m.xp).lv}</small></button>`:`<button class="btn red big" id=tGo>${I('ball')} 시작하기</button>`}
+  <div class=menuCol>${m.name?`<button class="btn red big" id=tGo>${I('ball')} 이어하기 <small style="font-size:13px">${nickHTML(m)} · Lv.${lvOf(m.xp).lv}</small></button>`:`<button class="btn red big" id=tGo>${I('ball')} 시작하기</button>`}
    <button class="btn green" id=tSave>${I('disk')} 저장 · 불러오기</button>
    <div class=row><button class="btn ghost" id=tSet>${I('gear')} 설정</button><button class="btn ghost" id=tTeach>${I('teacher')} 선생님</button></div></div>
   <p class=notice>본 앱은 <b>교육용 앱</b>입니다. 처음 시작할 때 <b>선생님께 받은 학년·학기 코드</b>를 입력해야 하고, 기본 학기를 바꿀 때도 <b>선생님 코드</b>가 필요합니다.<br>실명 대신 <b>닉네임</b>을 사용해 주세요.<br>비영리 교육용 팬 콘텐츠이며, 포켓몬 관련 권리는 각 권리자에게 있습니다.</p>
@@ -22360,7 +22415,7 @@ function enSize(level,type){const idx=level-1;return type==='vocabulary'?EN_WORD
 function makeEnglishQ(){
  const m=S.meta,level=Math.max(1,Math.min(EN_LEVELS.length,+m.enLevel||1)),studyMode=m.enStudyMode||'mixed';
  const typeSets={word:['vocabulary'],reading:['reading'],grammar:['grammar'],sentence:['translation'],mixed:['vocabulary','vocabulary','grammar','grammar','translation','reading']};
- const FX=S.enForce||null;const types=(FX&&FX.types)?FX.types:(typeSets[studyMode]||typeSets.mixed);
+ const FX=S.enForce||null;const types=(FX&&FX.types)?FX.types:enTypesOf(m);
  m.enWrong=(m.enWrong||[]);
  let item=null,review=false;
  // 틀린 문제는 약 30% 확률로 다시 출제해 복습(두 번 연속 맞히면 졸업)
@@ -24033,7 +24088,8 @@ KO_HANJA.push(...[
 const KO_BANK={pick:KO_PICK,dict:KO_DICT,space:KO_SPACE,fix:KO_FIX,vocab:KO_VOCAB,proverb:KO_PROVERB,idiom:KO_IDIOM,hanja:KO_HANJA};
 Object.keys(KO_TYPE).forEach(t=>{SKM['ko:'+t]={id:'ko:'+t,s:'',u:0,n:'국어 · '+(['vocab','proverb','idiom','hanja'].includes(t)?'':'맞춤법 · ')+KO_TYPE[t],es:[]};});
 const KO_RECENT=[];
-function koGrade(){const kl=+S.meta.koLevel;if(kl>=1&&kl<=6)return kl;const g=parseInt(String(S.meta.gs||'3-1')[0],10);return g>=1&&g<=6?g:3;}
+function koMin(){const g=parseInt(String(S.meta.gs||'3-1')[0],10);return g>=1&&g<=6?g:3;}   // 국어 수준은 내 수학 학년보다 낮게 고를 수 없어요
+function koGrade(){const kl=+S.meta.koLevel;if(kl>=koMin()&&kl<=6)return kl;return koMin();}
 function koShuf(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function koSpaceVariants(src){ // 바른 문장과 틀린 띄어쓰기 문장들을 만들어요
  const toStr=(s,cut,join)=>{let out='',i=0,sp=-1,bar=-1;for(const ch of s){if(ch==='_'||ch==='~'){sp++;out+=join.has('s'+sp)?'':' ';}else if(ch==='|'){bar++;out+=cut.has('b'+bar)?' ':'';}else out+=ch;}return out;};
@@ -24057,8 +24113,8 @@ const KO_TIER_W={L:[['pick',3],['dict',1],['vocab',1],['hanja',1]],M:[['dict',2]
 function makeKoreanQ(tier){const g=koGrade(),m=S.meta;m.ko=m.ko||{n:0,c:0,t:{},w:[]};
  const avail=t=>KO_BANK[t].map((it,i)=>({i,g:it[0]})).filter(x=>x.g<=g);
  // 틀렸던 문제는 가끔 다시 내요
- if(m.ko.w&&m.ko.w.length&&rnd()<.25){const ids=koShuf(m.ko.w);for(const id of ids){const t=id.replace(/\d+$/,''),i=+id.slice(t.length);if((S.koForce?S.koForce.includes(t):(!m.koMode||m.koMode==='mixed'||m.koMode===t))&&KO_BANK[t]&&KO_BANK[t][i]&&KO_BANK[t][i][0]<=g&&!KO_RECENT.includes(id)){const q=koBuild(t,i);if(q){q.rv=1;q.tier=tier||null;KO_RECENT.push(id);if(KO_RECENT.length>14)KO_RECENT.shift();return q;}}}}
- let wl=(KO_TIER_W[tier]||Object.keys(KO_TYPE).map(t=>[t,1])).filter(([t])=>avail(t).length);{const km=m.koMode;if(S.koForce){const l2=S.koForce.filter(t=>KO_BANK[t]&&avail(t).length).map(t=>[t,1]);if(l2.length)wl=l2;}else if(km&&km!=='mixed'&&KO_BANK[km]&&avail(km).length)wl=[[km,1]];}
+ if(m.ko.w&&m.ko.w.length&&rnd()<.25){const ids=koShuf(m.ko.w);for(const id of ids){const t=id.replace(/\d+$/,''),i=+id.slice(t.length);if((S.koForce?S.koForce.includes(t):(!koModesOf(m)||koModesOf(m).includes(t)))&&KO_BANK[t]&&KO_BANK[t][i]&&KO_BANK[t][i][0]<=g&&!KO_RECENT.includes(id)){const q=koBuild(t,i);if(q){q.rv=1;q.tier=tier||null;KO_RECENT.push(id);if(KO_RECENT.length>14)KO_RECENT.shift();return q;}}}}
+ let wl=(KO_TIER_W[tier]||Object.keys(KO_TYPE).map(t=>[t,1])).filter(([t])=>avail(t).length);{const km=m.koMode;if(S.koForce){const l2=S.koForce.filter(t=>KO_BANK[t]&&avail(t).length).map(t=>[t,1]);if(l2.length)wl=l2;}else{const ks=koModesOf(m);if(ks){const l3=ks.filter(t=>KO_BANK[t]&&avail(t).length).map(t=>[t,1]);if(l3.length)wl=l3;}}}
  for(let k=0;k<20;k++){let tot=wl.reduce((a,b)=>a+b[1],0),x=rnd()*tot,t=wl[wl.length-1][0];for(const [tt,w] of wl){x-=w;if(x<=0){t=tt;break;}}
   const pool=avail(t),wts=pool.map(p=>p.g>=g-1?3:1),sum=wts.reduce((a,b)=>a+b,0);let y=rnd()*sum,pick=pool[pool.length-1];for(let i=0;i<pool.length;i++){y-=wts[i];if(y<=0){pick=pool[i];break;}}
   const id=t+pick.i;if(KO_RECENT.includes(id)&&k<15)continue;
@@ -24207,44 +24263,62 @@ document.addEventListener('click',e=>{const t=e.target&&e.target.closest?e.targe
  q.__said=1;setTimeout(()=>enSpeak(q.say),120);},true);
 try{const st=document.createElement('style');st.textContent='.enSay{margin-left:8px;border:0;border-radius:999px;padding:4px 12px;background:#e6f0ff;color:#2f5aa8;font:inherit;font-size:13px;font-weight:700;cursor:pointer;vertical-align:middle}.enSay:active{transform:scale(.95)}';document.head.appendChild(st);}catch(e){}
 const __renderTitleWithScenario=renderTitle;
+const EN_MODE_ALL=['word','reading','grammar','sentence'],EN_MODE_NAME={word:'단어',reading:'독해',grammar:'문법',sentence:'문장 해석'};
+// 영어 영역: m.enModes(체크한 영역 목록). 4개 모두 체크하면 종합(단어·문법·해석·독해를 섞어서)
+function enModesOf(m){m=m||S.meta;if(Array.isArray(m.enModes)&&m.enModes.length){const s=EN_MODE_ALL.filter(k=>m.enModes.includes(k));if(s.length)return s;}const sm=m.enStudyMode;return EN_MODE_ALL.includes(sm)?[sm]:EN_MODE_ALL.slice();}
+function enTypesOf(m){const s=enModesOf(m);if(s.length>=EN_MODE_ALL.length)return ['vocabulary','vocabulary','grammar','grammar','translation','reading'];const T={word:'vocabulary',reading:'reading',grammar:'grammar',sentence:'translation'};return s.map(k=>T[k]);}
+function enModeLabel(m){const s=enModesOf(m);return s.length>=EN_MODE_ALL.length?'종합 모드':s.length===1?EN_MODE_NAME[s[0]]+' 모드':s.map(k=>EN_MODE_NAME[k]).join('·');}
+// 영역 체크박스 묶음(영어·국어 공통): 최소 1개는 체크, '종합 모드' 버튼은 모든 영역을 한 번에 체크
+function modeChecks(box,attr,all,get,set){
+ const paint=()=>{const sl=get();box.querySelectorAll('input['+attr+']').forEach(i=>{const on=sl.includes(i.getAttribute(attr));i.checked=on;const l=i.closest('label');if(l){l.classList.toggle('green',on);l.classList.toggle('ghost',!on);}});
+  const a=box.querySelector('[data-a=mode_mixed]');if(a){const full=all.every(k=>sl.includes(k));a.classList.toggle('green',full);a.classList.toggle('ghost',!full);}};
+ box.querySelectorAll('input['+attr+']').forEach(i=>i.onchange=()=>{const k=i.getAttribute(attr);let sl=get().slice();if(i.checked){if(!sl.includes(k))sl.push(k);}else sl=sl.filter(x=>x!==k);
+  if(!sl.length){i.checked=true;toast('영역은 최소 1개 골라야 해요');return;}set(all.filter(x=>sl.includes(x)));paint();});
+ paint();return {paint,all:()=>{set(all.slice());paint();}};}
+const modeRow=(attr,k,name,desc)=>`<label class="btn ghost" style="display:flex;align-items:center;gap:8px;text-align:left;white-space:normal;cursor:pointer;padding:8px 10px"><input type=checkbox ${attr}="${k}" style="width:20px;height:20px;flex:none"><span><b>${name}</b><small style="display:block;font-size:12px">${desc}</small></span></label>`;
 function chooseEnglishMode(fromHub,target){
  target=target==='mix'?'mix':'english';
- const modes=[['word','단어 모드','영어 단어와 한국어 뜻'],['reading','독해 모드','짧은 글을 읽고 내용 이해'],['grammar','문법 모드','빈칸에 알맞은 문법 표현'],['sentence','문장 해석 모드','영어 문장의 뜻 고르기'],['mixed','종합 모드','단어·문법·문장 해석·독해']];
- const current=S.meta.enStudyMode||'mixed';
- const modeButtons=modes.map(v=>`<button class="btn ${current===v[0]?'green':'ghost'}" data-a="mode_${v[0]}" style="text-align:left;justify-content:flex-start;white-space:normal"><b>${v[1]}</b><small style="display:block;font-size:12px;margin-left:6px">${v[2]}</small></button>`).join('');
+ const modes=[['word','단어 모드','영어 단어와 한국어 뜻'],['reading','독해 모드','짧은 글을 읽고 내용 이해'],['grammar','문법 모드','빈칸에 알맞은 문법 표현'],['sentence','문장 해석 모드','영어 문장의 뜻 고르기']];
+ const modeButtons=`<button class="btn ghost" data-a="mode_mixed" style="grid-column:1/-1;text-align:left;justify-content:flex-start;white-space:normal"><b>종합 모드</b><small style="display:block;font-size:12px;margin-left:6px">모든 영역 체크 · 단어·문법·문장 해석·독해</small></button>`+modes.map(v=>modeRow('data-en',v[0],v[1],v[2])).join('');
  const levels=enOrder().map((i,pos)=>{const v=EN_LEVELS[i];return `<button class="btn ${(+S.meta.enLevel||1)===i+1?'green':'ghost'}" style="white-space:normal;justify-content:flex-start;text-align:left" data-a="lv${i+1}"><span style="font-family:'Black Han Sans';font-size:20px;min-width:28px">${pos+1}</span><span><b>${v.n}</b><br><small style="font-size:12px;font-family:'Noto Sans KR'">${v.d}</small></span></button>`;}).join('');
- const actions={_close:()=>{}};
- modes.forEach(v=>actions['mode_'+v[0]]=()=>{S.meta.questionMode=target;S.meta.enStudyMode=v[0];autoSave();chooseEnglishMode(fromHub,target);});
- EN_LEVELS.forEach((v,i)=>actions['lv'+(i+1)]=()=>{S.meta.questionMode=target;S.meta.enLevel=i+1;S.meta.enStudyMode=S.meta.enStudyMode||'mixed';autoSave();closeM();if(fromHub)renderHub();else goStart();});
- M(`<h2>${target==='mix'?'영수 모드 · 영어 설정':'영어 학습 모드'}</h2><p style="font-size:14px;line-height:1.6;margin-bottom:8px">${target==='mix'?'수학 문제와 영어 문제가 번갈아 나와요. 영어 유형과 난이도를 고르면 시작해요. ':''}먼저 학습 유형을 고르고, 아래에서 난이도를 선택하세요. 틀린 문제는 나중에 다시 나와서 복습할 수 있어요.</p><h3 style="margin:8px 0">학습 유형</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">${modeButtons}</div><h3 style="margin:12px 0 7px">난이도</h3><div style="display:grid;grid-template-columns:1fr;gap:7px">${levels}</div><div class="mbtns"><button class="btn ghost" data-a="cancel">닫기</button></div>`,Object.assign(actions,{cancel:()=>closeM()}));}
+ const actions={_close:()=>{}};let chk=null;
+ EN_LEVELS.forEach((v,i)=>actions['lv'+(i+1)]=()=>{S.meta.questionMode=target;S.meta.enLevel=i+1;if(!Array.isArray(S.meta.enModes))S.meta.enModes=enModesOf(S.meta);S.meta.enStudyMode=S.meta.enStudyMode||'mixed';autoSave();closeM();if(fromHub)renderHub();else goStart();});
+ actions.mode_mixed=()=>{if(chk)chk.all();};
+ M(`<h2>${target==='mix'?'영수 모드 · 영어 설정':'영어 학습 모드'}</h2><p style="font-size:14px;line-height:1.6;margin-bottom:8px">${target==='mix'?'수학 문제와 영어 문제가 번갈아 나와요. 영어 영역과 난이도를 고르면 시작해요. ':''}풀고 싶은 영역을 체크하고(여러 개 가능, 최소 1개), 아래에서 난이도를 선택하세요. 틀린 문제는 나중에 다시 나와서 복습할 수 있어요.</p><h3 style="margin:8px 0">학습 영역</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">${modeButtons}</div><h3 style="margin:12px 0 7px">난이도</h3><div style="display:grid;grid-template-columns:1fr;gap:7px">${levels}</div><div class="mbtns"><button class="btn ghost" data-a="cancel">닫기</button></div>`,Object.assign(actions,{cancel:()=>closeM()}));
+ chk=modeChecks($('#mbox'),'data-en',EN_MODE_ALL,()=>enModesOf(S.meta),sl=>{S.meta.questionMode=target;S.meta.enModes=sl;S.meta.enStudyMode=sl.length>=EN_MODE_ALL.length?'mixed':sl.length===1?sl[0]:'multi';autoSave();});}
 
 const __qHTMLBeforeKoSp=qHTML;
 qHTML=function(q,head=''){let h=__qHTMLBeforeKoSp(q,head);if(!q||!q.ko||q.type!=='space')return h;
  h=h.replace(/(<button class=ch data-i="\d+">)([\s\S]*?)(<\/button>)/g,(m,a,t,b)=>a+t.replace(/(^|>)([^<]+)/g,(mm,p,x)=>p+x.replace(/ /g,'<span class="koSp">∨</span>'))+b);
  return h.replace('class="choices','class="choices koSpace');};
 const KO_LEVELS=[['1학년','쉬운 낱말 · 기본 받침'],['2학년','소리와 다르게 쓰는 낱말'],['3학년','헷갈리는 맞춤법 · 띄어쓰기 기초'],['4학년','자주 틀리는 표현 · 문장 띄어쓰기'],['5학년','까다로운 맞춤법 · 틀린 곳 고치기'],['6학년','어려운 맞춤법 · 종합 실력']];
+const KO_MODE_ALL=['pick','dict','space','fix','vocab','proverb','idiom','hanja'];
+// 국어 영역: m.koModes(체크한 영역 목록). 8개 모두 체크하면 종합(예전처럼 섞어서). null=종합
+function koModesOf(m){m=m||S.meta;if(Array.isArray(m.koModes)&&m.koModes.length){const s=KO_MODE_ALL.filter(k=>m.koModes.includes(k));return s.length&&s.length<KO_MODE_ALL.length?s:null;}return KO_MODE_ALL.includes(m.koMode)?[m.koMode]:null;}
+function koModeLabel(m){const s=koModesOf(m);return !s?'종합':s.length===1?KO_TYPE[s[0]]:s.map(k=>KO_TYPE[k]).join('·');}
 function chooseKoreanMode(fromHub){
- const modes=[['mixed','종합 모드','맞춤법·낱말·속담·관용 표현·한자어'],['pick','알맞은 표현','빈칸에 알맞은 말 고르기'],['dict','받아쓰기','소리 나는 대로 → 바른 표기'],['space','띄어쓰기','바르게 띄어 쓴 문장 고르기'],['fix','틀린 곳 고치기','밑줄 친 낱말 바르게 고치기'],['vocab','낱말 뜻','뜻을 보고 알맞은 낱말 고르기'],['proverb','속담','뜻을 보고 알맞은 속담 고르기'],['idiom','관용 표현','뜻을 보고 알맞은 관용 표현 고르기'],['hanja','한자어 낱말','뜻을 보고 알맞은 한자어 고르기']];
- const cur=S.meta.koMode||'mixed',curLv=+S.meta.koLevel||0;
- const modeButtons=modes.map(v=>`<button class="btn ${cur===v[0]?'green':'ghost'}" data-a="mode_${v[0]}" style="text-align:left;justify-content:flex-start;white-space:normal"><b>${v[1]}</b><small style="display:block;font-size:12px;margin-left:6px">${v[2]}</small></button>`).join('');
- const levels=KO_LEVELS.map((v,i)=>`<button class="btn ${curLv===i+1?'green':'ghost'}" style="white-space:normal;justify-content:flex-start;text-align:left" data-a="lv${i+1}"><span style="font-family:'Black Han Sans';font-size:20px;min-width:28px">${i+1}</span><span><b>${v[0]} 수준</b><br><small style="font-size:12px;font-family:'Noto Sans KR'">${v[1]}</small></span></button>`).join('')+`<button class="btn ${curLv?'ghost':'green'}" style="white-space:normal;justify-content:flex-start;text-align:left" data-a="lv0"><span style="font-size:20px;min-width:28px">🎓</span><span><b>내 학년에 맞춰서</b><br><small style="font-size:12px;font-family:'Noto Sans KR'">수학 학년·학기 설정을 따라가요</small></span></button>`;
- const actions={_close:()=>{}};
- modes.forEach(v=>actions['mode_'+v[0]]=()=>{S.meta.questionMode='korean';S.meta.koMode=v[0];autoSave();chooseKoreanMode(fromHub);});
- for(let i=0;i<=6;i++)actions['lv'+i]=()=>{S.meta.questionMode='korean';S.meta.koLevel=i;autoSave();closeM();if(fromHub)renderHub();else goStart();};
- M(`<h2>국어 학습 설정</h2><p style="font-size:14px;line-height:1.6;margin-bottom:8px">먼저 학습 유형을 고르고, 아래에서 수준을 선택하세요. 고른 학년까지의 문제가 나오고, 틀린 문제는 나중에 다시 나와요.</p><h3 style="margin:8px 0">학습 유형</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">${modeButtons}</div><h3 style="margin:12px 0 7px">수준</h3><div style="display:grid;grid-template-columns:1fr;gap:7px">${levels}</div><div class="mbtns"><button class="btn ghost" data-a="cancel">닫기</button></div>`,Object.assign(actions,{cancel:()=>closeM()}));}
+ const modes=[['pick','알맞은 표현','빈칸에 알맞은 말 고르기'],['dict','받아쓰기','소리 나는 대로 → 바른 표기'],['space','띄어쓰기','바르게 띄어 쓴 문장 고르기'],['fix','틀린 곳 고치기','밑줄 친 낱말 바르게 고치기'],['vocab','낱말 뜻','뜻을 보고 알맞은 낱말 고르기'],['proverb','속담','뜻을 보고 알맞은 속담 고르기'],['idiom','관용 표현','뜻을 보고 알맞은 관용 표현 고르기'],['hanja','한자어 낱말','뜻을 보고 알맞은 한자어 고르기']];
+ const kmin=koMin(),curLv=(+S.meta.koLevel>=kmin)?+S.meta.koLevel:0;
+ const modeButtons=`<button class="btn ghost" data-a="mode_mixed" style="grid-column:1/-1;text-align:left;justify-content:flex-start;white-space:normal"><b>종합 모드</b><small style="display:block;font-size:12px;margin-left:6px">모든 영역 체크 · 맞춤법·낱말·속담·관용 표현·한자어</small></button>`+modes.map(v=>modeRow('data-ko',v[0],v[1],v[2])).join('');
+ const levels=KO_LEVELS.map((v,i)=>i+1<kmin?`<button class="btn ghost" disabled style="white-space:normal;justify-content:flex-start;text-align:left;opacity:.4;cursor:not-allowed"><span style="font-size:18px;min-width:28px">🔒</span><span><b>${v[0]} 수준</b><br><small style="font-size:12px;font-family:'Noto Sans KR'">내 학년(${kmin}학년)보다 낮아서 고를 수 없어요</small></span></button>`:`<button class="btn ${curLv===i+1?'green':'ghost'}" style="white-space:normal;justify-content:flex-start;text-align:left" data-a="lv${i+1}"><span style="font-family:'Black Han Sans';font-size:20px;min-width:28px">${i+1}</span><span><b>${v[0]} 수준</b><br><small style="font-size:12px;font-family:'Noto Sans KR'">${v[1]}</small></span></button>`).join('')+`<button class="btn ${curLv?'ghost':'green'}" style="white-space:normal;justify-content:flex-start;text-align:left" data-a="lv0"><span style="font-size:20px;min-width:28px">🎓</span><span><b>내 학년에 맞춰서</b><br><small style="font-size:12px;font-family:'Noto Sans KR'">수학 학년·학기 설정을 따라가요</small></span></button>`;
+ const actions={_close:()=>{}};let chk=null;
+ for(let i=0;i<=6;i++)if(i===0||i>=koMin())actions['lv'+i]=()=>{S.meta.questionMode='korean';S.meta.koLevel=i;autoSave();closeM();if(fromHub)renderHub();else goStart();};
+ actions.mode_mixed=()=>{if(chk)chk.all();};
+ M(`<h2>국어 학습 설정</h2><p style="font-size:14px;line-height:1.6;margin-bottom:8px">풀고 싶은 영역을 체크하고(여러 개 가능, 최소 1개), 아래에서 수준을 선택하세요. 고른 학년까지의 문제가 나오고, 틀린 문제는 나중에 다시 나와요.</p><h3 style="margin:8px 0">학습 영역</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">${modeButtons}</div><h3 style="margin:12px 0 7px">수준</h3><div style="display:grid;grid-template-columns:1fr;gap:7px">${levels}</div><div class="mbtns"><button class="btn ghost" data-a="cancel">닫기</button></div>`,Object.assign(actions,{cancel:()=>closeM()}));
+ chk=modeChecks($('#mbox'),'data-ko',KO_MODE_ALL,()=>koModesOf(S.meta)||KO_MODE_ALL.slice(),sl=>{S.meta.questionMode='korean';S.meta.koModes=sl;S.meta.koMode=sl.length>=KO_MODE_ALL.length?'mixed':sl.length===1?sl[0]:'multi';autoSave();});}
 function chooseStartMode(){
  const cur=S.meta.questionMode||'math';
  const items=[['math','➗','수학 모드','학년·학기 수학 문제'],['english','📘','영어 모드','단어·문법·해석·독해'],['mix','🔀','영수 모드','수학과 영어 문제가 섞여서 나와요'],['korean','📖','국어 모드','맞춤법 · 띄어쓰기 · 받아쓰기']];
  const btns=items.map(v=>`<button class="btn ${cur===v[0]?'green':'ghost'}" data-a="m_${v[0]}" style="text-align:left;justify-content:flex-start;white-space:normal;padding:14px 16px"><span style="font-size:30px;margin-right:10px">${v[1]}</span><span><b style="font-size:19px">${v[2]}</b><br><small style="font-size:13px;font-family:'Noto Sans KR'">${v[3]}</small></span></button>`).join('');
  M(`<h2>어떤 모드로 시작할까요?</h2><div style="display:grid;gap:9px;margin-top:8px">${btns}</div><div class="mbtns"><button class="btn ghost" data-a="cancel">닫기</button></div>`,{
-  m_math:()=>{closeM();S.meta.questionMode='math';autoSave();goStart();},
+  m_math:()=>{closeM();chooseMathMode(false);},
   m_english:()=>{closeM();chooseEnglishMode(false,'english');},
   m_mix:()=>{closeM();chooseEnglishMode(false,'mix');},
   m_korean:()=>{closeM();S.meta.questionMode='korean';autoSave();chooseKoreanMode(false);},
   cancel:()=>closeM(),_close:()=>{}});}
-renderTitle=function(){__renderTitleWithScenario();const menu=$('.menuCol');if(!menu)return;const go=$('#tGo');if(go){go.innerHTML=`${I('calculator')} ${S.meta.name?'이어하기':'시작하기'}${S.meta.name?` <small style="font-size:13px">${esc(S.meta.name)} · Lv.${lvOf(S.meta.xp).lv}</small>`:''}`;go.onclick=()=>{sfx('tap');ac();if(S.meta.name){if(['math','english','mix','korean'].indexOf(S.meta.questionMode)<0){S.meta.questionMode='math';autoSave();}goStart();}else chooseStartMode();};}const old=$('#tEnglish');if(old)old.remove();};
+renderTitle=function(){__renderTitleWithScenario();const menu=$('.menuCol');if(!menu)return;const go=$('#tGo');if(go){go.innerHTML=`${I('calculator')} ${S.meta.name?'이어하기':'시작하기'}${S.meta.name?` <small style="font-size:13px">${nickHTML(S.meta)} · Lv.${lvOf(S.meta.xp).lv}</small>`:''}`;go.onclick=()=>{sfx('tap');ac();if(S.meta.name){if(['math','english','mix','korean'].indexOf(S.meta.questionMode)<0){S.meta.questionMode='math';autoSave();}goStart();}else chooseStartMode();};}const old=$('#tEnglish');if(old)old.remove();};
 const __renderHubWithEnglishScenario=renderHub;
-renderHub=function(){__renderHubWithEnglishScenario.apply(this,arguments);const wrap=$('#view .wrap');if(!wrap)return;let panel=$('#englishModePanel');if(!panel){panel=document.createElement('div');panel.id='englishModePanel';panel.className='panel';panel.style.cssText='display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px';const tiles=wrap.querySelector('.tiles');if(tiles)wrap.insertBefore(panel,tiles);}if(panel){const qm=S.meta.questionMode||'math',isEn=qm==='english',isMix=qm==='mix',lvName=EN_LEVELS[(S.meta.enLevel||1)-1].n,tp={word:'단어 모드',reading:'독해 모드',grammar:'문법 모드',sentence:'문장 해석 모드',mixed:'종합 모드'}[S.meta.enStudyMode||'mixed'];panel.innerHTML=`<div style="font-size:28px">${isEn?'📘':isMix?'🔀':'➗'}</div><div style="flex:1;min-width:130px"><b class="jua" style="font-size:18px">현재 모드: ${isEn?'영어 모드':isMix?'영수 모드':'수학 모드'}</b><div class="mut" style="font-size:12px">${isEn?`${lvName} · ${tp}`:isMix?`수학 + 영어 섞어서 · ${lvName} · ${tp}`:'기존 학년·학기 수학 문제'}</div></div><div class="hModeBtns"><button class="btn ${qm==='math'?'green':'ghost'} sm" id="hMathMode"><span class="mFull">수학 모드</span><span class="mShort">수학</span></button><button class="btn ${isEn?'green':'ghost'} sm" id="hEnglishMode"><span class="mFull">${isEn?'영어 설정':'영어 모드'}</span><span class="mShort">영어</span></button><button class="btn ${isMix?'green':'ghost'} sm" id="hMixMode"><span class="mFull">${isMix?'영수 설정':'영수 모드'}</span><span class="mShort">영수</span></button></div>`;$('#hEnglishMode').onclick=()=>{sfx('tap');if(isEn||!S.meta.enLevel)chooseEnglishMode(true,'english');else{S.meta.questionMode='english';autoSave();renderHub();}};$('#hMixMode').onclick=()=>{sfx('tap');if(isMix||!S.meta.enLevel)chooseEnglishMode(true,'mix');else{S.meta.questionMode='mix';autoSave();renderHub();}};$('#hMathMode').onclick=()=>{sfx('tap');S.meta.questionMode='math';autoSave();renderHub();};}
+renderHub=function(){__renderHubWithEnglishScenario.apply(this,arguments);const wrap=$('#view .wrap');if(!wrap)return;let panel=$('#englishModePanel');if(!panel){panel=document.createElement('div');panel.id='englishModePanel';panel.className='panel';panel.style.cssText='display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px';const tiles=wrap.querySelector('.tiles');if(tiles)wrap.insertBefore(panel,tiles);}if(panel){const qm=S.meta.questionMode||'math',isEn=qm==='english',isMix=qm==='mix',lvName=EN_LEVELS[(S.meta.enLevel||1)-1].n,tp=enModeLabel(S.meta);panel.innerHTML=`<div style="font-size:28px">${isEn?'📘':isMix?'🔀':'➗'}</div><div style="flex:1;min-width:130px"><b class="jua" style="font-size:18px">현재 모드: ${isEn?'영어 모드':isMix?'영수 모드':'수학 모드'}</b><div class="mut" style="font-size:12px">${isEn?`${lvName} · ${tp}`:isMix?`수학 + 영어 섞어서 · ${lvName} · ${tp}`:'기존 학년·학기 수학 문제'}</div></div><div class="hModeBtns"><button class="btn ${qm==='math'?'green':'ghost'} sm" id="hMathMode"><span class="mFull">수학 모드</span><span class="mShort">수학</span></button><button class="btn ${isEn?'green':'ghost'} sm" id="hEnglishMode"><span class="mFull">${isEn?'영어 설정':'영어 모드'}</span><span class="mShort">영어</span></button><button class="btn ${isMix?'green':'ghost'} sm" id="hMixMode"><span class="mFull">${isMix?'영수 설정':'영수 모드'}</span><span class="mShort">영수</span></button></div>`;$('#hEnglishMode').onclick=()=>{sfx('tap');if(isEn||!S.meta.enLevel)chooseEnglishMode(true,'english');else{S.meta.questionMode='english';autoSave();renderHub();}};$('#hMixMode').onclick=()=>{sfx('tap');if(isMix||!S.meta.enLevel)chooseEnglishMode(true,'mix');else{S.meta.questionMode='mix';autoSave();renderHub();}};$('#hMathMode').onclick=()=>{sfx('tap');S.meta.questionMode='math';autoSave();renderHub();};}
  const train=$('#tTrain');if(train){const title=train.querySelector('.tn'),desc=train.querySelector('.td');if(title)title.textContent=S.meta.questionMode==='english'?'오늘의 영어 훈련':S.meta.questionMode==='mix'?'오늘의 영수 훈련':'오늘의 훈련';if(desc&&S.meta.questionMode==='english')desc.innerHTML=`${trainN()}문제 · ${EN_LEVELS[(S.meta.enLevel||1)-1].n} · 영어 실력 키우기`;else if(desc&&S.meta.questionMode==='mix')desc.innerHTML=`${trainN()}문제 · 수학 + 영어 섞어서 · 실력 키우기`;else if(desc)desc.innerHTML=`${S.meta.train.daily===today()?'오늘 훈련 완료! 한 번 더 하면 사탕을 더 받아요.':`문제 ${trainN()}개 · 오늘의 카드팩 받기`}`;}
 };
 
@@ -24254,8 +24328,36 @@ const __renderHubBeforeKo=renderHub;
 renderHub=function(){__renderHubBeforeKo.apply(this,arguments);const panel=$('#englishModePanel');if(!panel)return;const qm=S.meta.questionMode||'math',isKo=qm==='korean';
  const btns=panel.querySelector('.hModeBtns');
  if(btns&&!$('#hKoMode')){const b=document.createElement('button');b.id='hKoMode';b.className='btn sm '+(isKo?'green':'ghost');b.innerHTML='<span class="mFull">'+(isKo?'국어 설정':'국어 모드')+'</span><span class="mShort">국어</span>';b.onclick=()=>{sfx('tap');S.meta.questionMode='korean';autoSave();chooseKoreanMode(true);};btns.appendChild(b);}
- if(isKo){const ic=panel.firstElementChild;if(ic)ic.textContent='📖';const t=panel.querySelector('b.jua');if(t)t.textContent='현재 모드: 국어 모드';const d=panel.querySelector('.mut');if(d)d.textContent=(({mixed:'종합',pick:'알맞은 표현',dict:'받아쓰기',space:'띄어쓰기',fix:'틀린 곳 고치기',vocab:'낱말 뜻',proverb:'속담',idiom:'관용 표현',hanja:'한자어 낱말'})[S.meta.koMode||'mixed']||'종합')+' · '+koGrade()+'학년 수준';
+ if(isKo){const ic=panel.firstElementChild;if(ic)ic.textContent='📖';const t=panel.querySelector('b.jua');if(t)t.textContent='현재 모드: 국어 모드';const d=panel.querySelector('.mut');if(d)d.textContent=koModeLabel(S.meta)+' · '+koGrade()+'학년 수준';
   const train=$('#tTrain');if(train){const tt=train.querySelector('.tn'),td=train.querySelector('.td');if(tt)tt.textContent='오늘의 국어 훈련';if(td)td.innerHTML=`${trainN()}문제 · 국어 맞춤법 · 실력 키우기`;}}
+};
+// ---- 수학 설정: 영어 설정처럼 모드를 고르면 뜨는 창. 이번 학기 단원을 체크한 단원 문제만 나와요 ----
+// 규칙: 최소 1개 체크 · 별을 모두 모은(🏅 마스터) 단원은 혼자 체크할 수 없고 아직 마스터 못한 단원과 같이 체크 · 아래 학년·마스터 단원 문제는 섞여 나와요
+function chooseMathMode(fromHub){
+ const m=S.meta,map=unitsWithSkills();
+ const list=(UNITS[m.gs]||[]).map((n,i)=>({n,u:i+1,k:unitKey(m.gs,i+1)})).filter(x=>map[x.k]).map(x=>{const sks=map[x.k];return Object.assign(x,{cnt:sks.length,st:sks.reduce((a,sk)=>a+((m.sk[sk.id]&&m.sk[sk.id].st)||0),0),max:sks.length*5,master:unitAllStars(x.k)});});
+ if(!list.length){m.questionMode='math';autoSave();if(fromHub)renderHub();else goStart();return;}
+ const um=list.filter(x=>!x.master);
+ let set=new Set((Array.isArray(m.mathUnits)&&m.mathUnits.length?m.mathUnits:list.map(x=>x.k)).filter(k=>list.some(x=>x.k===k)));
+ if(!set.size)list.forEach(x=>set.add(x.k));
+ if(um.length&&![...set].some(k=>um.some(x=>x.k===k)))um.forEach(x=>set.add(x.k));   // 저장된 선택이 전부 마스터 단원이면 아직 못 한 단원도 같이 켜요
+ const bad=nx=>{if(!nx.size)return '단원은 최소 1개 골라야 해요';
+  if(um.length&&![...nx].some(k=>um.some(x=>x.k===k)))return '🏅 마스터한 단원은 혼자 고를 수 없어요. 아직 마스터하지 못한 단원도 같이 골라 주세요';return '';};
+ const rows=list.map(x=>`<label class="btn ${set.has(x.k)?'green':'ghost'}" data-row="${x.k}" style="display:flex;align-items:center;gap:10px;text-align:left;white-space:normal;cursor:pointer"><input type=checkbox data-k="${x.k}" ${set.has(x.k)?'checked':''} style="width:22px;height:22px;flex:none"><span><b>${x.u}. ${esc(x.n)}</b>${x.master?' <span title="별을 모두 모았어요">🏅 마스터</span>':''}<br><small style="font-size:12px;font-family:'Noto Sans KR'">개념 ${x.cnt}개 · 별 ${x.st}/${x.max}</small></span></label>`).join('');
+ const act={_close:()=>{},cancel:()=>closeM(),
+  all:()=>{set=new Set(list.map(x=>x.k));paint();msg('');},
+  save:()=>{const w=bad(set);if(w){msg(w);return;}m.mathUnits=[...set];m.mathSet=1;m.questionMode='math';m.focus=null;m.focusRe=null;autoSave();closeM();toast('수학 설정을 저장했어요');if(fromHub)renderHub();else goStart();}};
+ M(`<h2>수학 학습 설정</h2><p style="font-size:14px;line-height:1.6;margin-bottom:8px"><b>${esc(semName(m.gs))}</b>에서 풀고 싶은 단원을 체크하세요. 체크한 단원의 문제가 나오고, <b>아래 학년 문제</b>와 <b>마스터한 🏅 단원</b> 문제는 함께 섞여 나와요. 단원의 개념마다 별 5개를 모두 모으면 마스터예요. 마스터한 단원은 혼자 고를 수 없고, 아직 마스터하지 못한 단원과 같이 골라야 해요.<br>🎖️ 이 학기 단원을 마스터할 때마다 닉네임 앞에 <b>칭호 번호(1~12)</b>가 붙고, 많이 모을수록 아이콘과 색이 멋져져요! (${unitMasterHTML(m)})</p><div style="display:grid;grid-template-columns:1fr;gap:7px">${rows}</div><div id=muMsg style="min-height:22px;margin-top:8px;font-size:13px;color:#d33;line-height:1.4"></div><div class="mbtns"><button class="btn ghost" data-a="all">전체 선택</button><button class="btn blue" data-a="save">저장</button><button class="btn ghost" data-a="cancel">닫기</button></div>`,act);
+ const bx=$('#mbox'),msg=t=>{const e=bx.querySelector('#muMsg');if(e)e.textContent=t;};
+ const paint=()=>bx.querySelectorAll('input[data-k]').forEach(i=>{const on=set.has(i.dataset.k);i.checked=on;const l=i.closest('label');if(l){l.classList.toggle('green',on);l.classList.toggle('ghost',!on);}});
+ bx.querySelectorAll('input[data-k]').forEach(i=>i.onchange=()=>{const nx=new Set(set);if(i.checked)nx.add(i.dataset.k);else nx.delete(i.dataset.k);
+  const w=bad(nx);if(w){i.checked=!i.checked;msg(w);return;}set=nx;msg('');paint();});}
+const __renderHubBeforeMathSet=renderHub;
+renderHub=function(){__renderHubBeforeMathSet.apply(this,arguments);const panel=$('#englishModePanel');if(!panel)return;const qm=S.meta.questionMode||'math',isMath=qm==='math';
+ const b=$('#hMathMode');if(b){const f=b.querySelector('.mFull');if(f)f.textContent=isMath?'수학 설정':'수학 모드';
+  b.onclick=()=>{sfx('tap');if(isMath||!S.meta.mathSet)chooseMathMode(true);else{S.meta.questionMode='math';autoSave();renderHub();}};}
+ if(isMath){const x=mathSel(),d=panel.querySelector('.mut');if(x&&d)d.textContent=semName(S.meta.gs)+' · 단원 '+x.C.size+'개 선택 (아래 학년·마스터 단원 문제도 섞여요)';
+  if(x&&x.fb&&!S.__mathFbToast){S.__mathFbToast=1;setTimeout(()=>toast('🏅 고른 단원을 모두 마스터했어요! 수학 설정에서 다른 단원도 골라 주세요'),400);}}
 };
 // ===== 로그라이크 모험 · 「끝없는 길」 (시나리오 모드 디자인 · 배경 · 음악 재사용) =====
 // 한 번 쓰러지면 끝! 분기점을 고르며 나아가 보스를 쓰러뜨리면 보상을 받아요.
@@ -31595,8 +31697,8 @@ html body #bInfo .card{width:128px}
  const bar=(a,b)=>{const p=b?Math.min(100,Math.round(a/b*100)):0;return '<div style="height:10px;background:#eadfc4;border-radius:6px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:linear-gradient(90deg,#8be08b,#3cc47c)"></div></div>';};
  function levelRow(sub){
   if(sub==='en'){return '<div class=rsLvRow><span>📘 영어 난이도</span><select class=inp id=rsLv>'+enOrder().map(i=>'<option value="'+(i+1)+'"'+(enLv()===i+1?' selected':'')+'>'+esc(EN_LEVELS[i].n)+'</option>').join('')+'</select></div>';}
-  if(sub==='ko'){const kl=+S.meta.koLevel||0,auto=Math.max(1,Math.min(6,parseInt(String(S.meta.gs||'3-1')[0],10)||3));
-   return '<div class=rsLvRow><span>📖 국어 수준</span><select class=inp id=rsLv><option value="0"'+(kl?'':' selected')+'>내 학년에 맞춰서 ('+auto+'학년)</option>'+[1,2,3,4,5,6].map(g=>'<option value="'+g+'"'+(kl===g?' selected':'')+'>'+g+'학년 수준</option>').join('')+'</select></div>';}
+  if(sub==='ko'){const kmin=koMin(),kl=(+S.meta.koLevel>=kmin)?+S.meta.koLevel:0,auto=Math.max(1,Math.min(6,parseInt(String(S.meta.gs||'3-1')[0],10)||3));
+   return '<div class=rsLvRow><span>📖 국어 수준</span><select class=inp id=rsLv><option value="0"'+(kl?'':' selected')+'>내 학년에 맞춰서 ('+auto+'학년)</option>'+[1,2,3,4,5,6].filter(g=>g>=kmin).map(g=>'<option value="'+g+'"'+(kl===g?' selected':'')+'>'+g+'학년 수준</option>').join('')+'</select></div>';}
   return '';}
  function renderRescue(){
   const sub=curSub();S.rescueSub=sub;
@@ -31620,7 +31722,7 @@ html body #bInfo .card{width:128px}
   const sp=$('#rsSpray');if(sp)sp.onclick=()=>{sfx('tap');const rr=RM();rr.spray=!rr.spray;autoSave();toast(rr.spray?'🧴 야생 포켓몬이 나타나지 않아요! 문제만 풀어요.':'야생 포켓몬이 다시 나타나요.');renderRescue();};
   $('#rsHome').onclick=()=>{sfx('tap');renderHub();};
   $('#view').querySelectorAll('[data-rsub]').forEach(b=>b.onclick=()=>{sfx('tap');S.rescueSub=b.dataset.rsub;renderRescue();});
-  const lv=$('#rsLv');if(lv)lv.onchange=()=>{sfx('tap');if(sub==='en')S.meta.enLevel=+lv.value||1;else S.meta.koLevel=+lv.value||0;autoSave();renderRescue();};
+  const lv=$('#rsLv');if(lv)lv.onchange=()=>{sfx('tap');if(sub==='en')S.meta.enLevel=+lv.value||1;else{const v=+lv.value||0;S.meta.koLevel=(v&&v<koMin())?0:v;}autoSave();renderRescue();};
   $('#view').querySelectorAll('[data-rs]').forEach(b=>b.onclick=()=>{sfx('tap');const a=b.dataset.rs.split('|');start(a[0],a[1]);});
  }
  function unitRow(sub,u,has){const nd=needU(sub,u),g=Math.min(nd,gotU(sub,u)),d=has&&g>=nd;
@@ -34980,7 +35082,7 @@ html body.hbOn #modal,html body.hbOn #modal2{z-index:9500}
 #hb .dsep{display:flex;align-items:center;gap:8px;color:#5a9;font-size:12px;margin-top:4px}
 #hb .dsep:before,#hb .dsep:after{content:"";flex:1;border-top:1px dashed #0a85}
 #hb .dbt{display:block;width:100%;box-sizing:border-box;min-height:46px;margin:0;padding:10px 12px;background:transparent;border:1px solid var(--c,#3f8);color:var(--c,#3f8);border-radius:4px;font-family:inherit;font-size:15px;text-align:left;cursor:pointer;text-shadow:0 0 6px currentColor;box-shadow:0 0 8px #0a84}
-#hb .dbt:hover,#hb .dbt:active{background:var(--c,#3f8);color:#001a12;text-shadow:none}
+#hb .dbt:hover,#hb .dbt:active,#hb .dbt:focus-visible{background:var(--c,#3f8);color:#001a12!important;text-shadow:none}
 #hb .dbt.j{--c:#3ff}
 #hb .dbt.q{--c:#f77;opacity:.85}
 #hb .dosSt{min-height:1.5em;color:#fd6;font-size:13px;word-break:keep-all;overflow-wrap:anywhere}
@@ -35017,7 +35119,7 @@ html body.hbOn #modal,html body.hbOn #modal2{z-index:9500}
 #hb .durs{grid-template-columns:repeat(auto-fit,minmax(80px,1fr))}
 #hb .idg{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
 #hb .idg .dbt{text-align:center;font-size:16px;overflow-wrap:anywhere}
-#hb .dbt.sel{background:var(--c,#3f8);color:#001a12;text-shadow:none}
+#hb .dbt.sel{background:var(--c,#3f8);color:#001a12!important;text-shadow:none}
 #hb .dbt:disabled{opacity:.35;cursor:default;pointer-events:none}
 #hb .dacc{font-size:13px;color:#8fd;margin-top:3px;line-height:1.5}
 #hb .dacc b{color:#3ff}
@@ -35297,12 +35399,12 @@ function syncPad(){const w=$h('.w'),p=$h('#hbP'),pb=p&&p.firstChild;if(!w)return
 function closeQ(){if(!C||C.mode!=='q')return;C.mode='closed';popx();showGo(1);syncPad();}
 function next(){if(!C||C.phase!=='play'||C.mode==='mini'||C.mode==='warn')return;C.mode=null;if(C.me.lock){mini();return;}if(C.hkM){renderHack();return;}if(C.pendWait)return;question();}
 /* 문제: 내가 고른 모드(수학·영어·국어·영수)를 따르되, 영어·국어는 어떤 세부 모드여도 '종합 모드'로만 출제하고(풀이 속도 균형), IQ·상식 문제는 평소처럼 섞여요. 내 설정은 건드리지 않고 바로 되돌려요 */
-function hbPick(){const m=S.meta,sv=[m.enStudyMode,m.koMode,S.enForce,S.koForce];let q=null;
- try{m.enStudyMode='mixed';m.koMode='mixed';S.enForce=null;S.koForce=null;
+function hbPick(){const m=S.meta,sv=[m.enStudyMode,m.koMode,S.enForce,S.koForce,m.enModes,m.koModes];let q=null;
+ try{m.enStudyMode='mixed';m.koMode='mixed';m.enModes=null;m.koModes=null;S.enForce=null;S.koForce=null;
   const t=nextCyc();if(t==='I'){q=iqQ();}
   if(!q)q=pickQ({cyc:1,tier:t==='I'?'H':t});}
  catch(e){q=null;}
- finally{m.enStudyMode=sv[0];m.koMode=sv[1];S.enForce=sv[2];S.koForce=sv[3];}
+ finally{m.enStudyMode=sv[0];m.koMode=sv[1];S.enForce=sv[2];S.koForce=sv[3];m.enModes=sv[4];m.koModes=sv[5];}
  return q&&q.ch&&q.ch.length>=2&&q.ch.map(String).includes(String(q.a))?q:null;}
 /* 학습 기록: 평소 문제 풀이와 똑같이 앱 기록(푼 문제·정답률·오답 노트·별·경험치·영어/국어/IQ 통계)에 반영해요 */
 function hbRec(q,ok,pick){try{recordAnswer(q,ok,Math.max(300,now()-(C.qAt||now())),{choice:pick});}catch(e){console.warn('hb record',e);}try{qStreak(ok);}catch(e){}try{autoSave();}catch(e){}}
@@ -35833,38 +35935,64 @@ const MINI={
   btn.onpointerdown=fix;stg.onpointerdown=fix;
   reset();requestAnimationFrame(frame);}},
  wire:{n:'와이어 자르기',f(box,ok){
-  /* 규칙: 안내된 색 순서대로 전선을 자르세요. 순서가 틀리면 전선이 다시 이어지고 처음부터! */
+  /* 규칙: 안내된 색 순서대로 전선 5개를 모두 자르세요. 순서가 틀리면 전선이 다시 이어지고 처음부터! (진짜 전선처럼: 구불구불한 피복 + 금속 단자, 자르면 구리선이 드러나요) */
   const COLS=[['빨강','#ff4d5a'],['파랑','#4da3ff'],['노랑','#ffd84d'],['초록','#3fe08a'],['보라','#c77dff']];
-  if(!document.getElementById('hbWrCss')){const st=document.createElement('style');st.id='hbWrCss';st.textContent=[
+  if(!document.getElementById('hbWrCss2')){const st=document.createElement('style');st.id='hbWrCss2';st.textContent=[
    '.mgW{font-family:var(--mono,monospace);color:#cfe;max-width:340px;margin:4px auto 2px;user-select:none;-webkit-user-select:none}',
    '.mgW .wMsg{font-size:14px;line-height:1.45;color:#bfe;min-height:21px}',
-   '.mgW .wClue{display:flex;gap:6px;justify-content:center;align-items:center;margin:8px 0;flex-wrap:wrap;font-size:14px}',
-   '.mgW .wClue b{padding:4px 10px;border-radius:14px;color:#111;font-size:14px}',
-   '.mgW .wClue i.dn{opacity:.35;text-decoration:line-through}',
-   '.mgW .wBox{padding:12px 10px;border:2px solid #0a8;border-radius:12px;background:linear-gradient(#03130f,#020b0a);box-shadow:inset 0 0 24px rgba(0,170,130,.3)}',
+   '.mgW .wClue{display:flex;gap:4px;justify-content:center;align-items:center;margin:8px 0;flex-wrap:wrap;font-size:13px}',
+   '.mgW .wClue b{padding:3px 8px;border-radius:12px;color:#111;font-size:13px}',
+   '.mgW .wBox{padding:8px 8px 6px;border:2px solid #0a8;border-radius:12px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 2px,transparent 2px 6px),linear-gradient(#03130f,#020b0a);box-shadow:inset 0 0 24px rgba(0,170,130,.3)}',
    '.mgW .wBox.win{border-color:#8fb;box-shadow:inset 0 0 30px rgba(90,255,160,.5),0 0 22px #3f8}',
    '.mgW .wBox.bad{animation:wbad .4s;border-color:#f55}@keyframes wbad{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}',
-   '.mgW .wW{position:relative;height:40px;margin:9px 0;border-radius:20px;color:#111;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;box-shadow:0 0 10px rgba(255,255,255,.25),inset 0 -6px 8px rgba(0,0,0,.25)}',
-   '.mgW .wW.cut{opacity:.35;filter:grayscale(.5);box-shadow:none;cursor:default;text-decoration:line-through}',
-   '.mgW .wW.cut::after{content:"✂";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;color:#fff;text-decoration:none}',
-   '@media (prefers-reduced-motion:reduce){.mgW .wBox.bad{animation:none}}'].join('\n');document.head.appendChild(st);}
-  const cs=COLS.map(c=>c).sort(()=>Math.random()-.5),need=cs.slice(0,3).map(c=>c[0]);
-  const order=COLS.map(c=>c).sort(()=>Math.random()-.5);
-  box.innerHTML='<div class=mgW><div class=wMsg></div><div class=wClue></div><div class=wBox>'+order.map(c=>'<div class=wW role=button data-n="'+c[0]+'" style="background:'+c[1]+'">'+c[0]+' 전선</div>').join('')+'</div></div>';
+   '.mgW .wW{position:relative;height:46px;margin:5px 0;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;outline:none}',
+   '.mgW .wW svg{position:absolute;left:14px;top:0;width:calc(100% - 28px);height:46px;overflow:visible;pointer-events:none;z-index:1}',
+   '.mgW .wW path{fill:none;stroke-linecap:round;vector-effect:non-scaling-stroke}',
+   '.mgW .wW .wo{stroke:#000;stroke-opacity:.55;stroke-width:16}',
+   '.mgW .wW .wc{stroke:var(--wc);stroke-width:11}',
+   '.mgW .wW .wr{stroke:#000;stroke-opacity:.22;stroke-width:11;stroke-dasharray:2 7;stroke-linecap:butt}',
+   '.mgW .wW .wh{stroke:#fff;stroke-opacity:.5;stroke-width:3;transform:translateY(-2.5px)}',
+   '.mgW .wW .wT{position:absolute;top:9px;width:15px;height:28px;border-radius:4px;z-index:2;background:linear-gradient(90deg,#8b949d,#eef3f7 45%,#69737d);box-shadow:0 1px 3px #000,inset 0 0 0 1px rgba(0,0,0,.35)}',
+   '.mgW .wW .wT::after{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:radial-gradient(#2b3138,#10151a)}',
+   '.mgW .wW .wT.l{left:0}.mgW .wW .wT.r{right:0}',
+   '.mgW .wW .wLb{position:absolute;left:21%;top:50%;transform:translateY(-50%);z-index:3;padding:1px 7px;border-radius:8px;background:rgba(0,0,0,.68);color:#fff;font-size:12px;font-weight:700;letter-spacing:.5px;pointer-events:none;white-space:nowrap}',
+   '.mgW .wW .wFr{display:none;position:absolute;z-index:2;width:9px;height:14px;border-radius:2px;background:repeating-linear-gradient(0deg,#f0b070 0 2px,#8a5a2a 2px 3px);pointer-events:none}',
+   '.mgW .wW .wFr.a{left:calc(14px + (100% - 28px)*.42);top:var(--ya,23px);transform:translate(-100%,-50%)}',
+   '.mgW .wW .wFr.b{left:calc(14px + (100% - 28px)*.58);top:var(--yb,23px);transform:translate(0,-50%)}',
+   '.mgW .wW.cut .wFr{display:block;animation:wsp .5s ease-out}@keyframes wsp{0%{box-shadow:0 0 14px 7px #ffe9a0}100%{box-shadow:0 0 0 0 transparent}}',
+   '.mgW .wW.cut svg{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 42%,transparent 42%,transparent 58%,#000 58%,#000 100%);mask-image:linear-gradient(90deg,#000 0,#000 42%,transparent 42%,transparent 58%,#000 58%,#000 100%)}',
+   '.mgW .wW.cut .wLb{opacity:.45}',
+   '.mgW .wW.cut::after{content:"✂";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;font-size:18px;color:#fff;text-shadow:0 0 6px #000;pointer-events:none}',
+   '.mgW .wW:focus-visible .wo{stroke:#fff;stroke-opacity:.9}',
+   '@media (prefers-reduced-motion:reduce){.mgW .wBox.bad,.mgW .wW.cut .wFr{animation:none}}'].join('\n');document.head.appendChild(st);}
+  const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;};
+  const need=sh(COLS.map(c=>c[0]));                              // 자를 순서: 5가지 색 모두
+  let order=sh(COLS);                                            // 화면에 놓인 전선 순서 (자를 순서와 같지 않게)
+  while(order.map(c=>c[0]).join()===need.join())order=sh(COLS);
+  const wireHTML=c=>{const a=5+Math.random()*8,s=Math.random()<.5?1:-1,y1=(23-s*a).toFixed(1),y2=(23+s*a).toFixed(1);
+   const d='M0 23 C 50 '+y1+', 100 '+y2+', 150 23 S 250 '+y1+', 300 23';
+   return '<div class=wW role=button tabindex=0 aria-label="'+c[0]+' 전선" data-n="'+c[0]+'" style="--wc:'+c[1]+'"><i class="wT l"></i><i class="wT r"></i>'
+    +'<svg viewBox="0 0 300 46" preserveAspectRatio="none" aria-hidden="true"><path class=wo d="'+d+'"/><path class=wc d="'+d+'"/><path class=wr d="'+d+'"/><path class=wh d="'+d+'"/></svg>'
+    +'<span class=wLb>'+c[0]+'</span><i class="wFr a"></i><i class="wFr b"></i></div>';};
+  box.innerHTML='<div class=mgW><div class=wMsg></div><div class=wClue></div><div class=wBox>'+order.map(wireHTML).join('')+'</div></div>';
   const ws=[...box.querySelectorAll('.wW')],bx=box.querySelector('.wBox'),mg=box.querySelector('.wMsg'),cl=box.querySelector('.wClue');
+  // 자른 자리(전선의 42%~58%)에 구리선 끝이 정확히 전선 위에 오도록 높이를 계산해요
+  const yAt=(p,x)=>{let lo=0,hi=p.getTotalLength();for(let i=0;i<16;i++){const m=(lo+hi)/2;if(p.getPointAtLength(m).x<x)lo=m;else hi=m;}return p.getPointAtLength(hi).y;};
+  ws.forEach(w=>{let ya=23,yb=23;try{const p=w.querySelector('path.wc');ya=yAt(p,126);yb=yAt(p,174);}catch(e){}w.style.setProperty('--ya',ya+'px');w.style.setProperty('--yb',yb+'px');});
   let pos=0,done=false,lock=false;
   const col=n=>COLS.find(c=>c[0]===n)[1];
   const alive=()=>document.body.contains(box);
   const clue=()=>{cl.innerHTML=need.map((n,i)=>'<span>'+(i?'→ ':'')+'<b style="background:'+col(n)+'">'+n+'</b></span>').join(' ');cl.querySelectorAll('span').forEach((s,i)=>{if(i<pos)s.style.opacity='.35';});};
   const msg=h=>{mg.innerHTML=h;};
-  ws.forEach(w=>w.onclick=()=>{if(done||lock||w.classList.contains('cut')||!alive())return;
+  const snip=w=>{if(done||lock||w.classList.contains('cut')||!alive())return;
    try{sfx('tap');}catch(e){}
    if(w.dataset.n===need[pos]){w.classList.add('cut');pos++;clue();
     if(pos>=need.length){done=true;bx.classList.add('win');msg('<b style="color:#8fb">🎉 보안 장치를 해제했어요!</b>');setTimeout(ok,650);}
-    else msg('✂ 좋아요! 다음은 <b>'+need[pos]+'</b>');}
+    else msg('✂ 좋아요! 다음은 <b>'+need[pos]+'</b> ('+pos+'/'+need.length+')');}
    else{lock=true;bx.classList.remove('bad');void bx.offsetWidth;bx.classList.add('bad');msg('💥 순서가 틀렸어요! 전선이 다시 이어져요');
-    setTimeout(()=>{if(!alive())return;ws.forEach(x=>x.classList.remove('cut'));pos=0;lock=false;clue();msg('✂ 안내된 <b>순서대로</b> 잘라 보세요');},800);}});
-  clue();msg('✂ 안내된 <b>순서대로</b> 전선을 잘라 보세요');}},
+    setTimeout(()=>{if(!alive())return;ws.forEach(x=>x.classList.remove('cut'));bx.classList.remove('bad');pos=0;lock=false;clue();msg('✂ 안내된 <b>순서대로</b> 잘라 보세요');},800);}};
+  ws.forEach(w=>{w.onclick=()=>snip(w);w.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();snip(w);}};});
+  clue();msg('✂ 안내된 <b>순서대로</b> 전선 5개를 잘라 보세요');}},
  shadow:{n:'포켓몬 그림자 맞추기',f(box,ok){
   /* 규칙: 까만 그림자의 주인공 이름을 4개 중에서 고르세요. 3번 맞히면 성공! */
   const NEED=3;
@@ -35901,8 +36029,18 @@ const MINI={
    msg('🕵 이 그림자는 <b>누구</b>일까요? ('+(got+1)+'/'+NEED+')');};
   round();}},
  target:{n:'목표 숫자 만들기',f(box,ok){
-  /* 규칙: 숫자를 모두 한 번씩 써서 목표 숫자를 만드세요. 계산은 왼쪽부터 차례대로! 2라운드 */
-  const SIZES=[3,4];
+  /* (1학년 숫자 2~3개 · 1~2학년 유형은 왼쪽부터 순차 계산, 괄호 없음 · 5·6학년도 나누어떨어지는 것만) 규칙: 숫자를 모두 한 번씩 써서 목표 숫자를 만드세요. 학년·학기(S.meta.gs)에 따라 연산·숫자 개수가 달라져요.
+     내 학년 유형이 절반, 나머지는 아래 학년 유형이 섞여 나와요(1학년은 1학년 유형만). 곱셈이 나오는 유형은 곱셈·나눗셈 먼저 + ( ) 버튼. 1라운드.
+     친구 대전: 이 게임은 해킹당한 본인 화면에서 돌아가므로 각자 자기 S.meta.gs 로 출제돼요. */
+  const TIERS=[ // 학년별 유형 (ops 쓰는 연산 · n 숫자 개수 · sig 꼭 한 번은 쓰는 연산 · paren 괄호 버튼 · exact 나누어떨어지는 나눗셈만 · big 두 자리 수 나누어지는 수)
+   {k:'1학년',ops:['+','−'],n:[2,3],ltr:1},
+   {k:'2학년 1학기',ops:['+','−'],n:[3],ltr:1},
+   {k:'2학년 2학기',ops:['+','−','×'],n:[3],sig:'×',ltr:1},
+   {k:'3학년',ops:['+','−','×','÷'],n:[3],sig:'÷',paren:1,exact:1},
+   {k:'4학년',ops:['+','−','×','÷'],n:[3,4],sig:'÷',paren:1,exact:1},
+   {k:'5학년',ops:['+','−','×','÷'],n:[3],sig:'÷',paren:1,exact:1,big:1},
+   {k:'6학년',ops:['+','−','×','÷'],n:[3,4],sig:'÷',paren:1,exact:1,big:1}];
+  const tierOf=gs=>{const m=/^([1-6])-([12])$/.exec(String(gs||''));const g=m?+m[1]:3,s=m?+m[2]:1;return g<=1?0:g===2?(s===1?1:2):g;};
   if(!document.getElementById('hbTgCss')){const st=document.createElement('style');st.id='hbTgCss';st.textContent=[
    '.mgT{font-family:var(--mono,monospace);color:#cfe;max-width:340px;margin:4px auto 2px;user-select:none;-webkit-user-select:none;text-align:center}',
    '.mgT .tMsg{font-size:14px;line-height:1.45;color:#bfe;min-height:21px;text-align:left}',
@@ -35912,40 +36050,79 @@ const MINI={
    '.mgT .tGoal.bad{border-color:#f55;animation:tbad .4s}@keyframes tbad{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}',
    '.mgT .tEx{min-height:34px;font-size:22px;color:#fff;margin:6px 0;word-break:keep-all}',
    '.mgT .tRow{display:flex;gap:8px;justify-content:center;margin:6px 0;flex-wrap:wrap}',
+   '.mgT .tRow:empty{display:none}',
    '.mgT .tB{min-width:62px;padding:12px 0;border:2px solid #0a8;border-radius:10px;background:#062a3a;color:#bfe;font-size:22px;font-weight:700;cursor:pointer;touch-action:manipulation}',
    '.mgT .tB.op{border-color:#fa4;color:#fc7}',
+   '.mgT .tB.par{border-color:#6bf;color:#9cf;min-width:62px}',
    '.mgT .tB.off{opacity:.3;pointer-events:none}',
    '.mgT .tB.sm{font-size:14px;min-width:96px;padding:10px 0;border-color:#789;color:#abc}',
-   '.mgT .tBar{font-size:13px;color:#9ab;margin-top:6px}',
+   '.mgT .tBar{font-size:13px;color:#9ab;margin-top:6px;line-height:1.4}',
    '@media (prefers-reduced-motion:reduce){.mgT .tGoal.bad{animation:none}}'].join('\n');document.head.appendChild(st);}
-  box.innerHTML='<div class=mgT><div class=tMsg></div><div class=tGoal>목표 숫자<b></b></div><div class=tEx></div><div class="tRow tN"></div><div class="tRow tO"></div><div class=tRow><div class="tB sm" role=button data-a=undo>↩ 한 칸 지우기</div><div class="tB sm" role=button data-a=clear>🔄 처음부터</div></div><div class=tBar></div></div>';
-  const goalBox=box.querySelector('.tGoal'),goal=goalBox.querySelector('b'),ex=box.querySelector('.tEx'),rn=box.querySelector('.tN'),ro=box.querySelector('.tO'),mg=box.querySelector('.tMsg'),bar=box.querySelector('.tBar');
-  const OPS=['+','−','×'];
-  const ap=(a,o,b)=>o==='+'?a+b:o==='−'?a-b:a*b;
-  let lv=0,nums=[],target=0,toks=[],used=[],busy=false,done=false;
+  box.innerHTML='<div class=mgT><div class=tMsg></div><div class=tGoal>목표 숫자<b></b></div><div class=tEx></div><div class="tRow tN"></div><div class="tRow tO"></div><div class="tRow tP"></div><div class=tRow><div class="tB sm" role=button data-a=undo>↩ 한 칸 지우기</div><div class="tB sm" role=button data-a=clear>🔄 처음부터</div></div><div class=tBar></div></div>';
+  const goalBox=box.querySelector('.tGoal'),goal=goalBox.querySelector('b'),ex=box.querySelector('.tEx'),rn=box.querySelector('.tN'),ro=box.querySelector('.tO'),rp=box.querySelector('.tP'),mg=box.querySelector('.tMsg'),bar=box.querySelector('.tBar');
+  const isN=t=>typeof t==='number',OPSET=['+','−','×','÷'];
+  /* 분수로 정확히 계산: 곱셈·나눗셈 먼저, 괄호 먼저. ex=나누어떨어지는 나눗셈만 허용, nn=뺄셈 결과가 음수면 안 됨(문제 만들 때만) */
+  const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){const t=a%b;a=b;b=t;}return a||1;};
+  const fr=(n,d)=>{if(d<0){n=-n;d=-d;}const g=gcd(n,d);return{n:n/g,d:d/g};};
+  const ev=(tk,ex2,nn,lt)=>{let p=0,bad='';   // lt: 1~2학년 유형은 혼합계산을 안 배우므로 왼쪽부터 차례로 계산(괄호 없음)
+   const ap=(v,o,b)=>{
+    if(o==='×')return fr(v.n*b.n,v.d*b.d);
+    if(o==='÷'){if(b.n===0){if(!bad)bad='zero';return v;}const r=fr(v.n*b.d,v.d*b.n);if(ex2&&r.d!==1&&!bad)bad='rem';return r;}
+    const r=o==='+'?fr(v.n*b.d+b.n*v.d,v.d*b.d):fr(v.n*b.d-b.n*v.d,v.d*b.d);if(nn&&r.n<0&&!bad)bad='neg';return r;};
+   if(lt){let v=fr(tk[0],1);for(let i=1;i+1<tk.length;i+=2)v=ap(v,tk[i],fr(tk[i+1],1));return bad?{e:bad}:{v};}
+   const fac=()=>{const t=tk[p++];if(t==='('){const v=exp();p++;return v;}return fr(t,1);};
+   const trm=()=>{let v=fac();while(p<tk.length&&(tk[p]==='×'||tk[p]==='÷')){const o=tk[p++];v=ap(v,o,fac());}return v;};
+   const exp=()=>{let v=trm();while(p<tk.length&&(tk[p]==='+'||tk[p]==='−')){const o=tk[p++];v=ap(v,o,trm());}return v;};
+   const v=exp();return bad?{e:bad}:{v};};
+  const fmt=f=>f.d===1?String(f.n):f.n+'/'+f.d;
+  /* 문제 만들기: 풀이가 하나는 있는 숫자 묶음+목표 숫자 */
+  const gen=ti=>{const T=TIERS[ti];
+   for(let a=0;a<2000;a++){
+    const n=pk(T.n),cap=ti>=5?99:n===2?18:n===3?40:60,un=[];let k=n;
+    if(T.big&&n>=3&&Math.random()<.6){let d,q;do{d=2+rr(8);q=2+rr(8);}while(d*q<10);un.push([d*q,'÷',d]);k-=2;}   // 5·6학년: 두 자리 수 ÷ 한 자리 수
+    for(let i=0;i<k;i++)un.push([1+rr(9)]);
+    un.sort(()=>Math.random()-.5);
+    const tk=[];un.forEach((u,i)=>{if(i)tk.push(pk(T.ops));u.forEach(x=>tk.push(x));});
+    if(T.sig&&!tk.includes(T.sig))continue;
+    let g=tk,grouped=false;
+    if(T.paren&&Math.random()<.5){const i=rr(n-1),j=i+1+rr(n-1-i);if(!(i===0&&j===n-1)){g=tk.slice(0,2*i).concat('(',tk.slice(2*i,2*j+1),')',tk.slice(2*j+1));grouped=true;}}
+    const r=ev(g,1,1,T.ltr);if(r.e||r.v.d!==1)continue;
+    const v=r.v.n,tiles=tk.filter(isN);
+    if(v<2||v>cap||tiles.includes(v))continue;
+    if(grouped){const b=ev(tk,1,1);if(!b.e&&b.v.d===1&&b.v.n===v)continue;}   // 괄호가 꼭 필요한 문제만
+    return{a:tiles,v};}
+   return ti>=1?{a:[2,3,4],v:9}:{a:[3,4],v:7};};
+  let T=TIERS[0],nums=[],target=0,toks=[],used=[],busy=false,done=false;
   const alive=()=>document.body.contains(box);
   const msg=h=>{mg.innerHTML=h;};
-  const gen=n=>{for(let t=0;t<500;t++){const a=Array.from({length:n},()=>1+rr(9));let v=a[0],okk=true;for(let i=1;i<n;i++){const o=OPS[rr(3)];v=ap(v,o,a[i]);if(v<0){okk=false;break;}}
-    if(okk&&v>=2&&v<=(n===3?40:60)&&!a.includes(v))return{a,v};}
-   return{a:[2,3,4].slice(0,n),v:ap(ap(2,'+',3),'×',4)};};
-  const val=()=>{let v=toks[0];for(let i=1;i+1<toks.length;i+=2)v=ap(v,toks[i],toks[i+1]);return v;};
-  const draw=()=>{const nn=toks.filter((_,i)=>i%2===0).length,expectNum=toks.length%2===0;
-   ex.innerHTML=toks.length?toks.join(' ')+(toks.length%2?' = <b style="color:#8fb">'+val()+'</b>':''):'<span style="color:#678;font-size:15px">숫자를 눌러 시작하세요</span>';
-   rn.innerHTML=nums.map((n,i)=>'<div class="tB'+(used[i]||!expectNum?' off':'')+'" role=button data-i='+i+'>'+n+'</div>').join('');
-   ro.innerHTML=OPS.map(o=>'<div class="tB op'+(expectNum||nn>=nums.length?' off':'')+'" role=button data-o="'+o+'">'+o+'</div>').join('');
-   bar.textContent='라운드 '+(lv+1)+'/'+SIZES.length+' · 숫자는 한 번씩만, 왼쪽부터 계산';
+  const depth=()=>toks.reduce((d,t)=>d+(t==='('?1:t===')'?-1:0),0);
+  const expOpd=()=>{const l=toks[toks.length-1];return l===undefined||l==='('||OPSET.includes(l);};   // 지금 숫자나 ( 를 눌러야 하는 차례?
+  const allUsed=()=>used.every(Boolean);
+  const txt=()=>{let s='';toks.forEach((t,i)=>{s+=t===')'?')':((i&&toks[i-1]!=='('?' ':'')+t);});return s;};
+  const draw=()=>{const eo=expOpd(),au=allUsed(),dp=depth();let tail='';
+   if(toks.length&&!eo&&dp===0){const r=ev(toks,T.exact,0,T.ltr);if(!r.e)tail=' = <b style="color:#8fb">'+fmt(r.v)+'</b>';}
+   ex.innerHTML=toks.length?txt()+tail:'<span style="color:#678;font-size:15px">숫자를 눌러 시작하세요</span>';
+   rn.innerHTML=nums.map((n,i)=>'<div class="tB'+(used[i]||!eo?' off':'')+'" role=button data-i='+i+'>'+n+'</div>').join('');
+   ro.innerHTML=T.ops.map(o=>'<div class="tB op'+(eo||au?' off':'')+'" role=button data-o="'+o+'">'+o+'</div>').join('');
+   rp.innerHTML=T.paren?'<div class="tB par'+(eo&&!au&&dp<2?'':' off')+'" role=button data-p="(">(</div><div class="tB par'+(!eo&&dp>0?'':' off')+'" role=button data-p=")">)</div>':'';
+   bar.textContent='📘 '+T.k+' 문제 · '+(T.paren?'곱셈·나눗셈을 먼저 계산해요. ( )로 묶으면 그 부분을 먼저 계산해요':'숫자는 한 번씩만, 왼쪽부터 계산')+(T.exact?' · 나눗셈은 나누어떨어지게':'');
    rn.querySelectorAll('.tB').forEach(b=>b.onclick=()=>pickN(+b.dataset.i));
-   ro.querySelectorAll('.tB').forEach(b=>b.onclick=()=>pickO(b.dataset.o));};
-  const check=()=>{const v=val();busy=true;
-   if(v===target){goalBox.classList.add('win');try{sfx('tap');}catch(e){}
-    if(lv+1>=SIZES.length){done=true;msg('<b style="color:#8fb">🎉 목표 숫자를 모두 만들었어요!</b>');setTimeout(ok,700);}
-    else{msg('✅ 정답! 다음 라운드로 가요');setTimeout(()=>{if(alive()){lv++;start();}},900);}}
-   else{goalBox.classList.remove('bad');void goalBox.offsetWidth;goalBox.classList.add('bad');msg('❌ 결과가 <b>'+v+'</b>예요. 다시 만들어 보세요');setTimeout(()=>{if(alive()){reset();}},1000);}};
-  const pickN=i=>{if(busy||done||used[i]||toks.length%2!==0)return;used[i]=1;toks.push(nums[i]);draw();if(toks.filter((_,k)=>k%2===0).length>=nums.length)check();};
-  const pickO=o=>{if(busy||done||toks.length%2!==1)return;toks.push(o);draw();};
+   ro.querySelectorAll('.tB').forEach(b=>b.onclick=()=>pickO(b.dataset.o));
+   rp.querySelectorAll('.tB').forEach(b=>b.onclick=()=>pickP(b.dataset.p));};
+  const check=()=>{const r=ev(toks,T.exact,0,T.ltr);busy=true;let why='';
+   if(r.e)why=r.e==='zero'?'0으로는 나눌 수 없어요':'나누어떨어지지 않는 나눗셈이에요';
+   else if(r.v.d===1&&r.v.n===target){goalBox.classList.add('win');try{sfx('tap');}catch(e){}done=true;msg('<b style="color:#8fb">🎉 목표 숫자를 만들었어요!</b>');setTimeout(ok,700);return;}
+   else why='결과가 <b>'+fmt(r.v)+'</b>예요';
+   goalBox.classList.remove('bad');void goalBox.offsetWidth;goalBox.classList.add('bad');msg('❌ '+why+'. 다시 만들어 보세요');setTimeout(()=>{if(alive())reset();},1000);};
+  const finish=()=>{if(allUsed()&&depth()===0&&!expOpd())check();};
+  const pickN=i=>{if(busy||done||used[i]||!expOpd())return;used[i]=1;toks.push(nums[i]);draw();finish();};
+  const pickO=o=>{if(busy||done||expOpd()||allUsed())return;toks.push(o);draw();};
+  const pickP=p=>{if(busy||done)return;if(p==='('){if(!T.paren||!expOpd()||allUsed()||depth()>=2)return;}else if(expOpd()||depth()<=0)return;toks.push(p);draw();finish();};
   const reset=()=>{toks=[];used=nums.map(()=>0);busy=false;goalBox.classList.remove('bad','win');msg('🧮 숫자와 기호를 눌러 <b>'+target+'</b>을 만들어 보세요');draw();};
-  const start=()=>{const g=gen(SIZES[lv]);nums=g.a.slice().sort(()=>Math.random()-.5);target=g.v;goal.textContent=target;reset();};
-  box.querySelector('[data-a=undo]').onclick=()=>{if(busy||done||!toks.length)return;const t=toks.pop();if(typeof t==='number'){const i=nums.findIndex((n,k)=>used[k]&&n===t);if(i>=0)used[i]=0;}draw();};
+  const start=()=>{let gs='3-1';try{gs=S.meta.gs||gs;}catch(e){}   // 전역 S 의 학년·학기 (1-1 ~ 6-2)
+   const my=tierOf(gs),ti=my>0&&Math.random()<.5?rr(my):my;   // 절반은 내 학년, 나머지는 아래 학년 유형
+   T=TIERS[ti];const g=gen(ti);nums=g.a.slice().sort(()=>Math.random()-.5);target=g.v;goal.textContent=target;reset();};
+  box.querySelector('[data-a=undo]').onclick=()=>{if(busy||done||!toks.length)return;const t=toks.pop();if(isN(t)){const i=nums.findIndex((n,k)=>used[k]&&n===t);if(i>=0)used[i]=0;}draw();};
   box.querySelector('[data-a=clear]').onclick=()=>{if(busy||done)return;reset();};
   start();}},
  slide:{n:'슬라이딩 퍼즐',f(box,ok){
@@ -35980,7 +36157,7 @@ const fmt2=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+'
 /* ---------- 첫 화면: DOS 부팅 · 타이핑 연출 ---------- */
 let bootSeen=false,bootTk=0;
 const BOOT_FULL=[
- {t:'ZASAMON-DEX BIOS v9.25 ........ [OK]',c:'dim'},
+ {t:'JWASAMMON-DEX BIOS v9.25 ........ [OK]',c:'dim'},
  {t:'> 도감 보안 서버에 접속하는 중...',d:220},
  {t:'> 방화벽 우회  [##########] 100%',c:'ok'},
  {t:'> 암호 키 교환 ........ 완료',c:'ok'},
@@ -36017,7 +36194,7 @@ function accBox(w){if(!w)return '';const t=w.ok+w.wr,me=w.pid===C.pid;
 function accRow(p){const t=p.ok+p.wr,r=t?Math.round(p.ok/t*100):0;return '<div class=dacc>🎯 맞힌 문제 <b>'+p.ok+'</b> / 푼 문제 <b>'+t+'</b> · 정답률 <b>'+(t?r+'%':'-')+'</b><span class=dbar><i style="width:'+r+'%"></i></span></div>';}
 function paintMenu(){let sv={};try{sv=JSON.parse(localStorage.getItem('zhb_sv')||'{}');}catch(e){}
  const nmv=esc(sv.name||(S.meta&&(S.meta.name||S.meta.nick))||''),cdv=esc(sv.code||''),rcv=esc(sv.rc&&sv.rc!=='(방장)'?sv.rc:'');
- root.innerHTML='<div class=w><div class=dos><div class=dosH><span class=dosDots><i></i><i></i><i></i></span><b>C:\\ZASAMON\\HACK.EXE</b></div>'
+ root.innerHTML='<div class=w><div class=dos><div class=dosH><span class=dosDots><i></i><i></i><i></i></span><b>C:\\JWASAMMON\\HACK.EXE</b></div>'
  +'<div class=dosB id=hbBoot></div>'
  +'<div class=dosF id=hbForm>'
  +'<label class=dr><span>사용자명<small>USER</small></span><input id=hbNm maxlength=8 value="'+nmv+'" placeholder="내 이름" autocomplete=off spellcheck=false></label>'
@@ -36026,8 +36203,8 @@ function paintMenu(){let sv={};try{sv=JSON.parse(localStorage.getItem('zhb_sv')|
  +'<label class=dr><span>방 번호<small>ROOM</small></span><input id=hbCd maxlength=4 inputmode=numeric value="" placeholder="4자리" autocomplete=off></label>'
  +'<label class=dr><span>재접속 번호<small>REJOIN</small></span><input id=hbRc maxlength=4 inputmode=numeric value="" placeholder="끊겼을 때만" autocomplete=off></label>'
  +'<button class="dbt j" data-x=join>▷ 참가하기</button>'
- +'<button class="dbt" data-x=rejoin style="border-color:#fd2;color:#fd6">🔄 재접속하기 (방 번호·재접속 번호 불러오기)</button>'
- +'<button class="dbt" data-x=prac style="border-color:#fd2;color:#fd6">🛠 해킹 복구 연습</button><div id=hbPr></div>'
+ +'<button class="dbt" data-x=rejoin style="--c:#fd2">🔄 재접속하기 (방 번호·재접속 번호 불러오기)</button>'
+ +'<button class="dbt" data-x=prac style="--c:#fd2">🛠 해킹 복구 연습</button><div id=hbPr></div>'
  +'<div id=hbSt class=dosSt></div>'
  +'<button class="dbt q" data-x=quit>✖ 닫기</button>'
  +'</div></div><div id=hbP class=pop></div></div>';
@@ -36045,7 +36222,7 @@ function pickInfo(){const t=$h('#hbIt'),w=$h('#hbIw');if(!t||!C||C.phase!=='pick
  t.textContent=C.hidPick?'✅ 선택 완료! 다른 친구를 기다려요…':(left>0?'⏱ '+left+'초 안에 골라 주세요 (안 고르면 맨 앞 아이디로 자동 선택돼요)':'곧 시작해요…');
  if(w)w.textContent=(C.idw&&C.idw.n?'선택한 친구 '+(C.idw.d|0)+' / '+(C.idw.n|0)+'명':'')+(left<-12?' · 방장과 연결이 끊긴 것 같아요. 나가기를 눌러 주세요':'');}
 function paintPick(){root.className='on';
- root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\ZASAMON\\ID_SELECT.EXE</b></div><div class=dosP><div class="dl ttl s" id=hbTt></div><div class="dl txt">해킹할 때 친구들이 보는 내 이름표예요. 참가자마다 <b>서로 다른 후보</b>가 나와서 아이디가 겹치지 않아요!</div><div class="dl warn" style="background:none;border:0;padding:0"><b id=hbIt></b></div><div class=idg id=hbIc></div><div id=hbIw class=dosSt></div><button class="dbt q" data-x=quit>✖ 나가기</button></div></div><div id=hbP class=pop></div></div>';
+ root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\JWASAMMON\\ID_SELECT.EXE</b></div><div class=dosP><div class="dl ttl s" id=hbTt></div><div class="dl txt">해킹할 때 친구들이 보는 내 이름표예요. 참가자마다 <b>서로 다른 후보</b>가 나와서 아이디가 겹치지 않아요!</div><div class="dl warn" style="background:none;border:0;padding:0"><b id=hbIt></b></div><div class=idg id=hbIc></div><div id=hbIw class=dosSt></div><button class="dbt q" data-x=quit>✖ 나가기</button></div></div><div id=hbP class=pop></div></div>';
  tline($h('#hbTt'),'> 해킹 아이디 선택',2);
  const draw=()=>{const b=$h('#hbIc');if(!b)return;b.innerHTML=C.cand.map(n=>'<button class="dbt'+(C.hidPick===n?' sel':'')+'" data-x=pid data-v="'+esc(n)+'"'+(C.hidPick&&C.hidPick!==n?' disabled':'')+'>'+(C.hidPick===n?'✔ ':'')+esc(n)+'</button>').join('');};
  draw();pickInfo();
@@ -36064,7 +36241,7 @@ function pracClick(e){const x=e.target.closest&&e.target.closest('[data-pg]');if
  if(k==='close'){const b=pracBox();b.innerHTML='';delete b.dataset.on;}else if(k==='menu')pracMenu();else pracRun(k);}
 function paintLobby(){const host=C.role==='host',first=!C.lobTyped;C.lobTyped=1;const pl=C.pl||[];
  const keepPr=pracBox();const prOn=keepPr&&keepPr.dataset.on?keepPr:null;if(prOn)prOn.remove();   // 연습 중이면 화면이 갱신돼도 그대로 유지해요
- root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\ZASAMON\\LOBBY.EXE</b></div><div class=dosP>'
+ root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\JWASAMMON\\LOBBY.EXE</b></div><div class=dosP>'
  +'<div class="dl ttl s" id=hbTt></div>'
  +'<div class=dkv><span>ROOM</span><b class=big>'+C.code+'</b></div>'
  +'<div class=dkv><span>MY_ID</span><b>'+C.hid+'</b></div>'
@@ -36073,12 +36250,12 @@ function paintLobby(){const host=C.role==='host',first=!C.lobTyped;C.lobTyped=1;
  +'<div class=dsep>참가자 '+pl.length+'명</div><div class=ptags>'+pl.map(p=>'<span class="ptag'+(p.a?' away':'')+'">'+esc(p.n)+(p.a?' (자리비움)':'')+'</span>').join('')+'</div>'
  +(host?'<div class=dsep>게임 시간</div><div class=durs>'+CFG.DURS.map(d=>'<button class="dbt'+(C.dur===d?' sel':'')+'" data-x=d'+d+'>'+d+'분</button>').join('')+'</div><button class="dbt" data-x=st>▶ 게임 시작 (2명 이상)</button>':'<div class=dnote style="font-size:14px;color:#8fd">방장이 시작하길 기다려요… ('+(C.dur||5)+'분 게임)<i class=cur></i></div>')
  +'<div class=dnote>🎁 보상: 참가자 '+CFG.REWARD_MIN_P+'명 이상 · 내 점수 '+CFG.REWARD_MIN_SCORE+'점 이상이면 ★1~2 포켓몬 1마리 · 1·2·3등은 5·4·3성 조각 추가 · 🎯 정답률 1위('+CFG.ACC_MIN_Q+'문제 이상 푼 사람)도 5성 조각 추가</div>'
- +'<button class="dbt" data-x=prac style="border-color:#fd2;color:#fd6">🛠 해킹 복구 연습 (기다리는 동안 해 보세요)</button><div id=hbPr class=dosP></div>'
+ +'<button class="dbt" data-x=prac style="--c:#fd2">🛠 해킹 복구 연습 (기다리는 동안 해 보세요)</button><div id=hbPr class=dosP></div>'
  +'<div id=hbSt class=dosSt></div><button class="dbt q" data-x=quit>✖ 나가기</button></div></div><div id=hbP class=pop></div></div>';
  if(prOn){const n=$h('#hbPr');if(n)n.replaceWith(prOn);}else{const n=$h('#hbPr');if(n)n.addEventListener('click',pracClick);}
  tline($h('#hbTt'),'> 대기실 접속 완료',first?2:0);
  root.onclick=e=>{const x=e.target.dataset&&e.target.dataset.x;if(!x)return;if(x==='quit')return quit();if(x==='prac'){if(pracBox()&&pracBox().dataset.on)return;pracMenu();return;}if(x==='st')tx({t:'st'});if(/^d\d+$/.test(x))tx({t:'dur',v:+x.slice(1)});};}
-function paintPlay(){root.className='on';root.innerHTML='<div class=w><div class="dosH dosHs">'+DOTS+'<b>C:\\ZASAMON\\HACK.EXE — LIVE</b></div><div class="box top"><div>⏱ <b id=hbT>--:--</b></div><div>🃏 <b id=hbN>0</b>장 · ⭐ <b id=hbS>0</b>점</div><div id=hbB></div><button class=b data-x=key>🔑 내 번호</button></div><div id=hbW></div><div class=box><b id=hbRh class=bh>▌RANK ▸ 실시간 순위</b><div class=rk id=hbR style="margin-top:6px">집계 중…</div></div><div class=box><b id=hbDh class=bh>▌DEX ▸ 내 도감</b><div class=dex id=hbD style="margin-top:6px"></div></div><div id=hbSt class=dosSt></div><div id=hbP class=pop></div><div id=hbGo class=gobar><button class="b g" data-x=go>🔓 해킹하기 · 문제 풀기</button></div></div>';
+function paintPlay(){root.className='on';root.innerHTML='<div class=w><div class="dosH dosHs">'+DOTS+'<b>C:\\JWASAMMON\\HACK.EXE — LIVE</b></div><div class="box top"><div>⏱ <b id=hbT>--:--</b></div><div>🃏 <b id=hbN>0</b>장 · ⭐ <b id=hbS>0</b>점</div><div id=hbB></div><button class=b data-x=key>🔑 내 번호</button></div><div id=hbW></div><div class=box><b id=hbRh class=bh>▌RANK ▸ 실시간 순위</b><div class=rk id=hbR style="margin-top:6px">집계 중…</div></div><div class=box><b id=hbDh class=bh>▌DEX ▸ 내 도감</b><div class=dex id=hbD style="margin-top:6px"></div></div><div id=hbSt class=dosSt></div><div id=hbP class=pop></div><div id=hbGo class=gobar><button class="b g" data-x=go>🔓 해킹하기 · 문제 풀기</button></div></div>';
  root.onclick=e=>{const d=e.target.dataset||{};if(d.x==='go'){if(C.mode==='closed'){C.mode=null;showGo(0);question();}return;}if(d.x==='key'||d.k){const v=d.k?e.target.parentNode.querySelector('.hbKv'):$h('#hbSt');if(v)v.textContent=v.textContent?'':'재접속 번호 '+C.rc+' · 해킹 아이디 '+C.hid+' · 방 '+C.code+' (남에게 보여 주지 마세요)';}};
  clearInterval(uiT);uiT=setInterval(tick,250);paintMe();paintTop();}
 function tick(){if(C.phase!=='play')return;syncPad();const l=C.end-now();const t=$h('#hbT');if(t){t.textContent=fmt2(l);}const on=l<=CFG.LAST30_MS&&l>0;root.classList.toggle('l30',on);if(!!C._l30!==on){C._l30=on;hbBgm();}const w=$h('#hbW');if(w)w.innerHTML=on?'<div class=warn>🚨 마지막 30초! 카드 획득 확률 UP · 남은 '+Math.ceil(l/1000)+'초</div>':'';
@@ -36102,7 +36279,7 @@ function finish(m){m.rank=(Array.isArray(m.rank)?m.rank:[]).map(p=>({pid:String(
    if(me.r<=3){const star=CFG.REWARD[me.r],id2=pk(POOL[star]);let g2=null;try{g2=gainCard(id2);}catch(e){}rw+='<div class=box style="border-color:#fd2;text-align:center;font-size:20px">'+['🥇','🥈','🥉'][me.r-1]+' '+me.r+'등 추가 보상 — '+star+'성 조각 획득!<br>'+card(id2,g2)+'</div>';}
    if(accW&&accW.pid===me.pid){const id3=pk(POOL[5]);let g3=null;try{g3=gainCard(id3);}catch(e){}rw+='<div class=box style="border-color:#3ff;text-align:center;font-size:20px">🎯 정답률 1위 추가 보상 — 5성 조각 획득!<br>'+card(id3,g3)+'</div>';}
    try{autoSave();}catch(e){}try{saveLocal();}catch(e){}}}
- root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\ZASAMON\\RESULT.EXE</b></div><div class=dosP><div class="dl ttl s" id=hbTt></div>'+rw+accBox(accW)+'<div class=box>'+m.rank.map(p=>'<div style="padding:4px 0;border-bottom:1px dashed #0a85;'+(p.pid===C.pid?'color:#ff6':'')+'">'+(p.r<=3?['🥇','🥈','🥉'][p.r-1]:p.r+'위')+' <b>'+esc(p.n)+'</b>'+(accW&&accW.pid===p.pid?' <span class=dtt>🎯 정답률 1위</span>':'')+' — '+p.s+'점 · 카드 '+p.tot+'장 · ★1~5: '+p.st.join('/')+accRow(p)+'</div>').join('')+'</div><button class="dbt q" data-x=quit>✖ 닫기</button></div></div><div id=hbP class=pop></div></div>';tline($h('#hbTt'),'> 게임 종료'+(m.why==='all'?' (모든 포켓몬을 모았어요!)':''),2);root.onclick=e=>{if(e.target.dataset&&e.target.dataset.x==='quit')quit();};}
+ root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\JWASAMMON\\RESULT.EXE</b></div><div class=dosP><div class="dl ttl s" id=hbTt></div>'+rw+accBox(accW)+'<div class=box>'+m.rank.map(p=>'<div style="padding:4px 0;border-bottom:1px dashed #0a85;'+(p.pid===C.pid?'color:#ff6':'')+'">'+(p.r<=3?['🥇','🥈','🥉'][p.r-1]:p.r+'위')+' <b>'+esc(p.n)+'</b>'+(accW&&accW.pid===p.pid?' <span class=dtt>🎯 정답률 1위</span>':'')+' — '+p.s+'점 · 카드 '+p.tot+'장 · ★1~5: '+p.st.join('/')+accRow(p)+'</div>').join('')+'</div><button class="dbt q" data-x=quit>✖ 닫기</button></div></div><div id=hbP class=pop></div></div>';tline($h('#hbTt'),'> 게임 종료'+(m.why==='all'?' (모든 포켓몬을 모았어요!)':''),2);root.onclick=e=>{if(e.target.dataset&&e.target.dataset.x==='quit')quit();};}
 function quit(){try{S.curQ=null;}catch(e){}clearInterval(uiT);if(H){clearInterval(H.tm);try{H.peer.destroy();}catch(e){}H=null;}try{C&&C.peer&&C.peer.destroy();}catch(e){}C=null;root.className='';root.innerHTML='';setTimeout(hbBgm,0);try{if(typeof renderPvp==='function'){renderPvp();}else{S.screen='hub';renderHub();}}catch(e){try{S.screen='hub';renderHub();}catch(e2){}}}
 /* ---------- 배경음악: 해킹 배틀 전용 곡 (게임의 MUS 엔진에 곡만 등록해서 써요) ----------
    hack  = 사이버 해킹 분위기(프리지안 단조 · 달리는 16분 아르페지오 · 펌핑 톱니파 베이스 · 4박 킥)
