@@ -7870,7 +7870,7 @@ function wildEncounterIntro(ids){
    const heroId=(()=>{try{return kit?kit.hero():0;}catch(e){return 0;}})();
    const ready=()=>!!(kit&&kit.atlas&&kit.atlas.complete&&kit.atlas.naturalWidth);
    const drawHero=(y,walk,flip)=>{
-    if(ready()){const row=walk?4:1;
+    if(window.pskDraw&&window.pskDraw(g,1,walk,HX,y,flip?1:0,16)){}else if(ready()){const row=walk?4:1;
      if(flip){g.save();g.translate(HX+T,y);g.scale(-1,1);g.drawImage(kit.atlas,heroId*16,row*16,16,16,0,0,16,16);g.restore();}
      else g.drawImage(kit.atlas,heroId*16,row*16,16,16,HX,y,16,16);}
     else{g.fillStyle='#e5534b';g.fillRect(HX+3,y+3,10,12);g.fillStyle='#ffd9a8';g.fillRect(HX+4,y,8,5);}
@@ -19607,7 +19607,7 @@ function rl2DrawPeer(sprite,g,q){
   const A=rl2Api();let ox=0;
   if(A&&A.p&&!q.mv&&!A.p.moving&&A.p.x===q.x&&A.p.y===q.y)ox=6;
   const wf=!!(q.mv&&q.tt<.62);
-  sprite(q.hs,q.d,wf,Math.round(q.px)+ox,Math.round(q.py)-3,(q.d<2&&wf&&q.par)?1:0);
+  (q.sk&&window.pskDraw&&window.pskDraw(g,q.d,wf,Math.round(q.px)+ox,Math.round(q.py)-3,(q.d<2&&wf&&q.par)?1:0,16,q.sk,'peer'))||sprite(q.hs,q.d,wf,Math.round(q.px)+ox,Math.round(q.py)-3,(q.d<2&&wf&&q.par)?1:0);
   g.save();g.font='bold 6px sans-serif';g.textAlign='center';g.lineWidth=2;g.strokeStyle='rgba(20,20,40,.85)';g.fillStyle='#ffe08a';
   const nm=String(q.name||'친구').slice(0,5),cx=Math.round(q.px)+8+ox,cy=Math.round(q.py)-6;g.strokeText(nm,cx,cy);g.fillText(nm,cx,cy);g.restore();}
 // 필드 update 에서 매 프레임 부르는 훅: 내 위치 보내기 · 친구 움직임 이어주기 · 기다리던 같이 말 걸기 열기
@@ -19616,7 +19616,7 @@ function rl2FieldTick(p){
   RL2P.lastTick=performance.now();
   const mv=p.moving?1:0,nx=mv?p.nx:p.x,ny=mv?p.ny:p.y,s=rl2PosKey();
   const rr=RUN(),dl=rr&&rr.deck?rr.deck.length:0,k=[p.x,p.y,p.dir,mv,nx,ny,s,dl].join(',');
-  if(k!==RL2P.pk){RL2P.pk=k;const m={t:'rl2-pos',x:p.x,y:p.y,d:p.dir,m:mv,nx,ny,s,hs:rl2Hs(),nm:S.meta.name};if(dl!==RL2P.dkSent&&rr){RL2P.dkSent=dl;m.dk=rr.deck.slice();}rl2Send(m);}
+  if(k!==RL2P.pk){RL2P.pk=k;const m={t:'rl2-pos',x:p.x,y:p.y,d:p.dir,m:mv,nx,ny,s,hs:rl2Hs(),nm:S.meta.name,sk:(window.pskId?window.pskId():'')};if(dl!==RL2P.dkSent&&rr){RL2P.dkSent=dl;m.dk=rr.deck.slice();}rl2Send(m);}
   rl2PeerStep(performance.now());
   rl2FieldPump();}
 // ---- 친구의 포켓몬 힘 빌리기: 장해물 앞에서 내 덱에 맞는 속성이 없을 때 친구에게 도움을 요청해요 ----
@@ -19650,7 +19650,7 @@ function rl2OnPos(d){
   if(!q){q=RL2P.pp={par:0,tt:0,hs:0,name:'친구',px:0,py:0,x:0,y:0,nx:0,ny:0,d:1,mv:0,t0:0,s:d.s,wp:[],cur:null,u:0,sx:0,sy:0,lx:0,ly:0,lt:now,hold:0};snap();}
   else if(q.s!==d.s||Math.abs(tx-q.lx)+Math.abs(ty-q.ly)>3||q.wp.length>4){q.s=d.s;snap();}
   else if(tx!==q.lx||ty!==q.ly){if(!q.cur&&!q.wp.length)q.hold=now+60;q.wp.push([tx,ty]);q.lx=tx;q.ly=ty;} // 걷기 시작할 때만 아주 짧게 모아서(60ms) 네트워크 흔들림을 흡수해요
-  q.s=d.s;q.hs=(d.hs|0)+(BC.host?1000:0);q.name=d.nm||'친구';q.t0=now;
+  q.s=d.s;q.hs=(d.hs|0)+(BC.host?1000:0);q.sk=(typeof d.sk==='string'&&/^[a-z]{1,12}$/.test(d.sk))?d.sk:'';q.name=d.nm||'친구';q.t0=now;
   if(!q.cur&&!q.wp.length)q.d=d.d;} // 서 있을 땐 보내온 방향 그대로, 걷는 중엔 걸어가는 방향을 써요
 // ---- 진행도 지도에서 못 연 상자가 있는 지난 단계로 같이 돌아가기 ----
 // 한 명이 누르면 친구 화면에 대사창이 떠요: [간다.] 면 같이 가고, [가지 않는다.] 면 처음엔 거절돼요. 같은 층에서 한 번 더 제안했는데도 거절하면 룰렛으로 정해요.
@@ -33170,7 +33170,7 @@ function mount(run){
   g.save();g.translate(-cx,-cy);if(M.boss)drawHallBack();drawRustle();
   const list=ents.map(e=>({y:e.y*T,e})).concat(ents.filter(e=>e.n&&bkey(e.n)).map(e=>({y:e.y*T-1,gym:e})),(M.decor||[]).map(d=>({y:d.y*T+(d.k==='pil'?9:7),dec:d})),[{y:p.py+(p.moving?0:0),p:1},{y:p.py+.5,ov:1}].concat(typeof rl2PeerList==='function'?rl2PeerList():[])).sort((a,b)=>a.y-b.y);
   const vis=q=>q.x==null||q.y==null||(q.x*T+8>cx-128&&q.x*T<cx+vw+128&&q.y*T+8>cy-128&&q.y*T<cy+vh+260);
-  list.forEach(o=>{if(o.pe){try{rl2DrawPeer(sprite,g,o.pe);}catch(er){}return;}if(o.ov){grassOver();return;}if(o.dec){if(vis(o.dec))drawDecor(o.dec);return;}if(o.gym){if(vis(o.gym))drawGym(o.gym);return;}if(o.e){if(vis(o.e))drawEnt(o.e);}else{const wf=p.moving&&p.t<.62,rd=gact&&gact.k==='ride';if(rd)gRideBelow();sprite(rl2MyHs(HSPR()),p.dir,wf,Math.round(p.px),Math.round(p.py)-3-(rd?Math.round(gact.up):0),(p.dir<2&&wf&&p.par)?1:0);}});
+  list.forEach(o=>{if(o.pe){try{rl2DrawPeer(sprite,g,o.pe);}catch(er){}return;}if(o.ov){grassOver();return;}if(o.dec){if(vis(o.dec))drawDecor(o.dec);return;}if(o.gym){if(vis(o.gym))drawGym(o.gym);return;}if(o.e){if(vis(o.e))drawEnt(o.e);}else{const wf=p.moving&&p.t<.62,rd=gact&&gact.k==='ride';if(rd)gRideBelow();(window.pskDraw&&window.pskDraw(g,p.dir,wf,Math.round(p.px),Math.round(p.py)-3-(rd?Math.round(gact.up):0),(p.dir<2&&wf&&p.par)?1:0,16))||sprite(rl2MyHs(HSPR()),p.dir,wf,Math.round(p.px),Math.round(p.py)-3-(rd?Math.round(gact.up):0),(p.dir<2&&wf&&p.par)?1:0);}});
   gDraw();drawLeaves();drawReward();try{rl2BubblesDraw(g,cx,cy,KE,p);}catch(er){}
   g.restore();
   if(th.tint){g.fillStyle=th.tint;g.fillRect(0,0,CW,CH);}
@@ -33539,7 +33539,7 @@ function paint(cv){
   g.fillStyle='rgba(120,110,200,.35)';g.fillRect(62,80,36,2);g.fillRect(58,82,44,1);
   try{const k=window.__RLKIT;if(k&&k.atlas&&k.atlas.complete&&k.atlas.naturalWidth&&k.hero){
    g.fillStyle='rgba(8,6,28,.6)';g.fillRect(68,80,24,2);
-   g.drawImage(k.atlas,k.hero()*16,0,16,16,64,50,32,32);}}catch(e){}
+   if(!(window.pskDraw&&window.pskDraw(g,0,0,64,50,0,32)))g.drawImage(k.atlas,k.hero()*16,0,16,16,64,50,32,32);}}catch(e){}
   if((t%9)<7){g.fillStyle='#ff3b4a';g.fillRect(130,63,3,2);g.fillRect(138,63,3,2);g.fillStyle='#ffb3b8';g.fillRect(131,63,1,1);g.fillRect(139,63,1,1);}
   pages.forEach(p=>{const yy=p.y-((t*2+p.p*3)%22),a=1-((t*2+p.p*3)%22)/22;g.globalAlpha=Math.max(.15,a);g.fillStyle='#f4efe0';g.fillRect(p.x,yy,3,4);g.fillStyle='#c9b98a';g.fillRect(p.x,yy+3,3,1);});
   g.globalAlpha=1;
@@ -36391,7 +36391,7 @@ html.lowfx .htSkinAv{animation:none}
  const baseImg=()=>{try{return CHAR_ART.hero_m;}catch(e){return '';}};
 
  /* 이야기 속 주인공 얼굴: 고른 스킨의 정면 모습을 그대로 오려서 써요 (남자 주인공만) */
- const PORT={};
+ const PORT={},FR={},IM={},OV=new WeakMap();
  function mkPort(sk){
   const im=new Image();
   im.onload=()=>{try{
@@ -36403,12 +36403,51 @@ html.lowfx .htSkinAv{animation:none}
    const w=x1-x0+1,h=y1-y0+1,c2=document.createElement('canvas');c2.width=w;c2.height=h;
    c2.getContext('2d').drawImage(c,x0,y0,w,h,0,0,w,h);
    PORT[sk.id]=c2.toDataURL('image/png');
-  }catch(e){}};
+  }catch(e){}
+  /* 체육관·필드: 칸(256×256)을 크기 조절 없이 그대로 정사각 캔버스 아래쪽에 얹어요 (흔들림용 좌우 뒤집기 포함) */
+  try{
+   const SQ=272,rows={down:[0,3],up:[1,4],left:[2,5]},fr={};
+   for(const d in rows)for(let w=0;w<2;w++)for(let fl=0;fl<2;fl++){
+    const c=document.createElement('canvas');c.width=SQ;c.height=SQ;const x=c.getContext('2d');x.imageSmoothingEnabled=false;
+    if(fl){x.translate(SQ,0);x.scale(-1,1);}
+    x.drawImage(im,FX,rows[d][w]*FS,FS,FS,(SQ-FS)/2,SQ-FS,FS,FS);
+    fr[d+w+fl]=c.toDataURL('image/png');
+   }
+   FR[sk.id]=fr;
+  }catch(e){}
+  IM[sk.id]=im;};
   im.src=sk.sheet;
  }
  SKINS.filter(s=>s.sheet).forEach(mkPort);
  const oldHero=window.charHero;
  window.charHero=function(){try{if(isMale()){const p=PORT[curId()];if(p)return p;}}catch(e){}return typeof oldHero==='function'?oldHero():baseImg();};
+
+ /* 체육관 · 성 · 챔피언 필드(gp)의 주인공 그림: 스킨을 입었으면 스킨 칸을 써요 (남자 주인공만) */
+ const oldGHS=window.gpHeroSpr;
+ if(typeof oldGHS==='function')window.gpHeroSpr=function(dir,walk,flip){
+  try{if(isMale()){const f=FR[curId()];if(f){const d=dir==='right'?'left':dir,u=f[d+(walk?1:0)+(flip?1:0)];if(u)return u;}}}catch(e){}
+  return oldGHS.apply(this,arguments);};
+
+ /* 16×16 도트 판(로그라이크 필드 · 풀숲 연출)에서는 같은 자리·같은 키로, 원본 해상도 그대로 위에 얹어 그려요 */
+ setInterval(()=>{const now=performance.now();document.querySelectorAll('canvas.pskOv').forEach(o=>{const c=o._cv;if(!c||!c.isConnected){o.remove();return;}o.style.display=(now-o._t>400)?'none':'';});},250);
+ window.pskId=()=>{try{return isMale()&&curId()!=='base'?curId():'';}catch(e){return '';}};
+ window.pskDraw=function(g,dir,walk,x,y,flip,size,sid,key){
+  try{
+   const im=sid?IM[sid]:(isMale()?IM[curId()]:null);if(!im||!im.complete||!im.naturalWidth)return false;
+   const cv=g.canvas,row=[[0,3],[1,4],[2,5],[2,5]][dir];if(!cv||!cv.isConnected||!row||!cv.parentNode)return false;
+   const cw=cv.clientWidth,ch=cv.clientHeight;if(!cw||!ch)return false;
+   let om=OV.get(cv);if(!om){om={};OV.set(cv,om);}const kk=key||'me';let ov=om[kk];
+   if(!ov||!ov.isConnected){ov=document.createElement('canvas');ov.className='pskOv';ov._cv=cv;ov.style.cssText='position:absolute;pointer-events:none;image-rendering:auto';cv.parentNode.insertBefore(ov,cv.nextSibling);om[kk]=ov;}
+   const dpr=Math.min(window.devicePixelRatio||1,3),W=Math.round(cw*dpr),H=Math.round(ch*dpr);
+   if(ov.width!==W||ov.height!==H){ov.width=W;ov.height=H;}
+   ov.style.left=cv.offsetLeft+'px';ov.style.top=cv.offsetTop+'px';ov.style.width=cw+'px';ov.style.height=ch+'px';
+   const t=g.getTransform?g.getTransform():{a:1,d:1,e:0,f:0},k=W/cv.width;
+   const sz=(size||16)*t.a*k,dh=sz,dw=dh*230/248,dx=(x*t.a+t.e)*k+(sz-dw)/2,dy=(y*t.d+t.f)*k;
+   const o=ov.getContext('2d');o.clearRect(0,0,W,H);o.imageSmoothingEnabled=true;o.imageSmoothingQuality='high';
+   o.save();if(dir===3||flip){o.translate(dx+dw,0);o.scale(-1,1);o.drawImage(im,400,row[walk?1:0]*FS+4,230,248,0,dy,dw,dh);}
+   else o.drawImage(im,400,row[walk?1:0]*FS+4,230,248,dx,dy,dw,dh);
+   o.restore();ov._t=performance.now();ov.style.display='';return true;
+  }catch(e){return false;}};
 
  /* 홈 화면 조각 */
  window.pskBtn=()=>isMale()?`<button class="btn ghost sm" id=hPskin>${(typeof I==='function'&&I('star'))||'✨'} 스킨 변경</button>`:'';
