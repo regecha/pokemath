@@ -3746,6 +3746,7 @@ function sfx(n,p=0){
 
 // ===== 아이콘 (이모지 대신 SVG) =====
 const ICONS={
+home:'<path d="M12 3 2.5 11.5h2.8V20a1 1 0 0 0 1 1h3.7v-6h4v6h3.7a1 1 0 0 0 1-1v-8.5h2.8z" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>',
  full:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="#3a2e3f" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>',
  fullx:'<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" fill="none" stroke="#3a2e3f" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>',
  ball:'<circle cx="12" cy="12" r="10" fill="#fff" stroke="#3a2e3f" stroke-width="2"/><path d="M2 12a10 10 0 0 1 20 0z" fill="#ff5a5f" stroke="#3a2e3f" stroke-width="2"/><path d="M2 12h20" stroke="#3a2e3f" stroke-width="2.4"/><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="#3a2e3f" stroke-width="2"/>',
@@ -20700,7 +20701,7 @@ const gymBadge=(i,won)=>{const c=won===false?'#b8b2a6':GYMS[i].c,mx=(a,b,t)=>{co
  if(won!==false){GYM_SYM[i].forEach((r,y)=>{for(let x=0;x<8;x++)if(r[x]!=='.')rows[4+y][4+x]=r[x];});}else{[[7,5],[8,5],[8,6],[8,7],[7,8],[8,10]].forEach(p=>{rows[p[1]][p[0]]='d';});}
  return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+PXG(rows.map(r=>r.join('')),pal)+'</svg>';};
 function hudHTML(){const m=S.meta,L=lvOf(m.xp);let lgI=-1;try{Object.keys(m.gyms||{}).forEach(k=>{if(+k>lgI)lgI=+k;});}catch(e){}const lgName=lgI>=0?GYMS[lgI].n:'도전 전';
- return `<div class=hud><i class=hudGold></i><div class=hudL><div class=hl1><button class="btn ghost sm" id=hHome>${I('ball')}<span class=bt> 방</span></button><div class=lvBox><span class=lvNum>Lv.${L.lv}</span><div class=xpBar title="${L.cur}/${L.need}"><i style="width:${L.cur/L.need*100}%"></i></div></div></div><div class=hl2><span class=gsTag>${esc(semName(m.gs))}</span><span class=hudSp></span><button class="btn green sm" id=hSave title="누르면 바로 저장돼요. 저장 옮기기는 길게 누르거나 설정에서">${I('disk')}<span class=bt> 저장</span></button><button class="btn ghost sm" id=hSet>${I('gear')}</button></div></div><div class=hudR><span class=pill title="사탕">${I('candy')}${m.candy}</span><span class=pill title="코인">${I('coin')}${m.coins}</span><span class=pill title="카드팩">${I('pack')}${m.packs}</span><span class="pill hBall" role=button tabindex=0 style="cursor:pointer" title="포켓볼 (눌러서 종류별 개수 보기)">${I('ball')}${(()=>{try{return ballTotal();}catch(e){return 0;}})()}</span><span class=pill title="별가루">${I('star')}${m.dust||0}</span><span class="pill hEnergy" role=button tabindex=0 style="cursor:pointer" title="정원 에너지 (눌러서 얻는 방법 보기)">⚡${(()=>{try{return gdEnergy(m);}catch(e){return 0;}})()}</span><span class=pill title="레벨 포인트">🔷${m.lp||0}</span><span class="pill lgPill" title="${lgI>=0?'최근 클리어한 체육관: '+lgName:'아직 체육관에 도전하지 않았어요'}" style="--lc:${lgI>=0?GYMS[lgI].c:'#b8b2a6'}">${gymBadge(Math.max(lgI,0),lgI>=0)}<b>${lgName}</b></span><button class="btn ghost sm fsBtn" id=hFull title="전체 화면" aria-label="전체 화면">${I('full','fsO')}${I('fullx','fsX')}</button></div></div>`;}
+ return `<div class=hud><i class=hudGold></i><div class=hudL><div class=hl1><button class="btn ghost sm" id=hHome>${I('home')}<span class=bt> 홈</span></button><div class=lvBox><span class=lvNum>Lv.${L.lv}</span><div class=xpBar title="${L.cur}/${L.need}"><i style="width:${L.cur/L.need*100}%"></i></div></div></div><div class=hl2><span class=gsTag>${esc(semName(m.gs))}</span><span class=hudSp></span><button class="btn green sm" id=hSave title="누르면 바로 저장돼요. 저장 옮기기는 길게 누르거나 설정에서">${I('disk')}<span class=bt> 저장</span></button><button class="btn ghost sm" id=hSet>${I('gear')}</button></div></div><div class=hudR><span class="pill hBall" role=button tabindex=0 style="cursor:pointer" title="포켓볼 (눌러서 종류별 개수 보기)">${I('ball')}${(()=>{try{return ballTotal();}catch(e){return 0;}})()}</span><span class="pill hEnergy" role=button tabindex=0 style="cursor:pointer" title="정원 에너지 (눌러서 얻는 방법 보기)">⚡${(()=>{try{return gdEnergy(m);}catch(e){return 0;}})()}</span><span class=pill title="사탕">${I('candy')}${m.candy}</span><span class=pill title="코인">${I('coin')}${m.coins}</span><span class=pill title="카드팩">${I('pack')}${m.packs}</span><span class=pill title="별가루">${I('star')}${m.dust||0}</span><span class=pill title="레벨 포인트">🔷${m.lp||0}</span><span class="pill lgPill" title="${lgI>=0?'최근 클리어한 체육관: '+lgName:'아직 체육관에 도전하지 않았어요'}" style="--lc:${lgI>=0?GYMS[lgI].c:'#b8b2a6'}">${gymBadge(Math.max(lgI,0),lgI>=0)}<b>${lgName}</b></span><button class="btn ghost sm fsBtn" id=hFull title="전체 화면" aria-label="전체 화면">${I('full','fsO')}${I('fullx','fsX')}</button></div></div>`;}
 function bindHud(){const h=$('#hHome');if(h)h.onclick=()=>{sfx('tap');renderHub();};const hb=$('.hBall');if(hb){hb.onclick=()=>{sfx('tap');showBallBag();};hb.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();hb.click();}};}const s=$('#hSave');if(s){s.onclick=()=>{sfx('coin');quickSave();};s.oncontextmenu=e=>{e.preventDefault();showSaveBox();};}const t=$('#hSet');if(t)t.onclick=()=>{sfx('tap');showSettings();};const fb=$('#hFull');if(fb)fb.onclick=()=>{sfx('tap');goFull();};}
 
 // ---- 기능 단계적 열림 ----
@@ -37043,6 +37044,36 @@ html.lowfx .htSkinAv{animation:none}
 .pskHow{font-size:12px;color:#8a7f66;margin-top:2px}
 .pskCard.lock .pskTh{filter:brightness(.5) saturate(.6)}
 .pskLock{position:absolute;top:4px;right:4px;background:#5a4aa8;color:#fff;font-style:normal;font-size:11px;font-family:'Jua',sans-serif;padding:1px 7px;border-radius:9px;box-shadow:0 1px 0 rgba(0,0,0,.3)}
+
+/* ===== 클릭 가능(입체) vs 클릭 불가(평면) 구분 ===== */
+/* 1) 클릭 안 되는 안내 요소: 위/아래 그림자·하이라이트 제거 → 평면 */
+html body :is(.panel,.explain,.gsTag,.sc-tag,span.rl-chip,.thinkBar,.bubble,.wildTop,.deckBar,.tcode,.sc-reward,.sc-quizhead,.saveStatus),
+html body .pill:not([role=button]){
+  box-shadow:none!important;text-shadow:none;
+}
+html body .pill:not([role=button]){
+  background:#f6f1e3!important;border-color:#ddd3b8!important;
+}
+html body .hud .pill:not([role=button]){
+  background:#f6f1e3!important;border-color:#ddd3b8!important;box-shadow:none!important;
+}
+/* 2) 클릭되는 버튼: 아래쪽 두꺼운 면 + 위쪽 하이라이트로 확실한 입체 */
+html body .btn:not(.pxb):not(:disabled)::before,html body .fbtn::before,html body .ch::before{
+  box-shadow:inset 0 -5px 0 rgba(0,0,0,.26),inset 0 2px 0 rgba(255,255,255,.6)!important;
+}
+html body .btn:not(.pxb):not(:disabled),html body .fbtn,html body .ch{cursor:pointer}
+html body .btn:not(.pxb):not(:disabled):hover{transform:translateY(-1px)}
+html body .btn:not(.pxb):not(:disabled):active{transform:translateY(3px)}
+html body .btn:not(.pxb):not(:disabled):active::before{box-shadow:inset 0 -1px 0 rgba(0,0,0,.2)!important}
+/* 눌러도 반응 없는 비활성 버튼은 평면 */
+html body .btn:disabled::before{box-shadow:none!important}
+/* 3) 클릭되는 칩(포켓볼 개수·정원 에너지 등)도 입체 */
+html body .pill[role=button],html body .hud .pill[role=button],html body button.rl-chip{
+  cursor:pointer;background:linear-gradient(180deg,#fff,#efe3c6)!important;border-color:#8a7650!important;
+  box-shadow:inset 0 -3px 0 rgba(120,95,50,.32),inset 0 1.5px 0 #fff!important;
+}
+html body .pill[role=button]:hover,html body button.rl-chip:hover{filter:brightness(1.05);transform:translateY(-1px)}
+html body .pill[role=button]:active,html body button.rl-chip:active{transform:translateY(2px);box-shadow:inset 0 -1px 0 rgba(120,95,50,.3)!important}
 </style>
 <script id="psk-js">
 /* ===== 주인공 스킨 ===== 스프라이트 시트(1024×1536, 6칸)는 크기 조절 없이 원본 그대로 쓰고, 칸만 잘라서 보여줘요.
