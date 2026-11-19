@@ -227,6 +227,7 @@ h2{font-size:26px;margin-bottom:8px}h3{font-size:19px;margin:12px 0 6px}
 .gdBgGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:8px}
 .gdBgItem{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:2px solid #e3c87a;border-radius:14px;background:linear-gradient(#fffdf5,#fbf1d9);box-shadow:0 3px 0 rgba(138,100,32,.3);cursor:pointer;font-family:inherit;color:#5a4220}
 .gdBgItem.on{border-color:#e8a02a;background:linear-gradient(#fff6c8,#ffe48a)}
+.gdBgItem.lock{opacity:.8;cursor:not-allowed}.gdBgItem.lock .gdBgPrev{filter:grayscale(1) brightness(.55)}.gdBgItem.lock b{color:#8a7d8f}
 .gdBgItem b{font-size:13px}.gdBgItem i{font-style:normal;font-size:12px;color:#b05a00}
 .gdBgPrev{position:relative;width:100%;aspect-ratio:3/2;border-radius:8px;overflow:hidden;border:2px solid #c9a24a}
 .gdBgPrev img{width:100%;height:100%;display:block;image-rendering:pixelated}
@@ -4412,9 +4413,18 @@ function xferSend(){
 // ===== 보이는 영역에 맞추기 · 화면 크기 =====
 const FIT={top:0,h:0,z:1};
 function uiZoom(h,w){const st=S.meta.settings.zoom||'auto';if(st!=='auto')return +st||1;let z=1;if(h<560)z=Math.max(.62,h/560);if(w/z<340)z=Math.max(.55,w/340);return Math.round(z*100)/100;}
-function applyFit(top,h){const de=document.documentElement,ds=de.style;const z=uiZoom(h,innerWidth);ds.zoom=z===1?'':String(z);FIT.z=z;
+function applyFit(top,h){const de=document.documentElement,ds=de.style;const K=window.__kb;if(K){top=K.t;h=K.h;}const z=K?K.z:uiZoom(h,innerWidth);ds.zoom=z===1?'':String(z);FIT.z=z;
  ds.setProperty('--vt',top/z+'px');ds.setProperty('--vh',h/z+'px');ds.setProperty('--z',z);de.classList.toggle('short',h/z<680);}
 const fitMode=()=>S.meta.settings.fit||'auto';
+/* 📱 모바일 키보드: 글자를 입력하려고 칸을 누르면 키보드가 올라오면서 화면이 위로 확 밀려 올라가 안 보이던 문제를 고쳐요.
+   키보드가 떠 있는 동안에는 '지금 눈에 보이는 영역(visualViewport)'에 창을 딱 맞추고, 화면 크기(확대 비율)는 그대로 둬요. 키보드가 닫히면 원래대로 돌아와요. */
+(function(){const vv=window.visualViewport;if(!vv||!(('ontouchstart' in window)||navigator.maxTouchPoints>0))return;let raf=0,rel=0;
+ const isF=el=>!!el&&!!el.tagName&&(/^(TEXTAREA|SELECT)$/.test(el.tagName)||(el.tagName==='INPUT'&&!/^(button|checkbox|radio|range|submit|reset|file|color|image)$/i.test(el.type||'')));
+ const upd=()=>{raf=0;const K=window.__kb;if(!K)return;K.t=Math.max(0,vv.offsetTop);K.h=Math.max(120,vv.height);try{applyFit(0,0);}catch(e){}};
+ const sched=()=>{if(!raf)raf=requestAnimationFrame(upd);};
+ addEventListener('focusin',e=>{if(!isF(e.target))return;clearTimeout(rel);if(!window.__kb)window.__kb={t:0,h:vv.height,z:FIT.z||1};sched();[120,350,700].forEach(t=>setTimeout(sched,t));},true);
+ addEventListener('focusout',()=>{clearTimeout(rel);rel=setTimeout(()=>{if(isF(document.activeElement))return;window.__kb=null;try{dispatchEvent(new Event('resize'));}catch(e){}},250);},true);
+ vv.addEventListener('resize',sched);vv.addEventListener('scroll',sched);})();
 // 상단 재화 칸: 재화가 많아 줄이 늘어나면(예: 3줄) 칸 높이를 내용에 맞춰 키우고, 계단형 패널(--hs)도 같이 키워요.
 setInterval(function(){try{const h=document.querySelector('.hud'),r=h&&h.querySelector('.hudR');if(!r)return;const want=Math.max(62,Math.ceil(r.offsetHeight))+'px';if(h.style.getPropertyValue('--hs')!==want)h.style.setProperty('--hs',want);}catch(e){}},400);
 function refit(){applyFit(fitMode()==='off'?0:FIT.top,fitMode()==='off'||!FIT.h?innerHeight:Math.min(FIT.h,innerHeight));}
@@ -21161,7 +21171,7 @@ function showSettings(l2){const st=S.meta.settings;if(st.cool===undefined)st.coo
     try{location.reload();}catch(e){renderTitle();}},full:()=>{closeM(l2);goFull();},save:()=>showSaveBox(),code:()=>{closeM(l2);showGradePick();},tsend:()=>{closeM(l2);showTsend();},gift:()=>{closeM(l2);showGift();},nick:()=>{closeM(l2);if(S.meta.name)renderName(true);},unit:()=>{closeM(l2);if(S.meta.gs)askUnit(()=>{if(S.screen==='hub')renderHub();},true);},title:()=>{closeM(l2);renderTitle();},tutor:()=>{closeM(l2);tutPicker();return;if(window.TUT_A){const m=S.meta,sk=m.seen&&m.seen.tutSkip;if(sk){const k=Math.min(4,m.tutDone||0);try{toast(k>0?'파트 '+(k+1)+'부터 이어서 시작해요':'처음부터 시작해요');}catch(e){}TUT_A.begin({from:k});}else TUT_A.begin({replay:true});}}},{layer2:!!l2});
  {const sb=$('#sfxVol');if(sb){sb.oninput=()=>{st.sfxVol=+sb.value;$('#sfxVolN').textContent=sb.value+'%';};sb.onchange=()=>{autoSave();if(st.sound)sfx('ok');};}}
  {const vb=$('#bgmVol');if(vb){vb.oninput=()=>{st.bgmVol=+vb.value;$('#bgmVolN').textContent=vb.value+'%';applyBgmVol();};vb.onchange=()=>{autoSave();};}}
- $(l2?'#mbox2':'#mbox').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;st[k]=v;if(k==='bgm'){if(v)startBgm();else stopBgm();}if(k==='bgmMix'){bgmRotClear();if(st.bgm)startBgm();}autoSave();applySafe();refit();sfx('tap');showSettings(l2);if(k==='imgs'&&S.screen==='hub')renderHub();});}
+ $(l2?'#mbox2':'#mbox').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;st[k]=v;if(k==='bgm'){if(v)startBgm();else stopBgm();}if(k==='bgmMix'){bgmRotClear();if(st.bgm)startBgm();}autoSave();applySafe();refit();sfx('tap');{const _bx=$(l2?'#mbox2':'#mbox'),_y=_bx.scrollTop;showSettings(l2);_bx.scrollTop=_y;}if(k==='imgs'&&S.screen==='hub')renderHub();});}
 
 // ---- 타이틀 · 입장 ----
 function renderTitle(){S.screen='title';const m=S.meta;$('#battle').classList.remove('on');
@@ -21842,7 +21852,7 @@ function scStageHTML(u,pos,pg,grant){
 function scClearHTML(u,pos,pg,grant){
  const r=pg.r-1,reg=SC_REGIONS[r],ids=scRegionIds(r),p=scState(),rw=reg.reward,got=p.col,cnt=scOwned().length;
  const slot=(id,boss)=>`<div class="scv-slot ${got[id]?'on':''} ${boss?'boss':''}"><div>${monImg(id,'front')}</div><span>${esc(scMonName(id))}</span><small>${boss?'보스':'일반'}</small></div>`;
- return `<div class="scv-card scv-clear"><span class="sc-tag sc-tag-good">제${pg.r}지역 클리어</span><h3>${esc(reg.name)}</h3><div class="scv-slots">${ids.map((id,i)=>slot(id,i===4)).join('')}</div><div class="sc-reward-list"><div class="sc-reward"><strong>${cnt}장</strong>시나리오 보유 카드</div><div class="sc-reward"><strong>${p.vows.length}/6</strong>새겨진 맹세</div><div class="sc-reward"><strong>+${rw.packs}</strong>카드팩</div><div class="sc-reward"><strong>+${rw.coins}</strong>코인</div></div>${(pg.notes&&pg.notes.length)?`<ul class="scv-notes">${pg.notes.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}<p class="sc-note">${grant?'지역 클리어 보상(카드팩·코인·사탕)을 받았어요!':'지역 클리어 보상은 이미 받았어요.'}</p></div>`;
+ return `<div class="scv-card scv-clear"><span class="sc-tag sc-tag-good">제${pg.r}지역 클리어</span><h3>${esc(reg.name)}</h3><div class="scv-slots">${ids.map((id,i)=>slot(id,i===4)).join('')}</div><div class="sc-reward-list"><div class="sc-reward"><strong>${cnt}장</strong>시나리오 보유 카드</div><div class="sc-reward"><strong>${p.vows.length}/6</strong>새겨진 맹세</div><div class="sc-reward"><strong>+${rw.packs}</strong>카드팩</div><div class="sc-reward"><strong>+${rw.coins}</strong>코인</div></div>${(pg.notes&&pg.notes.length)?`<ul class="scv-notes">${pg.notes.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}${gdBgUnlockNote(pg.r)}<p class="sc-note">${grant?'지역 클리어 보상(카드팩·코인·사탕)을 받았어요!':'지역 클리어 보상은 이미 받았어요.'}</p></div>`;
 }
 function scBtHTML(u,pos,pg){
  const duel=pg.kind==='duel',id=duel?448:(scMonId(pg.who)||scMonId(pg.label)),beaten=scBeaten(u,pos),p=scState();
@@ -28988,6 +28998,12 @@ function gdSnack(){const m=S.meta,pets=gdPets(m);if(!pets.length){toast('정원�
   toast(`🍬 ${esc(MON[id].name)}: ${rpick(['냠냠! 맛있어요~','달콤해요! 고마워요!','기운이 쑥쑥 나요!'])}`);gdMis('snack');});}
 // ===== 정원 배경 (도트 그림 6종) · 꾸미기 > 배경 탭에서 바꿔요 =====
 const GD_BGS=[{k:'',n:'기본 정원'},{k:'forest',n:'초록 숲의 시작'},{k:'sea',n:'푸른 바다의 항구'},{k:'fire',n:'불의 산'},{k:'ice',n:'얼음꽃의 설원'},{k:'desert',n:'사막의 유적지'},{k:'future',n:'미래의 도시'}];
+/* 정원 배경 해금: 메인 스토리(시나리오) 지역을 클리어하면 하나씩 열려요. 값은 지역 번호(1~6). 기본 정원은 처음부터 쓸 수 있어요.
+   이미 쓰고 있던 배경은 그대로 두고(빼앗지 않아요), 다른 배경으로 바꾼 뒤에는 해금해야 다시 쓸 수 있어요. */
+const GD_BG_NEED={forest:1,sea:2,fire:3,future:4,desert:5,ice:6};
+function gdBgOpen(k,cur){if(!k||!GD_BG_NEED[k]||k===cur)return true;try{return ((S.meta.scenario&&S.meta.scenario.cleared)||[]).indexOf(GD_BG_NEED[k])>=0;}catch(e){return true;}}
+function gdBgNeedName(k){try{return SC_REGIONS[GD_BG_NEED[k]-1].name;}catch(e){return '메인 스토리';}}
+function gdBgUnlockNote(r){try{const k=Object.keys(GD_BG_NEED).find(x=>GD_BG_NEED[x]===r),b=GD_BGS.find(x=>x.k===k);return b?`<p class="sc-note">🖼️ 정원 배경 「${esc(b.n)}」${hasJong(b.n)?'이':'가'} 열렸어요! (나의 정원 › 꾸미기 › 배경)</p>`:'';}catch(e){return '';}}
 const _gdBgC={};
 function gdBgPaint(k,B,DW,DH){
  const S=2,W=DW/S,H=DH/S;
@@ -29323,7 +29339,7 @@ function gdBgPaint(k,B,DW,DH){
 function gdBgURL(k){if(!k)k='home';if(_gdBgC[k])return _gdBgC[k];
  try{const W=384,H=256,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d'),id=x.createImageData(W,H);gdBgPaint(k,id.data,W,H);x.putImageData(id,0,0);const c2=document.createElement('canvas');c2.width=W*4;c2.height=H*4;const y2=c2.getContext('2d');y2.imageSmoothingEnabled=false;y2.drawImage(cv,0,0,W*4,H*4);return _gdBgC[k]=c2.toDataURL('image/png');}catch(e){return '';}}
 function gdBgStyle(g){const u=gdBgURL(g&&g.bg);return u?`background-image:url(${u});background-size:100% 100%;background-repeat:no-repeat;background-position:0 0;image-rendering:auto`:'';}
-function gdBgPickHTML(g){const cur=g.bg||'';return `<p class=mut style="font-size:13px;text-align:center">정원 배경을 골라요. 누르면 바로 바뀌어요!</p><div class=gdBgGrid>${GD_BGS.map(b=>`<button class="gdBgItem${b.k===cur?' on':''}" data-bg="${b.k}"><div class=gdBgPrev><img src="${gdBgURL(b.k||'home')}" alt=""></div><b>${b.n}</b>${b.k===cur?'<i>✓ 사용 중</i>':''}</button>`).join('')}</div>`;}
+function gdBgPickHTML(g){const cur=g.bg||'';return `<p class=mut style="font-size:13px;text-align:center">정원 배경을 골라요. 누르면 바로 바뀌어요! 메인 스토리 지역을 클리어하면 새 배경이 하나씩 열려요.</p><div class=gdBgGrid>${GD_BGS.map(b=>`<button class="gdBgItem${b.k===cur?' on':''}${gdBgOpen(b.k,cur)?'':' lock'}" data-bg="${b.k}"><div class=gdBgPrev><img src="${gdBgURL(b.k||'home')}" alt=""></div><b>${b.n}</b>${b.k===cur?'<i>✓ 사용 중</i>':gdBgOpen(b.k,cur)?'':'<i>🔒 「'+gdBgNeedName(b.k)+'」 클리어</i>'}</button>`).join('')}</div>`;}
 // 꾸미기
 const GD_DEC=[
  {k:'bed',n:'꽃밭',p:40},{k:'sun',n:'해바라기',p:50},{k:'mush',n:'버섯 가족',p:30},{k:'rock',n:'이끼 바위',p:50},
@@ -29385,7 +29401,7 @@ function gdDecor(){const m=S.meta,g=gd(m);g.dec=Array.isArray(g.dec)?g.dec:[];
    <div class=mbtns><button class="btn gold" data-a=x>닫기</button></div>`,{x:()=>closeM(),_close:()=>closeM()},{wide:1});
   const box=$('#mbox');if(keep)box.scrollTop=st;
   box.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{tab=b.dataset.t;sfx('tap');draw();});
-  box.querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>{g.bg=b.dataset.bg;sfx('coin');gdSaveSoon(true);gdRefresh();draw(true);});
+  box.querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>{if(!gdBgOpen(b.dataset.bg,g.bg||'')){try{sfx('wrong');}catch(e){}toast('🔒 메인 스토리 「'+gdBgNeedName(b.dataset.bg)+'」'+(hasJong(gdBgNeedName(b.dataset.bg))?'을':'를')+' 클리어하면 열려요');return;}g.bg=b.dataset.bg;sfx('coin');gdSaveSoon(true);gdRefresh();draw(true);});
   box.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const d=GD_DEC[+b.dataset.b],mine=g.dec.filter(x=>x.k===d.k);
    if(mine.length){const shown=mine.some(x=>!x.h);
     if(shown){mine.forEach(x=>{x.h=1;});toast(`${d.n}: 정원에서 모두 치웠어요 (보유 중 ${mine.length}개)`);sfx('tap');gdSaveSoon(true);gdRefresh();draw(true);return;}
