@@ -8,6 +8,14 @@ document.documentElement.innerHTML='<head><meta charset="utf-8"><meta name="view
 }catch(e){}})();
 </script>
 
+<script id="tsPre">/* 첫 화면 배경: 저장된 선택이 '새 배경'이면 로딩 중에도 이전 배경이 먼저 보이지 않게 가려요 */
+(function(){try{var m=null;try{m=localStorage.getItem('zsTitleBg');}catch(e){}if(m==='old')return;
+var h=document.documentElement;h.classList.add('tsPre');
+var st=document.createElement('style');st.id='tsPreCss';
+st.textContent='html.tsPre,html.tsPre body{background:#1b2a6c!important}html.tsPre #bg,html.tsPre #bgImg,html.tsPre #bgMons,html.tsPre #bgFx,html.tsPre #view>.title:not(.tsT){visibility:hidden!important}';
+(document.head||h).appendChild(st);
+setTimeout(function(){h.classList.remove('tsPre');},10000);}catch(e){}})();
+</script>
 <meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>학생 맞춤 수집형 학습 게임 - 몬스터디</title>
@@ -21758,6 +21766,7 @@ function init(){loadLocal();buildCheck();applySafe();initFit();coachInit();
   if(/^[1-4]$/.test(e.key)){const host=$('#bq.on')||($('#qHost')&&S.screen==='train'?$('#qHost'):null);if(host){const b=host.querySelectorAll('.ch')[+e.key-1];if(b)b.click();}}
   if(e.key==='Enter'){const k=document.querySelector('.explain [data-k]');if(k)k.click();}});
  if(!STORE_OK)setTimeout(()=>toast(I('lock')+' 이 화면에서는 자동 저장이 막혀 있어요. <b>저장 · 불러오기 → 저장 코드</b>를 써 주세요'),800);
+ try{bgTick();}catch(e){}
  setInterval(bgTick,250);
  renderTitle();}
 
@@ -26006,6 +26015,29 @@ init();
   if(g!=='f')return `<g><ellipse cx="31" cy="104" rx="25" ry="3.2" fill="#0b1026" opacity=".4"/><image class="tsHeroU" x="0" y="0" width="61.5" height="106" href="${HERO_USER_M}"/></g>`;
 
  return `<g><ellipse cx="37" cy="104" rx="29" ry="3.4" fill="#0b1026" opacity=".4"/><image class="tsHeroU" x="0" y="0" width="73.9" height="106" href="${HERO_USER_F}"/></g>`;}
+
+ /* 자연스러운 구름: 노이즈(fBm)로 구름 덩어리를 한 번만 그려 두고, 해 쪽에서 오는 빛으로 밝고 어둡게 칠해요(노을빛 아랫면·가장자리 은빛). 둥근 원 뭉치 대신 납작하고 결이 있는 모양이에요 */
+ const CT={};
+ function cTex(seed,w,h){const k=seed+'_'+w+'_'+h;if(k in CT)return CT[k];let url='';try{
+  const r=R0(seed),L=new Float32Array(4096);for(let i=0;i<4096;i++)L[i]=r();
+  const nz=(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),fx=x-xi,fy=y-yi,u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy),g=(a,b)=>L[((b&63)<<6)|(a&63)];return(g(xi,yi)*(1-u)+g(xi+1,yi)*u)*(1-v)+(g(xi,yi+1)*(1-u)+g(xi+1,yi+1)*u)*v;};
+  const fb=(x,y)=>{let s=0,a=.5,f=1;for(let o=0;o<5;o++){s+=a*nz(x*f+o*7.3,y*f);f*=2.03;a*=.5;}return s;};
+  const cv=(x,y)=>{const nx=(x/w-.5)*2,ny=(y/h-.5)*2,base=1-(nx*nx*.85+Math.pow(ny*1.3+.15,2));return base*1.25+(fb(x/w*5+seed,y/h*2.3+seed*.7)-.5)*1.5-.2;};
+  const sm=(a,b,x)=>{x=Math.max(0,Math.min(1,(x-a)/(b-a)));return x*x*(3-2*x);};
+  const c=document.createElement('canvas');c.width=w;c.height=h;const cx=c.getContext('2d'),im=cx.createImageData(w,h),D=im.data;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const c0=cv(x,y),al=sm(0,.5,c0);const o=(y*w+x)*4;if(al<=0.004){D[o+3]=0;continue;}
+   const lit=Math.max(0,Math.min(1,1-(cv(x+7,y+5)-c0)*3.4)),wb=sm(.1,.95,y/h),e=(1-al)*.55;
+   let R=118+(255-118)*lit,G=110+(234-110)*lit,B=166+(205-166)*lit;
+   const k2=.38*wb*lit;R+=(255-R)*k2;G+=(168-G)*k2;B+=(140-B)*k2;
+   R+=(255-R)*e;G+=(240-G)*e;B+=(216-B)*e;
+   D[o]=R;D[o+1]=G;D[o+2]=B;D[o+3]=255*al*.92;}
+  cx.putImageData(im,0,0);url=c.toDataURL('image/png');}catch(e){url='';}
+  return CT[k]=url;}
+ function skyClouds(){const T=[[3,480,150],[11,480,150],[27,480,120]].map(a=>({u:cTex(a[0],a[1],a[2]),w:a[1],h:a[2]}));if(!T[0].u)return '';
+  const defs='<defs>'+T.map((t,i)=>t.u?`<image id="tsCT${i}" width="${t.w}" height="${t.h}" href="${t.u}"/>`:'').join('')+'</defs>';
+  const P=[[0,-120,30,.9,.5,1,160,10],[1,170,62,1,.55,0,190,70],[2,-190,140,1.3,.5,0,210,40],[0,150,205,1.5,.72,0,170,100],[1,-230,255,1.7,.82,1,200,20],[2,140,282,1.4,.8,0,150,60],[0,-80,300,1.2,.7,1,180,5]];
+  return defs+P.map(q=>{const t=T[q[0]];if(!t.u)return '';const sc=q[3],tr=q[5]?`translate(${q[1]+t.w*sc} ${q[2]}) scale(${-sc} ${sc})`:`translate(${q[1]} ${q[2]}) scale(${sc})`;
+   return `<g class="tsDr" style="animation-duration:${q[6]}s;animation-delay:-${q[7]}s"><use href="#tsCT${q[0]}" transform="${tr}" opacity="${q[4]}"/></g>`;}).join('');}
  function scene(pid,pg){
   const r=R0(77);
   const far=ridge({seed:3,base:352,amp:20,f:.011,step:12,jag:9,peaks:[[238,70,34],[60,34,40],[392,40,46],[-150,40,60],[640,50,60]]});
@@ -26037,8 +26069,7 @@ init();
   <rect x="${X0}" y="0" width="${X1-X0}" height="${H}" fill="url(#tsSky)"/>
   <circle cx="292" cy="330" r="430" fill="url(#tsSun)" class="tsGlow"/>
   <g class="tsRays" opacity=".9">${[-150,-128,-110,-92,-70,-52].map((a,i)=>{const L=900,w=.05+(i%3)*.018,a0=a*Math.PI/180;return `<path d="M292 330L${f1(292+Math.cos(a0-w)*L)} ${f1(330+Math.sin(a0-w)*L)}L${f1(292+Math.cos(a0+w)*L)} ${f1(330+Math.sin(a0+w)*L)}Z" fill="#fff0c8" opacity="${(.1+(i%2)*.06).toFixed(2)}"/>`;}).join('')}</g>
-  <g opacity=".9">${[[40,86,150,10],[210,66,190,8],[-120,140,230,12],[330,150,150,8],[100,196,210,9]].map((c,i)=>`<g class="tsDr" style="animation-duration:${90+i*23}s;animation-delay:-${i*17}s"><ellipse cx="${c[0]}" cy="${c[1]}" rx="${c[2]}" ry="${c[3]}" fill="url(#tsCl)" opacity=".7"/></g>`).join('')}</g>
-  ${cloud(-30,170,1.5,5,150,20)}${cloud(300,118,1.1,8,170,60)}${cloud(120,250,1.3,12,190,40)}${cloud(-260,260,1.7,14,210,100)}${cloud(470,236,1.4,19,180,10)}${cloud(380,300,.9,23,160,90)}
+  ${skyClouds()}
   <g stroke="#2a2442" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">${[[0,0,38,0],[22,-14,38,9],[-18,12,38,18],[40,10,46,4],[-40,-4,46,26]].map(b=>`<g class="tsBird" style="animation-duration:${b[2]}s;animation-delay:-${b[3]}s"><g transform="translate(${b[0]+60} ${230+b[1]})"><path class="tsWing" d="M-5 0Q-2.5 -3.6 0 0Q2.5 -3.6 5 0"/></g></g>`).join('')}</g>
   <path d="${pathFrom(far,H)}" fill="url(#tsM1)"/>
   <g fill="#a99cc6"><rect x="215" y="${f1(yAt(far,215)-24)}" width="5" height="26"/><rect x="223" y="${f1(yAt(far,223)-33)}" width="6" height="35"/><path d="M222 ${f1(yAt(far,223)-33)}l4 -9 4 9z"/><rect x="232" y="${f1(yAt(far,232)-22)}" width="5" height="24"/><path d="M214 ${f1(yAt(far,215)-24)}l3.5 -6 3.5 6zM231 ${f1(yAt(far,232)-22)}l3.5 -6 3.5 6z"/></g>
@@ -26059,9 +26090,9 @@ init();
   <path d="M-200 470C-100 466 0 468 60 462C110 458 160 466 240 466C270 466 292 472 304 482L300 479C262 470 240 468 200 467L60 463Z" fill="#9bd07a" opacity=".85"/>
   <g class="tsSw1">${grass(-120,300,cliffTop,31,['#3f8a52','#58a860','#bfe08a','#2f6a4c'],56)}</g>
   <g class="tsSw2">${grass(-120,300,cliffTop,53,['#47965a','#a6d27c','#2f6a4c'],40)}</g>
-  <g class="tsHero"><g transform="translate(158 364)">${trainer(pg)}</g>
-  <g class="tsMonG"><ellipse cx="100" cy="468" rx="30" ry="4" fill="#0b1026" opacity=".45"/><image class="tsMon" x="49" y="372" width="102" height="102" preserveAspectRatio="xMidYMax meet" href="${pid?'':''}"/></g>
-  <g class="tsSw2">${grass(50,150,cliffTop,81,['#3f8a52','#bfe08a','#58a860'],14)}</g></g>
+  <g class="tsHero"><g class="tsMonG"><ellipse cx="100" cy="468" rx="30" ry="4" fill="#0b1026" opacity=".45"/><image class="tsMon" x="49" y="372" width="102" height="102" preserveAspectRatio="xMidYMax meet" href="${pid?'':''}"/></g>
+  <g class="tsHeroB" data-px="${pg==='f'?195:189}" data-hw="${pg==='f'?37:31}" transform="translate(158 364)">${trainer(pg)}</g>
+  <g class="tsSw2">${grass(50,150,cliffTop,81,['#3f8a52','#bfe08a','#58a860'],14)}${grass(158,238,cliffTop,91,['#3f8a52','#bfe08a','#58a860','#2f6a4c'],12)}</g></g>
   </g>
   <g fill="#ffe7b0">${Array.from({length:16},(_,i)=>{const x=(r()*420-10).toFixed(0),y=(380+r()*240).toFixed(0),d=(5+r()*6).toFixed(1);return `<circle class="tsMote" cx="${x}" cy="${y}" r="${(.8+r()*1.4).toFixed(1)}" style="animation-duration:${d}s;animation-delay:-${(r()*8).toFixed(1)}s"/>`;}).join('')}</g>
   <rect x="${X0}" y="0" width="${X1-X0}" height="${H}" fill="url(#tsVig)"/>
@@ -26086,7 +26117,7 @@ init();
 .tsT .tsMon{image-rendering:pixelated;filter:brightness(1.02) saturate(1.08) drop-shadow(1.2px -.6px 0 rgba(255,224,170,.9)) drop-shadow(0 0 7px rgba(255,200,130,.35));transform-box:fill-box;transform-origin:50% 100%;animation:tsBreath 3.4s ease-in-out infinite}
 .tsT .tsMon.tsSil{filter:brightness(.12) drop-shadow(1.2px -.6px 0 rgba(255,224,170,.9))}
 .tsT .tsSf{opacity:0;image-rendering:pixelated;animation:tsSfK 1.5s step-end infinite}.tsT .tsSf1{animation-delay:-1s}.tsT .tsSf2{animation-delay:-.5s}
-.tsT .tsHeroU{image-rendering:pixelated;animation:tsBob 1.8s steps(1) infinite}
+.tsT .tsHeroU{image-rendering:pixelated;filter:brightness(.97) saturate(.95) sepia(.1) drop-shadow(1.2px -.6px 0 rgba(255,224,170,.9)) drop-shadow(0 0 7px rgba(255,200,130,.35));animation:tsBob 1.8s steps(1) infinite}
 @keyframes tsBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
 .tsT .tsPony{transform-box:fill-box;transform-origin:0% 8%;animation:tsPony 2.6s ease-in-out infinite}
 .tsT .tsScarf{transform-box:fill-box;transform-origin:0% 40%;animation:tsScarf 1.7s ease-in-out infinite}
@@ -26110,8 +26141,8 @@ init();
 @keyframes tsMote{0%{opacity:0;transform:translate(0,0)}25%{opacity:.85}100%{opacity:0;transform:translate(22px,-70px)}}
 @keyframes tsRay{from{opacity:.55;transform:rotate(-2deg)}to{opacity:1;transform:rotate(2deg)}}
 @keyframes tsGlow{from{transform:scale(.97)}to{transform:scale(1.05)}}
-#view>.title.tsT.intro .tsScene{animation:tsIn 2.4s ease-out both}
-@keyframes tsIn{from{opacity:0;filter:brightness(.5)}to{opacity:1;filter:none}}
+/* 새 배경은 처음부터 불투명하게(투명→불투명 페이드는 아래의 이전 배경을 비치게 해서 뺐어요). 어두운 화면에서 밝아지는 연출은 #ttFade가 맡아요 */
+#view>.title.tsT.intro .tsScene{animation:none!important;opacity:1}
 @media(max-height:720px){.tsT>.logo canvas{zoom:.7}.tsT>.menuCol{gap:7px!important}.tsT>.menuCol .pxb{min-height:44px}.tsT>.menuCol .pxb small{display:none}.tsT>.studio{margin-top:6px!important}.tsT>.studio canvas{zoom:.8}}
 @media(prefers-reduced-motion:reduce){.tsT .tsSvg,.tsT .tsSvg *{animation:none!important}}
 `;
@@ -26119,30 +26150,45 @@ init();
   const w=t.clientWidth||innerWidth,h=t.clientHeight||innerHeight,vbW=Math.max(400,H*w/h),sc=h/H;sv.setAttribute('viewBox',`${f1(200-vbW/2)} 0 ${f1(vbW)} ${H}`);
   const wide=w/h>.8,hero=sv.querySelector('.tsHero'),cl=sv.querySelector('#tsCliff');
   // 가로로 넓은 화면: 주인공을 왼쪽으로 옮겨 버튼과 겹치지 않게
-  if(hero){const mob=w<=600,k=mob?.76:1,tx=wide?-Math.min((vbW-400)*.36,330):0;hero.setAttribute('transform',`translate(${f1(tx)} 0) translate(160 470) scale(${k}) translate(-160 -470)`);}
+  const mob=w<=600,k=mob?.76:1,tx=wide?-Math.min((vbW-400)*.36,330):0;if(hero){hero.setAttribute('transform',`translate(${f1(tx)} 0) translate(160 470) scale(${k}) translate(-160 -470)`);}
   // 세로 화면: 버튼 위쪽에 발이 오도록 절벽을 필요한 만큼 올림
   let extra=0;if(!wide){const menu=t.querySelector('.menuCol'),mt=menu?menu.offsetTop:h*.62;extra=Math.max(0,Math.min(110,((h-(H-435)*sc)-(mt-14))/sc));}
-  if(cl)cl.setAttribute('transform',`translate(0 ${f1(-34-extra)})`);}
-/* 파트너 크기 반영: 포켓몬 실제 키(PokeAPI)로 화면에서 보이는 크기를 정해요.
-   그림 속 투명 여백은 빼고 '진짜 모습'의 크기를 재서 맞추고, 키는 한 번 받으면 기억해요 */
- const MH_KEY='zsMonH';
+  if(cl)cl.setAttribute('transform',`translate(0 ${f1(-34-extra)})`);sv._g={k,tx,extra,sc,vl:200-w/(2*sc)};tsLayout();}
+/* 크기 반영: 주인공(키 1.4m 기준)과 파트너의 '실제 키' 비율대로 그려요.
+   큰 포켓몬은 화면이 허락하는 만큼 키우고, 그래도 모자라면 주인공을 줄여서(최대 절반) 비율을 맞춰요. 작은 포켓몬은 작게, 너무 작아 안 보이면 최소 크기만 지켜요.
+   키는 도감 데이터(MON.ht, m)를 먼저 쓰고(인터넷이 없어도 돼요), 없을 때만 PokeAPI에서 받아 기억해요. 그림 속 투명 여백은 빼고 '진짜 모습' 크기로 재요 */
+ const MH_KEY='zsMonH',HERO_DM=14,HERO_H=104,BB0={w:96,h:96,x0:8,y0:10,x1:88,y1:92};
  const mhCache=()=>{try{return JSON.parse(localStorage.getItem(MH_KEY)||'{}')||{};}catch(e){return {};}};
- function monHeightDm(id){const c=mhCache();if(c[id]>0)return Promise.resolve(c[id]);
+ function dmSync(id){try{const m=MON[id];if(m&&+m.ht>0)return Math.round(m.ht*10);}catch(e){}const c=mhCache();return c[id]>0?c[id]:10;}
+ function monHeightDm(id){try{const m=MON[id];if(m&&+m.ht>0)return Promise.resolve(Math.round(m.ht*10));}catch(e){}const c=mhCache();if(c[id]>0)return Promise.resolve(c[id]);
   return fetch('https://pokeapi.co/api/v2/pokemon/'+id).then(r=>{if(!r.ok)throw 0;return r.json();}).then(j=>{const h=+j.height||0;if(h>0){const c2=mhCache();c2[id]=h;try{localStorage.setItem(MH_KEY,JSON.stringify(c2));}catch(e){}}return h;}).catch(()=>0);}
- const monVisH=dm=>Math.max(34,Math.min(150,64*Math.pow(Math.max(dm,1)/10,.42)));   // 키(dm) → 화면 높이: 너무 큰 포켓몬도 화면 안에 들어오게 부드럽게 줄여요
  function monBounds(url){return new Promise(res=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>{try{const w=i.naturalWidth,h=i.naturalHeight;if(!w||!h||w>1200||h>1200)return res(null);
    const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(i,0,0);const d=cx.getImageData(0,0,w,h).data;let x0=w,y0=h,x1=-1,y1=-1;
    for(let y=0;y<h;y++)for(let x=0;x<w;x++){if(d[(y*w+x)*4+3]>24){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}}
    res(x1<0?null:{w,h,x0,y0,x1:x1+1,y1:y1+1});}catch(e){res(null);}};i.onerror=()=>res(null);i.src=url;});}
  async function tsSizeMon(im,pid){const url=im.getAttribute('href');if(!url)return;
-  const r=await Promise.all([monHeightDm(pid),monBounds(url)]),dm=r[0],bb=r[1];
-  if(!dm||!bb||!im.isConnected||im.getAttribute('href')!==url)return;
-  let s=monVisH(dm)/(bb.y1-bb.y0);const visW0=(bb.x1-bb.x0)*s;if(visW0>125)s*=125/visW0;   // 옆으로 너무 퍼진 포켓몬은 절벽 밖으로 안 나가게
-  const visW=(bb.x1-bb.x0)*s,cx=Math.min(100,152-visW/2);   // 주인공(오른쪽)과 겹치지 않게 왼쪽으로 비켜 서요
-  im.setAttribute('preserveAspectRatio','none');
-  im.setAttribute('width',f1(bb.w*s));im.setAttribute('height',f1(bb.h*s));
-  im.setAttribute('x',f1(cx-(bb.x0+bb.x1)/2*s));im.setAttribute('y',f1(471-bb.y1*s));
-  const g=im.parentNode,sh=g&&g.querySelector('ellipse');if(sh){sh.setAttribute('cx',f1(cx));sh.setAttribute('rx',f1(Math.max(24,visW*.42)));}}
+  const r=await Promise.all([monHeightDm(pid),monBounds(url)]);
+  if(!im.isConnected||im.getAttribute('href')!==url)return;
+  im._ts={dm:r[0]||dmSync(pid),bb:r[1]||BB0};fit();}
+ function tsLayout(){
+  const t=document.querySelector('#view>.title.tsT'),sv=t&&t.querySelector('.tsSvg');if(!sv||!sv._g)return;
+  const im=sv.querySelector('.tsMon'),hb=sv.querySelector('.tsHeroB');if(!im||!hb)return;
+  const g=sv._g,d=im._ts||{},pid=im._pid||25,dm=d.dm||dmSync(pid),bb=d.bb||BB0,px=+hb.dataset.px||189,hw=+hb.dataset.hw||31;
+  const a=Math.max(.3,Math.min(3,(bb.x1-bb.x0)/(bb.y1-bb.y0)));
+  const R=dm/HERO_DM,ratio=R<1?Math.pow(R,.8):R<=4?R:4*Math.pow(R/4,.55);        // 주인공 대비 키 비율 (아주 큰 포켓몬만 살짝 줄여요)
+  const gap=8-12*Math.max(0,Math.min(1,(ratio-1)/2));                              // 큰 포켓몬은 주인공 뒤로 살짝 겹쳐 서요
+  const leftG=160+(g.vl+8-g.tx-160)/g.k,feet=470+g.k-34-g.extra,capFor=top=>Math.max(40,(feet-top/g.sc)/g.k);
+  const solve=hCap=>{for(let hs=1;hs>=.499;hs-=.02){const monR=px-hw*hs-gap,wc=Math.min(monR-leftG,320),hMax=Math.min(hCap,wc/a),want=ratio*HERO_H*hs;
+    if(want<=hMax||hs<.51)return{hs,monR,hm:Math.max(30,Math.min(want,hMax))};}};
+  let o=solve(Math.min(250,capFor(10)));
+  const lg=t.querySelector('.logo');                                               // 제목 로고를 가리면 높이를 줄여요
+  if(lg){const tr=t.getBoundingClientRect(),lr=lg.getBoundingClientRect(),lb=lr.bottom-tr.top,xp=xg=>(g.tx+160+g.k*(xg-160)-g.vl)*g.sc,vw0=(bb.x1-bb.x0)*o.hm/(bb.y1-bb.y0);
+   if(xp(o.monR)>lr.left-tr.left-6&&xp(o.monR-vw0)<lr.right-tr.left+6&&(feet-g.k*o.hm)*g.sc<lb+4)o=solve(Math.min(250,capFor(lb+8)));}
+  const s2=o.hm/(bb.y1-bb.y0),vw=(bb.x1-bb.x0)*s2,cx=o.monR-vw/2;
+  hb.setAttribute('transform',`translate(${px} 468) scale(${o.hs.toFixed(3)}) translate(${-px} -468) translate(158 364)`);
+  im.setAttribute('preserveAspectRatio','none');im.setAttribute('width',f1(bb.w*s2));im.setAttribute('height',f1(bb.h*s2));
+  im.setAttribute('x',f1(cx-(bb.x0+bb.x1)/2*s2));im.setAttribute('y',f1(471-bb.y1*s2));
+  const sh=im.parentNode.querySelector('ellipse');if(sh){sh.setAttribute('cx',f1(cx));sh.setAttribute('rx',f1(Math.max(24,vw*.42)));}}
  function build(t){
   if(!t||t.classList.contains('tsT'))return;
   if(!document.getElementById('tsCss')){const st=document.createElement('style');st.id='tsCss';st.textContent=CSS;document.head.appendChild(st);}
@@ -26151,7 +26197,7 @@ init();
   const sc=document.createElement('div');sc.className='tsScene';sc.innerHTML=scene(pid,(S.meta&&S.meta.pg)||'m')+'<div class="tsShade"></div>';
   t.insertBefore(sc,t.firstChild);
   const foot=document.createElement('div');foot.className='tsFoot';foot.textContent='비영리 교육용 팬 콘텐츠이며, 포켓몬 관련 권리는 각 권리자에게 있습니다.';t.appendChild(foot);
-  const im=sc.querySelector('.tsMon');
+  const im=sc.querySelector('.tsMon');if(im)im._pid=pid;
   if(im){const set=u=>{im.setAttribute('href',u);im.setAttributeNS('http://www.w3.org/1999/xlink','href',u);};
    let st=0;im.addEventListener('error',()=>{st++;try{if(st===1)set(SPR_BASE+'back/'+pid+'.png');else if(st===2){set(spriteURL(pid,'front'));im.classList.add('tsSil');}else if(st===3){im.classList.remove('tsSil');set(fallbackSprite(pid));}}catch(e){}});
    im.addEventListener('load',()=>{try{tsSizeMon(im,pid);}catch(e){}});try{set(spriteURL(pid,'back'));}catch(e){set(fallbackSprite(pid));}}
@@ -26166,11 +26212,12 @@ init();
  function unbuild(t){t.classList.remove('tsT');['.tsScene','.tsFoot'].forEach(q=>{const e=t.querySelector(':scope>'+q);if(e)e.remove();});}
  function tsBind(t){const lg=t.querySelector('.logo');if(!lg||lg.dataset.tsTog)return;lg.dataset.tsTog='1';lg.style.cursor='pointer';lg.style.pointerEvents='auto';lg.title='눌러서 배경 바꾸기';
   lg.addEventListener('click',()=>{const next=tsMode()==='new'?'old':'new';tsSave(next);try{sfx('tap');}catch(e){}if(next==='new')build(t);else unbuild(t);});}
- renderTitle=function(){const r=prev.apply(this,arguments);try{const t=document.querySelector('#view>.title');if(t){if(tsMode()==='new')build(t);tsBind(t);}}catch(e){console.warn('title scene',e);}return r;};
+ renderTitle=function(){const r=prev.apply(this,arguments);try{const t=document.querySelector('#view>.title');if(t){if(tsMode()==='new')build(t);tsBind(t);}}catch(e){console.warn('title scene',e);}finally{try{document.documentElement.classList.remove('tsPre');}catch(e){}}return r;};
  window.__tsScene=scene;
 })();
 
-if(S.screen==='title')renderTitle();</script><div style="position: fixed; left: 0px; top: 0px; width: 100%; height: 100%; pointer-events: none; visibility: hidden; z-index: -5;"></div>
+if(S.screen==='title')renderTitle();
+try{document.documentElement.classList.remove('tsPre');}catch(e){}</script><div style="position: fixed; left: 0px; top: 0px; width: 100%; height: 100%; pointer-events: none; visibility: hidden; z-index: -5;"></div>
 
 
 
