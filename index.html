@@ -3026,7 +3026,8 @@ textarea.inp.code{word-break:break-all}
 h1,h2,h3,h4,.qText,.hubTop{text-wrap:balance}
 </style>
 <style>.bkBanner{display:flex;gap:12px;align-items:center;margin-bottom:12px;background:linear-gradient(135deg,#fff7e0,#ffeec2);border:3px solid #ffc94d}</style>
-<style id="pgCss">.pgOpt{flex:1;max-width:170px;background:#fff;border:3px solid #d9cfae;border-radius:14px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-family:'Jua';font-size:15px;color:#4a3b2a}.pgOpt img{width:100%;aspect-ratio:164/200;object-fit:cover;border-radius:9px}.pgOpt.on{border-color:#e8573f;box-shadow:0 0 0 3px #ffd9cf;background:#fff6f2}</style>
+<style id="pgCss">.pgOpt{flex:1;max-width:170px;background:#fff;border:3px solid #d9cfae;border-radius:14px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-family:'Jua';font-size:15px;color:#4a3b2a}.pgOpt img{width:100%;aspect-ratio:164/200;object-fit:cover;border-radius:9px}.pgOpt.on{border-color:#e8573f;box-shadow:0 0 0 3px #ffd9cf;background:#fff6f2}
+.pgOpt img.pgGif{object-fit:contain;image-rendering:pixelated}</style>
 <style>
 .tsPanel{position:relative}
 .tsPanel.hasLp{background:linear-gradient(120deg,#fff8d6,#ffe9a8)!important;border:3px solid #f5b400!important;animation:tsGlow 1.3s ease-in-out infinite}
@@ -21401,7 +21402,7 @@ function renderName(change){S.screen='name';$('#view').innerHTML=`<div class=tit
   <div style="width:96px;height:96px">${monImg(25,'anim')}</div><h2 style="margin:0">트레이너 닉네임</h2>
   <p style="font-size:14px;text-align:center;line-height:1.6"><b style="color:#d9393f">진짜 이름은 쓰지 않아요!</b><br>게임에서 불릴 트레이너 닉네임을 만들어요. 생각이 안 나면 <b>닉네임 뽑기</b>를 눌러 봐요.</p>
   <div style="font-size:14px;margin-top:2px">주인공 모습을 골라요</div>
-  <div class=row id=pgRow style="gap:10px;justify-content:center;width:100%">${[['m','남자 주인공',CHAR_ART.hero_m],['f','여자 주인공',CHAR_ART.hero_f]].map(g=>`<button type=button class="pgOpt${(S.meta.pg||'m')===g[0]?' on':''}" data-g="${g[0]}"><img src="${g[2]}" alt=""><span>${g[1]}</span></button>`).join('')}</div>
+  <div class=row id=pgRow style="gap:10px;justify-content:center;width:100%">${[['m','남자 주인공',CHAR_ART.hero_m,'boy_front.gif'],['f','여자 주인공',CHAR_ART.hero_f,'girl_front.gif']].map(g=>`<button type=button class="pgOpt${(S.meta.pg||'m')===g[0]?' on':''}" data-g="${g[0]}"><img class=pgGif src="https://raw.githubusercontent.com/regecha/pokemath/main/${g[3]}" data-g1="https://cdn.jsdelivr.net/gh/regecha/pokemath@main/${g[3]}" data-fb="${g[2]}" onerror="if(this.dataset.g1){this.src=this.dataset.g1;this.dataset.g1='';}else{this.onerror=null;this.classList.remove('pgGif');this.src=this.dataset.fb;}" alt=""><span>${g[1]}</span></button>`).join('')}</div>
   <input class=inp id=nIn maxlength=12 placeholder="예: 용감한 탐험가" style="text-align:center;font-size:22px" value="${change?esc(S.meta.name):''}">
   <div class=row style="width:100%"><button class="btn purple" id=nRand>${I('star')} 닉네임 뽑기</button><button class="btn red" id=nOk>${change?'바꾸기':'다음'}</button></div>
   ${change?'<button class="btn ghost sm" id=nBack>취소</button>':''}
@@ -26038,20 +26039,20 @@ init();
   const c=document.createElement('canvas');c.width=w;c.height=h;const cx=c.getContext('2d'),im=cx.createImageData(w,h),D=im.data;
   for(let y=0;y<h;y++)for(let x=0;x<w;x++){const c0=cv(x,y),al=sm(0,.5,c0);const o=(y*w+x)*4;if(al<=0.004){D[o+3]=0;continue;}
    const lit=Math.max(0,Math.min(1,1-(cv(x+7,y+5)-c0)*3.4)),wb=sm(.1,.95,y/h),e=(1-al)*.55;
-   let R=118+(255-118)*lit,G=110+(234-110)*lit,B=166+(205-166)*lit;
-   const k2=.38*wb*lit;R+=(255-R)*k2;G+=(168-G)*k2;B+=(140-B)*k2;
-   R+=(255-R)*e;G+=(240-G)*e;B+=(216-B)*e;
+   let R=150+(255-150)*lit,G=172+(255-172)*lit,B=210+(255-210)*lit;
+   const k2=.1*wb*lit;R+=(255-R)*k2;G+=(236-G)*k2;B+=(226-B)*k2;
+   R+=(255-R)*e;G+=(255-G)*e;B+=(255-B)*e;
    D[o]=R;D[o+1]=G;D[o+2]=B;D[o+3]=255*al*.92;}
   cx.putImageData(im,0,0);url=c.toDataURL('image/png');}catch(e){url='';}
   return CT[k]=url;}
  function skyClouds(){const T=[[3,480,150],[11,480,150],[27,480,120]].map(a=>({u:cTex(a[0],a[1],a[2]),w:a[1],h:a[2]}));if(!T[0].u)return '';
   const defs='<defs>'+T.map((t,i)=>t.u?`<image id="tsCT${i}" width="${t.w}" height="${t.h}" href="${t.u}"/>`:'').join('')+'</defs>';
-  const P=[[0,-120,30,.9,.5,1,160,10],[1,170,62,1,.55,0,190,70],[2,-190,140,1.3,.5,0,210,40],[0,150,205,1.5,.72,0,170,100],[1,-230,255,1.7,.82,1,200,20],[2,140,282,1.4,.8,0,150,60],[0,-80,300,1.2,.7,1,180,5]];
+  const P=[[0,-120,30,.9,.5,1,160,10],[1,170,62,1,.55,0,190,70],[2,-190,140,1.3,.5,0,210,40],[0,150,205,1.5,.72,0,170,100],[1,-230,255,1.7,.82,1,200,20],[2,140,282,1.4,.8,0,150,60],[0,-80,300,1.2,.7,1,180,5],[1,-520,90,1.1,.6,1,200,30],[2,-470,215,1.3,.55,0,230,90],[0,-420,300,1.1,.7,0,190,50],[2,470,40,1.2,.6,0,210,15],[0,560,150,1.3,.6,1,240,110],[1,540,255,1.5,.75,0,200,65],[2,780,70,1.1,.55,1,220,45],[1,760,200,1.4,.65,0,250,20],[0,730,305,1.2,.7,1,190,80]];
   return defs+P.map(q=>{const t=T[q[0]];if(!t.u)return '';const sc=q[3],tr=q[5]?`translate(${q[1]+t.w*sc} ${q[2]}) scale(${-sc} ${sc})`:`translate(${q[1]} ${q[2]}) scale(${sc})`;
    return `<g class="tsDr" style="animation-duration:${q[6]}s;animation-delay:-${q[7]}s"><use href="#tsCT${q[0]}" transform="${tr}" opacity="${q[4]}"/></g>`;}).join('');}
 
  /* 세계 풍경: 석양 속 실루엣 성, 눈 덮인 먼 산, 계곡 평원(밭·마을·풍차·호수·강) */
- function castle(x,y,k){
+ function castle(x,y,k,low){
   const cren=(a,b,yt)=>{let d='';for(let i=a;i<b-1.5;i+=3.2)d+=`M${f1(i)} ${yt}h1.8v-1.9h-1.8z`;return d;};
   const cone=(a,b,yb,yt)=>`M${a} ${yb}L${f1((a+b)/2)} ${yt}L${b} ${yb}Z`;
   const P=`<path d="M-48 4V-13H-24V-15H24V-13H48V4Z"/><path d="M-21 2V-23H21V2Z"/>`
@@ -26061,10 +26062,10 @@ init();
    +`<path d="M9 -23V-33H16V-23Z"/><path d="${cone(7,18,-33,-43)}"/>`
    +`<path d="${cren(-46,-24,-15)}${cren(24,46,-13)}${cren(-20,20,-23)}${cren(-33,-22,-37)}${cren(22,33,-31)}"/>`
    +`<path d="M0 -64V-74M0 -74l10 2.6-10 2.6Z M-27 -53V-61M-27 -61l7 2-7 2Z M27 -46V-53M27 -53l7 2-7 2Z" stroke-width=".7"/>`;
-  const win='<g fill="#ffd27a"><rect x="-3.4" y="-38" width="1.7" height="3.4"/><rect x="1.6" y="-38" width="1.7" height="3.4"/><rect x="-29" y="-30" width="1.6" height="3.2"/><rect x="26" y="-23" width="1.6" height="3.2"/><rect x="-14" y="-15" width="1.4" height="3"/><rect x="12" y="-15" width="1.4" height="3"/><rect x="-1" y="-15" width="1.6" height="3.2"/><rect x="-45" y="-17" width="1.3" height="2.8"/><rect x="45" y="-14" width="1.3" height="2.8"/><rect x="-12" y="-30" width="1.3" height="2.8"/></g>';
-  return `<g transform="translate(${x} ${y}) scale(${k})"><path d="M-44 3L-40 11L-52 50L52 50L40 11L44 3L30 1L0 5L-30 1Z" fill="#c6b6da"/><path d="M-44 3L-40 11L-52 50L-30 50L-26 14L-30 1Z" fill="#b2a2cc" opacity=".6"/>`
-   +`<g fill="#ffd9b0" stroke="#ffd9b0" stroke-width=".6" opacity=".95" transform="translate(1.2 -.7)">${P}</g><g fill="#7d71a6" stroke="#7d71a6" stroke-width=".6">${P}</g>`
-   +`<path d="M-3 4V-5a3 3 0 0 1 6 0V4Z" fill="#3a3256"/>${win}</g>`;}
+  const win='<g fill="#fff0b0"><rect x="-3.4" y="-38" width="1.7" height="3.4"/><rect x="1.6" y="-38" width="1.7" height="3.4"/><rect x="-29" y="-30" width="1.6" height="3.2"/><rect x="26" y="-23" width="1.6" height="3.2"/><rect x="-14" y="-15" width="1.4" height="3"/><rect x="12" y="-15" width="1.4" height="3"/><rect x="-1" y="-15" width="1.6" height="3.2"/><rect x="-45" y="-17" width="1.3" height="2.8"/><rect x="45" y="-14" width="1.3" height="2.8"/><rect x="-12" y="-30" width="1.3" height="2.8"/></g>';
+  return `<g transform="translate(${x} ${y}) scale(${k})">`+(low?`<path d="M-84 24Q-62 8 -40 5Q0 -1 40 5Q62 8 84 24Z" fill="#7fae82"/><path d="M-60 12Q-30 2 0 2Q30 2 60 12Q30 8 0 8Q-30 8 -60 12Z" fill="#bfe0a0" opacity=".7"/><path d="M-84 24Q-62 8 -40 5L-40 24Z" fill="#5f9a6c" opacity=".5"/>`:`<path d="M-44 3L-40 11L-52 50L52 50L40 11L44 3L30 1L0 5L-30 1Z" fill="#c4d4e6"/><path d="M-44 3L-40 11L-52 50L-30 50L-26 14L-30 1Z" fill="#a9bcd6" opacity=".6"/>`)
+   +`<g fill="#f4f9ff" stroke="#f4f9ff" stroke-width=".6" opacity=".95" transform="translate(1.2 -.7)">${P}</g><g fill="#6f86ad" stroke="#6f86ad" stroke-width=".6">${P}</g>`
+   +`<path d="M-3 4V-5a3 3 0 0 1 6 0V4Z" fill="#34425e"/>${win}</g>`;}
  function snowCap(far,x){
   const c=far.map((q,i)=>[q,i]).filter(e=>Math.abs(e[0][0]-x)<16).sort((u,v)=>u[0][1]-v[0][1])[0];if(!c)return '';
   const pi=c[1],X=far[pi][0],Y=far[pi][1],SL=Y+20;let l=pi,rr=pi;
@@ -26089,55 +26090,107 @@ init();
   const wx=55,wy=f1(Y(wx)+5);
   o+=`<g transform="translate(${wx} ${wy})"><path d="M-2.4 0L-1.5 -10L1.5 -10L2.4 0Z" fill="#efd7b6"/><path d="M-2 -10L0 -13L2 -10Z" fill="#8c4a58"/><g stroke="#5b4a62" stroke-width=".9" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 0 -10" to="360 0 -10" dur="26s" repeatCount="indefinite"/><path d="M0 -10L-5.6 -14.6M0 -10L5.6 -5.4M0 -10L4.6 -15.6M0 -10L-4.6 -4.4"/></g></g>`;
   return o;}
+ function boulder(cx,cy,w,h){const q=n=>f1(n);
+  return `<g><ellipse cx="${q(cx+w*.15)}" cy="${q(cy+1)}" rx="${q(w*1.05)}" ry="${q(h*.18)}" fill="#1f4a3a" opacity=".35"/>`
+   +`<path d="M${q(cx-w)} ${q(cy)}Q${q(cx-w*1.02)} ${q(cy-h*.8)} ${q(cx-w*.35)} ${q(cy-h*.98)}Q${q(cx+w*.5)} ${q(cy-h*1.08)} ${q(cx+w*.95)} ${q(cy-h*.4)}L${q(cx+w)} ${q(cy)}Z" fill="url(#tsRock)"/>`
+   +`<path d="M${q(cx-w*.9)} ${q(cy-h*.3)}Q${q(cx-w*.85)} ${q(cy-h*.85)} ${q(cx-w*.3)} ${q(cy-h*.93)}Q${q(cx+w*.15)} ${q(cy-h*.98)} ${q(cx+w*.2)} ${q(cy-h*.7)}Q${q(cx-w*.3)} ${q(cy-h*.6)} ${q(cx-w*.9)} ${q(cy-h*.3)}Z" fill="#e4e0cc" opacity=".55"/>`
+   +`<path d="M${q(cx+w*.2)} ${q(cy-h*.5)}Q${q(cx+w*.7)} ${q(cy-h*.7)} ${q(cx+w*.95)} ${q(cy-h*.4)}L${q(cx+w)} ${q(cy)}L${q(cx+w*.3)} ${q(cy)}Z" fill="#4d5a50" opacity=".4"/></g>`;}
  function scene(pid,pg){
   const r=R0(77);
   const far=ridge({seed:3,base:352,amp:20,f:.011,step:12,jag:9,peaks:[[238,70,34],[60,34,40],[392,40,46],[-150,40,60],[640,50,60]]});
+  let vxl=1e9,vxr=-1e9,vTop=1e9;far.forEach(q=>{if(Math.abs(q[0]-238)<30&&q[1]<vTop)vTop=q[1];});
+  const vYr=vTop+11;far.forEach(q=>{if(Math.abs(q[0]-238)<=40&&q[1]<vYr){q[1]=vYr;if(q[0]<vxl)vxl=q[0];if(q[0]>vxr)vxr=q[0];}});
+  const vcx=(vxl+vxr)/2,vrx=Math.max(8,(vxr-vxl)/2);
   const mid=ridge({seed:9,base:372,amp:26,f:.014,step:10,jag:7,peaks:[[330,26,40],[110,22,52],[-260,30,60],[560,34,70]]});
   const near=ridge({seed:15,base:398,amp:22,f:.017,step:8,jag:4,peaks:[[60,14,60]]});
   const h1=ridge({seed:21,base:424,amp:18,f:.02,step:6,jag:2});
   const h2=ridge({seed:31,base:446,amp:15,f:.024,step:6,jag:2});
   const plain=ridge({seed:41,base:410,amp:4,f:.03,step:8,jag:1});
   const cliffTop=x=>{if(x<-200)return 470;if(x<20)return 470+(x+200)*(-.02);return 466+Math.sin(x*.05)*1.5+ (x>200?(x-200)*.18:0);};
-  const lip=x=>x>222?454+(x-222)*.65:452+Math.sin(x*.07)*2.2+Math.sin(x*.19)*1.1+(x<-190?(-190-x)*.5:0);
+  const lipB=x=>452+Math.sin(x*.07)*2.2+Math.sin(x*.19)*1.1+(x>222?120*(1-Math.exp(-(x-222)/170)):0)+(x<-190?120*(1-Math.exp((x+190)/170)):0);
+  const lip=x=>{const w=Math.max(0,Math.min(1,Math.max(x-222,-190-x)/50));return lipB(x)+w*(Math.sin(x*.043+1.3)*4.6+Math.sin(x*.11+.4)*2.4+Math.sin(x*.27)*1.2+Math.sin(x*.61)*.6);};
   const lp=[];for(let x=-232;x<=260;x+=6)lp.push([x,lip(x)]);const lipD='M'+lp.map(q=>q[0]+' '+f1(q[1])).join('L');
+  const lf=[];for(let x=-700;x<=1100;x+=6)lf.push([x,lip(x)]);const lipFullD='M'+lf.map(q=>q[0]+' '+f1(q[1])).join('L'),bodyD=lipFullD+'L1100 '+(H+260)+'L-700 '+(H+260)+'Z';
+  const slopeShade=`<ellipse cx="300" cy="560" rx="150" ry="44" fill="#1f5a48" opacity=".22"/><ellipse cx="-40" cy="540" rx="170" ry="40" fill="#1f5a48" opacity=".18"/><ellipse cx="120" cy="486" rx="150" ry="13" fill="#fff9c8" opacity=".16"/><ellipse cx="-110" cy="500" rx="110" ry="16" fill="#fff9c8" opacity=".12"/><ellipse cx="230" cy="520" rx="90" ry="14" fill="#fff9c8" opacity=".1"/>`
+   +`<ellipse cx="540" cy="610" rx="210" ry="38" fill="#1f5a48" opacity=".2"/><ellipse cx="-310" cy="600" rx="200" ry="36" fill="#1f5a48" opacity=".18"/><ellipse cx="720" cy="650" rx="170" ry="30" fill="#1f5a48" opacity=".16"/><ellipse cx="430" cy="560" rx="150" ry="11" fill="#fff9c8" opacity=".13"/><ellipse cx="-290" cy="535" rx="130" ry="11" fill="#fff9c8" opacity=".12"/><ellipse cx="640" cy="598" rx="130" ry="10" fill="#fff9c8" opacity=".1"/>`
+   +`<g class="tsSw2">${grass(-450,850,x=>Math.max(508,lip(x)+14),71,['#4f9a5a','#a6d27c','#3f8a52','#c8e890'],130)}</g><g transform="translate(0 540) scale(1.5) translate(0 -540)" class="tsSw1">${grass(-300,570,x=>Math.max(540,lip(x)+44),73,['#3f8a52','#7fbf68','#a6d27c','#2f6a4c'],80)}</g><g transform="translate(0 600) scale(2) translate(0 -600)" class="tsSw2">${grass(-225,425,x=>Math.max(600,lip(x)+70),79,['#2f6a4c','#4f9a5a','#7fbf68'],50)}</g>`;
+  const rk=(x,d,w,h)=>boulder(x,f1(lip(x)+d),w,h);
+  const bush=(x,d,w)=>{const y=f1(lip(x)+d),q=f1;return `<g><ellipse cx="${x}" cy="${y}" rx="${w}" ry="${q(w*.22)}" fill="#1f5a48" opacity=".3"/><path d="M${q(x-w)} ${y}Q${q(x-w*.9)} ${q(y-w*.7)} ${q(x-w*.3)} ${q(y-w*.8)}Q${x} ${q(y-w*1.15)} ${q(x+w*.4)} ${q(y-w*.75)}Q${q(x+w)} ${q(y-w*.6)} ${q(x+w)} ${y}Z" fill="#2f7a4c"/><path d="M${q(x-w*.7)} ${q(y-w*.35)}Q${q(x-w*.3)} ${q(y-w*.85)} ${q(x+w*.2)} ${q(y-w*.75)}Q${q(x-w*.1)} ${q(y-w*.5)} ${q(x-w*.7)} ${q(y-w*.35)}Z" fill="#6fb85a" opacity=".8"/></g>`;};
+  const fp=(cx,d,n,seed)=>{const r=R0(seed),cs=['#fff6d8','#ffd86b','#ff9fb2','#c3b4ff'];let o='';for(let i=0;i<n;i++){const x=cx+(r()-.5)*54,y=lip(x)+d+(r()-.5)*10,h=4+r()*4,c=cs[(r()*4)|0];o+=`<path d="M${f1(x)} ${f1(y)}q${f1((r()-.5)*2)} ${f1(-h*.5)} ${f1((r()-.5)*1.5)} ${f1(-h)}" stroke="#4f9a5a" stroke-width=".7" fill="none"/><circle cx="${f1(x)}" cy="${f1(y-h)}" r="1.3" fill="${c}"/>`;}return o;};
+  const turfLow=(x0,x1,seed,n,dep)=>{const r=R0(seed),cs=['#9fd27a','#78b866','#4f9a5a','#c8e890'];let o='';for(let i=0;i<n;i++){const x=x0+(x1-x0)*r(),y=lip(x)+3+r()*dep,w=2+r()*4;o+=`<path d="M${f1(x)} ${f1(y)}q${f1(w*.5)} -1.6 ${f1(w)} 0" stroke="${cs[(r()*4)|0]}" stroke-width=".8" fill="none" opacity="${(.35+r()*.4).toFixed(2)}" stroke-linecap="round"/>`;}return o;};
+  const sideDecor=turfLow(-450,850,41,320,170)
+   +[[-420,30,26,17],[-330,52,18,11],[-230,24,34,22],[-120,40,24,15],[236,58,16,10],[400,6,9,6],[470,26,30,19],[520,5,8,5],[560,60,18,11],[640,34,36,23],[690,5,10,6],[760,70,26,16],[780,6,8,5],[820,24,20,12],[-370,5,8,5],[-280,4,9,6],[-160,4,8,5]].map(a=>rk(a[0],a[1],a[2],a[3])).join('')
+   +[[-380,12,16],[-250,10,14],[8,36,13],[430,18,18],[600,22,20],[720,16,16]].map(a=>bush(a[0],a[1],a[2])).join('')
+   +[[-200,34],[-340,42],[-90,50],[60,44],[250,48],[440,30],[580,50],[700,40]].map((a,i)=>fp(a[0],a[1],9,100+i)).join('')
+   +`<g class="tsSw1">${grass(-450,-225,lip,18,['#7fbf68','#bfe08a','#4f9a5a','#a6d27c'],60)}${grass(222,850,lip,19,['#7fbf68','#bfe08a','#4f9a5a','#a6d27c'],170)}</g><g class="tsSw2">${grass(-450,-225,x=>lip(x)+8,32,['#3f8a52','#58a860','#bfe08a','#2f6a4c'],40)}${grass(222,850,x=>lip(x)+8,33,['#3f8a52','#58a860','#bfe08a','#2f6a4c'],110)}</g>`;
   let s=`<svg class="tsSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 ${H}" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
   <defs>
-   <linearGradient id="tsSky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#1b2a6c"/><stop offset=".2" stop-color="#3a5bb4"/><stop offset=".36" stop-color="#86a2e0"/><stop offset=".46" stop-color="#f3bfa0"/><stop offset=".53" stop-color="#ffe2a8"/><stop offset="1" stop-color="#ffe9bd"/></linearGradient>
-   <radialGradient id="tsSun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fffdf0"/><stop offset=".14" stop-color="#fff0c4" stop-opacity=".95"/><stop offset=".4" stop-color="#ffc88a" stop-opacity=".42"/><stop offset="1" stop-color="#ff9a6a" stop-opacity="0"/></radialGradient>
+   <linearGradient id="tsSky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4f8fdc"/><stop offset=".22" stop-color="#7db4ea"/><stop offset=".4" stop-color="#b3d6f1"/><stop offset=".5" stop-color="#e2f0f5"/><stop offset="1" stop-color="#eef7ee"/></linearGradient>
+   <radialGradient id="tsSun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff"/><stop offset=".12" stop-color="#ffffff" stop-opacity=".92"/><stop offset=".4" stop-color="#f4fbff" stop-opacity=".38"/><stop offset="1" stop-color="#dff0ff" stop-opacity="0"/></radialGradient>
    <radialGradient id="tsCl" cx=".42" cy=".36" r=".62"><stop offset="0" stop-color="#fffaf0" stop-opacity=".97"/><stop offset=".55" stop-color="#ffd9b0" stop-opacity=".8"/><stop offset="1" stop-color="#ffb894" stop-opacity="0"/></radialGradient>
    <radialGradient id="tsCs" cx=".5" cy=".5" r=".55"><stop offset="0" stop-color="#6d5a9c" stop-opacity=".78"/><stop offset="1" stop-color="#8f78b4" stop-opacity="0"/></radialGradient>
+   <radialGradient id="tsAuraG" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fffbe0" stop-opacity=".85"/><stop offset=".45" stop-color="#fff3c0" stop-opacity=".35"/><stop offset="1" stop-color="#fff3c0" stop-opacity="0"/></radialGradient>
+   <radialGradient id="tsPuff" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff" stop-opacity=".8"/><stop offset=".6" stop-color="#f4fbff" stop-opacity=".35"/><stop offset="1" stop-color="#f4fbff" stop-opacity="0"/></radialGradient>
+   <linearGradient id="tsBeam" x1="0" x2="0" y1="1" y2="0"><stop offset="0" stop-color="#fffbe0" stop-opacity="0"/><stop offset=".14" stop-color="#fffbe0" stop-opacity=".6"/><stop offset=".5" stop-color="#fffbe0" stop-opacity=".28"/><stop offset=".8" stop-color="#fffbe0" stop-opacity=".1"/><stop offset="1" stop-color="#fffbe0" stop-opacity="0"/></linearGradient>
+   <filter id="tsBeamBlur" x="-80%" y="-20%" width="260%" height="140%"><feGaussianBlur stdDeviation="6"/></filter>
+   <linearGradient id="tsVolT" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7a6c92" stop-opacity=".5"/><stop offset=".6" stop-color="#7a6c92" stop-opacity=".18"/><stop offset="1" stop-color="#7a6c92" stop-opacity="0"/></linearGradient>
+   <radialGradient id="tsLava" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd9a0" stop-opacity=".95"/><stop offset=".4" stop-color="#ff8a4a" stop-opacity=".55"/><stop offset="1" stop-color="#ff6a3a" stop-opacity="0"/></radialGradient>
+   <radialGradient id="tsAsh" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#b9b2c8" stop-opacity=".6"/><stop offset=".6" stop-color="#c8c4d4" stop-opacity=".28"/><stop offset="1" stop-color="#d8d8e4" stop-opacity="0"/></radialGradient>
+   <filter id="tsLavaBlur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation=".7"/></filter>
    <linearGradient id="tsRay" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff4cc" stop-opacity=".5"/><stop offset="1" stop-color="#fff4cc" stop-opacity="0"/></linearGradient>
-   <linearGradient id="tsM1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c9b8dc"/><stop offset="1" stop-color="#f1cfc8"/></linearGradient>
-   <linearGradient id="tsM2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8f8cc6"/><stop offset="1" stop-color="#e0b8c0"/></linearGradient>
-   <linearGradient id="tsM3" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5f78b4"/><stop offset="1" stop-color="#b2a8c0"/></linearGradient>
-   <linearGradient id="tsH1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4f8f78"/><stop offset="1" stop-color="#8fae96"/></linearGradient>
-   <linearGradient id="tsH2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2f7a62"/><stop offset="1" stop-color="#4a8a70"/></linearGradient>
-   <linearGradient id="tsH3" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#1f5f52"/><stop offset="1" stop-color="#1d4a48"/></linearGradient>
-   <linearGradient id="tsMist" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff2dc" stop-opacity="0"/><stop offset=".55" stop-color="#fff2dc" stop-opacity=".55"/><stop offset="1" stop-color="#fff2dc" stop-opacity="0"/></linearGradient>
-   <linearGradient id="tsRock" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#1b2138"/><stop offset=".6" stop-color="#262d4c"/><stop offset="1" stop-color="#3a3556"/></linearGradient>
-   <linearGradient id="tsRockLit" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#2a3150"/><stop offset="1" stop-color="#8a6a6a"/></linearGradient>
+   <linearGradient id="tsM1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#bfd3e8"/><stop offset="1" stop-color="#e6f0f4"/></linearGradient>
+   <linearGradient id="tsM2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#9db9d8"/><stop offset="1" stop-color="#d3e4ee"/></linearGradient>
+   <linearGradient id="tsM3" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7ea2c8"/><stop offset="1" stop-color="#b9d2e0"/></linearGradient>
+   <linearGradient id="tsH1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#6aae88"/><stop offset="1" stop-color="#a6cba6"/></linearGradient>
+   <linearGradient id="tsH2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4a9a6c"/><stop offset="1" stop-color="#6fae80"/></linearGradient>
+   <linearGradient id="tsH3" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2f7a58"/><stop offset="1" stop-color="#2a6a4e"/></linearGradient>
+   <linearGradient id="tsMist" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f2fbff" stop-opacity="0"/><stop offset=".55" stop-color="#f2fbff" stop-opacity=".6"/><stop offset="1" stop-color="#f2fbff" stop-opacity="0"/></linearGradient>
+   <linearGradient id="tsRock" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#b3ae98"/><stop offset=".55" stop-color="#8d8f7c"/><stop offset="1" stop-color="#6a7466"/></linearGradient>
+   <linearGradient id="tsGnd" gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="440" y2="720"><stop offset="0" stop-color="#bde27c"/><stop offset=".12" stop-color="#92c868"/><stop offset=".4" stop-color="#62a65a"/><stop offset=".75" stop-color="#3f8650"/><stop offset="1" stop-color="#2c6a4c"/></linearGradient>
+   <linearGradient id="tsRockLit" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#9aa08a"/><stop offset="1" stop-color="#d8d4b8"/></linearGradient>
    <linearGradient id="tsRiv" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#9fd0e8" stop-opacity=".5"/><stop offset=".6" stop-color="#ffe9c0" stop-opacity=".95"/><stop offset="1" stop-color="#ffe9c0" stop-opacity=".6"/></linearGradient>
-   <radialGradient id="tsVig" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#0a1030" stop-opacity="0"/><stop offset="1" stop-color="#0a1030" stop-opacity=".45"/></radialGradient>
-   <linearGradient id="tsTop" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#0c1550" stop-opacity=".55"/><stop offset="1" stop-color="#0c1550" stop-opacity="0"/></linearGradient>
+   <radialGradient id="tsVig" cx=".5" cy=".5" r=".75"><stop offset=".65" stop-color="#12304a" stop-opacity="0"/><stop offset="1" stop-color="#12304a" stop-opacity=".22"/></radialGradient>
+   <linearGradient id="tsTop" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2f6fc0" stop-opacity=".3"/><stop offset="1" stop-color="#2f6fc0" stop-opacity="0"/></linearGradient>
    <linearGradient id="tsTurf" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b6dc78"/><stop offset=".3" stop-color="#6aa65a"/><stop offset="1" stop-color="#2f6a4c"/></linearGradient>
    <linearGradient id="tsFace" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#3a3556"/><stop offset=".55" stop-color="#7a5f66"/><stop offset="1" stop-color="#d09a78"/></linearGradient>
    <linearGradient id="tsAO" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#1a1f38" stop-opacity=".55"/><stop offset="1" stop-color="#1a1f38" stop-opacity="0"/></linearGradient>
-   <linearGradient id="tsPl" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d2cf98"/><stop offset=".4" stop-color="#93b07c"/><stop offset="1" stop-color="#4f7f66"/></linearGradient>
+   <linearGradient id="tsPl" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#cfe0a6"/><stop offset=".4" stop-color="#9cc47e"/><stop offset="1" stop-color="#5f9a6a"/></linearGradient>
   </defs>
   <rect x="${X0}" y="0" width="${X1-X0}" height="${H}" fill="url(#tsSky)"/>
-  <circle cx="292" cy="330" r="430" fill="url(#tsSun)" class="tsGlow"/>
-  <g class="tsRays" opacity=".9">${[-150,-128,-110,-92,-70,-52].map((a,i)=>{const L=900,w=.05+(i%3)*.018,a0=a*Math.PI/180;return `<path d="M292 330L${f1(292+Math.cos(a0-w)*L)} ${f1(330+Math.sin(a0-w)*L)}L${f1(292+Math.cos(a0+w)*L)} ${f1(330+Math.sin(a0+w)*L)}Z" fill="#fff0c8" opacity="${(.1+(i%2)*.06).toFixed(2)}"/>`;}).join('')}</g>
+  <circle cx="300" cy="150" r="430" fill="url(#tsSun)" class="tsGlow"/>
+  <g class="tsRays" opacity=".9">${[28,46,64,82,100,120,140].map((a,i)=>{const L=900,w=.05+(i%3)*.018,a0=a*Math.PI/180;return `<path d="M300 150L${f1(300+Math.cos(a0-w)*L)} ${f1(150+Math.sin(a0-w)*L)}L${f1(300+Math.cos(a0+w)*L)} ${f1(150+Math.sin(a0+w)*L)}Z" fill="#ffffff" opacity="${(.1+(i%2)*.06).toFixed(2)}"/>`;}).join('')}</g>
+  <g fill="#e8ffd8"><circle cx="262" cy="196" r="7" opacity="0.28"/><circle cx="238" cy="224" r="13" opacity="0.18"/><circle cx="204" cy="262" r="5" opacity="0.3"/><circle cx="176" cy="292" r="19" opacity="0.14"/><circle cx="132" cy="338" r="9" opacity="0.2"/></g>
   ${skyClouds()}
-  <g stroke="#2a2442" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">${[[0,0,38,0],[22,-14,38,9],[-18,12,38,18],[40,10,46,4],[-40,-4,46,26]].map(b=>`<g class="tsBird" style="animation-duration:${b[2]}s;animation-delay:-${b[3]}s"><g transform="translate(${b[0]+60} ${230+b[1]})"><path class="tsWing" d="M-5 0Q-2.5 -3.6 0 0Q2.5 -3.6 5 0"/></g></g>`).join('')}</g>
+  <g stroke="#3a4668" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">${[[0,0,38,0],[22,-14,38,9],[-18,12,38,18],[40,10,46,4],[-40,-4,46,26]].map(b=>`<g class="tsBird" style="animation-duration:${b[2]}s;animation-delay:-${b[3]}s"><g transform="translate(${b[0]+60} ${230+b[1]})"><path class="tsWing" d="M-5 0Q-2.5 -3.6 0 0Q2.5 -3.6 5 0"/></g></g>`).join('')}</g>
   <g transform="translate(0 -30)">
   <clipPath id="tsFc"><path d="${pathFrom(far,H)}"/></clipPath>
   <path d="${pathFrom(far,H)}" fill="url(#tsM1)"/>
   <g clip-path="url(#tsFc)">${[60,392,-150,640].map(x=>snowCap(far,x)).join('')}</g>
-  ${castle(238,f1(yAt(far,238)+14),.38)}
+  ${(()=>{const cx=f1(vcx),cy=f1(vYr),rx=f1(vrx),q=f1;
+   /* 용암 줄기: 산비탈 윤곽을 따라 안쪽으로 흘러내려요. 아래로 갈수록 옅어져요 */
+   const flow=(side,off,len,wig,sw,spread)=>{const xe=side>0?vxr:vxl,n=8,vy=len/n,sl=Math.max(.35,(yAt(far,xe+side*40)-cy)/40),vx=vy/sl*spread,x0=cx+side*off;let pts=[];
+    for(let k=0;k<=n;k++)pts.push([x0+side*k*vx+Math.sin(k*1.5+wig)*.8,cy+1.5+k*vy+Math.sin(k*2.1+wig)*.35]);
+    const seg=(a,b,o)=>`<path d="M${pts.slice(a,b+1).map(t=>q(t[0])+' '+q(t[1])).join('L')}" stroke-width="${sw}" opacity="${o}"/>`;
+    return seg(0,3,1)+seg(3,6,.55)+seg(6,8,.25);};
+   return `<g clip-path="url(#tsFc)"><rect x="${q(cx-60)}" y="${q(cy-4)}" width="120" height="70" fill="url(#tsVolT)"/>`
+    +`<g filter="url(#tsLavaBlur)" fill="none" stroke="#ff9a5a" stroke-linecap="round" stroke-linejoin="round" opacity=".5">${flow(1,rx*.55,38,0,1.1,.55)}${flow(1,rx*.1,28,2,.8,.4)}${flow(-1,rx*.4,34,4,1,.5)}</g></g>`
+    +`<g class="tsDr" style="animation-duration:110s"><ellipse cx="${q(cx+38)}" cy="${q(cy-52)}" rx="76" ry="7" fill="url(#tsAsh)" opacity=".55" transform="rotate(-6 ${q(cx+38)} ${q(cy-52)})"/></g>`
+    +[0,3,6,9,12].map((d,i)=>`<circle class="tsSmoke" cx="${q(cx+(i%2?2:-2))}" cy="${q(cy-3)}" r="${7+i%3*2}" fill="url(#tsAsh)" style="animation-delay:-${d}s"/>`).join('')
+    +`<g class="tsDr" style="animation-duration:90s;animation-delay:-25s"><ellipse cx="${cx}" cy="${q(cy+30)}" rx="95" ry="13" fill="url(#tsPuff)" opacity=".8"/></g>`;})()}
   <path d="${pathFrom(mid,H)}" fill="url(#tsM2)"/>
   <path d="${pathFrom(near,H)}" fill="url(#tsM3)"/>
   </g>
   ${vista(plain)}
+  ${(()=>{const cx=238,cy=f1(yAt(plain,cx)+1),k=.34,ring=(R,n,dur,rev,pr)=>`<g transform="translate(${cx} ${cy+2}) scale(1 .26)"><g><animateTransform attributeName="transform" type="rotate" from="${rev?360:0}" to="${rev?0:360}" dur="${dur}s" repeatCount="indefinite"/>${Array.from({length:n},(_,i)=>{const a=i*2*Math.PI/n;return `<circle cx="${f1(Math.cos(a)*R)}" cy="${f1(Math.sin(a)*R)}" r="${pr}" fill="url(#tsPuff)"/>`;}).join('')}</g></g>`;
+   const rings=ring(70,4,46,0,24)+ring(44,3,32,1,16);
+   return `<clipPath id="tsOcB"><rect x="${cx-160}" y="${cy-120}" width="320" height="${120+2}"/></clipPath><clipPath id="tsOcF"><rect x="${cx-160}" y="${cy+2}" width="320" height="80"/></clipPath>`
+    +`<g class="tsAura" filter="url(#tsBeamBlur)"><path d="M${cx-12} ${f1(cy-12)}L${cx-44} ${f1(cy-180)}L${cx+44} ${f1(cy-180)}L${cx+12} ${f1(cy-12)}Z" fill="url(#tsBeam)" opacity=".75"/><path d="M${cx-5} ${f1(cy-12)}L${cx-17} ${f1(cy-170)}L${cx+17} ${f1(cy-170)}L${cx+5} ${f1(cy-12)}Z" fill="url(#tsBeam)"/></g>`
+    +`<ellipse class="tsAura" cx="${cx}" cy="${f1(cy-18)}" rx="58" ry="42" fill="url(#tsAuraG)"/>`
+    +`<g clip-path="url(#tsOcB)">${rings}</g>`
+    +castle(cx,cy,k,1)
+    +`<g clip-path="url(#tsOcF)">${rings}</g>`
+    +`<g class="tsDr" style="animation-duration:70s"><ellipse cx="${cx}" cy="${cy+7}" rx="120" ry="6" fill="url(#tsMist)"/></g>`
+    +`<g fill="#fff6c8">${[[-30,-20,0],[14,-34,2.2],[34,-12,4.1],[-12,-44,5.3],[2,-8,1.4]].map(m=>`<circle class="tsMote" cx="${cx+m[0]}" cy="${f1(cy+m[1])}" r="1.1" style="animation-duration:${6+m[2]}s;animation-delay:-${m[2]}s"/>`).join('')}</g>`;})()}
   <g class="tsDr" style="animation-duration:120s"><ellipse cx="220" cy="392" rx="420" ry="22" fill="url(#tsMist)"/></g>
   <g transform="translate(0 40)">
   <g class="tsDr" style="animation-duration:90s;animation-delay:-20s"><ellipse cx="200" cy="410" rx="420" ry="20" fill="url(#tsMist)"/></g>
@@ -26147,19 +26200,11 @@ init();
   <path d="${pathFrom(h2,H)}" fill="url(#tsH2)"/>${trees(h2,4,X0,X1,10,13,['#2a6a58','#33776a','#245c52'])}
   <path d="M-700 ${f1(yAt(h2,-700)+12)}L1100 ${f1(yAt(h2,1100)+12)}L1100 ${H}L-700 ${H}Z" fill="url(#tsH3)"/></g>
   <g id="tsCliff" transform="translate(0 -34)">
-  <path d="M-232 ${H+60}L-246 640L-228 592L-256 550L-236 512L-252 488L-230 470L-200 470L-60 468C-20 466 10 458 40 456C70 454 90 462 130 465L200 466C222 466 242 470 260 478L282 492L278 512L298 532L282 562L306 600L290 640L312 ${H+60}Z" fill="url(#tsRock)"/>
-  <path d="M260 478L282 492L278 512L298 532L282 562L306 600L290 640L312 ${H+60}L276 ${H+60}L278 640L260 596L272 560L256 530L264 506Z" fill="url(#tsRockLit)" opacity=".7"/>
-  <path d="M-60 468C-20 466 10 458 40 456C70 454 90 462 130 465L200 466C222 466 242 470 260 478L264 506L210 480L120 474L30 470Z" fill="#33406a" opacity=".55"/>
-  <path d="M-236 520L-180 526L-20 506L120 540L210 520L256 560L220 600L290 660L260 ${H+60}L-700 ${H+60}Z" fill="#141a30" opacity=".55"/>
-  <path d="${lipD}L260 486L-232 486Z" fill="url(#tsTurf)"/>
-  <path d="${lipD}" transform="translate(0 4)" stroke="#1f4a3a" stroke-width="3.5" fill="none" opacity=".45"/>
-  <path d="${lipD}" stroke="#e3f6a8" stroke-width="1.7" fill="none" opacity=".95"/>
-  <path d="M-232 470L-246 640M300 478L322 492L318 512L338 532L322 562L346 600L330 640" stroke="none" fill="none"/>
-  <path d="M222 454C240 462 256 470 264 480L282 492L278 512L298 532L282 562L306 600L290 640" stroke="#ffd9a0" stroke-width="1.5" fill="none" opacity=".75"/>
-  <path d="M-232 470L-252 488L-236 512L-256 550L-228 592L-246 640" stroke="#7d86b8" stroke-width="1.3" fill="none" opacity=".5"/>
-  <g stroke="#c9a08c" stroke-width="1.2" fill="none" opacity=".5" stroke-linecap="round"><path d="M266 494L294 500M272 520L296 526M268 548L292 556M284 580L304 586M288 618L306 624M270 506L282 504"/></g>
-  <g stroke="#6f7aa8" stroke-width="1.1" fill="none" opacity=".45" stroke-linecap="round"><path d="M-250 492L-232 496M-238 516L-250 520M-254 552L-230 558M-232 596L-244 602"/></g>
-  <path d="${lipD}" transform="translate(0 6)" stroke="url(#tsAO)" stroke-width="10" fill="none" opacity=".0"/>
+  <path d="${bodyD}" fill="url(#tsGnd)"/>
+  <g opacity=".9">${slopeShade}</g>
+  <path d="${lipD}" transform="translate(0 5)" stroke="#2f7a4c" stroke-width="4" fill="none" opacity=".28"/>
+  <path d="${lipFullD}" stroke="#e9f8a6" stroke-width="1.8" fill="none" opacity=".95"/>
+  ${boulder(-14,498,30,20)}${boulder(300,512,34,22)}${boulder(342,534,16,11)}${sideDecor}
   ${turfTex(-230,258,lip,23,120)}${flowers(-215,215,lip,29,26)}
   <g class="tsSw1">${grass(-225,222,lip,17,['#7fbf68','#bfe08a','#4f9a5a','#a6d27c'],100)}</g>
   <g fill="#8d7f92"><path d="M34 458l5-6 8 1 4 5z"/><path d="M198 456l4-6 7 1 3 5z"/><path d="M228 463l4-5 6 1 3 4z"/><path d="M-60 456l4-5 7 1 3 4z"/></g>
@@ -26179,32 +26224,38 @@ init();
  const CSS=`
 #view:has(>.title.tsT){padding-bottom:0}
 #view>.title.tsT{position:relative;justify-content:flex-start!important;gap:0!important;padding:0!important;min-height:var(--vh)!important;overflow:hidden}
-.tsT>.tsScene{position:absolute;left:0;right:0;top:0;bottom:0;overflow:hidden;z-index:0;pointer-events:none;background:#1b2a6c}
+.tsT>.tsScene{position:absolute;left:0;right:0;top:0;bottom:0;overflow:hidden;z-index:0;pointer-events:none;background:#6fa8e8}
 .tsT .tsSvg{position:absolute;inset:0;width:100%;height:100%;display:block;transform-origin:50% 100%;animation:tsKen 26s ease-in-out infinite alternate}
-.tsT .tsShade{position:absolute;left:0;right:0;bottom:0;height:52%;background:linear-gradient(180deg,rgba(8,12,34,0),rgba(8,12,34,.55) 38%,rgba(8,12,34,.86))}
+.tsT .tsShade{position:absolute;left:0;right:0;bottom:0;height:52%;background:linear-gradient(180deg,rgba(10,50,45,0),rgba(10,50,45,.5) 38%,rgba(10,44,44,.8))}
 .tsT>*:not(.tsScene){position:relative;z-index:2}
 .tsT>.peek,.tsT>.notice{display:none!important}
 .tsT>.logo{margin:clamp(10px,4.5vh,40px) 0 0!important}
 .tsT>.logo canvas{zoom:.82}
-.tsT>.logo small{color:#fff6d8!important;text-shadow:0 2px 0 rgba(20,30,100,.7),0 0 12px rgba(20,30,100,.7)!important}
+.tsT>.logo small{color:#fff6d8!important;text-shadow:0 2px 0 rgba(20,60,130,.85),0 0 4px rgba(20,60,130,.9),0 0 14px rgba(20,60,130,.8)!important}
 .tsT>.menuCol{margin-top:auto!important;width:min(340px,88vw)!important;gap:9px!important}
 .tsT>.studio{margin:12px 0 0!important}
 .tsT>.tsFoot{padding:6px 16px calc(10px + var(--sb));font-size:10.5px;line-height:1.5;color:rgba(255,255,255,.62);text-shadow:0 1px 2px rgba(0,0,0,.6)}
-.tsT .tsMon{image-rendering:pixelated;filter:brightness(1.02) saturate(1.08) drop-shadow(1.2px -.6px 0 rgba(255,224,170,.9)) drop-shadow(0 0 7px rgba(255,200,130,.35));transform-box:fill-box;transform-origin:50% 100%;animation:tsBreath 3.4s ease-in-out infinite}
-.tsT .tsMon.tsSil{filter:brightness(.12) drop-shadow(1.2px -.6px 0 rgba(255,224,170,.9))}
+.tsT .tsMon{image-rendering:pixelated;filter:brightness(1.02) saturate(1.08) drop-shadow(1.2px -.6px 0 rgba(255,255,235,.85)) drop-shadow(0 0 6px rgba(255,255,220,.25));transform-box:fill-box;transform-origin:50% 100%;animation:tsBreath 3.4s ease-in-out infinite}
+.tsT .tsMon.tsSil{filter:brightness(.12) drop-shadow(1.2px -.6px 0 rgba(255,255,235,.85))}
 .tsT .tsSf{opacity:0;image-rendering:pixelated;animation:tsSfK 1.5s step-end infinite}.tsT .tsSf1{animation-delay:-1s}.tsT .tsSf2{animation-delay:-.5s}
-.tsT .tsHeroU{image-rendering:pixelated;filter:brightness(.97) saturate(.95) sepia(.1) drop-shadow(1.2px -.6px 0 rgba(255,224,170,.9)) drop-shadow(0 0 7px rgba(255,200,130,.35));animation:tsBob 1.8s steps(1) infinite}
+.tsT .tsHeroU{image-rendering:pixelated;filter:brightness(1) saturate(1) drop-shadow(1.2px -.6px 0 rgba(255,255,235,.85)) drop-shadow(0 0 6px rgba(255,255,220,.25));animation:tsBob 1.8s steps(1) infinite}
 @keyframes tsBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
 .tsT .tsPony{transform-box:fill-box;transform-origin:0% 8%;animation:tsPony 2.6s ease-in-out infinite}
 .tsT .tsScarf{transform-box:fill-box;transform-origin:0% 40%;animation:tsScarf 1.7s ease-in-out infinite}
 .tsT .tsSw1,.tsT .tsSw2{transform-box:fill-box;transform-origin:50% 100%;animation:tsSway 4.2s ease-in-out infinite}
 .tsT .tsSw2{animation-duration:5.6s;animation-delay:-1.4s}
+.tsT .tsAura{transform-box:fill-box;transform-origin:50% 100%;animation:tsAura 6s ease-in-out infinite}
+.tsT .tsSmoke{transform-box:fill-box;transform-origin:50% 100%;opacity:0;animation:tsSmoke 15s ease-out infinite}
+.tsT .tsLavaP{animation:tsLavaP 4.5s ease-in-out infinite}
 .tsT .tsDr{animation:tsDrift 140s ease-in-out infinite alternate}
 .tsT .tsBird{animation:tsFly 40s linear infinite}
 .tsT .tsWing{transform-box:fill-box;transform-origin:50% 100%;animation:tsFlap .55s ease-in-out infinite alternate}
 .tsT .tsMote{opacity:0;animation:tsMote 7s ease-in-out infinite}
-.tsT .tsRays{transform-origin:292px 330px;animation:tsRay 9s ease-in-out infinite alternate}
-.tsT .tsGlow{transform-origin:292px 330px;animation:tsGlow 7s ease-in-out infinite alternate}
+.tsT .tsRays{transform-origin:300px 150px;animation:tsRay 9s ease-in-out infinite alternate}
+.tsT .tsGlow{transform-origin:300px 150px;animation:tsGlow 7s ease-in-out infinite alternate}
+@keyframes tsAura{0%,100%{opacity:.55;transform:scale(.94)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes tsSmoke{0%{opacity:0;transform:translate(0,0) scale(.5)}14%{opacity:.75}100%{opacity:0;transform:translate(36px,-84px) scale(2.2)}}
+@keyframes tsLavaP{0%,100%{opacity:.6}50%{opacity:1}}
 @keyframes tsKen{from{transform:scale(1.0)}to{transform:scale(1.045)}}
 @keyframes tsBreath{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.025)}}
 @keyframes tsSfK{0%{opacity:1}37%{opacity:0}100%{opacity:0}}
@@ -37319,8 +37370,9 @@ setInterval(()=>{if(C&&C.role==='guest'&&C.phase==='play'){tx({t:'hb'});}else if
 .hubTop #hPskin{flex:none;white-space:nowrap}
 @media(max-width:560px){.hubTop #hPskin{padding:5px 9px;font-size:13px}}
 .hubTop .htMon{position:relative;overflow:visible}
-.htSkinAv{position:absolute;right:-16px;bottom:-8px;width:66px;height:66px;pointer-events:none;filter:drop-shadow(0 2px 0 rgba(0,0,0,.25));animation:pskBob 1s steps(2,end) infinite}
-@media(max-width:560px){.htSkinAv{right:-14px;bottom:-6px}}
+.htSkinAv{position:absolute;right:-12px;bottom:-6px;width:48px;height:48px;pointer-events:none;filter:drop-shadow(0 2px 0 rgba(0,0,0,.25));animation:pskBob 1s steps(2,end) infinite}
+@media(max-width:560px){.htSkinAv{right:-10px;bottom:-5px}}
+.htSkinGif{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 html.lowfx .htSkinAv{animation:none}
 @keyframes pskBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 /* 팝업 */
@@ -37453,6 +37505,10 @@ html body .pill[role=button]:active,html body button.rl-chip:active{transform:tr
  const curId=()=>{try{const id=byId(S.meta&&S.meta.psk).id;return owned(id)?id:'base';}catch(e){return 'base';}};
  const sp=(sk,f,s)=>`<span class="pskSp ${sk.cls}" style="--s:${s};--f:${f}"></span>`;
  const baseImg=()=>{try{return CHAR_ART.hero_m;}catch(e){return '';}};
+ /* 기본 주인공 앞모습 gif (남/여) · 못 불러오면 예전 일러스트로 돌아가요 */
+ const BASE_GIF={m:'boy_front.gif',f:'girl_front.gif'};
+ const gifUrls=()=>{const f=BASE_GIF[isMale()?'m':'f'];return ['https://raw.githubusercontent.com/regecha/pokemath/main/'+f,'https://cdn.jsdelivr.net/gh/regecha/pokemath@main/'+f];};
+ window.pskBaseGifErr=function(im){try{const u=gifUrls(),i=+im.dataset.gi||0;if(i+1<u.length){im.dataset.gi=i+1;im.src=u[i+1];}else{im.onerror=null;im.src=baseImg();}}catch(e){}};
 
  /* 이야기 속 주인공 얼굴: 고른 스킨의 정면 모습을 그대로 오려서 써요 (남자 주인공만) */
  const PORT={},FR={},IM={},OV=new WeakMap();
@@ -37557,7 +37613,9 @@ html body .pill[role=button]:active,html body button.rl-chip:active{transform:tr
 
  /* 홈 화면 조각 */
  window.pskBtn=()=>isMale()?`<button class="btn ghost sm" id=hPskin>${(typeof I==='function'&&I('star'))||'✨'} 스킨<span class=mbLong> 변경</span>${(()=>{try{const b=bal();return b>0?` <span style="color:#d97a00">💎${b}</span>`:'';}catch(e){return '';}})()}</button>`:'';
- window.pskHub=()=>{if(!isMale())return '';const sk=byId(curId());return sk.cls?`<span class=htSkinAv>${sp(sk,0,.26)}</span>`:'';};
+ window.pskHub=()=>{const sk=isMale()?byId(curId()):null;
+  if(sk&&sk.cls)return `<span class=htSkinAv>${sp(sk,0,.19)}</span>`;
+  const u=gifUrls();return `<span class=htSkinAv><img class=htSkinGif src="${u[0]}" data-gi=0 onerror="(function(i){var g=${JSON.stringify(u).replace(/"/g,'&quot;')},n=(+i.dataset.gi||0)+1;if(n<g.length){i.dataset.gi=n;i.src=g[n];}else{i.onerror=null;i.parentNode.style.display='none';}})(this)" alt=""></span>`;};
 
  /* 팝업 */
  const SEG=[
@@ -37580,7 +37638,7 @@ html body .pill[role=button]:active,html body button.rl-chip:active{transform:tr
    ensureSheet(sk).then(()=>{if(sel===sk.id&&document.getElementById('pskView'))paintStage();}).catch(()=>{const v=document.getElementById('pskView');if(v&&sel===sk.id)v.innerHTML='<div style="color:#ffb0b0;padding:24px;text-align:center">그림을 불러오지 못했어요.<br>인터넷을 확인해 주세요</div>';});
    return;}
   const s=scale(),size=Math.round(FS*s);
-  view.innerHTML=`<div class=pskMv id=pskMv style="width:${size}px;height:${size}px">${sk.cls?`<span class="pskSp ${sk.cls}" id=pskAct style="--s:${s};--f:0"></span>`:`<img class=pskBaseImg id=pskAct src="${baseImg()}" alt="">`}</div>`;
+  view.innerHTML=`<div class=pskMv id=pskMv style="width:${size}px;height:${size}px">${sk.cls?`<span class="pskSp ${sk.cls}" id=pskAct style="--s:${s};--f:0"></span>`:`<img class=pskBaseImg id=pskAct src="${gifUrls()[0]}" data-gi=0 onerror="pskBaseGifErr(this)" alt="">`}</div>`;
   document.getElementById('pskNm').textContent=sk.name;
   document.getElementById('pskTg').textContent=(sk.cls?sk.tag:'걷는 도트 모습은 없어요 · '+sk.tag)+(owned(sk.id)?'':' · 💎 재화 '+costOf(sk)+'개로 살 수 있어요');
   const mv=document.getElementById('pskMv'),act=document.getElementById('pskAct'),dir=document.getElementById('pskDir');
