@@ -26046,6 +26046,8 @@ init();
   const h1=ridge({seed:21,base:424,amp:18,f:.02,step:6,jag:2});
   const h2=ridge({seed:31,base:446,amp:15,f:.024,step:6,jag:2});
   const cliffTop=x=>{if(x<-200)return 470;if(x<20)return 470+(x+200)*(-.02);return 466+Math.sin(x*.05)*1.5+ (x>240?(x-240)*.18:0);};
+  const lip=x=>x>262?454+(x-262)*.65:452+Math.sin(x*.07)*2.2+Math.sin(x*.19)*1.1+(x<-190?(-190-x)*.5:0);
+  const lp=[];for(let x=-232;x<=300;x+=6)lp.push([x,lip(x)]);const lipD='M'+lp.map(q=>q[0]+' '+f1(q[1])).join('L');
   let s=`<svg class="tsSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 ${H}" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
   <defs>
    <linearGradient id="tsSky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#1b2a6c"/><stop offset=".2" stop-color="#3a5bb4"/><stop offset=".36" stop-color="#86a2e0"/><stop offset=".46" stop-color="#f3bfa0"/><stop offset=".53" stop-color="#ffe2a8"/><stop offset="1" stop-color="#ffe9bd"/></linearGradient>
@@ -26065,6 +26067,9 @@ init();
    <linearGradient id="tsRiv" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#9fd0e8" stop-opacity=".5"/><stop offset=".6" stop-color="#ffe9c0" stop-opacity=".95"/><stop offset="1" stop-color="#ffe9c0" stop-opacity=".6"/></linearGradient>
    <radialGradient id="tsVig" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#0a1030" stop-opacity="0"/><stop offset="1" stop-color="#0a1030" stop-opacity=".45"/></radialGradient>
    <linearGradient id="tsTop" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#0c1550" stop-opacity=".55"/><stop offset="1" stop-color="#0c1550" stop-opacity="0"/></linearGradient>
+   <linearGradient id="tsTurf" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b6dc78"/><stop offset=".3" stop-color="#6aa65a"/><stop offset="1" stop-color="#2f6a4c"/></linearGradient>
+   <linearGradient id="tsFace" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#3a3556"/><stop offset=".55" stop-color="#7a5f66"/><stop offset="1" stop-color="#d09a78"/></linearGradient>
+   <linearGradient id="tsAO" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#1a1f38" stop-opacity=".55"/><stop offset="1" stop-color="#1a1f38" stop-opacity="0"/></linearGradient>
   </defs>
   <rect x="${X0}" y="0" width="${X1-X0}" height="${H}" fill="url(#tsSky)"/>
   <circle cx="292" cy="330" r="430" fill="url(#tsSun)" class="tsGlow"/>
@@ -26076,18 +26081,30 @@ init();
   <path d="${pathFrom(mid,H)}" fill="url(#tsM2)"/>
   <path d="${pathFrom(near,H)}" fill="url(#tsM3)"/>
   <g class="tsDr" style="animation-duration:120s"><ellipse cx="220" cy="392" rx="420" ry="22" fill="url(#tsMist)"/></g>
+  <g transform="translate(0 40)">
+  <g class="tsDr" style="animation-duration:90s;animation-delay:-20s"><ellipse cx="200" cy="410" rx="420" ry="20" fill="url(#tsMist)"/></g>
   <path d="${pathFrom(h1,H)}" fill="url(#tsH1)"/>${trees(h1,2,X0,X1,9,9,['#3f7d68','#4a8a72','#37705f'])}
   <path d="M-80 ${f1(yAt(h1,-80)+8)}C40 ${f1(yAt(h1,40)+14)} 120 ${f1(yAt(h1,120)+5)} 190 ${f1(yAt(h1,190)+12)}S330 ${f1(yAt(h1,330)+20)} 520 ${f1(yAt(h1,520)+10)}" stroke="url(#tsRiv)" stroke-width="5" fill="none" opacity=".8" stroke-linecap="round"/>
   <g class="tsDr" style="animation-duration:100s;animation-delay:-30s"><ellipse cx="120" cy="436" rx="420" ry="18" fill="url(#tsMist)"/></g>
   <path d="${pathFrom(h2,H)}" fill="url(#tsH2)"/>${trees(h2,4,X0,X1,10,13,['#2a6a58','#33776a','#245c52'])}
-  <path d="M-700 ${f1(yAt(h2,-700)+12)}L1100 ${f1(yAt(h2,1100)+12)}L1100 ${H}L-700 ${H}Z" fill="url(#tsH3)"/>
+  <path d="M-700 ${f1(yAt(h2,-700)+12)}L1100 ${f1(yAt(h2,1100)+12)}L1100 ${H}L-700 ${H}Z" fill="url(#tsH3)"/></g>
   <g id="tsCliff" transform="translate(0 -34)">
-  <path d="M-700 ${H+60}L-700 468L-400 470L-200 470L-60 468C-20 466 10 458 40 456C70 454 90 462 130 465L240 466C262 466 282 470 300 478L322 492L318 512L338 532L322 562L346 600L330 640L352 ${H+60}Z" fill="url(#tsRock)"/>
+  <path d="M-232 ${H+60}L-246 640L-228 592L-256 550L-236 512L-252 488L-230 470L-200 470L-60 468C-20 466 10 458 40 456C70 454 90 462 130 465L240 466C262 466 282 470 300 478L322 492L318 512L338 532L322 562L346 600L330 640L352 ${H+60}Z" fill="url(#tsRock)"/>
   <path d="M300 478L322 492L318 512L338 532L322 562L346 600L330 640L352 ${H+60}L316 ${H+60}L318 640L300 596L312 560L296 530L304 506Z" fill="url(#tsRockLit)" opacity=".7"/>
   <path d="M-60 468C-20 466 10 458 40 456C70 454 90 462 130 465L240 466C262 466 282 470 300 478L304 506L250 480L120 474L30 470Z" fill="#33406a" opacity=".55"/>
-  <path d="M-700 520L-420 506L-180 526L-20 506L120 540L250 520L296 560L260 600L330 660L300 ${H+60}L-700 ${H+60}Z" fill="#141a30" opacity=".55"/>
-  <path d="M-200 470C-100 466 0 468 60 462C110 458 160 466 240 466C270 466 292 472 304 482L296 490C270 482 250 478 220 478L60 474L-200 478Z" fill="#2f6a4c"/>
-  <path d="M-200 470C-100 466 0 468 60 462C110 458 160 466 240 466C270 466 292 472 304 482L300 479C262 470 240 468 200 467L60 463Z" fill="#9bd07a" opacity=".85"/>
+  <path d="M-236 520L-180 526L-20 506L120 540L250 520L296 560L260 600L330 660L300 ${H+60}L-700 ${H+60}Z" fill="#141a30" opacity=".55"/>
+  <path d="${lipD}L300 486L-232 486Z" fill="url(#tsTurf)"/>
+  <path d="${lipD}" transform="translate(0 4)" stroke="#1f4a3a" stroke-width="3.5" fill="none" opacity=".45"/>
+  <path d="${lipD}" stroke="#e3f6a8" stroke-width="1.7" fill="none" opacity=".95"/>
+  <path d="M-232 470L-246 640M300 478L322 492L318 512L338 532L322 562L346 600L330 640" stroke="none" fill="none"/>
+  <path d="M262 454C280 462 296 470 304 480L322 492L318 512L338 532L322 562L346 600L330 640" stroke="#ffd9a0" stroke-width="1.5" fill="none" opacity=".75"/>
+  <path d="M-232 470L-252 488L-236 512L-256 550L-228 592L-246 640" stroke="#7d86b8" stroke-width="1.3" fill="none" opacity=".5"/>
+  <g stroke="#c9a08c" stroke-width="1.2" fill="none" opacity=".5" stroke-linecap="round"><path d="M306 494L334 500M312 520L336 526M308 548L332 556M324 580L344 586M328 618L346 624M310 506L322 504"/></g>
+  <g stroke="#6f7aa8" stroke-width="1.1" fill="none" opacity=".45" stroke-linecap="round"><path d="M-250 492L-232 496M-238 516L-250 520M-254 552L-230 558M-232 596L-244 602"/></g>
+  <path d="${lipD}" transform="translate(0 6)" stroke="url(#tsAO)" stroke-width="10" fill="none" opacity=".0"/>
+  <g class="tsSw1">${grass(-225,262,lip,17,['#7fbf68','#bfe08a','#4f9a5a'],64)}</g>
+  <g fill="#8d7f92"><path d="M34 458l5-6 8 1 4 5z"/><path d="M238 456l4-6 7 1 3 5z"/><path d="M268 463l4-5 6 1 3 4z"/><path d="M-60 456l4-5 7 1 3 4z"/></g>
+  <g fill="#cbb7b0" opacity=".8"><path d="M36 456l3-3 4 0-2 3z"/><path d="M240 454l3-3 4 0-2 3z"/><path d="M270 461l3-3 3 0-1 3z"/></g>
   <g class="tsSw1">${grass(-120,300,cliffTop,31,['#3f8a52','#58a860','#bfe08a','#2f6a4c'],56)}</g>
   <g class="tsSw2">${grass(-120,300,cliffTop,53,['#47965a','#a6d27c','#2f6a4c'],40)}</g>
   <g class="tsHero"><g class="tsMonG"><ellipse cx="100" cy="468" rx="30" ry="4" fill="#0b1026" opacity=".45"/><image class="tsMon" x="49" y="372" width="102" height="102" preserveAspectRatio="xMidYMax meet" href="${pid?'':''}"/></g>
