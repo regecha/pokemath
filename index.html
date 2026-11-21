@@ -26038,6 +26038,38 @@ init();
   const P=[[0,-120,30,.9,.5,1,160,10],[1,170,62,1,.55,0,190,70],[2,-190,140,1.3,.5,0,210,40],[0,150,205,1.5,.72,0,170,100],[1,-230,255,1.7,.82,1,200,20],[2,140,282,1.4,.8,0,150,60],[0,-80,300,1.2,.7,1,180,5]];
   return defs+P.map(q=>{const t=T[q[0]];if(!t.u)return '';const sc=q[3],tr=q[5]?`translate(${q[1]+t.w*sc} ${q[2]}) scale(${-sc} ${sc})`:`translate(${q[1]} ${q[2]}) scale(${sc})`;
    return `<g class="tsDr" style="animation-duration:${q[6]}s;animation-delay:-${q[7]}s"><use href="#tsCT${q[0]}" transform="${tr}" opacity="${q[4]}"/></g>`;}).join('');}
+
+ /* 세계 풍경: 석양 속 실루엣 성, 눈 덮인 먼 산, 계곡 평원(밭·마을·풍차·호수·강) */
+ function castle(x,y,k){
+  const cren=(a,b,yt)=>{let d='';for(let i=a;i<b-1.5;i+=3.2)d+=`M${f1(i)} ${yt}h1.8v-1.9h-1.8z`;return d;};
+  const cone=(a,b,yb,yt)=>`M${a} ${yb}L${f1((a+b)/2)} ${yt}L${b} ${yb}Z`;
+  const P=`<path d="M-48 4V-13H-24V-15H24V-13H48V4Z"/><path d="M-21 2V-23H21V2Z"/>`
+   +`<path d="M-8 -22V-43H8V-22Z"/><path d="${cone(-10,10,-43,-64)}"/><path d="M-34 -10V-37H-21V-10Z"/><path d="${cone(-36,-19,-37,-53)}"/>`
+   +`<path d="M21 -8V-31H34V-8Z"/><path d="${cone(19,36,-31,-46)}"/><path d="M-50 -8V-25H-41V-8Z"/><path d="${cone(-52,-39,-25,-36)}"/>`
+   +`<path d="M41 -6V-21H50V-6Z"/><path d="${cone(39,52,-21,-31)}"/><path d="M-16 -23V-35H-9V-23Z"/><path d="${cone(-18,-7,-35,-46)}"/>`
+   +`<path d="M9 -23V-33H16V-23Z"/><path d="${cone(7,18,-33,-43)}"/>`
+   +`<path d="${cren(-46,-24,-15)}${cren(24,46,-13)}${cren(-20,20,-23)}${cren(-33,-22,-37)}${cren(22,33,-31)}"/>`
+   +`<path d="M0 -64V-74M0 -74l10 2.6-10 2.6Z M-27 -53V-61M-27 -61l7 2-7 2Z M27 -46V-53M27 -53l7 2-7 2Z" stroke-width=".7"/>`;
+  const win='<g fill="#ffd27a"><rect x="-3.4" y="-38" width="1.7" height="3.4"/><rect x="1.6" y="-38" width="1.7" height="3.4"/><rect x="-29" y="-30" width="1.6" height="3.2"/><rect x="26" y="-23" width="1.6" height="3.2"/><rect x="-14" y="-15" width="1.4" height="3"/><rect x="12" y="-15" width="1.4" height="3"/><rect x="-1" y="-15" width="1.6" height="3.2"/><rect x="-45" y="-17" width="1.3" height="2.8"/><rect x="45" y="-14" width="1.3" height="2.8"/><rect x="-12" y="-30" width="1.3" height="2.8"/></g>';
+  return `<g transform="translate(${x} ${y}) scale(${k})"><path d="M-62 14L-54 3L-46 5L-30 1L0 4L30 1L46 5L56 3L64 14L48 26L-48 26Z" fill="#b9a6d0"/>`
+   +`<g fill="#ffd9b0" stroke="#ffd9b0" stroke-width=".6" opacity=".95" transform="translate(1.2 -.7)">${P}</g><g fill="#7d71a6" stroke="#7d71a6" stroke-width=".6">${P}</g>`
+   +`<path d="M-3 4V-5a3 3 0 0 1 6 0V4Z" fill="#3a3256"/>${win}</g>`;}
+ function snowCap(far,x){const q=far.filter(a=>Math.abs(a[0]-x)<16).sort((a,b)=>a[1]-b[1])[0];if(!q)return '';const X=q[0],Y=q[1];
+  return `<path d="M${X-12} ${Y+13}L${X-6} ${Y+6}L${X-3} ${Y+8}L${X} ${Y-1}L${X+3} ${Y+7}L${X+6} ${Y+5}L${X+12} ${Y+13}L${X+6} ${Y+10}L${X+2} ${Y+14}L${X-3} ${Y+10}Z" fill="#fff4ec" opacity=".85"/>`;}
+ function vista(pl){const r=R0(88),Y=x=>yAt(pl,x);let o=`<path d="${pathFrom(pl,H)}" fill="url(#tsPl)"/>`;
+  const fc=['#e2d28a','#b9cf7c','#93bd72','#d6bd7a','#a6c78a'];
+  for(let i=0;i<56;i++){const x=X0+r()*(X1-X0),w=12+r()*26,y=Y(x)+2+r()*10,h=2.2+r()*2.6,sk=3+r()*4;o+=`<path d="M${f1(x)} ${f1(y)}h${f1(w)}l${-f1(sk)} ${f1(h)}h${f1(-w)}z" fill="${fc[(r()*5)|0]}" opacity="${(.5+r()*.3).toFixed(2)}"/>`;}
+  o+=trees(pl,6,X0,X1,6,5.5,['#4c8466','#3f7560','#5a9170']);
+  const lx=285,ly=f1(Y(lx)+9);
+  o+=`<ellipse cx="${lx}" cy="${ly}" rx="72" ry="4.3" fill="url(#tsRiv)"/>`;
+  for(let i=0;i<10;i++){const w=4+i*2.6,xx=292+(r()-.5)*5;o+=`<rect x="${f1(xx-w/2)}" y="${f1(ly-3.2+i*.72)}" width="${f1(w)}" height=".7" fill="#fffbe8" opacity="${(.95-i*.05).toFixed(2)}"/>`;}
+  o+=`<path d="M225 ${f1(Y(225)+10)}C190 ${f1(Y(190)+14)} 160 ${f1(Y(160)+8)} 120 ${f1(Y(120)+14)}S40 ${f1(Y(40)+11)} -40 ${f1(Y(-40)+16)}S-200 ${f1(Y(-200)+12)} -300 ${f1(Y(-300)+15)}" stroke="url(#tsRiv)" stroke-width="2.4" fill="none" opacity=".85" stroke-linecap="round"/>`;
+  const house=(x,y,s)=>`<g transform="translate(${f1(x)} ${f1(y)}) scale(${s.toFixed(2)})"><rect x="-3" y="-3.6" width="6" height="3.6" fill="#efd7b6"/><rect x=".6" y="-3.6" width="2.4" height="3.6" fill="#d2a98c"/><path d="M-4 -3.6L0 -7.2L4 -3.6Z" fill="${r()<.5?'#a9525a':'#8c4a58'}"/><rect x="-1.7" y="-2.5" width="1.1" height="1.2" fill="#ffd27a"/></g>`;
+  [[130,10],[-90,8],[330,7],[-300,9],[560,9]].forEach(v=>{const hs=[];for(let i=0;i<v[1];i++){const x=v[0]+(r()-.5)*64;hs.push([x,Y(x)+3+r()*8,.7+r()*.35]);}hs.sort((a,b)=>a[1]-b[1]);
+   o+=hs.map(h=>house(h[0],h[1],h[2])).join('')+`<g transform="translate(${v[0]+8} ${f1(Y(v[0]+8)+6)})"><rect x="-1.6" y="-10" width="3.2" height="10" fill="#efd7b6"/><path d="M-2.4 -10L0 -17L2.4 -10Z" fill="#8c4a58"/><rect x="-.5" y="-8" width="1" height="1.8" fill="#ffd27a"/></g>`;});
+  const wx=55,wy=f1(Y(wx)+5);
+  o+=`<g transform="translate(${wx} ${wy})"><path d="M-2.4 0L-1.5 -10L1.5 -10L2.4 0Z" fill="#efd7b6"/><path d="M-2 -10L0 -13L2 -10Z" fill="#8c4a58"/><g stroke="#5b4a62" stroke-width=".9" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 0 -10" to="360 0 -10" dur="26s" repeatCount="indefinite"/><path d="M0 -10L-5.6 -14.6M0 -10L5.6 -5.4M0 -10L4.6 -15.6M0 -10L-4.6 -4.4"/></g></g>`;
+  return o;}
  function scene(pid,pg){
   const r=R0(77);
   const far=ridge({seed:3,base:352,amp:20,f:.011,step:12,jag:9,peaks:[[238,70,34],[60,34,40],[392,40,46],[-150,40,60],[640,50,60]]});
@@ -26045,6 +26077,7 @@ init();
   const near=ridge({seed:15,base:398,amp:22,f:.017,step:8,jag:4,peaks:[[60,14,60]]});
   const h1=ridge({seed:21,base:424,amp:18,f:.02,step:6,jag:2});
   const h2=ridge({seed:31,base:446,amp:15,f:.024,step:6,jag:2});
+  const plain=ridge({seed:41,base:410,amp:4,f:.03,step:8,jag:1});
   const cliffTop=x=>{if(x<-200)return 470;if(x<20)return 470+(x+200)*(-.02);return 466+Math.sin(x*.05)*1.5+ (x>240?(x-240)*.18:0);};
   const lip=x=>x>262?454+(x-262)*.65:452+Math.sin(x*.07)*2.2+Math.sin(x*.19)*1.1+(x<-190?(-190-x)*.5:0);
   const lp=[];for(let x=-232;x<=300;x+=6)lp.push([x,lip(x)]);const lipD='M'+lp.map(q=>q[0]+' '+f1(q[1])).join('L');
@@ -26070,16 +26103,22 @@ init();
    <linearGradient id="tsTurf" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b6dc78"/><stop offset=".3" stop-color="#6aa65a"/><stop offset="1" stop-color="#2f6a4c"/></linearGradient>
    <linearGradient id="tsFace" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#3a3556"/><stop offset=".55" stop-color="#7a5f66"/><stop offset="1" stop-color="#d09a78"/></linearGradient>
    <linearGradient id="tsAO" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#1a1f38" stop-opacity=".55"/><stop offset="1" stop-color="#1a1f38" stop-opacity="0"/></linearGradient>
+   <linearGradient id="tsPl" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d2cf98"/><stop offset=".4" stop-color="#93b07c"/><stop offset="1" stop-color="#4f7f66"/></linearGradient>
   </defs>
   <rect x="${X0}" y="0" width="${X1-X0}" height="${H}" fill="url(#tsSky)"/>
   <circle cx="292" cy="330" r="430" fill="url(#tsSun)" class="tsGlow"/>
   <g class="tsRays" opacity=".9">${[-150,-128,-110,-92,-70,-52].map((a,i)=>{const L=900,w=.05+(i%3)*.018,a0=a*Math.PI/180;return `<path d="M292 330L${f1(292+Math.cos(a0-w)*L)} ${f1(330+Math.sin(a0-w)*L)}L${f1(292+Math.cos(a0+w)*L)} ${f1(330+Math.sin(a0+w)*L)}Z" fill="#fff0c8" opacity="${(.1+(i%2)*.06).toFixed(2)}"/>`;}).join('')}</g>
   ${skyClouds()}
   <g stroke="#2a2442" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".8">${[[0,0,38,0],[22,-14,38,9],[-18,12,38,18],[40,10,46,4],[-40,-4,46,26]].map(b=>`<g class="tsBird" style="animation-duration:${b[2]}s;animation-delay:-${b[3]}s"><g transform="translate(${b[0]+60} ${230+b[1]})"><path class="tsWing" d="M-5 0Q-2.5 -3.6 0 0Q2.5 -3.6 5 0"/></g></g>`).join('')}</g>
+  <g transform="translate(0 -30)">
+  <clipPath id="tsFc"><path d="${pathFrom(far,H)}"/></clipPath>
   <path d="${pathFrom(far,H)}" fill="url(#tsM1)"/>
-  <g fill="#a99cc6"><rect x="215" y="${f1(yAt(far,215)-24)}" width="5" height="26"/><rect x="223" y="${f1(yAt(far,223)-33)}" width="6" height="35"/><path d="M222 ${f1(yAt(far,223)-33)}l4 -9 4 9z"/><rect x="232" y="${f1(yAt(far,232)-22)}" width="5" height="24"/><path d="M214 ${f1(yAt(far,215)-24)}l3.5 -6 3.5 6zM231 ${f1(yAt(far,232)-22)}l3.5 -6 3.5 6z"/></g>
+  <g clip-path="url(#tsFc)">${[60,392,-150,640].map(x=>snowCap(far,x)).join('')}</g>
+  ${castle(238,f1(yAt(far,238)+5),.72)}
   <path d="${pathFrom(mid,H)}" fill="url(#tsM2)"/>
   <path d="${pathFrom(near,H)}" fill="url(#tsM3)"/>
+  </g>
+  ${vista(plain)}
   <g class="tsDr" style="animation-duration:120s"><ellipse cx="220" cy="392" rx="420" ry="22" fill="url(#tsMist)"/></g>
   <g transform="translate(0 40)">
   <g class="tsDr" style="animation-duration:90s;animation-delay:-20s"><ellipse cx="200" cy="410" rx="420" ry="20" fill="url(#tsMist)"/></g>
