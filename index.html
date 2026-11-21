@@ -26369,7 +26369,7 @@ init();
   const mob=w<=600,k=mob?.76:1,tx=wide?-Math.min((vbW-400)*.36,330):0;if(hero){hero.setAttribute('transform',`translate(${f1(tx)} 0) translate(160 470) scale(${k}) translate(-160 -470)`);}
   // 세로 화면: 버튼 위쪽에 발이 오도록 절벽을 필요한 만큼 올림
   let extra=0;if(!wide){const menu=t.querySelector('.menuCol'),mt=menu?menu.offsetTop:h*.62;extra=Math.max(0,Math.min(110,((h-(H-435)*sc)-(mt-14))/sc));}
-  if(cl)cl.setAttribute('transform',`translate(0 ${f1(-34-extra)})`);sv._g={k,tx,extra,sc,vl:200-w/(2*sc)};tsLayout();}
+  if(cl)cl.setAttribute('transform',`translate(0 ${f1(-34-extra)})`);sv._g={k,tx,extra,sc,vl:200-w/(2*sc)};tsRange(sv,w,h,sc);tsLayout();}
 /* 크기 반영: 주인공(키 1.4m 기준)과 파트너의 '실제 키' 비율대로 그려요.
    큰 포켓몬은 화면이 허락하는 만큼 키우고, 그래도 모자라면 주인공을 줄여서(최대 절반) 비율을 맞춰요. 작은 포켓몬은 작게, 너무 작아 안 보이면 최소 크기만 지켜요.
    키는 도감 데이터(MON.ht, m)를 먼저 쓰고(인터넷이 없어도 돼요), 없을 때만 PokeAPI에서 받아 기억해요. 그림 속 투명 여백은 빼고 '진짜 모습' 크기로 재요 */
@@ -26405,6 +26405,66 @@ init();
   im.setAttribute('preserveAspectRatio','none');im.setAttribute('width',f1(bb.w*s2));im.setAttribute('height',f1(bb.h*s2));
   im.setAttribute('x',f1(cx-(bb.x0+bb.x1)/2*s2));im.setAttribute('y',f1(471-bb.y1*s2));
   const sh=im.parentNode.querySelector('ellipse');if(sh){sh.setAttribute('cx',f1(cx));sh.setAttribute('rx',f1(Math.max(24,vw*.42)));}}
+ /* ── 성능: ① 화면 밖 그림은 지우고 ② 안 움직이는 그림은 층마다 한 장의 그림으로 굳혀요 ──
+    움직이는 것(구름·안개·풀·연기·반짝임·주인공)은 그대로 두고, 그 사이사이 가만히 있는 층만 한 장씩 사진처럼 바꿔서
+    화면에 그려야 할 조각 수를 크게 줄여요. 화면 크기가 크게 바뀌면(가로/세로 전환) 새로 그려요. */
+ const TSA='.tsDr,.tsAura,.tsSw1,.tsSw2,.tsMote,.tsChim,.tsSmoke,.tsTw,.tsLavaP,.tsGlow,.tsRays,.tsBird,.tsWing,.tsPony,.tsScarf,.tsSf,.tsHeroU,.tsMon,.tsHero,.tsHeroB,.tsMonG,[style*="animation"]';
+ const TSKEEP='.tsBird,.tsDr,.tsRays,.tsGlow,.tsHero,.tsHeroB,.tsMonG';
+ const TSRES=/^(defs|clipPath|linearGradient|radialGradient|filter|mask|pattern|style|title|metadata|animate|animateTransform|set)$/;
+ const TSINH=['fill','stroke','stroke-width','stroke-linecap','stroke-linejoin','stroke-miterlimit','stroke-dasharray','fill-opacity','stroke-opacity','fill-rule'];
+ async function tsBake(sv,tries){
+  if(!sv||!sv.isConnected||sv._baked||sv._baking||window.__tsNoBake)return;
+  const t=sv.closest('.title'),vr=sv.getBoundingClientRect();
+  if(!t||vr.width<50||vr.height<50||!sv._g){if((tries||0)<6)setTimeout(()=>tsBake(sv,(tries||0)+1),800);return;}
+  sv._baking=1;const T0=performance.now(),dpr=Math.min(window.devicePixelRatio||1,2),XS=new XMLSerializer(),urls=sv._urls=[];
+  const M=Math.max(60,vr.width*.12),L=vr.left-M,R=vr.right+M,Tp=vr.top-M,B=vr.bottom+M,st={cut:0,runs:0,from:sv.getElementsByTagName('*').length};
+  const out=e=>{const r=e.getBoundingClientRect();return r.width+r.height>0&&(r.right<L||r.left>R||r.bottom<Tp||r.top>B);};
+  const hasImg=e=>e.localName==='image'||e.localName==='foreignObject'||!!e.querySelector('image,foreignObject');
+  /* 풀 흔들림 등은 '그림 크기의 가운데 아래'를 기준으로 움직여요. 안쪽을 지우거나 굳혀도 기준점이 안 변하게 먼저 고정해요 */
+  sv.querySelectorAll('.tsSw1,.tsSw2,.tsAura,.tsSmoke,.tsChim').forEach(e=>{try{const cs=getComputedStyle(e);if(cs.transformBox!=='fill-box')return;const bb=e.getBBox(),og=cs.transformOrigin.split(' ').map(parseFloat);
+   e.style.transformBox='view-box';e.style.transformOrigin=(bb.x+og[0])+'px '+(bb.y+og[1])+'px';}catch(x){}});
+  /* ① 화면 밖 지우기 */
+  (function cull(P){for(const c of [...P.children]){if(TSRES.test(c.localName))continue;
+    if(c.matches(TSKEEP)||hasImg(c)){if(c.localName==='g'&&c.children.length>8&&!c.matches('.tsHero,.tsHeroB,.tsMonG'))cull(c);continue;}
+    if(out(c)){c.remove();st.cut++;continue;}
+    if(c.localName==='g'&&c.children.length>8)cull(c);}})(sv);
+  const res=[...sv.querySelectorAll('defs')].map(d=>XS.serializeToString(d)).join('')+[...sv.querySelectorAll('clipPath,mask,filter,pattern,linearGradient,radialGradient')].filter(e=>!e.closest('defs')).map(e=>XS.serializeToString(e)).join('');
+  const ld=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src;});
+  const bakeRun=async(P,nodes)=>{
+   const m=P.getScreenCTM();if(!m)return;const inv=m.inverse();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+   nodes.forEach(n=>{const r=n.getBoundingClientRect();if(!(r.width+r.height))return;
+    const a=Math.max(r.left,L),b=Math.min(r.right,R),c=Math.max(r.top,Tp),d=Math.min(r.bottom,B);if(b<=a||d<=c)return;
+    [[a,c],[b,c],[a,d],[b,d]].forEach(q=>{const u=new DOMPoint(q[0],q[1]).matrixTransform(inv);x0=Math.min(x0,u.x);y0=Math.min(y0,u.y);x1=Math.max(x1,u.x);y1=Math.max(y1,u.y);});});
+   if(x1<=x0||y1<=y0){nodes.forEach(n=>n.remove());return;}
+   x0-=1;y0-=1;x1+=1;y1+=1;const w=x1-x0,h=y1-y0;let k=Math.hypot(m.a,m.b)*dpr*1.04;const cap=5.2e6;if(w*h*k*k>cap)k=Math.sqrt(cap/(w*h));
+   const pw=Math.max(1,Math.ceil(w*k)),ph=Math.max(1,Math.ceil(h*k)),cs=getComputedStyle(P);
+   const inh=TSINH.map(q=>q+':'+cs.getPropertyValue(q)).join(';');
+   const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${pw}" height="${ph}" viewBox="${x0} ${y0} ${w} ${h}">${res}<g style="${inh}">${nodes.map(n=>XS.serializeToString(n)).join('')}</g></svg>`;
+   const u1=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
+   let img;try{img=await ld(u1);}finally{URL.revokeObjectURL(u1);}
+   const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;cv.getContext('2d').drawImage(img,0,0,pw,ph);
+   const blob=await new Promise(r=>cv.toBlob(r,'image/webp',.94));cv.width=cv.height=1;
+   if(!blob||!sv.isConnected||!nodes[0].parentNode)return;
+   const u2=URL.createObjectURL(blob);urls.push(u2);
+   const im=document.createElementNS('http://www.w3.org/2000/svg','image');
+   im.setAttribute('x',x0);im.setAttribute('y',y0);im.setAttribute('width',w);im.setAttribute('height',h);im.setAttribute('preserveAspectRatio','none');im.setAttribute('href',u2);im.setAttribute('data-bake','1');im.style.pointerEvents='none';
+   nodes[0].parentNode.insertBefore(im,nodes[0]);nodes.forEach(n=>n.remove());st.runs++;};
+  /* ② 가만히 있는 층 굳히기 */
+  const walk=async P=>{let run=[],cnt=0;const flush=async()=>{const r=run,c=cnt;run=[];cnt=0;if(r.length&&c>=20&&sv.isConnected){try{await bakeRun(P,r);}catch(e){console.warn('bake',e);}}};
+   for(const c of [...P.children]){if(!c.isConnected)continue;const tag=c.localName;if(TSRES.test(tag))continue;
+    const selfA=c.matches(TSA)||!!c.querySelector(':scope>animateTransform,:scope>animate,:scope>set'),descA=!selfA&&!!c.querySelector(TSA+',animateTransform,animate');
+    if(!selfA&&!descA&&!hasImg(c)){run.push(c);cnt+=c.getElementsByTagName('*').length+1;continue;}
+    await flush();
+    if(tag==='g'&&c.children.length>3&&!c.matches('.tsHero,.tsHeroB,.tsMonG'))await walk(c);
+    await new Promise(r=>setTimeout(r,0));}
+   await flush();};
+  try{await walk(sv);}catch(e){console.warn('bake',e);}
+  const g=sv._g,half=vr.width/(2*g.sc)+M/g.sc;
+  sv._bk={l:200-half,r:200+half,sc:g.sc,h:vr.height};sv._baked=1;sv._baking=0;
+  sv._bakeInfo={ms:Math.round(performance.now()-T0),cut:st.cut,runs:st.runs,before:st.from,after:sv.getElementsByTagName('*').length};
+  try{console.debug('title bake',JSON.stringify(sv._bakeInfo));}catch(e){}}
+ function tsRange(sv,w,h,sc){if(!sv._baked||sv._rb)return;const b=sv._bk,half=w/(2*sc);
+  if(!b||200-half<b.l+4||200+half>b.r-4||Math.abs(sc/b.sc-1)>.1||h>b.h*1.15){sv._rb=1;setTimeout(()=>{const t=document.querySelector('#view>.title.tsT');if(t){unbuild(t);build(t);}},60);}}
  function build(t){
   if(!t||t.classList.contains('tsT'))return;
   if(!document.getElementById('tsCss')){const st=document.createElement('style');st.id='tsCss';st.textContent=CSS;document.head.appendChild(st);}
@@ -26418,6 +26478,7 @@ init();
    let st=0;im.addEventListener('error',()=>{st++;try{if(st===1)set(SPR_BASE+'back/'+pid+'.png');else if(st===2){set(spriteURL(pid,'front'));im.classList.add('tsSil');}else if(st===3){im.classList.remove('tsSil');set(fallbackSprite(pid));}}catch(e){}});
    im.addEventListener('load',()=>{try{tsSizeMon(im,pid);}catch(e){}});try{set(spriteURL(pid,'back'));}catch(e){set(fallbackSprite(pid));}}
   fit();setTimeout(fit,400);setTimeout(fit,1500);
+  setTimeout(()=>{try{tsBake(sc.querySelector('.tsSvg'));}catch(e){console.warn(e);}},800);
  }
  let rz=0;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(fit,120);});
  const prev=renderTitle;
@@ -26425,7 +26486,7 @@ init();
  const TS_KEY='zsTitleBg';
  const tsMode=()=>{try{return localStorage.getItem(TS_KEY)==='old'?'old':'new';}catch(e){return 'new';}};
  const tsSave=m=>{try{localStorage.setItem(TS_KEY,m);}catch(e){}};
- function unbuild(t){t.classList.remove('tsT');['.tsScene','.tsFoot'].forEach(q=>{const e=t.querySelector(':scope>'+q);if(e)e.remove();});}
+ function unbuild(t){const sv0=t.querySelector('.tsSvg');if(sv0&&sv0._urls)sv0._urls.forEach(u=>URL.revokeObjectURL(u));t.classList.remove('tsT');['.tsScene','.tsFoot'].forEach(q=>{const e=t.querySelector(':scope>'+q);if(e)e.remove();});}
  function tsBind(t){const lg=t.querySelector('.logo');if(!lg||lg.dataset.tsTog)return;lg.dataset.tsTog='1';lg.style.cursor='pointer';lg.style.pointerEvents='auto';lg.title='눌러서 배경 바꾸기';
   lg.addEventListener('click',()=>{const next=tsMode()==='new'?'old':'new';tsSave(next);try{sfx('tap');}catch(e){}if(next==='new')build(t);else unbuild(t);});}
  renderTitle=function(){const r=prev.apply(this,arguments);try{const t=document.querySelector('#view>.title');if(t){if(tsMode()==='new')build(t);tsBind(t);}}catch(e){console.warn('title scene',e);}finally{try{document.documentElement.classList.remove('tsPre');}catch(e){}}return r;};
