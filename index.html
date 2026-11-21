@@ -25998,8 +25998,34 @@ init();
  function ridge(o){const r=R0(o.seed),pts=[];for(let x=X0;x<=X1;x+=o.step||10){let y=o.base-o.amp*(.5*Math.sin(x*o.f+o.seed)+.3*Math.sin(x*o.f*2.3+o.seed*1.7)+.2*Math.sin(x*o.f*5.1+o.seed*.3));
    if(o.jag)y+=(r()-.5)*o.jag;(o.peaks||[]).forEach(p=>{y-=p[1]*Math.exp(-Math.pow((x-p[0])/p[2],2));});pts.push([x,y]);}return pts;}
  function yAt(pts,x){const i=Math.max(0,Math.min(pts.length-2,Math.floor((x-pts[0][0])/(pts[1][0]-pts[0][0]))));const a=pts[i],b=pts[i+1],t=(x-a[0])/(b[0]-a[0]||1);return a[1]+(b[1]-a[1])*t;}
- function trees(pts,seed,x0,x1,gap,sz,cols){const r=R0(seed);let s='';for(let x=x0;x<x1;x+=gap*(.6+r()*.8)){const y=yAt(pts,x)+1,h=sz*(.7+r()*.7),w=h*.62,c=cols[(r()*cols.length)|0];
-   s+=`<path d="M${f1(x)} ${f1(y-h)}L${f1(x+w/2)} ${f1(y)}L${f1(x-w/2)} ${f1(y)}Z" fill="${c}"/>`;}return s;}
+
+ /* 나무: 겹겹이 쌓인 침엽수 + 둥근 활엽수를 섞고, 숲덩이(군락)와 빈터가 생기게 심어요. 해가 오른쪽 위라서 오른쪽 면이 밝아요 */
+ function trees(pts,seed,x0,x1,gap,sz,cols,mix,bc,hi,dn){const r=R0(seed);mix=mix==null?.3:mix;bc=bc||cols;hi=hi||'#eaf6c0';const T=[];
+  for(let x=x0;x<x1;x+=gap*.5*(.6+r()*.8)){const dens=.5+.5*Math.sin(x*.031+seed)*Math.sin(x*.0113+seed*2.1);if(r()>Math.min(1,(dens*.85+.12)*(dn||1)))continue;
+   const y=yAt(pts,x)+1+(r()-.3)*gap*.25,h=sz*(.7+r()*.75),broad=r()<mix;T.push({x:x+(r()-.5)*gap*.4,y,h,broad,c:(broad?bc:cols)[(r()*(broad?bc:cols).length)|0]});}
+  T.sort((a,b)=>a.y-b.y);let s='';
+  T.forEach(t=>{const x=f1(t.x),y=f1(t.y),h=t.h,q=f1;
+   if(t.broad){const cy=y-h*.5,rx=h*.34,ry=h*.42;
+    s+=`<ellipse cx="${x}" cy="${q(cy)}" rx="${q(rx)}" ry="${q(ry)}" fill="${t.c}"/><ellipse cx="${q(t.x+h*.1)}" cy="${q(cy-h*.1)}" rx="${q(rx*.62)}" ry="${q(ry*.62)}" fill="${hi}" opacity=".24"/>`+(h>7?`<rect x="${q(t.x-.35)}" y="${q(y-h*.16)}" width=".7" height="${q(h*.16)}" fill="#4a5a44"/>`:'');}
+   else{const w=h*.58,A=[[1,.62,.24],[.82,.34,.36],[.58,.02,.5]];let d='',l='';
+    A.forEach(a=>{d+=`M${x} ${q(t.y-h*a[0])}L${q(t.x+w*a[2])} ${q(t.y-h*a[1])}L${q(t.x-w*a[2])} ${q(t.y-h*a[1])}Z`;l+=`M${x} ${q(t.y-h*a[0])}L${q(t.x+w*a[2])} ${q(t.y-h*a[1])}L${x} ${q(t.y-h*a[1])}Z`;});
+    s+=`<path d="${d}" fill="${t.c}"/><path d="${l}" fill="${hi}" opacity=".2"/>`;}});
+  return s;}
+ /* 유리숲: 절벽 아래 짙은 초록 언덕을 빽빽한 숲으로 채우고, 수정처럼 빛나는 나무를 군데군데 섞어요 */
+ function crystal(x,y,h){const q=f1,w=h*.2;
+  return `<circle cx="${q(x)}" cy="${q(y-h*.5)}" r="${q(h*.62)}" fill="url(#tsGlowC)"/>`
+   +`<path d="M${q(x-w*.9)} ${q(y)}L${q(x-w)} ${q(y-h*.5)}L${q(x-w*.2)} ${q(y-h)}L${q(x+w*.6)} ${q(y-h*.78)}L${q(x+w)} ${q(y-h*.4)}L${q(x+w*.8)} ${q(y)}Z" fill="#6fdcc0"/>`
+   +`<path d="M${q(x+w*.15)} ${q(y)}L${q(x-w*.2)} ${q(y-h)}L${q(x+w*.6)} ${q(y-h*.78)}L${q(x+w)} ${q(y-h*.4)}L${q(x+w*.8)} ${q(y)}Z" fill="#c8fff0" opacity=".55"/>`
+   +`<path d="M${q(x-w*.9)} ${q(y)}L${q(x-w)} ${q(y-h*.5)}L${q(x-w*.2)} ${q(y-h)}L${q(x+w*.15)} ${q(y)}Z" fill="#2fa38c" opacity=".55"/>`
+   +`<path d="M${q(x+w*1.2)} ${q(y)}L${q(x+w*1.45)} ${q(y-h*.42)}L${q(x+w*2.1)} ${q(y)}Z" fill="#9ff0da"/>`;}
+ function spark(x,y,d){const q=f1;return `<path class="tsTw" style="animation-delay:-${d.toFixed(1)}s" d="M${q(x)} ${q(y-2.6)}L${q(x+.5)} ${q(y-.5)}L${q(x+2.6)} ${q(y)}L${q(x+.5)} ${q(y+.5)}L${q(x)} ${q(y+2.6)}L${q(x-.5)} ${q(y+.5)}L${q(x-2.6)} ${q(y)}L${q(x-.5)} ${q(y-.5)}Z" fill="#eafff8"/>`;}
+ function forest(h2){let s='';const rr=R0(77),rows=[[10,12,5,401],[22,14,5.5,402],[34,16,6,403],[46,18,6.5,404],[58,21,7,405],[70,24,7.5,406]];
+  const cols=['#1f5a4c','#276a58','#1b5046','#2b7260'],bc=['#2f7a5a','#37866a','#27684f'];
+  rows.forEach((o,k)=>{const pts=h2.map(q=>[q[0],q[1]+o[0]]);
+   [[X0,-60],[300,X1]].forEach((rg,gi)=>{s+=trees(pts,o[3]+gi*7,rg[0],rg[1],o[2],o[1],cols,.25,bc,'#bff0d0',2.2);
+    for(let x=rg[0]+rr()*20;x<rg[1];x+=26+rr()*34){if(rr()<.55){const y=yAt(pts,x)+1,hh=o[1]*(1+rr()*.5);s+=crystal(x,y,hh);if(rr()<.6)s+=spark(x+(rr()-.5)*6,y-hh*(.5+rr()*.5),rr()*3);}}});
+   if(k==1)s+=`<g class="tsDr" style="animation-duration:95s"><ellipse cx="620" cy="${f1(yAt(h2,620)+30)}" rx="230" ry="12" fill="url(#tsPuff)" opacity=".4"/><ellipse cx="-330" cy="${f1(yAt(h2,-330)+30)}" rx="230" ry="12" fill="url(#tsPuff)" opacity=".4"/></g>`;});
+  return s;}
  function cloud(cx,cy,sc,seed,dur,dly){const r=R0(seed),n=6+((r()*3)|0),pf=[];for(let i=0;i<n;i++){const x=(i-(n-1)/2)*24+(r()-.5)*10,rad=20+r()*18-Math.abs(x)*.1,y=-rad*.5+(r()-.5)*8;pf.push([x,y,rad]);}
   let g=`<g class="tsDr" style="animation-duration:${dur}s;animation-delay:-${dly}s"><g transform="translate(${cx} ${cy}) scale(${sc})">`;
   pf.forEach(p=>g+=`<circle cx="${f1(p[0])}" cy="${f1(p[1]+9)}" r="${f1(p[2])}" fill="url(#tsCs)"/>`);
@@ -26078,15 +26104,71 @@ init();
    +`<path d="M${f1(X)} ${f1(Y)}L${f1(X+2)} ${f1(SL+3)}" stroke="#fffaf2" stroke-width=".9" fill="none" opacity=".8"/>`;} // 능선(햇빛 받는 모서리)
  function vista(pl){const r=R0(88),Y=x=>yAt(pl,x);let o=`<path d="${pathFrom(pl,H)}" fill="url(#tsPl)"/>`;
   const fc=['#e2d28a','#b9cf7c','#93bd72','#d6bd7a','#a6c78a'];
-  for(let i=0;i<56;i++){const x=X0+r()*(X1-X0),w=12+r()*26,y=Y(x)+2+r()*10,h=2.2+r()*2.6,sk=3+r()*4;o+=`<path d="M${f1(x)} ${f1(y)}h${f1(w)}l${-f1(sk)} ${f1(h)}h${f1(-w)}z" fill="${fc[(r()*5)|0]}" opacity="${(.5+r()*.3).toFixed(2)}"/>`;}
-  o+=trees(pl,6,X0,X1,6,5.5,['#4c8466','#3f7560','#5a9170']);
+  for(let i=0;i<56;i++){const x=X0+r()*(X1-X0),w=12+r()*26,y=Y(x)+2+r()*10,h=2.2+r()*2.6,sk=3+r()*4,c=fc[(r()*5)|0];o+=`<path d="M${f1(x)} ${f1(y)}h${f1(w)}l${-f1(sk)} ${f1(h)}h${f1(-w)}z" fill="${c}" opacity="${(.5+r()*.3).toFixed(2)}"/>`;for(let j=1;j<4;j++){const fx=x+w*j/4;o+=`<path d="M${f1(fx)} ${f1(y)}l${-f1(sk)} ${f1(h)}" stroke="#6f9a5a" stroke-width=".35" opacity=".3"/>`;}}
+  o+=trees(pl,6,X0,X1,6,5.5,['#4c8466','#3f7560','#5a9170'],.45,['#6f9f6e','#7fae74','#5d9068']);
   const lx=285,ly=f1(Y(lx)+9);
   o+=`<ellipse cx="${lx}" cy="${ly}" rx="72" ry="4.3" fill="url(#tsRiv)"/>`;
   for(let i=0;i<10;i++){const w=4+i*2.6,xx=292+(r()-.5)*5;o+=`<rect x="${f1(xx-w/2)}" y="${f1(ly-3.2+i*.72)}" width="${f1(w)}" height=".7" fill="#fffbe8" opacity="${(.95-i*.05).toFixed(2)}"/>`;}
   o+=`<path d="M225 ${f1(Y(225)+10)}C190 ${f1(Y(190)+14)} 160 ${f1(Y(160)+8)} 120 ${f1(Y(120)+14)}S40 ${f1(Y(40)+11)} -40 ${f1(Y(-40)+16)}S-200 ${f1(Y(-200)+12)} -300 ${f1(Y(-300)+15)}" stroke="url(#tsRiv)" stroke-width="2.4" fill="none" opacity=".85" stroke-linecap="round"/>`;
-  const house=(x,y,s)=>`<g transform="translate(${f1(x)} ${f1(y)}) scale(${s.toFixed(2)})"><rect x="-3" y="-3.6" width="6" height="3.6" fill="#efd7b6"/><rect x=".6" y="-3.6" width="2.4" height="3.6" fill="#d2a98c"/><path d="M-4 -3.6L0 -7.2L4 -3.6Z" fill="${r()<.5?'#a9525a':'#8c4a58'}"/><rect x="-1.7" y="-2.5" width="1.1" height="1.2" fill="#ffd27a"/></g>`;
-  [[130,10],[-90,8],[330,7],[-300,9],[560,9]].forEach(v=>{const hs=[];for(let i=0;i<v[1];i++){const x=v[0]+(r()-.5)*64;hs.push([x,Y(x)+3+r()*8,.7+r()*.35]);}hs.sort((a,b)=>a[1]-b[1]);
-   o+=hs.map(h=>house(h[0],h[1],h[2])).join('')+`<g transform="translate(${v[0]+8} ${f1(Y(v[0]+8)+6)})"><rect x="-1.6" y="-10" width="3.2" height="10" fill="#efd7b6"/><path d="M-2.4 -10L0 -17L2.4 -10Z" fill="#8c4a58"/><rect x="-.5" y="-8" width="1" height="1.8" fill="#ffd27a"/></g>`;});
+  const roofs=[['#bd6054','#93464a'],['#7a8db4','#5a6e96'],['#cfa862','#a68544'],['#b0584e','#86424a']];
+  const house=(x,y,s)=>{const rf=roofs[(r()*4)|0],long=r()<.4,chim=r()<.35,wall=r()<.5?'#f6e8cc':'#efdcbc',k=f1;
+   const body=long?`<rect x="-5" y="-3.4" width="10" height="3.4" fill="${wall}"/><rect x="2.6" y="-3.4" width="2.4" height="3.4" fill="#cfb08c" opacity=".7"/><path d="M-6 -3.2L-3.4 -6.4L3.4 -6.4L6 -3.2Z" fill="${rf[0]}"/><path d="M0 -6.4L3.4 -6.4L6 -3.2L0 -3.2Z" fill="${rf[1]}"/><rect x="-3.6" y="-2.4" width="1.2" height="1.3" fill="#ffd98a"/><rect x="-.4" y="-2.4" width="1.2" height="1.3" fill="#ffd98a"/><rect x="2.4" y="-2.2" width="1.1" height="2.2" fill="#6a4a3a"/>`
+    :`<rect x="-3" y="-3.5" width="6" height="3.5" fill="${wall}"/><rect x="1.4" y="-3.5" width="1.6" height="3.5" fill="#cfb08c" opacity=".7"/><path d="M-3.9 -3.3L0 -7.6L3.9 -3.3Z" fill="${rf[0]}"/><path d="M0 -7.6L3.9 -3.3L0 -3.3Z" fill="${rf[1]}"/><rect x="-1.9" y="-2.5" width="1.2" height="1.3" fill="#ffd98a"/><rect x=".6" y="-2.2" width="1" height="2.2" fill="#6a4a3a"/>`;
+   return `<g transform="translate(${k(x)} ${k(y)}) scale(${s.toFixed(2)})"><ellipse cx="1.2" cy=".3" rx="${long?6.4:4.6}" ry=".8" fill="#2f5a44" opacity=".28"/>${body}`+(chim?`<rect x="1.5" y="-7.6" width=".9" height="2.2" fill="#b89478"/><circle class="tsChim" cx="1.95" cy="-8" r=".9" fill="#f4f6fa" style="animation-delay:-${(r()*5).toFixed(1)}s"/>`:'')+`</g>`;};
+  const church=(x,y)=>`<g transform="translate(${f1(x)} ${f1(y)})"><ellipse cx="1" cy=".4" rx="6" ry=".9" fill="#2f5a44" opacity=".28"/><rect x="-5" y="-4" width="6" height="4" fill="#f3e4c6"/><path d="M-5.6 -3.8L-2 -6.6L1.6 -3.8Z" fill="#a9525a"/><rect x="1" y="-11" width="3.4" height="11" fill="#f0dfc0"/><rect x="2.8" y="-11" width="1.6" height="11" fill="#cfb08c" opacity=".7"/><path d="M.5 -10.8L2.7 -18L4.9 -10.8Z" fill="#7488b0"/><path d="M2.7 -18L4.9 -10.8L2.7 -10.8Z" fill="#5a6e96"/><rect x="2.1" y="-9" width="1.2" height="1.8" fill="#ffd98a"/><path d="M2.7 -18V-20.4M1.7 -19.4H3.7" stroke="#d9c070" stroke-width=".5"/></g>`;
+  [[130,11],[-90,10],[800,9]].forEach((v,vi)=>{const hs=[];for(let i=0;i<v[1];i++){const x=v[0]+(r()-.5)*72;hs.push([x,Y(x)+3+r()*9,.95+r()*.5]);}hs.sort((a,b)=>a[1]-b[1]);
+   o+=`<g opacity=".88"><path d="M${v[0]-4} ${f1(Y(v[0])+16)}C${v[0]+6} ${f1(Y(v[0])+9)} ${v[0]-8} ${f1(Y(v[0])+5)} ${v[0]+4} ${f1(Y(v[0])+1)}" stroke="#ead9ac" stroke-width="1.6" fill="none" opacity=".7" stroke-linecap="round"/>`
+    +trees(pl,200+vi,v[0]-52,v[0]+52,6,6.5,['#5a8a64','#4c7c5c'],.9,['#79a76c','#8bb674','#6a9a66'],'#f0f8c8')
+    +hs.map(h=>house(h[0],h[1],h[2])).join('')+church(v[0]+10,Y(v[0]+10)+7)+'</g>';});
+  /* ── 시나리오 장소: 이름을 잃은 도시 / 시간의 역천문대 / 밀물의 무덤 ── */
+  const city=cx=>{const rr=R0(404),y0=Y(cx)+5,q=f1,B=[];
+   for(let i=0;i<24;i++){const x=cx-42+i*(84/23)+(rr()-.5)*2,d=Math.abs(x-cx);B.push({x,h:7+Math.exp(-((d/24)**2))*(12+rr()*12)+rr()*6,w:3.4+rr()*3.2,back:rr()<.45});}
+   B.sort((a,b)=>Number(b.back)-Number(a.back));
+   const ty=y0-47;let s=`<g opacity=".93"><ellipse cx="${cx}" cy="${q(y0+1)}" rx="58" ry="4" fill="#a8b8b0" opacity=".55"/>`
+    +`<circle class="tsAura" cx="${cx}" cy="${q(ty)}" r="18" fill="url(#tsGlowV)"/><path d="M${cx-12} ${q(ty)}A12 2.8 0 0 1 ${cx+12} ${q(ty)}" stroke="#b6a8ff" stroke-width=".9" fill="none" opacity=".75"/>`;
+   B.forEach(b=>{const by=y0-(b.back?2:0),x=q(b.x-b.w/2),c=b.back?'#b7bdd3':'#9ca3bd',sh=b.back?'#9aa1bb':'#7f86a2';
+    s+=`<rect x="${x}" y="${q(by-b.h)}" width="${q(b.w)}" height="${q(b.h)}" fill="${c}"/><rect x="${q(b.x+b.w*.12)}" y="${q(by-b.h)}" width="${q(b.w*.38)}" height="${q(b.h)}" fill="${sh}" opacity=".55"/><rect x="${x}" y="${q(by-b.h)}" width="${q(b.w)}" height=".7" fill="#dfe3f2"/>`;
+    const rows=Math.floor((b.h-2)/2.8),cols=Math.max(1,Math.floor(b.w/2.2));
+    for(let a=0;a<rows;a++)for(let c2=0;c2<cols;c2++){const lit=rr()<.16;s+=`<rect x="${q(b.x-b.w/2+.7+c2*2.1)}" y="${q(by-b.h+1.6+a*2.8)}" width="1" height="1.2" fill="${lit?'#cfc6ff':'#e9ecf8'}" opacity="${lit?.85:.32}"/>`;}
+    if(rr()<.25)s+=`<path d="M${q(b.x)} ${q(by-b.h)}v-3" stroke="#8b92ac" stroke-width=".4"/>`;});
+   s+=`<path d="M${q(cx-2.6)} ${q(y0)}L${q(cx-1.5)} ${q(ty+4)}L${q(cx+1.5)} ${q(ty+4)}L${q(cx+2.6)} ${q(y0)}Z" fill="#b4bad4"/><path d="M${q(cx+.4)} ${q(y0)}L${q(cx+.4)} ${q(ty+4)}L${q(cx+1.5)} ${q(ty+4)}L${q(cx+2.6)} ${q(y0)}Z" fill="#8b92b0" opacity=".6"/><path d="M${cx} ${q(ty+4)}V${q(ty-4)}" stroke="#a394ff" stroke-width=".7" opacity=".9"/>`
+    +`<path d="M${cx-12} ${q(ty)}A12 2.8 0 0 0 ${cx+12} ${q(ty)}" stroke="#b6a8ff" stroke-width="1" fill="none" opacity=".9"/>`
+    +`<path d="M${cx-30} ${q(y0-9)}h8M${cx+22} ${q(y0-12)}h9" stroke="#8ee6ff" stroke-width=".5" opacity=".6"/>`
+    +trees(pl,310,cx-70,cx-46,6,6,['#6f8f80','#5f8274'],.5,['#86a58a','#779a82'],'#eef6d8')+trees(pl,311,cx+46,cx+70,6,6,['#6f8f80','#5f8274'],.5,['#86a58a','#779a82'],'#eef6d8')+'</g>';
+   return s;};
+  const obs=ox=>{const q=f1,y0=f1(Y(ox)+4);let s=`<g><ellipse cx="${ox}" cy="${q(y0+1.5)}" rx="40" ry="5" fill="#86b27c"/><ellipse cx="${ox-4}" cy="${q(y0+.5)}" rx="27" ry="3" fill="#a9cf90" opacity=".8"/>`;
+   [[-31,6,.95],[-22,9,1.05],[-13,5,.9],[16,7,1],[25,5,.95],[34,8,1.05]].forEach(h=>{s+=house(ox+h[0],Y(ox+h[0])+h[1]-1,h[2]);});
+   s+=trees(pl,300,ox-52,ox-38,6,7,['#5a8a64','#4c7c5c'],.9,['#79a76c','#8bb674','#6a9a66'],'#f0f8c8')+trees(pl,301,ox+40,ox+54,6,7,['#5a8a64','#4c7c5c'],.9,['#79a76c','#8bb674','#6a9a66'],'#f0f8c8');
+   s+=`<g transform="translate(${ox} ${y0})"><circle class="tsAura" cx="0" cy="-34" r="14" fill="url(#tsGlowV)" opacity=".7"/>`
+    +`<rect x="-5.2" y="-4" width="10.4" height="4" fill="#d8d3e8"/><path d="M-3.8 -4L-3 -30L3 -30L3.8 -4Z" fill="#ece8f6"/><path d="M1.2 -4L1.5 -30L3 -30L3.8 -4Z" fill="#c4bfe0" opacity=".8"/>`
+    +`<rect x="-5.2" y="-31.6" width="10.4" height="1.7" fill="#bdb7dc"/><path d="M-4.6 -31.6A4.6 4.6 0 0 1 4.6 -31.6Z" fill="#8e9ae0"/><path d="M-3.8 -33.2A4.2 4.2 0 0 1 -.4 -35.6" stroke="#cfd6ff" stroke-width=".7" fill="none" opacity=".8"/><rect x="-.6" y="-36" width="1.2" height="4.4" fill="#2f3466"/>`
+    +`<path d="M0 -36.2V-40.2" stroke="#8e9ae0" stroke-width=".6"/><circle cx="0" cy="-40.6" r=".9" fill="#fff6c8"/>`
+    +`<circle cx="0" cy="-20" r="3.4" fill="#fff7e0" stroke="#8d84b8" stroke-width=".5"/><g fill="#6c6490"><circle cx="0" cy="-22.6" r=".3"/><circle cx="2.6" cy="-20" r=".3"/><circle cx="0" cy="-17.4" r=".3"/><circle cx="-2.6" cy="-20" r=".3"/></g>`
+    +`<g transform="translate(0 -20)" stroke="#4a4270" stroke-linecap="round"><path d="M0 0V-2.7" stroke-width=".45"><animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="24s" repeatCount="indefinite"/></path><path d="M0 0V-1.8" stroke-width=".7"><animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="288s" repeatCount="indefinite"/></path></g>`
+    +`<rect x="-.8" y="-27" width="1.6" height="2.6" fill="#ffd98a"/><rect x="-.8" y="-11" width="1.6" height="2.6" fill="#ffd98a"/></g>`
+    +`<g transform="translate(${ox} ${q(y0-44)}) scale(1 .26)"><g opacity=".6"><animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="70s" repeatCount="indefinite"/><circle r="17" fill="none" stroke="#c9d0ff" stroke-width="1.2" stroke-dasharray="1.2 5"/>`
+    +[0,90,180,270].map(a=>`<circle cx="${q(Math.cos(a*Math.PI/180)*17)}" cy="${q(Math.sin(a*Math.PI/180)*17)}" r="1.6" fill="#fff"/>`).join('')+`</g></g>`
+    +`<g class="tsDr" style="animation-duration:75s"><ellipse cx="${ox}" cy="${q(y0-12)}" rx="32" ry="4" fill="url(#tsPuff)"/></g></g>`;
+   return s;};
+  const coast=()=>{const rr=R0(515),q=f1,sm=t=>t*t*(3-2*t),cl=t=>Math.max(0,Math.min(1,t)),xs=-700,xe=-230;
+   const shore=x=>Y(x)+2+22*(1-sm(cl((x+440)/190)))+Math.sin(x*.07)*1.1,wd=x=>1-sm(cl((x+330)/90));
+   const top=[],bot=[];for(let x=xs;x<=xe;x+=8){top.push(q(x)+' '+q(Y(x)+.5));bot.push(q(x)+' '+q(shore(x)));}
+   const strip=(a,b)=>{const u=[],l=[];for(let x=xs;x<=xe;x+=8){u.push(q(x)+' '+q(shore(x)+a));l.push(q(x)+' '+q(shore(x)+a+b*wd(x)));}return `M${u.join('L')}L${l.reverse().join('L')}Z`;};
+   let o=`<path d="M${top.join('L')}L${bot.slice().reverse().join('L')}Z" fill="url(#tsSea)"/>`;
+   for(let i=0;i<34;i++){const x=xs+rr()*(xe-60-xs),y=Y(x)+3+rr()*Math.max(1,shore(x)-Y(x)-5);o+=`<path d="M${q(x)} ${q(y)}h${q(6+rr()*16)}" stroke="#fff" stroke-width=".45" opacity="${(.25+rr()*.3).toFixed(2)}"/>`;}
+   o+=`<path d="${strip(1.5,7)}" fill="#efdfb0"/><path d="${strip(0,3.5)}" fill="#c9b88f" opacity=".85"/><path d="M${bot.join('L')}" stroke="#fff" stroke-width=".9" fill="none" opacity=".85"/>`;
+   [[-430,.4],[-390,1.9],[-352,2.1],[-300,.9]].forEach(a=>{const x=a[0],y=shore(x)+a[1]+1.6;o+=`<path transform="translate(${x} ${q(y)}) scale(1.1)" d="M0 0Q-2.4 -.6 -2.2 -2.6Q-1.2 -4.4 .8 -3.6Q2.6 -2.6 2.2 0Z" fill="#f4dcd3" stroke="#c99a92" stroke-width=".3"/>`;});
+   const sy=shore(-372);o+=`<g fill="#7b6655"><rect x="-373.2" y="${q(sy-8)}" width="2.4" height="9"/></g><path d="M-373.2 ${q(sy-6.4)}h2.4M-373.2 ${q(sy-4.4)}h2.4M-373.2 ${q(sy-2.4)}h2.4" stroke="#54433a" stroke-width=".3"/><rect x="-374" y="${q(sy-8.6)}" width=".8" height="1.6" fill="#54433a"/><rect x="-371.2" y="${q(sy-8.6)}" width=".8" height="1.6" fill="#54433a"/>`;
+   o+=`<g class="tsDr" style="animation-duration:80s"><ellipse cx="-520" cy="${q(Y(-520)+9)}" rx="190" ry="8" fill="url(#tsPuff)" opacity=".75"/></g>`;
+   const wx=-402,wy=Y(wx)+10;o+=`<g transform="translate(${wx} ${q(wy)}) rotate(-9) scale(1.35)"><ellipse cx="0" cy="4.9" rx="19" ry="1.5" fill="none" stroke="#fff" stroke-width=".45" opacity=".6"/><ellipse cx="0" cy="5.1" rx="26" ry="2" fill="none" stroke="#fff" stroke-width=".35" opacity=".35"/>`
+    +`<path d="M-14 -3L-11 3.6Q0 6 11 3.2L15 -4.4L9 -2.6Q0 -1.4 -8 -2.2Z" fill="#6b5448"/><path d="M-14 -3L-8 -2.2Q0 -1.4 9 -2.6L15 -4.4L12 -3.4Q0 -3 -10 -3.6Z" fill="#8a7060"/><path d="M-6 -2L-5 3M2 -1.6L3 3.6" stroke="#3f2f2a" stroke-width=".5"/>`
+    +`<path d="M-.5 -2.4L-3.8 -16.6" stroke="#4b3a33" stroke-width=".9" stroke-linecap="round"/><path d="M-6.4 -13.2L2 -14.8" stroke="#4b3a33" stroke-width=".6"/><path d="M-5.4 -13L1.8 -14.4L1 -7.6L-1.4 -8.8L-3 -7L-5 -8.6Z" fill="#e9e4d6" opacity=".88"/><path d="M-1.4 -8.8L-1 -11" stroke="#bfb8a6" stroke-width=".3"/><path d="M-3.8 -16.4L13 -4.2" stroke="#6b5448" stroke-width=".25" opacity=".8"/></g>`;
+   const ax=-318,ay=shore(ax)+6;o+=`<g transform="translate(${ax} ${q(ay)}) rotate(16) scale(1.2)"><ellipse cx="0" cy="5.2" rx="4.6" ry="1" fill="#c9b88f"/><g stroke="#4a4658" stroke-width=".8" fill="none" stroke-linecap="round"><circle cx="0" cy="-3.2" r="1"/><path d="M0 -2.2V5M-2.2 -.2H2.2M-3.6 2.8Q-2.8 5.4 0 5.2Q2.8 5.4 3.6 2.8"/></g></g>`;
+   const hx=-232,hy=Y(hx)+5;o+=`<ellipse cx="${hx}" cy="${q(hy+.5)}" rx="10" ry="3" fill="#7d8190"/><ellipse cx="${hx+4}" cy="${q(hy-.6)}" rx="5" ry="2" fill="#979bab"/>`
+    +`<g transform="translate(${hx} ${q(hy)})"><circle class="tsAura" cx="0" cy="-27.2" r="10" fill="url(#tsAuraG)" opacity=".55"/><path d="M-2.6 0L-1.8 -24L1.8 -24L2.6 0Z" fill="#f4f1ea"/><rect x="-2.25" y="-13" width="4.5" height="4" fill="#d9534f"/><rect x="-2" y="-21" width="4" height="4" fill="#d9534f"/><path d="M.9 0L.6 -24L1.8 -24L2.6 0Z" fill="#cfcac0" opacity=".6"/><rect x="-3" y="-25.4" width="6" height="1.4" fill="#4a4f66"/><rect x="-1.7" y="-29" width="3.4" height="3.6" fill="#ffe9a8"/><path d="M-2.6 -29L0 -32.6L2.6 -29Z" fill="#c8504a"/></g>`;
+   [-212,-199,-187].forEach((x,i)=>{o+=house(x,Y(x)+5+i%2*2,.95+i*.05);});
+   return o;};
+  o+=city(330)+obs(560)+coast();
   const wx=55,wy=f1(Y(wx)+5);
   o+=`<g transform="translate(${wx} ${wy})"><path d="M-2.4 0L-1.5 -10L1.5 -10L2.4 0Z" fill="#efd7b6"/><path d="M-2 -10L0 -13L2 -10Z" fill="#8c4a58"/><g stroke="#5b4a62" stroke-width=".9" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 0 -10" to="360 0 -10" dur="26s" repeatCount="indefinite"/><path d="M0 -10L-5.6 -14.6M0 -10L5.6 -5.4M0 -10L4.6 -15.6M0 -10L-4.6 -4.4"/></g></g>`;
   return o;}
@@ -26137,6 +26219,9 @@ init();
    <radialGradient id="tsLava" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd9a0" stop-opacity=".95"/><stop offset=".4" stop-color="#ff8a4a" stop-opacity=".55"/><stop offset="1" stop-color="#ff6a3a" stop-opacity="0"/></radialGradient>
    <radialGradient id="tsAsh" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#b9b2c8" stop-opacity=".6"/><stop offset=".6" stop-color="#c8c4d4" stop-opacity=".28"/><stop offset="1" stop-color="#d8d8e4" stop-opacity="0"/></radialGradient>
    <filter id="tsLavaBlur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation=".7"/></filter>
+   <radialGradient id="tsGlowC" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#a8ffe6" stop-opacity=".45"/><stop offset="1" stop-color="#a8ffe6" stop-opacity="0"/></radialGradient>
+   <radialGradient id="tsGlowV" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#cfc6ff" stop-opacity=".7"/><stop offset=".5" stop-color="#a394ff" stop-opacity=".25"/><stop offset="1" stop-color="#a394ff" stop-opacity="0"/></radialGradient>
+   <linearGradient id="tsSea" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d4ecf1"/><stop offset=".5" stop-color="#a6d6e3"/><stop offset="1" stop-color="#7fbfd6"/></linearGradient>
    <linearGradient id="tsRay" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff4cc" stop-opacity=".5"/><stop offset="1" stop-color="#fff4cc" stop-opacity="0"/></linearGradient>
    <linearGradient id="tsM1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#bfd3e8"/><stop offset="1" stop-color="#e6f0f4"/></linearGradient>
    <linearGradient id="tsM2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#9db9d8"/><stop offset="1" stop-color="#d3e4ee"/></linearGradient>
@@ -26194,11 +26279,11 @@ init();
   <g class="tsDr" style="animation-duration:120s"><ellipse cx="220" cy="392" rx="420" ry="22" fill="url(#tsMist)"/></g>
   <g transform="translate(0 40)">
   <g class="tsDr" style="animation-duration:90s;animation-delay:-20s"><ellipse cx="200" cy="410" rx="420" ry="20" fill="url(#tsMist)"/></g>
-  <path d="${pathFrom(h1,H)}" fill="url(#tsH1)"/>${trees(h1,2,X0,X1,9,9,['#3f7d68','#4a8a72','#37705f'])}
+  <path d="${pathFrom(h1,H)}" fill="url(#tsH1)"/>${trees(h1,2,X0,X1,9,9,['#3f7d68','#4a8a72','#37705f'],.3,['#5a9a6e','#68a876','#4c8a64'])}
   <path d="M-80 ${f1(yAt(h1,-80)+8)}C40 ${f1(yAt(h1,40)+14)} 120 ${f1(yAt(h1,120)+5)} 190 ${f1(yAt(h1,190)+12)}S330 ${f1(yAt(h1,330)+20)} 520 ${f1(yAt(h1,520)+10)}" stroke="url(#tsRiv)" stroke-width="5" fill="none" opacity=".8" stroke-linecap="round"/>
   <g class="tsDr" style="animation-duration:100s;animation-delay:-30s"><ellipse cx="120" cy="436" rx="420" ry="18" fill="url(#tsMist)"/></g>
-  <path d="${pathFrom(h2,H)}" fill="url(#tsH2)"/>${trees(h2,4,X0,X1,10,13,['#2a6a58','#33776a','#245c52'])}
-  <path d="M-700 ${f1(yAt(h2,-700)+12)}L1100 ${f1(yAt(h2,1100)+12)}L1100 ${H}L-700 ${H}Z" fill="url(#tsH3)"/></g>
+  <path d="${pathFrom(h2,H)}" fill="url(#tsH2)"/>${trees(h2,4,X0,X1,10,13,['#2a6a58','#33776a','#245c52'],.28,['#3f8a62','#4a9a6c','#357a58'])}
+  <path d="M-700 ${f1(yAt(h2,-700)+12)}L1100 ${f1(yAt(h2,1100)+12)}L1100 ${H}L-700 ${H}Z" fill="url(#tsH3)"/>${forest(h2)}</g>
   <g id="tsCliff" transform="translate(0 -34)">
   <path d="${bodyD}" fill="url(#tsGnd)"/>
   <g opacity=".9">${slopeShade}</g>
@@ -26247,6 +26332,8 @@ init();
 .tsT .tsAura{transform-box:fill-box;transform-origin:50% 100%;animation:tsAura 6s ease-in-out infinite}
 .tsT .tsSmoke{transform-box:fill-box;transform-origin:50% 100%;opacity:0;animation:tsSmoke 15s ease-out infinite}
 .tsT .tsLavaP{animation:tsLavaP 4.5s ease-in-out infinite}
+.tsT .tsChim{transform-box:fill-box;transform-origin:50% 100%;opacity:0;animation:tsChim 5s ease-out infinite}
+.tsT .tsTw{animation:tsTw 3.2s ease-in-out infinite}
 .tsT .tsDr{animation:tsDrift 140s ease-in-out infinite alternate}
 .tsT .tsBird{animation:tsFly 40s linear infinite}
 .tsT .tsWing{transform-box:fill-box;transform-origin:50% 100%;animation:tsFlap .55s ease-in-out infinite alternate}
@@ -26256,6 +26343,8 @@ init();
 @keyframes tsAura{0%,100%{opacity:.55;transform:scale(.94)}50%{opacity:1;transform:scale(1.06)}}
 @keyframes tsSmoke{0%{opacity:0;transform:translate(0,0) scale(.5)}14%{opacity:.75}100%{opacity:0;transform:translate(36px,-84px) scale(2.2)}}
 @keyframes tsLavaP{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes tsChim{0%{opacity:0;transform:translate(0,0) scale(.6)}20%{opacity:.7}100%{opacity:0;transform:translate(3px,-9px) scale(2)}}
+@keyframes tsTw{0%,100%{opacity:.12}50%{opacity:.95}}
 @keyframes tsKen{from{transform:scale(1.0)}to{transform:scale(1.045)}}
 @keyframes tsBreath{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.025)}}
 @keyframes tsSfK{0%{opacity:1}37%{opacity:0}100%{opacity:0}}
