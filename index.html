@@ -20797,11 +20797,15 @@ function wgPanelOne(m,sub){
  // 오늘의 추천: 이번 주 목표 중 아직 덜 채운 영역 하나(오늘 푼 문제가 적은 것 먼저), 다 채웠으면 첫 영역
  const todo=rows.filter(r=>r.n<WG_NEED).sort((a,b)=>a.t-b.t||a.n-b.n);
  const rec=todo[0]||rows[0];
- return `<div class=panel id=${sid} style="border-left:6px solid ${rec.d.c}"><div class=row style="align-items:center;gap:8px"><h3 style="margin:0">🎯 이번 주 목표</h3><span class=pill style="font-size:12px">${NK_SUBN[sub]}</span><span class=hudSp></span><span class=mut style="font-size:12px">오늘의 추천 영역</span></div>
+ const __h=`<div class=panel id=${sid} style="border-left:6px solid ${rec.d.c}"><div class=row style="align-items:center;gap:8px"><h3 style="margin:0">🎯 이번 주 목표</h3><span class=pill style="font-size:12px">${NK_SUBN[sub]}</span><span class=hudSp></span><span class=mut style="font-size:12px">오늘의 추천 영역</span></div>
   <div class=row style="margin-top:8px;align-items:center;gap:10px;flex-wrap:wrap"><div style="flex:1;min-width:160px;font-size:15px;line-height:1.5">${allDone?'이번 주 목표를 모두 채웠어요! 🎉':`오늘은 <b>${rec.d.ic} ${rec.d.n}</b> 어때요?`}</div><button class="btn red wgGo" data-sub="${sub}" data-k="${rec.d.k}">${rec.d.n} 8문제</button></div>
   <div style="display:grid;gap:6px;margin-top:10px">${rows.map(r=>{const p=Math.min(100,Math.round(r.n/WG_NEED*100));return `<div style="display:flex;align-items:center;gap:8px"><span style="min-width:112px;font-size:13px"><b>${r.d.ic} ${r.d.n}</b></span><div style="flex:1;height:14px;background:#f0e8d8;border-radius:7px;overflow:hidden"><i style="display:block;height:100%;width:${p}%;background:${r.d.c}"></i></div><span style="min-width:44px;text-align:right;font-size:13px;font-weight:700">${r.n>=WG_NEED?'✓':r.n+'/'+WG_NEED}</span></div>`;}).join('')}</div>
   <div class="wgRew${allDone&&!g.claimed?' rdy':''}"><div class=wgRewTop><span class=mut style="font-size:12px">세 영역을 각각 <b>${WG_NEED}문제</b> 이상 풀면 (훈련·전투·포획 모두 세요)</span></div>
-   <div class="wgRewRow${g.claimed?' one':''}"><span class="wgChip pk">${I('pack','wgIc')||'🎴'}<b>카드팩 ${WG_PACKS}개</b></span><span class="wgChip cn">${I('coin','wgIc')}<b>코인 ${WG_COINS}</b></span><span class=hudSp></span>${g.claimed?'<span class=pill>받았어요 ✓</span>':allDone?`<button class="btn gold wgClaim" data-sub="${sub}">보상 받기!</button>`:''}</div></div></div>`;}
+   <div class="wgRewRow${g.claimed?' one':''}"><span class="wgChip pk">${I('pack','wgIc')||'🎴'}<b>카드팩 ${WG_PACKS}개</b></span><span class="wgChip cn">${I('coin','wgIc')}<b>코인 ${WG_COINS}</b></span><span class=hudSp></span>${g.claimed?'<span class=pill>받았어요 ✓</span>':allDone?`<button class="btn gold wgClaim" data-sub="${sub}">보상 받기!</button>`:''}</div></div></div>`;
+ if(!allDone)return __h;
+ /* 목표를 다 채우면 한 줄로 접어요. 눌러서 다시 펼칠 수 있어요 */
+ const inner=__h.replace(/^<div class=panel id=\S+ style="[^"]*">/,'').replace(/<\/div>$/,'');
+ return `<div class="panel wgDone" id=${sid} style="border-left:6px solid ${rec.d.c}"><div class=wgSum role=button tabindex=0 aria-expanded=false><h3>🎯 이번 주 목표</h3><span class=pill style="font-size:12px">${NK_SUBN[sub]}</span><span class=hudSp></span>${g.claimed?'<span class="pill wgOk">달성 ✓</span>':`<button class="btn gold sm wgClaim" data-sub="${sub}">보상 받기!</button>`}<span class=wgCh aria-hidden=true>▾</span></div><div class=wgBody>${inner}</div></div>`;}
 function wgPanel(m){if(!m.train||!m.train.count)return '';
  try{return wgSubsFor(m).map(s=>wgPanelOne(m,s)).join('');}catch(e){return '';}}
 function wgClaimSub(m,sub){const g=sub==='math'?m.wg:(m.wgx||{})[sub];if(!g||g.claimed)return;
@@ -20829,7 +20833,6 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
   <div class=tiles>
    <button class="tile main" id=tTrain>${done?'':'<i class=newTag>오늘!</i>'}<span class=ti>${I('flame','ti')}</span><span><span class=tn>오늘의 훈련</span><br><span class=td>${done?'오늘 훈련 완료! 한 번 더 하면 사탕을 더 받아요.':`문제 ${trainN()}개 · 오늘의 카드팩 받기`}${gh?`<br>어제의 나: ${gh.n}문제 중 ${gh.c}개 정답`:''}${(()=>{try{const n=wbDueList(m).length;return n?`<br>📅 복습할 틀린 문제 ${n}개가 섞여 나와요`:'';}catch(e){return '';}})()}</span></span></button>
    ${tiles}</div>
-  ${next?`<div class=nextFeat>${I('lock')} 다음에 열릴 기능: <b>${next.n}</b> — ${next.how}</div>`:''}
   <div class=nextFeat>${esc(semName(m.gs))}${m.uMax&&m.uMax<20?` ${m.uMax}단원`:''}까지의 문제가 나와요 (약한 개념은 아래 학년 기초도 나와요) · <a href="#" id=hCode style="color:inherit">학년 변경</a></div></div>`;
  bindHud();wgBind(m);
  $('#hTrainerSkills').onclick=()=>{sfx('tap');renderTrainerSkills();};
@@ -37416,7 +37419,7 @@ function finish(m){m.rank=(Array.isArray(m.rank)?m.rank:[]).map(p=>({pid:String(
    if(accW&&accW.pid===me.pid){const id3=pk(POOL[5]);let g3=null;try{g3=gainCard(id3);}catch(e){}if(g3)gains.push({id:g3.id||id3,g:g3});rw+='<div class=box style="border-color:#3ff;text-align:center;font-size:20px">🎯 정답률 1위 추가 보상 — 5성 조각 획득!<br>'+card(id3,g3)+'</div>';}
    try{autoSave();}catch(e){}try{saveLocal();}catch(e){}}}
  const show=anim=>{if(!C||C.phase!=='end'||!root)return;root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\MONSTUDY\\RESULT.EXE</b></div><div class=dosP><div class="dl ttl s" id=hbTt></div>'+rw+accBox(accW)+'<div class=box>'+m.rank.map(p=>'<div style="padding:4px 0;border-bottom:1px dashed #0a85;'+(p.pid===C.pid?'color:#ff6':'')+'">'+(p.r<=3?['🥇','🥈','🥉'][p.r-1]:p.r+'위')+' <b>'+ttTxt(p.t)+esc(p.n)+'</b>'+(accW&&accW.pid===p.pid?' <span class=dtt>🎯 정답률 1위</span>':'')+' — '+p.s+'점 · 카드 '+p.tot+'장 · ★1~5: '+p.st.join('/')+accRow(p)+'</div>').join('')+'</div><button class="dbt q" data-x=quit>✖ 닫기</button></div></div><div id=hbP class=pop></div></div>';tline($h('#hbTt'),'> 게임 종료'+(m.why==='all'?' (모든 포켓몬을 모았어요!)':''),2);root.onclick=e=>{if(e.target.dataset&&e.target.dataset.x==='quit')quit();};;if(gains.length){const gg=gains.splice(0),rk=me?me.r:0,ttl=rk>=1&&rk<=3?['🥇','🥈','🥉'][rk-1]+' '+rk+'등! 해킹 배틀 보상 카드':'🎁 해킹 배틀 보상 카드';setTimeout(async()=>{if(!C||C.phase!=='end'||!root)return;document.body.classList.add('hbRw');try{await cardRewardFx(gg,{title:ttl,logo:'HACK REWARD'});}catch(e){console.warn('hb reward fx',e);}document.body.classList.remove('hbRw');},reduceMo()?200:900);}if(anim&&!reduceMo()){const w0=root.firstChild;if(w0&&w0.classList)w0.classList.add('hkOn');}};endCut(m,show);}
-function quit(){try{S.curQ=null;}catch(e){}try{const mt=document.getElementById('hbMt');if(mt)mt.remove();}catch(e){}clearInterval(uiT);if(H){clearInterval(H.tm);clearInterval(H.botT);try{H.peer.destroy();}catch(e){}H=null;}try{C&&C.peer&&C.peer.destroy();}catch(e){}C=null;root.className='';root.innerHTML='';setTimeout(hbBgm,0);try{if(typeof renderPvp==='function'){renderPvp();}else{S.screen='hub';renderHub();}}catch(e){try{S.screen='hub';renderHub();}catch(e2){}}}
+function quit(){try{S.curQ=null;}catch(e){}try{const mt=document.getElementById('hbMt');if(mt)mt.remove();}catch(e){}clearInterval(uiT);if(H){clearInterval(H.tm);clearInterval(H.botT);try{H.peer.destroy();}catch(e){}H=null;}try{C&&C.peer&&C.peer.destroy();}catch(e){}C=null;root.className='';root.innerHTML='';setTimeout(hbBgm,0);try{S.screen='hub';S.hubTab='adv';renderHub();}catch(e){}}  /* 해킹 배틀은 모험 탭 메뉴라서 끝나면 모험 탭으로 돌아와요 */
 /* ---------- 배경음악: 해킹 배틀 전용 곡 (게임의 MUS 엔진에 곡만 등록해서 써요) ----------
    hack  = 사이버 해킹 분위기(프리지안 단조 · 달리는 16분 아르페지오 · 펌핑 톱니파 베이스 · 4박 킥)
    hackL = 같은 곡의 '마지막 30초' 빠른 버전(템포↑ · 드럼 풀 · 종소리)
@@ -37443,7 +37446,7 @@ let musMo=null;function musWatch(){if(musMo||!root||typeof MutationObserver==='u
 function open(){if(!sumOK()){toast('설정 오류: 확률 합계가 100이 아니에요');return;}if(!root){root=document.createElement('div');root.id='hb';document.body.appendChild(root);try{new MutationObserver(()=>document.body.classList.toggle('hbOn',root.classList.contains('on'))).observe(root,{attributes:true,attributeFilter:['class']});}catch(e){}}
  C={phase:'menu',role:null,me:{own:[],sc:0,tot:0,def:0,lock:0},mode:null};S.screen='hb';root.className='on';paintMenu();musWatch();musBtn();hbBgm();}
 function addModeBtn(){const box=document.querySelector('#view .t2modes');if(!box||box.querySelector('[data-hb]'))return;const b=document.createElement('button');b.className='t2mode';b.setAttribute('data-hb','1');b.id='pvMHack';b.style.cssText='grid-column:1/-1;background:linear-gradient(180deg,#14304f,#07101f);border-color:#2fd6ff;color:#aef;box-shadow:0 4px 0 #0a3a5c';b.innerHTML='<span class=t2mi>🕶️</span><b style="color:#3ff">도감 해킹 배틀</b><small style="color:#9fe;opacity:.9">여러 친구와 함께! 문제를 풀어 카드를 모으고 해킹으로 빼앗아요</small>';b.onclick=e=>{e.stopPropagation();try{sfx('tap');}catch(_){}open();};box.appendChild(b);}
-if(typeof renderPvp==='function'){const rp=renderPvp;renderPvp=function(){const r=rp.apply(this,arguments);try{addModeBtn();}catch(e){console.warn('hb mode btn',e);}return r;};}
+if(typeof renderPvp==='function'){const rp=renderPvp;renderPvp=function(){const r=rp.apply(this,arguments);return r;  /* 해킹 배틀은 홈 > 모험 탭의 별도 메뉴로 옮겼어요 */};}
 /* ---------- 🎲 랜덤 매칭: 지금은 AI 3명과 한 방에서 해요 (진짜 자동 매칭을 넣을 땐 이 부분만 바꿔요) ---------- */
 /* 방장이 대기실에서 AI 친구를 더하거나 빼요 (학생 2명이 할 때 AI를 몇 명 더해서 같이 하기). AI 이름 앞에는 🤖 가 붙어요 */
 const AI_FB=['별빛','도토리','파랑새','구름','하늘','달토끼','솜사탕','번개','바람','초코','나무','불꽃'];
@@ -37506,7 +37509,7 @@ function randHB(nm){
  at(()=>{stop();if(!C||C.phase!=='menu'||!root||!root.classList.contains('on'))return;C.name=nm;hostLocalAI(nm,names,dur);},tEnd+1400);
 }
 window.HB={CFG,MINI,open,_t:!window.__sim?undefined:{hostStart,hostBegin,idPick,idWait,get Cc(){return C;},showPick,showRes,showHack,pkRow,hbPick,cm,finish,question,hjoin,rhash,snapPk,becomeHost,migrate,hostTick,get H(){return H;},setH(h){H=h;},setC(c){C=c;},newP,give,mult,take,calc,endGame,hmsg,mkSlot,pools,sumOK,cmp}};
-try{if(S.screen==='pvp')addModeBtn();}catch(e){}
+
 setInterval(()=>{if(C&&C.role==='guest'&&C.phase==='play'){tx({t:'hb'});}else if(C&&C.role==='guest'&&(C.phase==='lobby'||C.phase==='pick')){tx({t:'hb'});}},4000);
 })();
 </script>
@@ -37839,6 +37842,84 @@ html body .pill[role=button]:active,html body button.rl-chip:active{transform:tr
   paintWal();paintList();paintStage();paintBtn();
   try{njThumbs().then(()=>{if(document.getElementById('pskList')){paintList();paintBtn();}});}catch(e){}
  };
+})();
+</script>
+
+<script>
+/* ===== 홈 하단 탭바: 홈 / 모험 / 카드 / 나 ===== */
+(function(){
+ const TABS=[['home','홈','home'],['adv','모험','sword'],['card','카드','cards'],['me','나','medal']];
+ const css=document.createElement('style');css.id='hubTabCss';css.textContent=`
+#view[data-htab="home"] [data-ht]:not([data-ht="home"]),#view[data-htab="adv"] [data-ht]:not([data-ht="adv"]),#view[data-htab="card"] [data-ht]:not([data-ht="card"]),#view[data-htab="me"] [data-ht]:not([data-ht="me"]){display:none!important}
+html{--tbh:calc(66px + var(--sb))}
+#view:has(.hubTab){padding-bottom:calc(var(--tbh) + 18px)}
+html body .hubTab{position:fixed;left:0;right:0;top:calc(var(--vt) + var(--vh) - var(--tbh));height:var(--tbh);z-index:21;box-sizing:border-box;display:flex;justify-content:center;gap:6px;padding:9px max(10px,calc((100% - 560px)/2)) calc(7px + var(--sb));background:#efe9d8;border-top:0;box-shadow:0 -3px 0 #e3a92e,0 -7px 0 rgba(185,143,62,.28),0 -10px 18px rgba(60,40,10,.12);isolation:isolate}
+html body .hubTab::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:rgba(255,255,255,.75);pointer-events:none}
+html body .hubTab button{position:relative;flex:1 1 0;min-width:0;max-width:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px 4px 0;border-radius:11px;border:2px solid transparent;background:transparent;color:#6b5a3e;font-family:'Jua','Galmuri11',sans-serif;font-size:13px;line-height:1.1;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s}
+html body .hubTab button:active{transform:translateY(2px)}
+html body .hubTab button .ic{width:28px;height:28px;filter:grayscale(.35) opacity(.8)}
+html body .hubTab button.on{background:linear-gradient(180deg,#4a4f94,#2f3470);border-color:#1d2050;color:#ffe27a;text-shadow:0 2px 0 #1d2050;box-shadow:inset 0 2px 0 rgba(255,255,255,.25),0 3px 0 rgba(29,32,80,.45)}
+html body .hubTab button.on .ic{filter:none}
+html body .hubTab .tbDot{position:absolute;top:1px;right:calc(50% - 25px);min-width:17px;height:17px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:#e8453c;border:2px solid #fff6dc;color:#fff;font:700 10px/13px 'Noto Sans KR',sans-serif;text-align:center;text-shadow:none}
+html body .hubTab .tbDot.pt{min-width:13px;width:13px;height:13px;padding:0;top:3px;right:calc(50% - 22px)}
+/* 이번 주 목표: 달성하면 한 줄로 접혀요 */
+.wgDone .wgSum{display:flex;align-items:center;gap:8px;cursor:pointer}
+.wgDone .wgSum h3{margin:0;font-size:inherit}
+.wgDone .wgOk{color:#2f8f5b}
+.wgDone .wgCh{font-size:15px;color:#8a7650;transition:transform .2s}
+.wgDone.open .wgCh{transform:rotate(180deg)}
+.wgDone .wgBody{display:none;margin-top:8px}
+.wgDone.open .wgBody{display:block}
+`;
+ document.head.appendChild(css);
+ const $$=(q,r)=>[...(r||document).querySelectorAll(q)];
+ const tag=(el,t)=>{if(el)el.dataset.ht=t;};
+ function layout(){
+  const v=document.getElementById('view'),wrap=v&&v.querySelector(':scope > .wrap');if(!wrap||!wrap.querySelector('#tTrain'))return false;
+  const tiles=wrap.querySelector(':scope > .tiles'),q=s=>wrap.querySelector(s);
+  const train=q('#tTrain'),trainRow=train&&train.closest('.tileRow'),scRow=q('#scHubTile')&&q('#scHubTile').closest('.tileRow');
+  const rescue=q('[data-f=rescue]'),map=q('[data-f=map]'),garden=q('#gardenPanel'),trade=q('#tradePanel');
+  /* 한 줄 짝 바꾸기: [오늘의 훈련 | 학습 지도] , 구출 미션은 모험으로 */
+  if(trainRow&&rescue&&map&&scRow&&tiles){tiles.insertBefore(rescue,scRow.nextSibling);trainRow.appendChild(map);}
+  /* 정원은 카드 탭의 맨 아래(교환 위)로 */
+  if(garden&&trade)wrap.insertBefore(garden,trade);
+  const home=[wrap.querySelector('.hubTop'),trainRow||train];
+  $$(':scope > *',wrap).forEach(e=>tag(e,'home'));
+  $$(':scope > *',tiles||document.createElement('i')).forEach(e=>tag(e,'home'));
+  tag(garden,'card');tag(trade,'card');
+  tag(scRow,'adv');['rescue','league','endless','pvp','bosscoop'].forEach(k=>tag(q('[data-f='+k+']'),'adv'));
+  ['pack','dex','deck'].forEach(k=>tag(q('[data-f='+k+']'),'card'));
+  /* 도감 해킹 배틀: 보스전 뒤에 별도 메뉴로 */
+  if(tiles&&!tiles.querySelector('#hbHubTile')){const boss=q('[data-f=bosscoop]');const b=document.createElement('button');b.className='tile';b.id='hbHubTile';b.type='button';
+   b.innerHTML='<span class=ti><span style="font-size:44px;line-height:1;display:block">🕶️</span></span><span class=tn>도감 해킹 배틀</span><span class=td>여러 친구와 카드를 모아요 · 해킹으로 빼앗기</span>';
+   b.onclick=()=>{try{sfx('tap');}catch(e){}try{window.HB.open();}catch(e){console.warn(e);}};
+   if(boss)boss.after(b);else tiles.appendChild(b);}
+  tag(q('#hbHubTile'),'adv');
+  ['season','grow','ach','card'].forEach(k=>tag(q('[data-f='+k+']'),'me'));
+  tag(q('.tsPanel'),'me');
+  if(tiles)tag(tiles,'');
+  if(tiles)delete tiles.dataset.ht;
+  return true;}
+ function bar(){
+  let m;try{m=S.meta;}catch(e){m={};}
+  let dot={};try{if(m.train&&m.train.daily!==today())dot.home='pt';if(m.packs>0)dot.card=m.packs>99?'99+':m.packs;}catch(e){}
+  const cur=S.hubTab||'home';
+  return `<nav class=hubTab role=tablist aria-label="홈 메뉴">${TABS.map(t=>`<button type=button role=tab data-tb="${t[0]}" aria-selected="${t[0]===cur}" class="${t[0]===cur?'on':''}">${I(t[2])}<span>${t[1]}</span>${dot[t[0]]?`<i class="tbDot${dot[t[0]]==='pt'?' pt':''}">${dot[t[0]]==='pt'?'':dot[t[0]]}</i>`:''}</button>`).join('')}</nav>`;}
+ function show(k){const v=document.getElementById('view');if(!v)return;S.hubTab=k;v.dataset.htab=k;
+  $$('.hubTab button',v).forEach(b=>{const on=b.dataset.tb===k;b.classList.toggle('on',on);b.setAttribute('aria-selected',on);});}
+ const prev=renderHub;
+ renderHub=function(){
+  const r=prev.apply(this,arguments);
+  try{
+   const v=document.getElementById('view');if(!v||S.screen!=='hub'||!layout())return r;
+   v.querySelectorAll('.hubTab').forEach(e=>e.remove());
+   v.insertAdjacentHTML('beforeend',bar());
+   show(S.hubTab||'home');
+   $$('.hubTab button',v).forEach(b=>b.onclick=()=>{if(b.dataset.tb===S.hubTab){v.scrollTo({top:0,behavior:'smooth'});return;}try{sfx('tap');}catch(e){}show(b.dataset.tb);v.scrollTop=0;});
+  }catch(e){console.warn('hubTab',e);}
+  return r;};
+ document.addEventListener('click',e=>{const h=e.target.closest&&e.target.closest('.wgSum');if(!h||e.target.closest('.btn'))return;const p=h.parentNode;p.classList.toggle('open');h.setAttribute('aria-expanded',p.classList.contains('open'));});
+ document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('wgSum')){e.preventDefault();e.target.click();}});
 })();
 </script>
 
