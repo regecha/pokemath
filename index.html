@@ -4018,7 +4018,8 @@ const clMyId=()=>String((CL.user&&CL.user.email)||'').replace(CLOUD_MAIL,'');
  +'.cConsent{font-size:13px;line-height:1.6;background:#fff8e6;border:2px solid #f1d27a;border-radius:12px;padding:6px 10px;margin:6px 0}'
  +'.cRem{display:flex;gap:6px;align-items:flex-start;font-size:13px;margin:6px 0;line-height:1.4}'
  +'#cloudChip{position:fixed;right:8px;top:calc(var(--vt,0px) + 71px);z-index:90;font:700 11px/1.2 "Jua",sans-serif;padding:3px 8px;border-radius:999px;border:2px solid #9be0a2;background:rgba(255,255,255,.94);color:#2a6f35;opacity:.92}'
- +'#cloudChip.bad{border-color:#e8a1a1;color:#b3262c;background:#fff1f1}';
+ +'#cloudChip.bad{border-color:#e8a1a1;color:#b3262c;background:#fff1f1}'
+ +'body.gfBig #cloudChip,body.rltOpen #cloudChip,body:has(.gpWrap) #cloudChip{z-index:50;pointer-events:none}';
  (document.head||document.documentElement).appendChild(st);}catch(e){}})();
 
 // ---------- 상태 표시(오른쪽 위 작은 알약) ----------
@@ -4032,7 +4033,23 @@ function clChipRender(){let c=document.getElementById('cloudChip');
  else if(CL.state==='conflict'||CL.state==='hold'||!CL.ready){txt='⚠️ 기록 확인이 필요해요';cls='bad';}
  else if(!CL.pref.auto){txt='☁️ 자동 올리기 꺼짐';}
  else{txt='☁️ 로그인됨'+(CL.lastPush?` · ${pad2(t.getHours())}:${pad2(t.getMinutes())} 저장`:'');}
- c.textContent=txt;c.className=cls;c.style.display='';}
+ c.textContent=txt;c.className=cls;c.style.display='';try{clChipPlace(c);}catch(e){}}
+// 로그인 표시는 글씨·버튼·칩 위를 덮지 않는 자리를 골라 앉아요 (위 오른쪽 → 맨 위 → 아래 오른쪽 → 아래 왼쪽 순서로 살펴봐요)
+function clChipCovers(e){if(!e||e===document.body||e===document.documentElement||e.id==='view')return false;
+ try{if(e.closest('button,a,input,select,textarea,canvas,img,svg,.pill,.btn,.rl-chip,.scv-tag'))return true;}catch(er){}
+ return [...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim());}
+function clChipPlace(c){
+ const vt='var(--vt,0px)',sb='env(safe-area-inset-bottom,0px)';
+ const spots=[{top:`calc(${vt} + 71px)`,right:'8px'},{top:`calc(${vt} + 2px)`,right:'8px'},{bottom:`calc(${sb} + 10px)`,right:'8px'},{bottom:`calc(${sb} + 10px)`,left:'8px'}];
+ c.style.visibility='hidden';let best=null,bn=1e9;
+ for(const sp of spots){
+  c.style.top=c.style.bottom=c.style.left=c.style.right='auto';Object.assign(c.style,sp);
+  const r=c.getBoundingClientRect();let n=0;
+  for(const fx of [.1,.5,.9])for(const fy of [.25,.75]){n+=clChipCovers(document.elementFromPoint(r.left+r.width*fx,r.top+r.height*fy))?1:0;}
+  if(n<bn){bn=n;best=sp;}if(n===0)break;}
+ c.style.top=c.style.bottom=c.style.left=c.style.right='auto';Object.assign(c.style,best);c.style.visibility='';}
+(function(){let t=0;const go=()=>{if(t)return;t=setTimeout(()=>{t=0;try{const c=document.getElementById('cloudChip');if(c&&c.style.display!=='none')clChipPlace(c);}catch(e){}},300);};
+ addEventListener('scroll',go,{capture:true,passive:true});addEventListener('resize',go);})();
 setInterval(()=>{try{if(CL.user)clChipRender();}catch(e){}},2500);
 
 // ---------- Firebase 프로그램 불러오기 ----------
@@ -18315,7 +18332,7 @@ function gpOpen(gi,resume){
  GP.held=[];GP.pend=-1;GP.just=false;GP.path=[];GP.ptalk=null;GP.last=0;GP._sk=null;
  GP.D={on:false,pages:[],pi:0,ch:[],shown:0,lastN:-1,state:'',opt:{},sel:0};
  const w=document.createElement('div');w.className='gpWrap '+(th.cls||'');w.id='gpWrap';
- w.innerHTML=`<div class=gpBox><div class=gpHead><h3 id=gpTt></h3><button type=button tabindex=-1 class="gpChip gpChipB" id=gpC1>🃏 덱</button><button type=button tabindex=-1 class="gpChip gpChipB" id=gpC2>🛡️ 스킬</button><button type=button tabindex=-1 class="gpChip gpChipB gfPadTog">⌨ 키패드</button><button class=gpX id=gpX aria-label=닫기>✕</button></div>
+ w.innerHTML=`<div class=gpBox><div class=gpHead><h3 id=gpTt></h3><button type=button tabindex=-1 class="gpChip gpChipB" id=gpC1>🃏 덱</button><button type=button tabindex=-1 class="gpChip gpChipB" id=gpC2>🛡️ 스킬</button><button type=button tabindex=-1 class="gpChip gpChipB gfPadTog">⌨ 키패드</button><button type=button tabindex=-1 class="gpChip gpChipB gfFsBtn" aria-label="전체 화면">🖥 전체</button><button class=gpX id=gpX aria-label=닫기>✕</button></div>
  <div class=gpStage id=gpStage><canvas id=gpCv width=${GP_C*GP_T} height=${GP_R*GP_T}></canvas><div class=gpEnt id=gpEnt></div><div class=gpFade id=gpFade></div><div class="gf-box" id=gpBx><span id=gpTx></span><i class="gf-more" id=gpMore>▼</i></div><div class="gf-menu" id=gpMn></div></div>
  <div class="gf-pad"><div class="gf-joy" id=gpJoy aria-label="이동 조이스틱"><span class="ja u">▲</span><span class="ja d">▼</span><span class="ja l">◀</span><span class="ja r">▶</span><div class="gf-knob"></div></div>${gfDpadHTML()}<div class="gf-ab"><button data-k="b">B</button><button data-k="a">A</button></div></div>
  <div class=gpHint><span class=pc>방향키·WASD 이동 · 스페이스/Enter/Z 말 걸기·확인 · X/Esc 취소 · </span>터치는 아래 빈 공간 아무 데나 눌러 조이스틱(⌨ 키패드 버튼으로 십자키 전환), 화면을 톡 누르면 그 자리까지 자동 이동, 꾹 누른 채 끌면 그 방향으로 걸어요</div></div>`;
@@ -20852,7 +20869,7 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
  $('#view').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{sfx('tap');const k=b.dataset.f;if(m.unlNew[k]){delete m.unlNew[k];autoSave();}NAV[k]();});
  if(S.lvUp)levelUpFx();
  featTick();setTimeout(achCelebrate,600);
- if(!m.seen.c_hub)setTimeout(()=>coachOnce('c_hub',[{el:'#tTrain',h:'트레이너 방',img:spriteURL(partner,'front'),t:'여기가 내 방이에요. 매일 <b>오늘의 훈련</b>부터 시작해요! 훈련을 하면 새 기능이 하나씩 열려요.'}]),400);}
+ if(!m.seen.c_hub){m.seen.c_hub=1;autoSave();} /* 예전 '트레이너 방' 안내는 처음 시작 안내(순서대로 하이라이트)의 홈 탭 단계로 옮겼어요 */}
 const bestPartner=()=>partnerId();
 function hubLine(){const m=S.meta;const d=dayRec();const s=streakDays();
  if(!m.train.count)return '첫 훈련으로 오늘의 나를 기록해 봐요!';
@@ -28479,7 +28496,7 @@ window.TUT_A={begin,afterStarter,abort,parts,get state(){return cur;},
   const bt=document.getElementById('battle');
   if(SKIP[S.screen]||(bt&&bt.classList.contains('on')))return;
   if(v.querySelector('.scHomeBtn')||v.querySelector('#hHome')||v.querySelector(':scope>.title'))return;
-  const b=document.createElement('button');b.type='button';b.className='btn ghost sm scHomeBtn';b.title='홈으로';b.setAttribute('aria-label','홈으로');b.innerHTML=I('ball');b.onclick=goHome;
+  const b=document.createElement('button');b.type='button';b.className='btn ghost sm scHomeBtn';b.title='홈으로';b.setAttribute('aria-label','홈으로');b.innerHTML=I('home');b.onclick=goHome;
   const pg=v.querySelector('.sc-page');
   if(pg){const bar=pg.querySelector('.scv-bar');if(bar)bar.insertBefore(b,bar.firstChild);else{b.classList.add('scHomeFloat');pg.appendChild(b);}return;}
   if(v.querySelector('.hud'))return;
@@ -28487,6 +28504,25 @@ window.TUT_A={begin,afterStarter,abort,parts,get state(){return cur;},
  }catch(e){}}
  try{const v=document.getElementById('view');new MutationObserver(()=>setTimeout(ensure,0)).observe(v,{childList:true});}catch(e){}
  try{ensure();}catch(e){}
+})();
+
+// 전체 화면 버튼: 허브·전투 말고도 시나리오·로그라이크·정원 등 모든 일반 화면에 있어요 (이미 있으면 안 만들어요)
+(function(){
+ const SKIP2={battle:1,scenarioBattle:1,scenarioRLBattle:1,pvp:1,bosscoop:1};
+ function mk(cls){const b=document.createElement('button');b.type='button';b.className=cls;b.title='전체 화면';b.setAttribute('aria-label','전체 화면');b.innerHTML=I('full','fsO')+I('fullx','fsX');return b;}
+ function ensureFs(){try{
+  const v=document.getElementById('view');if(!v)return;
+  const bt=document.getElementById('battle');
+  if(SKIP2[S.screen]||(bt&&bt.classList.contains('on')))return;
+  if(v.querySelector('.fsBtn')||v.querySelector('.hud'))return;
+  const pg=v.querySelector('.sc-page'),bar=pg&&pg.querySelector('.scv-bar');
+  if(bar){const b=mk('btn ghost sm fsBtn gfFsBtn');const g=bar.querySelector('.scSetBtn');if(g)bar.insertBefore(b,g);else bar.appendChild(b);return;}
+  v.appendChild(mk('btn ghost sm fsBtn gfFsBtn scFsFloat'));
+ }catch(e){}}
+ try{const st=document.createElement('style');st.textContent='.scFsFloat{position:fixed;top:calc(var(--vt,0px) + 8px);right:8px;z-index:80}';document.head.appendChild(st);}catch(e){}
+ try{const v=document.getElementById('view');new MutationObserver(()=>setTimeout(ensureFs,0)).observe(v,{childList:true});}catch(e){}
+ document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('.gfFsBtn');if(!b)return;e.stopPropagation();e.preventDefault();try{sfx('tap');}catch(er){}try{b.blur();}catch(er){}goFull();},true);
+ try{ensureFs();}catch(e){}
 })();
 
 // 로그라이크 전투 중 '저장하고 나가기': 모험은 그대로 저장하고, 이 전투는 다음에 처음부터 다시 시작해요
@@ -33368,7 +33404,7 @@ function mount(run){
  const holder=q('#view .rl-opts');if(!holder||!run||!run.opts)return;
  const th=TH[run.bg]||TH[0],M=genMap(run,run.rv),W=M.W,H=M.H,sheet=makeSheet(th),tufts=makeTufts(th);
  const wrap=document.createElement('div');wrap.className='gf-wrap';
- wrap.innerHTML='<div class="gf-frame"><canvas id="gfCv" width="640" height="576"></canvas><div class="gf-tools"><button type="button" tabindex="-1" class="gfPadTog gf-padtog">⌨ 키패드</button><button type="button" tabindex="-1" class="gf-big" id="gfBig">🖥 크게</button><button type="button" tabindex="-1" class="gf-zoom" id="gfZoom">확대 ×1</button></div><div class="gf-box" id="gfBox"><span id="gfTxt"></span><i class="gf-more" id="gfMore">▼</i></div><div class="gf-menu" id="gfMenu"></div></div>'+
+ wrap.innerHTML='<div class="gf-frame"><canvas id="gfCv" width="640" height="576"></canvas><div class="gf-tools"><button type="button" tabindex="-1" class="gf-home" id="gfHome">🏠 홈</button><button type="button" tabindex="-1" class="gfPadTog gf-padtog">⌨ 키패드</button><button type="button" tabindex="-1" class="gf-big" id="gfBig">🖥 크게</button><button type="button" tabindex="-1" class="gf-zoom" id="gfZoom">확대 ×1</button><button type="button" tabindex="-1" class="gf-home gfFsBtn" aria-label="전체 화면">🖥 전체</button></div><div class="gf-box" id="gfBox"><span id="gfTxt"></span><i class="gf-more" id="gfMore">▼</i></div><div class="gf-menu" id="gfMenu"></div></div>'+
   '<div class="gf-pad"><div class="gf-joy" id="gfJoy" aria-label="이동 조이스틱"><span class="ja u">▲</span><span class="ja d">▼</span><span class="ja l">◀</span><span class="ja r">▶</span><div class="gf-knob"></div></div>'+gfDpadHTML()+'<div class="gf-ab"><button data-k="b">B</button><button data-k="a">A</button></div></div>'+
   '<details class="gf-help"><summary>❓ 조작법 보기</summary><div class="gfh-b">방향키·WASD 이동 · Z/Enter/Space 말 걸기·확인 · X/Esc 취소 · +/- 확대<br>🖥 크게: 필드 창을 화면에 꽉 차게 키워요 · 터치는 필드 아래 빈 공간 아무 데나 눌러서 조이스틱(위쪽 ⌨ 키패드 버튼을 누르면 십자키로 바뀌어요), 또는 화면을 톡 누르면 그 자리까지 자동 이동 · 꾹 누른 채 끌면 그 방향으로 걸어요! 길을 따라 걷다 보면 분기점이 기다리고 있어요.<br>🏺 아래쪽 샛길의 보물상자는 내 유물 · 📖 도감은 내 덱 포켓몬! 말을 걸어 보세요.</div></details>';
  holder.replaceWith(wrap);try{gfPadApply();}catch(e){}
@@ -33393,7 +33429,7 @@ function mount(run){
  let ZM=(()=>{try{const z=+rlMeta().fieldZoom;return z===1.5||z===2?z:1;}catch(e){return 1;}})(),KE=K,VW=CW,VH=CH;
  const ZL=[1,1.5,2],zb=q('#gfZoom');
  if(!document.getElementById('gf-zoom-css')){const st=document.createElement('style');st.id='gf-zoom-css';
-  st.textContent='.gf-tools{position:absolute;top:6px;right:6px;z-index:5;display:flex;gap:6px}.gf-zoom,.gf-big{font:700 13px/1.2 "Jua","Noto Sans KR",sans-serif;color:#fff;background:rgba(43,33,64,.78);border:2px solid #fff;border-radius:999px;padding:4px 11px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.3);-webkit-tap-highlight-color:transparent}.gf-zoom.on,.gf-big.on{background:#ff8a3c}.gf-zoom:active,.gf-big:active{transform:translateY(1px)}';
+  st.textContent='.gf-tools{position:absolute;top:6px;right:6px;z-index:5;display:flex;gap:6px}.gf-zoom,.gf-big,.gf-home{font:700 13px/1.2 "Jua","Noto Sans KR",sans-serif;color:#fff;background:rgba(43,33,64,.78);border:2px solid #fff;border-radius:999px;padding:4px 11px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.3);-webkit-tap-highlight-color:transparent}.gf-zoom.on,.gf-big.on{background:#ff8a3c}.gf-zoom:active,.gf-big:active,.gf-home:active{transform:translateY(1px)}';
   document.head.appendChild(st);}
  const zlab=()=>{zb.textContent='확대 ×'+ZM;zb.classList.toggle('on',ZM>1);};
  const setZoom=d=>{const i=ZL.indexOf(ZM);ZM=ZL[(i+(d||1)+ZL.length)%ZL.length];zlab();try{rlMeta().fieldZoom=ZM;rlSave();}catch(e){}sfx('tap');};
@@ -33430,6 +33466,13 @@ function mount(run){
  const toText=()=>{if(typeof rl2Co==='function'&&rl2Co()){try{rl2FieldExit();}catch(er){}return;}try{sfx('tap');}catch(e){}try{setBig(false,1);}catch(e){}try{const r=RUN();if(r){r.mode='text';rlSave();}}catch(e){}try{rlRenderMap();}catch(e){console.warn('to text',e);}};
  const bigKey=e=>{if(BIG&&e.key==='Escape'){e.stopImmediatePropagation();e.preventDefault();toText();}};
  bb.addEventListener('pointerdown',ev=>ev.stopPropagation());
+ const hb=q('#gfHome');
+ if(hb){hb.addEventListener('pointerdown',ev=>ev.stopPropagation());
+  hb.addEventListener('click',ev=>{ev.stopPropagation();hb.blur();
+   if(typeof rl2Co==='function'&&rl2Co()){try{sfx('tap');}catch(e){}try{rl2FieldExit();}catch(er){}return;} // 2인 모험은 나가기(저장) 확인
+   try{sfx('tap');}catch(e){}try{setBig(false,1);}catch(e){}try{teardownForText();}catch(e){}
+   try{const r=RUN();if(r)rlSave();}catch(e){} // 모험은 그대로 저장 — 모험 메뉴에서 이어하기로 돌아와요
+   try{scBackToHub();}catch(e){console.warn('field home',e);try{renderHub();}catch(e2){}}});}
  wrap.addEventListener('touchmove',e=>{if(BIG&&!(e.target.closest&&e.target.closest('.gf-box')))e.preventDefault();},{passive:false}); // 크게 보기 중에는 바깥을 밀어도 화면이 스크롤되지 않아요
  bb.addEventListener('click',ev=>{ev.stopPropagation();bb.blur();toText();});
  document.addEventListener('click',bigOut,true);document.addEventListener('keydown',bigKey,true);
@@ -34184,8 +34227,8 @@ body.rltOpen #view{overflow:hidden!important}
  body.gfBig .gf-wrap{--gup:max(0px,min(calc(var(--vh) * .12),calc(var(--vh) / 2 - var(--fh) / 2 - 156px)));
   --kp:clamp(46px,calc((var(--vh) / 2 - var(--fh) / 2 - 70px + var(--gup)) / 3),68px);--abs:clamp(54px,calc(var(--kp) * 1.15),78px);--jd:clamp(132px,calc(var(--kp) * 2.8),184px)}
  body.gfBig .gf-frame{top:calc(50% - var(--gup))!important}
- body.gfBig .gf-tools{top:auto;bottom:calc(100% + 16px);left:0;right:0;justify-content:flex-end;gap:8px}
- body.gfBig .gf-tools button{font-size:15px;padding:6px 15px}
+ body.gfBig .gf-tools{top:auto;bottom:calc(100% + 16px);left:0;right:0;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+ body.gfBig .gf-tools button{font-size:15px;padding:6px 12px}
  body.gfBig .gf-hud{bottom:calc(50% + var(--fh) / 2 + 66px + var(--gup))!important}
  body.gfBig .gf-pad.gf-fl{top:calc(50% + var(--fh) / 2 + 22px - var(--gup))!important}
  /* 로그라이크 초기화면 */
@@ -34252,7 +34295,7 @@ function rlTitle(){try{rl2ToSolo();rl2TitleCss();}catch(e){}
  try{rlSetBg('',run?run.bg:(rl.lastBg!=null?rl.lastBg:4));rlShell('',{noRun:true,screen:'scenarioRLEntry'});}catch(e){}
  const sub=run?`${run.floor||1}층 ${Math.min(run.step+1,RL.steps+1)}단계 · HP ${run.hp}/${run.max}`:'';
  ov=document.createElement('div');ov.id='rlTitle';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','몬스터디 로그라이크');
- ov.innerHTML='<div class="rlt-top"><button type="button" tabindex="-1" class="rlt-x gfPadTog">⌨ 키패드</button><button type="button" class="rlt-x" id="rltX">✕ 닫기</button></div>'
+ ov.innerHTML='<div class="rlt-top"><button type="button" tabindex="-1" class="rlt-x gfPadTog">⌨ 키패드</button><button type="button" tabindex="-1" class="rlt-x gfFsBtn" aria-label="전체 화면">🖥 전체</button><button type="button" class="rlt-x" id="rltX">✕ 닫기</button></div>'
   +'<div class="rlt-screen"><canvas class="rlt-cv" width="160" height="144"></canvas>'
   +'<div class="rlt-logo"><span class="rlt-glow"></span><span class="rlt-rb">몬스터디</span><br><b data-t="로그라이크"><span>로그라이크</span></b><i><em></em>끝없는 길<em></em></i><span class="sp s1"></span><span class="sp s2"></span><span class="sp s3"></span></div>'
   +'<div class="rlt-menu" role="menu">'
@@ -35381,34 +35424,55 @@ function rmAdd(id,label,fn){
 })();
 </script>
 <script>
-/* ===== 처음 시작 안내: 순서대로 하이라이트 (v2) ===== */
+/* ===== 처음 시작 안내: 순서대로 하이라이트 (v3) =====
+   순서: 전체 화면 → 홈 탭 → 모험 탭 → 포켓몬 탭 → 나 탭 (탭마다 안내를 전부 끝내고 다음 탭으로)
+   - tab   : 이 안내가 들어 있는 하단 탭. 다른 탭을 보고 있으면 그 탭 버튼을 먼저 하이라이트해서 눌러 보게 해요.
+   - tabGo : 이 단계 자체가 "이 탭을 눌러요" 안내예요. 이미 그 탭이면 건너뛰어요.
+   - deep  : 하위 화면(지도·시나리오 등)에 있는 대상이에요. 홈에서는 hub 대상을 대신 보여 줘요. */
 (function(){
- const K='tourStep',DONE=999;
+ const K='tourStep3',DONE=999; // 순서를 새로 짜서 저장 이름도 새로 써요(예전 진행 위치와 섞이지 않게)
  const mapRow=()=>{const b=document.querySelector('#fClr');return b?b.closest('.setRow'):null;};
- const needTrain={sel:'#tTrain',t:'🔥 먼저 훈련부터!',d:'오늘의 훈련을 풀면 카드팩을 받아요. 훈련을 먼저 눌러 봐요.'};
- const needPack={sel:'[data-f="pack"]',t:'🎴 먼저 카드팩을 열어요',d:'카드팩을 열어 카드를 모아야 덱을 짤 수 있어요.'};
+ const tabSel=k=>'.hubTab [data-tb="'+k+'"]';
+ const TABN={home:['🏠 홈 탭','아래 「홈」 탭을 눌러요.'],adv:['⚔️ 모험 탭','아래 「모험」 탭을 눌러요.'],card:['🎴 포켓몬 탭','아래 「포켓몬」 탭을 눌러요.'],me:['🏅 나 탭','아래 「나」 탭을 눌러요.']};
+ const BACKS=['#rlTitle .rlt-x','#hHome','#rsHome','.scHom','#scHubBack','#rlBack']; // 하위 화면에서 홈으로 돌아오는 버튼들
+ const NOHOME={train:1,result:1,battle:1,title:1,gate:1,name:1,starter:1,scenarioBattle:1,scenarioRLBattle:1};
+ const isFs=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
  const STEPS=[
-  {sel:'#tTrain',t:'🔥 오늘의 훈련',d:'여기부터 시작해요! 문제를 풀면 카드팩을 받아요.'},
-  {sel:'[data-f="pack"]',t:'🎴 카드팩',d:'훈련으로 받은 카드팩을 열어 포켓몬 카드를 모아요.',need:()=>S.meta.packs>0?null:needTrain},
-  {sel:'[data-f="deck"]',t:'🃏 덱 짜기',d:'모은 카드로 나만의 배틀 덱을 만들어요.',need:()=>ownCount()>0?null:(S.meta.packs>0?needPack:needTrain)},
-  {sel:'[data-f="rescue"]',t:'🆘 미션! 포켓몬 구출하기',d:'구하고 싶은 포켓몬을 골라 문제를 풀면 내 포켓몬이 돼요.'},
-  {sel:'#rsPick',hub:'[data-f="rescue"]',hubT:'🆘 미션 화면으로 가요',hubD:'여기를 눌러 들어가서 구출할 포켓몬을 골라요.',soft:1,skipOn:['rescue'],t:'🎯 포켓몬 고르기',d:'여기를 눌러 구출하고 싶은 포켓몬을 한 마리 골라요!'},
-  {sel:'[data-f="endless"]',t:'🌿 야생 포켓몬 포획',d:'문제를 풀다 보면 야생 포켓몬이 나타나요. 맞혀서 잡아 봐요!'},
-  {sel:'#hTrainerSkills',t:'🛡️ 트레이너 스킬',d:'레벨 포인트로 스킬을 배워서 전투에서 써요.'},
-  {sel:'[data-f="league"]',t:'🏆 배틀 리그',d:'내 카드로 배틀! 공격할 때마다 문제를 풀어요.'},
-  {sel:'#scHubTile',t:'🌌 시나리오 모드',d:'이야기를 따라가며 포켓몬을 만나고 해방하는 모드예요.'},
-  {sel:'[data-go="main"]',hub:'#scHubTile',hubT:'🌌 시나리오 모드로 들어가요',hubD:'들어가서 「메인 스토리」를 눌러요.',soft:1,skipOn:['scenarioMap'],t:'📖 메인 스토리',d:'여기를 눌러 메인 스토리로 들어가요!'},
-  {sel:'#scCta',hub:'#scHubTile',hubT:'🌌 시나리오 모드로 들어가요',hubD:'들어가서 이야기를 시작해요.',soft:1,t:'▶ 이야기 시작',d:'이 버튼을 누르면 이야기가 시작돼요!'},
-  {sel:'#rlHubTile',t:'🗺️ 로그라이크 모험',d:'유물을 모으며 끝없는 길을 걷는 모험이에요. 보스에게 도전해요!'},
-  {sel:'[data-f="map"]',t:'🗺 학습 지도',d:'단원을 골라 연습하고, 개념별 별을 모아요.'},
-  {sel:mapRow,hub:'[data-f="map"]',hubT:'🗺 학습 지도로 가요',hubD:'들어가서 집중할 단원을 정해요.',soft:1,t:'🎯 원하는 단원만 집중!',d:'「훈련 집중 단원」을 정하면 그 단원 문제만 나와요. 약한 단원을 골라 집중해 봐요.'},
-  {sel:'#hTrade',t:'🔄 포켓몬 교환',d:'친구와 같은 성급(★)끼리 포켓몬을 1마리씩 바꿔요.',after:()=>{try{if(document.querySelector('.modal.on'))coach([{h:'포켓몬 교환',ic:'teacher',t:'① <b>📤 전송</b>: 보낼 포켓몬을 골라 전송하면 <b>숫자 4자리</b>가 나와요. 친구에게 알려 주세요.<br>② <b>📥 번호로 받기</b>: 친구가 알려 준 번호를 넣고, 내 포켓몬 중 같은 성급(★)의 하나를 골라 바꿔요.<br>※ 같은 성급끼리만 교환할 수 있어요.'}]);}catch(e){}}},
-  {sel:'[data-f="dex"]',t:'📖 도감',d:'모은 카드를 보고, 사탕으로 진화시켜요.'},
-  {sel:'#gardenPanel',manual:1,t:'🌳 나의 정원',d:'공부하며 모은 에너지로 알을 키우고, 포켓몬을 정원에 풀어놓아요. 포켓몬을 터치하면 반응해요!'},
-  {sel:'[data-f="grow"]',t:'📈 나의 학습 기록',d:'틀린 문제를 모은 오답 노트와 주간 리포트를 볼 수 있어요.'},
-  {sel:'[data-f="season"]',t:'📅 시즌',d:'시즌 레벨을 올려 보상을 받아요.'},
-  {sel:'[data-f="bosscoop"]',t:'👥 보스전',d:'친구와 방 번호를 나누고 힘을 합쳐 보스를 공략해요. (대결은 「친구 대전」)'},
-  {sel:'[data-f="ach"]',t:'🏅 도전 과제',d:'열심히 한 만큼 배지가 생겨요.'}
+  /* ── 0. 전체 화면 ── */
+  {sel:'#hFull',hubOnly:1,skipIf:isFs,t:'🖥️ 전체 화면',d:'먼저 오른쪽 위 이 버튼을 눌러 화면을 크게 키워요! (안 되는 기기에서는 「이 단계 넘기기」를 눌러도 돼요)'},
+  /* ── 1. 홈 탭 ── */
+  {tab:'home',sel:'.hubTop',t:'👤 여기가 내 방이에요',d:'내 이름과 함께하는 파트너가 보여요. 「파트너」로 짝꿍을, 「스킨」으로 주인공의 옷을 바꿀 수 있어요. 버튼을 하나 눌러 봐요!'},
+  {tab:'home',sel:'#tTrain',t:'🔥 오늘의 훈련',d:'매일 여기부터 시작해요! 눌러서 첫 훈련을 해 봐요. 문제를 풀면 카드팩을 받아요.'},
+  {tab:'home',sel:'[data-f="map"]',t:'🗺 학습 지도',d:'단원을 골라 연습하고, 개념별 별을 모아요. 눌러서 들어가 봐요!'},
+  {tab:'home',deep:1,sel:mapRow,hub:'[data-f="map"]',hubT:'🗺 학습 지도로 가요',hubD:'들어가서 집중할 단원을 정해요.',soft:1,t:'🎯 원하는 단원만 집중!',d:'「훈련 집중 단원」을 정하면 그 단원 문제만 나와요. 약한 단원을 골라 집중해 봐요.'},
+  {tab:'home',sel:'#englishModePanel',t:'📚 공부 과목 고르기',d:'수학 · 영어 · 영수(섞어서) · 국어 중에서 오늘 공부할 과목을 하나 눌러 골라 봐요.'},
+  /* ── 2. 모험 탭 ── */
+  {tabGo:'adv',sel:tabSel('adv'),t:'⚔️ 모험 탭으로 가요',d:'홈 안내는 끝! 이제 아래 「모험」 탭을 눌러 배틀과 모험을 둘러봐요.'},
+  {tab:'adv',sel:'#scHubTile',t:'🌌 시나리오 모드',d:'이야기를 따라가며 포켓몬을 만나고 해방하는 모드예요. 눌러서 들어가 봐요!'},
+  {tab:'adv',deep:1,sel:'[data-go="main"]',hub:'#scHubTile',hubT:'🌌 시나리오 모드로 들어가요',hubD:'들어가서 「메인 스토리」를 눌러요.',soft:1,skipOn:['scenarioMap'],t:'📖 메인 스토리',d:'여기를 눌러 메인 스토리로 들어가요!'},
+  {tab:'adv',deep:1,sel:'#scCta',hub:'#scHubTile',hubT:'🌌 시나리오 모드로 들어가요',hubD:'들어가서 이야기를 시작해요.',soft:1,t:'▶ 이야기 시작',d:'이 버튼을 누르면 이야기가 시작돼요!'},
+  {tab:'adv',sel:'#rlHubTile',t:'🗺️ 로그라이크 모험',d:'유물을 모으며 끝없는 길을 걷는 모험이에요. 친구와 둘이서 함께 떠날 수도 있어요. 보스에게 도전해요!'},
+  {tab:'adv',sel:'[data-f="rescue"]',t:'🆘 미션! 포켓몬 구출하기',d:'구하고 싶은 포켓몬을 골라 문제를 풀면 내 포켓몬이 돼요.'},
+  {tab:'adv',deep:1,sel:'#rsPick',hub:'[data-f="rescue"]',hubT:'🆘 미션 화면으로 가요',hubD:'여기를 눌러 들어가서 구출할 포켓몬을 골라요.',soft:1,skipOn:['rescue'],t:'🎯 포켓몬 고르기',d:'여기를 눌러 구출하고 싶은 포켓몬을 한 마리 골라요!'},
+  {tab:'adv',sel:'[data-f="endless"]',t:'🌿 야생 포켓몬 포획',d:'문제를 풀다 보면 야생 포켓몬이 나타나요. 맞혀서 잡아 봐요!'},
+  {tab:'adv',sel:'[data-f="league"]',t:'🏆 배틀 리그',d:'내 카드로 배틀! 공격할 때마다 문제를 풀어요.'},
+  {tab:'adv',sel:'[data-f="pvp"]',t:'🤝 친구 대전',d:'한 사람이 방을 만들고 번호를 알려 주면, 친구가 번호를 넣고 들어와서 1대1로 겨뤄요.'},
+  {tab:'adv',sel:'[data-f="bosscoop"]',t:'👥 보스전',d:'친구와 방 번호를 나누고 힘을 합쳐 보스를 공략해요.'},
+  {tab:'adv',sel:'#hbHubTile',t:'🕶️ 도감 해킹 배틀',d:'여러 친구가 한 방에서 문제를 풀며 카드를 모아요. 해킹 이벤트가 터지면 [해킹]으로 다른 친구의 카드를 빼앗고, 방어권으로 막을 수도 있어요!'},
+  /* ── 3. 포켓몬 탭 ── */
+  {tabGo:'card',sel:tabSel('card'),t:'🎴 포켓몬 탭으로 가요',d:'모험 안내는 끝! 이번에는 아래 「포켓몬」 탭을 눌러요.'},
+  {tab:'card',sel:'[data-f="pack"]',manual:0,onShow:()=>{const m=S.meta;m.packs=(m.packs||0)+1;try{sfx('win');}catch(e){}try{toast('🎁 카드팩 1개를 선물로 받았어요!');}catch(e){}autoSave();renderHub();},t:'🎴 카드팩',d:'카드팩을 열어 포켓몬 카드를 모아요. 안내가 끝나면 훈련으로도 매일 받을 수 있어요. 눌러서 열어 봐요!'},
+  {tab:'card',sel:'[data-f="dex"]',t:'📖 도감',d:'모은 카드를 보고, 사탕으로 진화시켜요.'},
+  {tab:'card',sel:'[data-f="deck"]',t:'🃏 덱 짜기',d:'모은 카드로 나만의 배틀 덱을 만들어요.'},
+  {tab:'card',sel:'#gardenPanel',t:'🌳 나의 정원',d:'공부하며 모은 에너지로 알을 키우고, 포켓몬을 정원에 풀어놓아요. 정원을 눌러 포켓몬을 터치해 봐요!'},
+  {tab:'card',sel:'#hTrade',t:'🔄 포켓몬 교환',d:'친구와 같은 성급(★)끼리 포켓몬을 1마리씩 바꿔요.',after:()=>{try{if(document.querySelector('.modal.on'))coach([{h:'포켓몬 교환',ic:'teacher',t:'① <b>📤 전송</b>: 보낼 포켓몬을 골라 전송하면 <b>숫자 4자리</b>가 나와요. 친구에게 알려 주세요.<br>② <b>📥 번호로 받기</b>: 친구가 알려 준 번호를 넣고, 내 포켓몬 중 같은 성급(★)의 하나를 골라 바꿔요.<br>※ 같은 성급끼리만 교환할 수 있어요.'}]);}catch(e){}}},
+  /* ── 4. 나 탭 ── */
+  {tabGo:'me',sel:tabSel('me'),t:'🏅 나 탭으로 가요',d:'포켓몬 안내도 끝! 마지막으로 아래 「나」 탭을 눌러요.'},
+  {tab:'me',sel:'#hTrainerSkills',t:'🛡️ 트레이너 스킬',d:'레벨 포인트로 스킬을 배워서 전투에서 써요.'},
+  {tab:'me',sel:'[data-f="season"]',t:'📅 시즌',d:'시즌 레벨을 올려 보상을 받아요.'},
+  {tab:'me',sel:'[data-f="grow"]',t:'📈 나의 학습 기록',d:'틀린 문제를 모은 오답 노트와 주간 리포트를 볼 수 있어요.'},
+  {tab:'me',sel:'[data-f="ach"]',t:'🏅 도전 과제',d:'열심히 한 만큼 배지가 생겨요.'},
+  {tab:'me',sel:'[data-f="card"]',t:'🪪 트레이너 카드',d:'에너지를 모으면 카드 등급이 올라가요. 선생님께 진짜 카드로 인쇄를 부탁할 수도 있어요!'}
  ];
  const st=document.createElement('style');
  st.textContent='.tourHi{position:relative}'
@@ -35427,72 +35491,108 @@ function rmAdd(id,label,fn){
  document.head.appendChild(st);
  const bub=document.createElement('div');bub.id='tourBub';document.body.appendChild(bub);
  const dim=document.createElement('div');dim.id='tourDim';document.body.appendChild(dim);
- const find=s=>{try{return typeof s==='function'?s():document.querySelector(s);}catch(e){return null;}};
+ // 화면에 실제로 보이는 대상만 잡아요 (다른 탭에 숨은 요소는 크기가 0이라 위치를 못 잡았어요)
+ const vis=e=>!!(e&&e.getClientRects().length);
+ // 다른 창(타이틀 덮개 등)에 가려져 있지 않은 버튼만 안내해요
+ const onTop=e=>{try{const r=e.getBoundingClientRect(),t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !!t&&(e.contains(t)||t.contains(e));}catch(x){return true;}};
+ const find=s=>{try{const e=typeof s==='function'?s():document.querySelector(s);return vis(e)?e:null;}catch(e){return null;}};
  const ready=()=>{try{const m=S.meta;return !!(m&&m.name&&m.starter&&m.seen&&codeValid());}catch(e){return false;}};
- const blocked=()=>!!(document.querySelector('.modal.on,#coach.on,#unlock.on,#pack.on,#battle.on'));
+ const blocked=()=>{try{if(document.querySelector('.modal.on,#coach.on,#unlock.on,#pack.on,#battle.on'))return true;const hb=document.getElementById('hb');return !!(hb&&getComputedStyle(hb).display!=='none');}catch(e){return false;}};
  function get(){try{const m=S.meta;let v=m.seen[K];
   if(v===undefined){v=((m.train&&m.train.count>0)||(m.stats&&m.stats.opened>0))?DONE:0;m.seen[K]=v;}
   return v>=STEPS.length?-1:v;}catch(e){return -1;}}
  function set(v){try{S.meta.seen[K]=v;autoSave();}catch(e){}}
- // 지금 보여 줄 대상 계산(필요 조건 미달이면 먼저 할 일로 안내)
- function view(i){const s=STEPS[i];let t=s,redirect=false,viaHub=false;
+ // 지금 보여 줄 대상 계산: 탭이 다르면 탭 버튼, 하위 화면이면 홈 버튼을 먼저 안내해요
+ function view(i){const s=STEPS[i];let t=s,redirect=false,viaHub=false,viaTab=false,viaHome=false;
   let nd=null;try{nd=s.need?s.need():null;}catch(e){}
-  if(nd){t=Object.assign({},s,nd);redirect=true;}
+  if(nd){t=Object.assign({},s,nd);redirect=!nd.keep;}
+  const onHub=S.screen==='hub';
+  if(!onHub&&!s.deep){ // 홈이 아닌 화면에 있으면 홈으로 돌아가는 버튼을 알려 줘요
+   let el=null;if(!NOHOME[S.screen])for(const b of BACKS){el=find(b);if(el&&onTop(el))break;el=null;}
+   return {s,t:{t:'🏠 홈으로 돌아가요',d:'안내를 이어 가려면 여기를 눌러 홈으로 돌아가요.'},el,redirect:true,viaHome:true};}
+  if(onHub&&t.tab&&S.hubTab!==t.tab&&!s.tabGo){ // 다른 탭에 있으면 그 탭 버튼부터
+   const n=TABN[t.tab];
+   return {s,t:{t:n[0]+'으로 가요',d:n[1]+' ('+(t.t||'')+' 안내가 거기 있어요)'},el:find(tabSel(t.tab)),redirect:true,viaTab:true};}
   let el=find(t.sel);
-  if(!el&&!redirect&&s.hub&&S.screen==='hub'){el=find(s.hub);viaHub=true;t=Object.assign({},s,{t:s.hubT||s.t,d:s.hubD||s.d});}
-  return {s,t,el,redirect,viaHub};}
- let cur=null,miss=0,key='',scrolledFor='',lastR='',shown=false,settleUntil=0,raf=0;
+  if(!el&&!redirect&&s.hub&&onHub){el=find(s.hub);viaHub=true;t=Object.assign({},s,{t:s.hubT||s.t,d:s.hubD||s.d});}
+  return {s,t,el,redirect,viaHub,viaTab,viaHome};}
+ let cur=null,miss=0,key='',scrolledFor='',lastR='',shown=false,settleUntil=0,raf=0,scrSince=0,lastScr='';
  function unHi(){if(cur){cur.classList.remove('tourHi');cur=null;}bub.classList.remove('on');dim.classList.remove('on');bub.style.display='none';dim.style.display='none';key='';lastR='';shown=false;}
  // 안내를 따라 다른 화면으로 가면 새 화면은 항상 맨 위에서 시작해요
  function fixScroll(prev){const f=()=>{try{const vw=document.getElementById('view');if(vw&&S.screen!==prev&&vw.scrollTop>0)vw.scrollTop=0;}catch(e){}};setTimeout(f,60);setTimeout(f,350);}
  function adv(i,after){const prev=S.screen;set(i+1);unHi();fixScroll(prev);if(after)setTimeout(after,700);}
- // 대상이 이미 화면 안에 있으면 그대로 두고, 밖에 있을 때만 한 번에(부드러운 스크롤 없이) 가운데로 옮겨요
- function ensureVisible(el){try{const r=zRect(el),z=ZM(),vh=innerHeight/z,hud=document.querySelector('.hud');
-  const top=hud?(zRect(hud).top+zRect(hud).height+8):8,bot=vh-8;
-  if(r.top>=top&&r.top+r.height<=bot)return;
-  el.scrollIntoView({block:'center'});}catch(e){}}
+ // 말풍선이 들어갈 영역: 위는 상단 HUD, 아래는 하단 탭바 앞까지예요
+ function bounds(){const z=ZM(),vh=innerHeight/z,hud=document.querySelector('.hud'),tb=document.querySelector('.hubTab');
+  const top=hud&&vis(hud)?(zRect(hud).top+zRect(hud).height+6):6;
+  const bot=tb&&vis(tb)?(zRect(tb).top-6):vh-6;
+  return {vh,top,bot};}
+ // 대상과 말풍선이 같이 보이게 스크롤해요. 이미 잘 보이면 그대로 두고, 아니면 대상을 위쪽에 붙여서 아래에 말풍선 자리를 만들어요
+ function ensureVisible(el){try{
+  if(el.closest('.hud,.hubTab'))return; // 고정 막대 안은 스크롤할 필요 없어요
+  const vw=document.getElementById('view');if(!vw)return;
+  const B=bounds(),bh=bub.offsetHeight||150;
+  const ok=()=>{const r=zRect(el);const a=r.top-B.top-16,b=B.bot-(r.top+r.height)-16;return r.top>=B.top&&r.top+r.height<=B.bot&&(a>=bh+24||b>=bh+24||r.height>(B.bot-B.top)*0.55);};
+  if(ok())return;
+  const r0=zRect(el),room=B.bot-B.top;
+  const want=(r0.height+bh+44<=room)?B.top+12:(B.top+(room-r0.height)/2); // 둘 다 들어가면 위쪽에, 아니면 가운데로
+  for(let k=0;k<4;k++){const d=zRect(el).top-want;if(Math.abs(d)<2)break;const b4=vw.scrollTop;vw.scrollTop=b4+d;if(vw.scrollTop===b4)break;}
+ }catch(e){}}
+ function content(i,v){const s=v.s,t=v.t;const manual=!!t.manual&&!v.redirect;
+  bub.innerHTML='<span class=tbA></span>'+(i>0&&!v.redirect?'<div class=tbOk>✅ 앞 단계 완료! 다음 차례예요</div>':'')+'<b>'+t.t+'</b>'+t.d
+   +'<div class=tbN>안내 '+(i+1)+' / '+STEPS.length+'</div>'
+   +'<div class=tbf>'+(manual?'<button type=button class=tbMain id=tourOk>확인했어요 ▶</button>':'<span style="font-size:11px;color:#8a7430">'+(v.redirect?'누르면 안내가 이어져요':'눌러 보면 넘어가요')+'</span>')
+   +'<span><button type=button id=tourNext>이 단계 넘기기</button><button type=button id=tourSkip>안내 끝내기</button></span></div>';
+  const ok=bub.querySelector('#tourOk');if(ok)ok.onclick=()=>adv(i);
+  bub.querySelector('#tourNext').onclick=()=>{set(i+1);unHi();};
+  bub.querySelector('#tourSkip').onclick=()=>{set(DONE);unHi();try{toast('안내를 끝냈어요. 홈 맨 아래 「안내 다시 보기」로 다시 볼 수 있어요');}catch(e){}};}
  function tick(){try{
   if(document.hidden)return;
+  if(S.screen!==lastScr){lastScr=S.screen;scrSince=performance.now();}
   if(!ready()){unHi();return;}
   const i=get();if(i<0){unHi();addRe();return;}
   addRe();
   if(blocked()){unHi();return;}
+  const s0=STEPS[i];
+  // 이미 끝난 일은 건너뛰어요 (전체 화면이 켜져 있음 · 이미 그 탭을 보고 있음)
+  try{if(s0.skipIf&&s0.skipIf()){set(i+1);return;}}catch(e){}
+  if(s0.tabGo&&S.screen==='hub'&&S.hubTab===s0.tabGo){set(i+1);return;}
+  // 체험용 선물(카드팩 1개): 그 탭에 도착했을 때 한 번만 지급해요
+  if(s0.onShow&&S.screen==='hub'&&S.hubTab===s0.tab&&!S.meta.seen['tg'+i]){S.meta.seen['tg'+i]=1;try{s0.onShow();}catch(e){}return;}
   const v=view(i),s=v.s,t=v.t,el=v.el;
+  if(v.viaHome&&performance.now()-scrSince<700){unHi();return;} // 화면이 막 바뀌었을 때는 잠깐 기다려요
   if(!el){unHi();
    if(s.skipOn&&s.skipOn.indexOf(S.screen)>=0){set(i+1);return;}
    if(S.screen==='hub'&&!s.soft&&!v.redirect){if(++miss>8){miss=0;set(i+1);}}
    return;}
   miss=0;
   if(cur!==el){if(cur)cur.classList.remove('tourHi');cur=el;el.classList.add('tourHi');}
-  const sk=i+'|'+S.screen+'|'+(v.redirect?1:0)+'|'+(v.viaHub?1:0);
-  if(scrolledFor!==sk){scrolledFor=sk;ensureVisible(el);settleUntil=performance.now()+120;shown=false;lastR='';bub.classList.remove('on');dim.classList.remove('on');}
+  const k=i+'|'+(v.redirect?1:0)+'|'+(v.viaHub?1:0)+'|'+(v.viaTab?1:0)+'|'+(v.viaHome?1:0)+'|'+(t.manual?1:0)+'|'+t.t;
+  const sk=i+'|'+S.screen+'|'+S.hubTab+'|'+(v.redirect?1:0)+'|'+(v.viaHub?1:0);
+  if(scrolledFor!==sk){scrolledFor=sk;
+   if(k!==key){key=k;content(i,v);}          // 말풍선 높이를 먼저 알아야 자리를 계산할 수 있어요
+   bub.style.display='block';
+   ensureVisible(el);settleUntil=performance.now()+120;shown=false;lastR='';bub.classList.remove('on');dim.classList.remove('on');}
   if(performance.now()<settleUntil)return;
-  const k=i+'|'+(v.redirect?1:0)+'|'+(v.viaHub?1:0);
   const r=zRect(el),rs=Math.round(r.left)+','+Math.round(r.top)+','+Math.round(r.width)+','+Math.round(r.height);
   if(k===key&&rs===lastR&&shown)return; // 아무것도 안 바뀌었으면 다시 그리지 않아요
-  if(k!==key){key=k;
-   bub.innerHTML='<span class=tbA></span>'+(i>0&&!v.redirect?'<div class=tbOk>✅ 앞 단계 완료! 다음 차례예요</div>':'')+'<b>'+t.t+'</b>'+t.d
-    +'<div class=tbN>안내 '+(i+1)+' / '+STEPS.length+'</div>'
-    +'<div class=tbf>'+(s.manual&&!v.redirect?'<button type=button class=tbMain id=tourOk>확인했어요 ▶</button>':'<span style="font-size:11px;color:#8a7430">눌러 보면 넘어가요</span>')
-    +'<span><button type=button id=tourNext>이 단계 넘기기</button><button type=button id=tourSkip>안내 끝내기</button></span></div>';
-   const ok=bub.querySelector('#tourOk');if(ok)ok.onclick=()=>adv(i);
-   bub.querySelector('#tourNext').onclick=()=>{set(i+1);unHi();};
-   bub.querySelector('#tourSkip').onclick=()=>{set(DONE);unHi();try{toast('안내를 끝냈어요. 홈 맨 아래 「안내 다시 보기」로 다시 볼 수 있어요');}catch(e){}};}
+  if(k!==key){key=k;content(i,v);}
   lastR=rs;
   bub.style.display='block';dim.style.display='block';
-  const z=ZM(),vw=innerWidth/z,vh=innerHeight/z,bw=bub.offsetWidth,bh=bub.offsetHeight;
+  const z=ZM(),vw=innerWidth/z,B=bounds(),vh=B.vh,bw=bub.offsetWidth,bh=bub.offsetHeight;
   dim.style.left=(r.left-4)+'px';dim.style.top=(r.top-4)+'px';dim.style.width=(r.width+8)+'px';dim.style.height=(r.height+8)+'px';
-  const hud=document.querySelector('.hud'),minTop=hud?(zRect(hud).top+zRect(hud).height+6):6;
-  const sAbove=r.top-minTop-16,sBelow=vh-(r.top+r.height)-16;
+  const minTop=B.top,botLim=B.bot;
+  const sAbove=r.top-minTop-16,sBelow=botLim-(r.top+r.height)-16;
   let top,arrow='';
-  if(r.height>vh*0.55){top=vh-bh-8;}
-  else if(sAbove>=bh+24){top=r.top-bh-16;arrow='above';}
-  else if(sBelow>=bh+24){top=r.top+r.height+16;arrow='below';}
-  else{top=(r.top+r.height/2>vh/2)?minTop:vh-bh-8;}
-  top=Math.max(6,Math.min(vh-bh-6,top));
+  if(sBelow>=bh+24){top=r.top+r.height+16;arrow='below';}               // 대상 아래(말풍선이 대상을 안 가려요)
+  else if(sAbove>=bh+24){top=r.top-bh-16;arrow='above';}                 // 대상 위
+  else if(r.height>(botLim-minTop)*0.55){top=botLim-bh-8;}               // 대상이 아주 크면 화면 아래쪽에 겹쳐서
+  else{top=(r.top+r.height/2>(minTop+botLim)/2)?minTop+4:botLim-bh-4;}   // 어느 쪽에도 안 들어가면 반대편에
+  top=Math.max(6,Math.min(botLim-bh,top));
   let left=r.left+r.width/2-bw/2;left=Math.max(8,Math.min(vw-bw-8,left));
   bub.style.left=left+'px';bub.style.top=top+'px';
-  const a=bub.querySelector('.tbA');if(a){a.style.display=arrow?'block':'none';a.textContent=arrow==='above'?'👇':'👆';a.style.cssText='display:'+(arrow?'block':'none')+';'+(arrow==='above'?'bottom:-30px':'top:-30px');}
+  const a=bub.querySelector('.tbA');if(a){a.style.display=arrow?'block':'none';a.textContent=arrow==='above'?'👇':'👆';a.style.cssText='display:'+(arrow?'block':'none')+';'+(arrow==='above'?'bottom:-30px':'top:-30px');
+   // 화살표가 대상 가운데를 가리키도록 (말풍선이 가장자리로 밀렸을 때도)
+   const cx=r.left+r.width/2-left;if(arrow)a.style.left=Math.max(18,Math.min(bw-18,cx))+'px';}
   if(!shown){shown=true;requestAnimationFrame(()=>{dim.classList.add('on');bub.classList.add('on');});}
  }catch(e){}}
  function addRe(){try{if(S.screen!=='hub')return;const hc=document.getElementById('hCode');if(!hc||document.getElementById('tourRe'))return;
@@ -35500,8 +35600,9 @@ function rmAdd(id,label,fn){
   a.onclick=e=>{e.preventDefault();set(0);try{toast('처음부터 다시 안내할게요!');}catch(x){}tick();};
   hc.parentNode.appendChild(document.createTextNode(' · '));hc.parentNode.appendChild(a);}catch(e){}}
  document.addEventListener('click',e=>{try{if(!ready())return;const i=get();if(i<0)return;const v=view(i);
-  if(v.el&&!v.redirect&&!v.viaHub&&!v.s.manual&&v.el.contains(e.target))adv(i,v.s.after);}catch(x){}},true);
+  if(v.el&&!v.redirect&&!v.viaHub&&!v.t.manual&&v.el.contains(e.target))adv(i,v.s.after);}catch(x){}},true);
  {const vwEl=document.getElementById('view');if(vwEl)vwEl.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;tick();});},{passive:true});}
+ addEventListener('resize',()=>{lastR='';});
  setInterval(tick,250);
  window.tourReset=()=>{set(0);};
 })();
@@ -37603,6 +37704,7 @@ html body .pill[role=button],html body .hud .pill[role=button],html body button.
   cursor:pointer;background:linear-gradient(180deg,#fff,#efe3c6)!important;border-color:#8a7650!important;
   box-shadow:inset 0 -3px 0 rgba(120,95,50,.32),inset 0 1.5px 0 #fff!important;
 }
+html body button.rl-chip{color:#3a2e3f!important;text-shadow:none!important}
 html body .pill[role=button]:hover,html body button.rl-chip:hover{filter:brightness(1.05);transform:translateY(-1px)}
 html body .pill[role=button]:active,html body button.rl-chip:active{transform:translateY(2px);box-shadow:inset 0 -1px 0 rgba(120,95,50,.3)!important}
 
@@ -37970,6 +38072,8 @@ html body #view[data-htab]:not([data-htab="home"]) .tileRow:has(#tTrain){display
   const rescue=q('[data-f=rescue]'),map=q('[data-f=map]'),garden=q('#gardenPanel'),trade=q('#tradePanel');
   /* 한 줄 짝 바꾸기: [오늘의 훈련 | 학습 지도] , 구출 미션은 모험으로 */
   if(trainRow&&rescue&&map&&scRow&&tiles){tiles.insertBefore(rescue,scRow.nextSibling);trainRow.appendChild(map);}
+  /* 모험 메뉴: 야생 포켓몬 포획을 배틀 리그 앞으로 */
+  {const lg=q('[data-f=league]'),en=q('[data-f=endless]');if(lg&&en&&lg.parentNode&&lg.parentNode===en.parentNode&&en.nextElementSibling!==lg)lg.parentNode.insertBefore(en,lg);}
   /* 정원은 카드 탭의 맨 아래(교환 위)로 */
   if(garden&&trade)wrap.insertBefore(garden,trade);
   const home=[wrap.querySelector('.hubTop'),trainRow||train];
