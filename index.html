@@ -20884,7 +20884,7 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
   return `<button class=tile data-f="${f.k}">${extra}${m.unlNew[f.k]?'<i class=newTag>NEW</i>':''}<span class=ti>${I(f.ic,'ti')}</span><span class=tn>${f.n}</span><span class=td>${td}</span></button>`;}).join('');
  const next=FEAT.find(f=>!m.unl[f.k]);
  $('#view').innerHTML=hudHTML()+`<div class=wrap>
-  <div class="panel hubTop" style="display:flex;gap:12px;align-items:center"><div class=htMon>${monImg(partner,'anim')}${window.pskHub?window.pskHub():''}</div><div class=htBody><div class=htRow><div class=htNameRow><div class="jua htName">${nickHTML(m)}</div><button type=button class="btn ghost sm" id=hMaster title="단원 마스터 현황 보기">🏅<span class=mbLong> 마스터</span> 현황</button></div><div class=htBtns><button class="btn ghost sm" id=hPartner>${I('heart')} 파트너<span class=mbLong> 바꾸기</span></button>${window.pskBtn?window.pskBtn():''}</div></div><div class="mut htSub">${esc(lvOf(m.xp).title)} · ${josa(esc(MON[partner].name),'와과')} 함께해요${shinyOn(partner)?' ✨':''}</div><div class="mut htBond">${shinyOn(partner)?'✨ 이로치 파트너!':`이로치까지 함께 푼 문제 ${Math.min(bondOf(partner),SHINY_AT)} / ${SHINY_AT}`}</div><div class=htLine>${hubLine()}</div></div></div>
+  <div class="panel hubTop" style="display:flex;gap:12px;align-items:center"><div class=htMon>${monImg(partner,'anim')}${window.pskHub?window.pskHub():''}</div><div class=htBody><div class=htRow><div class=htNameRow><div class="jua htName">${nickHTML(m)}</div><button type=button class="btn ghost sm" id=hMaster title="단원 마스터 현황 보기">🏅<span class=mbLong> 마스터</span> 현황</button></div><div class=htBtns><button class="btn ghost sm" id=hPartner>${I('heart')} 파트너<span class=mbLong> 바꾸기</span></button>${window.pskBtn?window.pskBtn():''}</div></div><div class="mut htSub">${esc(lvOf(m.xp).title)} · ${esc(MON[partner].name)}${shinyOn(partner)?' ✨':''}</div><div class="mut htBond">${shinyOn(partner)?'✨ 이로치 파트너!':`이로치까지 함께 푼 문제 ${Math.min(bondOf(partner),SHINY_AT)} / ${SHINY_AT}`}</div><div class=htLine>${hubLine()}</div></div></div>
   ${bkBannerHTML(m)}
   ${gardenPanel(m)}
   ${wgPanel(m)}
@@ -20912,7 +20912,7 @@ const bestPartner=()=>partnerId();
 function hubLine(){const m=S.meta;const d=dayRec();const s=streakDays();
  if(!m.train.count)return '첫 훈련으로 오늘의 나를 기록해 봐요!';
  if(m.train.daily!==today())return s>1?`<b>${s}일</b> 연속 공부 중이에요. 오늘도 이어 가요!`:'오늘의 훈련으로 어제의 나와 겨뤄요!';
- return `오늘 <b>${d.c}</b>문제를 맞혔어요. ${s>1?`<b>${s}일</b> 연속 공부!`:'내일도 만나요!'}`;}
+ return `오늘 <b>${d.c}</b>문제를 맞혔어요.${s>1?` <b>${s}일</b> 연속 공부!`:''}`;}
 
 // ---- 나의 학습 기록 (학생용 LMS) ----
 // ===== 영역 진단: 2022 개정 수학 4개 영역별로 푼 문제를 분석해요 =====
@@ -38306,4 +38306,20 @@ html body #view[data-htab]:not([data-htab="home"]) .tileRow:has(#tTrain){display
  }catch(e){}
 })();
 </script>
+<style id="hub-partner-css">
+/* 홈 파트너 카드: 파트너 크게 · 글자는 오른쪽 · 현황/파트너/스킨 버튼은 우측 끝 세로 3줄 */
+html body .hubTop .htMon{width:112px;height:112px;margin-right:14px}
+html body .hubTop .htSkinAv{width:56px;height:56px;right:-16px;bottom:-8px}
+@media(min-width:561px){html body .hubTop .htMon{width:136px;height:136px}html body .hubTop .htSkinAv{width:64px;height:64px}}
+html body .hubTop .htBody{display:grid!important;grid-template-columns:minmax(0,1fr) auto;column-gap:8px;row-gap:0;align-items:center}
+html body .hubTop .htRow,html body .hubTop .htNameRow,html body .hubTop .htBtns{display:contents!important}
+html body .hubTop .htName{grid-column:1;grid-row:1/span 2;flex:none!important;min-width:0;max-width:100%}
+html body .hubTop #hMaster{grid-column:2;grid-row:1/span 2}
+html body .hubTop #hPartner{grid-column:2;grid-row:3/span 2}
+html body .hubTop #hPskin{grid-column:2;grid-row:5/span 2}
+html body .hubTop #hMaster,html body .hubTop #hPartner,html body .hubTop #hPskin{flex:none!important;width:auto;min-width:0;margin:2px 0!important;padding:5px 9px!important;font-size:13px!important;min-height:32px;justify-content:center;white-space:nowrap}
+html body .hubTop .htSub{grid-column:1;grid-row:3}
+html body .hubTop .htBond{grid-column:1;grid-row:4}
+html body .hubTop .htLine{grid-column:1;grid-row:5/span 2;margin-top:0;align-self:center}
+</style>
 </body></html>
