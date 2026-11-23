@@ -3040,6 +3040,20 @@ html body .btn.purple.tsGo,html body .btn.tsGo.tsGo.tsGo{background:linear-gradi
 @keyframes tsBlink{50%{opacity:.35}}
 @keyframes tsBounce{50%{transform:scale(1.08)}}
 .tiles>.tsPanel{grid-column:1/-1;margin-bottom:0!important}
+/* 포켓몬 탭: 카드팩은 한 줄을 길게 쓰고, 도감 · 덱 짜기는 한 줄에 둘이 나란히 */
+html body #view .tiles>[data-f=pack]{grid-column:1/-1;display:grid!important;grid-template-columns:64px minmax(0,1fr);grid-template-areas:"i n" "i d";column-gap:14px;row-gap:2px;align-items:center;justify-items:start;text-align:left;min-height:88px!important;padding:10px 18px!important}
+html body #view .tiles>[data-f=pack] span.ti{grid-area:i;width:60px!important;height:60px!important}
+html body #view .tiles>[data-f=pack] .tn{grid-area:n;font-size:22px!important}
+html body #view .tiles>[data-f=pack] .td{grid-area:d}
+/* 카드팩 메뉴: 오늘의 훈련처럼 은은한 색 기운 (연한 하늘색) */
+html body #view .tiles>[data-f=pack]{--ta:#5b8fd0;background-image:linear-gradient(120deg,#f2f8ff,#cfe3fa)!important;border-color:#7fb0e0!important}
+/* 포켓몬 탭: 도감 · 덱 짜기는 시나리오 · 로그라이크처럼 한 줄을 반반 가로로 꽉 채워요 */
+html body #view[data-htab=card] .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+html body #view[data-htab=card] .tiles>.tile{width:auto;min-width:0;max-width:none;box-sizing:border-box}
+/* 나 탭: 메뉴 칸이 한 줄을 꽉 채우게 가로로만 늘어나요 (좁은 화면에서는 알아서 줄바꿈) */
+html body #view[data-htab=me] .tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:640px){html body #view[data-htab=me] .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+html body #view[data-htab=me] .tiles>.tile{width:auto;min-width:0;max-width:none;box-sizing:border-box}
 </style>
 <style id="lowfxPlus">
 /* 홈 화면 최적화: 홈 화면과 포켓몬 정원의 상시 효과(밤·저녁 색 필터, 하늘 반짝임, 깜빡이는 테두리)를 꺼요 */
@@ -24558,7 +24572,7 @@ renderHub=function(){__renderHubWithEnglishScenario.apply(this,arguments);const 
 const __renderHubBeforeKo=renderHub;
 renderHub=function(){__renderHubBeforeKo.apply(this,arguments);const panel=$('#englishModePanel');if(!panel)return;const qm=S.meta.questionMode||'math',isKo=qm==='korean';
  const btns=panel.querySelector('.hModeBtns');
- if(btns&&!$('#hKoMode')){const b=document.createElement('button');b.id='hKoMode';b.className='btn sm '+(isKo?'green':'ghost');b.innerHTML='<span class="mFull">'+(isKo?'국어 설정':'국어 모드')+'</span><span class="mShort">국어</span>';b.onclick=()=>{sfx('tap');S.meta.questionMode='korean';autoSave();chooseKoreanMode(true);};btns.appendChild(b);}
+ if(btns&&!$('#hKoMode')){const b=document.createElement('button');b.id='hKoMode';b.className='btn sm '+(isKo?'green':'ghost');b.innerHTML='<span class="mFull">'+(isKo?'국어 설정':'국어 모드')+'</span><span class="mShort">국어</span>';b.onclick=()=>{sfx('tap');if(S.meta.questionMode==='korean'||(S.meta.koLevel===undefined&&!S.meta.koModes))chooseKoreanMode(true);else{S.meta.questionMode='korean';autoSave();renderHub();}};btns.appendChild(b);}
  if(isKo){const ic=panel.firstElementChild;if(ic)ic.textContent='📖';const t=panel.querySelector('b.jua');if(t)t.textContent='현재 모드: 국어 모드';const d=panel.querySelector('.mut');if(d)d.textContent=koModeLabel(S.meta)+' · '+koGrade()+'학년 수준';
   const train=$('#tTrain');if(train){const tt=train.querySelector('.tn'),td=train.querySelector('.td');if(tt)tt.textContent='오늘의 국어 훈련';if(td)td.innerHTML=trainDone()?'오늘 훈련 완료! 한 번 더 하면 사탕을 더 받아요.':`${trainN()}문제 · 국어 맞춤법<br><span class=tPk style="margin-top:4px">카드팩 1개 받기</span>`;}}
 };
@@ -24590,6 +24604,11 @@ renderHub=function(){__renderHubBeforeMathSet.apply(this,arguments);const panel=
  if(isMath){const x=mathSel(),d=panel.querySelector('.mut');if(x&&d)d.textContent=semName(S.meta.gs)+' · 단원 '+x.C.size+'개 선택 (아래 학년·마스터 단원 문제도 섞여요)';
   if(x&&x.fb&&!S.__mathFbToast){S.__mathFbToast=1;setTimeout(()=>toast('🏅 고른 단원을 모두 마스터했어요! 수학 설정에서 다른 단원도 골라 주세요'),400);}}
 };
+// ---- 모드 버튼: 지금 선택된 모드의 버튼은 '○○ 설정'으로 이름이 바뀌어요 (짧은 이름 표시에도 적용) ----
+const __renderHubBeforeModeLabel=renderHub;
+renderHub=function(){__renderHubBeforeModeLabel.apply(this,arguments);try{const panel=$('#englishModePanel');if(!panel)return;const qm=S.meta.questionMode||'math';
+ [['hMathMode','math','수학'],['hEnglishMode','english','영어'],['hMixMode','mix','영수'],['hKoMode','korean','국어']].forEach(([id,k,n])=>{const b=document.getElementById(id);if(!b)return;const cur=qm===k,f=b.querySelector('.mFull'),sh=b.querySelector('.mShort');
+  if(f)f.textContent=cur?n+' 설정':n+' 모드';if(sh)sh.textContent=cur?n+' 설정':n;b.style.fontSize='14px';});}catch(e){console.warn('modeLabel',e);}};
 // ===== 로그라이크 모험 · 「끝없는 길」 (시나리오 모드 디자인 · 배경 · 음악 재사용) =====
 // 한 번 쓰러지면 끝! 분기점을 고르며 나아가 보스를 쓰러뜨리면 보상을 받아요.
 // 모험 중 얻는 포켓몬·유물·골드는 모험 안에서만 쓰고, 클리어 보상만 내 기록으로 가져와요.
@@ -37820,6 +37839,9 @@ html body .pill[role=button]:active,html body button.rl-chip:active{transform:tr
   html body .hud .hudR .fsBtn.fsBtn.fsBtn.fsBtn{height:34px;margin-left:6px}
   html body .bMenuCol .fsBtn.fsBtn.fsBtn.fsBtn{height:32px}
   html body .bMenuCol .fsBtn.fsBtn.fsBtn.fsBtn::after{font-size:14px}
+  /* 첫 화면 오른쪽 아래 버튼: 글씨가 들어가도록 폭을 늘려요 (전에는 42px로 고정돼 '체 화'만 보였어요) */
+  html body #view>.title .tsFs.fsBtn.fsBtn{width:auto;min-width:0;height:40px;padding:0 14px!important;gap:7px}
+  html body #view>.title .tsFs.fsBtn.fsBtn .ic{width:22px;height:22px}
   /* 처음 몇 번만 살짝 통통 튀어서 눈에 띄게 (전체 화면 중에는 멈춤) */
   html:not(.isfs) body .fsBtn.fsBtn.fsBtn.fsBtn{animation:fsNudge 1.6s ease-in-out 1s 5}
   @keyframes fsNudge{0%,100%{translate:0 0}50%{translate:0 -4px}}
@@ -38090,6 +38112,7 @@ html body .pill[role=button]:active,html body button.rl-chip:active{transform:tr
 (function(){
  const MBALL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABBklEQVR4XmNkwAGs9Oz/I0sdu3SQEZtSFnRBmMYYk/loUolgA9ENQjEApBmmMVPmGcP0J1JwQ44GtEL5if+RDWGCqUDWbBGgCBYGGYJMX7l3hsFAKBvFe2ADQJqPTlsO1gDSfGLDfbBGkAuQXaKjZMKQw/GGYY5UONwQuAsYdt1D8TPM+eg0OmBEdjoyWHImEYWPHKggr4DAhXdTIQbgisqjFw+Apaz1HXApQfICmQDsAphNyADdVmQ11+68BCtNDQ6HaAEZQiy4evsFGMO8jogFSgHMFTAb0AFMHNl2EEDJICBDZq9didctIH8jJ2WMHAbzG7pBsABDz0xYsygsYJGdgis7AwAOr8GP7ka1YwAAAABJRU5ErkJggg==";
  const TABS=[['home','홈','home'],['adv','모험','sword'],['card','포켓몬','mball'],['me','나','medal']];
+ try{window.__HTAB_MBALL=MBALL;}catch(e){}
  const css=document.createElement('style');css.id='hubTabCss';css.textContent=`
 #view[data-htab="home"] [data-ht]:not([data-ht="home"]),#view[data-htab="adv"] [data-ht]:not([data-ht="adv"]),#view[data-htab="card"] [data-ht]:not([data-ht="card"]),#view[data-htab="me"] [data-ht]:not([data-ht="me"]){display:none!important}
 html{--tbh:calc(66px + var(--sb))}
@@ -38171,6 +38194,8 @@ html body #view[data-htab]:not([data-htab="home"]) .tileRow:has(#tTrain){display
   {const lg=q('[data-f=league]'),en=q('[data-f=endless]');if(lg&&en&&lg.parentNode&&lg.parentNode===en.parentNode&&en.nextElementSibling!==lg)lg.parentNode.insertBefore(en,lg);}
   /* 정원은 카드 탭의 맨 아래(교환 위)로 */
   if(garden&&trade)wrap.insertBefore(garden,trade);
+  /* 홈 탭: 오늘의 훈련 → 이번 주 목표 → 학습 지도 순서 (이번 주 목표를 훈련 타일과 학습 지도 사이로) */
+  if(trainRow&&train){let anchor=train;$$(':scope > .wgDone',wrap).forEach(p=>{trainRow.insertBefore(p,anchor.nextSibling);anchor=p;});}
   const home=[wrap.querySelector('.hubTop'),trainRow||train];
   $$(':scope > *',wrap).forEach(e=>tag(e,'home'));
   $$(':scope > *',tiles||document.createElement('i')).forEach(e=>tag(e,'home'));
@@ -38211,4 +38236,68 @@ html body #view[data-htab]:not([data-htab="home"]) .tileRow:has(#tTrain){display
 })();
 </script>
 
+<script id="global-tabbar">
+/* ===== 아래 탭을 허브뿐 아니라 일반 화면(도감·덱·학습 기록 등)에도 보여 줘요. 누르면 그 탭의 홈 화면으로 가요 =====
+   전투 · 훈련 문제 · 해킹 배틀 · 필드 모험 · 배틀 리그 필드 · 이야기 · 시작 화면 같은 특수 화면에서는 나오지 않아요
+   깜빡임 방지: 이 탭은 한 번 만들어 두면 계속 그 자리에 있어요 (홈에서도 홈 탭바 바로 아래에 깔려 있다가, 다른 화면으로 가면 그대로 이어서 보여요) */
+(function(){
+ const OK={hub:1,pvp:1,bosscoop:1,dex:1,deck:1,trainerSkills:1,league:1,ach:1,season:1,card:1,grow:1,map:1,rescue:1,result:1,scenarioSelect:1,scenarioMap:1,scenarioSide:1,scenarioDex:1,scenarioDeck:1};
+ const TABS=[['home','홈','home'],['adv','모험','sword'],['card','포켓몬','mball'],['me','나','medal']];
+ try{const st=document.createElement('style');st.id='gTabCss';st.textContent='html.gTab #view{padding-bottom:calc(var(--tbh) + 18px)}html body #gTabBar{z-index:20}';document.head.appendChild(st);}catch(e){}
+ let nav=null,last='';
+ function inner(){
+  let m;try{m=S.meta;}catch(e){m={};}
+  const dot={};try{if(m.train&&!trainDone(m))dot.home='pt';if(m.packs>0)dot.card=m.packs>99?'99+':m.packs;}catch(e){}
+  const ball=window.__HTAB_MBALL||'';
+  const cur=(S.screen==='hub')?(S.hubTab||'home'):'';
+  return TABS.map(t=>`<button type=button role=tab data-tb="${t[0]}" aria-selected="${t[0]===cur}" class="${t[0]===cur?'on':''}">${t[2]==='mball'?`<img class="ic px" alt="" draggable="false" src="${ball}">`:I(t[2])}<span>${t[1]}</span>${dot[t[0]]?`<i class="tbDot${dot[t[0]]==='pt'?' pt':''}">${dot[t[0]]==='pt'?'':dot[t[0]]}</i>`:''}</button>`).join('');}
+ function bind(){nav.querySelectorAll('button').forEach(b=>b.onclick=()=>go(b.dataset.tb));}
+ function go(k){
+  try{sfx('tap');}catch(e){}
+  try{S.hubTab=k;}catch(e){}
+  try{if(S.screen==='pvp'){try{pvpClose();}catch(e){}try{t2Close();}catch(e){}}else if(S.screen==='bosscoop'){try{bossClose();}catch(e){}try{t2Close();}catch(e){}}}catch(e){}
+  try{if(/^scenario/.test(S.screen)&&typeof scBackToHub==='function')scBackToHub();else renderHub();}catch(e){console.warn('gTab',e);try{renderHub();}catch(e2){}}
+  sync();
+ }
+ function sync(){
+  try{
+   const bt=document.getElementById('battle');
+   const ok=!!OK[S.screen]&&!(bt&&bt.classList.contains('on'));
+   if(!ok){if(nav){nav.remove();nav=null;last='';}document.documentElement.classList.remove('gTab');return;}
+   if(!nav||!nav.isConnected){nav=document.createElement('nav');nav.className='hubTab';nav.id='gTabBar';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','아래 메뉴');document.body.appendChild(nav);last='';}
+   const h=inner();
+   if(h!==last){nav.innerHTML=h;last=h;bind();}   /* 같은 탭 줄을 그 자리에서 고쳐요 (지우고 다시 만들지 않아서 깜빡이지 않아요) */
+   document.documentElement.classList.add('gTab');
+  }catch(e){}
+ }
+ try{const v=document.getElementById('view');new MutationObserver(sync).observe(v,{childList:true});}catch(e){}
+ setInterval(sync,500);sync();
+})();
+</script>
+<script id="fresh-check">
+/* ===== 예전 버전 캐시 자동 해결 =====
+   브라우저가 저장해 둔 예전 index.html을 열었더라도, 서버에 더 새 파일이 있으면 한 번만 새 파일을 받아서 다시 열어요.
+   (주소가 http/https일 때만 · 시작 화면에서만 · 같은 새 버전에 대해 한 번만 시도해서 무한 새로고침은 없어요) */
+(function(){
+ try{
+  if(!/^https?:$/.test(location.protocol)||/^(localhost|127\.)/.test(location.hostname))return;
+  window.addEventListener('load',function(){setTimeout(async function(){
+   try{
+    if(typeof S!=='undefined'&&S&&S.screen&&S.screen!=='title')return;
+    const u=location.pathname+location.search;
+    const r=await fetch(u,{method:'HEAD',cache:'no-store'});
+    const lm=r.headers.get('last-modified');if(!lm)return;
+    const server=Date.parse(lm),mine=Date.parse(document.lastModified);
+    if(!(server>mine+1500))return;
+    const key='zsm_fresh_'+server;
+    if(sessionStorage.getItem(key))return;
+    sessionStorage.setItem(key,'1');
+    try{toast('새 버전을 받는 중이에요…');}catch(e){}
+    await fetch(u,{cache:'reload'});
+    location.reload();
+   }catch(e){}
+  },1500);});
+ }catch(e){}
+})();
+</script>
 </body></html>
