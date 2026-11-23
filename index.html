@@ -20133,7 +20133,7 @@ async function turnPrepStatic(){if(_turnCred&&_turnCred.exp>Date.now()/1000+600)
 // ================= ★ 연결 중계 서버(TURN) 설정 ★ =================
 // 같은 학교 와이파이의 다른 기기끼리 · 휴대폰 핫스팟 · '학교 와이파이 ↔ 휴대폰 데이터' 연결은 중계 서버(TURN)를 거쳐야 해요.
 // Metered(metered.ca)에서 받은 앱 이름과 API Key를 아래에 넣어요. (다른 TURN 서비스는 TURN_CUSTOM에 주소·아이디·비밀번호를 넣어요)
-const TURN_METERED={app:'monstudy',key:'312912282248ebb8d30d6fe1279419ea0994'};
+const TURN_METERED={app:'ljcmon',key:'3d4a3fb51b20c694fffcb47c3fb46c428f3b'};
 const TURN_CUSTOM=[]; // 예: [{urls:['turn:서버주소:3478','turns:서버주소:443?transport=tcp'],username:'아이디',credential:'비밀번호'}]
 let _turnList=null;
 async function turnPrep(){
