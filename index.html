@@ -2345,6 +2345,13 @@ html.lowfx .unit.frozen .sp img{filter:sepia(.55) hue-rotate(168deg) saturate(1.
 #myLane.fitSp .unit .sp,#foeLane.fitSp .unit .sp{flex:0 0 var(--spH)!important;height:var(--spH)!important;min-height:0!important;max-height:var(--spH)!important}
 #myLane.fitSp .unit .sp img,#foeLane.fitSp .unit .sp img{height:100%;width:auto;max-width:100%;min-width:0;min-height:0;aspect-ratio:auto;object-fit:contain}
 
+/* 협동전 칸 밖으로 삐져나온 포켓몬·테두리·닉네임이 잘리지 않게 */
+#myLane.coopLane,#foeLane.coopLane,.coopLane{overflow:visible!important}
+.coopLane .slot{position:relative}
+.coopLane .slot:has(.unit.sel){z-index:4}
+.unit .coopOwnerN{position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);z-index:9;pointer-events:none;box-sizing:border-box;max-width:calc(100% + 8px);margin:0;padding:0 6px;border-radius:6px;font-family:'Jua','Noto Sans KR',sans-serif;font-size:10.5px;font-weight:900;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;color:#fff;background:#3d7bff;box-shadow:0 1px 2px rgba(20,20,45,.25)}
+.unit .coopOwnerN.o0{background:#3d7bff}.unit .coopOwnerN.o1{background:#ff8a3d}.unit .coopOwnerN.o2{background:#2fb36b}.unit .coopOwnerN.o3{background:#9a5cff}
+.coopLane .unit .coopOwnerN{font-size:clamp(8px,1vw,11px);padding:0 3px;bottom:-8px}
 .rl-nmimg{display:inline-flex;align-items:center;gap:2px;vertical-align:middle;background:#fff;border:2px solid #b8c8ff;border-radius:12px;padding:0 8px 0 2px;margin:0 2px;line-height:1}
 .rl-nmimg>img{width:40px;height:40px;object-fit:contain;image-rendering:pixelated}
 .rl-nmimg>b{font-family:'Jua',sans-serif;font-weight:400;color:#1d2b5a}
@@ -7959,7 +7966,7 @@ function partnerReact(kind){const b=$('.buddy .bimg');if(!b)return;b.classList.r
  if(kind==='hug')tone(520,.12,'sine',.05,.05,640);else tone(1040,.06,'triangle',.05,.12,1320);}
 // 야생 포켓몬 포획 야생 포켓몬: 좋은 포켓몬이 조금 더 자주 나오도록 희귀도 가중치를 조정했어요.
 // 희귀 이상(영웅·전설) 합계: 8%에서 10%로 상향. 포획하면 원본 능력치 카드 1장을 얻어요.
-const ENDLESS_WILD_W={1:25,2:30,3:30,4:10,5:5}; // ★n 야생 포켓몬은 n문제를 맞히면 바로 등장
+const ENDLESS_WILD_W={1:26,2:31,3:31,4:10,5:2}; /* 전설 2%로 낮춤 (영웅 10% 그대로, 줄어든 3%는 ★1~3에 나눔) */ // ★n 야생 포켓몬은 n문제를 맞히면 바로 등장
 function rollEndlessSet(){const rars=[rollEndlessRar()];if(rnd()<0.10)rars.push(rollEndlessRar());return rars;} // 10%: 두 마리(성급은 각각 독립), 필요한 문제 수 = 더 높은 성급
 function rollEndlessRar(){let x=rnd()*100;for(const k of [1,2,3,4,5]){x-=ENDLESS_WILD_W[k];if(x<=0)return k;}return 1;}
 function rollEndlessWildId(forceRar){let rar=forceRar||rollEndlessRar();
@@ -9206,7 +9213,7 @@ function gainCard(id,noPull){const m=S.meta;let r=MON[id].rar;m.shard=m.shard||{
  if(m.shard[id]>=need){delete m.shard[id];m.col[id]=1;m.stats.shardDone=(m.stats.shardDone||0)+1;return{k:'done',need,id};}
  return{k:'shard',n:m.shard[id],need,id};}
 // 별가루 교환소: 본 적 있는 포켓몬의 조각(희귀 이상)이나 카드(일반·고급)를 별가루로 만들어요
-const DUST_COST={1:6,2:12,3:20,4:40,5:80};
+const DUST_COST={1:6,2:12,3:20,4:40,5:100};
 // 카드의 가치(코인). 너무너무 갖고 싶으면 가치의 20배로 살 수 있어요 — 전설은 문제를 풀어 조각으로만!
 const CARD_VALUE={1:10,2:20,3:40,4:80};const BUY_X=20;
 const buyPrice=id=>MON[id].rar>=5?0:CARD_VALUE[MON[id].rar]*BUY_X;
@@ -10087,16 +10094,17 @@ function fitLaneSprites(){try{['#myLane:not(.gmaxLane)','#foeLane:not(.wildLane)
  lane.querySelectorAll('.slot').forEach(sl=>{const u=sl.querySelector('.unit'),sp=u&&u.querySelector('.sp'),un=u&&u.querySelector('.un'),us=u&&u.querySelector('.us');if(!sp||!un||!us)return;
   if(sl.offsetHeight<=L+2)return;const below=us.getBoundingClientRect().bottom-un.getBoundingClientRect().top;const room=L-below-12;need=need===null?room:Math.min(need,room);});
  if(need!==null){lane.style.setProperty('--slotH',Math.floor(L)+'px');lane.style.setProperty('--spH',Math.max(30,Math.floor(need))+'px');lane.classList.add('fitSp');}});}catch(e){}}
-function fitUnitNames(){fitLaneSprites();try{document.querySelectorAll('#battle .unit .un').forEach(e=>{if(e.style.fontSize)e.style.fontSize='';let fs=parseFloat(getComputedStyle(e).fontSize)||12,n=0;while(e.scrollWidth>e.clientWidth+0.5&&fs>6&&n<16){fs-=.5;e.style.fontSize=fs+'px';n++;}});}catch(e){}}
+function fitUnitNames(){fitLaneSprites();try{document.querySelectorAll('#battle .unit .un,#battle .unit .coopOwnerN').forEach(e=>{if(e.style.fontSize)e.style.fontSize='';let fs=parseFloat(getComputedStyle(e).fontSize)||12,n=0;while(e.scrollWidth>e.clientWidth+0.5&&fs>6&&n<16){fs-=.5;e.style.fontSize=fs+'px';n++;}});}catch(e){}}
 (function(){let q=0;const go=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;fitUnitNames();});};
  const start=()=>{const b=document.getElementById('battle');if(!b)return;new MutationObserver(go).observe(b,{childList:true,subtree:true});};
  if(document.readyState==='loading')addEventListener('DOMContentLoaded',start);else start();
  addEventListener('resize',go);})();
+function coopOwnInfo(u,P,me){const _L=(P===me?B.coop.players:(B.coop.foeTeam||B.coop.players));let ow=Number(u.coopOwner??0);if(!Number.isInteger(ow)||ow<0||ow>3||ow>=Math.max(2,_L.length))ow=0;const nm=String((_L[ow]&&_L[ow].name)||(ow?'친구':'방장')).trim()||(ow?'친구':'방장');return {ow,nm};}
 function renderBattle(){if(!B||window.__sim)return;try{wildSkinRoll();}catch(e){}if(window.__fpsGuard)__fpsGuard();B.trainerSkillUsed=B.trainerSkillUsed||{};const me=B.me,fo=B.foe;const my=B.side==='me'&&!B.busy&&!B.over&&(!B.coop||B.coop.active===BC.localIndex)&&!(B.t2&&t2Done1());
  const valid=targetsFor(B.sel);
  const unitH=(u,P,i)=>{if(!u)return '';const friendly=P===me;const mine=friendly&&(!B.coop||Number(u.coopOwner??0)===B.coop.active);const m=MON[u.id];const ready=mine&&my&&u.att>0&&!u.frozen;
   return `<div class="unit${u.mg?' mega':''}${u.mg&&!u.fz&&PRIMAL[u.id]?' primal':''}${u.mg&&!u.fz&&evoCat(u.id)==='S'?' spform':''}${u.mg&&!u.fz&&evoCat(u.id)==='U'?' ultra':''}${u.mg&&u.fz?' fuse':''}${(u.gm||u.wGm)?' gmax':''}${(u.gm||u.wGm)&&u.id===890?' eterna':''}${ready?' ready':''}${mine&&B.sel===i?' sel':''}${!friendly&&valid.units.includes(i)?' tgt':''}${!friendly&&my&&B.sel>=0&&valid.units.length&&!valid.units.includes(i)?' blocked':''}${isTaunt(u)?' taunt':''}${hk(u,'armor')&&!hk(u,'taunt')?' steelU':''}${u.frozen?' frozen':''}${u.frozen&&u.moon?' moonstun':''}${u.shield?' shielded':''}${mine&&B.itemTargetMode&&!u.frozen?' itemTarget':''}${!friendly&&B.moonTargetMode?' itemTarget':''}${mine&&!ready&&my?' zz':''}" data-i="${i}"${u.mg?` style="--mc:${TYPE_COL[kwType(m)]||'#8ad0ff'}"`:''}>
-   ${B.coop?(()=>{const _L=(P===me?B.coop.players:(B.coop.foeTeam||B.coop.players));let ow=Number(u.coopOwner??0);if(!Number.isInteger(ow)||ow<0||ow>3||ow>=Math.max(2,_L.length))ow=0;const nm=String((_L[ow]&&_L[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${(kwOf(m).k==='armor'&&hk(u,'armor'))||(kwOf(m).k==='grow'&&hk(u,'grow'))?'':I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div>${stateIconsH(u,ready,mine&&my)}${mine&&B.sel===i?'<span class=selX title="선택 취소" aria-label="선택 취소">✕</span>':''}<div class=shadow></div><div class=sp${u.gbk?` style="animation:gmBackIn .85s cubic-bezier(.2,1.3,.4,1) both;animation-delay:-${Math.max(0,Math.min(.8,(Date.now()-u.gbk)/1000)).toFixed(2)}s"`:''}>${unitImgHTML(u,mine)}</div><div class=un>${esc(u.fz&&FORMNAME[u.mg]?FORMNAME[u.mg]:m.name)}</div><div class=tdots>${(u.fz&&FUSE_TYPES[u.mg]||unitTypes(u,true)).map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
+   ${B.coop&&B.wildMode&&!friendly?(()=>{const o=coopOwnInfo(u,P,me);return `<span class="coopOwner o${o.ow}">${esc(Array.from(o.nm).slice(0,2).join('')||(o.ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${(kwOf(m).k==='armor'&&hk(u,'armor'))||(kwOf(m).k==='grow'&&hk(u,'grow'))?'':I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div>${stateIconsH(u,ready,mine&&my)}${mine&&B.sel===i?'<span class=selX title="선택 취소" aria-label="선택 취소">✕</span>':''}<div class=shadow></div><div class=sp${u.gbk?` style="animation:gmBackIn .85s cubic-bezier(.2,1.3,.4,1) both;animation-delay:-${Math.max(0,Math.min(.8,(Date.now()-u.gbk)/1000)).toFixed(2)}s"`:''}>${unitImgHTML(u,mine)}</div><div class=un>${esc(u.fz&&FORMNAME[u.mg]?FORMNAME[u.mg]:m.name)}</div>${B.coop&&!(B.wildMode&&!friendly)?(()=>{const o=coopOwnInfo(u,P,me);return `<div class="coopOwnerN o${o.ow}" title="${esc(o.nm)}">${esc(o.nm)}</div>`;})():''}<div class=tdots>${(u.fz&&FUSE_TYPES[u.mg]||unitTypes(u,true)).map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
    <div class=us><span class="st atk">${u.atk}</span><span class="st hp"${u.hp<u.max?' style="background:#d9393f"':''}>${u.hp}</span></div></div>`;};
  const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=(B.coop&&!(B.t2&&B.t2.boss&&!B.rl2))?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${heroImgV(P)}</div><div><div class=hn>${nameTag(P.name)}${P.t2done?' ✔':''}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
   const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),sp=Math.max(0,Math.min(P.sunMana||0,P.mana-bp)),bl=P.mana-bp-sp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}${Array.from({length:sp},()=>'<i class="on sun"></i>').join('')}${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}<b>${bl}${bp+sp?`<span class=manaPlus>+${bp+sp}</span>`:''}/${den}</b></div>`;};
@@ -15857,7 +15865,9 @@ async function startTurn(side){if(!B||B.over)return;closeInfo();try{if(B.coop&&B
  P.maxMana=Math.min(6,P.maxMana+1);P.mana=P.maxMana;P.bonusMana=0;P.sunMana=0;B.defUsed=false;  if(side==='me'&&!B.coop&&!B.pvp&&!window.__sim&&!B.studyUsesSet){B.studyUsesSet=1;const sx=studyExtraUses(trainerSkillLevels().study);P.powerUses=STUDY_BASE+sx+((B.rl&&typeof rlHas==='function'&&rlHas('studybook'))?2:0);}
  if(side==='me'&&!B.pvp&&!window.__sim){const ml=B.coop?(Number(P.manaLv)||0):(Number(trainerSkillLevels().mana)||0);if(ml>0&&rnd()*100<manaChance(ml)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.manaBonusFx=1;}}
  else if(B.pvp&&!window.__sim){const ml=Number(P.manaLv)||0;if(ml>0&&P.passRng()*100<manaChance(ml)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.manaBonusFx=1;}}
- if(side==='foe'){P.fcounter=0;if(hgOn()&&rnd()*100<manaChance(5)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;}}
+ /* 후공 보정: 1:1·2:2 대전에서 나중에 시작하는 쪽은 첫 차례에만 에너지 +1 (최대 에너지는 그대로) */
+if(!window.__sim&&P.maxMana===1&&!P.lateBonus&&((B.pvp&&B.pvpFirst&&side!==B.pvpFirst)||(B.t2&&!B.t2.boss&&P.team===1))){P.lateBonus=1;P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;B.lateFx=1;}
+if(side==='foe'){P.fcounter=0;if(hgOn()&&rnd()*100<manaChance(5)){P.mana+=1;P.bonusMana=(P.bonusMana||0)+1;}}
  const wildAliveCount=B.wildMode&&side==='foe'?B.foe.board.filter(u=>u&&u.hp>0).length:0;
  P.board.forEach((u,ix)=>{if(!u)return;if(B.coop&&side==='me'&&Number(u.coopOwner??0)!==B.coop.active)return;u.fresh=0;u.att=u.frozen?0:(B.wildMode&&P===B.foe?((u.rlAtt!=null?u.rlAtt:(((S.meta.settings.easy&&!B.coop)||(wildAliveCount>=2&&!(B.t2&&B.t2.boss&&B.t2.boards[0].length>8)))?1:((B.t2&&B.t2.boss&&B.t2.boards[0].length>8&&(B.wildIds||[]).length>=2&&wildAliveCount<2)?3:2)))+(hk(u,'double')?1:0)):(hk(u,'double')?2:1));u.attTot=u.att;if(u.frozen&&side==='me'){}if(hk(u,'grow')&&u.grow<growCap(u)){u.grow++;u.atk++;setTimeout(()=>kwFx('grow',unitEl(P,ix)),90);if(isLeg(u)){u.hp++;u.max++;}}});
  if(B.coop&&B.wildMode&&side==='foe'&&P===B.foe){try{(B.t2&&B.t2.boss&&B.t2.boards[0].length>8?bossEscalate4:bossEscalate)(P);}catch(e){console.warn('bossEscalate',e);}try{bossIceCut(P);}catch(e){console.warn('bossIceCut',e);}}
@@ -15879,7 +15889,7 @@ async function startTurn(side){if(!B||B.over)return;closeInfo();try{if(B.coop&&B
  const rd=B.t2?Math.ceil(B.turn/(B.t2.boss?5:4)):B.pvp?Math.ceil(B.turn/2):B.round;
  if(rd>=10&&!(B.wildMode&&P===B.foe)&&!easyNoFatigue()&&!(B.t2&&B.t2.boss)){const sd=rd-9;P.hp-=sd;renderBattle();fx(heroEl(P),`지쳤다 -${sd}`,'');if(checkEnd())return;}
  renderBattle();
- if(B.manaBonusFx){B.manaBonusFx=0;fx(heroEl(P),'마나 연구! 에너지 +1','heal');trainerManaFx(heroEl(P));}
+ if(B.manaBonusFx){B.manaBonusFx=0;fx(heroEl(P),'마나 연구! 에너지 +1','heal');trainerManaFx(heroEl(P));}if(B.lateFx){B.lateFx=0;fx(heroEl(P),'후공 보너스! 에너지 +1','heal');trainerManaFx(heroEl(P));}
  if(side==='me'){if(B.t2){}else if(B.coop){const act=B.coop.active;banner.local=1;banner(act===BC.localIndex?'내 차례!':`${esc(B.coop.players[act].name)}의 차례!`,'',1000);banner.local=0;bossSend({t:'boss-turn',a:act,ms:1000});}else banner('내 차례!','',1000);}
  else if(B.pvp){B.busy=false;renderBattle();pvpPump();}
  else{await wait(700);await foeTurn();}}
@@ -19225,7 +19235,7 @@ function bossSend(o){try{if(BC.conn&&BC.conn.open)BC.conn.send(o)}catch(e){}}
 function renderBossCoop(keep){S.screen='bosscoop';if(!keep)bossClose();const m=S.meta;ensureDeck();
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><h2>⚔️ 협동 보스전</h2><p style="line-height:1.7">친구와 힘을 합쳐 강력한 보스 포켓몬을 공략하세요. 한 명이 방을 만들고 코드를 공유하면 다른 친구가 코드로 접속합니다.</p>
  <div class="tiles cmp" style="margin-top:8px"><div class=tile><span class=ti>🌈</span><span class=tn>4성 보스 20%</span><span class=td>희귀한 보스 포켓몬</span></div><div class=tile><span class=ti>✨</span><span class=tn>5성 보스 80%</span><span class=td>최상위 보스 포켓몬</span></div></div>
- <details class=bossHow style="margin-top:12px"><summary class="btn ghost sm" style="cursor:pointer;list-style:none">📖 설명 보기 / 접기</summary><div class=explain style="margin-top:8px;font-size:14px;line-height:1.7">보스 체력은 기본의 <b>15배</b>, 공격력은 그대로이며 기본 공격은 턴마다 <b>2회</b>예요. 단, 우리 포켓몬이 <b>3마리 늘 때마다 공격이 1회씩 늘어요</b>(최대 4회). 보스 체력이 <b>절반 이하면 공격력 +1</b>, <b>25% 이하면 공격 +1회</b>로 더 강해져요. 또 <b>3번째 보스 턴마다</b> 우리 포켓몬 모두에게 <b>1 피해</b>(분노한 뒤에는 2)를 주는 전체 공격이 와요. 한 턴 전에 예고가 떠요. 10% 확률로 보스 2마리가 등장하며, 이때는 각 보스가 턴마다 1회 공격해요. 보스전에서는 쉬운 전투가 적용되지 않아요. 보스를 쓰러뜨리면 보스 1마리당 조각 4개를 획득합니다. 보스는 아직 카드가 없는 포켓몬 위주로 나와요(나와 친구 둘 다 없는 포켓몬을 가장 먼저 찾아요). 두 플레이어는 8칸의 공유 출전 필드를 함께 사용합니다. 보스는 <b>내 트레이너와 친구 트레이너 중 한 명을 골라</b> 공격해요. 한 명의 체력이 0이 되어도 남은 한 명이 쓰러진 친구의 포켓몬까지 모두 조종하며 혼자 전투를 이어가요. <b>둘 다</b> 체력이 0이 되면 전투가 끝나요.</div></details>
+ <details class=bossHow style="margin-top:12px"><summary class="btn ghost sm" style="cursor:pointer;list-style:none">📖 설명 보기 / 접기</summary><div class=explain style="margin-top:8px;font-size:14px;line-height:1.7">보스 체력은 기본의 <b>15배</b>, 공격력은 그대로이며 기본 공격은 턴마다 <b>2회</b>예요. 단, 우리 포켓몬이 <b>3마리 늘 때마다 공격이 1회씩 늘어요</b>(최대 4회). 보스 체력이 <b>절반 이하면 공격력 +1</b>, <b>25% 이하면 공격 +1회</b>로 더 강해져요. 또 <b>3번째 보스 턴마다</b> 우리 포켓몬 모두에게 <b>1 피해</b>(분노한 뒤에는 2)를 주는 전체 공격이 와요. 한 턴 전에 예고가 떠요. 10% 확률로 보스 2마리가 등장하며, 이때는 각 보스가 턴마다 1회 공격해요. 보스전에서는 쉬운 전투가 적용되지 않아요. 보스를 쓰러뜨리면 보스 1마리당 조각 3개를 획득합니다. 보스는 아직 카드가 없는 포켓몬 위주로 나와요(나와 친구 둘 다 없는 포켓몬을 가장 먼저 찾아요). 두 플레이어는 8칸의 공유 출전 필드를 함께 사용합니다. 보스는 <b>내 트레이너와 친구 트레이너 중 한 명을 골라</b> 공격해요. 한 명의 체력이 0이 되어도 남은 한 명이 쓰러진 친구의 포켓몬까지 모두 조종하며 혼자 전투를 이어가요. <b>둘 다</b> 체력이 0이 되면 전투가 끝나요.</div></details>
  <div class=row style="margin-top:14px"><button class="btn red big" id=bcHost>방 만들기</button><button class="btn blue big" id=bcJoin>코드로 접속</button></div><button class="btn ghost big" id=bcRj style="width:100%;margin-top:8px">🔁 다시 들어가기 (나갔다 돌아올 때)</button><input class="inp codeIn" id=bcCode maxlength=4 inputmode=numeric placeholder="방 코드 4자리" style="margin-top:10px">
  <p class=mut style="font-size:12.5px;margin-top:8px;line-height:1.5">🔁 <b>전투 중에 나갔다면?</b> <b>🔁 다시 들어가기</b> 버튼을 누르고 방 번호와 방장/친구를 고르면 이어서 할 수 있어요. (같은 닉네임이어야 해요 · 방장이 다시 들어올 때 방장의 손패는 새로 뽑아요)</p>
  <p class=mut style="font-size:12px;margin-top:10px">인터넷 연결이 필요합니다. <b>학교 와이파이는 작동하지 않을 수 있어요.</b> 두 사람 모두 같은 버전의 게임 파일을 사용해 주세요. <a href="#" id=bcNet style="color:inherit">📶 연결 시험</a></p></div><div class=panel id=bcBox style="display:none;text-align:center"></div><div class=panel><h3>협동 규칙</h3><ul style="line-height:1.8;padding-left:20px"><li>턴 순서: 방장 → 친구 → 보스</li><li>각자 자기 손패와 덱으로 행동</li><li>8칸 공유 필드의 체력·상태·공격 횟수 동기화</li><li>문제는 행동한 플레이어가 풀고, 결과를 호스트가 판정·반영</li><li>보스 행동과 포획 결과는 호스트가 한 번만 처리해 두 화면에 전파</li></ul></div></div>`;
@@ -20563,13 +20573,13 @@ function pvpBegin(seed){if(PV.started)return;PV.started=true;const me=S.meta,f=P
  B.me.passRng=mkRngS((seed^hashStr(B.me.name)^0x7C3D)>>>0);B.foe.passRng=mkRngS((seed^hashStr(B.foe.name)^0x7C3D)>>>0);
  B.me.manaLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().mana)||0));B.me.studyLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().study)||0));
  B.foe.manaLv=Math.max(0,Math.min(5,Number(f.mana)||0));B.foe.studyLv=Math.max(0,Math.min(5,Number(f.study)||0));B.me.handLv=Math.max(0,Math.min(5,Number(trainerSkillLevels().hand)||0));B.foe.handLv=Math.max(0,Math.min(5,Number(f.hand)||0));B.me.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(B.me.studyLv));B.foe.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(B.foe.studyLv));
- // 먼저 하는 사람(방장)은 3장, 나중에 하는 사람은 4장
- const meFirst=PV.host;for(let i=0;i<(meFirst?3:4);i++)draw(B.me,true);for(let i=0;i<(meFirst?4:3);i++)draw(B.foe,true);
+ // 시작 카드는 둘 다 3장 (후공은 첫 차례 에너지 +1로 보정)
+ const meFirst=PV.host;for(let i=0;i<3;i++)draw(B.me,true);for(let i=0;i<3;i++)draw(B.foe,true);
  S.screen='battle';$('#view').innerHTML='';$('#battle').classList.add('on');startBgm('battle');renderBattle();
  PV.intro=1;let fRun=null;try{fRun=fieldFaceoffIntro([{name:me.name,pg:me.pg==='f'?'f':'m',av:partnerId(),me:true}],[{name:f.name,pg:f.pg==='f'?'f':'m',av:MON[f.av]?f.av:25}],{skip:false});}catch(e){fRun=null;}
  const goFight=()=>{PV.intro=0;if(!B)return;
  banner('친구 대전!',`${esc(f.name)}와(과) 대결`,1800);
- setTimeout(()=>{if(!B)return;if(meFirst)startTurn('me');else{B.side='foe';B.turn++;B.foe.maxMana=1;B.foe.mana=1;if(B.foe.manaLv>0&&B.foe.passRng()*100<manaChance(B.foe.manaLv)){B.foe.mana+=1;B.foe.bonusMana=1;}draw(B.foe);B.busy=false;renderBattle();pvpPump();}},1600);
+ setTimeout(()=>{if(!B)return;B.pvpFirst=meFirst?'me':'foe';if(meFirst)startTurn('me');else{B.side='foe';B.turn++;B.foe.maxMana=1;B.foe.mana=1;if(B.foe.manaLv>0&&B.foe.passRng()*100<manaChance(B.foe.manaLv)){B.foe.mana+=1;B.foe.bonusMana=1;}draw(B.foe);B.busy=false;renderBattle();pvpPump();}},1600);
  try{pvpPump();}catch(e){}};
  if(fRun)fRun.then(goFight,goFight);else goFight();}
 async function pvpEnd(win){try{pvSpecHide();}catch(e){}if(B&&B.pvp){if(B.__pvDone)return;B.__pvDone=true;}try{const q=$('#bq');if(q)q.classList.remove('on');}catch(e){}startBgm('adventure');const me=S.meta;const f=PV.foe||{name:'친구'};
@@ -25943,10 +25953,11 @@ async function rlBattleEnd(m,kind,win,me,fled){
 
 // ---------- 층 보스 보상 · 다음 층 ----------
 function rlGrantCard(weights){ // 보스 보상 카드: ★ 확률대로 뽑아 바로 도감에 넣어요 (이미 있으면 코인·별가루)
- const rar=rlRollRar(weights),pool=rlPoolByRar(rar,rar),fresh=pool.filter(id=>!S.meta.col[id]),id=rpick(fresh.length?fresh:pool);
+ let rar=rlRollRar(weights),pool=rlPoolByRar(rar,rar),fresh=pool.filter(id=>!S.meta.col[id]),id=rpick(fresh.length?fresh:pool);
+ if(rar>=3){const sh=S.meta.shard||{},prog=Object.keys(sh).map(Number).filter(x=>MON[x]&&MON[x].rar===rar&&!S.meta.col[x]&&sh[x]>0).sort((a,b)=>sh[b]-sh[a]);if(prog.length)id=prog[0]; /* 모으던 조각이 있으면 그 포켓몬 조각을 이어서 줘요 */if(!S.meta.col[id]){const g=gainBossShards(id,4);return{id,rar,g,isNew:g.k==='done',coin:g.coin,dust:g.dust};}} /* 이미 가진 포켓몬이면 아래에서 예전처럼 코인·별가루(★×10) */ /* 희귀(★3) 이상은 카드 대신 조각 4개 */
  if(!S.meta.col[id]){addCard(id);if(S.meta.shard&&S.meta.shard[id])delete S.meta.shard[id];return{id,rar,isNew:true};}
  const dust=rar*10,coin=rar*10;S.meta.dust=(S.meta.dust||0)+dust;S.meta.coins+=coin;return{id,rar,isNew:false,dust,coin};}
-function rlCardLine(c){return c.isNew?'새 포켓몬이 도감에 들어왔어요!':`이미 가진 카드예요. 대신 코인 +${c.coin}, 별가루 +${c.dust}!`;}
+function rlCardLine(c){if(c.g&&c.g.k==='shard')return `조각 +${c.g.added||4}개! (${c.g.n}/${c.g.need}) 조각을 다 모으면 카드가 돼요`;if(c.g&&c.g.k==='done')return `조각이 다 모여 카드가 됐어요! (조각 +${c.g.added||4})`;return c.isNew?'새 포켓몬이 도감에 들어왔어요!':`이미 가진 카드예요. 대신 코인 +${c.coin}, 별가루 +${c.dust}!`;}
 function rlCardsHTML(list){if(!list||!list.length)return '';
  return `<h4 class="rl-h" style="margin-top:14px">🎁 보스 보상 카드</h4><div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">${list.map(c=>`<div class="rl-gain"><div class="mut" style="font-size:12px">${c.floor||1}층 보스 ${starsHTML(MON[c.id].rar)}</div>${cardHTML(c.id,{size:'lg'})}<div style="margin-top:6px;font-size:13px"><b>${rlCardLine(c)}</b></div></div>`).join('')}</div>`;}
 async function rlFloorClear(m){
@@ -25954,7 +25965,7 @@ async function rlFloorClear(m){
  const fl=run.floor||1,F=RL_FLOOR[fl]||RL_FLOOR[1],last=fl>=RL.floors;
  const got=rlGrantCard(F.reward);run.cards=(run.cards||[]).concat([Object.assign({floor:fl},got)]);
  rlLog(run,'👑',`${fl}층 보스 ${rlJ(MON[m.id].name,'을','를')} 쓰러뜨렸다`);sfx('win');confetti(last?110:60);rlSave();
- try{await cardRewardFx([{id:got.id,isNew:got.isNew,coin:got.coin,dust:got.dust}],{title:`👑 ${fl}층 보스 보상 카드!`,logo:'BOSS CARD'});}catch(e){}
+ try{await cardRewardFx([{id:got.id,isNew:got.isNew,coin:got.coin,dust:got.dust,g:got.g}],{title:got.g?`👑 ${fl}층 보스 보상 조각!`:`👑 ${fl}층 보스 보상 카드!`,logo:got.g?'BOSS SHARD':'BOSS CARD'});}catch(e){}
  if(last)return rlEnd(true,'clear');
  const heal=rlHeal(RL.winHeal+(rlHas('herb')?2:0)+RL.floorHeal);rlSave();
  $('#battle').classList.remove('on');$('#battle').innerHTML='';$('#bq').classList.remove('on');
@@ -32395,12 +32406,12 @@ window.rjPrompt=function(kind,go){
 })();
 </script>
 <script id="boss-shards">
-/* 협동 보스전 승리 보상: 보스 1마리당 조각 4개 (조각이 다 모이면 카드가 되고, 남는 조각은 코인·별가루로 바뀌어요) */
-const BOSS_SHARDS=4;
-function gainBossShards(id){
+/* 협동 보스전 승리 보상: 보스 1마리당 조각 3개 (조각이 다 모이면 카드가 되고, 남는 조각은 코인·별가루로 바뀌어요) */
+const BOSS_SHARDS=3;
+function gainBossShards(id,cnt){cnt=cnt||BOSS_SHARDS;
  const m=S.meta,owned=!!m.col[id],need=SHARD_NEED[MON[id].rar];
  let added=0,coin=0,dust=0,done=false,last=null;
- for(let i=0;i<BOSS_SHARDS;i++){const r=gainCard(id,true);last=r;if(r.k==='dup'){coin+=r.coin||0;dust+=r.dust||0;}else{added++;if(r.k==='done')done=true;}}
+ for(let i=0;i<cnt;i++){const r=gainCard(id,true);last=r;if(r.k==='dup'){coin+=r.coin||0;dust+=r.dust||0;}else{added++;if(r.k==='done')done=true;}}
  if(owned||!added)return{k:'dup',id,coin,dust};
  if(done)return{k:'done',id,need,n:need,added,coin,dust};
  return{k:'shard',id,need,n:(m.shard&&m.shard[id])||last.n||added,added,coin,dust};}
@@ -35124,7 +35135,7 @@ function t2StartMatch(){if(!T2.host||T2.started||!t2CanStart())return;
   const p=mkPlayer(nameOf(m),hi.deck,hp,MON[hi.av]?hi.av:25,false,hi.owned,true);
   p.manaLv=t2clamp(hi.mana,0,5);p.studyLv=t2clamp(hi.study,0,5);p.powerUses=Math.min(3,STUDY_BASE+studyExtraUses(p.studyLv));p.handLv=t2clamp(hi.hand,0,5);p.evoLv=t2clamp(hi.evo,0,5);
   p.skm=skinCleanMap(hi.sk);p.team=t;p.tix=i;p.mid=m.id;p.tsUsed={};p.ctr=0;p.t2done=0;p.qc=0;p.board=boards[t];return p;}));
- teams.forEach((tm,t)=>tm.forEach(p=>{for(let i=0;i<(t===0?3:4);i++)draw(p,true);}));
+ teams.forEach((tm,t)=>tm.forEach(p=>{for(let i=0;i<3;i++)draw(p,true);}));
  const hostM=T2.members[0],vt=hostM.team,li=hostM.pos;BC.localIndex=li;BC.host=true;BC.t2=true;
  T2.started=true;T2.queue=[];T2.resDone=false;
  const first=teams[vt][li];
@@ -35488,7 +35499,7 @@ function renderBoss4(n){n=n===2?2:n===3?3:4;S.screen='bosscoop';bossClose();t2Cl
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${n===2?'⚡ 2인 동시 보스전':n===3?'👥 3인 협동 보스전':'👥 4인 협동 보스전'}</h2><span class=hudSp></span><button class="btn ghost sm" id=b4Back>← 모드 선택</button></div>
   <p style="line-height:1.65;margin-top:8px">방장이 방을 열고 친구 <b>${n-1}명</b>이 같은 번호로 들어오면 시작해요. 한 판에 <b>코인 ${PVP_COST}개</b>가 들어요. 보스는 ${n===2?'<b>4성 20% · 5성 80%</b>로 나타나고, 10% 확률로 <b>2마리</b>가 함께 나와요.':'<b>항상 전설 포켓몬 2마리</b>예요.'}</p>
   <div class="tiles cmp" style="margin-top:8px"><div class=tile><span class=ti>✨</span><span class=tn>${n===2?'4성 20% · 5성 80%':'5성 보스 100%'}</span><span class=td>${n===2?'보스 1마리 (10%는 2마리)':'항상 전설 포켓몬'}</span></div><div class=tile><span class=ti>👹</span><span class=tn>보스 ${n===2?'1~2마리':'2마리'}</span><span class=td>${n===2?'가끔 두 마리가 나와요':'한꺼번에 등장해요'}</span></div></div>
-  <details class=bossHow style="margin-top:10px"><summary class="btn ghost sm" style="cursor:pointer;list-style:none">📖 설명 보기 / 접기</summary><div class=explain style="margin-top:8px;font-size:14px;line-height:1.7">• ${n}명 모두 <b>동시에</b> 행동하고, 모두 <b>차례 끝</b>을 누르면 보스 차례가 돼요.<br>• ${n===2?8:10}칸 필드와 <b>트레이너 체력은 모두가 함께</b> 써요. 체력은 <b>${n===2?20:n===3?B3_HP:30}</b> + 각자의 체력증강 레벨 합(모두 5레벨이면 <b>${n===2?30:n===3?B3_HP+15:50}</b>)이에요.<br>• 트레이너 스킬은 <b>각자</b> 쓸 수 있어요.<br>${n===2?'• 보스는 <b>1마리면 2회</b>, <b>2마리면 각각 1회</b> 공격해요. 한 마리가 쓰러지면 남은 보스는 2회가 돼요. 우리 필드에 포켓몬이 <b>3마리 이상</b>이면 +1회(6마리 이상이면 +2회), 보스 체력이 <b>25% 이하</b>면 발악해서 +1회 (최대 4회). 체력이 50% 이하면 분노해서 공격력도 +1이에요.<br>':'• 보스는 <b>각각 2회</b> 공격해요. 체력이 <b>50% 이하</b>면 분노해서 공격력 +1, <b>25% 이하</b>면 발악해서 +1회, 우리 필드에 포켓몬이 <b>5마리 이상</b>이면 +1회 (최대 4회).<br>'}• 보스가 트레이너를 공격하면 <b>방어 문제가 한 명씩 돌아가며</b> 나와요. 다른 친구들은 그 친구가 고른 답을 보고, 결과가 <b>❤️ / 💔</b>로 나와요. 내 차례가 아닐 땐 <b>답이라고 생각하는 보기를 눌러 ❤️ 로 응원</b>할 수 있어요. 푸는 친구 화면에 작은 ❤️ 가 최대 3개 떠요. ❤️는 <b>문제 시작 30초 뒤</b>에 떠요.<br>• <b>차례 끝</b>을 누르면 아직 행동 중인 친구의 <b>공격·공부 기술 문제</b>를 구경할 수 있어요. 친구가 여럿이면 <b>◀ ▶</b> 로 바꿔 볼 수 있어요. (방어 문제는 언제나 가장 먼저 보여요)<br>• 보스를 쓰러뜨리면 보스 1마리당 조각 ${typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:4}개를 받아요. 코인은 들지 않아요.</div></details>
+  <details class=bossHow style="margin-top:10px"><summary class="btn ghost sm" style="cursor:pointer;list-style:none">📖 설명 보기 / 접기</summary><div class=explain style="margin-top:8px;font-size:14px;line-height:1.7">• ${n}명 모두 <b>동시에</b> 행동하고, 모두 <b>차례 끝</b>을 누르면 보스 차례가 돼요.<br>• ${n===2?8:10}칸 필드와 <b>트레이너 체력은 모두가 함께</b> 써요. 체력은 <b>${n===2?20:n===3?B3_HP:30}</b> + 각자의 체력증강 레벨 합(모두 5레벨이면 <b>${n===2?30:n===3?B3_HP+15:50}</b>)이에요.<br>• 트레이너 스킬은 <b>각자</b> 쓸 수 있어요.<br>${n===2?'• 보스는 <b>1마리면 2회</b>, <b>2마리면 각각 1회</b> 공격해요. 한 마리가 쓰러지면 남은 보스는 2회가 돼요. 우리 필드에 포켓몬이 <b>3마리 이상</b>이면 +1회(6마리 이상이면 +2회), 보스 체력이 <b>25% 이하</b>면 발악해서 +1회 (최대 4회). 체력이 50% 이하면 분노해서 공격력도 +1이에요.<br>':'• 보스는 <b>각각 2회</b> 공격해요. 체력이 <b>50% 이하</b>면 분노해서 공격력 +1, <b>25% 이하</b>면 발악해서 +1회, 우리 필드에 포켓몬이 <b>5마리 이상</b>이면 +1회 (최대 4회).<br>'}• 보스가 트레이너를 공격하면 <b>방어 문제가 한 명씩 돌아가며</b> 나와요. 다른 친구들은 그 친구가 고른 답을 보고, 결과가 <b>❤️ / 💔</b>로 나와요. 내 차례가 아닐 땐 <b>답이라고 생각하는 보기를 눌러 ❤️ 로 응원</b>할 수 있어요. 푸는 친구 화면에 작은 ❤️ 가 최대 3개 떠요. ❤️는 <b>문제 시작 30초 뒤</b>에 떠요.<br>• <b>차례 끝</b>을 누르면 아직 행동 중인 친구의 <b>공격·공부 기술 문제</b>를 구경할 수 있어요. 친구가 여럿이면 <b>◀ ▶</b> 로 바꿔 볼 수 있어요. (방어 문제는 언제나 가장 먼저 보여요)<br>• 보스를 쓰러뜨리면 보스 1마리당 조각 ${typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:3}개를 받아요. 코인은 들지 않아요.</div></details>
   <div class=row style="margin-top:12px"><button class="btn red big" id=b4Host>방 만들기 (방장)</button><button class="btn blue big" id=b4Join>방 들어가기</button></div><button class="btn ghost big" id=b4Rj style="width:100%;margin-top:8px">🔁 다시 들어가기 (나갔다 돌아올 때)</button>
   <div class=row style="margin-top:8px;align-items:center"><input class="inp codeIn" id=b4Code maxlength=4 inputmode=numeric placeholder="방 번호 4자리" style="flex:1"></div>
   <p class=mut style="font-size:12.5px;margin-top:8px;line-height:1.5">🔁 <b>전투 중에 나갔다면?</b> <b>🔁 다시 들어가기</b>를 누르고 <b>같은 닉네임</b>으로 방 번호를 넣으면 원래 자리에서 이어서 할 수 있어요. (방장이 껐다면 방장이 「방장이었어요」를 고르고, 남은 친구들은 화면을 켠 채 기다려 주세요 · 방장 손패는 새로 뽑아요)</p>
@@ -35634,7 +35645,7 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
  const nm=(d.ids||[]).map(x=>esc(MON[x].name)).join(' · ');
  const why=d.why==='quit'?`${esc(d.who||'누군가')}님이 전투를 그만두었어요.`:'';
  M(`<div style="text-align:center"><h2 style="font-size:30px">${win?'🏆 보스 격파!':'아쉬워요…'}</h2><p><b>${nm}</b></p>${why?`<p class=mut>${why}</p>`:''}
-  <p>${win?`보스 조각 ${(d.ids||[]).length*(typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:4)}개를 받았어요!`:'이번에는 보스를 쓰러뜨리지 못했어요.'}</p><p>우리 팀: ${(d.names||[]).map(esc).join(' · ')}<br>내가 맞힌 문제 ${qc}개</p>
+  <p>${win?`보스 조각 ${(d.ids||[]).length*(typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:3)}개를 받았어요!`:'이번에는 보스를 쓰러뜨리지 못했어요.'}</p><p>우리 팀: ${(d.names||[]).map(esc).join(' · ')}<br>내가 맞힌 문제 ${qc}개</p>
   ${win?`<div class=row style="justify-content:center;gap:8px"><span class=pill>${I('coin')} +100</span><span class=pill>${I('candy')} +${10+qc}</span></div>`:''}
   <div class=mbtns><button class="btn gold" data-a=x>확인</button></div></div>`,{x:()=>{t2AfterResult();},_close:()=>{}});
  if(win&&gs[0]){try{setTimeout(()=>{try{bossRewardPack(d.ids,gs);}catch(e){console.warn(e);}},300);}catch(e){}}}
