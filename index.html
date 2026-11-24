@@ -2231,6 +2231,21 @@ html.lowfx .unit.frozen .sp img{filter:sepia(.55) hue-rotate(168deg) saturate(1.
 .rl-nmimg>img{width:40px;height:40px;object-fit:contain;image-rendering:pixelated}
 .rl-nmimg>b{font-family:'Jua',sans-serif;font-weight:400;color:#1d2b5a}
 
+/* ===== 상태 아이콘: 공격 가능(초록 검) · 바위벽/강철(갈색 방패) ===== */
+.unit .stI{position:absolute;top:-9px;display:flex;gap:2px;align-items:flex-start;z-index:7;pointer-events:none}
+#myLane .unit .stI{right:-5px}
+#foeLane:not(.wildLane) .unit .stI{left:-5px}
+#foeLane.wildLane .unit .stI{top:3px;left:3px}
+.unit .stI>span{display:flex;align-items:center;justify-content:center;width:22px;height:22px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.unit .stI>span>.ic{width:15px;height:15px;filter:none}
+.unit .stI .atkB{border-radius:50%;background:#35d879;border:2px solid #14803f;animation:stIPulse 1.2s ease-in-out infinite}
+.unit .stI .defB{background:#f6ead6;border:2px solid #9a744e;border-radius:4px 4px 50% 50%/4px 4px 70% 70%;height:23px}
+.unit .stI .defB.steel{background:#e3e9f4;border-color:#6b4a2e}
+@keyframes stIPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+html.lowfx .unit .stI .atkB{animation:none}
+@media(prefers-reduced-motion:reduce){.unit .stI .atkB{animation:none}}
+@media(max-width:520px){.unit .stI>span{width:18px;height:18px}.unit .stI>span>.ic{width:12px;height:12px}.unit .stI .defB{height:19px}}
+
 </style>
 
 
@@ -9745,6 +9760,12 @@ function drawSpecial(P){if(!P||!P.specials)return null;
  return null;}
 
 const isTaunt=u=>u&&(hk(u,'taunt')||hk(u,'armor'));
+/* 공격 가능(초록 테두리)·바위벽·강철(갈색 테두리)을 아이콘으로도 알려 줘요: 검 = 공격 가능, 바위 방패 = 바위벽, 강철 방패 = 강철 */
+function stateIconsH(u,ready){if(!u)return '';let h='';
+ if(ready)h+=`<span class="atkB" title="공격할 수 있어요">${I('sword')}</span>`;
+ if(hk(u,'taunt'))h+=`<span class="defB rock" title="바위벽: 상대는 이 포켓몬부터 공격해야 해요">${I('rock')}</span>`;
+ if(hk(u,'armor'))h+=`<span class="defB steel" title="강철: 받는 피해 -${armorV(u)||1} · 상대는 이 포켓몬부터 공격해야 해요">${I('steel')}</span>`;
+ return h?`<div class=stI>${h}</div>`:'';}
 const gmxIdx=P=>P&&P.board?P.board.map((u,i)=>u&&u.gm&&u.hp>0?i:-1).filter(i=>i>=0):[]; // 거다이맥스 중인 포켓몬: 트레이너는 공격받지 않고, 이 포켓몬부터 공격해야 해요(몰래 공격도 예외 없음)
 function startBattle(gi,hi){const me=S.meta;const H=hi!=null?HARD[hi]:null;if(gi>=0&&!window.__sim)me.stats.gymTry=(me.stats.gymTry||0)+1;if(!ensureDeck()){toast('덱에 카드가 '+deckN()+'장 있어야 해요. 카드팩을 더 열어 봐요!');return;}
  const g=gi>=0?GYMS[gi]:null;const diff=H?10+hi:(g?gi+1:clamp(Math.ceil(lvOf(me.xp).lv/2),1,7));
@@ -9870,7 +9891,7 @@ function renderBattle(){if(!B||window.__sim)return;try{wildSkinRoll();}catch(e){
  const valid=targetsFor(B.sel);
  const unitH=(u,P,i)=>{if(!u)return '';const friendly=P===me;const mine=friendly&&(!B.coop||Number(u.coopOwner??0)===B.coop.active);const m=MON[u.id];const ready=mine&&my&&u.att>0&&!u.frozen;
   return `<div class="unit${u.mg?' mega':''}${u.mg&&!u.fz&&PRIMAL[u.id]?' primal':''}${u.mg&&!u.fz&&evoCat(u.id)==='S'?' spform':''}${u.mg&&!u.fz&&evoCat(u.id)==='U'?' ultra':''}${u.mg&&u.fz?' fuse':''}${(u.gm||u.wGm)?' gmax':''}${(u.gm||u.wGm)&&u.id===890?' eterna':''}${ready?' ready':''}${mine&&B.sel===i?' sel':''}${!friendly&&valid.units.includes(i)?' tgt':''}${isTaunt(u)?' taunt':''}${u.frozen?' frozen':''}${u.frozen&&u.moon?' moonstun':''}${u.shield?' shielded':''}${mine&&B.itemTargetMode&&!u.frozen?' itemTarget':''}${!friendly&&B.moonTargetMode?' itemTarget':''}${mine&&!ready&&my?' zz':''}" data-i="${i}"${u.mg?` style="--mc:${TYPE_COL[kwType(m)]||'#8ad0ff'}"`:''}>
-   ${B.coop?(()=>{const _L=(P===me?B.coop.players:(B.coop.foeTeam||B.coop.players));let ow=Number(u.coopOwner??0);if(!Number.isInteger(ow)||ow<0||ow>3||ow>=Math.max(2,_L.length))ow=0;const nm=String((_L[ow]&&_L[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div><div class=shadow></div><div class=sp${u.gbk?` style="animation:gmBackIn .85s cubic-bezier(.2,1.3,.4,1) both;animation-delay:-${Math.max(0,Math.min(.8,(Date.now()-u.gbk)/1000)).toFixed(2)}s"`:''}>${unitImgHTML(u,mine)}</div><div class=un>${esc(u.fz&&FORMNAME[u.mg]?FORMNAME[u.mg]:m.name)}</div><div class=tdots>${(u.fz&&FUSE_TYPES[u.mg]||unitTypes(u,true)).map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
+   ${B.coop?(()=>{const _L=(P===me?B.coop.players:(B.coop.foeTeam||B.coop.players));let ow=Number(u.coopOwner??0);if(!Number.isInteger(ow)||ow<0||ow>3||ow>=Math.max(2,_L.length))ow=0;const nm=String((_L[ow]&&_L[ow].name)||(ow?'친구':'방장')).trim();return `<span class="coopOwner o${ow}">${esc(Array.from(nm).slice(0,2).join('')||(ow?'친구':'방장'))}</span>`;})():''}${!friendly?tgtBadge(u,i):''}<div class=kwI>${I(kwOf(m).ic)}${u.shield?numIcH('shield','shield',u.shield,'방어막 '+u.shield):''}${icyBadgeH(u)}${traitBadgeH(u)}</div>${stateIconsH(u,ready)}<div class=shadow></div><div class=sp${u.gbk?` style="animation:gmBackIn .85s cubic-bezier(.2,1.3,.4,1) both;animation-delay:-${Math.max(0,Math.min(.8,(Date.now()-u.gbk)/1000)).toFixed(2)}s"`:''}>${unitImgHTML(u,mine)}</div><div class=un>${esc(u.fz&&FORMNAME[u.mg]?FORMNAME[u.mg]:m.name)}</div><div class=tdots>${(u.fz&&FUSE_TYPES[u.mg]||unitTypes(u,true)).map(t=>`<i style="background:${TYPE_COL[t]}"></i>`).join('')}</div>
    <div class=us><span class="st atk">${u.atk}</span><span class="st hp"${u.hp<u.max?' style="background:#d9393f"':''}>${u.hp}</span></div></div>`;};
  const loc=B.coop?(B.coop.players[BC.localIndex]||me):me;const ally=(B.coop&&!(B.t2&&B.t2.boss&&!B.rl2))?(B.coop.players[1-BC.localIndex]||null):null;const heroH=(P,id,cur)=>`<div class="hero${cur?' turnNow':''}" id=${id} style="cursor:pointer" title="트레이너 스킬 열기"><div class=av>${heroImgV(P)}</div><div><div class=hn>${nameTag(P.name)}${P.t2done?' ✔':''}</div><div class=hhp>${I('heart')}${P.hp}</div></div></div>`;
   const mana=P=>{const bp=Math.max(0,Math.min(P.bonusMana||0,P.mana)),sp=Math.max(0,Math.min(P.sunMana||0,P.mana-bp)),bl=P.mana-bp-sp,den=Math.max(P.maxMana,bl);return `<div class=mana>${Array.from({length:bp},()=>'<i class="on bonus"></i>').join('')}${Array.from({length:sp},()=>'<i class="on sun"></i>').join('')}${Array.from({length:6},(_,i)=>`<i class="${i<bl?'on':''}"${i>=den?' style="opacity:.3"':''}></i>`).join('')}<b>${bl}${bp+sp?`<span class=manaPlus>+${bp+sp}</span>`:''}/${den}</b></div>`;};
