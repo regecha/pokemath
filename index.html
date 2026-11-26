@@ -3731,6 +3731,16 @@ const MUS=(()=>{
   sc5:{bpm:96,swing:0,scale:'min',tonic:0,oct:5,seed:163,vol:0.77,lift:0,prog:{A:['Cm','Ab','Fm','Gm','Cm','Ab','Fm','Gm'],B:['Ab','Eb','Bb','Gm','Ab','Fm','Gm','Gm']},rhyA:['sparse','dotted'],rhyB:['flowing','sparse'],
    lead:{w:'triangle',v:.075,vib:5,rev:.55,dly:.3},arp:{pat:'broken',w:'sine',v:.05,base:60,rev:.5,dly:.3},bass:{st:'whole',w:'sine',v:.17,base:24},pad:{w:'sawtooth',v:.024,cut:800,base:48},bell:{v:.07},kit:'tick',
    lay:{A:{lead:0,arp:1,pad:1,bass:1,dr:1,bell:1},A2:{lead:1,arp:1,pad:1,bass:1,dr:1,bell:1},B:{lead:1,harm:1,arp:1,pad:1,bass:1,dr:2,bell:1},A3:{lead:1,arp:1,pad:1,bass:1,dr:2,bell:1}}}
+,
+  // ----- 사이드 스토리 -----
+  // 〈작은 믿음, 거대한 승리〉 다윗과 골리앗: 양치기 소년의 수금(하프) 소리로 조용히 시작해서, 점점 용기가 차오르다가 마지막에 밝은 장조로 열려요
+  sc6:{bpm:92,swing:.1,scale:'dor',tonic:2,oct:5,seed:206,vol:0.9,lift:1,prog:{A:['Dm','C','Bb','C','Dm','Gm','A','Dm'],B:['Bb','F','C','Dm','Bb','F','C','D']},rhyA:['flowing','dotted'],rhyB:['bouncy','run'],
+   lead:{w:'triangle',v:.085,vib:5,rev:.5,dly:.25},arp:{pat:'up8',w:'triangle',v:.06,base:57,rev:.5,dly:.25},bass:{st:'sway',w:'sine',v:.16,base:34},pad:{w:'triangle',v:.03,cut:1000,base:53},bell:{v:.06},kit:'taiko',
+   lay:{A:{arp:1,pad:1,bass:1,bell:1},A2:{lead:1,arp:1,pad:1,bass:1,bell:1},B:{lead:1,harm:1,arp:1,pad:1,bass:1,dr:1,bell:1},A3:{lead:1,harm:1,arp:1,pad:1,bass:1,dr:1,bell:1}}},
+  // 〈불멸의 이순신〉: 낮은 북소리와 가야금·피리 같은 소리, 열린 5도 화음으로 장군의 묵직하고 의연한 바다를 그려요
+  sc7:{bpm:78,swing:0,scale:'min',tonic:2,oct:5,seed:307,vol:0.9,lift:0,prog:{A:['Dsus2','Gsus2','Dsus2','Asus4','Dsus2','Gsus2','Asus4','Dm'],B:['Bb','C','Dm','Dm','Bb','C','Asus4','A']},rhyA:['sparse','dotted'],rhyB:['dotted','flowing'],
+   lead:{w:'sawtooth',v:.05,vib:6,rev:.5,dly:.22,cut:2200},arp:{pat:'broken',w:'triangle',v:.055,base:52,rev:.45,dly:.2},bass:{st:'slow',w:'sine',v:.17,base:26},pad:{w:'sawtooth',v:.02,cut:700,base:46},bell:{v:.05},kit:'taiko',
+   lay:{A:{arp:1,pad:1,bass:1,dr:1},A2:{lead:1,arp:1,pad:1,bass:1,dr:1,bell:1},B:{lead:1,harm:1,arp:1,pad:1,bass:1,dr:2,bell:1},A3:{lead:1,harm:1,arp:1,pad:1,bass:1,dr:2,bell:1}}}
  };
  // ---------- 작곡: 곡 정보 → 스텝별 이벤트 ----------
  const cache={};
@@ -22181,8 +22191,8 @@ const SC_UNITS=[
 ].concat(SC_REGIONS.map((r,i)=>({name:r.name,sub:`제${i+1}장`,icon:r.icon,art:i,bgm:i,region:i})),[
  {name:'에필로그',sub:'다음 페이지',icon:'🌅',art:0,bgm:0},
  {name:'8시 15분의 등대',sub:'외전 · 약속을 배달하는 새',icon:'🌊',art:1,bgm:1},
- {name:'작은 믿음, 거대한 승리',sub:'외전 · 다윗과 골리앗',icon:'🪨',art:0,bgm:0},
- {name:'이순신 연대기 제1화',sub:'장난꾸러기 대장과 말에서 떨어진 날',icon:'🐢',art:0,bgm:0,yi:1},{name:'이순신 연대기 제2화',sub:'억울해도 정직하게, 변방의 장수',icon:'📜',art:0,bgm:0,yi:2},{name:'이순신 연대기 제3화',sub:'바다를 맡은 장군, 거북선을 만들다',icon:'🚢',art:0,bgm:0,yi:3},{name:'이순신 연대기 제4화',sub:'바다를 뒤흔든 첫 승리, 옥포에서 한산도까지',icon:'⚓',art:0,bgm:0,yi:4},{name:'이순신 연대기 제5화',sub:'가장 어두운 시간, 하얀 옷을 다시 입다',icon:'🏳️',art:0,bgm:0,yi:5},{name:'이순신 연대기 제6화',sub:'열두 척의 용기, 명량 대첩',icon:'🌊',art:0,bgm:0,yi:6},{name:'이순신 연대기 제7화',sub:'마지막 바다, 노량',icon:'🌅',art:0,bgm:0,yi:7}
+ {name:'작은 믿음, 거대한 승리',sub:'외전 · 다윗과 골리앗',icon:'🪨',art:0,bgm:6},
+ {name:'이순신 연대기 제1화',sub:'장난꾸러기 대장과 말에서 떨어진 날',icon:'🐢',art:0,bgm:7,yi:1},{name:'이순신 연대기 제2화',sub:'억울해도 정직하게, 변방의 장수',icon:'📜',art:0,bgm:7,yi:2},{name:'이순신 연대기 제3화',sub:'바다를 맡은 장군, 거북선을 만들다',icon:'🚢',art:0,bgm:7,yi:3},{name:'이순신 연대기 제4화',sub:'바다를 뒤흔든 첫 승리, 옥포에서 한산도까지',icon:'⚓',art:0,bgm:7,yi:4},{name:'이순신 연대기 제5화',sub:'가장 어두운 시간, 하얀 옷을 다시 입다',icon:'🏳️',art:0,bgm:7,yi:5},{name:'이순신 연대기 제6화',sub:'열두 척의 용기, 명량 대첩',icon:'🌊',art:0,bgm:7,yi:6},{name:'이순신 연대기 제7화',sub:'마지막 바다, 노량',icon:'🌅',art:0,bgm:7,yi:7}
 ]);
 const SC_YI_START=10,SC_YI_N=7;const scIsYi=u=>u>=SC_YI_START&&u<SC_YI_START+SC_YI_N;
 const SC_YI_REWARD={packs:3,coins:100,candy:30};
@@ -22354,7 +22364,7 @@ function scApplyBackdrop(i,forBattle=false,key,variant){
 }
 function scStopMusic(){if(SC_BGM.timer){SC_BGM.timer=null;SC_BGM.region=-1;MUS.stop();}}
 function scMusicStart(region){
- region=Math.max(0,Math.min(5,Number(region)||0));
+ region=Math.max(0,Math.min(7,Number(region)||0));SC.mus=region; /* 0~5 지역곡 · 6 작은 믿음, 거대한 승리 · 7 불멸의 이순신 */
  if(!S.meta.settings.bgm){scStopMusic();MUS.stop();AU.musicMode='';if(AU.musicGain&&AU.ctx)AU.musicGain.gain.setTargetAtTime(.0001,AU.ctx.currentTime,.1);return;}
  const c=ac();if(!c)return;const bus=ensureMusicBus(c);MUS.bind(c,bus);
  bus.gain.cancelScheduledValues(c.currentTime);bus.gain.setTargetAtTime(Math.max(.0001,.36*bgmVol()),c.currentTime,.14);
@@ -22362,7 +22372,7 @@ function scMusicStart(region){
  const intense=S.screen==='scenarioBattle'||(S.screen==='battle'&&!!B&&!B.over);
  SC_BGM.timer=1;SC_BGM.region=region;AU.musicMode='scenario';MUS.play('sc'+region,intense);
 }
-function scSetWorldMusic(){scMusicStart(SC.index>=0?SC.index:0);}
+function scSetWorldMusic(){scMusicStart(SC.mus!=null?SC.mus:(SC.index>=0?SC.index:0));}
 function scBackToHub(){try{rl2ToSolo();}catch(e){}SC.busy=false;scStopMusic();renderHub();startBgm();}
 
 // ----- 이야기 리더 -----
@@ -22629,8 +22639,8 @@ function scClearHTML(u,pos,pg,grant){
 function scBtHTML(u,pos,pg){
  const duel=pg.kind==='duel',id=duel?448:(scMonId(pg.who)||scMonId(pg.label)),beaten=scBeaten(u,pos),p=scState();
  const nm=duel?'이안':scMonName(id),official=(!duel&&SC_ALIAS_SHOW[id]&&MON[id].name!==SC_ALIAS_SHOW[id])?`<small class="scv-alias">게임 카드 이름: ${esc(MON[id].name)}</small>`:'';
- const _yk=(scIsYi(u)&&window.scYiHeroArt)?window.scYiHeroArt(u,pos):null,heroImg=`<img class="scv-vsimg" src="${_yk||SC_USER_ART.portraits.hero}" alt="">`,fn=(pg.foes&&pg.foes.length)||1,foeImg=duel?`<img class="scv-vsimg" src="${SC_USER_ART.portraits.rival}" alt="">`:(fn>1?`<div style="display:flex;justify-content:center;gap:2px;width:100%">${pg.foes.map(scMonId).map(fid=>`<div class="scv-vsmon" style="width:${Math.floor(92/fn)}%;min-width:0">${monImg(fid,'front')}</div>`).join('')}</div>`:`<div class="scv-vsmon">${monImg(id,'front')}</div>`);
- return `<div class="scv-card scv-bt"><span class="sc-tag ${pg.kind==='wild'?'':'sc-tag-hot'}">⚔ ${scBtHeader(pg)}</span><div class="scv-vs"><div class="side">${heroImg}<b>${esc(scIsYi(u)?'순신':scNick())}</b></div><div class="mid">VS</div><div class="side">${foeImg}<b>${esc(fn>1?Object.entries(pg.foes.reduce((a,x)=>(a[x]=(a[x]||0)+1,a),{})).map(([k,v])=>k+(v>1?' ×'+v:'')).join(' · '):pg.who)}</b>${official}</div></div><p class="scv-btlabel">${esc(pg.label)}${pg.ph?`<br><em>${esc(pg.ph)}</em>`:''}</p><div class="sc-battle-rules"><b>전투 방식:</b> 덱에서 카드를 내고, 공격할 때 문제를 풀어요. ${duel?'이안의 체력을 모두 깎으면 승리!':((u===9||scIsYi(u))?'상대 체력을 모두 줄이면 승리해요!':'상대 체력을 모두 줄이면 묶여 있던 굴레가 풀리고 천공의 도감에 기록돼요.')}</div>${scDeckThumbs()}<div class="mbtns"><button class="btn red big" id="scGoBattle">${beaten?'⚔ 다시 싸우기':'⚔ 전투 시작'}</button><button class="btn blue" id="scBtDeck">🃏 덱 편성</button>${(beaten||SC.replay)?`<button class="btn ghost" id="scBtSkip">전투 건너뛰기 ▶</button>`:''}</div>${(duel&&!beaten)?`<p class="sc-note" style="margin-top:8px">져도 이야기는 이어갈 수 있어요. 마음껏 도전해 보세요!</p>`:''}</div>`;
+ const _yk=(scIsYi(u)&&window.scYiHeroArt)?window.scYiHeroArt(u,pos):(u===9?scDavidFace()||null:null),heroImg=`<img class="scv-vsimg" src="${_yk||SC_USER_ART.portraits.hero}" alt="">`,fn=(pg.foes&&pg.foes.length)||1,foeImg=duel?`<img class="scv-vsimg" src="${SC_USER_ART.portraits.rival}" alt="">`:(fn>1?`<div style="display:flex;justify-content:center;gap:2px;width:100%">${pg.foes.map(scMonId).map(fid=>`<div class="scv-vsmon" style="width:${Math.floor(92/fn)}%;min-width:0">${monImg(fid,'front')}</div>`).join('')}</div>`:`<div class="scv-vsmon">${monImg(id,'front')}</div>`);
+ return `<div class="scv-card scv-bt"><span class="sc-tag ${pg.kind==='wild'?'':'sc-tag-hot'}">⚔ ${scBtHeader(pg)}</span><div class="scv-vs"><div class="side">${heroImg}<b>${esc(scIsYi(u)?'순신':u===9?'다윗':scNick())}</b></div><div class="mid">VS</div><div class="side">${foeImg}<b>${esc(fn>1?Object.entries(pg.foes.reduce((a,x)=>(a[x]=(a[x]||0)+1,a),{})).map(([k,v])=>k+(v>1?' ×'+v:'')).join(' · '):pg.who)}</b>${official}</div></div><p class="scv-btlabel">${esc(pg.label)}${pg.ph?`<br><em>${esc(pg.ph)}</em>`:''}</p><div class="sc-battle-rules"><b>전투 방식:</b> 덱에서 카드를 내고, 공격할 때 문제를 풀어요. ${duel?'이안의 체력을 모두 깎으면 승리!':((u===9||scIsYi(u))?'상대 체력을 모두 줄이면 승리해요!':'상대 체력을 모두 줄이면 묶여 있던 굴레가 풀리고 천공의 도감에 기록돼요.')}</div>${scDeckThumbs()}<div class="mbtns"><button class="btn red big" id="scGoBattle">${beaten?'⚔ 다시 싸우기':'⚔ 전투 시작'}</button><button class="btn blue" id="scBtDeck">🃏 덱 편성</button>${(beaten||SC.replay)?`<button class="btn ghost" id="scBtSkip">전투 건너뛰기 ▶</button>`:''}</div>${(duel&&!beaten)?`<p class="sc-note" style="margin-top:8px">져도 이야기는 이어갈 수 있어요. 마음껏 도전해 보세요!</p>`:''}</div>`;
 }
 function scShow(u,pos){if(scUnitLocked(u)){try{toast(scLockMsg(u));}catch(e){}return;}
  const pages=scPages(u);if(!pages.length){scBackFor(u);return;}
@@ -22781,9 +22791,10 @@ function scBindStageClicks(){
   if(!pp.done[u]&&(pp.pos[u]||0)>0){M(`<h2>${esc(SC_UNITS[u].name)}</h2><p style="line-height:1.7">저장된 장면이 있어요. 어디서부터 볼까요?</p><div class="mbtns"><button class="btn gold big" data-a="c">이어서 보기</button><button class="btn ghost" data-a="s">처음부터</button></div>`,{c:()=>{closeM();scEnterUnit(u,false);},s:()=>{closeM();scEnterUnit(u,true);},_close:()=>closeM()});}
   else scEnterUnit(u,true);});
 }
+const scDavidFace=()=>{try{const m=/src="([^"]+)"/.exec(window.scSpeakerArt('다윗')||'');return m?m[1]:'';}catch(e){return '';}}; /* 다윗 대표 그림: 이야기 속 다윗 말풍선 일러스트를 그대로 써요 */
 function scCardHTML(un,u,p,cur){const done=!!p.done[u],open=(u>=SC_MAIN_N?!scUnitLocked(u):u<=p.unlocked),act=u===cur&&!done&&open,inprog=!done&&(p.pos[u]||0)>0;
   const st=done?'완료':open?(act?(inprog?'진행 중':'진행 가능'):'열림'):'잠김';
-  return `<button class="sc-stage ${done?'done':''} ${act?'next':''}" data-u="${u}" ${open?'':'disabled'}><div class="sc-stage-art"><span class="sc-stage-number">${u===0?'PROLOGUE':u===7?'EPILOGUE':u>=SC_MAIN_N?'SIDE STORY':'CHAPTER '+String(u).padStart(2,'0')}</span><span class="sc-stage-status">${st}</span><img class="scv-thumb" src="${scBgSVG(scUnitBgKey(u),'')}" alt=""></div><div class="sc-stage-info"><b>${un.icon} ${esc(un.name)}</b><span>${esc(u>=1&&u<=6?SC_REGIONS[u-1].short:un.sub)}</span><small>${done?'✓ 이야기 완료 · 다시 보기':open?(inprog?'▶ 이어하기 가능':'▶ 시작할 수 있어요'):(u>=SC_MAIN_N?'🔒 트레이너 Lv.'+scSideNeed(u)+'부터 열려요 (지금 Lv.'+scLvNow()+')':'🔒 앞 이야기를 먼저 마쳐요')}</small></div></button>`;}
+  return `<button class="sc-stage ${done?'done':''} ${act?'next':''}" data-u="${u}" ${open?'':'disabled'}><div class="sc-stage-art"><span class="sc-stage-number">${u===0?'PROLOGUE':u===7?'EPILOGUE':u>=SC_MAIN_N?'SIDE STORY':'CHAPTER '+String(u).padStart(2,'0')}</span><span class="sc-stage-status">${st}</span><img class="scv-thumb" src="${scBgSVG(scUnitBgKey(u),'')}" alt="">${/작은 믿음/.test(un.name)&&scDavidFace()?`<img class="scv-yi-face" src="${scDavidFace()}" alt="">`:''}</div><div class="sc-stage-info"><b>${un.icon} ${esc(un.name)}</b><span>${esc(u>=1&&u<=6?SC_REGIONS[u-1].short:un.sub)}</span><small>${done?'✓ 이야기 완료 · 다시 보기':open?(inprog?'▶ 이어하기 가능':'▶ 시작할 수 있어요'):(u>=SC_MAIN_N?'🔒 트레이너 Lv.'+scSideNeed(u)+'부터 열려요 (지금 Lv.'+scLvNow()+')':'🔒 앞 이야기를 먼저 마쳐요')}</small></div></button>`;}
 function scRenderMap(){
  const p=scState(),cur=scCurrentUnit();S.screen='scenarioMap';SC.from='map';SC.index=SC_UNITS[cur].art;SC.bgKey=scUnitBgKey(cur);SC.bgVar='';scMusicStart(SC_UNITS[cur].bgm);scApplyBackdrop(SC.index,false,SC.bgKey,'');
  const doneN=SC_UNITS.reduce((s,_,u)=>s+(u<SC_MAIN_N&&p.done[u]?1:0),0),prog=Math.round(doneN/SC_MAIN_N*100),own=scOwned().length;
@@ -22880,7 +22891,7 @@ let SC_FITW=0;function scFitAuto(){try{const b=document.getElementById('scDAuto'
  for(const q of ['.aiw','.jjw']){if(row.scrollWidth<=row.clientWidth+1)break;b.querySelector(q).style.display='none';}}catch(e){}}
 window.addEventListener('resize',()=>{if(window.innerWidth===SC_FITW)return;SC_FITW=window.innerWidth;if(document.getElementById('scDAuto'))scFitAuto();});
 function scRenderDeck(back){
- if(back)SC.deckBack=back;const p=scState();S.screen='scenarioDeck';scEnsureDeck(!!back);scMusicStart(SC.index);SC.bgKey=undefined;SC.bgVar='camp';scApplyBackdrop(SC.index,false,undefined,'camp');
+ if(back)SC.deckBack=back;const p=scState();S.screen='scenarioDeck';scEnsureDeck(!!back);scMusicStart(SC.mus!=null?SC.mus:SC.index);SC.bgKey=undefined;SC.bgVar='camp';scApplyBackdrop(SC.index,false,undefined,'camp');
  const counts={};p.deck.forEach(id=>counts[id]=(counts[id]||0)+1);
  const curve=[1,2,3,4,5,6].map(c=>p.deck.filter(id=>MON[id].cost===c).length),owned=scOwned().sort((a,b)=>MON[a].cost-MON[b].cost||a-b);
  $('#view').innerHTML=`<div class="sc-page scv"><div class="scv-bar"><button class="btn gold sm" id="scDeckDone">✔ 편성 완료</button><h2>스토리 덱 편성</h2><span class="sc-tag">${p.deck.length} / ${DECK_N}</span></div><div class="scv-card"><div class="row" style="align-items:center"><h3 style="margin:0">${I('cards')} 내 스토리 덱</h3><span class="hudSp"></span><button class="btn blue sm" id="scDAuto" style="white-space:nowrap;flex:none"><span class="aiL"><span class="aiw">AI </span>자동 덱<span class="jjw"> 짜기</span></span></button></div><p class="sc-note" style="margin:6px 0">덱 카드를 누르면 빠지고, 아래 카드를 누르면 들어가요. 스토리 덱은 <b>스토리에서 기록한 포켓몬</b>만 쓸 수 있어요. 같은 카드는 많이 모은 일반 카드는 최대 3~4장, 희귀 카드는 적게 넣을 수 있어요. 비용이 낮은 카드가 많아야 처음부터 싸울 수 있어요.</p><div class="row" style="align-items:flex-end;gap:16px;margin-bottom:18px"><div><div class="mut" style="font-size:12px">비용별 장수</div><div class="curve">${(()=>{const mx=Math.max(1,...curve);return curve.map((n,i)=>`<div title="비용 ${i+1}: ${n}장" style="height:${Math.round(2+n/mx*38)}px"><span>${i+1}</span></div>`).join('');})()}</div></div></div><div class="deckBar" id="scDeckBar">${p.deck.map((id,i)=>cardHTML(id,{size:'deck'}).replace('class="card','data-di="'+i+'" class="card')).join('')}</div><h3>스토리 보유 카드 (${owned.length}종)</h3>${starBarHTML(SC_RAR,owned)}${(()=>{const names=[];owned.forEach(id=>{const n=kwOf(MON[id]).n;if(!names.includes(n))names.push(n);});if(SC_KW&&!names.includes(SC_KW))SC_KW='';const cnt=n=>owned.filter(id=>kwOf(MON[id]).n===n).length;const sel=SC_KW?Object.values(KW).find(k=>k.n===SC_KW):null;return `${kwFilterHTML(names,cnt,SC_KW,owned.length)}${sel?`<div class=mut style="font-size:13px;margin-bottom:8px">${I(sel.ic)} <b>${esc(sel.n)}</b> · ${esc(sel.d)}</div>`:''}`;})()}${evoBarHTML(SC_EVO,owned)}<div class="colGrid" id="scColGrid">${owned.filter(id=>(!SC_RAR||MON[id].rar===SC_RAR)&&(!SC_KW||kwOf(MON[id]).n===SC_KW)&&(!SC_EVO||(SC_EVO==='mega'?MEGA[id]:GMAX[id]))).map(id=>{const inD=counts[id]||0,lim=scLim(id);return `<div class="scv-own">${cardHTML(id,{size:'deck',cls:inD>=lim?'locked':''})}<small>${inD}/${lim}</small></div>`;}).join('')}</div></div></div>`;
