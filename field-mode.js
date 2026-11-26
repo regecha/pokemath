@@ -721,7 +721,7 @@ function mount(run){
  const holder=q('#view .rl-opts');if(!holder||!run||!run.opts)return;
  const th=TH[run.bg]||TH[0],M=genMap(run,run.rv),W=M.W,H=M.H,sheet=makeSheet(th),tufts=makeTufts(th);
  const wrap=document.createElement('div');wrap.className='gf-wrap';
- wrap.innerHTML='<div class="gf-frame"><canvas id="gfCv" width="640" height="576"></canvas><div class="gf-tools"><button type="button" tabindex="-1" class="gf-home" id="gfHome">🏠 홈</button><button type="button" tabindex="-1" class="gfPadTog gf-padtog">⌨ 키패드</button><button type="button" tabindex="-1" class="gf-big" id="gfBig">🖥 크게</button><button type="button" tabindex="-1" class="gf-zoom" id="gfZoom">확대 ×1</button><button type="button" tabindex="-1" class="gf-home gfFsBtn" aria-label="전체 화면">🖥 전체</button></div><div class="gf-box" id="gfBox"><span id="gfTxt"></span><i class="gf-more" id="gfMore">▼</i></div><div class="gf-menu" id="gfMenu"></div></div>'+
+ wrap.innerHTML='<div class="gf-frame"><canvas id="gfCv" width="640" height="576"></canvas><div class="gf-tools"><button type="button" tabindex="-1" class="gf-home" id="gfHome">🏠 홈</button><button type="button" tabindex="-1" class="gfPadTog gf-padtog">⌨ 키패드</button><button type="button" tabindex="-1" class="gf-big" id="gfBig">🖥 크게</button><button type="button" tabindex="-1" class="gf-home gfFsBtn" aria-label="전체 화면">🖥 전체</button></div><div class="gf-box" id="gfBox"><span id="gfTxt"></span><i class="gf-more" id="gfMore">▼</i></div><div class="gf-menu" id="gfMenu"></div></div>'+
   '<div class="gf-pad"><div class="gf-joy" id="gfJoy" aria-label="이동 조이스틱"><span class="ja u">▲</span><span class="ja d">▼</span><span class="ja l">◀</span><span class="ja r">▶</span><div class="gf-knob"></div></div>'+gfDpadHTML()+'<div class="gf-ab"><button data-k="b">B</button><button data-k="a">A</button></div></div>'+
   '<details class="gf-help"><summary>❓ 조작법 보기</summary><div class="gfh-b">방향키·WASD 이동 · Z/Enter/Space 말 걸기·확인 · X/Esc 취소 · +/- 확대<br>🖥 크게: 필드 창을 화면에 꽉 차게 키워요 · 터치는 필드 아래 빈 공간 아무 데나 눌러서 조이스틱(위쪽 ⌨ 키패드 버튼을 누르면 십자키로 바뀌어요), 또는 화면을 톡 누르면 그 자리까지 자동 이동 · 꾹 누른 채 끌면 그 방향으로 걸어요! 길을 따라 걷다 보면 분기점이 기다리고 있어요.<br>🏺 아래쪽 샛길의 보물상자는 내 유물 · 📖 도감은 내 덱 포켓몬! 말을 걸어 보세요.</div></details>';
  holder.replaceWith(wrap);try{gfPadApply();}catch(e){}
@@ -748,11 +748,11 @@ function mount(run){
  if(!document.getElementById('gf-zoom-css')){const st=document.createElement('style');st.id='gf-zoom-css';
   st.textContent='.gf-tools{position:absolute;top:6px;right:6px;z-index:5;display:flex;gap:6px}.gf-zoom,.gf-big,.gf-home{font:700 13px/1.2 "Jua","Noto Sans KR",sans-serif;color:#fff;background:rgba(43,33,64,.78);border:2px solid #fff;border-radius:999px;padding:4px 11px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.3);-webkit-tap-highlight-color:transparent}.gf-zoom.on,.gf-big.on{background:#ff8a3c}.gf-zoom:active,.gf-big:active,.gf-home:active{transform:translateY(1px)}';
   document.head.appendChild(st);}
- const zlab=()=>{zb.textContent='확대 ×'+ZM;zb.classList.toggle('on',ZM>1);};
+ const zlab=()=>{if(!zb)return;zb.textContent='확대 ×'+ZM;zb.classList.toggle('on',ZM>1);};
  const setZoom=d=>{const i=ZL.indexOf(ZM);ZM=ZL[(i+(d||1)+ZL.length)%ZL.length];zlab();try{rlMeta().fieldZoom=ZM;rlSave();}catch(e){}sfx('tap');};
- zlab();
+ if(zb){zlab();
  zb.addEventListener('pointerdown',ev=>ev.stopPropagation());
- zb.addEventListener('click',ev=>{ev.stopPropagation();setZoom(1);zb.blur();});
+ zb.addEventListener('click',ev=>{ev.stopPropagation();setZoom(1);zb.blur();});}
  let BIG=false,gfSp=null;
  const bigS=()=>{const z=(typeof FIT!=='undefined'&&FIT&&FIT.z)||1,vw=innerWidth/z,vh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vh'))||innerHeight/z,hd=wrap.querySelector('.gf-hud'),hh=(hd&&hd.offsetHeight)||40,land=matchMedia('(orientation:landscape) and (max-height:520px)').matches;
    const s=land?Math.min(vw/160,(vh-hh-14)/144):Math.min((vw-44)/160,(vh-290)/144);return Math.min(8,Math.max(1,Math.floor(s*20)/20));}; // 0.5칸 단위로 내림하던 걸 0.05 단위로 — 화면을 거의 꽉 채워요
