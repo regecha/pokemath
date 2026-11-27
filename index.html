@@ -21314,7 +21314,7 @@ function wgxEnsure(m,sub){const w=wgMonday(),av=nkAvail(sub);m.wgx=m.wgx||{};con
  const ranked=NK_AREAS[sub].filter(a=>av.includes(a.k)).map((a,i)=>({k:a.k,i,r:nkAcc(m,sub,a.k)})).sort((a,b)=>a.r-b.r||a.i-b.i);
  const ng={w,doms:ranked.slice(0,3).map(x=>x.k),claimed:!!(g&&g.w===w&&g.claimed)};m.wgx[sub]=ng;autoSave();return ng;}
 function wgTrainSub(sub,k){if(sub==='math')return wgTrain(k);
- if(nkLeft(sub)<=0){toast('오늘 '+NK_SUBN[sub]+' 문제 <b>'+NK_DAILY_MAX+'개</b>를 다 풀었어요! 내일 또 도전해요 🌙');return;}
+ if(nkLeft(sub)<=0){toast('오늘 '+NK_SUBN[sub]+' 문제 <b>'+NK_DAILY_MAX+'개</b>를 다 풀었어요! 수학 100문제를 풀면 다시 풀 수 있어요!');return;}
  const a=NK_AREAS[sub].find(x=>x.k===k);if(!a)return;
  const xs=sub==='en'?{sub:'en',types:[k]}:{sub:'ko',types:a.types};
  startTraining({pool:Object.assign([{id:'xs'}],{xs}),n:8,rescueCount:true});}
@@ -21699,7 +21699,7 @@ function renderMap(){S.screen='map';const m=S.meta;const map=unitsWithSkills();c
    return `<div class=skRow style="flex-wrap:wrap">${m.badges[x.k]?I('medal','uBadge'):''}<span class=sn><b>${x.u}. ${esc(x.n)}</b><br><span class=mut style="font-size:12px">개념 ${sks.length}개 · 별 ${st}/${sks.length*5}</span></span><button class="fbtn${foc?' on':''}" data-fk="${x.k}">${foc?((m.focusRe&&m.focusRe[x.k]>0)?'집중 중 · '+m.focusRe[x.k]+'문제 남음':'집중 중'):'집중'}</button><button class="btn blue sm" data-pk="${x.k}">연습</button></div>`;}).join('')}</div>`;}).join('')}${xsPanelsHTML(m,true)}<div class=panel><div class=mbtns style="margin:0"><button class="btn ghost" id=mpKo>📖 국어 모드로 바꾸기</button><button class="btn ghost" id=mpEn>📘 영어 모드 설정</button></div><p class=mut style="font-size:12px;margin:6px 0 0">국어·영어는 하루 100문제씩만 풀 수 있고, 다 풀면 수학 모드로 돌아가요.</p></div></div>`;
  bindHud();
  {const mh=$('#mHelp');if(mh)mh.onclick=()=>{sfx('tap');mapTutorial();};} try{if(!S.meta.seen.c_map1)setTimeout(()=>{if(S.screen==='map')coachOnce('c_map1',mapCoachSteps());},500);}catch(e){}
- {const a=$('#mpKo');if(a)a.onclick=()=>{sfx('tap');if(nkLeft('ko')<=0){toast('오늘 국어 문제 200개를 다 풀었어요. 내일 또 만나요!');return;}S.meta.questionMode='korean';autoSave();chooseKoreanMode(true);};const b=$('#mpEn');if(b)b.onclick=()=>{sfx('tap');if(nkLeft('en')<=0){toast('오늘 영어 문제 200개를 다 풀었어요. 내일 또 만나요!');return;}chooseEnglishMode(true,'english');};}
+ {const a=$('#mpKo');if(a)a.onclick=()=>{sfx('tap');if(nkLeft('ko')<=0){toast('오늘 국어 문제 100개를 다 풀었어요. 수학 100문제를 풀면 다시 풀 수 있어요!');return;}S.meta.questionMode='korean';autoSave();chooseKoreanMode(true);};const b=$('#mpEn');if(b)b.onclick=()=>{sfx('tap');if(nkLeft('en')<=0){toast('오늘 영어 문제 200개를 다 풀었어요. 내일 또 만나요!');return;}chooseEnglishMode(true,'english');};}
  $('#uSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{sfx('tap');m.uMax=+b.dataset.u;m.uMaxAt=today();autoSave();renderMap();});
  $('#fClr').onclick=()=>{m.focus=null;m.focusRe=null;autoSave();renderMap();};
  $('#view').querySelectorAll('[data-fk]').forEach(b=>b.onclick=()=>{sfx('tap');const k=b.dataset.fk;m.focus=m.focus||[];const i=m.focus.indexOf(k);if(i>=0){m.focus.splice(i,1);if(m.focusRe)delete m.focusRe[k];}else{m.focus.push(k);if(unitAllStars(k)){m.focusRe=m.focusRe||{};m.focusRe[k]=FOCUS_RE_N;toast('별을 다 모은 단원이에요! 다시 100문제만 풀어 봐요');}}autoSave();renderMap();});
@@ -25127,11 +25127,13 @@ function makeKoreanQ(tier){const g=koGrade(),m=S.meta;m.ko=m.ko||{n:0,c:0,t:{},w
   const q=koBuild(t,pick.i);if(!q||q.ch.length<2)continue;q.tier=tier||null;KO_RECENT.push(id);if(KO_RECENT.length>14)KO_RECENT.shift();return q;}
  return null;}
 
-const NK_DAILY_MAX=200; // 영어·국어 각각 하루에 풀 수 있는 문제 수
-function nkToday(){const m=S.meta,t=today();if(!m.nkDay||m.nkDay.d!==t)m.nkDay={d:t,ko:0,en:0};return m.nkDay;}
-function nkLeft(k){return Math.max(0,NK_DAILY_MAX-(nkToday()[k]||0));}
+const NK_DAILY_MAX=100; // 영어·국어 각각 하루에 풀 수 있는 문제 수
+const NK_MATH_REFILL=100; // 수학 이만큼 풀면 영어·국어 100개씩 다시 풀 수 있어요
+function nkToday(){const m=S.meta,t=today();if(!m.nkDay||m.nkDay.d!==t)m.nkDay={d:t,ko:0,en:0,math:0};return m.nkDay;}
+function nkRefill(){const d=nkToday();if((d.math||0)>=NK_MATH_REFILL){d.ko=0;d.en=0;d.math=0;autoSave();return true;}return false;}
+function nkLeft(k){nkRefill();return Math.max(0,NK_DAILY_MAX-(nkToday()[k]||0));}
 const __pickQBeforeEnglish=pickQ;
-pickQ=function(opt={}){if(opt.cyc&&!opt.tier){const t=nextCyc();if(t==='I'){const iq=iqQ();if(iq)return iq;opt=Object.assign({},opt,{tier:'H'});}else opt=Object.assign({},opt,{tier:t});}let qm=opt.pool?'math':S.meta.questionMode;{const sk=qm==='korean'?'ko':(qm==='english'||qm==='mix')?'en':null;if(sk&&nkLeft(sk)<=0){S.meta.questionMode='math';qm='math';autoSave();try{toast('오늘 '+(sk==='ko'?'국어':'영어')+' 문제 <b>'+NK_DAILY_MAX+'개</b>를 다 풀었어요! 수학 모드로 바꿨어요 ➗');}catch(e){}}}if(qm==='korean'){const kq=makeKoreanQ(opt.tier||null);if(kq)return kq;}if(qm==='english'||(qm==='mix'&&rnd()<.5))return makeEnglishQ();return __pickQBeforeEnglish(opt);};
+pickQ=function(opt={}){if(opt.cyc&&!opt.tier){const t=nextCyc();if(t==='I'){const iq=iqQ();if(iq)return iq;opt=Object.assign({},opt,{tier:'H'});}else opt=Object.assign({},opt,{tier:t});}let qm=opt.pool?'math':S.meta.questionMode;{const sk=qm==='korean'?'ko':(qm==='english'||qm==='mix')?'en':null;if(sk&&nkLeft(sk)<=0){S.meta.questionMode='math';qm='math';autoSave();try{toast('오늘 '+(sk==='ko'?'국어':'영어')+' 문제 <b>'+NK_DAILY_MAX+'개</b>를 다 풀었어요! 수학 모드로 바꿨어요 ➗ 수학 100문제를 풀면 다시 풀 수 있어요!');}catch(e){}}}if(qm==='korean'){const kq=makeKoreanQ(opt.tier||null);if(kq)return kq;}if(qm==='english'||(qm==='mix'&&rnd()<.5))return makeEnglishQ();return __pickQBeforeEnglish(opt);};
 /* 전투 문제에 틀렸던 문제를 가끔 섞어요: 오답 노트에서 아직 해결 못 한 수학 문제를 평소 문제 사이에 끼워 다시 풀게 해요 (맞히면 오답 노트가 정리돼요) */
 let RV_GAP=0;
 function reviewPickQ(opt){try{
@@ -25151,7 +25153,7 @@ const __foundUpdateBeforeEnglish=foundUpdate;
 foundUpdate=function(q,ok){if(q&&(q.en||q.iq||q.ko))return;return __foundUpdateBeforeEnglish(q,ok);};
 const __recordAnswerBeforeEnglish=recordAnswer;
 recordAnswer=function(q,ok,ms,opt={}){
- try{if(q&&(q.en||q.ko)&&!opt.retry)nkToday()[q.ko?'ko':'en']++;}catch(e){}
+ try{if(q&&!opt.retry){const d=nkToday();if(q.en||q.ko)d[q.ko?'ko':'en']++;else if(!q.iq){d.math=(d.math||0)+1;if(d.math===NK_MATH_REFILL)toast('수학 100문제 완료! 🎉 영어·국어 문제를 다시 100개씩 풀 수 있어요!');}}}catch(e){}
  if(!q||!q.en)return __recordAnswerBeforeEnglish(q,ok,ms,opt);
  const m=S.meta;m.enStats=m.enStats||{q:0,c:0,streak:0,bestCombo:0};const z=m.enStats;
  if(!opt.retry){z.q++;if(ok)z.c++;
@@ -30078,7 +30080,7 @@ html body #bInfo .card{width:128px}
  function findUnit(s,u){const sub=(s==='en'||s==='ko')?s:'math';return units(sub).find(U=>sub==='math'?(U.s===s&&U.u===+u):String(U.u)===String(u));}
  function mkEx(U){return{s:U.s,u:U.u,k:U.k,n:U.n,sub:U.sub,pool:U.sub==='math'?U.pool:Object.assign([{id:'xs'}],{xs:U.xs})};}
  function mk(s,u){const U=findUnit(s,u);return U?mkEx(U):{s,u,k:unitKey(s,u),n:(UNITS[s]||[])[u-1]||'',pool:SK.filter(x=>x.s===s&&x.u===u)};}
- function limitToast(sub){toast('오늘 '+SUBN[sub]+' 문제 <b>'+NK_DAILY_MAX+'개</b>를 다 풀었어요! 내일 또 도전해요 🌙');}
+ function limitToast(sub){toast('오늘 '+SUBN[sub]+' 문제 <b>'+NK_DAILY_MAX+'개</b>를 다 풀었어요! 수학 100문제를 풀면 다시 풀 수 있어요!');}
  function start(s,u){const U=findUnit(s,u),sub=U?U.sub:'math',r=RS(sub);if(!r.t||!MON[r.t]){toast('먼저 구할 포켓몬을 골라요!');return;}if(!U)return;
   if(gotU(sub,U)>=needU(sub,U)){toast('이 '+unitWord(sub)+'은 이미 다 풀었어요!');return;}
   if(sub!=='math'&&nkLeft(sub)<=0){limitToast(sub);return;}
