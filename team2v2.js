@@ -561,9 +561,14 @@ if(typeof document!=='undefined'){const st=document.createElement('style');st.id
 .hero.t2h .av{width:34px;height:34px;border-width:2px}.hero.t2h .av img,.hero.t2h .av svg{width:30px;height:30px}
 .hero.t2h .hn{font-size:12px;max-width:24vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hero.t2h .hhp{font-size:17px}
 .lane.coopLane.c10{grid-template-columns:repeat(10,minmax(0,1fr))}
+.lane.coopLane.c12{grid-template-columns:repeat(12,minmax(0,1fr))}
+@media(max-width:1100px){
+ .lane.coopLane.c12{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+}
 #t2Force{font-size:12px;padding:5px 8px;margin-right:4px}
 @media(max-width:560px){
  .lane.coopLane.c10{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+ .lane.coopLane.c12{grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
  #foeLane.coopLane,#myLane.coopLane{flex:1 1 0}
  #foeLane.coopLane .slot{aspect-ratio:auto!important;height:100%!important;max-height:100%!important;min-height:0!important}
  body:has(#heroFoeB) #foeLane.coopLane{min-height:0}
@@ -732,7 +737,7 @@ pvSpecResult=function(i,ok){_pvSpecResult.apply(this,arguments);try{if(t2Active(
 function t2BossTop(){const fo=B.foe,T=B.t2,sh=B.coop.players[0];
  const slots=aliveWildSlots();
  const roster=slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);
-  return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.wsk||wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>★ ${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max} · 공격 ${wu.att>0?wu.att+'회':'2회'}</div><div class=endWildHp><i class="${pct<=25?'low':''}" style="width:${pct}%"></i></div></div></div>`;}).join('');
+  return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.wsk||wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>★ ${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}<span class=wtAtt> · 공격 ${wu.att>0?wu.att+'회':'2회'}</span></div><div class=endWildHp><i class="${pct<=25?'low':''}" style="width:${pct}%"></i></div></div></div>`;}).join('');
  const mates=B.coop.players.map((p,i)=>`<span class="b4m${T.done[0][i]?' dn':''}${i===BC.localIndex?' me':''}">${esc(Array.from(p.name).slice(0,3).join(''))}${T.done[0][i]?'✔':''}</span>`).join('');
  return `<div class=wildTop id=wildStatus><div class=wildRoster>${roster}</div><div class=b4bar>${B.rl2?B.coop.players.map(p=>`<span class=b4hp>❤️ ${esc(Array.from(p.name).slice(0,4).join(''))} <b>${Math.max(0,p.hp)}</b>/${p.max}</span>`).join(''):`<span class=b4hp>❤️ 팀 체력 <b>${Math.max(0,sh.hp)}</b>/${sh.max}</span>`}<span class=b4mates>${mates}</span></div></div>`;}
 
@@ -761,6 +766,8 @@ function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const m
 #wildStatus .wildEntry .av{width:30px;height:30px}
 #wildStatus .wtInfo{min-width:0}
 #wildStatus .wtName,#wildStatus .wtHp{font-size:12px}
+#wildStatus .wtHp{overflow:hidden;text-overflow:ellipsis}
+@media(max-width:560px){#wildStatus .wtAtt{display:none}#wildStatus{flex:1 1 100%}#battle .bMenuCol{flex-direction:row;align-items:center}}
 #wildStatus .b4bar{flex:1 1 100%;margin-top:4px}
 #wildStatus .b4bar{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:3px;flex-wrap:wrap}
 .b4hp{font-family:'Jua';font-size:14px;background:rgba(255,255,255,.9);border:2px solid #e8434f;border-radius:10px;padding:0 8px}.b4hp b{color:#e8434f;font-size:17px}
