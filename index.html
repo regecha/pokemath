@@ -8333,6 +8333,7 @@ function bossCapReportGauge(z){
 async function bossCapThrowAnim(d){
   try{closeM();}catch(e){}
   if(!B||!B.t2||!B.t2.boss)return;
+  if(d&&d.ok){try{wqTick('boss')}catch(e){}}
   const slot=Number(d.slot),k=String(d.ball||'monster');
   const u=B.foe.board[slot];
   const nm=u?MON[u.id].name:'보스';
@@ -8367,7 +8368,7 @@ function tryCatchWildPokemon(slot=null,ball='monster',bonus=0){
   st.caughtIds=st.caughtIds||[];st.caughtNewIds=st.caughtNewIds||[];st.caughtIds.push(id);st.caughtNewIds.push(wasNew);st.caughtNew=wasNew;
   st.note=B.coop?`${w.name}을(를) 포획했어요!`:`${w.name}을(를) 포획했어요! 원래 능력치 그대로 도감에 등록했어요.`;
   B.foe.board[targetSlot]=null;B.wildState.captureModalOpen=false;B.wildCaptureTargetSlot=null;B.capturePrompted=false;
-  autoSave();sfx('rare');confetti(22);
+  autoSave();sfx('rare');confetti(22);try{wqTick('wild')}catch(e){}
   if(B.coop){try{const nm=(B.coop.players[B.coop.active]||{}).name||'친구';bossLog(B.coop.active,`포획 성공 → ${esc(w.name)}`);banner('🎉 포획 성공!',`${esc(nm)}이(가) ${esc(w.name)}을(를) 포획했어요`,2600);}catch(e){}}
   const cont=()=>{
   const remaining=syncWildPrimary();
@@ -21337,6 +21338,20 @@ function wgClaimSub(m,sub){const g=sub==='math'?m.wg:(m.wgx||{})[sub];if(!g||g.c
 function wgBind(m){
  document.querySelectorAll('#view .wgGo').forEach(b=>{b.onclick=()=>{sfx('tap');wgTrainSub(b.dataset.sub,b.dataset.k);};});
  document.querySelectorAll('#view .wgClaim').forEach(b=>{b.onclick=()=>wgClaimSub(m,b.dataset.sub);});}
+// ===== 주간 퀘스트 (주간 목표와 같은 주기·보상 방식: 월요일 리셋, 카드팩 10개) =====
+const WQ_PACKS=10;
+const WQ_DEFS=[
+ {k:'wild',n:'야생 포켓몬 포획',ic:'🔴',c:'#d9393f',t:3,d:'야생 포켓몬을 3마리 포획해요'},
+ {k:'endless',n:'끝없는 모험 1층 클리어',ic:'🗺️',c:'#e07b1a',t:1,d:'끝없는 모험에서 1층 보스를 쓰러뜨려요'},
+ {k:'arena',n:'아레나 3위 이상',ic:'🏆',c:'#7a5cd6',t:1,d:'아레나(해킹 배틀)에서 3위 안에 들어요'},
+ {k:'boss',n:'보스 포켓몬 포획',ic:'👑',c:'#2f7fd6',t:1,d:'협동 보스전에서 보스 포켓몬을 1마리 포획해요'},
+];
+function wqEnsure(m){const w=wgMonday();if(m.wq&&m.wq.w===w&&m.wq.q)return m.wq;m.wq={w,q:{wild:0,endless:0,arena:0,boss:0},claimed:false,doneToast:false};autoSave();return m.wq;}
+function wqTick(k){try{const m=S.meta;if(!m)return;const q=wqEnsure(m),def=WQ_DEFS.find(d=>d.k===k);if(!def)return;q.q[k]=Math.min(def.t,(q.q[k]||0)+1);if(WQ_DEFS.every(d=>(q.q[d.k]||0)>=d.t)&&!q.claimed&&!q.doneToast){q.doneToast=true;toast('🎉 주간 퀘스트를 모두 깼어요! 트레이너 방에서 카드팩 10개를 받으세요');}autoSave();}catch(e){console.warn('wqTick',e);}}
+function wqAllDone(m){const q=wqEnsure(m);return WQ_DEFS.every(d=>(q.q[d.k]||0)>=d.t);}
+function wqClaim(m){const q=wqEnsure(m);if(q.claimed||!wqAllDone(m))return;q.claimed=true;m.packs=(m.packs||0)+WQ_PACKS;autoSave();sfx('win');confetti(50);toast(`🎉 주간 퀘스트 완료! 🎴 카드팩 ${WQ_PACKS}개를 받았어요`);renderHub();}
+function wqPanel(m){const q=wqEnsure(m);const rows=WQ_DEFS.map(d=>({d,n:q.q[d.k]||0}));const allDone=rows.every(r=>r.n>=r.d.t);const dn=rows.filter(r=>r.n>=r.d.t).length;const segs=rows.map(r=>`<i class=wgSeg><b style="width:${Math.min(100,Math.round(r.n/r.d.t*100))}%;background:${r.d.c}"></b></i>`).join('');const right=allDone?(q.claimed?'<span class="pill wgOk">달성 ✓</span>':`<button class="btn gold sm wqClaim">보상 받기!</button>`):`<span class=wgCnt>${dn}/${rows.length} 완료</span>`;const inner=`<div style="display:grid;gap:6px;margin-top:10px">${rows.map(r=>{const p=Math.min(100,Math.round(r.n/r.d.t*100));return `<div style="display:flex;align-items:center;gap:8px"><span style="min-width:170px;font-size:13px;line-height:1.35"><b>${r.d.ic} ${r.d.n}</b><br><span class=mut style="font-size:11.5px">${r.d.d}</span></span><div style="flex:1;height:14px;background:#f0e8d8;border-radius:7px;overflow:hidden"><i style="display:block;height:100%;width:${p}%;background:${r.d.c}"></i></div><span style="min-width:44px;text-align:right;font-size:13px;font-weight:700">${r.n>=r.d.t?'✓':r.n+'/'+r.d.t}</span></div>`;}).join('')}</div><div class="wgRew${allDone&&!q.claimed?' rdy':''}"><div class=wgRewTop><span class=mut style="font-size:12px">네 퀘스트를 모두 깨면</span></div><div class="wgRewRow${q.claimed?' one':''}"><span class="wgChip pk">${I('pack','wgIc')||'🎴'}<b>카드팩 ${WQ_PACKS}개</b></span><span class=hudSp></span>${q.claimed?'<span class=pill>받았어요 ✓</span>':allDone?`<button class="btn gold wqClaim">보상 받기!</button>`:''}</div></div>`;return `<div class="panel wgDone${allDone?' wgAll':' open'}" id=wqBox style="border-left:6px solid #8a5cf6"><div class=wgSum role=button tabindex=0 aria-expanded=${!allDone}><h3>⭐ 주간 퀘스트</h3><span class=wgSegs>${segs}</span>${right}<span class=wgCh aria-hidden=true>▾</span></div><div class=wgBody>${inner}</div></div>`;}
+function wqBind(m){document.querySelectorAll('#view .wqClaim').forEach(b=>{b.onclick=()=>wqClaim(m);});}
 function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return renderEntry();ensureSeason();
  try{m.unl=m.unl||{};FEAT.forEach(f=>{m.unl[f.k]=1;});}catch(e){} /* 처음부터 모든 메뉴 해금 */
  const done=trainDone(m);const gh=lastTrain();const partner=bestPartner();
@@ -21349,13 +21364,14 @@ function renderHub(){S.screen='hub';const m=S.meta;if(!codeValid())return render
   ${bkBannerHTML(m)}
   ${gardenPanel(m)}
   ${wgPanel(m)}
+  ${wqPanel(m)}
   <div class="panel tsPanel${(m.lp||0)>0?' hasLp':''}" style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="font-size:30px">🛡️</div><div style="flex:1"><b class=jua style="font-size:19px">트레이너 스킬</b>${(m.lp||0)>0?`<span class=tsNew>NEW</span>`:''}<div class=mut style="font-size:13px">${(m.lp||0)>0?`<b class=tsPts>⭐ 스킬 포인트 ${m.lp}개!</b> 지금 새 스킬을 배워요`:'레벨 포인트 0개 · 스킬을 배우고 전투에서 사용해요'}</div></div><button class="btn purple${(m.lp||0)>0?' tsGo':''}" id="hTrainerSkills">${(m.lp||0)>0?`스킬 배우기 <span class=tsBadge>${m.lp}</span>`:'스킬 관리'}</button></div>
 
   <div class=tiles>
    <button class="tile main" id=tTrain>${done?'':'<i class=newTag>오늘!</i>'}<span class=ti>${I('flame','ti')}</span><span><span class=tn>오늘의 훈련</span><br><span class=td>${done?'오늘 훈련 완료! 한 번 더 하면 사탕을 더 받아요.':`문제 ${trainN()}개 · <span class=tPk>카드팩 1개 받기</span>`}${gh?`<br>어제의 나: ${gh.n}문제 중 ${gh.c}개 정답`:''}${(()=>{try{const n=wbDueList(m).length;return n?`<br>📅 복습할 틀린 문제 ${n}개가 섞여 나와요`:'';}catch(e){return '';}})()}</span></span></button>
    ${tiles}</div>
   <div class=nextFeat>${esc(semName(m.gs))}${m.uMax&&m.uMax<20?` ${m.uMax}단원`:''}까지의 문제가 나와요 (약한 개념은 아래 학년 기초도 나와요) · <a href="#" id=hCode style="color:inherit">학년 변경</a></div></div>`;
- bindHud();wgBind(m);
+ bindHud();wgBind(m);wqBind(m);
  $('#hTrainerSkills').onclick=()=>{sfx('tap');renderTrainerSkills();};
  $('#tTrain').onclick=()=>{sfx('tap');startTraining();};
  $('#hCode').onclick=e=>{e.preventDefault();sfx('tap');showGradePick();};
@@ -26314,6 +26330,7 @@ function rlCardsHTML(list){if(!list||!list.length)return '';
 async function rlFloorClear(m){
  const run=RUN();if(!run)return;
  const fl=run.floor||1,F=RL_FLOOR[fl]||RL_FLOOR[1],last=fl>=RL.floors;
+ if(fl===1){try{wqTick('endless')}catch(e){}}
  const got=rlGrantCard(F.reward);run.cards=(run.cards||[]).concat([Object.assign({floor:fl},got)]);
  rlLog(run,'👑',`${fl}층 보스 ${rlJ(MON[m.id].name,'을','를')} 쓰러뜨렸다`);sfx('win');confetti(last?110:60);rlSave();
  try{await cardRewardFx([{id:got.id,isNew:got.isNew,coin:got.coin,dust:got.dust,g:got.g}],{title:got.g?`👑 ${fl}층 보스 보상 조각!`:`👑 ${fl}층 보스 보상 카드!`,logo:got.g?'BOSS SHARD':'BOSS CARD'});}catch(e){}
