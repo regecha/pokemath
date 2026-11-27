@@ -195,7 +195,7 @@ function t2GuestRx(d){if(!d||typeof d!=='object')return;T2.lastRx=Date.now();if(
   else if(d.t==='t2-snap'){if(d.init)T2.started=true;bossApplySnapshot(d.state,!!d.init);}
  else if(d.t==='boss-fx'){bossFxPlay(d);}
  else if(d.t==='boss-banner'){banner(d.b1,d.b2,d.ms);}
- else if(d.t==='boss-megafx'){try{megaCine(+d.b,+d.m,String(d.n||''),null,d.ti||undefined);}catch(e){}}
+ else if(d.t==='boss-megafx'){try{megaCine(+d.b,+d.m,String(d.n||''),null,d.ti||undefined);}catch(e){}}   else if(d.t==='t2-capstart'){try{bossCaptureGauge(d);}catch(e){}}   else if(d.t==='t2-capresult'){try{bossCapThrowAnim(d);}catch(e){}}
  else if(d.t==='boss-defq'){bossAnswerDefense(d);}
  else if(d.t==='boss-dq'||d.t==='boss-dqr'){t2Spec(d);}
  else if(d.t==='boss-heart'){try{bossHeartShow(+d.i,0,d.f);}catch(e){}}
@@ -355,7 +355,9 @@ function t2Unend(d){const T=B.t2,team=d.team,idx=d.idx,p=T.teams[team]&&T.teams[
  p.t2uc=1;p.t2done=0;T.done[team][idx]=0;try{t2Sync();t2Rest();}catch(e){}try{banner.local=1;banner('↩ 취소',esc(p.name)+'님이 다시 행동해요',1100);banner.local=0;t2Raw({t:'boss-banner',b1:'↩ 취소',b2:esc(p.name)+'님이 다시 행동해요',ms:1100});}catch(e){}renderBattle();t2Broadcast(true);}
 // 효과/이미지가 멈춰도 처리 잠금이 영원히 안 풀리지 않게 30초 안전장치
 const T2G=p=>Promise.race([Promise.resolve(p),new Promise(r=>setTimeout(()=>{console.warn('t2 action timeout');r();},30000))]);
-async function t2Exec(d){if(!B||!B.t2||B.over)return;if((d.a||{}).type==='unend'){t2Unend(d);return;}const T=B.t2,team=d.team,idx=d.idx;
+async function t2Exec(d){if(!B||!B.t2||B.over)return;if((d.a||{}).type==='unend'){t2Unend(d);return;}
+  if((d.a||{}).type==='capgauge'){bossCapGaugeResult(d.a,d.idx);return;} // 포획 게이지 결과는 차례와 상관없이 받아요 (모두가 동시에 내요)
+  const T=B.t2,team=d.team,idx=d.idx;
  if(team!==T.turn||T.done[team][idx]||!T.teams[team][idx])return;
  const a=d.a||{};let fh=(a.tg&&a.tg.hero&&(a.tg.h===0||a.tg.h===1))?a.tg.h:0;if(!T.boss){const ft=T.teams[1-team];if(ft[fh]&&ft[fh].hp<=0&&ft[1-fh]&&ft[1-fh].hp>0)fh=1-fh;}
  T2.proc=true;B.coop.processing=true;const prevBusy=B.busy;
@@ -376,6 +378,7 @@ async function t2Exec(d){if(!B||!B.t2||B.over)return;if((d.a||{}).type==='unend'
    B.busy=false;await T2G(playerAttack(si,tg.hero?{hero:1}:{u:Number(tg.u)},!!a.ok,!!a.ok&&!!a.crit,a.hint?1:0));}
   else if(a.type==='power'){B.busy=false;await T2G(bossApplyPower(!!a.ok,!!a.ok&&!!a.crit));}
   else if(a.type==='mega'){const si=Number(a.si),u=ownU(si);if(!u||((P.qc||0)-(P.mgBase||0))<evoNeedFor(evoBase(u.id),P))return;B.busy=false;await T2G(megaDo(P,si));}
+  else if(a.type==='capstart'){bossCapStart(a,idx);}
   else if(a.type==='fuse'){const si=Number(a.si),pj=Number(a.pj);if(!fuseRemoteOk(P,si,pj,idx))return;B.busy=false;await T2G(fuseDo(P,si,pj));}
   else if(a.type==='trainerSkill'){const sk=String(a.skill||''),lv=Math.max(1,Math.min(5,Number(a.level)||1)),slot=Number(a.slot),U=B.trainerSkillUsed;
    if(!['heal','counter','attack','cheer'].includes(sk)||U[sk])return;
@@ -422,6 +425,103 @@ async function t2ResolveAttack(me,fo,si,tg,ok,cb,crit,hint){let red=0,dh=0,ctr=0
  if(ctr>0&&B&&!B.over&&me.board[si]){try{fx(heroEl(fo),`반격 -${ctr}`,'txt');await trainerAtkFx(heroEl(fo),unitEl(me,si),Math.min(5,ctr),'counter');}catch(e){}await dealUnit(me,si,ctr);try{cleanup();}catch(e){}renderBattle();checkEnd();}}
 
 /* ------------------------------ 끝내기 ------------------------------ */
+/* ------------------------------ 협동 보스전 포획 (보스 체력 10% 이하) ------------------------------
+   · 포획 버튼을 누른 사람이 공 1개를 골라 쓰고, 모두에게 게이지가 떠요 (퍼펙트 1명당 포획 확률 +2%)
+   · 모두가 게이지를 끝내면 공이 동시에 날아가고, 방장이 한 번만 판정해요
+   · 실패하면 그 보스에 대한 포획 시도 횟수만큼 도망 확률이 올라가요 (1번째 실패 뒤 10% … 5번째부터 50%)
+   · 잡은 보스는 조각 대상에 남고, 도망간 보스는 조각 대상에서 빠져요
+   · 도망 판정 위치: 아래 bossCapResolve() 안의 실패 분기 ('도망 판정' 표시 참고) — 포획 판정 직후에 있어요 */
+function bossCapN(){try{return (B&&B.t2&&B.t2.teams&&B.t2.teams[0])?B.t2.teams[0].length:0;}catch(e){return 0;}}
+function bossCapStart(d,idx){
+  if(!B||!B.t2||!B.t2.boss||B.over)return;
+  const st=B.wildState||(B.wildState={});
+  if(st.bossCap&&st.bossCap.state==='gauge')return; // 이미 포획 진행 중이에요
+  const slot=Number(d.slot),ball=String(d.ball||'monster');
+  const u=B.foe.board[slot];
+  if(!u||u.hp<=0||u.hp>u.max*0.1)return; // 10% 이하일 때만 포획해요
+  if(!BALLS[ball])return;
+  const fails=u.capFails||0,attempt=fails+1,fleePct=Math.min(50,attempt*10);
+  const nm=(B.t2.teams[0][idx]||{}).name||'친구';
+  st.bossCap={slot,ball,initiator:idx,name:nm,attempt,fleePct,results:{},state:'gauge',startedAt:Date.now()};
+  try{clearTimeout(T2.capTimer);}catch(e){}
+  T2.capTimer=setTimeout(()=>{try{bossCapResolve(true);}catch(e){}},25000); // 25초 안에 안 끝나면 안 한 사람은 GOOD(+0)으로 처리해요
+  const msg={t:'t2-capstart',slot,ball,name:nm,attempt,fleePct};
+  t2Raw(msg);
+  try{bossCaptureGauge(msg);}catch(e){} // 방장 화면에도 게이지를 띄워요
+  try{bossLog(idx,'포획 시작 → '+MON[u.id].name);}catch(e){}
+  t2Broadcast(true);
+}
+function bossCapGaugeResult(d,idx){
+  if(!B||!B.t2||!B.t2.boss||B.over)return;
+  const st=B.wildState||{};const cap=st.bossCap;
+  if(!cap||cap.state!=='gauge')return;
+  const z=String(d.zone||'G');
+  if(cap.results[idx]!=null)return;
+  cap.results[idx]=z;
+  if(Object.keys(cap.results).length>=bossCapN())bossCapResolve(false);
+}
+function bossCapResolve(timeout){
+  if(!B||!B.t2||!B.t2.boss)return;
+  const st=B.wildState||{};const cap=st.bossCap;
+  if(!cap||cap.state!=='gauge')return;
+  cap.state='done';
+  try{clearTimeout(T2.capTimer);}catch(e){}
+  const slot=Number(cap.slot),ball=String(cap.ball||'monster');
+  const u=B.foe.board[slot];
+  // 보스가 그 사이에 쓰러졌으면 포획은 없던 일로 해요 (공은 이미 소모됐어요)
+  if(!u||u.hp<=0){
+    const res0={t:'t2-capresult',slot,ball,ok:false,fled:false,void:true,perfects:0,chance:0,attempt:cap.attempt,fleePct:cap.fleePct};
+    t2Raw(res0);
+    try{bossCapThrowAnim(res0);}catch(e){}
+    st.bossCap=null;t2Broadcast(true);return;
+  }
+  const n=bossCapN();
+  for(let i=0;i<n;i++)if(cap.results[i]==null)cap.results[i]='G'; // 아직 안 낸 사람은 GOOD(+0)
+  const perfects=Object.values(cap.results).filter(z=>z==='P').length;
+  let chance=0;try{chance=ballChance(ball,u);}catch(e){chance=0;}
+  chance=Math.max(0,Math.min(100,chance+perfects*2));
+  const ok=rnd()*100<chance;
+  const res={t:'t2-capresult',slot,ball,ok,perfects,chance,attempt:cap.attempt,fleePct:cap.fleePct,fled:false};
+  const id=u.id;
+  if(!ok){
+    // ===== 도망 판정 (포획 판정 직후, 이 위치) =====
+    // '시도 1회' = 전원 동시 던지기 1라운드. 그 보스에 대한 실패 횟수만큼 확률이 올라가요 (1번째 실패 뒤 10% … 5번째부터 50%)
+    const fails=(u.capFails||0)+1;
+    u.capFails=fails;
+    const fleePct=Math.min(50,fails*10);
+    res.fled=rnd()*100<fleePct;
+    res.fleePct=fleePct;
+  }
+  const apply=()=>{
+    if(!B||!B.t2||B.over)return;
+    const uu=B.foe.board[slot];
+    if(ok){
+      // 잡았어요: 전장에서 빼고, 조각 대상에는 남겨 둬요
+      if(uu&&uu.id===id)B.foe.board[slot]=null;
+      st.caughtIds=st.caughtIds||[];if(!st.caughtIds.includes(id))st.caughtIds.push(id);
+      B.wildIds=(B.wildIds||[]).filter(x=>x!==id);
+      if(B.wildId===id){const nx=B.foe.board.findIndex(x=>x&&x.hp>0);B.wildId=nx>=0?B.foe.board[nx].id:null;B.wildSlot=nx>=0?nx:-1;}
+      try{bossLog('b','포획 성공 → '+MON[id].name);}catch(e){}
+    }else if(res.fled){
+      // 도망갔어요: 전장에서 빼고, 조각 대상에서도 빠져요 (이미 잡았거나 쓰러뜨린 다른 보스 보상은 그대로)
+      if(uu&&uu.id===id)B.foe.board[slot]=null;
+      st.ids=(st.ids||[]).filter(x=>x!==id);
+      B.wildIds=(B.wildIds||[]).filter(x=>x!==id);
+      if(B.wildId===id){const nx=B.foe.board.findIndex(x=>x&&x.hp>0);B.wildId=nx>=0?B.foe.board[nx].id:null;B.wildSlot=nx>=0?nx:-1;}
+      try{bossLog('b','도망 → '+MON[id].name);}catch(e){}
+    }else{
+      // 실패했지만 도망가지 않았어요: 보스는 그대로 남아서 전투가 계속돼요
+      try{bossLog('b','포획 실패 → '+MON[id].name);}catch(e){}
+    }
+    st.bossCap=null;
+    t2Broadcast(true);
+    try{checkEnd();}catch(e){}
+  };
+  // 결과를 먼저 모두에게 알려 연출을 띄우고, 연출이 끝난 뒤(약 1.3초) 상태를 바꿔요
+  t2Raw(res);
+  try{bossCapThrowAnim(res);}catch(e){}
+  setTimeout(apply,1300);
+}
 function t2CheckEnd(){if(!B||!B.t2||B.over)return !!(B&&B.over);if(!BC.host)return false;
  const T=B.t2;if(T.boss){if(!T.teams[1][0].board.some(u=>u&&u.hp>0)){t2FinishBoss('win');return true;}if(B.rl2?T.teams[0].every(p=>p.hp<=0):T.teams[0][0].hp<=0){t2FinishBoss('lose');return true;}return false;}for(let t=0;t<2;t++){if(T.teams[t].every(p=>p.hp<=0)){t2Finish(t,'ko');return true;}}return false;}
 function t2Finish(loseTeam,why,who){if(!B||!B.t2||B.t2.fin)return;const T=B.t2;T.fin=1;B.over=true;
@@ -606,7 +706,7 @@ function renderBoss4(n){n=n===2?2:n===3?3:n===5?5:4;S.screen='bosscoop';bossClos
  $('#view').innerHTML=hudHTML()+`<div class=wrap><div class=panel><div class=row style="align-items:center"><h2 style="margin:0">${n===2?'⚡ 2인 동시 보스전':n===3?'👥 3인 협동 보스전':n===5?'👥 5인 협동 보스전':'👥 4인 협동 보스전'}</h2><span class=hudSp></span><button class="btn ghost sm" id=b4Back>← 모드 선택</button></div>
   <p style="line-height:1.65;margin-top:8px">방장이 방을 열고 친구 <b>${n-1}명</b>이 같은 번호로 들어오면 시작해요. 한 판에 <b>코인 ${PVP_COST}개</b>가 들어요. 보스는 ${n===2?'<b>4성 20% · 5성 80%</b>로 나타나고, 10% 확률로 <b>2마리</b>가 함께 나와요.':n===5?'<b>항상 전설 포켓몬 3마리</b>예요.':'<b>항상 전설 포켓몬 2마리</b>예요.'}</p>
   <div class="tiles cmp" style="margin-top:8px"><div class=tile><span class=ti>✨</span><span class=tn>${n===2?'4성 20% · 5성 80%':'5성 보스 100%'}</span><span class=td>${n===2?'보스 1마리 (10%는 2마리)':'항상 전설 포켓몬'}</span></div><div class=tile><span class=ti>👹</span><span class=tn>보스 ${n===2?'1~2마리':n===5?'3마리':'2마리'}</span><span class=td>${n===2?'가끔 두 마리가 나와요':'한꺼번에 등장해요'}</span></div></div>
-  <details class=bossHow style="margin-top:10px"><summary class="btn ghost sm" style="cursor:pointer;list-style:none">📖 설명 보기 / 접기</summary><div class=explain style="margin-top:8px;font-size:14px;line-height:1.7">• ${n}명 모두 <b>동시에</b> 행동하고, 모두 <b>차례 끝</b>을 누르면 보스 차례가 돼요.<br>• ${n===2?8:n===5?12:10}칸 필드와 <b>트레이너 체력은 모두가 함께</b> 써요. 체력은 <b>${n===2?20:n===3?B3_HP:n===5?B5_HP:30}</b> + 각자의 체력증강 레벨 합(모두 5레벨이면 <b>${n===2?30:n===3?B3_HP+15:50}</b>)이에요.<br>• 트레이너 스킬은 <b>각자</b> 쓸 수 있어요.<br>${n===2?'• 보스는 <b>1마리면 2회</b>, <b>2마리면 각각 1회</b> 공격해요. 한 마리가 쓰러지면 남은 보스는 2회가 돼요. 우리 필드에 포켓몬이 <b>3마리 이상</b>이면 +1회(6마리 이상이면 +2회), 보스 체력이 <b>25% 이하</b>면 발악해서 +1회 (최대 4회). 체력이 50% 이하면 분노해서 공격력도 +1이에요.<br>':'• 보스는 <b>각각 2회</b> 공격해요. 체력이 <b>50% 이하</b>면 분노해서 공격력 +1, <b>25% 이하</b>면 발악해서 +1회, 우리 필드에 포켓몬이 <b>5마리 이상</b>이면 +1회 (최대 4회).<br>'}• 보스가 트레이너를 공격하면 <b>방어 문제가 한 명씩 돌아가며</b> 나와요. 다른 친구들은 그 친구가 고른 답을 보고, 결과가 <b>❤️ / 💔</b>로 나와요. 내 차례가 아닐 땐 <b>답이라고 생각하는 보기를 눌러 ❤️ 로 응원</b>할 수 있어요. 푸는 친구 화면에 작은 ❤️ 가 최대 ${n-1}개 떠요. ❤️는 <b>문제 시작 30초 뒤</b>에 떠요.<br>• <b>차례 끝</b>을 누르면 아직 행동 중인 친구의 <b>공격·공부 기술 문제</b>를 구경할 수 있어요. 친구가 여럿이면 <b>◀ ▶</b> 로 바꿔 볼 수 있어요. (방어 문제는 언제나 가장 먼저 보여요)<br>• 보스를 쓰러뜨리면 보스 1마리당 조각 ${typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:3}개를 받아요. 코인은 들지 않아요.</div></details>
+  <details class=bossHow style="margin-top:10px"><summary class="btn ghost sm" style="cursor:pointer;list-style:none">📖 설명 보기 / 접기</summary><div class=explain style="margin-top:8px;font-size:14px;line-height:1.7">• ${n}명 모두 <b>동시에</b> 행동하고, 모두 <b>차례 끝</b>을 누르면 보스 차례가 돼요.<br>• ${n===2?8:n===5?12:10}칸 필드와 <b>트레이너 체력은 모두가 함께</b> 써요. 체력은 <b>${n===2?20:n===3?B3_HP:n===5?B5_HP:30}</b> + 각자의 체력증강 레벨 합(모두 5레벨이면 <b>${n===2?30:n===3?B3_HP+15:50}</b>)이에요.<br>• 트레이너 스킬은 <b>각자</b> 쓸 수 있어요.<br>${n===2?'• 보스는 <b>1마리면 2회</b>, <b>2마리면 각각 1회</b> 공격해요. 한 마리가 쓰러지면 남은 보스는 2회가 돼요. 우리 필드에 포켓몬이 <b>3마리 이상</b>이면 +1회(6마리 이상이면 +2회), 보스 체력이 <b>25% 이하</b>면 발악해서 +1회 (최대 4회). 체력이 50% 이하면 분노해서 공격력도 +1이에요.<br>':'• 보스는 <b>각각 2회</b> 공격해요. 체력이 <b>50% 이하</b>면 분노해서 공격력 +1, <b>25% 이하</b>면 발악해서 +1회, 우리 필드에 포켓몬이 <b>5마리 이상</b>이면 +1회 (최대 4회).<br>'}• 보스가 트레이너를 공격하면 <b>방어 문제가 한 명씩 돌아가며</b> 나와요. 다른 친구들은 그 친구가 고른 답을 보고, 결과가 <b>❤️ / 💔</b>로 나와요. 내 차례가 아닐 땐 <b>답이라고 생각하는 보기를 눌러 ❤️ 로 응원</b>할 수 있어요. 푸는 친구 화면에 작은 ❤️ 가 최대 ${n-1}개 떠요. ❤️는 <b>문제 시작 30초 뒤</b>에 떠요.<br>• <b>차례 끝</b>을 누르면 아직 행동 중인 친구의 <b>공격·공부 기술 문제</b>를 구경할 수 있어요. 친구가 여럿이면 <b>◀ ▶</b> 로 바꿔 볼 수 있어요. (방어 문제는 언제나 가장 먼저 보여요)<br>• 보스를 쓰러뜨리면 보스 1마리당 조각 ${n===5?2:(typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:3)}개를 받아요. 코인은 들지 않아요.<br>• 보스 체력이 20% 이하가 되면 메가진화나 거다이맥스가 가능한 보스는 진화해요 (공격력만 올라요, 체력은 그대로). 10% 이하가 되면 포획 버튼이 떠요. 공 1개를 골라 던지면 모두에게 게이지가 떠요 (퍼펙트 1명당 +2%). 포획에 실패하면 도망갈 수 있어요 (시도할수록 확률 상승).</div></details>
   <div class=row style="margin-top:12px"><button class="btn red big" id=b4Host>방 만들기 (방장)</button><button class="btn blue big" id=b4Join>방 들어가기</button></div><button class="btn ghost big" id=b4Rj style="width:100%;margin-top:8px">🔁 다시 들어가기 (나갔다 돌아올 때)</button>
   <div class=row style="margin-top:8px;align-items:center"><input class="inp codeIn" id=b4Code maxlength=4 inputmode=numeric placeholder="방 번호 4자리" style="flex:1"></div>
   <p class=mut style="font-size:12.5px;margin-top:8px;line-height:1.5">🔁 <b>전투 중에 나갔다면?</b> <b>🔁 다시 들어가기</b>를 누르고 <b>같은 닉네임</b>으로 방 번호를 넣으면 원래 자리에서 이어서 할 수 있어요. (방장이 껐다면 방장이 「방장이었어요」를 고르고, 남은 친구들은 화면을 켠 채 기다려 주세요 · 방장 손패는 새로 뽑아요)</p>
@@ -746,13 +846,14 @@ function t2FinishBoss(outcome,why,who){if(!B||!B.t2||B.t2.fin)return;const T=B.t
  const ids=(B.wildState.ids||[]).filter(x=>MON[x]);
  const d={t:'t2-result',boss:1,outcome,why:why||'',who:who||'',ids,names:T.teams[0].map(p=>p.name),qcs:T.teams[0].map(p=>p.qc||0)};
  t2Raw(d);setTimeout(()=>t2OnBossResult(d),outcome==='win'?1500:900);}
+function t2BossShards(){return (typeof T2!=='undefined'&&T2.bn===5)?2:(typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:3);}
 function t2OnBossResult(d){if(T2.resDone)return;T2.resDone=true;t2Done();const me=S.meta,win=d.outcome==='win';const li=BC.localIndex;const qc=(d.qcs&&d.qcs[li])||0;
- let gs=[];if(win&&d.ids&&d.ids.length){gs=d.ids.map(x=>gainBossShards(x));me.coins=(me.coins||0)+100;me.dust=(me.dust||0)+10;me.candy=(me.candy||0)+10;}
+ let gs=[];if(win&&d.ids&&d.ids.length){gs=d.ids.map(x=>gainBossShards(x,t2BossShards()));me.coins=(me.coins||0)+100;me.dust=(me.dust||0)+10;me.candy=(me.candy||0)+10;}
  me.candy+=qc;me.stats.candyAll=(me.stats.candyAll||0)+qc;try{gainXP(win?30:15);}catch(e){}autoSave();sfx(win?'win':'lose');if(win)confetti(60);startBgm('adventure');
  const nm=(d.ids||[]).map(x=>esc(MON[x].name)).join(' · ');
  const why=d.why==='quit'?`${esc(d.who||'누군가')}님이 전투를 그만두었어요.`:'';
  M(`<div style="text-align:center"><h2 style="font-size:30px">${win?'🏆 보스 격파!':'아쉬워요…'}</h2><p><b>${nm}</b></p>${why?`<p class=mut>${why}</p>`:''}
-  <p>${win?`보스 조각 ${(d.ids||[]).length*(typeof BOSS_SHARDS!=='undefined'?BOSS_SHARDS:3)}개를 받았어요!`:'이번에는 보스를 쓰러뜨리지 못했어요.'}</p><p>우리 팀: ${(d.names||[]).map(esc).join(' · ')}<br>내가 맞힌 문제 ${qc}개</p>
+  <p>${win?`보스 조각 ${(d.ids||[]).length*t2BossShards()}개를 받았어요!`:'이번에는 보스를 쓰러뜨리지 못했어요.'}</p><p>우리 팀: ${(d.names||[]).map(esc).join(' · ')}<br>내가 맞힌 문제 ${qc}개</p>
   ${win?`<div class=row style="justify-content:center;gap:8px"><span class=pill>${I('coin')} +100</span><span class=pill>${I('candy')} +${10+qc}</span></div>`:''}
   <div class=mbtns><button class="btn gold" data-a=x>확인</button></div></div>`,{x:()=>{t2AfterResult();},_close:()=>{}});
  if(win&&gs[0]){try{setTimeout(()=>{try{bossRewardPack(d.ids,gs);}catch(e){console.warn(e);}},300);}catch(e){}}}
