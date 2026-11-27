@@ -1228,7 +1228,7 @@ function endCut(m,show){
  const t0=now();o.onclick=e=>{e.stopPropagation();if(calm||now()-t0>700)out();};
  tm.push(setTimeout(out,calm?1800:4000));
 }
-function finish(m){m.rank=(Array.isArray(m.rank)?m.rank:[]).map(p=>({pid:String(p.pid),n:String(p.n),s:+p.s||0,c5:+p.c5||0,tot:+p.tot||0,st:[0,1,2,3,4].map(i=>+(p.st||[])[i]||0),ok:Math.max(0,+p.ok|0),wr:Math.max(0,+p.wr|0),r:+p.r||0}));m.gid=String(m.gid);C.phase='end';C.mode='end';clearInterval(uiT);hbBgm();root.classList.remove('l30');let rw='';const gains=[];const me=m.rank.find(x=>x.pid===C.pid),accW=accWin(m.rank);
+function finish(m){m.rank=(Array.isArray(m.rank)?m.rank:[]).map(p=>({pid:String(p.pid),n:String(p.n),s:+p.s||0,c5:+p.c5||0,tot:+p.tot||0,st:[0,1,2,3,4].map(i=>+(p.st||[])[i]||0),ok:Math.max(0,+p.ok|0),wr:Math.max(0,+p.wr|0),r:+p.r||0}));m.gid=String(m.gid);C.phase='end';C.mode='end';clearInterval(uiT);hbBgm();root.classList.remove('l30');let rw='';const gains=[];const me=m.rank.find(x=>x.pid===C.pid),accW=accWin(m.rank);if(me&&me.r>=1&&me.r<=3){try{window.wqTick&&wqTick('arena')}catch(e){}}
  if(m.ok&&me){pools();const k=(S.meta.hb=S.meta.hb||{paid:{}});k.paid=k.paid||{};
   const dm=CFG.DURS.includes(+m.dur)?+m.dur:(CFG.DURS.includes(+C.dur)?+C.dur:5),need=needSc(dm);
   const why=m.rank.length<CFG.REWARD_MIN_P?'참가자가 '+CFG.REWARD_MIN_P+'명 이상일 때만 보상을 받아요':me.s<need?dm+'분 게임은 '+need+'점 이상이어야 보상을 받아요 (내 점수 '+me.s+'점)':'';
