@@ -20605,7 +20605,7 @@ function bossHeartShow0(i,tries,from){try{const host=$('#bqHost');
   host.querySelectorAll('.hhs').forEach(x=>{if(!x.children.length)x.remove();});
   const c4=host.querySelector(`.ch[data-i="${i}"]`);
   if(c4){let box=c4.querySelector('.hhs');if(!box){box=document.createElement('span');box.className='hhs';c4.appendChild(box);}
-   if(box.children.length<3){const h=document.createElement('i');h.dataset.f=key;h.textContent='❤️';box.appendChild(h);try{sfx('heal');}catch(e){}}}
+   if(box.children.length<(B&&B.t2&&typeof t2N==='function'?t2N()-1:3)){const h=document.createElement('i');h.dataset.f=key;h.textContent='❤️';box.appendChild(h);try{sfx('heal');}catch(e){}}}
   return;}
  const chs=host?host.querySelectorAll('.ch'):[];if(!chs.length){if((tries||0)<8)setTimeout(()=>bossHeartShow0(i,(tries||0)+1),250);return;}document.querySelectorAll('#bqHost .ch.hh').forEach(x=>x.classList.remove('hh'));const c=host.querySelector(`.ch[data-i="${i}"]`);if(c){c.classList.add('hh');try{sfx('heal');}catch(e){}}}catch(e){}}
 function pvSpecResult(i,ok){try{const el=$('#pvSpec');if(!el)return;const c=el.querySelector(`.pvsC[data-i="${i}"]`);if(c)c.classList.add(ok?'ok':'no');const st=el.querySelector('.pvsSt');if(st){const kk=(el.className.match(/k-(\w+)/)||[])[1];st.textContent=ok?(kk==='def'?'정답! ⭕ 방어 성공':kk==='pow'?'정답! ⭕ 카드 +1':'정답! ⭕'):'오답… ❌';st.classList.add(ok?'ok':'no');}ok?sfx('ok',1):sfx('wrong');}catch(e){}}
@@ -30537,7 +30537,7 @@ rlTutorial=function(){
 <script id="team2v2" src="team2v2.js"></script>
 <script id="rm-js">
 /* ===================================================================
-   🎲 랜덤 매칭 (지금은 AI 친구와 함께) — 1:1 · 2:2 · 2인 보스전(턴제·동시) · 3인 보스전 · 4인 보스전
+   🎲 랜덤 매칭 (지금은 AI 친구와 함께) — 1:1 · 2:2 · 2인 보스전(턴제·동시) · 3인 보스전 · 4인 보스전 · 5인 보스전
    나중에 진짜 자동 매칭을 넣을 때는, rmMatch()의 콜백 안(= 'AI 친구를 붙이는 부분')만 서버 매칭으로 바꾸면 돼요.
    AI 실력은 rmChoose()의 acc(문제 정답률)·rmAIHi()(덱·레벨)로 조절해요.
    =================================================================== */
@@ -30591,7 +30591,7 @@ function rmStartT2(mode,bn,names){
  if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
  if(m.coins<PVP_COST){toast('코인이 '+(PVP_COST-m.coins)+'개 모자라요');return;}
  t2Close();
- T2.mode=mode;T2.bn=bn===2?2:bn===3?3:4;T2.host=true;T2.code='AI';T2.tok='';T2.turnAt=0;
+ T2.mode=mode;T2.bn=bn===2?2:bn===3?3:bn===5?5:4;T2.host=true;T2.code='AI';T2.tok='';T2.turnAt=0;
  const mem=[{id:1,host:true,name:String(m.name||'').trim()||'방장',av:partnerId(),team:null,pos:null,conn:null,hi:t2MyHi()}];
  const nAI=mode==='pvp'?3:T2.bn-1;
  for(let i=0;i<nAI;i++){const hi=rmAIHi(names[i]);mem.push({id:i+2,host:false,ai:true,name:hi.name,av:hi.av,team:null,pos:null,conn:null,hi,lastRx:Date.now(),aiN:0,aiAt:0,st:{pw:0}});}
@@ -30674,8 +30674,8 @@ function rmGoT2(mode,bn){
  const m=S.meta;
  if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
  if(m.coins<PVP_COST){toast('코인이 '+(PVP_COST-m.coins)+'개 모자라요. 공부해서 코인을 모아 와요!');return;}
- const need=mode==='pvp'?3:(bn===2?1:bn===3?2:3);
- rmMatch(mode==='pvp'?'2:2 팀 대전':(bn===2?'2인 동시 보스전':bn===3?'3인 보스전':'4인 보스전'),need,nm=>rmStartT2(mode,bn,nm));
+ const need=mode==='pvp'?3:(bn===2?1:bn===3?2:bn===5?4:3);
+ rmMatch(mode==='pvp'?'2:2 팀 대전':(bn===2?'2인 동시 보스전':bn===3?'3인 보스전':bn===5?'5인 보스전':'4인 보스전'),need,nm=>rmStartT2(mode,bn,nm));
 }
 function rmGoBoss(){
  if(!ensureDeck()){toast('덱이 '+deckN()+'장이어야 해요');return;}
@@ -30693,7 +30693,7 @@ function rmAdd(id,label,fn){
 }
 {const f=renderPvp1;renderPvp1=function(){const r=f.apply(this,arguments);try{rmAdd('rmB1','🎲 랜덤 매칭',rmGo1v1);}catch(e){}return r;};}
 {const f=renderPvp2;renderPvp2=function(){const r=f.apply(this,arguments);try{rmAdd('rmB2','🎲 랜덤 매칭',()=>rmGoT2('pvp',4));}catch(e){}return r;};}
-{const f=renderBoss4;renderBoss4=function(n){const r=f.apply(this,arguments);try{const k=n===2?2:n===3?3:4;rmAdd('rmB4','🎲 랜덤 매칭',()=>rmGoT2('boss',k));}catch(e){}return r;};}
+{const f=renderBoss4;renderBoss4=function(n){const r=f.apply(this,arguments);try{const k=n===2?2:n===3?3:n===5?5:4;rmAdd('rmB4','🎲 랜덤 매칭',()=>rmGoT2('boss',k));}catch(e){}return r;};}
 {const f=renderBossCoop;renderBossCoop=function(){const r=f.apply(this,arguments);try{rmAdd('rmBC','🎲 랜덤 매칭',rmGoBoss);}catch(e){}return r;};}
 </script>
 <script id="team2-reco">
