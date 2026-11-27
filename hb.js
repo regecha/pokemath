@@ -1,5 +1,5 @@
 
-/* ===== 몬스터디 도감 해킹 배틀 (독립 모듈) — 기존 pickQ·gainCard·loadPeer·PO 만 빌려 써요. 아래 CFG 로 밸런스를 조절해요. ===== */
+/* ===== 몬스터디 아레나 (독립 모듈) — 기존 pickQ·gainCard·loadPeer·PO 만 빌려 써요. 아래 CFG 로 밸런스를 조절해요. ===== */
 (function(){
 const CFG={
  DURS:[5,7,10],MIN_P:2,MAX_P:16,HOST_AI_MAX:6,   // HOST_AI_MAX: 방장이 대기실에서 추가할 수 있는 AI 최대 인원
@@ -1080,17 +1080,17 @@ const fmt2=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+'
 let bootSeen=false,bootTk=0;
 const BOOT_FULL=[
  {t:'MONSTUDY-DEX BIOS v9.25 ........ [OK]',c:'dim'},
- {t:'> 도감 보안 서버에 접속하는 중...',d:220},
- {t:'> 방화벽 우회  [##########] 100%',c:'ok'},
- {t:'> 암호 키 교환 ........ 완료',c:'ok'},
- {t:'> 접속 권한: GUEST (해킹 모듈 로드됨)',c:'warn',d:260},
- {t:'몬스터디 도감 해킹 배틀',c:'ttl',d:200},
- {t:'문제를 풀어 포켓몬 카드를 모으고, 해킹으로 친구의 카드를 빼앗아요!',c:'txt'},
+ {t:'> 아레나 서버에 접속하는 중...',d:220},
+ {t:'> 대전 준비  [##########] 100%',c:'ok'},
+ {t:'> 참가자 확인 ........ 완료',c:'ok'},
+ {t:'> 접속 권한: CHALLENGER (아레나 모듈 로드됨)',c:'warn',d:260},
+ {t:'몬스터디 아레나',c:'ttl',d:200},
+ {t:'문제를 풀어 포켓몬 카드를 모으고, 친구의 포켓몬을 뺏고 복제해서 전부 모아보자!',c:'txt'},
  {t:'로그인 정보를 입력하세요.',c:'txt'}
 ];
 const BOOT_QUICK=[
- {t:'몬스터디 도감 해킹 배틀',c:'ttl'},
- {t:'문제를 풀어 포켓몬 카드를 모으고, 해킹으로 친구의 카드를 빼앗아요!',c:'txt'},
+ {t:'몬스터디 아레나',c:'ttl'},
+ {t:'문제를 풀어 포켓몬 카드를 모으고, 친구의 포켓몬을 뺏고 복제해서 전부 모아보자!',c:'txt'},
  {t:'로그인 정보를 입력하세요.',c:'txt'}
 ];
 function bootType(box,lines,spd,done){
@@ -1116,7 +1116,7 @@ function accBox(w){if(!w)return '';const t=w.ok+w.wr,me=w.pid===C.pid;
 function accRow(p){const t=p.ok+p.wr,r=t?Math.round(p.ok/t*100):0;return '<div class=dacc>🎯 맞힌 문제 <b>'+p.ok+'</b> / 푼 문제 <b>'+t+'</b> · 정답률 <b>'+(t?r+'%':'-')+'</b><span class=dbar><i style="width:'+r+'%"></i></span></div>';}
 function paintMenu(){let sv={};try{sv=JSON.parse(localStorage.getItem('zhb_sv')||'{}');}catch(e){}
  const nmv=esc(sv.name||(S.meta&&(S.meta.name||S.meta.nick))||''),cdv=esc(sv.code||''),rcv=esc(sv.rc&&sv.rc!=='(방장)'?sv.rc:'');
- root.innerHTML='<div class=w><div class=dos><div class=dosH><span class=dosDots><i></i><i></i><i></i></span><b>C:\\MONSTUDY\\HACK.EXE</b></div>'
+ root.innerHTML='<div class=w><div class=dos><div class=dosH><span class=dosDots><i></i><i></i><i></i></span><b>C:\\MONSTUDY\\ARENA.EXE</b></div>'
  +'<div class=dosB id=hbBoot></div>'
  +'<div class=dosF id=hbForm>'
  +'<label class=dr><span>사용자명<small>USER</small></span><input id=hbNm maxlength=8 value="'+nmv+'" placeholder="내 이름" autocomplete=off spellcheck=false></label>'
@@ -1241,7 +1241,7 @@ function finish(m){m.rank=(Array.isArray(m.rank)?m.rank:[]).map(p=>({pid:String(
    if(me.r<=3){const star=CFG.REWARD[me.r],id2=pk(POOL[star]);let g2=null;try{g2=gainCard(id2);}catch(e){}if(g2)gains.push({id:g2.id||id2,g:g2});rw+='<div class=box style="border-color:#fd2;text-align:center;font-size:20px">'+['🥇','🥈','🥉'][me.r-1]+' '+me.r+'등 추가 보상 — '+star+'성 조각 획득!<br>'+card(id2,g2)+'</div>';}
    if(accW&&accW.pid===me.pid){const id3=pk(POOL[5]);let g3=null;try{g3=gainCard(id3);}catch(e){}if(g3)gains.push({id:g3.id||id3,g:g3});rw+='<div class=box style="border-color:#3ff;text-align:center;font-size:20px">🎯 정답률 1위 추가 보상 — 5성 조각 획득!<br>'+card(id3,g3)+'</div>';}
    try{autoSave();}catch(e){}try{saveLocal();}catch(e){}}}
- const show=anim=>{if(!C||C.phase!=='end'||!root)return;root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\MONSTUDY\\RESULT.EXE</b></div><div class=dosP><div class="dl ttl s" id=hbTt></div>'+rw+accBox(accW)+'<div class=box>'+m.rank.map(p=>'<div style="padding:4px 0;border-bottom:1px dashed #0a85;'+(p.pid===C.pid?'color:#ff6':'')+'">'+(p.r<=3?['🥇','🥈','🥉'][p.r-1]:p.r+'위')+' <b>'+ttTxt(p.t)+esc(p.n)+'</b>'+(accW&&accW.pid===p.pid?' <span class=dtt>🎯 정답률 1위</span>':'')+' — '+p.s+'점 · 카드 '+p.tot+'장 · ★1~5: '+p.st.join('/')+accRow(p)+'</div>').join('')+'</div><button class="dbt q" data-x=quit>✖ 닫기</button></div></div><div id=hbP class=pop></div></div>';tline($h('#hbTt'),'> 게임 종료'+(m.why==='all'?' (모든 포켓몬을 모았어요!)':''),2);root.onclick=e=>{if(e.target.dataset&&e.target.dataset.x==='quit')quit();};;if(gains.length){const gg=gains.splice(0),rk=me?me.r:0,ttl=rk>=1&&rk<=3?['🥇','🥈','🥉'][rk-1]+' '+rk+'등! 해킹 배틀 보상 카드':'🎁 해킹 배틀 보상 카드';setTimeout(async()=>{if(!C||C.phase!=='end'||!root)return;document.body.classList.add('hbRw');try{await cardRewardFx(gg,{title:ttl,logo:'HACK REWARD'});}catch(e){console.warn('hb reward fx',e);}document.body.classList.remove('hbRw');},reduceMo()?200:900);}if(anim&&!reduceMo()){const w0=root.firstChild;if(w0&&w0.classList)w0.classList.add('hkOn');}};endCut(m,show);}
+ const show=anim=>{if(!C||C.phase!=='end'||!root)return;root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\MONSTUDY\\RESULT.EXE</b></div><div class=dosP><div class="dl ttl s" id=hbTt></div>'+rw+accBox(accW)+'<div class=box>'+m.rank.map(p=>'<div style="padding:4px 0;border-bottom:1px dashed #0a85;'+(p.pid===C.pid?'color:#ff6':'')+'">'+(p.r<=3?['🥇','🥈','🥉'][p.r-1]:p.r+'위')+' <b>'+ttTxt(p.t)+esc(p.n)+'</b>'+(accW&&accW.pid===p.pid?' <span class=dtt>🎯 정답률 1위</span>':'')+' — '+p.s+'점 · 카드 '+p.tot+'장 · ★1~5: '+p.st.join('/')+accRow(p)+'</div>').join('')+'</div><button class="dbt q" data-x=quit>✖ 닫기</button></div></div><div id=hbP class=pop></div></div>';tline($h('#hbTt'),'> 게임 종료'+(m.why==='all'?' (모든 포켓몬을 모았어요!)':''),2);root.onclick=e=>{if(e.target.dataset&&e.target.dataset.x==='quit')quit();};;if(gains.length){const gg=gains.splice(0),rk=me?me.r:0,ttl=rk>=1&&rk<=3?['🥇','🥈','🥉'][rk-1]+' '+rk+'등! 아레나 보상 카드':'🎁 아레나 보상 카드';setTimeout(async()=>{if(!C||C.phase!=='end'||!root)return;document.body.classList.add('hbRw');try{await cardRewardFx(gg,{title:ttl,logo:'ARENA REWARD'});}catch(e){console.warn('hb reward fx',e);}document.body.classList.remove('hbRw');},reduceMo()?200:900);}if(anim&&!reduceMo()){const w0=root.firstChild;if(w0&&w0.classList)w0.classList.add('hkOn');}};endCut(m,show);}
 function quit(){try{S.curQ=null;}catch(e){}try{const mt=document.getElementById('hbMt');if(mt)mt.remove();}catch(e){}clearInterval(uiT);if(H){clearInterval(H.tm);clearInterval(H.botT);try{H.peer.destroy();}catch(e){}H=null;}try{C&&C.peer&&C.peer.destroy();}catch(e){}C=null;root.className='';root.innerHTML='';setTimeout(hbBgm,0);try{S.screen='hub';S.hubTab='adv';renderHub();}catch(e){}}  /* 해킹 배틀은 모험 탭 메뉴라서 끝나면 모험 탭으로 돌아와요 */
 /* ---------- 배경음악: 해킹 배틀 전용 곡 (게임의 MUS 엔진에 곡만 등록해서 써요) ----------
    hack  = 사이버 해킹 분위기(프리지안 단조 · 달리는 16분 아르페지오 · 펌핑 톱니파 베이스 · 4박 킥)
@@ -1268,7 +1268,7 @@ function musBtn(){if(!root||!root.classList.contains('on'))return;const h=root.q
 let musMo=null;function musWatch(){if(musMo||!root||typeof MutationObserver==='undefined')return;musMo=new MutationObserver(()=>{if(root.classList.contains('on')&&!root.querySelector('#hbMus'))musBtn();});musMo.observe(root,{childList:true});}
 function open(){if(!sumOK()){toast('설정 오류: 확률 합계가 100이 아니에요');return;}if(!root){root=document.createElement('div');root.id='hb';document.body.appendChild(root);try{new MutationObserver(()=>document.body.classList.toggle('hbOn',root.classList.contains('on'))).observe(root,{attributes:true,attributeFilter:['class']});}catch(e){}}
  C={phase:'menu',role:null,me:{own:[],sc:0,tot:0,def:0,lock:0},mode:null};S.screen='hb';root.className='on';paintMenu();musWatch();musBtn();hbBgm();}
-function addModeBtn(){const box=document.querySelector('#view .t2modes');if(!box||box.querySelector('[data-hb]'))return;const b=document.createElement('button');b.className='t2mode';b.setAttribute('data-hb','1');b.id='pvMHack';b.style.cssText='grid-column:1/-1;background:linear-gradient(180deg,#14304f,#07101f);border-color:#2fd6ff;color:#aef;box-shadow:0 4px 0 #0a3a5c';b.innerHTML='<span class=t2mi>🕶️</span><b style="color:#3ff">도감 해킹 배틀</b><small style="color:#9fe;opacity:.9">여러 친구와 함께! 문제를 풀어 카드를 모으고 해킹으로 빼앗아요</small>';b.onclick=e=>{e.stopPropagation();try{sfx('tap');}catch(_){}open();};box.appendChild(b);}
+function addModeBtn(){const box=document.querySelector('#view .t2modes');if(!box||box.querySelector('[data-hb]'))return;const b=document.createElement('button');b.className='t2mode';b.setAttribute('data-hb','1');b.id='pvMHack';b.style.cssText='grid-column:1/-1;background:linear-gradient(180deg,#14304f,#07101f);border-color:#2fd6ff;color:#aef;box-shadow:0 4px 0 #0a3a5c';b.innerHTML='<span class=t2mi>🏆</span><b style="color:#3ff">아레나</b><small style="color:#9fe;opacity:.9">여러 친구와 함께! 문제를 풀어 카드를 모으고, 친구의 포켓몬을 뺏고 복제하자!</small>';b.onclick=e=>{e.stopPropagation();try{sfx('tap');}catch(_){}open();};box.appendChild(b);}
 if(typeof renderPvp==='function'){const rp=renderPvp;renderPvp=function(){const r=rp.apply(this,arguments);return r;  /* 해킹 배틀은 홈 > 모험 탭의 별도 메뉴로 옮겼어요 */};}
 /* ---------- 🎲 랜덤 매칭: 지금은 AI 3명과 한 방에서 해요 (진짜 자동 매칭을 넣을 땐 이 부분만 바꿔요) ---------- */
 /* 방장이 대기실에서 AI 친구를 더하거나 빼요 (학생 2명이 할 때 AI를 몇 명 더해서 같이 하기). AI 이름 앞에는 🤖 가 붙어요 */
