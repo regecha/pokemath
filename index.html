@@ -30987,7 +30987,7 @@ function rmAdd(id,label,fn){
   {tab:'adv',sel:'[data-f="league"]',t:'🏆 배틀 리그',d:'내 카드로 배틀! 공격할 때마다 문제를 풀어요.'},
   {tab:'adv',sel:'[data-f="pvp"]',t:'🤝 친구 대전',d:'한 사람이 방을 만들고 번호를 알려 주면, 친구가 번호를 넣고 들어와서 1대1로 겨뤄요.'},
   {tab:'adv',sel:'[data-f="bosscoop"]',t:'👥 보스전',d:'친구와 방 번호를 나누고 힘을 합쳐 보스를 공략해요.'},
-  {tab:'adv',sel:'#hbHubTile',t:'🕶️ 도감 해킹 배틀',d:'여러 친구가 한 방에서 문제를 풀며 카드를 모아요. 해킹 이벤트가 터지면 [해킹]으로 다른 친구의 카드를 빼앗고, 방어권으로 막을 수도 있어요!'},
+  {tab:'adv',sel:'#hbHubTile',t:'🏆 아레나',d:'여러 친구가 한 방에서 문제를 풀며 카드를 모아요. 친구의 포켓몬을 뺏고 복제해서 전부 모아보자!'},
   /* ── 3. 포켓몬 탭 ── */
   {tabGo:'card',sel:tabSel('card'),t:'🎴 포켓몬 탭으로 가요',d:'모험 안내는 끝! 이번에는 아래 「포켓몬」 탭을 눌러요.'},
   {tab:'card',sel:'[data-f="pack"]',manual:0,onShow:()=>{const m=S.meta;m.packs=(m.packs||0)+1;try{sfx('win');}catch(e){}try{toast('🎁 카드팩 1개를 선물로 받았어요!');}catch(e){}autoSave();renderHub();},t:'🎴 카드팩',d:'카드팩을 열어 포켓몬 카드를 모아요. 안내가 끝나면 훈련으로도 매일 받을 수 있어요. 눌러서 열어 봐요!'},
@@ -32023,9 +32023,9 @@ html body #view[data-htab]:not([data-htab="home"]) .tileRow:has(#tTrain){display
   tag(garden,'card');tag(trade,'card');
   tag(scRow,'adv');['rescue','league','endless','pvp','bosscoop'].forEach(k=>tag(q('[data-f='+k+']'),'adv'));
   ['pack','dex','deck'].forEach(k=>tag(q('[data-f='+k+']'),'card'));
-  /* 도감 해킹 배틀: 보스전 뒤에 별도 메뉴로 */
+  /* 아레나: 보스전 뒤에 별도 메뉴로 */
   if(tiles&&!tiles.querySelector('#hbHubTile')){const boss=q('[data-f=bosscoop]');const b=document.createElement('button');b.className='tile';b.id='hbHubTile';b.type='button';
-   b.innerHTML='<span class=ti><span style="font-size:44px;line-height:1;display:block">🕶️</span></span><span class=tn>도감 해킹 배틀</span><span class=td>여러 친구와 카드를 모아요 · 해킹으로 빼앗기</span>';
+   b.innerHTML='<span class=ti><span style="font-size:44px;line-height:1;display:block">🏆</span></span><span class=tn>아레나</span><span class=td>친구의 포켓몬을 뺏고 복제해서 전부 모으자!</span>';
    b.onclick=()=>{try{sfx('tap');}catch(e){}try{window.HB.open();}catch(e){console.warn(e);}};
    if(boss)boss.after(b);else tiles.appendChild(b);}
   tag(q('#hbHubTile'),'adv');
