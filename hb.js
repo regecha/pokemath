@@ -18,6 +18,7 @@ const CFG={
  SOLVE_MIN_MS:2500,WRONG_WAIT:[3,5,8],TAKEOVER_STALE_MS:9000,
   ACC_MIN_Q:5   // 정답률 1위 칭호: 최소 이만큼 푼 사람만 (1문제 100% 방지). 보상은 REWARD_MIN_P·REWARD_MIN_SCORE 조건 동일
 };
+const TEAM_MAX=5;   // 팀전: 한 팀 최대 인원 (2v2 ~ 5v5)
 const needSc=d=>(CFG.REWARD_SCORE&&CFG.REWARD_SCORE[d])||CFG.REWARD_MIN_SCORE;
 const sumOK=()=>[CFG.EV,CFG.EV_L30].every(o=>Object.values(o).reduce((a,b)=>a+b,0)===100);
 const rr=n=>Math.floor(Math.random()*n),pk=a=>a[rr(a.length)],now=()=>Date.now();
@@ -43,7 +44,7 @@ const sha256=(()=>{const rot=(x,n)=>x>>>n|x<<32-n,K=[],H0=[];for(let c=2,p=0;p<6
 const RH={};
 const rhash=rc=>{const k=(H?H.code:'')+'|'+rc;if(RH[k])return RH[k];let h='zhb|'+k;for(let i=0;i<1000;i++)h=sha256(h+k);return RH[k]=h.slice(0,24);}; // 재접속 번호는 8자리 + SHA-256 1000회 해시로만 넘겨요(방장 승격 스냅샷)
 /* ---------- 방장(호스트) 쪽: 게임 상태를 확정하는 건 방장만 ---------- */
-function newP(name,conn,host,tt){return{pid:tok(6),tt:ttIn(tt),name:(name||'트레이너').slice(0,8),hid:engRand(usedHids()),rc:String(1000+rr(9000)),conn,host:!!host,away:false,own:{},tot:0,sc:0,c5:0,sAt:now(),def:0,shield:0,lock:0,seq:0,pend:null,hk:null,last:now(),lastSolve:0,rch:'',hkCancel:0,ok:0,wr:0,lastWrong:0,hp:0,lastHkq:0};}
+function newP(name,conn,host,tt){return{pid:tok(6),tt:ttIn(tt),name:(name||'트레이너').slice(0,8),hid:engRand(usedHids()),rc:String(1000+rr(9000)),conn,host:!!host,away:false,team:'',own:{},tot:0,sc:0,c5:0,sAt:now(),def:0,shield:0,lock:0,seq:0,pend:null,hk:null,last:now(),lastSolve:0,rch:'',hkCancel:0,ok:0,wr:0,lastWrong:0,hp:0,lastHkq:0};}
 function calc(p){let t=0,s=0,c5=0;for(const id in p.own){const n=p.own[id],r=MON[id].rar;t+=n;s+=n*r;if(r===5)c5+=n;}if(s!==p.sc)p.sAt=now();p.tot=t;p.sc=s;p.c5=c5;}
 function give(p,ids){for(const id of ids){p.own[id]=(p.own[id]||0)+1;p.tot++;}calc(p);}
 function pickW(o){let t=0;for(const id in o)t+=o[id];let x=Math.random()*t;for(const id in o){x-=o[id];if(x<0)return id;}return Object.keys(o)[0];}
@@ -76,12 +77,36 @@ function take(f,t,k){take.pts=0;k=Math.min(k,f.tot);if(!(k>0)){calc(f);calc(t);r
   const id=w[j][0];tk[id]=(tk[id]||0)+1;w[j]=w[w.length-1];w.pop();r--;}
  let n=0;for(const id in tk){const c=tk[id];f.own[id]-=c;if(f.own[id]<=0)delete f.own[id];t.own[id]=(t.own[id]||0)+c;n+=c;take.pts+=c*(MON[id]?MON[id].rar:1);}
  calc(f);calc(t);return n;}
+/* 팀 해킹용 빼앗기: 우선 종류(pref = 해킹하는 팀이 아직 없는 종)부터 비율대로 빼앗고, 모자라면 나머지 종류에서 비율대로 채워요. take()와 같은 비율 계산이에요 */
+function takePref(f,t,k,pref){takePref.pts=0;k=Math.min(k,f.tot);if(!(k>0)){calc(f);calc(t);return 0;}
+ const tk={};let got=0;
+ const run=(list,kk,base)=>{if(!(kk>0)||!list.length||!(base>0))return 0;let g=0;const ww=[];
+  for(const id of list){const x=f.own[id]*kk,b=Math.floor(x/base),rm=x-b*base;if(b){tk[id]=(tk[id]||0)+b;g+=b;}if(rm>0)ww.push([id,rm]);}
+  let r=kk-g;
+  while(r>0&&ww.length){let sm=0;for(const e of ww)sm+=e[1];let x=Math.random()*sm,j=0;for(;j<ww.length-1;j++){x-=ww[j][1];if(x<0)break;}
+   const id=ww[j][0];tk[id]=(tk[id]||0)+1;ww[j]=ww[ww.length-1];ww.pop();r--;}
+  return g;};
+ const ids=Object.keys(f.own);
+ const first=ids.filter(id=>pref&&pref.has(+id)),second=ids.filter(id=>!pref||!pref.has(+id));
+ const mt=first.reduce((a,id)=>a+f.own[id],0);
+ got+=run(first,Math.min(k,mt),mt);
+ if(got<k){const rt=second.reduce((a,id)=>a+f.own[id],0);got+=run(second,k-got,rt);}
+ let n=0;for(const id in tk){const c=tk[id];f.own[id]-=c;if(f.own[id]<=0)delete f.own[id];t.own[id]=(t.own[id]||0)+c;n+=c;takePref.pts+=c*(MON[id]?MON[id].rar:1);}
+ calc(f);calc(t);return n;}
+/* ---------- 팀전: 팀 도감은 팀원 보유분의 합집합, 팀 점수는 팀원 점수 합산 ---------- */
+const teamMembers=t=>H?H.players.filter(p=>p.team===t):[];
+const teamKindSet=t=>{const s=new Set();teamMembers(t).forEach(p=>{for(const id in p.own)s.add(+id);});return s;};
+const teamKinds=t=>teamKindSet(t).size;
+const teamScore=t=>teamMembers(t).reduce((a,p)=>a+p.sc,0);
+const teamTot=t=>teamMembers(t).reduce((a,p)=>a+p.tot,0);
+const teamDefender=t=>teamMembers(t).find(p=>p.def>0)||null;
+const teamLabel=t=>t==='A'?'🔴 A팀':'🔵 B팀';
 function snd(p,m){if(p.host){setTimeout(()=>cm(m),0);return;}try{p.conn&&p.conn.open&&p.conn.send(m);}catch(e){}}
 const bc=m=>H.players.forEach(p=>snd(p,m));
-const mePk=p=>({t:'me',own:Object.entries(p.own),sc:p.sc,tot:p.tot,def:p.def,sh:Math.max(0,p.shield-now()),lock:p.lock});
-function lobBC(){bc({t:'lob',pl:H.players.map(p=>({n:p.name,t:p.tt|0,a:p.away,b:p.ai?1:0})),dur:H.dur,code:H.code});}
-function topBC(){if(!H||H.state!=='play')return;const l=Math.max(0,H.end-now());bc({t:'top',top:[...H.players].sort(cmp).slice(0,3).map(p=>({n:p.name,t:p.tt|0,s:p.sc})),all:[...H.players].sort(cmp).map(p=>({id:p.pid,n:p.name,t:p.tt|0,s:p.sc})),left:l,away:H.players.filter(p=>p.away).length,order:H.players.filter(p=>!p.ai).map(p=>p.pid),gen:H.gen||0});}
-function snapPk(){return{t:'snap',dur:H.dur,gid:H.gid,t0:H.t0,pl:H.players.map(p=>({pid:p.pid,name:p.name,tt:p.tt|0,rch:p.rc?rhash(p.rc):(p.rch||''),own:Object.entries(p.own),sh:Math.max(0,p.shield-now()),def:p.def,lock:p.lock,seq:p.seq,sAt:p.sAt,pend:p.pend?{n:p.pend.n}:null,hk:p.hk?{n:p.hk.n}:null,ok:p.ok|0,wr:p.wr|0,hp:p.hp|0,ai:p.ai?1:0}))};}
+const mePk=p=>({t:'me',own:Object.entries(p.own),sc:p.sc,tot:p.tot,def:p.def,sh:Math.max(0,p.shield-now()),lock:p.lock,team:p.team||''});
+function lobBC(){bc({t:'lob',pl:H.players.map(p=>({n:p.name,t:p.tt|0,a:p.away,b:p.ai?1:0,id:p.pid,team:p.team||''})),dur:H.dur,code:H.code,tm:H.teamMode?1:0});}
+function topBC(){if(!H||H.state!=='play')return;const l=Math.max(0,H.end-now());bc({t:'top',top:[...H.players].sort(cmp).slice(0,3).map(p=>({n:p.name,t:p.tt|0,s:p.sc})),all:[...H.players].sort(cmp).map(p=>({id:p.pid,n:p.name,t:p.tt|0,s:p.sc})),left:l,away:H.players.filter(p=>p.away).length,order:H.players.filter(p=>!p.ai).map(p=>p.pid),gen:H.gen||0,tm:H.teamMode?['A','B'].map(t=>({t,k:teamKinds(t),s:teamScore(t)})):null});}
+function snapPk(){return{t:'snap',dur:H.dur,gid:H.gid,t0:H.t0,tm:H.teamMode?1:0,pl:H.players.map(p=>({pid:p.pid,name:p.name,tt:p.tt|0,rch:p.rc?rhash(p.rc):(p.rch||''),own:Object.entries(p.own),sh:Math.max(0,p.shield-now()),def:p.def,lock:p.lock,seq:p.seq,sAt:p.sAt,pend:p.pend?{n:p.pend.n}:null,hk:p.hk?{n:p.hk.n}:null,ok:p.ok|0,wr:p.wr|0,hp:p.hp|0,ai:p.ai?1:0,team:p.team||''}))};}
 function weights(){return H.end-now()<=CFG.LAST30_MS?CFG.EV_L30:CFG.EV;}
 function mkSlot(){const ev=wp(weights());const n={one:1,two:2,three:3}[ev]||0;const ids=[];for(let i=0;i<n;i++)ids.push(rollMon());return{ev,ids};}
 function welcome(p){snd(p,{t:'wel',pid:p.pid,hid:p.hid,rc:p.rc,code:H.code});lobBC();if(H.state==='pick'&&!p.idDone&&p.cands)snd(p,{t:'idc',c:p.cands,left:Math.max(1000,PICK_MS-(now()-H.pickAt))});if(H.state==='play'){snd(p,{t:'go',left:Math.max(0,H.end-now()),dur:H.dur,re:1});snd(p,mePk(p));if(p.pend&&!p.lock)snd(p,{t:'tri',n:p.pend.n});if(p.hkCancel){p.hkCancel=0;snd(p,{t:'hkr',ok:false,why:'방장이 바뀌어 해킹이 취소됐어요'});}}}
@@ -92,14 +117,19 @@ function hjoin(conn,m){
   if(p.conn&&p.conn!==conn&&p.conn.open&&!p.away&&now()-p.last<CFG.TAKEOVER_STALE_MS){conn.send({t:'no',m:'이미 접속 중이에요. 잠시 뒤에 다시 시도해 주세요'});return;}
   if(!p.rc)p.rc=String(m.rc);if(p.conn&&p.conn!==conn)try{p.conn.close();}catch(e){}p.conn=conn;p.away=false;p.last=now();bind(conn,p);welcome(p);return;}
  if(H.state!=='lobby'){conn.send({t:'no',m:H.state==='play'?'이미 시작했어요. 끊겼다면 재접속 번호를 같이 넣어 주세요':'끝난 게임이에요'});return;}
- if(H.players.length>=CFG.MAX_P){conn.send({t:'no',m:'방이 가득 찼어요'});return;}
- p=newP(m.name,conn,false,m.tt);while(H.players.some(x=>x.rc===p.rc))p.rc=String(1000+rr(9000));H.players.push(p);bind(conn,p);welcome(p);
+ if(H.players.length>=(H.teamMode?TEAM_MAX*2:CFG.MAX_P)){conn.send({t:'no',m:'방이 가득 찼어요'});return;}
+ p=newP(m.name,conn,false,m.tt);while(H.players.some(x=>x.rc===p.rc))p.rc=String(1000+rr(9000));
+ if(H.teamMode)p.team=teamMembers('A').length<=teamMembers('B').length?'A':'B';   // 팀전: 들어오는 순서대로 작은 팀에 교대로 배정
+ H.players.push(p);bind(conn,p);welcome(p);
 }
 function hmsg(p,m){
- if(!m||H.state!=='play'&&m.t!=='hb'&&m.t!=='st'&&m.t!=='dur'&&m.t!=='idp'&&m.t!=='aip'&&m.t!=='aim')return;
+ if(!m||H.state!=='play'&&m.t!=='hb'&&m.t!=='st'&&m.t!=='dur'&&m.t!=='idp'&&m.t!=='aip'&&m.t!=='aim'&&m.t!=='tmm'&&m.t!=='tmv'&&m.t!=='tfill')return;
  if(m.t==='dur'&&p.host&&H.state==='lobby'&&CFG.DURS.includes(m.v)){H.dur=m.v;lobBC();}
  else if(m.t==='aip'&&p.host&&H.state==='lobby')hostAddAI();
  else if(m.t==='aim'&&p.host&&H.state==='lobby')hostDelAI();
+ else if(m.t==='tmm'&&p.host&&H.state==='lobby'){H.teamMode=H.teamMode?0:1;if(H.teamMode)H.players.forEach((pl,i)=>{pl.team=i%2?'B':'A';});lobBC();}   // 팀전 켜기: 입장 순서대로 A/B 교대 배정
+ else if(m.t==='tmv'&&p.host&&H.state==='lobby'){const t=H.players.find(x=>x.pid===m.pid);if(t&&H.teamMode){t.team=t.team==='A'?'B':'A';lobBC();}}   // 방장이 친구 이름을 눌러 팀을 바꿔요
+ else if(m.t==='tfill'&&p.host&&H.state==='lobby')hostFillAI();
  else if(m.t==='st'&&p.host&&H.state==='lobby')hostStart();
  else if(m.t==='idp')idPick(p,m);
  else if(m.t==='solve'){if(p.lock||p.away)return;if(p.pend){snd(p,{t:'tri',n:p.pend.n});return;}{const t=now();if(t-p.lastSolve<CFG.SOLVE_MIN_MS)return;p.lastSolve=t;}p.pend={n:++p.seq,slots:[mkSlot(),mkSlot(),mkSlot()]};p.ok=(p.ok|0)+1;snd(p,{t:'tri',n:p.pend.n});}
@@ -108,14 +138,21 @@ function hmsg(p,m){
   if(s.ev==='one'||s.ev==='two'||s.ev==='three'){give(p,s.ids);s.ids.forEach(id=>{if(MON[id].rar===5)bc({t:'leg',id,who:p.name});});}
   else if(s.ev==='x2'||s.ev==='x3'){const a=mult(p,s.ev==='x2'?2:3);res.note=a>0?'카드 +'+a+'장!':'늘어날 카드가 없어요';}
   else if(s.ev==='def'){if(p.def)res={t:'res',n:m.n,ev:'dupdef',ids:[]};else p.def=1;}
-  else if(s.ev==='hack'){const oth=H.players.filter(x=>x!==p&&!x.away),el=oth.filter(x=>x.tot>0);
+  else if(s.ev==='hack'){const oth=H.teamMode?H.players.filter(x=>x.team&&x.team!==p.team&&!x.away):H.players.filter(x=>x!==p&&!x.away),el=oth.filter(x=>x.tot>0);
    if(!el.length)res={t:'res',n:m.n,ev:'miss',ids:[],note:'해킹할 상대가 없어요'};
    else{const sh=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);const real=sh(el).slice(0,2);if(real.length<2){const rest=sh(oth.filter(x=>!real.includes(x)));if(rest.length)real.push(rest[0]);}
     const used=new Set(H.players.map(x=>x.hid)),opts=real.map(x=>({hid:x.hid,pid:x.pid}));while(opts.length<4){const f=engRand(used);if(!used.has(f)){used.add(f);opts.push({hid:f,pid:null});}}
     const so=sh(opts);p.hk={n:m.n,opts:so,elim:[]};p.hp=0;snd(p,{t:'hk',n:m.n,opts:so.map(o=>o.hid),real:real.length});}}
   if(!(s.ev==='hack'&&p.hk&&p.hk.n===m.n))snd(p,res);snd(p,mePk(p));afterChange();}
  else if(m.t==='hit'){const k=p.hk;if(!k||k.n!==m.n)return;p.hk=null;const o=Number.isInteger(m.i)?k.opts[m.i]:null,t=o&&o.pid?H.players.find(x=>x.pid===o.pid):null;let r={t:'hkr',ok:false,why:'가짜 아이디였어요… 꽝!'};
-  if(t){if(t.away||t.tot<1)r.why='대상이 지금은 해킹할 수 없어요';
+  if(t){
+   if(H.teamMode&&t.team){const defTeam=t.team,def=teamDefender(defTeam);
+    if(def){def.def=0;const kk=Math.max(1,Math.ceil(teamTot(defTeam)*CFG.HACK_RATE));r.why='상대 팀의 해킹 방어권에 막혔어요!';r.blk=1;r.k=kk;r.from=def.name;snd(def,{t:'blk',by:p.name,k:kk});snd(def,mePk(def));H.players.filter(x=>x!==def).forEach(x=>snd(x,{t:'tdef',by:p.name,def:def.name,tm:defTeam}));}   // 팀 방어: 팀원 한 명의 방어권 1장이 팀 전체 해킹을 막아요
+    else{let total=0,pts=0;
+     H.players.filter(x=>x.team===defTeam&&!x.away&&x.tot>0).forEach(v=>{const kk=Math.ceil(v.tot*CFG.HACK_RATE);const missing=new Set(Object.keys(v.own).map(Number).filter(id=>!teamKindSet(p.team).has(id)));const mv=takePref(v,p,kk,missing);total+=mv;pts+=takePref.pts;v.lock=(v.lock|0)+1;snd(v,{t:'hit',by:p.name,k:mv});snd(v,mePk(v));});   // 팀 해킹: 상대 팀 전원에게 해킹 + 각자 복구 게임, 우리 팀이 없는 종부터 절반씩 빼앗아요
+     if(total>0){r={t:'hkr',ok:true,k:total,pts:pts,from:teamLabel(defTeam),tm:1};bc({t:'hsc',by:p.name,to:teamLabel(defTeam)+' 전체',k:total});}
+     else r.why='대상이 지금은 해킹할 수 없어요';}}
+   else if(t.away||t.tot<1)r.why='대상이 지금은 해킹할 수 없어요';
    else if(t.def){const kk=Math.max(1,Math.ceil(t.tot*CFG.HACK_RATE));t.def=0;r.why='상대의 해킹 방어권에 막혔어요!';r.blk=1;r.k=kk;r.from=t.name;snd(t,{t:'blk',by:p.name,k:kk});snd(t,mePk(t));}
    else{const mv=take(t,p,Math.ceil(t.tot*CFG.HACK_RATE));t.lock=(t.lock|0)+1;r={t:'hkr',ok:true,k:mv,pts:take.pts|0,from:t.name};snd(t,{t:'hit',by:p.name,k:mv});snd(t,mePk(t));bc({t:'hsc',by:p.name,to:t.name,k:mv});}}
   snd(p,r);snd(p,mePk(p));afterChange();}
@@ -126,10 +163,15 @@ function hmsg(p,m){
  else if(m.t==='rec'){if(!p.lock)return;p.lock--;snd(p,mePk(p));if(!p.lock&&p.pend)snd(p,{t:'tri',n:p.pend.n});}
 }
 const totKinds=()=>{pools();return [1,2,3,4,5].reduce((a,r)=>a+(POOL[r]||[]).length,0);};
-function afterChange(){const tk=totKinds();if(tk>0&&H.players.some(p=>Object.keys(p.own).length>=tk))return endGame('all');topBC();}
+function afterChange(){const tk=totKinds();
+ if(H.teamMode){if(tk>0){for(const t of ['A','B']){if(teamKinds(t)>=tk)return endGame('all',t);}}topBC();return;}   // 팀전: 팀 도감 합집합이 1025종이면 그 팀 승리
+ if(tk>0&&H.players.some(p=>Object.keys(p.own).length>=tk))return endGame('all');topBC();}
 /* 게임 시작을 누르면 먼저 '아이디 고르기' 단계예요. 방장이 참가자마다 서로 겹치지 않는 후보 6개씩을 나눠 주니까 아이디가 겹칠 수 없어요. */
 const PICK_MS=25000;
 function hostStart(){if(H.state!=='lobby'||H.players.filter(p=>!p.away).length<CFG.MIN_P){toast('2명 이상 모여야 시작할 수 있어요');return;}
+ if(H.teamMode){const a=teamMembers('A').length,b=teamMembers('B').length;
+  if(a<2||b<2){toast('팀전은 각 팀 2명 이상이 필요해요 (지금 🔴 A팀 '+a+'명 · 🔵 B팀 '+b+'명)');return;}
+  if(a!==b){toast('두 팀 인원수가 같아야 시작할 수 있어요 (🔴 A팀 '+a+'명 · 🔵 B팀 '+b+'명) — AI로 채워 주세요');return;}}
  H.state='pick';H.pickAt=now();
  const pool=ENG.slice();for(let i=pool.length-1;i>0;i--){const j=rr(i+1);[pool[i],pool[j]]=[pool[j],pool[i]];}
  H.players.forEach((p,i)=>{p.cands=pool.slice(i*6,i*6+6);p.idDone=0;});
@@ -145,12 +187,17 @@ function hostBegin(){if(H.state!=='pick')return;
 function hostTick(){if(!H)return;const t=now();H.players.forEach(p=>{if(!p.host&&p.conn&&t-p.last>CFG.HB_TIMEOUT){try{p.conn.close();}catch(e){}p.conn=null;p.away=true;}});
  if(H.state==='pick')idWait();
  if(H.state==='play'){if(t>=H.end)endGame('time');else{topBC();if(t-(H.snapAt||0)>=2000){H.snapAt=t;H.players.filter(p=>!p.ai).slice(1,3).forEach(p=>{if(!p.host&&p.conn)snd(p,snapPk());});}}}}
-function endGame(why){if(H.state==='end')return;H.state='end';const rk=[...H.players].sort(cmp).map((p,i)=>{const st=[0,0,0,0,0];for(const id in p.own)st[MON[id].rar-1]+=p.own[id];return{pid:p.pid,n:p.name,t:p.tt|0,s:p.sc,c5:p.c5,tot:p.tot,st,ok:p.ok|0,wr:p.wr|0,r:i+1};});bc({t:'end',rank:rk,why,gid:H.gid,dur:H.dur,ok:true});}
+function endGame(why,wteam){if(H.state==='end')return;H.state='end';const rk=[...H.players].sort(cmp).map((p,i)=>{const st=[0,0,0,0,0];for(const id in p.own)st[MON[id].rar-1]+=p.own[id];return{pid:p.pid,n:p.name,t:p.tt|0,s:p.sc,c5:p.c5,tot:p.tot,st,ok:p.ok|0,wr:p.wr|0,r:i+1};});
+ let tm=null,win=null;
+ if(H.teamMode){tm=['A','B'].map(t=>({t,k:teamKinds(t),s:teamScore(t),m:teamMembers(t).map(p=>p.name)}));
+  if(why==='all')win=wteam||null;
+  else{const a=tm[0],b=tm[1];win=a.s!==b.s?(a.s>b.s?'A':'B'):(a.k!==b.k?(a.k>b.k?'A':'B'):null);}}   // 시간 종료: 팀 점수 높은 쪽 승리 (동점이면 도감 종류 수)
+ bc({t:'end',rank:rk,why,gid:H.gid,dur:H.dur,ok:true,tm,wteam:win});}
 function wire(peer){peer.on('connection',conn=>{conn.on('data',d=>{if(!H)return;const p=conn._p;if(!p){if(d&&d.t==='join')hjoin(conn,d);return;}p.last=now();hmsg(p,d);});});}
 async function hostOpen(name){
  try{await loadPeer();}catch(e){toast(e.message);return;}
  pools();let tries=0;
- const open=()=>{const code=String(1000+rr(9000));const peer=new Peer(idOf(code,0),PO());H={code,peer,dur:5,state:'lobby',players:[],gen:0};
+ const open=()=>{const code=String(1000+rr(9000));const peer=new Peer(idOf(code,0),PO());H={code,peer,dur:5,state:'lobby',players:[],gen:0,teamMode:0};
   peer.on('open',()=>{const me=newP(name,null,true,ttNum());H.players.push(me);H.me=me;C.pid=me.pid;C.hid=me.hid;C.rc=me.rc;C.code=code;C.role='host';C.phase='lobby';sv();lobBC();H.tm=setInterval(hostTick,1000);});
   wire(peer);
   peer.on('error',e=>{if(e.type==='unavailable-id'&&tries++<6){try{peer.destroy();}catch(x){}open();}else toast('연결 오류: '+e.type);});
@@ -175,8 +222,8 @@ function migrate(){if(C.phase!=='play'||C.role==='host')return;C.gen=(C.gen||0)+
  if(c===C.pid)return becomeHost();stat('새 방장을 찾는 중…');C.tries=0;setTimeout(reTry,1500);}
 async function becomeHost(){const s=C.snap;if(!s)return migrate();try{await loadPeer();}catch(e){return migrate();}
  try{C.peer&&C.peer.destroy();}catch(e){}C.conn=null;const peer=new Peer(idOf(C.code,C.gen),PO());C.peer=peer;
- peer.on('open',()=>{H={code:C.code,peer,dur:s.dur,state:'play',players:[],t0:s.t0,end:C.end,gid:s.gid,gen:C.gen};
-  s.pl.forEach(o=>{const me=o.pid===C.pid,p=newP(o.name,null,me,o.tt);Object.assign(p,{pid:o.pid,hid:me?C.hid:p.hid,rc:me?C.rc:null,rch:o.rch||'',own:Object.fromEntries(o.own),def:o.def,lock:o.lock,seq:o.seq,pend:o.pend?{n:o.pend.n,slots:[mkSlot(),mkSlot(),mkSlot()]}:null,hk:null,hkCancel:o.hk?1:0,ok:+o.ok|0,wr:+o.wr|0,hp:+o.hp|0,shield:now()+o.sh,away:!me,last:now()});calc(p);p.sAt=o.sAt;if(o.ai){p.ai=1;p.conn={open:true,send(){},close(){}};p.away=false;}H.players.push(p);if(p.host)H.me=p;});
+ peer.on('open',()=>{H={code:C.code,peer,dur:s.dur,state:'play',players:[],t0:s.t0,end:C.end,gid:s.gid,gen:C.gen,teamMode:s.tm?1:0};
+  s.pl.forEach(o=>{const me=o.pid===C.pid,p=newP(o.name,null,me,o.tt);Object.assign(p,{pid:o.pid,hid:me?C.hid:p.hid,rc:me?C.rc:null,rch:o.rch||'',team:o.team||'',own:Object.fromEntries(o.own),def:o.def,lock:o.lock,seq:o.seq,pend:o.pend?{n:o.pend.n,slots:[mkSlot(),mkSlot(),mkSlot()]}:null,hk:null,hkCancel:o.hk?1:0,ok:+o.ok|0,wr:+o.wr|0,hp:+o.hp|0,shield:now()+o.sh,away:!me,last:now()});calc(p);p.sAt=o.sAt;if(o.ai){p.ai=1;p.conn={open:true,send(){},close(){}};p.away=false;}H.players.push(p);if(p.host)H.me=p;});
   if(!H.me){H=null;try{peer.destroy();}catch(e){}return migrate();}
   wire(peer);H.tm=setInterval(hostTick,1000);if(H.players.some(p=>p.ai))H.botT=setInterval(aiTick,700);C.role='host';C.rc=H.me.rc;sv();toast('👑 내가 새 방장이 됐어요!');stat('');H.players.forEach(p=>{if(p.host&&p.hkCancel){p.hkCancel=0;snd(p,{t:'hkr',ok:false,why:'방장이 바뀌어 해킹이 취소됐어요'});}});topBC();});
  peer.on('error',e=>{if(!H)migrate();});}
@@ -186,11 +233,11 @@ function cm(m){
  if(!m||!C)return;
  if(m.t==='wel'){C.tries=0;C.pid=String(m.pid);C.hid=esc(m.hid);if(C.role==='guest')C.rc=esc(m.rc);sv();if(C.phase!=='play'){C.phase='lobby';paintLobby();}}
  else if(m.t==='no'){stat(m.m);toast(esc(m.m));}
- else if(m.t==='lob'){C.pl=m.pl;C.dur=m.dur;if(C.phase==='lobby')paintLobby();}
- else if(m.t==='go'){if(C.phase!=='play'||!m.re){C.me={own:[],sc:0,tot:0,def:0,sh:0,lock:0};}C.end=now()+m.left;C.phase='play';C.top=[];paintPlay();setTimeout(next,m.re?600:900);}
- else if(m.t==='me'){C.me={own:(Array.isArray(m.own)?m.own:[]).filter(e=>e&&MON[e[0]]).map(e=>[+e[0],+e[1]|0]),sc:+m.sc|0,tot:+m.tot|0,def:m.def?1:0,lock:+m.lock|0,shEnd:now()+(+m.sh||0)};if(C.phase==='play'){paintMe();if(m.lock&&C.mode!=='mini'&&C.mode!=='warn')mini();}}
+ else if(m.t==='lob'){C.pl=m.pl;C.dur=m.dur;C.teamMode=m.tm?1:0;if(C.phase==='lobby')paintLobby();}
+ else if(m.t==='go'){if(C.phase!=='play'||!m.re){C.me={own:[],sc:0,tot:0,def:0,sh:0,lock:0,team:''};}C.end=now()+m.left;C.phase='play';C.top=[];paintPlay();setTimeout(next,m.re?600:900);}
+ else if(m.t==='me'){C.me={own:(Array.isArray(m.own)?m.own:[]).filter(e=>e&&MON[e[0]]).map(e=>[+e[0],+e[1]|0]),sc:+m.sc|0,tot:+m.tot|0,def:m.def?1:0,lock:+m.lock|0,shEnd:now()+(+m.sh||0),team:m.team||''};if(C.phase==='play'){paintMe();if(m.lock&&C.mode!=='mini'&&C.mode!=='warn')mini();}}
  else if(m.t==='snap'){C.snap=m;}
- else if(m.t==='top'){C.order=m.order;C.top=(Array.isArray(m.top)?m.top:[]).map(p=>({n:String(p.n),s:+p.s|0}));C.all=(Array.isArray(m.all)?m.all:[]).map(p=>({id:String(p.id),n:String(p.n),s:+p.s|0}));C.end=now()+m.left;C.away=m.away;if(C.phase==='play')paintTop();}
+ else if(m.t==='top'){C.order=m.order;C.top=(Array.isArray(m.top)?m.top:[]).map(p=>({n:String(p.n),s:+p.s|0}));C.all=(Array.isArray(m.all)?m.all:[]).map(p=>({id:String(p.id),n:String(p.n),s:+p.s|0}));C.end=now()+m.left;C.away=m.away;C.tm=m.tm||null;if(C.phase==='play')paintTop();}
  else if(m.t==='tri'){if(C.mode==='mini'||C.mode==='warn'||C.phase!=='play')return;showPick(m.n);}
  else if(m.t==='idc'){C.phase='pick';C.cand=(Array.isArray(m.c)?m.c:[]).map(String).filter(v=>ENGSET.has(v));C.pickEnd=now()+(+m.left||PICK_MS);C.hidPick=null;C.idw=null;paintPick();}
  else if(m.t==='idw'){if(C.phase==='pick'){C.idw=m;pickInfo();}}
@@ -201,6 +248,7 @@ function cm(m){
  else if(m.t==='hkx')hackElim(m);
  else if(m.t==='hit'){C.hitBy=m;hitWarn(m);}
  else if(m.t==='blk')defWin(m);
+ else if(m.t==='tdef'){nwAdd('nwD','🛡 <b>'+esc(m.def||'팀원')+'</b>의 방어권이 팀 해킹을 막았어요!');try{toast('🛡 팀 방어권이 해킹을 막았어요!');}catch(e){}}   // 팀 방어 알림 (방어권을 쓴 본인은 defWin 연출만 봐요)
  else if(m.t==='leg')legend(m);
   else if(m.t==='hsc')hackNews(m);
  else if(m.t==='end')finish(m);
@@ -434,7 +482,7 @@ function hackWin(m){
   for(let i=0;i<Math.min(n,8);i++)tm.push(setTimeout(()=>sx('tap'),250+i*110));},1450);
  at(()=>{q('.hkTi').classList.add('show');q('.hkBox').classList.add('shk');flash();rings('#3f8');sparks('#3f8',18,40);sx('crit');},2150);
  at(()=>q('.hkSub').classList.add('show'),2650);
- at(()=>{const l=q('.hkLoot');const pt=(m.pts==null)?-1:Math.max(0,+m.pts|0);l.innerHTML='<b>'+esc(from)+'</b> 님의 포켓몬 <b id=hkN>0</b>마리 탈취!'+(pt>=0?'<div style="margin-top:6px;color:#ffd23f">⭐ 내 점수 <b id=hkP>0</b>점 획득!</div>':'');l.classList.add('show');sx('win');sparks('#ffd23f',16,62);
+ at(()=>{const l=q('.hkLoot');const pt=(m.pts==null)?-1:Math.max(0,+m.pts|0);l.innerHTML='<b>'+esc(from)+'</b>'+(m.tm?' 팀의 포켓몬':' 님의 포켓몬')+' <b id=hkN>0</b>마리 탈취!'+(pt>=0?'<div style="margin-top:6px;color:#ffd23f">⭐ 내 점수 <b id=hkP>0</b>점 획득!</div>':'');l.classList.add('show');sx('win');sparks('#ffd23f',16,62);
   if(calm){q('#hkN').textContent=k;const pe=q('#hkP');if(pe)pe.textContent=pt;return;}
   const t0=now(),iv=setInterval(()=>{const n=q('#hkN');if(!n||!o.isConnected){clearInterval(iv);return;}const p=Math.min(1,(now()-t0)/900);n.textContent=Math.round(k*p);const pe=q('#hkP');if(pe)pe.textContent=Math.round(pt*p);if(p>=1)clearInterval(iv);},40);ivs.push(iv);
   for(let i=0;i<6;i++)tm.push(setTimeout(()=>sx('coin'),i*150));},3050);
@@ -1165,34 +1213,42 @@ function pracRun(k){const b=pracBox();if(!b||!MINI[k])return;b.dataset.on=1;
 function pracClick(e){const x=e.target.closest&&e.target.closest('[data-pg]');if(!x||!pracBox()||!pracBox().contains(x))return;const k=x.dataset.pg;
  if(k==='close'){const b=pracBox();b.innerHTML='';delete b.dataset.on;}else if(k==='menu')pracMenu();else pracRun(k);}
 function paintLobby(){const host=C.role==='host',first=!C.lobTyped;C.lobTyped=1;const pl=C.pl||[];
+ const tm=!!C.teamMode;
  const keepPr=pracBox();const prOn=keepPr&&keepPr.dataset.on?keepPr:null;if(prOn)prOn.remove();   // 연습 중이면 화면이 갱신돼도 그대로 유지해요
+ const tag=p=>'<span class="ptag'+(p.a?' away':'')+'"'+(host&&tm&&p.id?' data-x=tmv data-pid="'+p.id+'"':'')+'>'+ttTxt(p.t)+esc(p.n)+(p.a?' (자리비움)':'')+(p.b?' 🤖':'')+'</span>';
+ const teamBox=t=>{const ms=pl.filter(p=>p.team===t);return '<div class=dsep>'+(t==='A'?'🔴 A팀':'🔵 B팀')+' '+ms.length+'명</div><div class=ptags>'+(ms.length?ms.map(tag).join(''):'<span style="opacity:.6">아직 없어요</span>')+'</div>';};
+ const nA=pl.filter(p=>p.team==='A').length,nB=pl.filter(p=>p.team==='B').length;
  root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\MONSTUDY\\LOBBY.EXE</b></div><div class=dosP>'
  +'<div class="dl ttl s" id=hbTt></div>'
  +'<div class=dkv><span>ROOM</span><b class=big>'+C.code+'</b></div>'
  +'<div class=dkv><span>MY_ID</span><b>'+C.hid+'</b></div>'
  +'<div class=dkv><span>REJOIN</span><b>'+(C.rc||'')+'</b></div>'
  +'<div class=dnote>재접속 번호는 나만 보는 번호예요! 끊기면 이 번호로 돌아와요.</div>'
- +'<div class=dsep>참가자 '+pl.length+'명</div><div class=ptags>'+pl.map(p=>'<span class="ptag'+(p.a?' away':'')+'">'+ttTxt(p.t)+esc(p.n)+(p.a?' (자리비움)':'')+'</span>').join('')+'</div>'
- +(host?(()=>{const na=pl.filter(p=>p.b).length,full=na>=CFG.HOST_AI_MAX||pl.length>=CFG.MAX_P;return '<div class=dsep>🤖 AI 친구 '+na+'명</div><div class=durs><button class="dbt" data-x=aim'+(na?'':' disabled')+'>− 빼기</button><button class="dbt" data-x=aip'+(full?' disabled':'')+'>+ 추가</button></div><div class=dnote>친구가 적을 때 AI를 더해서 같이 할 수 있어요 (최대 '+CFG.HOST_AI_MAX+'명)</div>';})():'')
- +(host?'<div class=dsep>게임 시간</div><div class=durs>'+CFG.DURS.map(d=>'<button class="dbt'+(C.dur===d?' sel':'')+'" data-x=d'+d+'>'+d+'분</button>').join('')+'</div><button class="dbt" data-x=st>▶ 게임 시작 (2명 이상)</button>':'<div class=dnote style="font-size:14px;color:#8fd">방장이 시작하길 기다려요… ('+(C.dur||5)+'분 게임)<i class=cur></i></div>')
+ +(tm?teamBox('A')+teamBox('B'):'<div class=dsep>참가자 '+pl.length+'명</div><div class=ptags>'+pl.map(tag).join('')+'</div>')
+ +(host?(()=>{const na=pl.filter(p=>p.b).length,full=na>=CFG.HOST_AI_MAX||pl.length>=(tm?TEAM_MAX*2:CFG.MAX_P);return '<div class=dsep>🤖 AI 친구 '+na+'명</div><div class=durs><button class="dbt" data-x=aim'+(na?'':' disabled')+'>− 빼기</button><button class="dbt" data-x=aip'+(full?' disabled':'')+'>+ 추가</button></div><div class=dnote>친구가 적을 때 AI를 더해서 같이 할 수 있어요 (최대 '+CFG.HOST_AI_MAX+'명)</div>';})():'')
+ +(host?'<div class=dsep>모드</div><div class=durs><button class="dbt'+(tm?' sel':'')+'" data-x=tmm>👥 팀전 모드: '+(tm?'켜짐':'꺼짐')+'</button></div><div class=dnote>팀전은 2v2부터 5v5까지, 두 팀 인원수가 같아야 시작해요. 팀 도감은 팀원끼리 공유하고, 해킹은 상대 팀 전원에게 들어가요.</div>':'')
+ +(host&&tm&&nA!==nB?'<button class="dbt" data-x=tfill>🤖 AI로 인원 맞추기 (🔴 A팀 '+nA+'명 · 🔵 B팀 '+nB+'명)</button><div class=dnote>두 팀 인원수가 같아야 시작할 수 있어요. 작은 팀에 AI를 채워요.</div>':'')
+ +(host&&tm?'<div class=dnote>팀을 바꾸려면 친구 이름을 눌러요 (방장만 가능)</div>':'')
+ +(host?'<div class=dsep>게임 시간</div><div class=durs>'+CFG.DURS.map(d=>'<button class="dbt'+(C.dur===d?' sel':'')+'" data-x=d'+d+'>'+d+'분</button>').join('')+'</div><button class="dbt" data-x=st>'+(tm?'▶ 팀전 시작 (2v2 이상 · 같은 인원)':'▶ 게임 시작 (2명 이상)')+'</button>':'<div class=dnote style="font-size:14px;color:#8fd">방장이 시작하길 기다려요… ('+(C.dur||5)+'분 게임)<i class=cur></i></div>')
  +arenaRecLine()+'<div class=dnote>🎁 보상: 참가자 '+CFG.REWARD_MIN_P+'명 이상 · 내 점수 '+needSc(CFG.DURS.includes(+C.dur)?+C.dur:5)+'점 이상('+CFG.DURS.map(d=>d+'분 '+needSc(d)+'점').join(' · ')+')이면 ★1~2 포켓몬 1마리 · 1·2·3등은 5·4·3성 조각 추가 · 🎯 정답률 1위('+CFG.ACC_MIN_Q+'문제 이상 푼 사람)도 5성 조각 추가</div>'
  +'<button class="dbt" data-x=prac style="--c:#fd2">🛠 해킹 복구 연습 (기다리는 동안 해 보세요)</button><div id=hbPr class=dosP></div>'
  +'<div id=hbSt class=dosSt></div><button class="dbt q" data-x=quit>✖ 나가기</button></div></div><div id=hbP class=pop></div></div>';
  if(prOn){const n=$h('#hbPr');if(n)n.replaceWith(prOn);}else{const n=$h('#hbPr');if(n)n.addEventListener('click',pracClick);}
  tline($h('#hbTt'),'> 대기실 접속 완료',first?2:0);
- root.onclick=e=>{const x=e.target.dataset&&e.target.dataset.x;if(!x)return;if(x==='quit')return quit();if(x==='prac'){if(pracBox()&&pracBox().dataset.on)return;pracMenu();return;}if(x==='aip')tx({t:'aip'});if(x==='aim')tx({t:'aim'});if(x==='st')tx({t:'st'});if(/^d\d+$/.test(x))tx({t:'dur',v:+x.slice(1)});};}
+ root.onclick=e=>{const x=e.target.dataset&&e.target.dataset.x;if(!x)return;if(x==='quit')return quit();if(x==='prac'){if(pracBox()&&pracBox().dataset.on)return;pracMenu();return;}if(x==='aip')tx({t:'aip'});if(x==='aim')tx({t:'aim'});if(x==='st')tx({t:'st'});if(x==='tmm')tx({t:'tmm'});if(x==='tfill')tx({t:'tfill'});if(x==='tmv')tx({t:'tmv',pid:e.target.dataset.pid});if(/^d\d+$/.test(x))tx({t:'dur',v:+x.slice(1)});};}
 function paintPlay(){root.className='on';root.innerHTML='<div class="w hbPlay"><div class="dosH dosHs">'+DOTS+'<b>C:\\MONSTUDY\\HACK.EXE — LIVE</b></div><div class="box top"><div>⏱ <b id=hbT>--:--</b></div><div>🃏 <b id=hbN>0</b>장 · ⭐ <b id=hbS>0</b>점</div><div id=hbB></div><button class=b data-x=key>🔑 내 번호</button></div><div id=hbW></div><div class=box><b id=hbRh class=bh>▌RANK ▸ 실시간 순위</b><div class=rk id=hbR style="margin-top:6px">집계 중…</div></div><div class=box><b id=hbDh class=bh>▌DEX ▸ 내 도감</b><div class=dex id=hbD style="margin-top:6px"></div></div><div id=hbSt class=dosSt></div><div id=hbP class=pop></div><div id=hbGo class=gobar><button class="b g" data-x=go>🔓 해킹하기 · 문제 풀기</button></div></div>';
  root.onclick=e=>{const d=e.target.dataset||{};if(d.x==='go'){if(C.mode==='closed'){C.mode=null;showGo(0);question();}return;}if(d.x==='key'||d.k){const v=d.k?e.target.parentNode.querySelector('.hbKv'):$h('#hbSt');if(v)v.textContent=v.textContent?'':'재접속 번호 '+C.rc+' · 해킹 아이디 '+C.hid+' · 방 '+C.code+' (남에게 보여 주지 마세요)';}};
  clearInterval(uiT);uiT=setInterval(tick,250);paintMe();paintTop();}
 function tick(){if(C.phase!=='play')return;syncPad();const l=C.end-now();const t=$h('#hbT');if(t){t.textContent=fmt2(l);}const on=l<=CFG.LAST30_MS&&l>0;root.classList.toggle('l30',on);if(!!C._l30!==on){C._l30=on;hbBgm();}const w=$h('#hbW');if(w)w.innerHTML=on?'<div class=warn>🚨 마지막 30초! 카드 획득 확률 UP · 남은 '+Math.ceil(l/1000)+'초</div>':'';
  if(C.role==='guest'&&C.lastRx&&now()-C.lastRx>CFG.HB_TIMEOUT+2000&&C.conn){try{C.conn.close();}catch(e){}lost();}}
 function paintMe(){const m=C.me;if(!m)return;const q=(id,v)=>{const e=$h(id);if(e)e.textContent=v;};q('#hbN',m.tot);q('#hbS',m.sc);const b=$h('#hbB');if(b)b.innerHTML=(m.def?'🛡방어권 ':'')+(m.shEnd>now()?'✨보호막 ':'');
- const dh=$h('#hbDh');if(dh)dh.textContent='▌DEX ▸ 내 도감 · '+m.own.length+'종 / '+m.tot+'장';const d=$h('#hbD');if(!d)return;const own=[...m.own].sort((a,b)=>MON[b[0]].rar-MON[a[0]].rar||a[0]-b[0]);const NM={5:'전설',4:'영웅',3:'희귀',2:'고급',1:'일반'};let shown=0,hh='';
+ const dh=$h('#hbDh');if(dh){const tk=(C.tm&&C.me&&C.me.team)?(C.me.team==='A'?C.tm[0].k:C.tm[1].k):null;dh.textContent='▌DEX ▸ 내 도감 · '+m.own.length+'종 / '+m.tot+'장'+(tk!=null?' · 팀 도감 '+tk+'종':'');}const d=$h('#hbD');if(!d)return;const own=[...m.own].sort((a,b)=>MON[b[0]].rar-MON[a[0]].rar||a[0]-b[0]);const NM={5:'전설',4:'영웅',3:'희귀',2:'고급',1:'일반'};let shown=0,hh='';
  for(let r=5;r>=1;r--){const g=own.filter(e=>MON[e[0]].rar===r);if(!g.length)continue;const cut=g.slice(0,Math.max(0,400-shown));shown+=cut.length;hh+='<div class=dgh>'+'★'.repeat(r)+' '+NM[r]+' · '+g.length+'종 / '+g.reduce((a,e)=>a+e[1],0)+'장</div>'+cut.map(([id,n])=>'<div class="cc r'+r+((C.hold&&C.hold[id])?' hbHold':'')+'" data-id='+id+'>'+monImg(id,'front')+'<i>×'+n+'</i></div>').join('')+(g.length>cut.length?'<div class=dgh>…외 '+(g.length-cut.length)+'종</div>':'');}
  d.innerHTML=own.length?hh:'<div style="grid-column:1/-1;opacity:.7">도감이 비어 있어요. 문제를 풀어 포켓몬을 획득하세요!</div>';}
 function paintTop(){const r=$h('#hbR');if(!r)return;const all=C.all||[];const list=all.length?all:(C.top||[]).map(p=>({id:'',n:p.n,s:p.s}));
  if(!list.length){r.textContent='집계 중…';return;}const mi=all.findIndex(x=>x.id===C.pid);const h=$h('#hbRh');if(h)h.innerHTML='▌RANK ▸ 실시간 순위'+(mi>=0?' · <b style="color:#ff6">내 순위 '+(mi+1)+'위 / '+all.length+'명</b>':'');
- r.innerHTML=list.map((p,i)=>'<span'+(p.id&&p.id===C.pid?' style="border-color:#ff6;color:#ff6"':'')+'>'+(i<3?['🥇','🥈','🥉'][i]:(i+1)+'위')+' '+ttTxt(p.t)+esc(p.n)+' '+p.s+'점</span>').join('');}
+ const tmLine=(C.tm&&C.tm.length===2)?'<div style="margin:4px 0;padding:5px 8px;border:1px solid #0a85;border-radius:8px;font-size:14px;text-align:center">🔴 A팀 <b>'+C.tm[0].k+'</b>종 · <b>'+C.tm[0].s+'</b>점'+(C.me&&C.me.team==='A'?' ◀ 우리 팀':'')+' &nbsp;|&nbsp; 🔵 B팀 <b>'+C.tm[1].k+'</b>종 · <b>'+C.tm[1].s+'</b>점'+(C.me&&C.me.team==='B'?' ◀ 우리 팀':'')+'</div>':'';
+ r.innerHTML=tmLine+list.map((p,i)=>'<span'+(p.id&&p.id===C.pid?' style="border-color:#ff6;color:#ff6"':'')+'>'+(i<3?['🥇','🥈','🥉'][i]:(i+1)+'위')+' '+ttTxt(p.t)+esc(p.n)+' '+p.s+'점</span>').join('');}
 /* ---------- 게임 종료 연출: 해킹 접속 종료 (터미널 로그 → CONNECTION TERMINATED → CRT 꺼짐 → 결과 화면) ---------- */
 function endCut(m,show){
  if(!root||!C){show(false);return;}
@@ -1222,7 +1278,7 @@ function endCut(m,show){
   const t=q('.hkTi');t.textContent=all?'FULL ACCESS':'CONNECTION TERMINATED';t.classList.add('show');
   const f=q('.hkEFl');f.classList.add('go');const ib=q('.hkIn');ib.classList.add('shk');
   sx(all?'win':'crit');},2450);
- at(()=>{const s=q('.hkSub');s.textContent=all?'👑 모든 포켓몬을 해킹했어요!':'🔌 해킹 종료! 결과를 확인해요';s.classList.add('show');},2900);
+ at(()=>{const s=q('.hkSub');s.textContent=all?(m.wteam?'👑 '+(m.wteam==='A'?'🔴 A팀':'🔵 B팀')+'이(가) 도감 1025종을 모두 모았어요!':'👑 모든 포켓몬을 해킹했어요!'):'🔌 해킹 종료! 결과를 확인해요';s.classList.add('show');},2900);
  at(()=>q('.hkHint').classList.add('show'),3000);
  const fin=()=>{clearInterval(rain);ivs.forEach(clearInterval);if(C)C.cutOn=0;show(true);};
  const out=()=>{if(done||!o.isConnected)return;done=1;tm.forEach(clearTimeout);clearInterval(rain);ivs.forEach(clearInterval);
@@ -1247,7 +1303,8 @@ if(me){try{const k=(S.meta.hb=S.meta.hb||{paid:{}});const r=(k.rec=k.rec||{best:
    if(me.r<=3){const star=CFG.REWARD[me.r],id2=pk(POOL[star]);let g2=null;try{g2=gainCard(id2);}catch(e){}if(g2)gains.push({id:g2.id||id2,g:g2});rw+='<div class=box style="border-color:#fd2;text-align:center;font-size:20px">'+['🥇','🥈','🥉'][me.r-1]+' '+me.r+'등 추가 보상 — '+star+'성 조각 획득!<br>'+card(id2,g2)+'</div>';}
    if(accW&&accW.pid===me.pid){const id3=pk(POOL[5]);let g3=null;try{g3=gainCard(id3);}catch(e){}if(g3)gains.push({id:g3.id||id3,g:g3});rw+='<div class=box style="border-color:#3ff;text-align:center;font-size:20px">🎯 정답률 1위 추가 보상 — 5성 조각 획득!<br>'+card(id3,g3)+'</div>';}
    try{autoSave();}catch(e){}try{saveLocal();}catch(e){}}}
- const show=anim=>{if(!C||C.phase!=='end'||!root)return;root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\MONSTUDY\\RESULT.EXE</b></div><div class=dosP><div class="dl ttl s" id=hbTt></div>'+arenaRecLine()+rw+accBox(accW)+'<div class=box>'+m.rank.map(p=>'<div style="padding:4px 0;border-bottom:1px dashed #0a85;'+(p.pid===C.pid?'color:#ff6':'')+'">'+(p.r<=3?['🥇','🥈','🥉'][p.r-1]:p.r+'위')+' <b>'+ttTxt(p.t)+esc(p.n)+'</b>'+(accW&&accW.pid===p.pid?' <span class=dtt>🎯 정답률 1위</span>':'')+' — '+p.s+'점 · 카드 '+p.tot+'장 · ★1~5: '+p.st.join('/')+accRow(p)+'</div>').join('')+'</div><button class="dbt q" data-x=quit>✖ 닫기</button></div></div><div id=hbP class=pop></div></div>';tline($h('#hbTt'),'> 게임 종료'+(m.why==='all'?' (모든 포켓몬을 모았어요!)':''),2);root.onclick=e=>{if(e.target.dataset&&e.target.dataset.x==='quit')quit();};;if(gains.length){const gg=gains.splice(0),rk=me?me.r:0,ttl=rk>=1&&rk<=3?['🥇','🥈','🥉'][rk-1]+' '+rk+'등! 아레나 보상 카드':'🎁 아레나 보상 카드';setTimeout(async()=>{if(!C||C.phase!=='end'||!root)return;document.body.classList.add('hbRw');try{await cardRewardFx(gg,{title:ttl,logo:'ARENA REWARD'});}catch(e){console.warn('hb reward fx',e);}document.body.classList.remove('hbRw');},reduceMo()?200:900);}if(anim&&!reduceMo()){const w0=root.firstChild;if(w0&&w0.classList)w0.classList.add('hkOn');}};endCut(m,show);}
+ const show=anim=>{if(!C||C.phase!=='end'||!root)return;const tmHtml=(m.tm&&m.tm.length===2)?'<div class=box style="text-align:center;border-color:#fd2">'+(m.wteam?'<div style="font-size:22px">🏆 '+(m.wteam==='A'?'🔴 A팀':'🔵 B팀')+' 승리!</div>':'<div style="font-size:20px">🤝 무승부!</div>')+m.tm.map(t=>'<div style="margin-top:6px;font-size:16px">'+(t.t==='A'?'🔴':'🔵')+' '+t.t+'팀 — 도감 <b>'+t.k+'</b>종 · <b>'+t.s+'</b>점<br><small>'+t.m.map(esc).join(', ')+'</small></div>').join('')+'</div>':'';
+  root.innerHTML='<div class=w><div class=dos><div class=dosH>'+DOTS+'<b>C:\\MONSTUDY\\RESULT.EXE</b></div><div class=dosP><div class="dl ttl s" id=hbTt></div>'+arenaRecLine()+rw+accBox(accW)+tmHtml+'<div class=box>'+m.rank.map(p=>'<div style="padding:4px 0;border-bottom:1px dashed #0a85;'+(p.pid===C.pid?'color:#ff6':'')+'">'+(p.r<=3?['🥇','🥈','🥉'][p.r-1]:p.r+'위')+' <b>'+ttTxt(p.t)+esc(p.n)+'</b>'+(accW&&accW.pid===p.pid?' <span class=dtt>🎯 정답률 1위</span>':'')+' — '+p.s+'점 · 카드 '+p.tot+'장 · ★1~5: '+p.st.join('/')+accRow(p)+'</div>').join('')+'</div><button class="dbt q" data-x=quit>✖ 닫기</button></div></div><div id=hbP class=pop></div></div>';tline($h('#hbTt'),'> 게임 종료'+(m.why==='all'?(m.wteam?' ('+m.wteam+'팀 도감 완성!)':' (모든 포켓몬을 모았어요!)'):''),2);root.onclick=e=>{if(e.target.dataset&&e.target.dataset.x==='quit')quit();};;if(gains.length){const gg=gains.splice(0),rk=me?me.r:0,ttl=rk>=1&&rk<=3?['🥇','🥈','🥉'][rk-1]+' '+rk+'등! 아레나 보상 카드':'🎁 아레나 보상 카드';setTimeout(async()=>{if(!C||C.phase!=='end'||!root)return;document.body.classList.add('hbRw');try{await cardRewardFx(gg,{title:ttl,logo:'ARENA REWARD'});}catch(e){console.warn('hb reward fx',e);}document.body.classList.remove('hbRw');},reduceMo()?200:900);}if(anim&&!reduceMo()){const w0=root.firstChild;if(w0&&w0.classList)w0.classList.add('hkOn');}};endCut(m,show);}
 function quit(){try{S.curQ=null;}catch(e){}try{const mt=document.getElementById('hbMt');if(mt)mt.remove();}catch(e){}clearInterval(uiT);if(H){clearInterval(H.tm);clearInterval(H.botT);try{H.peer.destroy();}catch(e){}H=null;}try{C&&C.peer&&C.peer.destroy();}catch(e){}C=null;root.className='';root.innerHTML='';setTimeout(hbBgm,0);try{S.screen='hub';S.hubTab='adv';renderHub();}catch(e){}}  /* 해킹 배틀은 모험 탭 메뉴라서 끝나면 모험 탭으로 돌아와요 */
 /* ---------- 배경음악: 해킹 배틀 전용 곡 (게임의 MUS 엔진에 곡만 등록해서 써요) ----------
    hack  = 사이버 해킹 분위기(프리지안 단조 · 달리는 16분 아르페지오 · 펌핑 톱니파 베이스 · 4박 킥)
@@ -1280,11 +1337,15 @@ if(typeof renderPvp==='function'){const rp=renderPvp;renderPvp=function(){const 
 /* 방장이 대기실에서 AI 친구를 더하거나 빼요 (학생 2명이 할 때 AI를 몇 명 더해서 같이 하기). AI 이름 앞에는 🤖 가 붙어요 */
 const AI_FB=['별빛','도토리','파랑새','구름','하늘','달토끼','솜사탕','번개','바람','초코','나무','불꽃'];
 function hostAddAI(){if(!H||H.state!=='lobby')return;const n=H.players.filter(p=>p.ai).length;if(n>=CFG.HOST_AI_MAX||H.players.length>=CFG.MAX_P)return;
+ if(H.teamMode){if(H.players.length>=TEAM_MAX*2||(teamMembers('A').length>=TEAM_MAX&&teamMembers('B').length>=TEAM_MAX))return;}
  const used=new Set(H.players.map(p=>p.name));let pool=[];try{if(typeof rmNames==='function')pool=rmNames(6)||[];}catch(e){}
  pool=pool.concat(AI_FB.slice().sort(()=>Math.random()-.5)).map(x=>'🤖'+String(x).slice(0,5));
  const nm=pool.find(x=>!used.has(x))||'🤖AI'+(n+1);
  const p=newP(nm,{open:true,send(){},close(){}},false);p.ai=1;while(H.players.some(x=>x!==p&&x.rc===p.rc))p.rc=String(1000+rr(9000));
+ if(H.teamMode)p.team=teamMembers('A').length<=teamMembers('B').length?'A':'B';   // 팀전: AI는 작은 팀으로 들어가요
  H.players.push(p);if(!H.botT)H.botT=setInterval(aiTick,700);lobBC();}
+/* 팀전 AI 채우기: 두 팀 인원수가 같아질 때까지 작은 팀에 AI를 넣어 맞춤 (5v5까지) */
+function hostFillAI(){if(!H||H.state!=='lobby'||!H.teamMode)return;let guard=0;while(teamMembers('A').length!==teamMembers('B').length&&guard++<8){const before=H.players.length;hostAddAI();if(H.players.length===before)break;}}
 function hostDelAI(){if(!H||H.state!=='lobby')return;for(let i=H.players.length-1;i>=0;i--)if(H.players[i].ai){H.players.splice(i,1);break;}lobBC();}
 function aiTick(){
  if(!H||H.state==='end')return;const t=now();
@@ -1303,7 +1364,7 @@ function aiTick(){
 function hostLocalAI(name,names,dur){
  pools();
  const code=String(1000+rr(9000));
- H={code,peer:null,dur:CFG.DURS.includes(dur)?dur:5,state:'lobby',players:[],gen:0};
+ H={code,peer:null,dur:CFG.DURS.includes(dur)?dur:5,state:'lobby',players:[],gen:0,teamMode:0};
  const me=newP(name,null,true,ttNum());H.players.push(me);H.me=me;
  C.pid=me.pid;C.hid=me.hid;C.rc=me.rc;C.code=code;C.role='host';C.phase='lobby';
  (names||['별빛','도토리','파랑새']).slice(0,CFG.RAND_OPP[1]).forEach(n=>{const p=newP(n,{open:true,send(){},close(){}},false);p.ai=1;H.players.push(p);});
@@ -1337,7 +1398,7 @@ function randHB(nm){
  at(()=>{settled=1;o.classList.add('ok');Tm.innerHTML='⏱ 게임 시간 <b>'+dur+'분</b> 확정!';St.innerHTML='✅ 매칭 완료! 👥 참가자 <b>'+total+'명</b> · 🎁 <b>'+need+'점</b> 이상이면 보상';X.style.display='none';sx('ok');},tEnd);
  at(()=>{stop();if(!C||C.phase!=='menu'||!root||!root.classList.contains('on'))return;C.name=nm;hostLocalAI(nm,names,dur);},tEnd+1400);
 }
-window.HB={CFG,MINI,open,_t:!window.__sim?undefined:{hostStart,hostBegin,idPick,idWait,get Cc(){return C;},showPick,showRes,showHack,pkRow,hbPick,cm,finish,question,hjoin,rhash,snapPk,becomeHost,migrate,hostTick,get H(){return H;},setH(h){H=h;},setC(c){C=c;},newP,give,mult,take,calc,endGame,hmsg,mkSlot,pools,sumOK,cmp}};
+window.HB={CFG,MINI,open,_t:!window.__sim?undefined:{hostStart,hostBegin,idPick,idWait,get Cc(){return C;},showPick,showRes,showHack,pkRow,hbPick,cm,finish,question,hjoin,rhash,snapPk,becomeHost,migrate,hostTick,get H(){return H;},setH(h){H=h;},setC(c){C=c;},newP,give,mult,take,takePref,calc,endGame,hmsg,mkSlot,pools,sumOK,cmp,teamMembers,teamKinds,teamKindSet,teamScore,teamTot,teamDefender,teamLabel,hostFillAI,hostAddAI,afterChange}};
 
 setInterval(()=>{if(C&&C.role==='guest'&&C.phase==='play'){tx({t:'hb'});}else if(C&&C.role==='guest'&&(C.phase==='lobby'||C.phase==='pick')){tx({t:'hb'});}},4000);
 })();
