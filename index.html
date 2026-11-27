@@ -8043,6 +8043,7 @@ function easyHint(){try{const st=S.meta.settings;if(!st||st.easy)return;setTimeo
 /* ===== 몬스터볼 시스템 =====
    · 문제를 맞히면 볼이 나와요 (몬스터 20% · 슈퍼 10% · 하이퍼 5% · 마스터 1% · 타입별 볼 3%씩, 나머지는 꽝)
    · 포획은 체력 30% 이하에서만, 볼이 있어야만, 한 턴에 한 번 (던지면 내 턴이 끝나요)
+   · 도망: 야생 포켓몬 한 마리에게 던진 공 횟수마다 도망 확률이 올라가 (1번째 공 10% · 2번째 20% · 3번째 30% · 4번째 40% · 5번째 50%, 6번째부터는 50% 유지). 도망가면 그 포켓몬은 잡을 수 없고 전투가 끝나요 (볼은 쓴 걸로 쳐요). 협동 보스전에서는 도망가지 않아요.
    · 몬스터볼 성공률 = 상대 체력이 줄어든 만큼 올라가 (0% → ★1 100% · ★2 90% · ★3 80% · ★4 70% · ★5 60%) */
 const BALLS={
  monster:{n:'몬스터볼',c:'#ff5a5f',add:0,drop:20,d:'기본 볼'},
@@ -8236,13 +8237,113 @@ function askWildCapture(slot=null){
  if(!owned.length){
   body=`<p style="font-size:15px;line-height:1.6;margin:10px 0"><b>가지고 있는 볼이 없어요!</b><br>문제를 맞히면 볼을 얻을 수 있어요.<br>볼이 생길 때까지 계속 싸워 봐요.</p><div class="mbtns"><button class="btn ghost big" data-a=keep>계속 싸우기</button></div>`;
  }else{
+  const throwN=(u.throws||0)+1,fleePct=Math.min(50,throwN*10);
   const rows=owned.map(k=>{const b=BALLS[k],hit=ballTypeHit(k,u);
    const tag=b.types?(hit?`<small class=hit>★ ${ballTypeNames(k)} 타입 일치! +10%</small>`:`<small>${ballTypeNames(k)} 타입 특화 · 지금은 +5%</small>`):`<small>${b.d}</small>`;
    hd['ball_'+k]=()=>{closeM();if(B&&B.wildMode){captureGauge(targetSlot,k);}};
    return `<button class=ballBtn data-a="ball_${k}">${ballIcon(k,1)}<span class=bbN>${b.n}${tag}</span><span class=bbC>×${ballN(k)}</span><b class=bbP>${ballChance(k,u)}%</b></button>`;}).join('');
-  body=`<p class="mut" style="font-size:13px;margin:8px 0 2px">던질 볼을 골라요. <b>볼은 한 턴에 한 번</b>, 던지면 내 턴이 끝나요.</p>${rows}<div class="mbtns"><button class="btn ghost" data-a=keep>계속 싸우기</button></div>`;
+  body=`<p class="mut" style="font-size:13px;margin:8px 0 2px">던질 볼을 골라요. <b>볼은 한 턴에 한 번</b>, 던지면 내 턴이 끝나요.</p><p style="font-size:13px;line-height:1.5;margin:6px 0;color:#b3261e">⚠️ 이번 공은 <b>${throwN}번째</b> 공이에요. 던지면 <b>${fleePct}%</b> 확률로 ${esc(w.name)}이(가) 도망가요!</p>${rows}<div class="mbtns"><button class="btn ghost" data-a=keep>계속 싸우기</button></div>`;
  }
  M(`<div style="text-align:center">${head}${body}<p class="mut" style="font-size:12px;margin-top:6px">실패하면 ${esc(w.name)}이(가) 공격해요.</p></div>`,hd,{wide:1});
+}
+/* ===== 협동 보스전 포획: 보스 체력 10% 이하일 때만 =====
+   · 포획 버튼을 누른 사람이 볼 종류를 골라요. 고른 공 1개만 소모돼요 (다른 친구들 볼은 소모되지 않아요)
+   · 공을 고르면 모두의 화면에 포획 게이지가 떠요. 정중앙 PERFECT 1명당 포획 확률 +2%
+   · 포획 창에 이번 시도 횟수와 도망 확률을 미리 보여줘요 ("이번이 N번째 포획 시도예요. 실패하면 P% 확률로 보스가 도망가요!")
+   · 모두가 게이지를 끝내야 공이 동시에 날아가고, 방장이 한 번만 판정해요 */
+/* ===== 협동 보스전 포획: 보스 체력 10% 이하일 때만 =====
+   · 포획 버튼을 누른 사람이 볼 종류를 골라요. 고른 공 1개만 소모돼요 (다른 친구들 볼은 소모되지 않아요)
+   · 공을 고르면 모두의 화면에 포획 게이지가 떠요. 정중앙 PERFECT 1명당 포획 확률 +2%
+   · 포획 창에 이번 시도 횟수와 도망 확률을 미리 보여줘요 ("이번이 N번째 포획 시도예요. 실패하면 P% 확률로 보스가 도망가요!")
+   · 모두가 게이지를 끝내야 공이 동시에 날아가고, 방장이 한 번만 판정해요 */
+function askBossCapture(){
+  if(!B||!B.t2||!B.t2.boss||B.over)return;
+  const targets=bossCapTargets();
+  if(!targets.length){toast('보스 체력이 10% 이하일 때 포획할 수 있어요');return;}
+  if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex)){toast('내 차례가 되면 포획할 수 있어요');return;}
+  if(bossCapActive()){toast('지금 포획이 진행 중이에요');return;}
+  const owned=BALL_ORDER.filter(k=>ballN(k)>0);
+  const pickSlot=tg=>{
+    const u=B.foe.board[tg];if(!u||u.hp<=0)return;
+    const id=u.id,w=MON[id],pct=Math.round(u.hp/u.max*100);
+    const typesText=(unitTypes(u,true)||[]).map(t=>`<span class="typeTag" style="background:${TYPE_COL[t]}">${TYPE_KO[t]||t}</span>`).join(' ');
+    const fails=u.capFails||0,attempt=fails+1,fleePct=Math.min(50,attempt*10);
+    const head=`<div class="endWildImg" style="width:115px;height:105px;margin:0 auto 5px">${u.wsk?monImg(u.wsk,'art','',true):monImg(id,'art')}</div><h2>${esc(w.name)} 포획하기</h2><p style="font-size:14px;line-height:1.7">보스 체력이 <b>${pct}%</b> 남았어요.<br>${esc(w.name)} · ${'★'.repeat(w.rar||1)} · ${typesText}</p>`;
+    let body;
+    if(!owned.length){
+      body=`<p style="font-size:13px;line-height:1.6;margin:8px 0 4px;color:#b3261e">⚠️ 이번이 <b>${attempt}번째</b> 포획 시도예요. 실패하면 <b>${fleePct}%</b> 확률로 ${esc(w.name)}이(가) 도망가요!</p><p style="font-size:14px;line-height:1.8"><b>가지고 있는 볼이 없어요!</b><br>훈련 문제 정답을 맞추면 볼을 받을 수 있어요.</p><div class="mbtns"><button class="btn ghost" data-a=keep>계속 싸우기</button></div>`;
+    }else{
+      const rows=owned.map(k=>{const bal=BALLS[k],ch=ballChance(k,u);const tag=bal.types?(ballTypeHit(k,u)?`<small class=hit>★ ${ballTypeNames(k)} 타입 일치! +10%</small>`:`<small>${ballTypeNames(k)} 타입 특화 · 지금은 +5%</small>`):`<small>${bal.d||''}</small>`;return `<button class="ballBtn" data-a="ball_${k}" style="--bc:${bal.c}"><span class="ballIc">${ballIcon(k,1)}</span><span class="ballTx"><b>${bal.n}</b> <span style="color:#666">×${ballN(k)}</span><br><span style="font-size:12px;color:#555">${tag}</span></span><span class="ballCh" style="color:${ch>=50?'#0a7d2c':'#b3261e'}">${ch}%</span></button>`;}).join('');
+      body=`<p class="mut" style="font-size:13px;line-height:1.6">던질 볼을 골라요. <b>고른 공 1개만</b> 쓰고, 다른 친구들 볼은 소모되지 않아요.<br>공을 던지면 모두의 화면에 게이지가 떠요. 정중앙에 맞추면 <b>퍼펙트(+2%)</b>예요.</p>
+      <p style="font-size:13px;line-height:1.6;margin:8px 0 4px;color:#b3261e">⚠️ 이번이 <b>${attempt}번째</b> 포획 시도예요. 실패하면 <b>${fleePct}%</b> 확률로 ${esc(w.name)}이(가) 도망가요!</p>
+      ${rows}<div class="mbtns"><button class="btn ghost" data-a=keep>계속 싸우기</button></div>`;
+    }
+    const hd={keep:()=>closeM(),_close:()=>closeM()};
+    owned.forEach(k=>{hd['ball_'+k]=()=>{closeM();if(!B||!B.t2||!B.t2.boss)return;if(ballN(k)<=0){toast('그 볼이 없어요');return;}ballsOf()[k]=ballN(k)-1;saveLocal();bossSubmit({type:'capstart',slot:tg,ball:k});};});
+    M(`<div style="text-align:center">${head}${body}</div>`,hd,{wide:1});
+  };
+  if(targets.length===1){pickSlot(targets[0]);return;}
+  const rows=targets.map(tg=>{const u=B.foe.board[tg],w=MON[u.id];return `<button class="ballBtn" data-a="tg_${tg}"><span class="ballIc">⭐</span><span class="ballTx"><b>${esc(w.name)}</b><br><span style="font-size:12px;color:#555">체력 ${Math.round(u.hp/u.max*100)}% · ${'★'.repeat(w.rar||1)}</span></span></button>`;}).join('');
+  const hd2={keep:()=>closeM(),_close:()=>closeM()};
+  targets.forEach(tg=>{hd2['tg_'+tg]=()=>{closeM();pickSlot(tg);};});
+  M(`<div style="text-align:center"><h2>어느 보스를 포획할까요?</h2><p class="mut" style="font-size:13px">체력이 10% 이하인 보스만 포획할 수 있어요.</p>${rows}<div class="mbtns"><button class="btn ghost" data-a=keep>계속 싸우기</button></div></div>`,hd2,{wide:1});
+}
+/* 협동 보스전 포획 게이지: 야생 captureGauge와 같은 바예요. 정중앙 PERFECT 1명당 포획 확률 +2% (GOOD/FAIL은 +0) */
+function bossCaptureGauge(d){
+  if(!B||!B.t2||!B.t2.boss||B.over)return;
+  const slot=Number(d.slot),u=B.foe.board[slot];
+  if(!u||u.hp<=0)return;
+  const k=String(d.ball||'monster'),w=MON[u.id];
+  const attempt=Number(d.attempt)||1,fleePct=Number(d.fleePct)||0;
+  const NAME={P:'PERFECT!',G:'GOOD!',F:'FAIL…'};
+  let done=false,raf=0,autoT=0;const t0=performance.now();
+  const PER=.075,FAILW=.2;
+  const zone=p=>Math.abs(p-.5)<=PER?'P':(p<=FAILW||p>=1-FAILW)?'F':'G';
+  let pos=0;
+  const tick=now=>{if(done)return;const ph=((now-t0)/520)%2;pos=ph<1?ph:2-ph;const e=document.getElementById('cgBall');if(e)e.style.left=(pos*100)+'%';raf=requestAnimationFrame(tick);};
+  const stop=auto=>{
+    if(done)return;done=true;cancelAnimationFrame(raf);clearTimeout(autoT);
+    const z=auto?'G':(BALLS[k].sure?'P':zone(pos));
+    const j=document.getElementById('cgJudge');
+    if(j){j.className='cgJudge pop '+z;j.textContent=NAME[z];}
+    const bar=document.getElementById('cgBar');
+    if(bar){bar.classList.add('hit','hit'+z);if(z!=='F'){const n=z==='P'?10:5;for(let i=0;i<n;i++){const s=document.createElement('span');s.className='cgSpark';s.textContent='✦';s.style.left=(pos*100)+'%';s.style.setProperty('--sx',((Math.random()-.5)*150)+'px');s.style.setProperty('--sy',(-20-Math.random()*50)+'px');s.style.animationDelay=(Math.random()*.08)+'s';bar.appendChild(s);}}}
+    const b=document.getElementById('cgStop');if(b)b.disabled=true;
+    try{sfx(z==='P'?'rare':z==='G'?'coin':'hit');}catch(e){}
+    setTimeout(()=>{closeM();const md=document.getElementById('modal');if(md)md.classList.remove('cgDim');bossCapReportGauge(z);},1100);
+  };
+  M(`<div style="text-align:center">
+   <h2 style="font-size:22px;margin:4px 0">${esc(w.name)} 포획!</h2>
+   <p style="font-size:14px;line-height:1.6;margin:2px 0">${esc(d.name||'친구')}님이 ${esc(BALLS[k].n)}을(를) 던져요!<br>바가 정중앙에 왔을 때 눌러요. <b>퍼펙트 1명당 포획 확률 +2%</b></p>
+   <p style="font-size:13px;line-height:1.6;margin:6px 0;color:#b3261e">⚠️ 이번이 <b>${attempt}번째</b> 포획 시도예요. 실패하면 <b>${fleePct}%</b> 확률로 ${esc(w.name)}이(가) 도망가요!</p>
+   <div id=cgJudge class=cgJudge></div>
+   <div id=cgBar class=cgBar><svg class=cgMark viewBox="0 0 30 26" aria-hidden="true"><path d="M3 3 H27 L15 23 Z" fill="#ffd21f" stroke="#fff3a0" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 5 H23 L15 18 Z" fill="#ffe96b"/></svg><div class=cgTrk></div><span id=cgBall class=cgBall>${ballIcon(k,1)}</span></div>
+   <p style="font-size:12px;color:#666;margin:4px 0">30초 안에 안 누르면 GOOD으로 처리돼요</p>
+   <button class=cgThrow data-a=stop id=cgStop aria-label="던지기">${ballIcon(k,1)}</button></div>`,{stop:()=>stop(false),_close:()=>{}},{wide:1});
+  {const mb=document.getElementById('mbox'),md=document.getElementById('modal');if(mb){mb.classList.remove('panel');mb.classList.add('cgFree');}if(md)md.classList.add('cgDim');}
+  const bar=document.getElementById('cgBar');if(bar)bar.onclick=()=>stop(false);
+  autoT=setTimeout(()=>stop(true),30000);
+  raf=requestAnimationFrame(tick);
+}
+function bossCapReportGauge(z){
+  if(!B||!B.t2||!B.t2.boss)return;
+  try{bossSubmit({type:'capgauge',zone:z});}catch(e){}
+}
+/* 협동 보스전 포획 결과: 모두의 공이 동시에 날아가요 (참가자 수만큼 같은 공이 날아가요) */
+async function bossCapThrowAnim(d){
+  try{closeM();}catch(e){}
+  if(!B||!B.t2||!B.t2.boss)return;
+  const slot=Number(d.slot),k=String(d.ball||'monster');
+  const u=B.foe.board[slot];
+  const nm=u?MON[u.id].name:'보스';
+  const n=Math.max(1,(B.coop&&B.coop.players?B.coop.players.length:1));
+  try{window.__capJudge=(Number(d.perfects)||0)>=n?'P':'G';}catch(e){}
+  try{await Promise.all(Array.from({length:n},()=>captureFx(slot,k,!!d.ok)));}catch(e){}
+  const showBanner=(b1,b2,ms)=>{try{banner.local=1;banner(b1,b2,ms);banner.local=0;}catch(e){}};
+  if(d.void){toast('보스가 이미 쓰러졌어요. 포획은 없던 일이 됐어요.');return;}
+  if(d.ok){showBanner('🎉 포획 성공!',esc(nm)+'을(를) 잡았어요!',2600);try{sfx('rare');}catch(e){}}
+  else if(d.fled){showBanner('💨 보스가 도망갔어요!',esc(nm)+'이(가) 도망갔어요…',2600);}
+  else{showBanner('아쉬워요…',esc(nm)+' 포획에 실패했어요.',2200);}
 }
 function tryCatchWildPokemon(slot=null,ball='monster',bonus=0){
  if(!B||!B.wildMode||B.over||B.busy||B.side!=='me'||B.coop)return;
@@ -8250,8 +8351,17 @@ function tryCatchWildPokemon(slot=null,ball='monster',bonus=0){
  if(u.hp>u.max*.3){toast('체력이 30% 이하일 때 포획할 수 있어요');return;}
  if(!B.coop){if(!BALLS[ball]||ballN(ball)<=0){toast('그 볼이 없어요. 문제를 맞혀서 볼을 모아 봐요!');return;}ballsOf()[ball]=ballN(ball)-1;saveLocal();} // 볼은 던지면 성공·실패와 관계없이 하나 써요
  const id=u.id,w=MON[id],chance0=wildCatchChance(targetSlot,ball),chance=(B.coop||(BALLS[ball]&&BALLS[ball].sure))?chance0:Math.max(0,Math.min(100,chance0+(+bonus||0)));
- const __ok=rnd()*100<chance;
- const __go=()=>{if(__ok){
+ const throwN=(u.throws||0)+1;u.throws=throwN;const fleePct=Math.min(50,throwN*10); // 도망 확률: 던진 공 횟수마다 10%씩 (1번째 10% ~ 5번째 50%, 6번째부터 50% 유지)
+ const __ok=rnd()*100<chance,__fled=rnd()*100<fleePct;
+ const __go=()=>{if(__fled){
+  st.note=`${w.name}이(가) 도망갔어요! (${throwN}번째 공 · 도망 확률 ${fleePct}%)`;
+  B.foe.board[targetSlot]=null;B.wildState.captureModalOpen=false;B.wildCaptureTargetSlot=null;B.capturePrompted=false;
+  autoSave();toast(st.note);
+  const remaining=syncWildPrimary();
+  if(!remaining.length){B.over=true;finishEndlessWild('fled',st.note);return;}
+  B.busy=false;B.sel=-1;B.pick=-1;renderBattle();if(!checkEnd()&&!B.over){startTurn('foe');}
+  return;}
+ if(__ok){
   const wasNew=!S.meta.col[id];if(!B.coop){addCard(id);if(S.meta.shard)delete S.meta.shard[id];}
   if(!st.scenarioMode&&!B.coop){S.meta.endless=S.meta.endless||{best:0,total:0,runs:0,caught:0};S.meta.endless.caught=(S.meta.endless.caught||0)+1;}
   st.caughtIds=st.caughtIds||[];st.caughtNewIds=st.caughtNewIds||[];st.caughtIds.push(id);st.caughtNewIds.push(wasNew);st.caughtNew=wasNew;
@@ -9789,6 +9899,10 @@ const evoTitle=id=>{const c=evoCat(id);if(c==='W')return 'PRIMAL<br>REVERSION!';
 const mgWord=id=>evoWord(id),mgStone=id=>PRIMAL[id]?'원시 구슬':'메가스톤';
 // 지금 이 칸의 포켓몬이 변신할 수 있는지(내 기기에서 해금한 포켓몬만)
 function megaCan(P,i){try{const u=P&&P.board[i];if(!u||u.mg||u.gm||u.hp<=0||P.mgUsed||!megaOk(u.id))return false;if(B.coop&&Number(u.coopOwner??0)!==BC.localIndex)return false;return mgProg('m')>=evoNeedU(u.id);}catch(e){return false;}}
+/* 협동 보스전 포획 대상: 살아 있는 보스 중 체력 10% 이하인 슬롯 */
+function bossCapTargets(){try{if(!(B&&B.t2&&B.t2.boss&&B.foe&&B.foe.board))return[];return B.foe.board.map((u,i)=>u&&u.hp>0&&u.hp<=u.max*0.1?i:-1).filter(i=>i>=0);}catch(e){return[];}}
+/* 지금 포획 게이지가 진행 중인지 (wildState라 스냅샷으로 전파돼요) */
+function bossCapActive(){try{return !!(B&&B.wildState&&B.wildState.bossCap&&B.wildState.bossCap.state==='gauge');}catch(e){return false;}}
 function megaCand(P){try{return P.board.some((u,i)=>u&&!u.mg&&u.hp>0&&megaOk(u.id)&&(!B.coop||Number(u.coopOwner??0)===BC.localIndex));}catch(e){return false;}}
 
 /* ===================== 합체 진화 =====================
@@ -9952,7 +10066,7 @@ function wildEvoOK(){return wildEvoMode()>0;}
 /* 스킨이 있는 야생·보스 포켓몬은 등장할 때 모습(스킨)이 무작위로 정해져요 (기본 모습 포함) */
 function wildSkinRoll(){if(!B||!B.wildMode||!B.foe||!B.foe.board||(B.coop&&!(BC&&BC.host)))return;B.foe.board.forEach(u=>{if(!u||u.wsk!==undefined)return;const l=SKIN[u.id];if(!l||!l.length){u.wsk=0;return;}const k=Math.floor(Math.random()*(l.length+1));u.wsk=k===0?0:l[k-1][0];});}
 const wildEvoKind=u=>{if(!u)return 0;const m=!!MEGA[u.id],g=!!GMAX[u.id];return m&&g?3:m?1:g?2:0;};
-const wildEvoCan=u=>!!(u&&u.hp>0&&!u.wEvo&&!u.mg&&!u.gm&&!u.wGm&&u.hp<=u.max*(wildEvoMode()===2?.1:.3)&&wildEvoKind(u));
+const wildEvoCan=u=>!!(u&&u.hp>0&&!u.wEvo&&!u.mg&&!u.gm&&!u.wGm&&u.hp<=u.max*(wildEvoMode()===2?((B.coop||B.t2)?.2:.1):.3)&&wildEvoKind(u)); /* 협동 보스전은 20%, 그 외 보스는 10%, 야생은 30% */
 async function wildEvoRun(){
  if(!wildEvoOK()||B.over)return;
  const fo=B.foe;
@@ -10160,7 +10274,7 @@ function renderBattle(){if(!B||window.__sim)return;try{wildSkinRoll();}catch(e){
  $('#battle').innerHTML=`
   <div class=bTop>${B.t2?t2TopHTML(valid,me):B.wildMode?(()=>{const slots=aliveWildSlots();return `<div class=wildTop id=wildStatus><div class=wildRoster>${slots.map(i=>{const wu=fo.board[i],wm=MON[wu.id],pct=clamp(wu.hp/wu.max*100,0,100);return `<div class=wildEntry><div class=av style="background:#fff3cf">${monImg(wu.wsk||wu.id,'front','',true)}</div><div class=wtInfo><div class=wtName>${B.wildState&&B.wildState.scenarioMode?esc(B.wildState.label||'굴레')+' · ':'야생 · '}${esc(wm.name)}</div><div class=wtHp>HP ${Math.max(0,wu.hp)}/${wu.max}</div><div class=endWildHp><i class="${pct<=30?'low':''}" style="width:${pct}%"></i></div></div>${pct<=30&&!B.over&&!B.coop&&!(B.wildState&&B.wildState.scenarioMode)?((B.side==='me'&&(!B.coop||B.coop.active===BC.localIndex)&&!B.busy)?`<button class="btn gold sm" data-wild-catch-slot="${i}">🔴 포획${B.coop?'':` <small>(볼 ${ballTotal()})</small>`}</button>`:(B.coop?`<button class="btn ghost sm waitCatch" data-wild-catch-slot="${i}" title="체력이 30% 이하라 포획할 수 있어요. 내 차례에 시도해요">🔴 포획 가능</button>`:'')):''}</div>`;}).join('')}</div></div>`;})():`<div class="hero${valid.hero?' tgt':''}" id=heroFoe>${valid.hero&&me.board[B.sel]?`<div class=tbadge style="top:calc(100% + 2px);left:4px;transform:none;flex-direction:column;align-items:flex-start;z-index:50">${(u=>{const n=Math.max(1,Math.ceil(u.atk*rlBoost(u))+(B.combo>=2?1:0)+quakeB(u)+dragonMod(u));return `<b class=dmgp>-${n}</b>`+(B.pvp?`<b class=dmgp style="color:#2f62b5">방어 성공 시 -${Math.max(0,n-1)}</b>`:'');})(me.board[B.sel])}</div>`:''}<div class=av style="background:${B.g.c}">${heroImgV(fo)}</div><div><div class=hn>${nameTag(fo.name)}</div><div class=hhp>${I('heart')}${fo.hp}</div></div></div><span class=pill title="상대 손에 든 카드 수">${I('cards')} ${fo.hand.length}</span><span class=pill title="상대 남은 덱 카드 수">${I('book')} ${fo.deck.length}</span><span class=hudSp></span>${mana(fo)}`}<div class=bMenuCol><button class="btn ghost sm" id=bMenu>메뉴</button><button class="btn ghost sm fsBtn" id=bFull title="전체 화면" aria-label="전체 화면">${I('full','fsO')}${I('fullx','fsX')}</button></div></div>
   <div class="lane${B.t2&&!B.wildMode?' coopLane':''}${B.t2&&!B.wildMode&&fo.board.length>=10?' c10':''}${B.wildMode?` wildLane wildCount${fo.board.filter(Boolean).length}`:''}${fo.gmx?' gmaxLane':''}" id=foeLane>${fo.board.map((u,i)=>B.wildMode&&!u?'':`<div class=slot data-i="${i}">${unitH(u,fo,i)}</div>`).join('')}</div>
-  <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class="pill cmbPill ${B.combo>=10?'t10':B.combo>=7?'t7':B.combo>=5?'t5':''}" style="--lv:${Math.min(B.combo,14)};color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}${(!B.tut&&!B.tutReal)?`<span class=pill id=evoPill title="정답을 모으면 특수진화(메가진화·원시회귀 등)·거다이맥스를 쓸 수 있어요. 필요한 정답 수는 포켓몬 코스트에 따라 5~10개예요. 쓰면 처음부터 다시 모아요" style="color:${mgProg()>=evoPillNeed()?'#d97800':'#2f62b5'};${mgProg()>=evoPillNeed()?'border-color:#ffb100;background:#fff3d6':''}">${mgProg()>=evoPillNeed()?'✨':'🔷'} 진화 ${Math.min(Math.max(0,mgProg()),evoPillNeed())}/${evoPillNeed()}</span>`:''}${my&&B.sel>=0&&megaCan(B.me,B.sel)?`<button class="btn gold sm" id=bMega>🔷 ${evoWord(B.me.board[B.sel].id)}</button>`:''}${my&&B.sel>=0&&fuseCan(B.me,B.sel)?`<button class="btn purple sm" id=bFuse>🧬 합체</button>`:''}${my&&B.sel>=0&&gmaxCan(B.me,B.sel,1)?`<button class="btn red sm" id=bGmax>🌋 맥스</button>`:''}${my&&!B.coop&&B.sel>=0&&evoLeft(B.me,B.sel)?`<button class="btn sm" id=bEvoOut style="opacity:.6">🔒 진화</button>`:''}</div>
+  <div class=mid><div class=msg id=bMsg></div>${B.combo>=2?`<span class="pill cmbPill ${B.combo>=10?'t10':B.combo>=7?'t7':B.combo>=5?'t5':''}" style="--lv:${Math.min(B.combo,14)};color:#ff7a00">${I('flame')} ${B.combo}연속</span>`:''}${(!B.tut&&!B.tutReal)?`<span class=pill id=evoPill title="정답을 모으면 특수진화(메가진화·원시회귀 등)·거다이맥스를 쓸 수 있어요. 필요한 정답 수는 포켓몬 코스트에 따라 5~10개예요. 쓰면 처음부터 다시 모아요" style="color:${mgProg()>=evoPillNeed()?'#d97800':'#2f62b5'};${mgProg()>=evoPillNeed()?'border-color:#ffb100;background:#fff3d6':''}">${mgProg()>=evoPillNeed()?'✨':'🔷'} 진화 ${Math.min(Math.max(0,mgProg()),evoPillNeed())}/${evoPillNeed()}</span>`:''}${my&&B.sel>=0&&megaCan(B.me,B.sel)?`<button class="btn gold sm" id=bMega>🔷 ${evoWord(B.me.board[B.sel].id)}</button>`:''}${my&&B.sel>=0&&fuseCan(B.me,B.sel)?`<button class="btn purple sm" id=bFuse>🧬 합체</button>`:''}${my&&B.sel>=0&&gmaxCan(B.me,B.sel,1)?`<button class="btn red sm" id=bGmax>🌋 맥스</button>`:''}${my&&B.t2&&B.t2.boss&&bossCapTargets().length&&!bossCapActive()?`<button class="btn red sm" id=bCap>🔴 포획하기</button>`:''}${my&&!B.coop&&B.sel>=0&&evoLeft(B.me,B.sel)?`<button class="btn sm" id=bEvoOut style="opacity:.6">🔒 진화</button>`:''}</div>
   <div class="lane${B.coop?' coopLane':''}${B.t2&&me.board.length>=10?' c10':''}${B.t2&&me.board.length>=12?' c12':''}${me.gmx?' gmaxLane':''}" id=myLane>${me.board.map((u,i)=>`<div class="slot${B.pick>=0&&!u&&!isItemCard(me.hand[B.pick])?' can':''}" data-i="${i}">${unitH(u,me,i)}</div>`).join('')}</div>
   ${B.coop?`<div class="bBot coopHeroes">${heroH(loc,'heroMe',B.side==='me'&&B.coop.active===BC.localIndex)}${ally?heroH(ally,'heroAlly',B.side==='me'&&B.coop.active!==BC.localIndex):''}</div>`:''}<div class=bBot>${B.coop?'':heroH(me,'heroMe',false)}${mana(loc)}
    <button class="btn purple sm" id=bPower ${my&&(loc.powerUses||0)>0?'':'disabled'} title="남은 사용 횟수 ${Math.max(0,loc.powerUses||0)}회: 문제를 맞히면 카드 1장">${I('book')} 공부 기술 <small style="font-size:11px">${Math.max(0,loc.powerUses||0)}회</small></button>
@@ -10183,7 +10297,7 @@ function bindBattle(){const me=B.me;
  const n=endLeftN();if(n>0){confirmBox(`아직 공격 안 한 포켓몬이 <b>${n}마리</b> 있어요.<br>차례를 끝낼까요?`,'끝낼래요','더 할래요').then(ok=>{if(ok)go();});return;}go();};
  $('#bPower').onclick=()=>{if(B&&B.coop&&(!BC.host||B.t2)){if(B.busy||B.side!=='me'||B.coop.active!==BC.localIndex)return;const q=pickQ({cyc:1});(async()=>{if(!q){bossSubmit({type:'power',ok:true});return;}const r=await battleQ(q,{who:B.me.av,what:'공부 기술: 맞히면 카드 1장!',power:true});bossSubmit({type:'power',ok:r.ok,crit:!!(r.ok&&q.tier==='H')});})();return;}usePower();};
  lpBind();fitHandCrowd();
- {const eo=$('#bEvoOut');if(eo)eo.onclick=()=>{sfx('tap');toast(EVO_OUT_MSG);};}{const gb=$('#bGmax');if(gb)gb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0)return;if(B.coop){sfx('tap');toast('협동 보스전에서는 사용이 불가능해요.');return;}if(!gmaxCan(B.me,B.sel))return;const si=B.sel;sfx('tap');if(B.pvp)pvpSend({t:'gmax',si});gmaxDo(B.me,si);};}{const mb=$('#bMega');if(mb)mb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0||!megaCan(B.me,B.sel))return;const si=B.sel;sfx('tap');if(B.coop&&(!BC.host||B.t2)){bossSubmit({type:'mega',si});B.sel=-1;return;}if(B.pvp)pvpSend({t:'mega',si});megaDo(B.me,si);};}{const fb=$('#bFuse');if(fb)fb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0)return;const f=fuseInfo(B.me,B.sel);if(!f)return;const si=B.sel;sfx('tap');if(B.coop&&(!BC.host||B.t2)){bossSubmit({type:'fuse',si,pj:f.j});B.sel=-1;return;}if(B.pvp)pvpSend({t:'fuse',si,pj:f.j});fuseDo(B.me,si,f.j);};}
+ {const eo=$('#bEvoOut');if(eo)eo.onclick=()=>{sfx('tap');toast(EVO_OUT_MSG);};}{const gb=$('#bGmax');if(gb)gb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0)return;if(B.coop){sfx('tap');toast('협동 보스전에서는 사용이 불가능해요.');return;}if(!gmaxCan(B.me,B.sel))return;const si=B.sel;sfx('tap');if(B.pvp)pvpSend({t:'gmax',si});gmaxDo(B.me,si);};}{const mb=$('#bMega');if(mb)mb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0||!megaCan(B.me,B.sel))return;const si=B.sel;sfx('tap');if(B.coop&&(!BC.host||B.t2)){bossSubmit({type:'mega',si});B.sel=-1;return;}if(B.pvp)pvpSend({t:'mega',si});megaDo(B.me,si);};}{const cp=$('#bCap');if(cp)cp.onclick=()=>{if(B.busy||B.side!=='me'||!bossCapTargets().length)return;sfx('tap');askBossCapture();};}{const fb=$('#bFuse');if(fb)fb.onclick=()=>{if(B.busy||B.side!=='me'||B.sel<0)return;const f=fuseInfo(B.me,B.sel);if(!f)return;const si=B.sel;sfx('tap');if(B.coop&&(!BC.host||B.t2)){bossSubmit({type:'fuse',si,pj:f.j});B.sel=-1;return;}if(B.pvp)pvpSend({t:'fuse',si,pj:f.j});fuseDo(B.me,si,f.j);};}
  $('#battle').querySelectorAll('.hand .card').forEach(c=>c.onclick=()=>{if(B.busy||B.side!=='me'||(B.coop&&B.coop.active!==BC.localIndex)){
    /* 내 차례가 아닐 때(상대 공격 중·연출 중)에도 손패 카드를 누르면 설명 창만 볼 수 있어요 */
    const i0=+c.dataset.h,v0=(B.coop?B.coop.players[BC.localIndex].hand:me.hand)[i0];if(v0&&!B.over&&!B.itemTargetMode&&!B.moonTargetMode){sfx('tap');if(isItemCard(v0))showItemInfo(v0,{can:false});else if(isRandomMonCard(v0))toast(`${v0.name}: ${v0.desc}`);else showInfo(v0,{can:false});}return;}
