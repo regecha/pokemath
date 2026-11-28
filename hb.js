@@ -97,13 +97,14 @@ function takePref(f,t,k,pref){takePref.pts=0;k=Math.min(k,f.tot);if(!(k>0)){calc
 const teamMembers=t=>H?H.players.filter(p=>p.team===t):[];
 const teamKindSet=t=>{const s=new Set();teamMembers(t).forEach(p=>{for(const id in p.own)s.add(+id);});return s;};
 const teamKinds=t=>teamKindSet(t).size;
+const teamOwn=t=>{const o={};teamMembers(t).forEach(p=>{for(const id in p.own)o[id]=(o[id]||0)+p.own[id];});return o;};  // 팀 도감 합집합: 종별 장수까지 합친 맵
 const teamScore=t=>teamMembers(t).reduce((a,p)=>a+p.sc,0);
 const teamTot=t=>teamMembers(t).reduce((a,p)=>a+p.tot,0);
 const teamDefender=t=>teamMembers(t).find(p=>p.def>0)||null;
 const teamLabel=t=>t==='A'?'🔴 A팀':'🔵 B팀';
 function snd(p,m){if(p.host){setTimeout(()=>cm(m),0);return;}try{p.conn&&p.conn.open&&p.conn.send(m);}catch(e){}}
 const bc=m=>H.players.forEach(p=>snd(p,m));
-const mePk=p=>({t:'me',own:Object.entries(p.own),sc:p.sc,tot:p.tot,def:p.def,sh:Math.max(0,p.shield-now()),lock:p.lock,team:p.team||''});
+const mePk=p=>({t:'me',own:Object.entries(p.own),sc:p.sc,tot:p.tot,def:p.def,sh:Math.max(0,p.shield-now()),lock:p.lock,team:p.team||'',town:(H&&H.teamMode&&p.team)?Object.entries(teamOwn(p.team)):null});
 function lobBC(){bc({t:'lob',pl:H.players.map(p=>({n:p.name,t:p.tt|0,a:p.away,b:p.ai?1:0,id:p.pid,team:p.team||''})),dur:H.dur,code:H.code,tm:H.teamMode?1:0});}
 function topBC(){if(!H||H.state!=='play')return;const l=Math.max(0,H.end-now());bc({t:'top',top:[...H.players].sort(cmp).slice(0,3).map(p=>({n:p.name,t:p.tt|0,s:p.sc})),all:[...H.players].sort(cmp).map(p=>({id:p.pid,n:p.name,t:p.tt|0,s:p.sc})),left:l,away:H.players.filter(p=>p.away).length,order:H.players.filter(p=>!p.ai).map(p=>p.pid),gen:H.gen||0,tm:H.teamMode?['A','B'].map(t=>({t,k:teamKinds(t),s:teamScore(t)})):null});}
 function snapPk(){return{t:'snap',dur:H.dur,gid:H.gid,t0:H.t0,tm:H.teamMode?1:0,pl:H.players.map(p=>({pid:p.pid,name:p.name,tt:p.tt|0,rch:p.rc?rhash(p.rc):(p.rch||''),own:Object.entries(p.own),sh:Math.max(0,p.shield-now()),def:p.def,lock:p.lock,seq:p.seq,sAt:p.sAt,pend:p.pend?{n:p.pend.n}:null,hk:p.hk?{n:p.hk.n}:null,ok:p.ok|0,wr:p.wr|0,hp:p.hp|0,ai:p.ai?1:0,team:p.team||''}))};}
@@ -143,7 +144,7 @@ function hmsg(p,m){
    else{const sh=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);const real=sh(el).slice(0,2);if(real.length<2){const rest=sh(oth.filter(x=>!real.includes(x)));if(rest.length)real.push(rest[0]);}
     const used=new Set(H.players.map(x=>x.hid)),opts=real.map(x=>({hid:x.hid,pid:x.pid}));while(opts.length<4){const f=engRand(used);if(!used.has(f)){used.add(f);opts.push({hid:f,pid:null});}}
     const so=sh(opts);p.hk={n:m.n,opts:so,elim:[]};p.hp=0;snd(p,{t:'hk',n:m.n,opts:so.map(o=>o.hid),real:real.length});}}
-  if(!(s.ev==='hack'&&p.hk&&p.hk.n===m.n))snd(p,res);snd(p,mePk(p));afterChange();}
+  if(!(s.ev==='hack'&&p.hk&&p.hk.n===m.n))snd(p,res);snd(p,mePk(p));afterChange(p);}
  else if(m.t==='hit'){const k=p.hk;if(!k||k.n!==m.n)return;p.hk=null;const o=Number.isInteger(m.i)?k.opts[m.i]:null,t=o&&o.pid?H.players.find(x=>x.pid===o.pid):null;let r={t:'hkr',ok:false,why:'가짜 아이디였어요… 꽝!'};
   if(t){
    if(H.teamMode&&t.team){const defTeam=t.team,def=teamDefender(defTeam);
@@ -155,7 +156,7 @@ function hmsg(p,m){
    else if(t.away||t.tot<1)r.why='대상이 지금은 해킹할 수 없어요';
    else if(t.def){const kk=Math.max(1,Math.ceil(t.tot*CFG.HACK_RATE));t.def=0;r.why='상대의 해킹 방어권에 막혔어요!';r.blk=1;r.k=kk;r.from=t.name;snd(t,{t:'blk',by:p.name,k:kk});snd(t,mePk(t));}
    else{const mv=take(t,p,Math.ceil(t.tot*CFG.HACK_RATE));t.lock=(t.lock|0)+1;r={t:'hkr',ok:true,k:mv,pts:take.pts|0,from:t.name};snd(t,{t:'hit',by:p.name,k:mv});snd(t,mePk(t));bc({t:'hsc',by:p.name,to:t.name,k:mv});}}
-  snd(p,r);snd(p,mePk(p));afterChange();}
+  snd(p,r);snd(p,mePk(p));afterChange(p);}
  else if(m.t==='hkq'){const k=p.hk;if(!k||k.n!==m.n||p.away)return;const t=now();   // [해킹] 버튼: 문제를 풀었으니 가짜 아이디 1개를 알려줘요 (어느 게 가짜인지는 방장만 알아요)
   if(t-(p.lastHkq||0)<CFG.SOLVE_MIN_MS){snd(p,{t:'hkx',n:k.n,i:-2});return;}p.lastHkq=t;
   const fk=k.opts.map((o,i)=>i).filter(i=>!k.opts[i].pid&&!k.elim.includes(i));let i=-1;if(fk.length){i=pk(fk);k.elim.push(i);}
@@ -163,8 +164,8 @@ function hmsg(p,m){
  else if(m.t==='rec'){if(!p.lock)return;p.lock--;snd(p,mePk(p));if(!p.lock&&p.pend)snd(p,{t:'tri',n:p.pend.n});}
 }
 const totKinds=()=>{pools();return [1,2,3,4,5].reduce((a,r)=>a+(POOL[r]||[]).length,0);};
-function afterChange(){const tk=totKinds();
- if(H.teamMode){if(tk>0){for(const t of ['A','B']){if(teamKinds(t)>=tk)return endGame('all',t);}}topBC();return;}   // 팀전: 팀 도감 합집합이 1025종이면 그 팀 승리
+function afterChange(changed){const tk=totKinds();
+ if(H.teamMode){if(tk>0){for(const t of ['A','B']){if(teamKinds(t)>=tk)return endGame('all',t);}}H.players.forEach(p=>{if(!p.ai&&!p.away&&p!==changed&&p.team)snd(p,mePk(p));});topBC();return;}   // 팀전: 팀 도감 합집합이 1025종이면 그 팀 승리 — 바뀐 팀원의 도감을 같은 팀 전원 화면에 바로 반영
  if(tk>0&&H.players.some(p=>Object.keys(p.own).length>=tk))return endGame('all');topBC();}
 /* 게임 시작을 누르면 먼저 '아이디 고르기' 단계예요. 방장이 참가자마다 서로 겹치지 않는 후보 6개씩을 나눠 주니까 아이디가 겹칠 수 없어요. */
 const PICK_MS=25000;
@@ -234,8 +235,8 @@ function cm(m){
  if(m.t==='wel'){C.tries=0;C.pid=String(m.pid);C.hid=esc(m.hid);if(C.role==='guest')C.rc=esc(m.rc);sv();if(C.phase!=='play'){C.phase='lobby';paintLobby();}}
  else if(m.t==='no'){stat(m.m);toast(esc(m.m));}
  else if(m.t==='lob'){C.pl=m.pl;C.dur=m.dur;C.teamMode=m.tm?1:0;if(C.phase==='lobby')paintLobby();}
- else if(m.t==='go'){if(C.phase!=='play'||!m.re){C.me={own:[],sc:0,tot:0,def:0,sh:0,lock:0,team:''};}C.end=now()+m.left;C.phase='play';C.top=[];paintPlay();setTimeout(next,m.re?600:900);}
- else if(m.t==='me'){C.me={own:(Array.isArray(m.own)?m.own:[]).filter(e=>e&&MON[e[0]]).map(e=>[+e[0],+e[1]|0]),sc:+m.sc|0,tot:+m.tot|0,def:m.def?1:0,lock:+m.lock|0,shEnd:now()+(+m.sh||0),team:m.team||''};if(C.phase==='play'){paintMe();if(m.lock&&C.mode!=='mini'&&C.mode!=='warn')mini();}}
+ else if(m.t==='go'){if(C.phase!=='play'||!m.re){C.me={own:[],sc:0,tot:0,def:0,sh:0,lock:0,team:''};}C.end=now()+m.left;C.phase='play';C.top=[];C._dexN=null;paintPlay();setTimeout(next,m.re?600:900);}
+ else if(m.t==='me'){C.me={own:(Array.isArray(m.own)?m.own:[]).filter(e=>e&&MON[e[0]]).map(e=>[+e[0],+e[1]|0]),sc:+m.sc|0,tot:+m.tot|0,def:m.def?1:0,lock:+m.lock|0,shEnd:now()+(+m.sh||0),team:m.team||'',town:(Array.isArray(m.town)?m.town:[]).filter(e=>e&&MON[e[0]]).map(e=>[+e[0],+e[1]|0])};if(C.phase==='play'){paintMe();if(m.lock&&C.mode!=='mini'&&C.mode!=='warn')mini();}}
  else if(m.t==='snap'){C.snap=m;}
  else if(m.t==='top'){C.order=m.order;C.top=(Array.isArray(m.top)?m.top:[]).map(p=>({n:String(p.n),s:+p.s|0}));C.all=(Array.isArray(m.all)?m.all:[]).map(p=>({id:String(p.id),n:String(p.n),s:+p.s|0}));C.end=now()+m.left;C.away=m.away;C.tm=m.tm||null;if(C.phase==='play')paintTop();}
  else if(m.t==='tri'){if(C.mode==='mini'||C.mode==='warn'||C.phase!=='play')return;showPick(m.n);}
@@ -1242,9 +1243,9 @@ function paintPlay(){root.className='on';root.innerHTML='<div class="w hbPlay"><
 function tick(){if(C.phase!=='play')return;syncPad();const l=C.end-now();const t=$h('#hbT');if(t){t.textContent=fmt2(l);}const on=l<=CFG.LAST30_MS&&l>0;root.classList.toggle('l30',on);if(!!C._l30!==on){C._l30=on;hbBgm();}const w=$h('#hbW');if(w)w.innerHTML=on?'<div class=warn>🚨 마지막 30초! 카드 획득 확률 UP · 남은 '+Math.ceil(l/1000)+'초</div>':'';
  if(C.role==='guest'&&C.lastRx&&now()-C.lastRx>CFG.HB_TIMEOUT+2000&&C.conn){try{C.conn.close();}catch(e){}lost();}}
 function paintMe(){const m=C.me;if(!m)return;const q=(id,v)=>{const e=$h(id);if(e)e.textContent=v;};q('#hbN',m.tot);q('#hbS',m.sc);const b=$h('#hbB');if(b)b.innerHTML=(m.def?'🛡방어권 ':'')+(m.shEnd>now()?'✨보호막 ':'');
- const dh=$h('#hbDh');if(dh){const tk=(C.tm&&C.me&&C.me.team)?(C.me.team==='A'?C.tm[0].k:C.tm[1].k):null;dh.textContent='▌DEX ▸ 내 도감 · '+m.own.length+'종 / '+m.tot+'장'+(tk!=null?' · 팀 도감 '+tk+'종':'');}const d=$h('#hbD');if(!d)return;const own=[...m.own].sort((a,b)=>MON[b[0]].rar-MON[a[0]].rar||a[0]-b[0]);const NM={5:'전설',4:'영웅',3:'희귀',2:'고급',1:'일반'};let shown=0,hh='';
+ const dex=(m.team&&m.town&&m.town.length)?m.town:m.own,dexTot=dex.reduce((a,e)=>a+e[1],0);const dh=$h('#hbDh');if(dh){const tk=(C.tm&&C.me&&C.me.team)?(C.me.team==='A'?C.tm[0].k:C.tm[1].k):null;dh.textContent=m.team?('▌DEX ▸ 팀 도감 · '+dex.length+'종 / '+dexTot+'장 · 내 카드 '+m.tot+'장'):('▌DEX ▸ 내 도감 · '+m.own.length+'종 / '+m.tot+'장'+(tk!=null?' · 팀 도감 '+tk+'종':''));}const d=$h('#hbD');if(!d)return;const own=[...dex].sort((a,b)=>MON[b[0]].rar-MON[a[0]].rar||a[0]-b[0]);const NM={5:'전설',4:'영웅',3:'희귀',2:'고급',1:'일반'};let shown=0,hh='';
  for(let r=5;r>=1;r--){const g=own.filter(e=>MON[e[0]].rar===r);if(!g.length)continue;const cut=g.slice(0,Math.max(0,400-shown));shown+=cut.length;hh+='<div class=dgh>'+'★'.repeat(r)+' '+NM[r]+' · '+g.length+'종 / '+g.reduce((a,e)=>a+e[1],0)+'장</div>'+cut.map(([id,n])=>'<div class="cc r'+r+((C.hold&&C.hold[id])?' hbHold':'')+'" data-id='+id+'>'+monImg(id,'front')+'<i>×'+n+'</i></div>').join('')+(g.length>cut.length?'<div class=dgh>…외 '+(g.length-cut.length)+'종</div>':'');}
- d.innerHTML=own.length?hh:'<div style="grid-column:1/-1;opacity:.7">도감이 비어 있어요. 문제를 풀어 포켓몬을 획득하세요!</div>';}
+ d.innerHTML=own.length?hh:(m.team?'<div style="grid-column:1/-1;opacity:.7">팀 도감이 비어 있어요. 팀원이 문제를 풀면 여기에 쌓여요!</div>':'<div style="grid-column:1/-1;opacity:.7">도감이 비어 있어요. 문제를 풀어 포켓몬을 획득하세요!</div>');if(m.team){if(C._dexN!=null&&dex.length>C._dexN)dexBurst();C._dexN=dex.length;}}
 function paintTop(){const r=$h('#hbR');if(!r)return;const all=C.all||[];const list=all.length?all:(C.top||[]).map(p=>({id:'',n:p.n,s:p.s}));
  if(!list.length){r.textContent='집계 중…';return;}const mi=all.findIndex(x=>x.id===C.pid);const h=$h('#hbRh');if(h)h.innerHTML='▌RANK ▸ 실시간 순위'+(mi>=0?' · <b style="color:#ff6">내 순위 '+(mi+1)+'위 / '+all.length+'명</b>':'');
  const tmLine=(C.tm&&C.tm.length===2)?'<div style="margin:4px 0;padding:5px 8px;border:1px solid #0a85;border-radius:8px;font-size:14px;text-align:center">🔴 A팀 <b>'+C.tm[0].k+'</b>종 · <b>'+C.tm[0].s+'</b>점'+(C.me&&C.me.team==='A'?' ◀ 우리 팀':'')+' &nbsp;|&nbsp; 🔵 B팀 <b>'+C.tm[1].k+'</b>종 · <b>'+C.tm[1].s+'</b>점'+(C.me&&C.me.team==='B'?' ◀ 우리 팀':'')+'</div>':'';
